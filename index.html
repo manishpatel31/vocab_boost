@@ -104,6 +104,7 @@
   .fb-sentence{ background:#FBF1DD; color:#7A5A16; font-style:italic; }
   .fb-trick{ background:#EEE6F2; color:#5B3670; }
   .fb-origin{ background:#E7ECEF; color:#33495A; }
+  .fb-history{ background:#F5DED0; color:#8A3B1E; }
   .fb-row2{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
 
   .conf-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:12px; padding-top:10px; border-top:1px dashed var(--rule); }
@@ -149,8 +150,10 @@
   .loading-overlay{ position:fixed; inset:0; background:var(--paper); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px; z-index:100; font-family:'Fraunces',serif; font-size:18px; color:var(--ink-soft); }
   .loading-overlay.hidden{ display:none; }
 
-  .authbar{ display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:8px 14px; background:var(--ink); color:var(--paper); font-size:13px; }
+  .authbar{ display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:8px 14px; background:var(--ink); color:var(--paper); font-size:13px; flex-wrap:wrap; }
   .authbar .who{ display:flex; align-items:center; gap:8px; margin-right:auto; }
+  .offline-badge{ background:var(--maroon); color:#fff; font-size:11px; padding:3px 10px; border-radius:20px; font-weight:600; }
+  .notif-count{ position:absolute; top:-6px; right:-6px; background:var(--maroon); color:#fff; font-size:10px; font-weight:700; border-radius:20px; padding:1px 5px; line-height:1.3; }
   .admin-badge{ background:var(--mustard); color:var(--ink); font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; text-transform:lowercase; }
   .avatar{ width:22px; height:22px; border-radius:50%; }
 
@@ -170,6 +173,16 @@
   .pending-card{ background:var(--card); border:1px solid var(--rule); border-left:5px solid var(--mustard); border-radius:8px; padding:14px 16px; margin-bottom:10px; }
   .pending-meta{ font-size:12px; color:var(--ink-soft); margin-top:6px; }
 
+  .slide-overlay{ position:fixed; inset:0; background:var(--ink); z-index:200; display:none; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px; }
+  .slide-close{ position:absolute; top:18px; right:22px; background:none; border:none; color:var(--paper); font-size:24px; line-height:1; cursor:pointer; padding:6px; }
+  .slide-close:hover{ color:var(--mustard); }
+  .slide-body{ width:100%; max-width:640px; }
+  .slide-progress{ text-align:center; color:#B9AF95; font-size:13px; margin-bottom:14px; letter-spacing:.02em; }
+  .slide-card{ background:var(--card); color:var(--ink); border-radius:14px; padding:34px 32px; box-shadow:0 14px 44px rgba(0,0,0,.4); min-height:320px; cursor:pointer; max-height:72vh; overflow-y:auto; }
+  .slide-card .term{ font-size:32px; }
+  .slide-reveal-hint{ margin-top:34px; text-align:center; color:var(--ink-faint); font-size:15px; font-style:italic; }
+  .slide-nav{ display:flex; gap:14px; margin-top:22px; }
+
   .stage-item{ background:var(--card); border:1px solid var(--rule); border-radius:8px; padding:12px 14px; }
   .stage-item label{ display:flex; gap:10px; align-items:flex-start; cursor:pointer; }
   .stage-item input[type=checkbox]{ width:18px; height:18px; margin-top:3px; flex-shrink:0; }
@@ -184,6 +197,10 @@
     .conf-dot{ width:27px; height:27px; }
     header.top h1{ font-size:24px; }
     .stat-chip{ padding:6px 10px; }
+    .slide-card{ padding:24px 18px; }
+    .slide-card .term{ font-size:24px; }
+    .slide-nav{ width:100%; }
+    .slide-nav .btn{ flex:1; }
   }
 </style>
 </head>
@@ -192,6 +209,15 @@
 <div class="loading-overlay" id="loadingOverlay"><div>Opening your register…</div></div>
 <div class="modal-bg" id="modalBg"><div class="modal" id="modalBody"></div></div>
 <div class="toast" id="toast"></div>
+
+<div class="slide-overlay" id="slideOverlay" style="display:none;">
+  <button class="slide-close" id="slideClose" title="Exit full-screen view">✕</button>
+  <div class="slide-body" id="slideBody"></div>
+  <div class="slide-nav">
+    <button class="btn ghost" id="slidePrev">← Prev</button>
+    <button class="btn teal" id="slideNext">Next →</button>
+  </div>
+</div>
 
 <div class="gate-screen" id="setupScreen" style="display:none;">
   <div class="gate-card wide">
@@ -211,6 +237,8 @@
 <div id="appShell" style="display:none;">
   <div class="authbar">
     <div class="who" id="whoBox"></div>
+    <span class="offline-badge" id="onlineBadge" style="display:none;">Offline — showing cached data</span>
+    <button class="btn ghost sm" id="notifBtn" style="display:none; position:relative; color:var(--paper); border-color:var(--paper);">🔔<span class="notif-count" id="notifCount" style="display:none;"></span></button>
     <button class="btn ghost sm" id="installBtn" style="display:none; color:var(--paper); border-color:var(--paper);">Install app</button>
     <button class="btn ghost sm" id="signOutBtn" style="color:var(--paper); border-color:var(--paper);">Sign out</button>
   </div>
@@ -229,7 +257,10 @@
   <main class="main">
     <header class="top">
       <div>
-        <h1>CGL Vocabulary Register</h1>
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <h1 style="margin:0;">CGL Vocabulary Register</h1>
+          <button class="btn ghost sm" id="presentBtn" title="Open full-screen slide view">⛶ Present</button>
+        </div>
         <div class="sub">Build your word bank with any AI, then drill it here.</div>
       </div>
       <div class="stat-strip" id="statStrip"></div>
@@ -313,7 +344,12 @@
     <section class="view" id="view-review">
       <div id="reviewAdmin" style="display:none;">
         <h2>Pending submissions</h2>
-        <p class="help">Approve to add a word to the shared library, or reject to discard it.</p>
+        <p class="help">Approve to add a word to the shared library, or reject to discard it. The submitter gets notified either way.</p>
+        <div class="row-actions" id="bulkReviewBar" style="display:none;">
+          <label style="display:flex; align-items:center; gap:6px; font-size:13px; margin:0;"><input type="checkbox" id="bulkSelectAll"> Select all</label>
+          <button class="btn teal sm" id="bulkApproveBtn">Approve selected</button>
+          <button class="btn maroon sm" id="bulkRejectBtn">Reject selected</button>
+        </div>
         <div id="reviewList" class="grid"></div>
       </div>
       <div id="reviewSelf" style="display:none;">
@@ -327,6 +363,14 @@
       <div class="practice-wrap" id="practiceWrap">
         <p class="help" style="text-align:left;">Practice uses whatever the Library filters are currently set to. Set a tag/type/confidence filter in Library first for a focused drill, then come back here.</p>
         <div class="row-actions" style="justify-content:center; margin-bottom:16px;">
+          <select id="practiceSortBy" style="max-width:200px;">
+            <option value="shuffle">Shuffled</option>
+            <option value="lowconf">Lowest confidence first</option>
+            <option value="highconf">Highest confidence first</option>
+            <option value="new">Newest first</option>
+            <option value="old">Oldest first</option>
+            <option value="az">A → Z</option>
+          </select>
           <button class="btn" id="startPracticeBtn">Start practice session</button>
           <button class="btn ghost" id="shufflePracticeBtn" style="display:none;">Shuffle</button>
         </div>
@@ -435,14 +479,28 @@
   firebase.initializeApp(firebaseConfig);
   var auth = firebase.auth();
   var db = firebase.firestore();
+  try{
+    db.enablePersistence({synchronizeTabs:true}).catch(function(err){
+      // failed-precondition: persistence already enabled in another tab, safe to ignore.
+      // unimplemented: this browser doesn't support offline persistence, app still works online.
+    });
+  }catch(e){}
+
+  function updateOnlineBadge(){
+    var badge = document.getElementById('onlineBadge');
+    if(badge) badge.style.display = navigator.onLine ? 'none' : 'inline-flex';
+  }
+  window.addEventListener('online', updateOnlineBadge);
+  window.addEventListener('offline', updateOnlineBadge);
 
   var currentUser = null;
   var isAdminUser = false;
   var words = [];
   var progressMap = {};
   var submissions = [];
+  var notifications = [];
   var pendingReview = [];
-  var unsubWords = null, unsubProgress = null, unsubSubs = null;
+  var unsubWords = null, unsubProgress = null, unsubSubs = null, unsubNotif = null;
 
   var toastTimer = null;
   function showToast(msg){
@@ -491,6 +549,7 @@
       document.getElementById('appShell').style.display = 'none';
       document.getElementById('signedOutScreen').style.display = 'flex';
     }
+    updateOnlineBadge();
     document.getElementById('loadingOverlay').classList.add('hidden');
   });
 
@@ -534,14 +593,58 @@
       submissions.sort(function(a,b){ return tsMillis(b.createdAt) - tsMillis(a.createdAt); });
       renderReview();
     }, function(err){ showToast('Could not load submissions: ' + err.message); });
+
+    unsubNotif = db.collection('users').doc(currentUser.uid).collection('notifications').onSnapshot(function(snap){
+      notifications = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+      notifications.sort(function(a,b){ return tsMillis(b.createdAt) - tsMillis(a.createdAt); });
+      renderNotifBell();
+    }, function(err){ /* notifications are a convenience feature, fail silently */ });
   }
   function detachListeners(){
     if(unsubWords) unsubWords();
     if(unsubProgress) unsubProgress();
     if(unsubSubs) unsubSubs();
-    unsubWords = unsubProgress = unsubSubs = null;
-    words = []; progressMap = {}; submissions = [];
+    if(unsubNotif) unsubNotif();
+    unsubWords = unsubProgress = unsubSubs = unsubNotif = null;
+    words = []; progressMap = {}; submissions = []; notifications = [];
   }
+
+  // ---------------- notifications ----------------
+  function renderNotifBell(){
+    var btn = document.getElementById('notifBtn');
+    var countEl = document.getElementById('notifCount');
+    var unread = notifications.filter(function(n){ return !n.read; }).length;
+    btn.style.display = 'inline-flex';
+    if(unread > 0){ countEl.style.display = 'inline-block'; countEl.textContent = unread > 9 ? '9+' : String(unread); }
+    else { countEl.style.display = 'none'; }
+  }
+  document.getElementById('notifBtn').addEventListener('click', function(){
+    modalBodyRef().innerHTML = '<h3>Notifications</h3>' +
+      (notifications.length === 0 ? '<p class="help">Nothing yet — you\'ll see updates here when the admin reviews something you submitted.</p>' :
+        notifications.map(function(n){
+          var approved = n.status === 'approved';
+          return '<div class="pending-card" style="border-left-color:'+(approved?'var(--teal)':'var(--maroon)')+';">' +
+            '<strong>'+escapeHtml(n.term||'')+'</strong>' +
+            '<div class="pending-meta">'+(approved ? 'Approved and added to the library.' : 'Not approved by the admin.')+'</div>' +
+          '</div>';
+        }).join('')
+      ) +
+      '<div class="modal-actions"><button class="btn ghost" id="closeNotif">Close</button></div>';
+    modalBgRef().classList.add('open');
+    document.getElementById('closeNotif').addEventListener('click', function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML=''; });
+    markAllNotifsRead();
+  });
+  async function markAllNotifsRead(){
+    var unread = notifications.filter(function(n){ return !n.read; });
+    if(unread.length === 0) return;
+    try{
+      var batch = db.batch();
+      unread.forEach(function(n){ batch.update(db.collection('users').doc(currentUser.uid).collection('notifications').doc(n.id), {read:true}); });
+      await batch.commit();
+    }catch(e){ /* non-critical */ }
+  }
+  function modalBgRef(){ return document.getElementById('modalBg'); }
+  function modalBodyRef(){ return document.getElementById('modalBody'); }
 
   function viewEntries(){
     return words.map(function(w){
@@ -583,6 +686,7 @@
       antonyms: asArray(raw.antonyms),
       ssc_sentence: raw.ssc_sentence ? String(raw.ssc_sentence).trim() : '',
       mnemonic: raw.mnemonic ? String(raw.mnemonic).trim() : '',
+      ssc_history: raw.ssc_history ? String(raw.ssc_history).trim() : '',
       origin: raw.origin ? String(raw.origin).trim() : '-'
     };
   }
@@ -592,7 +696,7 @@
       term: norm.term, type: norm.type, part_of_speech: norm.part_of_speech,
       english_meaning: norm.english_meaning, hindi_meaning: norm.hindi_meaning,
       synonyms: norm.synonyms, antonyms: norm.antonyms, ssc_sentence: norm.ssc_sentence,
-      mnemonic: norm.mnemonic, origin: norm.origin,
+      mnemonic: norm.mnemonic, ssc_history: norm.ssc_history || '', origin: norm.origin,
       tags: tag ? [tag] : (norm.tags || []),
       authorUid: currentUser.uid,
       authorName: currentUser.displayName || currentUser.email,
@@ -630,6 +734,7 @@ listBlock,
 '  "antonyms": array of strings (2-5 antonyms; empty array if none apply),',
 '  "ssc_sentence": string (one example sentence in the style of an SSC exam question, using the term),',
 '  "mnemonic": string (a short trick or mnemonic to remember the meaning),',
+'  "ssc_history": string (how frequently and in what way this term tends to appear in SSC exams - e.g. common in Cloze Test, Error Spotting, One Word Substitution, or Synonym-Antonym sections; roughly how often such terms come up; how a typical question uses it. Describe the general pattern honestly - do not invent specific exam dates, years, or fake direct quotations from past papers. If this is not a well-documented exam pattern, say so plainly instead of guessing.),',
 '  "origin": string (etymology or origin, especially for idioms/phrases; use "-" if not relevant)',
 '}',
 '',
@@ -882,6 +987,7 @@ listBlock,
       synAnto +
       fieldBox('fb-sentence','ssc-style sentence', e.ssc_sentence) +
       fieldBox('fb-trick','trick / mnemonic', e.mnemonic) +
+      fieldBox('fb-history','ssc exam history', e.ssc_history) +
       (e.type==='idiom' ? fieldBox('fb-origin','origin', e.origin) : '') +
       (e.authorName ? '<div class="meta-line">Added by '+escapeHtml(e.authorName)+'</div>' : '') +
       '<div class="conf-row"><span class="conf-label">'+confLabel(e.confidence)+'</span>'+confDotsHtml(e.id, e.confidence)+'</div>' +
@@ -918,7 +1024,7 @@ listBlock,
   modalBg.addEventListener('click', function(ev){ if(ev.target === modalBg) closeModal(); });
 
   function entryFormHtml(e){
-    e = e || {term:'',type:'word',part_of_speech:'',english_meaning:'',hindi_meaning:'',synonyms:[],antonyms:[],ssc_sentence:'',mnemonic:'',origin:'',tags:[]};
+    e = e || {term:'',type:'word',part_of_speech:'',english_meaning:'',hindi_meaning:'',synonyms:[],antonyms:[],ssc_sentence:'',mnemonic:'',ssc_history:'',origin:'',tags:[]};
     return '' +
     '<div class="field"><label class="field-label">Term</label><input type="text" id="f_term" value="'+escapeAttr(e.term)+'"></div>' +
     '<div class="field-2col">' +
@@ -935,6 +1041,7 @@ listBlock,
     '</div>' +
     '<div class="field"><label class="field-label">SSC-style sentence</label><textarea id="f_sent" style="min-height:55px;">'+escapeHtml(e.ssc_sentence||'')+'</textarea></div>' +
     '<div class="field"><label class="field-label">Trick / mnemonic</label><textarea id="f_mne" style="min-height:55px;">'+escapeHtml(e.mnemonic||'')+'</textarea></div>' +
+    '<div class="field"><label class="field-label">SSC exam history / importance</label><textarea id="f_hist" style="min-height:55px;">'+escapeHtml(e.ssc_history||'')+'</textarea></div>' +
     '<div class="field"><label class="field-label">Origin (for idioms)</label><input type="text" id="f_ori" value="'+escapeAttr(e.origin||'')+'"></div>' +
     '<div class="field"><label class="field-label">Tags (comma separated)</label><input type="text" id="f_tags" value="'+escapeAttr((e.tags||[]).join(', '))+'"></div>';
   }
@@ -950,6 +1057,7 @@ listBlock,
       antonyms: asArray(document.getElementById('f_ant').value),
       ssc_sentence: document.getElementById('f_sent').value.trim(),
       mnemonic: document.getElementById('f_mne').value.trim(),
+      ssc_history: document.getElementById('f_hist').value.trim(),
       origin: document.getElementById('f_ori').value.trim() || '-',
       tags: asArray(document.getElementById('f_tags').value)
     };
@@ -1003,11 +1111,21 @@ listBlock,
   }
 
   // ---------------- review tab (submissions) ----------------
+  function chunkArr(arr, size){
+    var out = [];
+    for(var i = 0; i < arr.length; i += size) out.push(arr.slice(i, i+size));
+    return out;
+  }
+
   function renderReview(){
     document.getElementById('reviewAdmin').style.display = isAdminUser ? 'block' : 'none';
     document.getElementById('reviewSelf').style.display = isAdminUser ? 'none' : 'block';
     if(isAdminUser){
+      var bar = document.getElementById('bulkReviewBar');
       var list = document.getElementById('reviewList');
+      bar.style.display = submissions.length ? 'flex' : 'none';
+      var selectAll = document.getElementById('bulkSelectAll');
+      if(selectAll) selectAll.checked = false;
       if(submissions.length === 0){ list.innerHTML = emptyStateHtml('Nothing pending', 'Submissions from other signed-in users will show up here.'); return; }
       list.innerHTML = submissions.map(pendingCardHtml).join('');
       list.querySelectorAll('[data-approve]').forEach(function(b){ b.addEventListener('click', function(){ approveSubmission(b.dataset.approve); }); });
@@ -1024,16 +1142,51 @@ listBlock,
     }
   }
 
+  document.getElementById('bulkSelectAll').addEventListener('change', function(){
+    var checked = document.getElementById('bulkSelectAll').checked;
+    document.querySelectorAll('.bulk-check').forEach(function(cb){ cb.checked = checked; });
+  });
+  document.getElementById('bulkApproveBtn').addEventListener('click', function(){
+    var ids = Array.from(document.querySelectorAll('.bulk-check:checked')).map(function(cb){ return cb.dataset.bulkId; });
+    if(ids.length === 0){ showToast('Select at least one.'); return; }
+    bulkApprove(ids);
+  });
+  document.getElementById('bulkRejectBtn').addEventListener('click', function(){
+    var ids = Array.from(document.querySelectorAll('.bulk-check:checked')).map(function(cb){ return cb.dataset.bulkId; });
+    if(ids.length === 0){ showToast('Select at least one.'); return; }
+    bulkReject(ids);
+  });
+
   function pendingCardHtml(s){
     return '<div class="pending-card">' +
-      '<div class="vcard-top"><div><div class="term">'+escapeHtml(s.term)+'</div><div class="pos">'+escapeHtml(s.part_of_speech||'-')+'</div></div><span class="badge '+s.type+'">'+TYPE_LABELS[s.type]+'</span></div>' +
-      '<div class="meaning-en">'+escapeHtml(s.english_meaning||'')+'</div>' +
-      (s.hindi_meaning ? '<div class="field-box fb-hindi"><div class="fb-label">hindi</div><div>'+escapeHtml(s.hindi_meaning)+'</div></div>' : '') +
-      '<div class="pending-meta">Submitted by '+escapeHtml(s.authorName||s.authorEmail||'someone')+(s.tags&&s.tags.length?' · '+escapeHtml(s.tags.join(', ')):'')+'</div>' +
+      '<label style="display:flex; gap:8px; align-items:flex-start; cursor:pointer;">' +
+        '<input type="checkbox" class="bulk-check" data-bulk-id="'+s.id+'" style="margin-top:4px; width:18px; height:18px; flex-shrink:0;">' +
+        '<div style="flex:1;">' +
+          '<div class="vcard-top"><div><div class="term">'+escapeHtml(s.term)+'</div><div class="pos">'+escapeHtml(s.part_of_speech||'-')+'</div></div><span class="badge '+s.type+'">'+TYPE_LABELS[s.type]+'</span></div>' +
+          '<div class="meaning-en">'+escapeHtml(s.english_meaning||'')+'</div>' +
+          (s.hindi_meaning ? '<div class="field-box fb-hindi"><div class="fb-label">hindi</div><div>'+escapeHtml(s.hindi_meaning)+'</div></div>' : '') +
+          '<div class="pending-meta">Submitted by '+escapeHtml(s.authorName||s.authorEmail||'someone')+(s.tags&&s.tags.length?' · '+escapeHtml(s.tags.join(', ')):'')+'</div>' +
+        '</div>' +
+      '</label>' +
       '<div class="row-actions" style="margin-top:10px;">' +
         '<button class="btn maroon sm" data-reject="'+s.id+'">Reject</button>' +
         '<button class="btn teal sm" data-approve="'+s.id+'">Approve</button>' +
       '</div></div>';
+  }
+
+  function notifyIfNotSelf(batch, s){
+    if(s.authorUid && s.authorUid !== currentUser.uid){
+      batch.set(db.collection('users').doc(s.authorUid).collection('notifications').doc(), {
+        term: s.term, status: 'approved', read: false, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+  }
+  function notifyRejectIfNotSelf(batch, s){
+    if(s.authorUid && s.authorUid !== currentUser.uid){
+      batch.set(db.collection('users').doc(s.authorUid).collection('notifications').doc(), {
+        term: s.term, status: 'rejected', read: false, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
   }
 
   async function approveSubmission(id){
@@ -1044,17 +1197,58 @@ listBlock,
       var batch = db.batch();
       batch.set(db.collection('words').doc(), data);
       batch.delete(db.collection('submissions').doc(id));
+      notifyIfNotSelf(batch, s);
       await batch.commit();
       showToast('Approved "'+s.term+'".');
     }catch(e){ showToast('Could not approve: ' + e.message); }
   }
   async function rejectSubmission(id){
-    try{ await db.collection('submissions').doc(id).delete(); showToast('Rejected.'); }
-    catch(e){ showToast('Could not reject: ' + e.message); }
+    var s = submissions.find(function(x){ return x.id === id; });
+    try{
+      var batch = db.batch();
+      batch.delete(db.collection('submissions').doc(id));
+      if(s) notifyRejectIfNotSelf(batch, s);
+      await batch.commit();
+      showToast('Rejected.');
+    }catch(e){ showToast('Could not reject: ' + e.message); }
   }
   async function withdrawSubmission(id){
     try{ await db.collection('submissions').doc(id).delete(); showToast('Withdrawn.'); }
     catch(e){ showToast('Could not withdraw: ' + e.message); }
+  }
+
+  async function bulkApprove(ids){
+    try{
+      for(var c = 0; c < chunkArr(ids, 100).length; c++){
+        var group = chunkArr(ids, 100)[c];
+        var batch = db.batch();
+        group.forEach(function(id){
+          var s = submissions.find(function(x){ return x.id === id; });
+          if(!s) return;
+          var data = Object.assign({}, s); delete data.id;
+          batch.set(db.collection('words').doc(), data);
+          batch.delete(db.collection('submissions').doc(id));
+          notifyIfNotSelf(batch, s);
+        });
+        await batch.commit();
+      }
+      showToast(ids.length + ' word' + (ids.length===1?'':'s') + ' approved.');
+    }catch(e){ showToast('Could not approve: ' + e.message); }
+  }
+  async function bulkReject(ids){
+    try{
+      for(var c = 0; c < chunkArr(ids, 100).length; c++){
+        var group = chunkArr(ids, 100)[c];
+        var batch = db.batch();
+        group.forEach(function(id){
+          var s = submissions.find(function(x){ return x.id === id; });
+          batch.delete(db.collection('submissions').doc(id));
+          if(s) notifyRejectIfNotSelf(batch, s);
+        });
+        await batch.commit();
+      }
+      showToast(ids.length + ' rejected.');
+    }catch(e){ showToast('Could not reject: ' + e.message); }
   }
 
   // ---------------- practice ----------------
@@ -1068,7 +1262,7 @@ listBlock,
       document.getElementById('shufflePracticeBtn').style.display = 'none';
       return;
     }
-    shuffle(practiceSet);
+    applyPracticeSort();
     practiceIdx = 0;
     document.getElementById('shufflePracticeBtn').style.display = 'inline-block';
     renderPracticeCard();
@@ -1076,6 +1270,15 @@ listBlock,
   document.getElementById('shufflePracticeBtn').addEventListener('click', function(){
     shuffle(practiceSet); practiceIdx = 0; renderPracticeCard();
   });
+  function applyPracticeSort(){
+    var mode = document.getElementById('practiceSortBy').value;
+    if(mode === 'shuffle') shuffle(practiceSet);
+    else if(mode === 'lowconf') practiceSet.sort(function(a,b){ return a.confidence - b.confidence; });
+    else if(mode === 'highconf') practiceSet.sort(function(a,b){ return b.confidence - a.confidence; });
+    else if(mode === 'new') practiceSet.sort(function(a,b){ return tsMillis(b.createdAt) - tsMillis(a.createdAt); });
+    else if(mode === 'old') practiceSet.sort(function(a,b){ return tsMillis(a.createdAt) - tsMillis(b.createdAt); });
+    else if(mode === 'az') practiceSet.sort(function(a,b){ return a.term.localeCompare(b.term); });
+  }
   function shuffle(arr){
     for(var i = arr.length - 1; i > 0; i--){
       var j = Math.floor(Math.random() * (i+1));
@@ -1102,6 +1305,7 @@ listBlock,
           '</div>' +
           fieldBox('fb-sentence','sentence', e.ssc_sentence) +
           fieldBox('fb-trick','trick', e.mnemonic) +
+          fieldBox('fb-history','ssc exam history', e.ssc_history) +
         '</div>' +
       '</div>' +
       '<div class="conf-row" style="border-top:none; justify-content:center;" id="practiceConfRow"></div>' +
@@ -1124,6 +1328,128 @@ listBlock,
         progressMap[entryId] = Object.assign({}, progressMap[entryId], {confidence: lvl});
         setProgress(entryId, {confidence: lvl});
         renderPracticeConfRow(entryId);
+      });
+    });
+  }
+
+  // ---------------- full-screen slide view ----------------
+  var slideDeck = [];
+  var slideIdx = 0;
+  var slideRevealAll = true;
+  var slideCurrentRevealed = true;
+
+  document.getElementById('presentBtn').addEventListener('click', function(){
+    var list = getFiltered();
+    if(list.length === 0){ showToast('No words match your current Library filters.'); return; }
+    modalBodyRef().innerHTML = '<h3>Full-screen view</h3>' +
+      '<p class="help">This will show '+list.length+' word'+(list.length===1?'':'s')+' matching your current Library filters, one per slide.</p>' +
+      '<div class="modal-actions" style="justify-content:flex-start; gap:10px; flex-wrap:wrap;">' +
+        '<button class="btn ghost" id="revealShow">Show meanings right away</button>' +
+        '<button class="btn teal" id="revealHide">Hide meanings first (flash-note style)</button>' +
+      '</div>';
+    modalBgRef().classList.add('open');
+    document.getElementById('revealShow').addEventListener('click', function(){
+      modalBgRef().classList.remove('open'); modalBodyRef().innerHTML='';
+      startSlideshow(list, true);
+    });
+    document.getElementById('revealHide').addEventListener('click', function(){
+      modalBgRef().classList.remove('open'); modalBodyRef().innerHTML='';
+      startSlideshow(list, false);
+    });
+  });
+
+  function startSlideshow(list, revealImmediately){
+    slideDeck = list.slice();
+    slideIdx = 0;
+    slideRevealAll = revealImmediately;
+    var overlay = document.getElementById('slideOverlay');
+    overlay.style.display = 'flex';
+    var reqFs = overlay.requestFullscreen || overlay.webkitRequestFullscreen;
+    if(reqFs){ reqFs.call(overlay).catch(function(){}); }
+    document.addEventListener('keydown', slideKeyHandler);
+    renderSlide();
+  }
+
+  function exitSlideshow(){
+    document.getElementById('slideOverlay').style.display = 'none';
+    document.removeEventListener('keydown', slideKeyHandler);
+    var exitFs = document.exitFullscreen || document.webkitExitFullscreen;
+    if(document.fullscreenElement || document.webkitFullscreenElement){
+      try{ exitFs.call(document).catch(function(){}); }catch(e){}
+    }
+  }
+
+  document.addEventListener('fullscreenchange', function(){
+    if(!document.fullscreenElement && document.getElementById('slideOverlay').style.display !== 'none'){
+      exitSlideshow();
+    }
+  });
+
+  function slideKeyHandler(ev){
+    if(ev.key === 'Escape'){ exitSlideshow(); }
+    else if(ev.key === 'ArrowRight' || ev.key === ' '){ ev.preventDefault(); document.getElementById('slideNext').click(); }
+    else if(ev.key === 'ArrowLeft'){ document.getElementById('slidePrev').click(); }
+  }
+
+  document.getElementById('slideClose').addEventListener('click', exitSlideshow);
+  document.getElementById('slidePrev').addEventListener('click', function(){
+    if(slideIdx > 0){ slideIdx--; renderSlide(); }
+  });
+  document.getElementById('slideNext').addEventListener('click', function(){
+    if(slideIdx < slideDeck.length - 1){ slideIdx++; renderSlide(); }
+    else { showToast('End of the set.'); exitSlideshow(); }
+  });
+
+  function renderSlide(){
+    var e = slideDeck[slideIdx];
+    slideCurrentRevealed = slideRevealAll;
+    paintSlide(e);
+  }
+
+  function paintSlide(e){
+    var synAnto = (e.synonyms&&e.synonyms.length) || (e.antonyms&&e.antonyms.length) ? (
+      '<div class="fb-row2">' +
+        fieldBox('fb-syn','synonyms', e.synonyms&&e.synonyms.length?e.synonyms.join(', '):'') +
+        fieldBox('fb-anto','antonyms', e.antonyms&&e.antonyms.length?e.antonyms.join(', '):'') +
+      '</div>'
+    ) : '';
+    var detailsHtml = '<div class="meaning-en" style="font-size:15.5px; margin-top:14px;">'+escapeHtml(e.english_meaning||'')+'</div>' +
+      fieldBox('fb-hindi','hindi', e.hindi_meaning) +
+      synAnto +
+      fieldBox('fb-sentence','ssc-style sentence', e.ssc_sentence) +
+      fieldBox('fb-trick','trick / mnemonic', e.mnemonic) +
+      fieldBox('fb-history','ssc exam history', e.ssc_history) +
+      (e.type==='idiom' ? fieldBox('fb-origin','origin', e.origin) : '');
+
+    var body = document.getElementById('slideBody');
+    body.innerHTML =
+      '<div class="slide-progress">'+(slideIdx+1)+' / '+slideDeck.length+'</div>' +
+      '<div class="slide-card" id="slideCard">' +
+        '<div class="vcard-top"><div><div class="term">'+escapeHtml(e.term)+'</div><div class="pos">'+escapeHtml(e.part_of_speech||'-')+'</div></div><span class="badge '+e.type+'">'+TYPE_LABELS[e.type]+'</span></div>' +
+        (e.tags && e.tags.length ? '<div class="tagrow">'+e.tags.map(function(t){return '<span class="chip">'+escapeHtml(t)+'</span>';}).join('')+'</div>' : '') +
+        (slideCurrentRevealed ? detailsHtml : '<div class="slide-reveal-hint">Tap anywhere to reveal the meaning</div>') +
+      '</div>' +
+      '<div class="conf-row" style="justify-content:center; border-top:none; margin-top:20px;" id="slideConfRow"></div>';
+
+    document.getElementById('slideCard').addEventListener('click', function(){
+      if(!slideCurrentRevealed){ slideCurrentRevealed = true; paintSlide(e); }
+    });
+    renderSlideConfRow(e.id);
+    document.getElementById('slidePrev').disabled = slideIdx === 0;
+  }
+
+  function renderSlideConfRow(entryId){
+    var row = document.getElementById('slideConfRow');
+    if(!row) return;
+    var level = (progressMap[entryId] && progressMap[entryId].confidence) || 0;
+    row.innerHTML = '<span class="conf-label" style="color:var(--paper);">'+confLabel(level)+'</span>'+confDotsHtml(entryId, level);
+    row.querySelectorAll('.conf-dot').forEach(function(btn){
+      btn.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        var lvl = +btn.dataset.level;
+        progressMap[entryId] = Object.assign({}, progressMap[entryId], {confidence: lvl});
+        setProgress(entryId, {confidence: lvl});
+        renderSlideConfRow(entryId);
       });
     });
   }
