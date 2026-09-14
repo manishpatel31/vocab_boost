@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>शब्दRegister — CGL Vocab Register</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EDE7D8; --paper-deep:#E4DCC8; --rule:#CFC3A3; --card:#FBF8F0;
+    --ink:#242019; --ink-soft:#6B6255; --ink-faint:#948A78;
+    --maroon:#8C2F39; --maroon-deep:#6E232B; --teal:#2F6F63; --teal-deep:#20544A;
+    --mustard:#C99A2E; --mustard-deep:#A87E1F; --shadow: 2px 3px 0 rgba(36,32,25,0.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    background-image:repeating-linear-gradient(var(--paper) 0px, var(--paper) 27px, var(--rule) 28px);
+    background-attachment:local; color:var(--ink); font-family:'Work Sans', sans-serif; min-height:100vh;
+  }
+  ::selection{ background:var(--mustard); color:var(--ink); }
+  h1,h2,h3,.headword{ font-family:'Fraunces', serif; }
+  button{ font-family:inherit; cursor:pointer; }
+  input,select,textarea{ font-family:inherit; }
+
+  .shell{ display:flex; min-height:calc(100vh - 44px); }
+  .spine{ width:64px; flex-shrink:0; background:var(--ink); display:flex; flex-direction:column; align-items:center; padding:18px 0; position:sticky; top:44px; height:calc(100vh - 44px); gap:4px; }
+  .spine .brand{ color:var(--mustard); font-family:'Fraunces', serif; font-size:22px; font-weight:600; margin-bottom:22px; writing-mode:vertical-rl; letter-spacing:0.02em; }
+  .tab{ writing-mode:vertical-rl; text-orientation:mixed; background:transparent; border:none; color:#C9C1AE; padding:14px 10px; font-size:13px; letter-spacing:0.04em; border-radius:0 8px 8px 0; transition:background .15s ease, color .15s ease; width:100%; }
+  .tab:hover{ color:#fff; background:rgba(255,255,255,0.06); }
+  .tab.active{ background:var(--paper); color:var(--ink); font-weight:600; }
+
+  .main{ flex:1; min-width:0; padding:28px 34px 60px; }
+  header.top{ display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:14px; border-bottom:2px solid var(--ink); padding-bottom:14px; margin-bottom:22px; }
+  header.top h1{ font-size:30px; margin:0; font-weight:600; }
+  header.top .sub{ color:var(--ink-soft); font-size:13px; margin-top:4px; }
+  .stat-strip{ display:flex; gap:18px; }
+  .stat-chip{ background:var(--card); border:1px solid var(--rule); border-radius:6px; padding:8px 14px; text-align:center; box-shadow:var(--shadow); }
+  .stat-chip .num{ font-family:'Fraunces',serif; font-size:20px; font-weight:600; display:block; }
+  .stat-chip .lbl{ font-size:11px; color:var(--ink-soft); text-transform:lowercase; }
+
+  section.view{ display:none; }
+  section.view.active{ display:block; }
+
+  .btn{ background:var(--ink); color:var(--paper); border:none; padding:10px 18px; border-radius:5px; font-size:14px; font-weight:600; box-shadow:var(--shadow); }
+  .btn:hover{ background:#3a3428; }
+  .btn.teal{ background:var(--teal); } .btn.teal:hover{ background:var(--teal-deep); }
+  .btn.maroon{ background:var(--maroon); } .btn.maroon:hover{ background:var(--maroon-deep); }
+  .btn.mustard{ background:var(--mustard); color:var(--ink);} .btn.mustard:hover{ background:var(--mustard-deep); }
+  .btn.ghost{ background:transparent; color:var(--ink); border:1.5px solid var(--ink); box-shadow:none; }
+  .btn.ghost:hover{ background:var(--ink); color:var(--paper); }
+  .btn.sm{ padding:6px 12px; font-size:12.5px; }
+  .btn:disabled{ opacity:.45; cursor:not-allowed; }
+
+  textarea, input[type=text], input[type=search], select{ width:100%; background:var(--card); border:1.5px solid var(--rule); border-radius:6px; padding:10px 12px; font-size:14px; color:var(--ink); }
+  textarea:focus, input:focus, select:focus{ outline:2px solid var(--mustard); outline-offset:1px; }
+  textarea{ min-height:130px; resize:vertical; line-height:1.5; }
+  label.field-label{ font-size:12.5px; font-weight:600; color:var(--ink-soft); display:block; margin-bottom:6px; text-transform:lowercase; letter-spacing:.02em; }
+
+  .panel{ background:var(--card); border:1px solid var(--rule); border-radius:8px; padding:22px; box-shadow:var(--shadow); margin-bottom:20px; max-width:760px; }
+  .panel h2{ margin-top:0; font-size:20px; }
+  .panel p.help{ color:var(--ink-soft); font-size:13.5px; line-height:1.55; }
+  .step-badge{ display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; background:var(--maroon); color:#fff; font-size:12px; font-weight:700; margin-right:8px; }
+  .row-actions{ display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; align-items:center; }
+  .copy-note{ font-size:12.5px; color:var(--teal-deep); font-weight:600; }
+  pre.prompt-preview{ background:#2A241C; color:#EFE7D3; padding:16px; border-radius:6px; font-size:12.5px; line-height:1.6; overflow:auto; max-height:340px; white-space:pre-wrap; }
+
+  .toolbar{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px; align-items:center; }
+  .toolbar input[type=search]{ max-width:230px; }
+  .toolbar select{ width:auto; max-width:160px; }
+  .toolbar .spacer{ flex:1; }
+
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:14px; }
+  .empty-state{ border:1.5px dashed var(--rule); border-radius:8px; padding:40px 20px; text-align:center; color:var(--ink-soft); max-width:520px; }
+  .empty-state h3{ margin-bottom:6px; color:var(--ink); }
+
+  .vcard{ background:var(--card); border:1px solid var(--rule); border-radius:8px; box-shadow:var(--shadow); padding:16px 16px 14px; position:relative; }
+  .vcard.memorized{ border-left:5px solid var(--teal); }
+  .vcard:not(.memorized){ border-left:5px solid var(--maroon); }
+  .vcard-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+  .vcard .term{ font-size:19px; font-weight:600; line-height:1.2; }
+  .vcard .pos{ color:var(--ink-faint); font-size:12px; font-style:italic; margin-top:2px; }
+  .badge{ font-size:10.5px; font-weight:700; letter-spacing:.03em; text-transform:lowercase; padding:3px 8px; border-radius:20px; white-space:nowrap; flex-shrink:0; }
+  .badge.word{ background:#E4E9E0; color:#3E5C34; }
+  .badge.idiom{ background:#EFE0D6; color:#8C4A24; }
+  .badge.one_word_substitution{ background:#DDE6EC; color:#2A5878; }
+  .badge.phrasal_verb{ background:#EAE0EF; color:#6B3A82; }
+  .badge.other{ background:#EAE5D8; color:var(--ink-soft); }
+
+  .tagrow{ display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
+  .chip{ font-size:11px; background:var(--paper-deep); color:var(--ink-soft); padding:3px 8px; border-radius:20px; }
+
+  .vcard .meaning-en{ margin-top:10px; font-size:13.5px; line-height:1.45; }
+  .vcard .meaning-hi{ font-size:13.5px; color:var(--ink-soft); margin-top:2px; }
+  .meta-line{ font-size:11px; color:var(--ink-faint); margin-top:6px; }
+
+  .vcard-controls{ display:flex; justify-content:space-between; align-items:center; margin-top:12px; }
+  .iconbtn{ background:none; border:none; font-size:16px; padding:4px 6px; color:var(--ink-soft); border-radius:4px; }
+  .iconbtn:hover{ background:var(--paper-deep); color:var(--ink); }
+  .iconbtn.on{ color:var(--mustard-deep); }
+
+  .detail{ display:none; margin-top:12px; border-top:1px dashed var(--rule); padding-top:12px; font-size:13px; line-height:1.6; }
+  .detail.open{ display:block; }
+  .detail dt{ font-weight:700; color:var(--ink-soft); font-size:11px; text-transform:lowercase; margin-top:8px; }
+  .detail dt:first-child{ margin-top:0; }
+  .detail dd{ margin:2px 0 0; }
+  .detail .syn-anto{ display:flex; gap:18px; flex-wrap:wrap; }
+
+  .practice-wrap{ max-width:480px; margin:0 auto; text-align:center; }
+  .flashcard{ background:var(--card); border:1px solid var(--rule); border-radius:12px; box-shadow: 4px 5px 0 rgba(36,32,25,0.10); min-height:280px; padding:30px 24px; display:flex; flex-direction:column; justify-content:center; align-items:center; cursor:pointer; gap:10px; }
+  .flashcard .fc-badge{ margin-bottom:6px; }
+  .flashcard .fc-term{ font-size:30px; font-weight:600; }
+  .flashcard .fc-hint{ color:var(--ink-faint); font-size:12px; margin-top:14px; }
+  .flashcard .fc-back{ display:none; text-align:left; width:100%; font-size:13.5px; line-height:1.6; }
+  .flashcard.flipped .fc-front{ display:none; }
+  .flashcard.flipped .fc-back{ display:block; }
+  .progress-line{ color:var(--ink-soft); font-size:13px; margin:14px 0 10px; }
+  .practice-actions{ display:flex; gap:10px; justify-content:center; margin-top:16px; }
+
+  .bar-row{ display:flex; align-items:center; gap:10px; margin-bottom:10px; font-size:13px; }
+  .bar-row .lbl{ width:150px; flex-shrink:0; color:var(--ink-soft); }
+  .bar-track{ flex:1; background:var(--paper-deep); border-radius:20px; height:14px; overflow:hidden; }
+  .bar-fill{ height:100%; background:var(--teal); border-radius:20px; }
+  .bar-row .count{ width:36px; text-align:right; font-weight:600; }
+
+  .modal-bg{ position:fixed; inset:0; background:rgba(36,32,25,0.45); display:none; align-items:center; justify-content:center; padding:20px; z-index:50; }
+  .modal-bg.open{ display:flex; }
+  .modal{ background:var(--card); border-radius:10px; padding:24px; max-width:520px; width:100%; max-height:86vh; overflow:auto; box-shadow:0 10px 40px rgba(0,0,0,0.25); }
+  .modal h3{ margin-top:0; }
+  .field{ margin-bottom:12px; }
+  .field-2col{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .modal-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:18px; }
+
+  .toast{ position:fixed; bottom:22px; left:50%; transform:translateX(-50%); background:var(--ink); color:var(--paper); padding:10px 18px; border-radius:6px; font-size:13.5px; opacity:0; pointer-events:none; transition:opacity .25s ease; z-index:80; box-shadow:0 4px 14px rgba(0,0,0,0.25); max-width:80vw; text-align:center; }
+  .toast.show{ opacity:1; }
+
+  .loading-overlay{ position:fixed; inset:0; background:var(--paper); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px; z-index:100; font-family:'Fraunces',serif; font-size:18px; color:var(--ink-soft); }
+  .loading-overlay.hidden{ display:none; }
+
+  .authbar{ display:flex; align-items:center; justify-content:flex-end; gap:14px; padding:9px 18px; background:var(--ink); color:var(--paper); font-size:13px; height:44px; }
+  .authbar .who{ display:flex; align-items:center; gap:8px; }
+  .admin-badge{ background:var(--mustard); color:var(--ink); font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; text-transform:lowercase; }
+  .avatar{ width:24px; height:24px; border-radius:50%; }
+
+  .gate-screen{ min-height:100vh; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:16px; text-align:center; padding:20px; }
+  .gate-card{ background:var(--card); border:1px solid var(--rule); border-radius:10px; padding:36px 34px; box-shadow:var(--shadow); max-width:400px; }
+  .gate-card.wide{ max-width:600px; text-align:left; }
+  .gate-card code{ background:var(--paper-deep); padding:1px 6px; border-radius:4px; font-size:12.5px; }
+  .google-btn{ display:inline-flex; align-items:center; gap:10px; background:#fff; color:#3c4043; border:1px solid #dadce0; padding:10px 22px; border-radius:6px; font-weight:600; font-size:14px; box-shadow:var(--shadow); }
+
+  .pending-card{ background:var(--card); border:1px solid var(--rule); border-left:5px solid var(--mustard); border-radius:8px; padding:14px 16px; margin-bottom:10px; }
+  .pending-meta{ font-size:12px; color:var(--ink-soft); margin-top:6px; }
+
+  @media (max-width: 760px){
+    .shell{ flex-direction:column; }
+    .spine{ width:100%; height:auto; position:sticky; top:44px; flex-direction:row; overflow-x:auto; padding:10px 8px; gap:2px; }
+    .spine .brand{ display:none; }
+    .tab{ writing-mode:horizontal-tb; white-space:nowrap; border-radius:8px; padding:8px 12px; }
+    .main{ padding:18px 16px 50px; }
+    .field-2col{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay"><div>Opening your register…</div></div>
+<div class="modal-bg" id="modalBg"><div class="modal" id="modalBody"></div></div>
+<div class="toast" id="toast"></div>
+
+<div class="gate-screen" id="setupScreen" style="display:none;">
+  <div class="gate-card wide">
+    <h2 style="margin-top:0;">One-time setup needed</h2>
+    <p class="help">This copy isn't connected to a Firebase project yet. Open this file's HTML, find the <code>firebaseConfig</code> and <code>ADMIN_EMAILS</code> constants near the top of the <code>&lt;script&gt;</code> tag, and fill in your own project's details.</p>
+  </div>
+</div>
+
+<div class="gate-screen" id="signedOutScreen" style="display:none;">
+  <div class="gate-card">
+    <h2 style="margin-top:0;">CGL Vocabulary Register</h2>
+    <p class="help">Sign in to add words, review submissions, and practice — synced across all your devices.</p>
+    <button class="google-btn" id="signInBtn">Sign in with Google</button>
+  </div>
+</div>
+
+<div id="appShell" style="display:none;">
+  <div class="authbar">
+    <div class="who" id="whoBox"></div>
+    <button class="btn ghost sm" id="signOutBtn" style="color:var(--paper); border-color:var(--paper);">Sign out</button>
+  </div>
+
+  <div class="shell">
+    <nav class="spine">
+      <div class="brand">शब्दRegister</div>
+      <button class="tab active" data-tab="library">Library</button>
+      <button class="tab" data-tab="add">Add words</button>
+      <button class="tab" data-tab="paste">Paste result</button>
+      <button class="tab" data-tab="review">Review</button>
+      <button class="tab" data-tab="practice">Practice</button>
+      <button class="tab" data-tab="stats">Stats</button>
+      <button class="tab" data-tab="backup">Backup</button>
+    </nav>
+
+    <main class="main">
+      <header class="top">
+        <div>
+          <h1>CGL Vocabulary Register</h1>
+          <div class="sub">Build your word bank with any AI, then drill it here.</div>
+        </div>
+        <div class="stat-strip" id="statStrip"></div>
+      </header>
+
+      <section class="view active" id="view-library">
+        <div class="toolbar">
+          <input type="search" id="searchBox" placeholder="Search term…">
+          <select id="filterType">
+            <option value="all">All types</option>
+            <option value="word">Word</option>
+            <option value="idiom">Idiom</option>
+            <option value="one_word_substitution">One-word sub</option>
+            <option value="phrasal_verb">Phrasal verb</option>
+            <option value="other">Other</option>
+          </select>
+          <select id="filterTag"><option value="all">All tags</option></select>
+          <select id="filterStatus">
+            <option value="all">All status</option>
+            <option value="memorized">Memorized</option>
+            <option value="not">Not memorized</option>
+          </select>
+          <select id="sortBy">
+            <option value="new">Newest first</option>
+            <option value="old">Oldest first</option>
+            <option value="az">A → Z</option>
+          </select>
+          <div class="spacer"></div>
+          <button class="btn mustard sm" id="addManualBtn">+ Add one manually</button>
+        </div>
+        <div id="libraryGrid" class="grid"></div>
+      </section>
+
+      <section class="view" id="view-add">
+        <div class="panel">
+          <h2><span class="step-badge">1</span>Paste your word list</h2>
+          <p class="help" id="addPanelHelp">Paste the words you want to add, generate the prompt, run it through any AI, then bring the reply back here.</p>
+          <label class="field-label">Words / idioms / phrases</label>
+          <textarea id="wordListInput" placeholder="e.g.&#10;laconic&#10;bury the hatchet&#10;call off&#10;one who cannot be corrected"></textarea>
+          <div style="margin-top:12px; max-width:260px;">
+            <label class="field-label">Tag this batch</label>
+            <input type="text" id="batchTagInput" placeholder="e.g. Mock 1">
+          </div>
+          <div class="row-actions"><button class="btn" id="generatePromptBtn">Generate prompt</button></div>
+        </div>
+
+        <div class="panel" id="promptPanel" style="display:none;">
+          <h2><span class="step-badge">2</span>Copy this into any AI chatbot</h2>
+          <p class="help">Paste this whole prompt into ChatGPT, Gemini, Claude — any AI chat — and send it. Then copy the AI's reply and bring it back to the "Paste result" tab.</p>
+          <pre class="prompt-preview" id="promptPreview"></pre>
+          <div class="row-actions">
+            <button class="btn teal" id="copyPromptBtn">Copy prompt</button>
+            <button class="btn ghost" id="goToPasteBtn">Go to "Paste result" →</button>
+            <span class="copy-note" id="copyNote" style="display:none;">Copied ✓</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-paste">
+        <div class="panel">
+          <h2><span class="step-badge">3</span>Paste the AI's response</h2>
+          <p class="help">Paste the reply you got back (the JSON). It's fine if it's wrapped in ```json fences — this handles that.</p>
+          <label class="field-label">Tag for this batch</label>
+          <input type="text" id="pasteTagInput" placeholder="e.g. Mock 1" style="max-width:260px; margin-bottom:12px;">
+          <label class="field-label">AI response</label>
+          <textarea id="responseInput" style="min-height:220px;" placeholder="Paste the AI's JSON reply here…"></textarea>
+          <div class="row-actions">
+            <button class="btn maroon" id="parseBtn">Submit</button>
+            <span id="parseStatus" style="font-size:13px;"></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-review">
+        <div id="reviewAdmin" style="display:none;">
+          <h2>Pending submissions</h2>
+          <p class="help">Approve to add a word to the shared library, or reject to discard it.</p>
+          <div id="reviewList" class="grid"></div>
+        </div>
+        <div id="reviewSelf" style="display:none;">
+          <h2>Your submissions</h2>
+          <p class="help">Words you've submitted, waiting for the admin's approval.</p>
+          <div id="mySubmissionsList"></div>
+        </div>
+      </section>
+
+      <section class="view" id="view-practice">
+        <div class="practice-wrap" id="practiceWrap">
+          <p class="help" style="text-align:left;">Practice uses whatever the Library filters are currently set to. Set a tag/type/status filter in Library first for a focused drill, then come back here.</p>
+          <div class="row-actions" style="justify-content:center; margin-bottom:16px;">
+            <button class="btn" id="startPracticeBtn">Start practice session</button>
+            <button class="btn ghost" id="shufflePracticeBtn" style="display:none;">Shuffle</button>
+          </div>
+          <div id="practiceArea"></div>
+        </div>
+      </section>
+
+      <section class="view" id="view-stats">
+        <div class="panel" style="max-width:560px;"><h2>By type</h2><div id="statsByType"></div></div>
+        <div class="panel" style="max-width:560px;"><h2>By tag</h2><div id="statsByTag"></div></div>
+        <div class="panel" style="max-width:560px;"><h2>Overall recall</h2><div id="statsOverall"></div></div>
+      </section>
+
+      <section class="view" id="view-backup">
+        <div class="panel">
+          <h2>Export</h2>
+          <p class="help">Download the library as you currently see it, including your own progress, as a JSON file.</p>
+          <button class="btn teal" id="exportBtn">Download backup (.json)</button>
+        </div>
+        <div class="panel admin-only" id="importPanel">
+          <h2>Import</h2>
+          <p class="help">Restore from a previously exported file, straight into the shared library. Duplicates by exact term + type are skipped.</p>
+          <input type="file" id="importFile" accept="application/json">
+        </div>
+        <div class="panel admin-only" id="clearPanel">
+          <h2>Clear the shared library</h2>
+          <p class="help">Removes every approved word for everyone. This can't be undone — export a backup first if you're not sure.</p>
+          <button class="btn maroon" id="clearAllBtn">Clear everything</button>
+        </div>
+        <div class="panel" id="nonAdminBackupNote" style="display:none;">
+          <p class="help">Importing and clearing the shared library are limited to the admin account.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  // ============ CONFIGURE THESE, THEN SEE THE SETUP GUIDE ============
+  var ADMIN_EMAILS = ["47manish31@gmail.com"]; // <-- your Google account email(s)
+
+  var firebaseConfig = {
+    apiKey: "AIzaSyDiTH-7aVK8ojL1njbv3BmiHJujW4xsUvM",
+    authDomain: "cgl-vocab-register.firebaseapp.com",
+    projectId: "cgl-vocab-register",
+    storageBucket: "cgl-vocab-register.firebasestorage.app",
+    messagingSenderId: "452480698099",
+    appId: "1:452480698099:web:7b08914cd817e4152f1986"
+  };
+  // =====================================================================
+
+  var NOT_CONFIGURED = firebaseConfig.apiKey === "YOUR_API_KEY";
+
+  var TYPE_LABELS = {
+    word:"Word", idiom:"Idiom", one_word_substitution:"One-word sub",
+    phrasal_verb:"Phrasal verb", other:"Other"
+  };
+
+  if(NOT_CONFIGURED){
+    document.getElementById('loadingOverlay').classList.add('hidden');
+    document.getElementById('setupScreen').style.display = 'flex';
+    return;
+  }
+
+  firebase.initializeApp(firebaseConfig);
+  var auth = firebase.auth();
+  var db = firebase.firestore();
+
+  var currentUser = null;
+  var isAdminUser = false;
+  var words = [];
+  var progressMap = {};
+  var submissions = [];
+  var unsubWords = null, unsubProgress = null, unsubSubs = null;
+
+  // ---------------- toast ----------------
+  var toastTimer = null;
+  function showToast(msg){
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 3200);
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function escapeAttr(s){ return escapeHtml(s); }
+  function asArray(v){
+    if(Array.isArray(v)) return v.map(String).map(function(s){return s.trim();}).filter(Boolean);
+    if(typeof v === 'string' && v.trim()) return v.split(/[,;]/).map(function(s){return s.trim();}).filter(Boolean);
+    return [];
+  }
+  function emptyStateHtml(title, msg){
+    return '<div class="empty-state"><h3>'+escapeHtml(title)+'</h3><p>'+escapeHtml(msg)+'</p></div>';
+  }
+  function tsMillis(ts){ if(ts && typeof ts.toMillis === 'function') return ts.toMillis(); return 0; }
+
+  // ---------------- auth ----------------
+  document.getElementById('signInBtn').addEventListener('click', function(){
+    var provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider).catch(function(e){ showToast('Sign-in failed: ' + e.message); });
+  });
+  document.getElementById('signOutBtn').addEventListener('click', function(){ auth.signOut(); });
+
+  auth.onAuthStateChanged(function(user){
+    currentUser = user;
+    detachListeners();
+    if(user){
+      isAdminUser = ADMIN_EMAILS.indexOf(user.email) !== -1;
+      document.getElementById('signedOutScreen').style.display = 'none';
+      document.getElementById('appShell').style.display = 'block';
+      renderWhoBox();
+      applyRoleUI();
+      attachListeners();
+    } else {
+      isAdminUser = false;
+      document.getElementById('appShell').style.display = 'none';
+      document.getElementById('signedOutScreen').style.display = 'flex';
+    }
+    document.getElementById('loadingOverlay').classList.add('hidden');
+  });
+
+  function renderWhoBox(){
+    var box = document.getElementById('whoBox');
+    box.innerHTML =
+      (currentUser.photoURL ? '<img class="avatar" src="'+currentUser.photoURL+'">' : '') +
+      '<span>'+escapeHtml(currentUser.displayName || currentUser.email)+'</span>' +
+      (isAdminUser ? '<span class="admin-badge">admin</span>' : '');
+  }
+
+  function applyRoleUI(){
+    document.querySelectorAll('.admin-only').forEach(function(el){ el.style.display = isAdminUser ? '' : 'none'; });
+    document.getElementById('nonAdminBackupNote').style.display = isAdminUser ? 'none' : 'block';
+    document.getElementById('addManualBtn').textContent = isAdminUser ? '+ Add one manually' : '+ Submit one manually';
+    document.getElementById('parseBtn').textContent = isAdminUser ? 'Add to shared library' : 'Submit for approval';
+    document.getElementById('addPanelHelp').textContent = isAdminUser
+      ? 'Paste the words you want to add, generate the prompt, run it through any AI, then bring the reply back here — it goes straight into the shared library.'
+      : 'Paste the words you want to add, generate the prompt, run it through any AI, then bring the reply back here — it will wait for the admin to approve it before it appears for everyone.';
+  }
+
+  // ---------------- Firestore listeners ----------------
+  function attachListeners(){
+    unsubWords = db.collection('words').orderBy('createdAt','desc').onSnapshot(function(snap){
+      words = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+      renderAll();
+    }, function(err){ showToast('Could not load the library: ' + err.message); });
+
+    unsubProgress = db.collection('users').doc(currentUser.uid).collection('progress').onSnapshot(function(snap){
+      var map = {};
+      snap.forEach(function(d){ map[d.id] = d.data(); });
+      progressMap = map;
+      renderAll();
+    }, function(err){ showToast('Could not load your progress: ' + err.message); });
+
+    var subsQuery = isAdminUser
+      ? db.collection('submissions')
+      : db.collection('submissions').where('authorUid','==', currentUser.uid);
+    unsubSubs = subsQuery.onSnapshot(function(snap){
+      submissions = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+      submissions.sort(function(a,b){ return tsMillis(b.createdAt) - tsMillis(a.createdAt); });
+      renderReview();
+    }, function(err){ showToast('Could not load submissions: ' + err.message); });
+  }
+  function detachListeners(){
+    if(unsubWords) unsubWords();
+    if(unsubProgress) unsubProgress();
+    if(unsubSubs) unsubSubs();
+    unsubWords = unsubProgress = unsubSubs = null;
+    words = []; progressMap = {}; submissions = [];
+  }
+
+  function viewEntries(){
+    return words.map(function(w){
+      var p = progressMap[w.id] || {};
+      return Object.assign({}, w, { memorized: !!p.memorized, starred: !!p.starred });
+    });
+  }
+
+  // ---------------- tabs ----------------
+  var tabs = document.querySelectorAll('.tab');
+  var views = document.querySelectorAll('.view');
+  tabs.forEach(function(tab){ tab.addEventListener('click', function(){ switchTab(tab.dataset.tab); }); });
+  function switchTab(name){
+    tabs.forEach(function(t){ t.classList.toggle('active', t.dataset.tab === name); });
+    views.forEach(function(v){ v.classList.toggle('active', v.id === 'view-' + name); });
+    if(name === 'library') renderLibrary();
+    if(name === 'stats') renderStats();
+    if(name === 'review') renderReview();
+  }
+
+  // ---------------- normalize helpers ----------------
+  function normalizeType(t){
+    if(!t) return 'other';
+    var s = String(t).toLowerCase().replace(/[\s-]+/g, '_');
+    if(s.indexOf('idiom') !== -1) return 'idiom';
+    if(s.indexOf('one_word') !== -1 || s.indexOf('one word') !== -1) return 'one_word_substitution';
+    if(s.indexOf('phrasal') !== -1) return 'phrasal_verb';
+    if(s.indexOf('word') !== -1) return 'word';
+    return 'other';
+  }
+
+  function buildEntryData(raw, tag){
+    return {
+      term: String(raw.term).trim(),
+      type: normalizeType(raw.type),
+      part_of_speech: raw.part_of_speech ? String(raw.part_of_speech).trim() : '-',
+      english_meaning: raw.english_meaning ? String(raw.english_meaning).trim() : '',
+      hindi_meaning: raw.hindi_meaning ? String(raw.hindi_meaning).trim() : '',
+      synonyms: asArray(raw.synonyms),
+      antonyms: asArray(raw.antonyms),
+      ssc_sentence: raw.ssc_sentence ? String(raw.ssc_sentence).trim() : '',
+      mnemonic: raw.mnemonic ? String(raw.mnemonic).trim() : '',
+      origin: raw.origin ? String(raw.origin).trim() : '-',
+      tags: tag ? [tag] : (asArray(raw.tags)),
+      authorUid: currentUser.uid,
+      authorName: currentUser.displayName || currentUser.email,
+      authorEmail: currentUser.email,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+  }
+
+  // ---------------- prompt generation ----------------
+  document.getElementById('generatePromptBtn').addEventListener('click', function(){
+    var raw = document.getElementById('wordListInput').value.trim();
+    if(!raw){ showToast('Paste at least one word first.'); return; }
+    var wordsList = raw.split(/\r?\n|,/).map(function(w){ return w.trim(); }).filter(Boolean);
+    if(wordsList.length === 0){ showToast('Paste at least one word first.'); return; }
+
+    var listBlock = wordsList.map(function(w, i){ return (i+1) + '. ' + w; }).join('\n');
+
+    var prompt = [
+'You are helping a student preparing for the SSC CGL exam build a vocabulary database.',
+'For each term in the list below, identify what kind of item it is, then give exam-focused details.',
+'',
+'Terms:',
+listBlock,
+'',
+'Return ONLY a valid JSON array — no markdown code fences, no explanation before or after it.',
+'Each element must be an object with exactly these fields:',
+'{',
+'  "term": string (the word/phrase exactly as given),',
+'  "type": one of "word", "idiom", "one_word_substitution", "phrasal_verb", "other",',
+'  "part_of_speech": string (e.g. "noun", "verb", "adjective"; use "-" if not applicable),',
+'  "english_meaning": string (clear, concise English definition),',
+'  "hindi_meaning": string (Hindi meaning, in Devanagari script),',
+'  "synonyms": array of strings (2-5 synonyms; empty array if none apply),',
+'  "antonyms": array of strings (2-5 antonyms; empty array if none apply),',
+'  "ssc_sentence": string (one example sentence in the style of an SSC exam question, using the term),',
+'  "mnemonic": string (a short trick or mnemonic to remember the meaning),',
+'  "origin": string (etymology or origin, especially for idioms/phrases; use "-" if not relevant)',
+'}',
+'',
+'Output only the JSON array.'
+    ].join('\n');
+
+    document.getElementById('promptPreview').textContent = prompt;
+    document.getElementById('promptPanel').style.display = 'block';
+    document.getElementById('promptPanel').scrollIntoView({behavior:'smooth', block:'start'});
+  });
+
+  document.getElementById('copyPromptBtn').addEventListener('click', async function(){
+    var text = document.getElementById('promptPreview').textContent;
+    try{ await navigator.clipboard.writeText(text); }
+    catch(e){
+      var ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      try{ document.execCommand('copy'); }catch(e2){}
+      document.body.removeChild(ta);
+    }
+    var note = document.getElementById('copyNote');
+    note.style.display = 'inline';
+    setTimeout(function(){ note.style.display = 'none'; }, 2000);
+  });
+
+  document.getElementById('goToPasteBtn').addEventListener('click', function(){
+    var tag = document.getElementById('batchTagInput').value.trim();
+    if(tag) document.getElementById('pasteTagInput').value = tag;
+    switchTab('paste');
+  });
+
+  // ---------------- parsing response ----------------
+  function extractJson(text){
+    var t = text.trim();
+    t = t.replace(/```json/gi, '```').replace(/```/g, '');
+    t = t.trim();
+    var start = t.indexOf('[');
+    var end = t.lastIndexOf(']');
+    if(start !== -1 && end !== -1 && end > start){ t = t.slice(start, end + 1); }
+    return JSON.parse(t);
+  }
+
+  document.getElementById('parseBtn').addEventListener('click', async function(){
+    var statusEl = document.getElementById('parseStatus');
+    var raw = document.getElementById('responseInput').value;
+    if(!raw.trim()){ statusEl.style.color = 'var(--maroon)'; statusEl.textContent = 'Paste the AI response first.'; return; }
+    var tag = document.getElementById('pasteTagInput').value.trim();
+
+    var parsed;
+    try{
+      parsed = extractJson(raw);
+      if(!Array.isArray(parsed)) throw new Error('not an array');
+    }catch(e){
+      statusEl.style.color = 'var(--maroon)';
+      statusEl.textContent = "Couldn't read that as JSON. Check the reply is a JSON array and try again.";
+      return;
+    }
+
+    var valid = parsed.filter(function(item){ return item && item.term; });
+    if(valid.length === 0){ statusEl.style.color = 'var(--maroon)'; statusEl.textContent = 'No usable entries found in that response.'; return; }
+
+    try{
+      var targetCollection = isAdminUser ? db.collection('words') : db.collection('submissions');
+      var batch = db.batch();
+      valid.forEach(function(item){
+        var ref = targetCollection.doc();
+        batch.set(ref, buildEntryData(item, tag));
+      });
+      await batch.commit();
+      statusEl.style.color = 'var(--teal-deep)';
+      statusEl.textContent = valid.length + ' term' + (valid.length===1?'':'s') + (isAdminUser ? ' added to the library.' : ' submitted for approval.');
+      document.getElementById('responseInput').value = '';
+      setTimeout(function(){ switchTab(isAdminUser ? 'library' : 'review'); }, 700);
+    }catch(e){
+      statusEl.style.color = 'var(--maroon)';
+      statusEl.textContent = 'Could not save: ' + e.message;
+    }
+  });
+
+  // ---------------- library rendering ----------------
+  var searchBox = document.getElementById('searchBox');
+  var filterType = document.getElementById('filterType');
+  var filterTag = document.getElementById('filterTag');
+  var filterStatus = document.getElementById('filterStatus');
+  var sortBy = document.getElementById('sortBy');
+  [searchBox, filterType, filterTag, filterStatus, sortBy].forEach(function(el){
+    el.addEventListener('input', renderLibrary);
+    el.addEventListener('change', renderLibrary);
+  });
+
+  function allTags(){
+    var set = {};
+    words.forEach(function(e){ (e.tags||[]).forEach(function(t){ set[t] = true; }); });
+    return Object.keys(set).sort();
+  }
+  function refreshTagFilter(){
+    var current = filterTag.value;
+    var tags = allTags();
+    filterTag.innerHTML = '<option value="all">All tags</option>' +
+      tags.map(function(t){ return '<option value="'+escapeAttr(t)+'">'+escapeHtml(t)+'</option>'; }).join('');
+    if(tags.indexOf(current) !== -1) filterTag.value = current;
+  }
+
+  function getFiltered(){
+    var q = searchBox.value.trim().toLowerCase();
+    var ty = filterType.value, tg = filterTag.value, st = filterStatus.value;
+    var list = viewEntries().filter(function(e){
+      if(q && e.term.toLowerCase().indexOf(q) === -1) return false;
+      if(ty !== 'all' && e.type !== ty) return false;
+      if(tg !== 'all' && (e.tags||[]).indexOf(tg) === -1) return false;
+      if(st === 'memorized' && !e.memorized) return false;
+      if(st === 'not' && e.memorized) return false;
+      return true;
+    });
+    if(sortBy.value === 'new') list.sort(function(a,b){ return tsMillis(b.createdAt) - tsMillis(a.createdAt); });
+    if(sortBy.value === 'old') list.sort(function(a,b){ return tsMillis(a.createdAt) - tsMillis(b.createdAt); });
+    if(sortBy.value === 'az') list.sort(function(a,b){ return a.term.localeCompare(b.term); });
+    return list;
+  }
+
+  function renderLibrary(){
+    refreshTagFilter();
+    var grid = document.getElementById('libraryGrid');
+    if(words.length === 0){
+      grid.style.display = 'block';
+      grid.innerHTML = emptyStateHtml('Your register is empty', 'Head to "Add words" to build your first prompt, or add one manually above.');
+      return;
+    }
+    var list = getFiltered();
+    if(list.length === 0){
+      grid.style.display = 'block';
+      grid.innerHTML = emptyStateHtml('No matches', 'Try clearing a filter or search term.');
+      return;
+    }
+    grid.style.display = 'grid';
+    grid.innerHTML = list.map(cardHtml).join('');
+    grid.querySelectorAll('[data-action]').forEach(function(btn){
+      btn.addEventListener('click', function(ev){ ev.stopPropagation(); handleCardAction(btn.dataset.action, btn.dataset.id); });
+    });
+    grid.querySelectorAll('.vcard-top, .meaning-en').forEach(function(el){
+      el.addEventListener('click', function(){ toggleDetail(el.closest('.vcard').dataset.id); });
+    });
+  }
+
+  var openIds = {};
+  function cardHtml(e){
+    var open = openIds[e.id] ? 'open' : '';
+    return '' +
+    '<div class="vcard '+(e.memorized?'memorized':'')+'" data-id="'+e.id+'">' +
+      '<div class="vcard-top" style="cursor:pointer;">' +
+        '<div><div class="term">'+escapeHtml(e.term)+'</div><div class="pos">'+escapeHtml(e.part_of_speech||'-')+'</div></div>' +
+        '<span class="badge '+e.type+'">'+TYPE_LABELS[e.type]+'</span>' +
+      '</div>' +
+      (e.tags && e.tags.length ? '<div class="tagrow">'+e.tags.map(function(t){return '<span class="chip">'+escapeHtml(t)+'</span>';}).join('')+'</div>' : '') +
+      '<div class="meaning-en" style="cursor:pointer;">'+escapeHtml(e.english_meaning||'')+'</div>' +
+      (e.hindi_meaning ? '<div class="meaning-hi">'+escapeHtml(e.hindi_meaning)+'</div>' : '') +
+      (e.authorName ? '<div class="meta-line">Added by '+escapeHtml(e.authorName)+'</div>' : '') +
+      '<div class="vcard-controls">' +
+        '<div>' +
+          '<button class="iconbtn '+(e.starred?'on':'')+'" data-action="star" data-id="'+e.id+'" title="Star">'+(e.starred?'★':'☆')+'</button>' +
+          (isAdminUser ? '<button class="iconbtn" data-action="edit" data-id="'+e.id+'" title="Edit">✎</button><button class="iconbtn" data-action="delete" data-id="'+e.id+'" title="Delete">🗑</button>' : '') +
+        '</div>' +
+        '<button class="btn sm '+(e.memorized?'teal':'ghost')+'" data-action="memorized" data-id="'+e.id+'">'+(e.memorized?'Memorized ✓':'Mark memorized')+'</button>' +
+      '</div>' +
+      '<div class="detail '+open+'" id="detail-'+e.id+'">' +
+        '<div class="syn-anto">' +
+          '<div><dt>Synonyms</dt><dd>'+(e.synonyms&&e.synonyms.length?escapeHtml(e.synonyms.join(', ')):'—')+'</dd></div>' +
+          '<div><dt>Antonyms</dt><dd>'+(e.antonyms&&e.antonyms.length?escapeHtml(e.antonyms.join(', ')):'—')+'</dd></div>' +
+        '</div>' +
+        '<dt>SSC-style sentence</dt><dd>'+escapeHtml(e.ssc_sentence||'—')+'</dd>' +
+        '<dt>Trick / mnemonic</dt><dd>'+escapeHtml(e.mnemonic||'—')+'</dd>' +
+        (e.type==='idiom' ? '<dt>Origin</dt><dd>'+escapeHtml(e.origin||'—')+'</dd>' : '') +
+      '</div>' +
+    '</div>';
+  }
+
+  function toggleDetail(id){
+    openIds[id] = !openIds[id];
+    var d = document.getElementById('detail-' + id);
+    if(d) d.classList.toggle('open', !!openIds[id]);
+  }
+
+  async function setProgress(id, patch){
+    if(!currentUser) return;
+    try{ await db.collection('users').doc(currentUser.uid).collection('progress').doc(id).set(patch, {merge:true}); }
+    catch(e){ showToast('Could not save progress: ' + e.message); }
+  }
+
+  function handleCardAction(action, id){
+    var e = words.find(function(x){ return x.id === id; });
+    if(!e) return;
+    var p = progressMap[id] || {};
+    if(action === 'memorized'){ setProgress(id, {memorized: !p.memorized}); }
+    else if(action === 'star'){ setProgress(id, {starred: !p.starred}); }
+    else if(action === 'delete' && isAdminUser){ openConfirmDelete(id); }
+    else if(action === 'edit' && isAdminUser){ openEditModal(id); }
+  }
+
+  // ---------------- modal: add/edit ----------------
+  var modalBg = document.getElementById('modalBg');
+  var modalBody = document.getElementById('modalBody');
+  function closeModal(){ modalBg.classList.remove('open'); modalBody.innerHTML = ''; }
+  modalBg.addEventListener('click', function(ev){ if(ev.target === modalBg) closeModal(); });
+
+  function entryFormHtml(e){
+    e = e || {term:'',type:'word',part_of_speech:'',english_meaning:'',hindi_meaning:'',synonyms:[],antonyms:[],ssc_sentence:'',mnemonic:'',origin:'',tags:[]};
+    return '' +
+    '<div class="field"><label class="field-label">Term</label><input type="text" id="f_term" value="'+escapeAttr(e.term)+'"></div>' +
+    '<div class="field-2col">' +
+      '<div class="field"><label class="field-label">Type</label><select id="f_type">' +
+        Object.keys(TYPE_LABELS).map(function(k){ return '<option value="'+k+'" '+(e.type===k?'selected':'')+'>'+TYPE_LABELS[k]+'</option>'; }).join('') +
+      '</select></div>' +
+      '<div class="field"><label class="field-label">Part of speech</label><input type="text" id="f_pos" value="'+escapeAttr(e.part_of_speech||'')+'"></div>' +
+    '</div>' +
+    '<div class="field"><label class="field-label">English meaning</label><textarea id="f_en" style="min-height:60px;">'+escapeHtml(e.english_meaning||'')+'</textarea></div>' +
+    '<div class="field"><label class="field-label">Hindi meaning</label><input type="text" id="f_hi" value="'+escapeAttr(e.hindi_meaning||'')+'"></div>' +
+    '<div class="field-2col">' +
+      '<div class="field"><label class="field-label">Synonyms (comma separated)</label><input type="text" id="f_syn" value="'+escapeAttr((e.synonyms||[]).join(', '))+'"></div>' +
+      '<div class="field"><label class="field-label">Antonyms (comma separated)</label><input type="text" id="f_ant" value="'+escapeAttr((e.antonyms||[]).join(', '))+'"></div>' +
+    '</div>' +
+    '<div class="field"><label class="field-label">SSC-style sentence</label><textarea id="f_sent" style="min-height:55px;">'+escapeHtml(e.ssc_sentence||'')+'</textarea></div>' +
+    '<div class="field"><label class="field-label">Trick / mnemonic</label><textarea id="f_mne" style="min-height:55px;">'+escapeHtml(e.mnemonic||'')+'</textarea></div>' +
+    '<div class="field"><label class="field-label">Origin (for idioms)</label><input type="text" id="f_ori" value="'+escapeAttr(e.origin||'')+'"></div>' +
+    '<div class="field"><label class="field-label">Tags (comma separated)</label><input type="text" id="f_tags" value="'+escapeAttr((e.tags||[]).join(', '))+'"></div>';
+  }
+
+  function readForm(){
+    return {
+      term: document.getElementById('f_term').value.trim(),
+      type: document.getElementById('f_type').value,
+      part_of_speech: document.getElementById('f_pos').value.trim() || '-',
+      english_meaning: document.getElementById('f_en').value.trim(),
+      hindi_meaning: document.getElementById('f_hi').value.trim(),
+      synonyms: asArray(document.getElementById('f_syn').value),
+      antonyms: asArray(document.getElementById('f_ant').value),
+      ssc_sentence: document.getElementById('f_sent').value.trim(),
+      mnemonic: document.getElementById('f_mne').value.trim(),
+      origin: document.getElementById('f_ori').value.trim() || '-',
+      tags: asArray(document.getElementById('f_tags').value)
+    };
+  }
+
+  function openEditModal(id){
+    var e = words.find(function(x){ return x.id === id; });
+    if(!e) return;
+    modalBody.innerHTML = '<h3>Edit entry</h3>' + entryFormHtml(e) +
+      '<div class="modal-actions"><button class="btn ghost" id="cancelEdit">Cancel</button><button class="btn teal" id="saveEdit">Save</button></div>';
+    modalBg.classList.add('open');
+    document.getElementById('cancelEdit').addEventListener('click', closeModal);
+    document.getElementById('saveEdit').addEventListener('click', async function(){
+      var data = readForm();
+      if(!data.term){ showToast('Term cannot be empty.'); return; }
+      try{ await db.collection('words').doc(id).update(data); closeModal(); }
+      catch(err){ showToast('Could not save: ' + err.message); }
+    });
+  }
+
+  document.getElementById('addManualBtn').addEventListener('click', function(){
+    modalBody.innerHTML = '<h3>'+(isAdminUser?'Add a word manually':'Submit a word manually')+'</h3>' + entryFormHtml() +
+      '<div class="modal-actions"><button class="btn ghost" id="cancelEdit">Cancel</button><button class="btn teal" id="saveEdit">'+(isAdminUser?'Add':'Submit')+'</button></div>';
+    modalBg.classList.add('open');
+    document.getElementById('cancelEdit').addEventListener('click', closeModal);
+    document.getElementById('saveEdit').addEventListener('click', async function(){
+      var data = readForm();
+      if(!data.term){ showToast('Term cannot be empty.'); return; }
+      try{
+        var entryData = buildEntryData(data, null);
+        entryData.tags = data.tags;
+        var target = isAdminUser ? db.collection('words') : db.collection('submissions');
+        await target.add(entryData);
+        showToast(isAdminUser ? 'Added.' : 'Submitted for approval.');
+        closeModal();
+      }catch(err){ showToast('Could not save: ' + err.message); }
+    });
+  });
+
+  function openConfirmDelete(id){
+    var e = words.find(function(x){ return x.id === id; });
+    if(!e) return;
+    modalBody.innerHTML = '<h3>Delete "'+escapeHtml(e.term)+'"?</h3><p class="help">This removes it from the shared library for everyone.</p>' +
+      '<div class="modal-actions"><button class="btn ghost" id="cancelDel">Cancel</button><button class="btn maroon" id="confirmDel">Delete</button></div>';
+    modalBg.classList.add('open');
+    document.getElementById('cancelDel').addEventListener('click', closeModal);
+    document.getElementById('confirmDel').addEventListener('click', async function(){
+      try{ await db.collection('words').doc(id).delete(); closeModal(); }
+      catch(err){ showToast('Could not delete: ' + err.message); }
+    });
+  }
+
+  // ---------------- review tab ----------------
+  function renderReview(){
+    document.getElementById('reviewAdmin').style.display = isAdminUser ? 'block' : 'none';
+    document.getElementById('reviewSelf').style.display = isAdminUser ? 'none' : 'block';
+    if(isAdminUser){
+      var list = document.getElementById('reviewList');
+      if(submissions.length === 0){ list.innerHTML = emptyStateHtml('Nothing pending', 'Submissions from other signed-in users will show up here.'); return; }
+      list.innerHTML = submissions.map(pendingCardHtml).join('');
+      list.querySelectorAll('[data-approve]').forEach(function(b){ b.addEventListener('click', function(){ approveSubmission(b.dataset.approve); }); });
+      list.querySelectorAll('[data-reject]').forEach(function(b){ b.addEventListener('click', function(){ rejectSubmission(b.dataset.reject); }); });
+    } else {
+      var mine = document.getElementById('mySubmissionsList');
+      if(submissions.length === 0){ mine.innerHTML = emptyStateHtml('Nothing pending', 'Words you submit will show up here until the admin approves them.'); return; }
+      mine.innerHTML = submissions.map(function(s){
+        return '<div class="pending-card"><strong>'+escapeHtml(s.term)+'</strong> <span class="badge '+s.type+'">'+TYPE_LABELS[s.type]+'</span>' +
+          '<div class="pending-meta">Awaiting review'+(s.tags&&s.tags.length?' · '+escapeHtml(s.tags.join(', ')):'')+'</div>' +
+          '<div style="margin-top:8px;"><button class="btn ghost sm" data-withdraw="'+s.id+'">Withdraw</button></div></div>';
+      }).join('');
+      mine.querySelectorAll('[data-withdraw]').forEach(function(b){ b.addEventListener('click', function(){ withdrawSubmission(b.dataset.withdraw); }); });
+    }
+  }
+
+  function pendingCardHtml(s){
+    return '<div class="pending-card">' +
+      '<div class="vcard-top"><div><div class="term">'+escapeHtml(s.term)+'</div><div class="pos">'+escapeHtml(s.part_of_speech||'-')+'</div></div><span class="badge '+s.type+'">'+TYPE_LABELS[s.type]+'</span></div>' +
+      '<div class="meaning-en">'+escapeHtml(s.english_meaning||'')+'</div>' +
+      (s.hindi_meaning ? '<div class="meaning-hi">'+escapeHtml(s.hindi_meaning)+'</div>' : '') +
+      '<div class="pending-meta">Submitted by '+escapeHtml(s.authorName||s.authorEmail||'someone')+(s.tags&&s.tags.length?' · '+escapeHtml(s.tags.join(', ')):'')+'</div>' +
+      '<div class="row-actions" style="margin-top:10px;">' +
+        '<button class="btn maroon sm" data-reject="'+s.id+'">Reject</button>' +
+        '<button class="btn teal sm" data-approve="'+s.id+'">Approve</button>' +
+      '</div></div>';
+  }
+
+  async function approveSubmission(id){
+    var s = submissions.find(function(x){ return x.id === id; });
+    if(!s) return;
+    var data = Object.assign({}, s); delete data.id;
+    try{
+      var batch = db.batch();
+      batch.set(db.collection('words').doc(), data);
+      batch.delete(db.collection('submissions').doc(id));
+      await batch.commit();
+      showToast('Approved "'+s.term+'".');
+    }catch(e){ showToast('Could not approve: ' + e.message); }
+  }
+  async function rejectSubmission(id){
+    try{ await db.collection('submissions').doc(id).delete(); showToast('Rejected.'); }
+    catch(e){ showToast('Could not reject: ' + e.message); }
+  }
+  async function withdrawSubmission(id){
+    try{ await db.collection('submissions').doc(id).delete(); showToast('Withdrawn.'); }
+    catch(e){ showToast('Could not withdraw: ' + e.message); }
+  }
+
+  // ---------------- practice ----------------
+  var practiceSet = [];
+  var practiceIdx = 0;
+
+  document.getElementById('startPracticeBtn').addEventListener('click', function(){
+    practiceSet = getFiltered().slice();
+    if(practiceSet.length === 0){
+      document.getElementById('practiceArea').innerHTML = emptyStateHtml('Nothing to practice', 'Adjust your Library filters, or add some words first.');
+      document.getElementById('shufflePracticeBtn').style.display = 'none';
+      return;
+    }
+    shuffle(practiceSet);
+    practiceIdx = 0;
+    document.getElementById('shufflePracticeBtn').style.display = 'inline-block';
+    renderPracticeCard();
+  });
+  document.getElementById('shufflePracticeBtn').addEventListener('click', function(){
+    shuffle(practiceSet); practiceIdx = 0; renderPracticeCard();
+  });
+  function shuffle(arr){
+    for(var i = arr.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i+1));
+      var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+  }
+  function renderPracticeCard(){
+    var area = document.getElementById('practiceArea');
+    if(practiceIdx >= practiceSet.length){
+      area.innerHTML = '<div class="panel" style="margin:0 auto;"><h2>Session done</h2><p class="help">You went through '+practiceSet.length+' term'+(practiceSet.length===1?'':'s')+'. Start again anytime.</p></div>';
+      return;
+    }
+    var e = practiceSet[practiceIdx];
+    area.innerHTML =
+      '<div class="progress-line">'+(practiceIdx+1)+' / '+practiceSet.length+'</div>' +
+      '<div class="flashcard" id="fcCard">' +
+        '<div class="fc-front"><span class="badge fc-badge '+e.type+'">'+TYPE_LABELS[e.type]+'</span><div class="fc-term">'+escapeHtml(e.term)+'</div><div class="fc-hint">Tap to reveal</div></div>' +
+        '<div class="fc-back">' +
+          '<dt>English</dt><dd>'+escapeHtml(e.english_meaning||'—')+'</dd>' +
+          '<dt>Hindi</dt><dd>'+escapeHtml(e.hindi_meaning||'—')+'</dd>' +
+          '<div class="syn-anto" style="margin-top:8px;">' +
+            '<div><dt>Synonyms</dt><dd>'+(e.synonyms&&e.synonyms.length?escapeHtml(e.synonyms.join(', ')):'—')+'</dd></div>' +
+            '<div><dt>Antonyms</dt><dd>'+(e.antonyms&&e.antonyms.length?escapeHtml(e.antonyms.join(', ')):'—')+'</dd></div>' +
+          '</div>' +
+          '<dt>Sentence</dt><dd>'+escapeHtml(e.ssc_sentence||'—')+'</dd>' +
+          '<dt>Trick</dt><dd>'+escapeHtml(e.mnemonic||'—')+'</dd>' +
+        '</div>' +
+      '</div>' +
+      '<div class="practice-actions"><button class="btn maroon" id="stillLearning">Still learning</button><button class="btn teal" id="gotIt">Got it ✓</button></div>';
+    document.getElementById('fcCard').addEventListener('click', function(){ this.classList.toggle('flipped'); });
+    document.getElementById('gotIt').addEventListener('click', function(ev){ ev.stopPropagation(); setProgress(e.id, {memorized:true}); practiceIdx++; renderPracticeCard(); });
+    document.getElementById('stillLearning').addEventListener('click', function(ev){ ev.stopPropagation(); setProgress(e.id, {memorized:false}); practiceIdx++; renderPracticeCard(); });
+  }
+
+  // ---------------- stats ----------------
+  function renderStats(){
+    var list = viewEntries();
+    var total = list.length;
+    var byType = {}; Object.keys(TYPE_LABELS).forEach(function(k){ byType[k] = 0; });
+    var byTag = {}; var memorized = 0;
+    list.forEach(function(e){
+      byType[e.type] = (byType[e.type]||0) + 1;
+      if(e.memorized) memorized++;
+      (e.tags||[]).forEach(function(t){ byTag[t] = (byTag[t]||0) + 1; });
+    });
+    document.getElementById('statsByType').innerHTML = total === 0 ? emptyStateHtml('No data yet','Add some words first.') :
+      Object.keys(TYPE_LABELS).map(function(k){ var c=byType[k]||0; return barRow(TYPE_LABELS[k], c, total?Math.round(c/total*100):0); }).join('');
+    var tags = Object.keys(byTag).sort(function(a,b){ return byTag[b]-byTag[a]; });
+    document.getElementById('statsByTag').innerHTML = tags.length === 0 ? emptyStateHtml('No tags yet','Tag a batch when you add words to see it here.') :
+      tags.map(function(t){ var c=byTag[t]; return barRow(t, c, total?Math.round(c/total*100):0); }).join('');
+    document.getElementById('statsOverall').innerHTML = total === 0 ? emptyStateHtml('No data yet','Add some words first.') :
+      barRow('Memorized', memorized, total?Math.round(memorized/total*100):0) + barRow('Still learning', total-memorized, total?Math.round((total-memorized)/total*100):0);
+  }
+  function barRow(label, count, pct){
+    return '<div class="bar-row"><div class="lbl">'+escapeHtml(label)+'</div><div class="bar-track"><div class="bar-fill" style="width:'+pct+'%;"></div></div><div class="count">'+count+'</div></div>';
+  }
+
+  function renderStatStrip(){
+    var list = viewEntries();
+    var total = list.length;
+    var memorized = list.filter(function(e){ return e.memorized; }).length;
+    document.getElementById('statStrip').innerHTML =
+      '<div class="stat-chip"><span class="num">'+total+'</span><span class="lbl">words</span></div>' +
+      '<div class="stat-chip"><span class="num">'+memorized+'</span><span class="lbl">memorized</span></div>' +
+      '<div class="stat-chip"><span class="num">'+(total-memorized)+'</span><span class="lbl">to revise</span></div>';
+  }
+
+  // ---------------- backup ----------------
+  document.getElementById('exportBtn').addEventListener('click', function(){
+    var blob = new Blob([JSON.stringify(viewEntries(), null, 2)], {type:'application/json'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'cgl-vocab-backup-' + new Date().toISOString().slice(0,10) + '.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById('importFile').addEventListener('change', function(ev){
+    if(!isAdminUser) return;
+    var file = ev.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = async function(){
+      try{
+        var data = JSON.parse(reader.result);
+        if(!Array.isArray(data)) throw new Error('bad format');
+        var existingKeys = {};
+        words.forEach(function(e){ existingKeys[e.term.toLowerCase()+'|'+e.type] = true; });
+        var toAdd = [];
+        data.forEach(function(item){
+          if(!item || !item.term) return;
+          var key = String(item.term).toLowerCase() + '|' + (item.type||'other');
+          if(existingKeys[key]) return;
+          existingKeys[key] = true;
+          toAdd.push(item);
+        });
+        var CHUNK = 400;
+        for(var i = 0; i < toAdd.length; i += CHUNK){
+          var batch = db.batch();
+          toAdd.slice(i, i+CHUNK).forEach(function(item){
+            var ref = db.collection('words').doc();
+            var d = buildEntryData(item, null);
+            d.tags = asArray(item.tags);
+            batch.set(ref, d);
+          });
+          await batch.commit();
+        }
+        showToast(toAdd.length + ' entr' + (toAdd.length===1?'y':'ies') + ' imported.');
+      }catch(e){ showToast("Couldn't read that file — make sure it's a valid backup JSON."); }
+      document.getElementById('importFile').value = '';
+    };
+    reader.readAsText(file);
+  });
+
+  document.getElementById('clearAllBtn').addEventListener('click', function(){
+    if(!isAdminUser) return;
+    modalBody.innerHTML = '<h3>Clear the entire shared library?</h3><p class="help">This deletes every word for every user, permanently. Consider exporting a backup first.</p>' +
+      '<div class="modal-actions"><button class="btn ghost" id="cancelClear">Cancel</button><button class="btn maroon" id="confirmClear">Clear everything</button></div>';
+    modalBg.classList.add('open');
+    document.getElementById('cancelClear').addEventListener('click', closeModal);
+    document.getElementById('confirmClear').addEventListener('click', async function(){
+      try{
+        var CHUNK = 400;
+        for(var i = 0; i < words.length; i += CHUNK){
+          var batch = db.batch();
+          words.slice(i, i+CHUNK).forEach(function(w){ batch.delete(db.collection('words').doc(w.id)); });
+          await batch.commit();
+        }
+        closeModal();
+        showToast('Library cleared.');
+      }catch(e){ showToast('Could not clear: ' + e.message); }
+    });
+  });
+
+  // ---------------- render all ----------------
+  function renderAll(){ renderStatStrip(); renderLibrary(); renderStats(); }
+
+})();
+</script>
+</body>
+</html>
