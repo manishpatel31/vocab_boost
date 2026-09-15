@@ -515,7 +515,7 @@
         </div>
         <div class="panel">
           <h2>Spelling challenge</h2>
-          <p class="help">Hear a word aloud and prove you can spell it, three ways. Vocabulary words only (idioms and phrases are skipped). Uses your current Library filters as the word pool.</p>
+          <p class="help">Hear a word aloud and prove you can spell it, three ways. Draws from every vocabulary word in your library (idioms and phrases are skipped) — independent of any Library search or filters you've set.</p>
           <div class="row-actions">
             <button class="btn" id="startSpellTypeBtn">Hear &amp; type</button>
             <button class="btn ghost" id="startSpellCorrectBtn">Choose the correct spelling</button>
@@ -539,6 +539,11 @@
         <h2>Leaderboard</h2>
         <p class="help">Ranked by percentage of the shared library each person has marked memorized (level 5).</p>
         <div id="leaderboardArea"></div>
+      </div>
+      <div style="max-width:900px; margin-top:28px;">
+        <h2>All users</h2>
+        <p class="help">Everyone who's signed in to this register at least once.</p>
+        <div id="allUsersArea"></div>
       </div>
     </section>
 
@@ -1115,7 +1120,7 @@
     tabs.forEach(function(t){ t.classList.toggle('active', t.dataset.tab === name); });
     views.forEach(function(v){ v.classList.toggle('active', v.id === 'view-' + name); });
     if(name === 'library') renderLibrary();
-    if(name === 'stats'){ renderStats(); renderLeaderboard(); }
+    if(name === 'stats'){ renderStats(); renderLeaderboard(); renderAllUsers(); }
     if(name === 'review') renderReview();
     if(name === 'quiz') renderQuizHome();
     if(name === 'roots') renderRoots();
@@ -2058,8 +2063,8 @@ listBlock,
   }
 
   document.getElementById('startSpellTypeBtn').addEventListener('click', function(){
-    var pool = getFiltered().filter(function(w){ return w.type === 'word'; });
-    if(pool.length === 0){ showToast('No vocabulary words match your current filters.'); return; }
+    var pool = viewEntries().filter(function(w){ return w.type === 'word'; });
+    if(pool.length === 0){ showToast('No vocabulary words in your library yet.'); return; }
     quizQueue = shuffleArr(pool.slice());
     quizIdx = 0; quizScore = 0; quizResults = [];
     document.getElementById('quizHome').style.display = 'none';
@@ -2106,8 +2111,8 @@ listBlock,
   }
 
   document.getElementById('startSpellCorrectBtn').addEventListener('click', function(){
-    var pool = getFiltered().filter(function(w){ return w.type === 'word'; });
-    if(pool.length === 0){ showToast('No vocabulary words match your current filters.'); return; }
+    var pool = viewEntries().filter(function(w){ return w.type === 'word'; });
+    if(pool.length === 0){ showToast('No vocabulary words in your library yet.'); return; }
     quizQueue = shuffleArr(pool.slice());
     quizIdx = 0; quizScore = 0; quizResults = [];
     document.getElementById('quizHome').style.display = 'none';
@@ -2160,8 +2165,8 @@ listBlock,
   }
 
   document.getElementById('startSpellWrongBtn').addEventListener('click', function(){
-    var pool = getFiltered().filter(function(w){ return w.type === 'word'; });
-    if(pool.length < 4){ showToast('Need at least 4 vocabulary words matching your current filters.'); return; }
+    var pool = viewEntries().filter(function(w){ return w.type === 'word'; });
+    if(pool.length < 4){ showToast('Need at least 4 vocabulary words in your library.'); return; }
     quizQueue = shuffleArr(pool.slice());
     quizIdx = 0; quizScore = 0; quizResults = [];
     document.getElementById('quizHome').style.display = 'none';
@@ -2764,6 +2769,34 @@ listBlock,
         '</div>';
       }).join('') + '</div>';
     }catch(e){ area.innerHTML = emptyStateHtml('Could not load the leaderboard', e.message); }
+  }
+
+  async function renderAllUsers(){
+    var box = document.getElementById('allUsersArea');
+    box.innerHTML = '<p class="help">Loading…</p>';
+    try{
+      var usersSnap = await db.collection('users').orderBy('displayName').limit(300).get();
+      var rolesSnap = await db.collection('roles').get();
+      var modMap = {};
+      rolesSnap.forEach(function(d){ modMap[d.id] = true; });
+      var rows = usersSnap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+      if(rows.length === 0){ box.innerHTML = emptyStateHtml('No users yet', 'People show up here once they sign in.'); return; }
+      box.innerHTML = '<div class="grid">' + rows.map(function(u){
+        var isAdminU = ADMIN_EMAILS.indexOf(u.email) !== -1;
+        var isModU = !!modMap[u.id];
+        return '<div class="vcard" style="cursor:default;">' +
+          '<div class="vcard-top">' +
+            '<div style="display:flex; align-items:center; gap:10px;">' +
+              (u.photoURL ? '<img class="avatar" src="'+u.photoURL+'" style="width:32px;height:32px;">' : '') +
+              '<div class="term" style="font-size:15px;">'+escapeHtml(u.displayName||u.email||'Someone')+'</div>' +
+            '</div>' +
+            (isAdminU ? '<span class="admin-badge">admin</span>' : (isModU ? '<span class="mod-badge">moderator</span>' : '')) +
+          '</div>' +
+          (isModeratorUser && u.email ? '<div class="meta-line">'+escapeHtml(u.email)+'</div>' : '') +
+          '<div class="meta-line">'+(u.masteredCount||0)+' memorized · '+(u.engagedCount||0)+' studied</div>' +
+        '</div>';
+      }).join('') + '</div>';
+    }catch(e){ box.innerHTML = emptyStateHtml('Could not load users', e.message); }
   }
 
   // ---------------- admin panel ----------------
