@@ -40,6 +40,26 @@
   body.dark .badge.one_word_substitution{ background:#1D2A33; color:#8FC1E3; }
   body.dark .badge.phrasal_verb{ background:#2A2032; color:#C99DE0; }
   body.dark .badge.other{ background:#2A2619; color:var(--ink-soft); }
+
+  /* text size + dyslexia-friendly font overrides */
+  body.text-lg .term{ font-size:21px; }
+  body.text-lg .meaning-en{ font-size:15px; }
+  body.text-lg .field-box{ font-size:14px; }
+  body.text-lg .pos{ font-size:13px; }
+  body.text-lg .badge{ font-size:11.5px; }
+  body.text-lg p.help{ font-size:14.5px; }
+  body.text-xl .term{ font-size:24px; }
+  body.text-xl .meaning-en{ font-size:16.5px; }
+  body.text-xl .field-box{ font-size:15.5px; }
+  body.text-xl .pos{ font-size:14px; }
+  body.text-xl .badge{ font-size:12.5px; }
+  body.text-xl p.help{ font-size:16px; }
+  body.dyslexia-font, body.dyslexia-font h1, body.dyslexia-font h2, body.dyslexia-font h3,
+  body.dyslexia-font .term, body.dyslexia-font .headword{
+    font-family: 'Comic Sans MS', 'Trebuchet MS', Verdana, sans-serif !important;
+  }
+  body.dyslexia-font{ letter-spacing:0.02em; line-height:1.7; }
+  body.dyslexia-font .field-box, body.dyslexia-font .meaning-en, body.dyslexia-font p.help{ line-height:1.8; }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0; transition:background-color .2s ease, color .2s ease;}
   body{
@@ -177,6 +197,7 @@
   .offline-badge{ background:var(--maroon); color:#fff; font-size:11px; padding:3px 10px; border-radius:20px; font-weight:600; }
   .notif-count{ position:absolute; top:-6px; right:-6px; background:var(--maroon); color:#fff; font-size:10px; font-weight:700; border-radius:20px; padding:1px 5px; line-height:1.3; }
   .admin-badge{ background:var(--mustard); color:var(--ink); font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; text-transform:lowercase; }
+  .mod-badge{ background:var(--teal); color:#fff; font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; text-transform:lowercase; }
   .avatar{ width:22px; height:22px; border-radius:50%; }
 
   .topnav{ display:flex; align-items:center; gap:2px; background:var(--bar-bg); padding:0 8px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
@@ -299,6 +320,7 @@
     <button class="btn ghost sm" id="notifBtn" style="display:none; position:relative; color:var(--bar-fg); border-color:var(--bar-fg);">🔔<span class="notif-count" id="notifCount" style="display:none;"></span></button>
     <button class="btn ghost sm" id="alertsSettingsBtn" style="color:var(--bar-fg); border-color:var(--bar-fg);">🔔 Alerts</button>
     <button class="btn ghost sm" id="darkModeBtn" style="color:var(--bar-fg); border-color:var(--bar-fg);">🌙 Dark</button>
+    <button class="btn ghost sm" id="displaySettingsBtn" style="color:var(--bar-fg); border-color:var(--bar-fg);">⚙️ Display</button>
     <button class="btn ghost sm" id="installBtn" style="display:none; color:var(--bar-fg); border-color:var(--bar-fg);">Install app</button>
     <button class="btn ghost sm" id="signOutBtn" style="color:var(--bar-fg); border-color:var(--bar-fg);">Sign out</button>
   </div>
@@ -314,6 +336,8 @@
     <button class="tab" data-tab="quiz">Quiz</button>
     <button class="tab" data-tab="roots">Roots</button>
     <button class="tab" data-tab="stats">Stats</button>
+    <button class="tab" data-tab="leaderboard">Leaderboard</button>
+    <button class="tab mod-only" data-tab="admin" style="display:none;">Admin</button>
     <button class="tab" data-tab="backup">Backup</button>
   </nav>
 
@@ -495,6 +519,15 @@
           <p class="help">Drills you on words your register has flagged as commonly confused with another (e.g. affect/effect) — the kind of trap SSC papers love. Needs both words of a pair to be in your library.</p>
           <button class="btn" id="startConfusableBtn">Start confusable-pairs quiz</button>
         </div>
+        <div class="panel">
+          <h2>Spelling challenge</h2>
+          <p class="help">Hear a word aloud and prove you can spell it, three ways. Uses your current Library filters as the word pool.</p>
+          <div class="row-actions">
+            <button class="btn" id="startSpellTypeBtn">Hear &amp; type</button>
+            <button class="btn ghost" id="startSpellCorrectBtn">Choose the correct spelling</button>
+            <button class="btn ghost" id="startSpellWrongBtn">Spot the misspelled one</button>
+          </div>
+        </div>
       </div>
       <div id="quizArea"></div>
     </section>
@@ -508,6 +541,58 @@
       <div class="panel" style="max-width:560px;"><h2>By confidence</h2><div id="statsByConf"></div></div>
       <div class="panel" style="max-width:560px;"><h2>By type</h2><div id="statsByType"></div></div>
       <div class="panel" style="max-width:560px;"><h2>By tag</h2><div id="statsByTag"></div></div>
+    </section>
+
+    <section class="view" id="view-leaderboard">
+      <p class="help">Ranked by percentage of the shared library each person has marked memorized (level 5).</p>
+      <div id="leaderboardArea"></div>
+    </section>
+
+    <section class="view" id="view-admin">
+      <div class="panel admin-only" style="max-width:700px;">
+        <h2>Moderators</h2>
+        <p class="help">Moderators can add words directly, edit or delete library entries, and approve or reject submissions. They can't manage other moderators, and can't touch Import/Clear in Backup.</p>
+        <div class="row-actions">
+          <input type="text" id="newModEmail" placeholder="Email of an existing user…" style="max-width:280px;">
+          <button class="btn teal sm" id="addModBtn">Make moderator</button>
+        </div>
+        <div id="moderatorsList" style="margin-top:14px;"></div>
+      </div>
+
+      <div class="panel" style="max-width:900px;">
+        <h2>Activity feed</h2>
+        <div id="activityFeedArea"></div>
+      </div>
+
+      <div class="panel" style="max-width:900px;">
+        <h2>Possible duplicates</h2>
+        <p class="help">Scans for words with very similar spelling and the same type — might be the same entry twice.</p>
+        <button class="btn ghost sm" id="findDupesBtn">Scan for duplicates</button>
+        <div id="dupesArea" style="margin-top:14px;"></div>
+      </div>
+
+      <div class="panel" style="max-width:700px;">
+        <h2>Bulk tag tools</h2>
+        <div class="field-2col">
+          <div class="field"><label class="field-label">Rename tag</label><select id="renameTagFrom"></select></div>
+          <div class="field"><label class="field-label">To</label><input type="text" id="renameTagTo" placeholder="new tag name"></div>
+        </div>
+        <div class="row-actions"><button class="btn teal sm" id="renameTagBtn">Rename everywhere</button></div>
+        <div class="field" style="margin-top:18px;"><label class="field-label">Delete a tag from every word</label><select id="deleteTagSelect"></select></div>
+        <div class="row-actions"><button class="btn maroon sm" id="deleteTagBtn">Remove tag everywhere</button></div>
+      </div>
+
+      <div class="panel" style="max-width:700px;">
+        <h2>Most commonly missed in quizzes</h2>
+        <p class="help">Highest wrong-answer rate across everyone's fill-blank, confusable, and spelling quizzes.</p>
+        <div id="missedWordsArea"></div>
+      </div>
+
+      <div class="panel" style="max-width:700px;">
+        <h2>Confidence breakdown by word</h2>
+        <p class="help">Of the people who've engaged with each word, what percentage sit at each confidence level.</p>
+        <div id="masteryBreakdownArea"></div>
+      </div>
     </section>
 
     <section class="view" id="view-backup">
@@ -554,6 +639,58 @@
     var nowOn = !document.body.classList.contains('dark');
     localStorage.setItem(DARK_MODE_KEY, nowOn ? '1' : '0');
     applyDarkModePreference();
+  });
+
+  // ---------------- text-to-speech ----------------
+  var ttsSupported = ('speechSynthesis' in window);
+  function speakText(text, lang){
+    if(!ttsSupported || !text) return;
+    try{
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.lang = lang || 'en-US';
+      u.rate = 0.92;
+      window.speechSynthesis.speak(u);
+    }catch(e){}
+  }
+
+  // ---------------- display settings: text size + dyslexia-friendly font ----------------
+  var TEXT_SIZE_KEY = 'vocabRegisterTextSize';
+  var DYSLEXIA_FONT_KEY = 'vocabRegisterDyslexiaFont';
+  function applyDisplaySettings(){
+    var size = localStorage.getItem(TEXT_SIZE_KEY) || 'normal';
+    document.body.classList.remove('text-lg', 'text-xl');
+    if(size === 'lg') document.body.classList.add('text-lg');
+    if(size === 'xl') document.body.classList.add('text-xl');
+    document.body.classList.toggle('dyslexia-font', localStorage.getItem(DYSLEXIA_FONT_KEY) === '1');
+  }
+  applyDisplaySettings();
+  document.getElementById('displaySettingsBtn').addEventListener('click', function(){
+    var size = localStorage.getItem(TEXT_SIZE_KEY) || 'normal';
+    var dys = localStorage.getItem(DYSLEXIA_FONT_KEY) === '1';
+    modalBodyRef().innerHTML = '<h3>Display settings</h3>' +
+      '<div class="field"><label class="field-label">Text size</label>' +
+        '<select id="textSizeSelect">' +
+          '<option value="normal" '+(size==='normal'?'selected':'')+'>Normal</option>' +
+          '<option value="lg" '+(size==='lg'?'selected':'')+'>Large</option>' +
+          '<option value="xl" '+(size==='xl'?'selected':'')+'>Extra large</option>' +
+        '</select>' +
+      '</div>' +
+      '<div class="field"><label style="display:flex; gap:10px; align-items:flex-start; cursor:pointer;">' +
+        '<input type="checkbox" id="dyslexiaFontChk" style="margin-top:3px; width:18px; height:18px;" '+(dys?'checked':'')+'>' +
+        '<span>Use a more dyslexia-friendly font (rounder letterforms, wider spacing)</span>' +
+      '</label></div>' +
+      '<div class="modal-actions"><button class="btn ghost" id="displaySettingsClose">Close</button></div>';
+    modalBgRef().classList.add('open');
+    document.getElementById('textSizeSelect').addEventListener('change', function(){
+      localStorage.setItem(TEXT_SIZE_KEY, this.value);
+      applyDisplaySettings();
+    });
+    document.getElementById('dyslexiaFontChk').addEventListener('change', function(){
+      localStorage.setItem(DYSLEXIA_FONT_KEY, this.checked ? '1' : '0');
+      applyDisplaySettings();
+    });
+    document.getElementById('displaySettingsClose').addEventListener('click', function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML=''; });
   });
 
   // ---------------- PWA install + service worker (works even before Firebase config) ----------------
@@ -637,6 +774,7 @@
 
   var currentUser = null;
   var isAdminUser = false;
+  var isModeratorUser = false;
   var words = [];
   var progressMap = {};
   var submissions = [];
@@ -682,14 +820,18 @@
     stopHourlyAlerts();
     if(user){
       isAdminUser = ADMIN_EMAILS.indexOf(user.email) !== -1;
+      isModeratorUser = isAdminUser;
       document.getElementById('signedOutScreen').style.display = 'none';
       document.getElementById('appShell').style.display = 'block';
       renderWhoBox();
       applyRoleUI();
       attachListeners();
+      ensureUserProfile();
+      checkModeratorRole().then(function(){ renderWhoBox(); applyRoleUI(); renderLibrary(); renderReview(); });
       if(anyAlertEnabled()){ startHourlyAlerts(); }
     } else {
       isAdminUser = false;
+      isModeratorUser = false;
       document.getElementById('appShell').style.display = 'none';
       document.getElementById('signedOutScreen').style.display = 'flex';
     }
@@ -697,20 +839,41 @@
     document.getElementById('loadingOverlay').classList.add('hidden');
   });
 
+  async function ensureUserProfile(){
+    try{
+      await db.collection('users').doc(currentUser.uid).set({
+        displayName: currentUser.displayName || currentUser.email,
+        email: (currentUser.email || '').toLowerCase(),
+        photoURL: currentUser.photoURL || '',
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge:true});
+    }catch(e){ /* non-critical */ }
+  }
+
+  async function checkModeratorRole(){
+    try{
+      var doc = await db.collection('roles').doc(currentUser.uid).get();
+      isModeratorUser = isAdminUser || (doc.exists && doc.data().role === 'moderator');
+    }catch(e){
+      isModeratorUser = isAdminUser;
+    }
+  }
+
   function renderWhoBox(){
     var box = document.getElementById('whoBox');
     box.innerHTML =
       (currentUser.photoURL ? '<img class="avatar" src="'+currentUser.photoURL+'">' : '') +
       '<span>'+escapeHtml(currentUser.displayName || currentUser.email)+'</span>' +
-      (isAdminUser ? '<span class="admin-badge">admin</span>' : '');
+      (isAdminUser ? '<span class="admin-badge">admin</span>' : (isModeratorUser ? '<span class="mod-badge">moderator</span>' : ''));
   }
 
   function applyRoleUI(){
     document.querySelectorAll('.admin-only').forEach(function(el){ el.style.display = isAdminUser ? '' : 'none'; });
+    document.querySelectorAll('.mod-only').forEach(function(el){ el.style.display = isModeratorUser ? '' : 'none'; });
     document.getElementById('nonAdminBackupNote').style.display = isAdminUser ? 'none' : 'block';
-    document.getElementById('addManualBtn').textContent = isAdminUser ? '+ Add one manually' : '+ Submit one manually';
+    document.getElementById('addManualBtn').textContent = isModeratorUser ? '+ Add one manually' : '+ Submit one manually';
     document.getElementById('parseBtn').textContent = 'Review before adding';
-    document.getElementById('addPanelHelp').textContent = isAdminUser
+    document.getElementById('addPanelHelp').textContent = isModeratorUser
       ? 'Paste the words you want to add, generate the prompt, run it through any AI, then bring the reply back here — it goes straight into the shared library.'
       : 'Paste the words you want to add, generate the prompt, run it through any AI, then bring the reply back here — it will wait for the admin to approve it before it appears for everyone.';
   }
@@ -882,7 +1045,7 @@
       renderAll();
     }, function(err){ showToast('Could not load your progress: ' + err.message); });
 
-    var subsQuery = isAdminUser
+    var subsQuery = isModeratorUser
       ? db.collection('submissions')
       : db.collection('submissions').where('authorUid','==', currentUser.uid);
     unsubSubs = subsQuery.onSnapshot(function(snap){
@@ -963,6 +1126,8 @@
     if(name === 'quiz') renderQuizHome();
     if(name === 'roots') renderRoots();
     if(name === 'enrich') renderEnrichHome();
+    if(name === 'leaderboard') renderLeaderboard();
+    if(name === 'admin') renderAdminPanel();
   }
 
   function normalizeType(t){
@@ -1143,7 +1308,7 @@ listBlock,
       '<div class="grid" id="stageGrid">' + pendingReview.map(stageItemHtml).join('') + '</div>' +
       '<div class="row-actions">' +
         '<button class="btn ghost" id="stageCancel">Cancel</button>' +
-        '<button class="btn maroon" id="stageConfirm">'+(isAdminUser ? 'Add selected to library' : 'Submit selected for approval')+'</button>' +
+        '<button class="btn maroon" id="stageConfirm">'+(isModeratorUser ? 'Add selected to library' : 'Submit selected for approval')+'</button>' +
       '</div>';
     wrap.querySelectorAll('[data-stage-toggle]').forEach(function(cb){
       cb.addEventListener('change', function(){ pendingReview[+cb.dataset.stageToggle].include = cb.checked; });
@@ -1172,18 +1337,19 @@ listBlock,
     if(selected.length === 0){ showToast('Nothing selected.'); return; }
     var tag = document.getElementById('pasteTagInput').value.trim();
     try{
-      var targetCollection = isAdminUser ? db.collection('words') : db.collection('submissions');
+      var targetCollection = isModeratorUser ? db.collection('words') : db.collection('submissions');
       var batch = db.batch();
       selected.forEach(function(item){
         var ref = targetCollection.doc();
         batch.set(ref, buildEntryData(item.data, tag));
       });
       await batch.commit();
-      showToast(selected.length + ' term' + (selected.length===1?'':'s') + (isAdminUser ? ' added to the library.' : ' submitted for approval.'));
+      logActivity(isModeratorUser ? 'words_added' : 'words_submitted', {count: selected.length});
+      showToast(selected.length + ' term' + (selected.length===1?'':'s') + (isModeratorUser ? ' added to the library.' : ' submitted for approval.'));
       pendingReview = [];
       renderStagePanel();
       document.getElementById('responseInput').value = '';
-      setTimeout(function(){ switchTab(isAdminUser ? 'library' : 'review'); }, 600);
+      setTimeout(function(){ switchTab(isModeratorUser ? 'library' : 'review'); }, 600);
     }catch(e){ showToast('Could not save: ' + e.message); }
   }
 
@@ -1316,7 +1482,7 @@ listBlock,
     return '' +
     '<div class="vcard conf-'+e.confidence+'" data-id="'+e.id+'">' +
       '<div class="vcard-top">' +
-        '<div><div class="term">'+escapeHtml(e.term)+'</div><div class="pos">'+escapeHtml(e.part_of_speech||'-')+'</div></div>' +
+        '<div><div class="term">'+escapeHtml(e.term)+' <button class="iconbtn" data-action="speak" data-id="'+e.id+'" title="Listen" style="font-size:14px; vertical-align:middle;">🔊</button></div><div class="pos">'+escapeHtml(e.part_of_speech||'-')+'</div></div>' +
         '<span class="badge '+e.type+'">'+TYPE_LABELS[e.type]+'</span>' +
       '</div>' +
       (e.tags && e.tags.length ? '<div class="tagrow">'+e.tags.map(function(t){return '<span class="chip">'+escapeHtml(t)+'</span>';}).join('')+'</div>' : '') +
@@ -1325,16 +1491,40 @@ listBlock,
       '<div class="conf-row"><span class="conf-label">'+confLabel(e.confidence)+'</span>'+confDotsHtml(e.id, e.confidence)+'</div>' +
       '<div class="vcard-controls">' +
         '<button class="iconbtn '+(e.starred?'on':'')+'" data-action="star" data-id="'+e.id+'" title="Star">'+(e.starred?'★':'☆')+'</button>' +
-        (isAdminUser ? '<button class="iconbtn" data-action="edit" data-id="'+e.id+'" title="Edit">✎</button><button class="iconbtn" data-action="delete" data-id="'+e.id+'" title="Delete">🗑</button>' : '') +
+        (isModeratorUser ? '<button class="iconbtn" data-action="edit" data-id="'+e.id+'" title="Edit">✎</button><button class="iconbtn" data-action="delete" data-id="'+e.id+'" title="Delete">🗑</button>' : '') +
       '</div>' +
     '</div>';
   }
 
 
-  async function setProgress(id, patch){
-    if(!currentUser) return;
-    try{ await db.collection('users').doc(currentUser.uid).collection('progress').doc(id).set(patch, {merge:true}); }
-    catch(e){ showToast('Could not save progress: ' + e.message); }
+  function setProgress(id, patch){
+    if(!currentUser) return Promise.resolve();
+    var hadRecord = !!(progressMap[id] && typeof progressMap[id].confidence === 'number');
+    var prevLevel = hadRecord ? progressMap[id].confidence : null;
+    progressMap[id] = Object.assign({}, progressMap[id], patch);
+    var writes = [db.collection('users').doc(currentUser.uid).collection('progress').doc(id).set(patch, {merge:true})];
+    if(typeof patch.confidence === 'number' && patch.confidence !== prevLevel){
+      var incObj = {};
+      if(prevLevel !== null){ incObj['confLevels.'+prevLevel] = firebase.firestore.FieldValue.increment(-1); }
+      incObj['confLevels.'+patch.confidence] = firebase.firestore.FieldValue.increment(1);
+      writes.push(db.collection('words').doc(id).update(incObj));
+      syncMyStats();
+    }
+    return Promise.all(writes).catch(function(e){ showToast('Could not save progress: ' + e.message); });
+  }
+  var statsSyncTimer = null;
+  function syncMyStats(){
+    if(statsSyncTimer) clearTimeout(statsSyncTimer);
+    statsSyncTimer = setTimeout(function(){
+      var list = viewEntries();
+      var mastered = list.filter(function(e){ return e.confidence >= 5; }).length;
+      var engaged = list.filter(function(e){ return e.confidence > 0; }).length;
+      if(currentUser){
+        db.collection('users').doc(currentUser.uid).set({
+          masteredCount: mastered, engagedCount: engaged, updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, {merge:true}).catch(function(){});
+      }
+    }, 1500);
   }
   function markVisited(id){
     var p = progressMap[id] || {};
@@ -1346,8 +1536,9 @@ listBlock,
     if(!e) return;
     var p = progressMap[id] || {};
     if(action === 'star'){ setProgress(id, {starred: !p.starred}); }
-    else if(action === 'delete' && isAdminUser){ openConfirmDelete(id); }
-    else if(action === 'edit' && isAdminUser){ openEditModal(id); }
+    else if(action === 'delete' && isModeratorUser){ openConfirmDelete(id); }
+    else if(action === 'edit' && isModeratorUser){ openEditModal(id); }
+    else if(action === 'speak'){ speakText(e.term); }
   }
 
   // ---------------- modal: add/edit ----------------
@@ -1418,8 +1609,8 @@ listBlock,
   }
 
   document.getElementById('addManualBtn').addEventListener('click', function(){
-    modalBody.innerHTML = '<h3>'+(isAdminUser?'Add a word manually':'Submit a word manually')+'</h3>' + entryFormHtml() +
-      '<div class="modal-actions"><button class="btn ghost" id="cancelEdit">Cancel</button><button class="btn teal" id="saveEdit">'+(isAdminUser?'Add':'Submit')+'</button></div>';
+    modalBody.innerHTML = '<h3>'+(isModeratorUser?'Add a word manually':'Submit a word manually')+'</h3>' + entryFormHtml() +
+      '<div class="modal-actions"><button class="btn ghost" id="cancelEdit">Cancel</button><button class="btn teal" id="saveEdit">'+(isModeratorUser?'Add':'Submit')+'</button></div>';
     modalBg.classList.add('open');
     document.getElementById('cancelEdit').addEventListener('click', closeModal);
     document.getElementById('saveEdit').addEventListener('click', async function(){
@@ -1428,9 +1619,10 @@ listBlock,
       try{
         var entryData = buildEntryData(data, null);
         entryData.tags = data.tags;
-        var target = isAdminUser ? db.collection('words') : db.collection('submissions');
+        var target = isModeratorUser ? db.collection('words') : db.collection('submissions');
         await target.add(entryData);
-        showToast(isAdminUser ? 'Added.' : 'Submitted for approval.');
+        logActivity(isModeratorUser ? 'word_added' : 'word_submitted', {term: data.term});
+        showToast(isModeratorUser ? 'Added.' : 'Submitted for approval.');
         closeModal();
       }catch(err){ showToast('Could not save: ' + err.message); }
     });
@@ -1457,9 +1649,9 @@ listBlock,
   }
 
   function renderReview(){
-    document.getElementById('reviewAdmin').style.display = isAdminUser ? 'block' : 'none';
-    document.getElementById('reviewSelf').style.display = isAdminUser ? 'none' : 'block';
-    if(isAdminUser){
+    document.getElementById('reviewAdmin').style.display = isModeratorUser ? 'block' : 'none';
+    document.getElementById('reviewSelf').style.display = isModeratorUser ? 'none' : 'block';
+    if(isModeratorUser){
       var bar = document.getElementById('bulkReviewBar');
       var list = document.getElementById('reviewList');
       bar.style.display = submissions.length ? 'flex' : 'none';
@@ -1538,6 +1730,7 @@ listBlock,
       batch.delete(db.collection('submissions').doc(id));
       notifyIfNotSelf(batch, s);
       await batch.commit();
+      logActivity('word_approved', {term: s.term});
       showToast('Approved "'+s.term+'".');
     }catch(e){ showToast('Could not approve: ' + e.message); }
   }
@@ -1548,6 +1741,7 @@ listBlock,
       batch.delete(db.collection('submissions').doc(id));
       if(s) notifyRejectIfNotSelf(batch, s);
       await batch.commit();
+      logActivity('word_rejected', {term: s ? s.term : ''});
       showToast('Rejected.');
     }catch(e){ showToast('Could not reject: ' + e.message); }
   }
@@ -1571,6 +1765,7 @@ listBlock,
         });
         await batch.commit();
       }
+      logActivity('words_approved', {count: ids.length});
       showToast(ids.length + ' word' + (ids.length===1?'':'s') + ' approved.');
     }catch(e){ showToast('Could not approve: ' + e.message); }
   }
@@ -1586,6 +1781,7 @@ listBlock,
         });
         await batch.commit();
       }
+      logActivity('words_rejected', {count: ids.length});
       showToast(ids.length + ' rejected.');
     }catch(e){ showToast('Could not reject: ' + e.message); }
   }
@@ -1641,7 +1837,7 @@ listBlock,
     area.innerHTML =
       '<div class="progress-line">'+(practiceIdx+1)+' / '+practiceSet.length+'</div>' +
       '<div class="flashcard" id="fcCard">' +
-        '<div class="fc-front"><span class="badge fc-badge '+e.type+'">'+TYPE_LABELS[e.type]+'</span><div class="fc-term">'+escapeHtml(e.term)+'</div><div class="fc-hint">Tap to reveal</div></div>' +
+        '<div class="fc-front"><span class="badge fc-badge '+e.type+'">'+TYPE_LABELS[e.type]+'</span><div class="fc-term">'+escapeHtml(e.term)+'</div><button class="iconbtn" id="fcSpeakBtn" title="Listen" style="font-size:18px;">🔊</button><div class="fc-hint">Tap to reveal</div></div>' +
         '<div class="fc-back">' +
           fieldBox('fb-hindi','hindi', e.hindi_meaning) +
           '<div class="meaning-en" style="margin-top:6px;">'+escapeHtml(e.english_meaning||'—')+'</div>' +
@@ -1659,6 +1855,7 @@ listBlock,
       '<div class="conf-row" style="border-top:none; justify-content:center;" id="practiceConfRow"></div>' +
       '<div class="practice-actions"><button class="btn ghost" id="skipCard">Skip</button><button class="btn teal" id="nextCard">Next →</button></div>';
     document.getElementById('fcCard').addEventListener('click', function(){ this.classList.toggle('flipped'); });
+    document.getElementById('fcSpeakBtn').addEventListener('click', function(ev){ ev.stopPropagation(); speakText(e.term); });
     renderPracticeConfRow(e.id);
     document.getElementById('nextCard').addEventListener('click', function(){ practiceIdx++; renderPracticeCard(); });
     document.getElementById('skipCard').addEventListener('click', function(){ practiceIdx++; renderPracticeCard(); });
@@ -1673,7 +1870,6 @@ listBlock,
       btn.addEventListener('click', function(ev){
         ev.stopPropagation();
         var lvl = +btn.dataset.level;
-        progressMap[entryId] = Object.assign({}, progressMap[entryId], {confidence: lvl});
         setProgress(entryId, {confidence: lvl});
         renderPracticeConfRow(entryId);
       });
@@ -1715,8 +1911,30 @@ listBlock,
     var p = progressMap[id] || {};
     var current = p.confidence || 0;
     var next = correct ? Math.min(5, current + 1) : Math.max(1, current - 1);
-    progressMap[id] = Object.assign({}, p, {confidence: next});
     setProgress(id, {confidence: next});
+    var w = words.find(function(x){ return x.id === id; });
+    logQuizAttempt(id, w ? w.term : '', correct);
+  }
+  function logQuizAttempt(wordId, term, correct){
+    if(!currentUser) return;
+    try{
+      db.collection('quizAttempts').add({
+        wordId: wordId, term: term, correct: !!correct, uid: currentUser.uid,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }catch(e){ /* analytics only, fail silently */ }
+  }
+
+  function logActivity(type, extra){
+    if(!currentUser) return;
+    try{
+      db.collection('activity').add(Object.assign({
+        type: type,
+        byUid: currentUser.uid,
+        byName: currentUser.displayName || currentUser.email,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, extra || {}));
+    }catch(e){ /* feed only, fail silently */ }
   }
 
   document.getElementById('startFillBlankBtn').addEventListener('click', function(){
@@ -1844,6 +2062,179 @@ listBlock,
     document.getElementById('quizNextBtn').addEventListener('click', function(){ quizIdx++; renderConfusableQuestion(); });
   }
 
+  // ---------------- spelling challenge ----------------
+  function generateMisspelling(word){
+    var tries = 0;
+    while(tries < 12){
+      tries++;
+      var variant = word.split('');
+      var op = Math.floor(Math.random()*4);
+      var i = Math.floor(Math.random()*variant.length);
+      if(op === 0 && variant.length > 1){
+        var j = (i+1) % variant.length;
+        var tmp = variant[i]; variant[i] = variant[j]; variant[j] = tmp;
+      } else if(op === 1){
+        variant.splice(i, 0, variant[i]);
+      } else if(op === 2 && variant.length > 3){
+        variant.splice(i, 1);
+      } else {
+        var letters = 'aeiou';
+        variant[i] = letters[Math.floor(Math.random()*letters.length)];
+      }
+      var result = variant.join('');
+      if(result.toLowerCase() !== word.toLowerCase()) return result;
+    }
+    return word + 'x';
+  }
+
+  document.getElementById('startSpellTypeBtn').addEventListener('click', function(){
+    var pool = getFiltered();
+    if(pool.length === 0){ showToast('No words match your current filters.'); return; }
+    quizQueue = shuffleArr(pool.slice());
+    quizIdx = 0; quizScore = 0;
+    document.getElementById('quizHome').style.display = 'none';
+    renderSpellTypeQuestion();
+  });
+  function renderSpellTypeQuestion(){
+    var area = document.getElementById('quizArea');
+    if(quizIdx >= quizQueue.length){ showQuizSummary(); return; }
+    var w = quizQueue[quizIdx];
+    quizAnswered = false;
+    area.innerHTML =
+      '<div class="quiz-wrap">' +
+        '<div class="quiz-progress">Word '+(quizIdx+1)+' / '+quizQueue.length+' · Score '+quizScore+'</div>' +
+        '<div class="quiz-question-card">' +
+          '<div class="quiz-prompt">Listen, then type what you hear.</div>' +
+          '<button class="btn teal" id="spellPlayBtn" style="margin-bottom:16px;">🔊 Play word</button><br>' +
+          '<input type="text" id="spellInput" placeholder="Type the word…" style="max-width:280px; text-align:center; font-size:17px; padding:12px; margin:0 auto; display:block;" autocomplete="off" autocapitalize="off" spellcheck="false">' +
+          '<div class="row-actions" style="justify-content:center; margin-top:14px;"><button class="btn maroon" id="spellSubmitBtn">Check</button></div>' +
+        '</div>' +
+        '<div class="quiz-actions"><button class="btn ghost" id="quizExitBtn">Exit quiz</button><button class="btn teal" id="quizNextBtn" style="display:none;">Next →</button></div>' +
+      '</div>';
+    document.getElementById('spellPlayBtn').addEventListener('click', function(){ speakText(w.term); });
+    speakText(w.term);
+    document.getElementById('spellInput').addEventListener('keydown', function(ev){ if(ev.key === 'Enter'){ document.getElementById('spellSubmitBtn').click(); } });
+    document.getElementById('spellSubmitBtn').addEventListener('click', function(){
+      if(quizAnswered) return;
+      quizAnswered = true;
+      var val = document.getElementById('spellInput').value.trim();
+      var correct = val.toLowerCase() === w.term.toLowerCase();
+      adjustConfidenceFromQuiz(w.id, correct);
+      if(correct) quizScore++;
+      document.getElementById('spellInput').disabled = true;
+      document.getElementById('spellSubmitBtn').disabled = true;
+      var fb = document.createElement('div');
+      fb.style.marginTop = '12px';
+      fb.style.fontWeight = '600';
+      fb.style.color = correct ? 'var(--teal-deep)' : 'var(--maroon)';
+      fb.textContent = correct ? 'Correct!' : ('Correct spelling: ' + w.term);
+      document.querySelector('.quiz-question-card').appendChild(fb);
+      document.getElementById('quizNextBtn').style.display = 'inline-flex';
+    });
+    document.getElementById('quizExitBtn').addEventListener('click', backToQuizHome);
+    document.getElementById('quizNextBtn').addEventListener('click', function(){ quizIdx++; renderSpellTypeQuestion(); });
+  }
+
+  document.getElementById('startSpellCorrectBtn').addEventListener('click', function(){
+    var pool = getFiltered();
+    if(pool.length === 0){ showToast('No words match your current filters.'); return; }
+    quizQueue = shuffleArr(pool.slice());
+    quizIdx = 0; quizScore = 0;
+    document.getElementById('quizHome').style.display = 'none';
+    renderSpellCorrectQuestion();
+  });
+  function renderSpellCorrectQuestion(){
+    var area = document.getElementById('quizArea');
+    if(quizIdx >= quizQueue.length){ showQuizSummary(); return; }
+    var w = quizQueue[quizIdx];
+    var wrongs = [];
+    var guard = 0;
+    while(wrongs.length < 3 && guard < 30){
+      guard++;
+      var variant = generateMisspelling(w.term);
+      if(wrongs.indexOf(variant) === -1 && variant.toLowerCase() !== w.term.toLowerCase()) wrongs.push(variant);
+    }
+    var options = shuffleArr([w.term].concat(wrongs));
+    quizAnswered = false;
+    area.innerHTML =
+      '<div class="quiz-wrap">' +
+        '<div class="quiz-progress">Word '+(quizIdx+1)+' / '+quizQueue.length+' · Score '+quizScore+'</div>' +
+        '<div class="quiz-question-card">' +
+          '<div class="quiz-prompt">Which is the correct spelling?</div>' +
+          '<button class="btn teal" id="spellPlayBtn" style="margin-bottom:16px;">🔊 Play word</button>' +
+          '<div class="quiz-options" id="quizOptions">' +
+            options.map(function(opt){ return '<button class="quiz-option" data-opt="'+escapeAttr(opt)+'">'+escapeHtml(opt)+'</button>'; }).join('') +
+          '</div>' +
+        '</div>' +
+        '<div class="quiz-actions"><button class="btn ghost" id="quizExitBtn">Exit quiz</button><button class="btn teal" id="quizNextBtn" style="display:none;">Next →</button></div>' +
+      '</div>';
+    document.getElementById('spellPlayBtn').addEventListener('click', function(){ speakText(w.term); });
+    speakText(w.term);
+    document.querySelectorAll('#quizOptions .quiz-option').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        if(quizAnswered) return;
+        quizAnswered = true;
+        var correct = btn.dataset.opt === w.term;
+        document.querySelectorAll('#quizOptions .quiz-option').forEach(function(b2){
+          b2.disabled = true;
+          if(b2.dataset.opt === w.term) b2.classList.add('correct');
+          else if(b2 === btn) b2.classList.add('wrong');
+        });
+        adjustConfidenceFromQuiz(w.id, correct);
+        if(correct) quizScore++;
+        document.getElementById('quizNextBtn').style.display = 'inline-flex';
+      });
+    });
+    document.getElementById('quizExitBtn').addEventListener('click', backToQuizHome);
+    document.getElementById('quizNextBtn').addEventListener('click', function(){ quizIdx++; renderSpellCorrectQuestion(); });
+  }
+
+  document.getElementById('startSpellWrongBtn').addEventListener('click', function(){
+    var pool = getFiltered();
+    if(pool.length < 4){ showToast('Need at least 4 words matching your current filters.'); return; }
+    quizQueue = shuffleArr(pool.slice());
+    quizIdx = 0; quizScore = 0;
+    document.getElementById('quizHome').style.display = 'none';
+    renderSpellSpotQuestion();
+  });
+  function renderSpellSpotQuestion(){
+    var area = document.getElementById('quizArea');
+    var remaining = quizQueue.length - quizIdx;
+    if(remaining < 4){ showQuizSummary(); return; }
+    var group = quizQueue.slice(quizIdx, quizIdx+4);
+    var wrongIdx = Math.floor(Math.random()*4);
+    var options = group.map(function(w,i){ return i===wrongIdx ? generateMisspelling(w.term) : w.term; });
+    quizAnswered = false;
+    area.innerHTML =
+      '<div class="quiz-wrap">' +
+        '<div class="quiz-progress">Round '+(Math.floor(quizIdx/4)+1)+' · Score '+quizScore+'</div>' +
+        '<div class="quiz-question-card">' +
+          '<div class="quiz-prompt">Which one is misspelled?</div>' +
+          '<div class="quiz-options" id="quizOptions">' +
+            options.map(function(opt){ return '<button class="quiz-option" data-opt="'+escapeAttr(opt)+'">'+escapeHtml(opt)+'</button>'; }).join('') +
+          '</div>' +
+        '</div>' +
+        '<div class="quiz-actions"><button class="btn ghost" id="quizExitBtn">Exit quiz</button><button class="btn teal" id="quizNextBtn" style="display:none;">Next round →</button></div>' +
+      '</div>';
+    document.querySelectorAll('#quizOptions .quiz-option').forEach(function(btn, idx){
+      btn.addEventListener('click', function(){
+        if(quizAnswered) return;
+        quizAnswered = true;
+        var pickedRight = (idx === wrongIdx);
+        document.querySelectorAll('#quizOptions .quiz-option').forEach(function(b2, i2){
+          b2.disabled = true;
+          if(i2 === wrongIdx) b2.classList.add(pickedRight ? 'correct' : 'wrong');
+        });
+        var targetWord = group[wrongIdx];
+        adjustConfidenceFromQuiz(targetWord.id, pickedRight);
+        if(pickedRight) quizScore++;
+        document.getElementById('quizNextBtn').style.display = 'inline-flex';
+      });
+    });
+    document.getElementById('quizExitBtn').addEventListener('click', backToQuizHome);
+    document.getElementById('quizNextBtn').addEventListener('click', function(){ quizIdx += 4; renderSpellSpotQuestion(); });
+  }
+
   // ---------------- root web ----------------
   function renderRoots(){
     var area = document.getElementById('rootsArea');
@@ -1928,9 +2319,9 @@ listBlock,
   }
 
   function renderEnrichHome(){
-    document.getElementById('enrichAdmin').style.display = isAdminUser ? 'block' : 'none';
-    document.getElementById('enrichNonAdmin').style.display = isAdminUser ? 'none' : 'block';
-    if(!isAdminUser) return;
+    document.getElementById('enrichAdmin').style.display = isModeratorUser ? 'block' : 'none';
+    document.getElementById('enrichNonAdmin').style.display = isModeratorUser ? 'none' : 'block';
+    if(!isModeratorUser) return;
     var missing = wordsMissingEnrichFields();
     document.getElementById('enrichCount').textContent = missing.length === 0
       ? "Every word has already been through this — nothing missing right now."
@@ -2234,7 +2625,7 @@ listBlock,
       '<div class="slide-progress">'+(slideIdx+1)+' / '+slideDeck.length+'</div>' +
       '<div class="slide-card" id="slideCard">' +
         '<div class="slide-card-head">' +
-          '<div class="vcard-top"><div><div class="term">'+escapeHtml(e.term)+'</div><div class="pos">'+escapeHtml(e.part_of_speech||'-')+'</div></div><span class="badge '+e.type+'">'+TYPE_LABELS[e.type]+'</span></div>' +
+          '<div class="vcard-top"><div><div class="term">'+escapeHtml(e.term)+' <button class="iconbtn" id="slideSpeakBtn" title="Listen" style="font-size:15px; vertical-align:middle;">🔊</button></div><div class="pos">'+escapeHtml(e.part_of_speech||'-')+'</div></div><span class="badge '+e.type+'">'+TYPE_LABELS[e.type]+'</span></div>' +
           (e.tags && e.tags.length ? '<div class="tagrow">'+e.tags.map(function(t){return '<span class="chip">'+escapeHtml(t)+'</span>';}).join('')+'</div>' : '') +
         '</div>' +
         (slideCurrentRevealed ? '<div class="slide-details-grid">'+detailsHtml+'</div>' : '<div class="slide-reveal-hint">Tap anywhere to reveal the meaning</div>') +
@@ -2244,6 +2635,7 @@ listBlock,
     document.getElementById('slideCard').addEventListener('click', function(){
       if(!slideCurrentRevealed){ slideCurrentRevealed = true; paintSlide(e); }
     });
+    document.getElementById('slideSpeakBtn').addEventListener('click', function(ev){ ev.stopPropagation(); speakText(e.term); });
     renderSlideConfRow(e.id);
     document.getElementById('slidePrev').disabled = slideIdx === 0;
   }
@@ -2257,7 +2649,6 @@ listBlock,
       btn.addEventListener('click', function(ev){
         ev.stopPropagation();
         var lvl = +btn.dataset.level;
-        progressMap[entryId] = Object.assign({}, progressMap[entryId], {confidence: lvl});
         setProgress(entryId, {confidence: lvl});
         renderSlideConfRow(entryId);
       });
@@ -2365,6 +2756,283 @@ listBlock,
       }catch(e){ showToast('Could not clear: ' + e.message); }
     });
   });
+
+  // ---------------- leaderboard ----------------
+  async function renderLeaderboard(){
+    var area = document.getElementById('leaderboardArea');
+    area.innerHTML = '<p class="help">Loading…</p>';
+    try{
+      var snap = await db.collection('users').orderBy('masteredCount', 'desc').limit(50).get();
+      var rows = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+      var totalWords = words.length;
+      if(rows.length === 0){ area.innerHTML = emptyStateHtml('No data yet', 'The leaderboard fills in as people study and mark words memorized.'); return; }
+      area.innerHTML = '<div class="grid">' + rows.map(function(u, i){
+        var pct = totalWords ? Math.round(((u.masteredCount||0)/totalWords)*100) : 0;
+        return '<div class="vcard" style="cursor:default;">' +
+          '<div class="vcard-top">' +
+            '<div style="display:flex; align-items:center; gap:10px;">' +
+              '<span style="font-family:\'Fraunces\',serif; font-size:18px; font-weight:600; color:var(--ink-faint); width:24px; flex-shrink:0;">#'+(i+1)+'</span>' +
+              (u.photoURL ? '<img class="avatar" src="'+u.photoURL+'" style="width:32px;height:32px;">' : '') +
+              '<div class="term" style="font-size:16px;">'+escapeHtml(u.displayName||u.email||'Someone')+'</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="conf-row" style="border-top:none;"><span class="conf-label">'+pct+'% of the library memorized</span></div>' +
+          '<div class="meta-line">'+(u.masteredCount||0)+' memorized · '+(u.engagedCount||0)+' studied</div>' +
+        '</div>';
+      }).join('') + '</div>';
+    }catch(e){ area.innerHTML = emptyStateHtml('Could not load the leaderboard', e.message); }
+  }
+
+  // ---------------- admin panel ----------------
+  function renderAdminPanel(){
+    renderModeratorsList();
+    renderActivityFeed();
+    renderTagToolSelects();
+    renderMissedWords();
+    renderMasteryBreakdown();
+    document.getElementById('dupesArea').innerHTML = '';
+  }
+
+  async function renderModeratorsList(){
+    if(!isAdminUser) return;
+    var box = document.getElementById('moderatorsList');
+    box.innerHTML = '<p class="help">Loading…</p>';
+    try{
+      var usersSnap = await db.collection('users').orderBy('displayName').limit(200).get();
+      var rolesSnap = await db.collection('roles').get();
+      var modMap = {};
+      rolesSnap.forEach(function(d){ modMap[d.id] = d.data(); });
+      var rows = usersSnap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); })
+        .filter(function(u){ return ADMIN_EMAILS.indexOf(u.email) === -1; });
+      if(rows.length === 0){ box.innerHTML = emptyStateHtml('No users yet', 'People show up here once they sign in at least once.'); return; }
+      box.innerHTML = rows.map(function(u){
+        var isMod = !!modMap[u.id];
+        return '<div class="pending-card" style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">' +
+          '<div>'+escapeHtml(u.displayName||u.email)+(isMod ? ' <span class="mod-badge">moderator</span>' : '')+'</div>' +
+          '<button class="btn '+(isMod?'maroon':'teal')+' sm" data-toggle-mod="'+u.id+'" data-is-mod="'+(isMod?'1':'0')+'">'+(isMod?'Remove':'Make moderator')+'</button>' +
+        '</div>';
+      }).join('');
+      box.querySelectorAll('[data-toggle-mod]').forEach(function(btn){
+        btn.addEventListener('click', function(){ toggleModerator(btn.dataset.toggleMod, btn.dataset.isMod === '1'); });
+      });
+    }catch(e){ box.innerHTML = emptyStateHtml('Could not load users', e.message); }
+  }
+
+  async function toggleModerator(uid, currentlyMod){
+    try{
+      if(currentlyMod){
+        await db.collection('roles').doc(uid).delete();
+        showToast('Moderator removed.');
+      } else {
+        var userDoc = await db.collection('users').doc(uid).get();
+        var ud = userDoc.exists ? userDoc.data() : {};
+        await db.collection('roles').doc(uid).set({
+          role: 'moderator', email: ud.email||'', displayName: ud.displayName||'',
+          grantedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        showToast('Moderator added.');
+      }
+      renderModeratorsList();
+    }catch(e){ showToast('Could not update: ' + e.message); }
+  }
+
+  document.getElementById('addModBtn').addEventListener('click', async function(){
+    var email = document.getElementById('newModEmail').value.trim().toLowerCase();
+    if(!email){ showToast('Enter an email.'); return; }
+    try{
+      var snap = await db.collection('users').where('email', '==', email).limit(1).get();
+      if(snap.empty){ showToast('No user found with that email — they need to sign in at least once first.'); return; }
+      await toggleModerator(snap.docs[0].id, false);
+      document.getElementById('newModEmail').value = '';
+    }catch(e){ showToast('Could not add: ' + e.message); }
+  });
+
+  var ACTION_VERB = {
+    word_added: 'added', words_added: 'added',
+    word_submitted: 'submitted', words_submitted: 'submitted',
+    word_approved: 'approved', words_approved: 'approved',
+    word_rejected: 'rejected', words_rejected: 'rejected'
+  };
+  async function renderActivityFeed(){
+    var box = document.getElementById('activityFeedArea');
+    box.innerHTML = '<p class="help">Loading…</p>';
+    try{
+      var snap = await db.collection('activity').orderBy('createdAt', 'desc').limit(150).get();
+      var raw = snap.docs.map(function(d){ return d.data(); });
+      if(raw.length === 0){ box.innerHTML = emptyStateHtml('Nothing yet', 'Activity shows up here as people add and review words.'); return; }
+      var grouped = [];
+      raw.forEach(function(a){
+        var verb = ACTION_VERB[a.type] || a.type;
+        var day = a.createdAt ? new Date(tsMillis(a.createdAt)).toDateString() : '';
+        var last = grouped[grouped.length-1];
+        if(last && last.byUid === a.byUid && last.verb === verb && last.day === day){
+          last.count += (a.count || 1);
+          if(a.term) last.terms.push(a.term);
+        } else {
+          grouped.push({ byUid: a.byUid, byName: a.byName, verb: verb, day: day, count: (a.count||1), terms: a.term ? [a.term] : [] });
+        }
+      });
+      var todayStr = new Date().toDateString();
+      box.innerHTML = grouped.slice(0, 40).map(function(g){
+        var when = g.day === todayStr ? 'today' : '';
+        var text;
+        if(g.count === 1 && g.terms[0]){
+          text = escapeHtml(g.byName) + ' ' + g.verb + ' "' + escapeHtml(g.terms[0]) + '"' + (when ? ' '+when : '');
+        } else {
+          text = escapeHtml(g.byName) + ' ' + g.verb + ' ' + g.count + ' word' + (g.count===1?'':'s') + (when ? ' '+when : '');
+        }
+        return '<div class="pending-meta" style="padding:6px 0; border-bottom:1px dashed var(--rule);">'+text+'</div>';
+      }).join('');
+    }catch(e){ box.innerHTML = emptyStateHtml('Could not load activity', e.message); }
+  }
+
+  function levenshtein(a, b){
+    a = a.toLowerCase(); b = b.toLowerCase();
+    var m = a.length, n = b.length;
+    var dp = [];
+    for(var i=0;i<=m;i++){ dp.push([i]); }
+    for(var j=0;j<=n;j++){ dp[0][j] = j; }
+    for(i=1;i<=m;i++){
+      for(j=1;j<=n;j++){
+        dp[i][j] = a[i-1]===b[j-1] ? dp[i-1][j-1] : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+      }
+    }
+    return dp[m][n];
+  }
+
+  document.getElementById('findDupesBtn').addEventListener('click', function(){
+    var box = document.getElementById('dupesArea');
+    box.innerHTML = '<p class="help">Scanning…</p>';
+    var pairs = [];
+    for(var i=0;i<words.length;i++){
+      for(var j=i+1;j<words.length;j++){
+        var a = words[i], b = words[j];
+        if(a.type !== b.type) continue;
+        var dist = levenshtein(a.term, b.term);
+        var maxLen = Math.max(a.term.length, b.term.length);
+        if(maxLen === 0) continue;
+        var similarity = 1 - dist/maxLen;
+        if(dist === 0 || (dist <= 2 && similarity > 0.72)){ pairs.push({a:a, b:b, dist:dist}); }
+      }
+    }
+    if(pairs.length === 0){ box.innerHTML = emptyStateHtml('No likely duplicates found', 'Nice and clean!'); return; }
+    pairs.sort(function(x,y){ return x.dist - y.dist; });
+    box.innerHTML = pairs.slice(0, 60).map(function(p, idx){
+      return '<div class="stage-item" style="margin-bottom:10px;">' +
+        '<div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">' +
+          '<div><strong>'+escapeHtml(p.a.term)+'</strong> vs <strong>'+escapeHtml(p.b.term)+'</strong> <span class="chip">'+TYPE_LABELS[p.a.type]+'</span></div>' +
+          '<div class="row-actions" style="margin:0;">' +
+            '<button class="btn ghost sm" data-keep-a="'+idx+'">Delete "'+escapeHtml(p.b.term)+'"</button>' +
+            '<button class="btn ghost sm" data-keep-b="'+idx+'">Delete "'+escapeHtml(p.a.term)+'"</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+    box.querySelectorAll('[data-keep-a]').forEach(function(btn){
+      btn.addEventListener('click', function(){ deleteDuplicate(pairs[+btn.dataset.keepA].b.id); });
+    });
+    box.querySelectorAll('[data-keep-b]').forEach(function(btn){
+      btn.addEventListener('click', function(){ deleteDuplicate(pairs[+btn.dataset.keepB].a.id); });
+    });
+  });
+
+  async function deleteDuplicate(id){
+    try{ await db.collection('words').doc(id).delete(); showToast('Deleted.'); document.getElementById('findDupesBtn').click(); }
+    catch(e){ showToast('Could not delete: ' + e.message); }
+  }
+
+  function renderTagToolSelects(){
+    var tags = allTags();
+    var optsHtml = tags.map(function(t){ return '<option value="'+escapeAttr(t)+'">'+escapeHtml(t)+'</option>'; }).join('');
+    document.getElementById('renameTagFrom').innerHTML = optsHtml || '<option value="">No tags yet</option>';
+    document.getElementById('deleteTagSelect').innerHTML = optsHtml || '<option value="">No tags yet</option>';
+  }
+
+  document.getElementById('renameTagBtn').addEventListener('click', async function(){
+    var from = document.getElementById('renameTagFrom').value;
+    var to = document.getElementById('renameTagTo').value.trim();
+    if(!from || !to){ showToast('Pick a tag and enter a new name.'); return; }
+    var affected = words.filter(function(w){ return (w.tags||[]).indexOf(from) !== -1; });
+    if(affected.length === 0){ showToast('No words have that tag.'); return; }
+    try{
+      var CHUNK = 300;
+      for(var i=0;i<affected.length;i+=CHUNK){
+        var batch = db.batch();
+        affected.slice(i,i+CHUNK).forEach(function(w){
+          var seen = {};
+          var newTags = (w.tags||[]).map(function(t){ return t===from ? to : t; }).filter(function(t){
+            if(seen[t]) return false; seen[t]=true; return true;
+          });
+          batch.update(db.collection('words').doc(w.id), {tags:newTags});
+        });
+        await batch.commit();
+      }
+      showToast('Renamed "'+from+'" to "'+to+'" on '+affected.length+' word'+(affected.length===1?'':'s')+'.');
+      document.getElementById('renameTagTo').value = '';
+      renderTagToolSelects();
+    }catch(e){ showToast('Could not rename: ' + e.message); }
+  });
+
+  document.getElementById('deleteTagBtn').addEventListener('click', async function(){
+    var tag = document.getElementById('deleteTagSelect').value;
+    if(!tag){ showToast('Pick a tag.'); return; }
+    var affected = words.filter(function(w){ return (w.tags||[]).indexOf(tag) !== -1; });
+    if(affected.length === 0){ showToast('No words have that tag.'); return; }
+    try{
+      var CHUNK = 300;
+      for(var i=0;i<affected.length;i+=CHUNK){
+        var batch = db.batch();
+        affected.slice(i,i+CHUNK).forEach(function(w){
+          var newTags = (w.tags||[]).filter(function(t){ return t !== tag; });
+          batch.update(db.collection('words').doc(w.id), {tags:newTags});
+        });
+        await batch.commit();
+      }
+      showToast('Removed "'+tag+'" from '+affected.length+' word'+(affected.length===1?'':'s')+'.');
+      renderTagToolSelects();
+    }catch(e){ showToast('Could not remove tag: ' + e.message); }
+  });
+
+  async function renderMissedWords(){
+    var box = document.getElementById('missedWordsArea');
+    box.innerHTML = '<p class="help">Loading…</p>';
+    try{
+      var snap = await db.collection('quizAttempts').orderBy('createdAt', 'desc').limit(1000).get();
+      var agg = {};
+      snap.forEach(function(d){
+        var a = d.data();
+        if(!agg[a.wordId]) agg[a.wordId] = {term: a.term, wrong: 0, total: 0};
+        agg[a.wordId].total++;
+        if(!a.correct) agg[a.wordId].wrong++;
+      });
+      var rows = Object.keys(agg).map(function(id){ return agg[id]; })
+        .filter(function(r){ return r.total >= 3; })
+        .sort(function(a,b){ return (b.wrong/b.total) - (a.wrong/a.total); });
+      if(rows.length === 0){ box.innerHTML = emptyStateHtml('Not enough quiz data yet', 'Shows up once a word has been attempted a few times across quizzes.'); return; }
+      box.innerHTML = rows.slice(0, 30).map(function(r){
+        var pct = Math.round(r.wrong/r.total*100);
+        return '<div class="bar-row"><div class="lbl">'+escapeHtml(r.term)+'</div><div class="bar-track"><div class="bar-fill" style="width:'+pct+'%; background:var(--maroon);"></div></div><div class="count">'+pct+'%</div></div>';
+      }).join('');
+    }catch(e){ box.innerHTML = emptyStateHtml('Could not load', e.message); }
+  }
+
+  function renderMasteryBreakdown(){
+    var box = document.getElementById('masteryBreakdownArea');
+    var withData = words.filter(function(w){ return w.confLevels && Object.keys(w.confLevels).length; });
+    if(withData.length === 0){ box.innerHTML = emptyStateHtml('No data yet', 'Fills in as people set a confidence level on words.'); return; }
+    withData.forEach(function(w){
+      w._total = Object.keys(w.confLevels).reduce(function(s,k){ return s + (w.confLevels[k]||0); }, 0);
+    });
+    withData.sort(function(a,b){ return b._total - a._total; });
+    box.innerHTML = withData.slice(0, 40).map(function(w){
+      var rows = [1,2,3,4,5].map(function(lvl){
+        var c = (w.confLevels && w.confLevels[lvl]) || 0;
+        var pct = w._total ? Math.round(c/w._total*100) : 0;
+        return '<div class="bar-row"><div class="lbl">Level '+lvl+'</div><div class="bar-track"><div class="bar-fill" style="width:'+pct+'%;"></div></div><div class="count">'+pct+'%</div></div>';
+      }).join('');
+      return '<div class="stage-item" style="margin-bottom:14px;"><div class="term" style="font-size:15px; margin-bottom:6px;">'+escapeHtml(w.term)+' <span style="font-size:12px; color:var(--ink-soft); font-weight:400;">('+w._total+' engaged)</span></div>'+rows+'</div>';
+    }).join('');
+  }
 
   // ---------------- render all ----------------
   function renderAll(){ renderStatStrip(); renderLibrary(); renderStats(); }
