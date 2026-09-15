@@ -35,6 +35,7 @@
   body.dark .fb-history{ background:#33261C; color:#E8A67C; }
   body.dark .fb-confusable{ background:#332020; color:#EAA9A9; }
   body.dark .fb-root{ background:#20302A; color:#9FDCC6; }
+  body.dark .fb-spelltrap{ background:#332818; color:#E8C27C; }
   body.dark .badge.word{ background:#243020; color:#9BCB86; }
   body.dark .badge.idiom{ background:#33261A; color:#E3A874; }
   body.dark .badge.one_word_substitution{ background:#1D2A33; color:#8FC1E3; }
@@ -150,6 +151,8 @@
   .fb-history{ background:#F5DED0; color:#8A3B1E; }
   .fb-confusable{ background:#F5E0DE; color:#8C3B3B; }
   .fb-root{ background:#DDEFE6; color:#256A4C; }
+  .fb-spelltrap{ background:#FBEBD2; color:#8A5A12; }
+  .spelltrap-chip{ background:var(--mustard); color:var(--ink); font-weight:700; }
   .fb-row2{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
 
   .conf-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:12px; padding-top:10px; border-top:1px dashed var(--rule); }
@@ -516,6 +519,10 @@
         <div class="panel">
           <h2>Spelling challenge</h2>
           <p class="help">Hear a word aloud and prove you can spell it, three ways. Draws from every vocabulary word in your library (idioms and phrases are skipped) — independent of any Library search or filters you've set.</p>
+          <label style="display:flex; gap:8px; align-items:center; font-size:13px; margin-bottom:10px; cursor:pointer;">
+            <input type="checkbox" id="spellTrapOnly" style="width:16px; height:16px;">
+            Only use words flagged as a spelling trap (⚠ tricky/commonly misspelled)
+          </label>
           <div class="row-actions">
             <button class="btn" id="startSpellTypeBtn">Hear &amp; type</button>
             <button class="btn ghost" id="startSpellCorrectBtn">Choose the correct spelling</button>
@@ -1152,6 +1159,8 @@
       ssc_history: raw.ssc_history ? String(raw.ssc_history).trim() : '',
       confusable_with: (raw.confusable_with && String(raw.confusable_with).trim() !== '-') ? String(raw.confusable_with).trim() : '',
       root: (raw.root && String(raw.root).trim() !== '-') ? String(raw.root).trim() : '',
+      spelling_trap: raw.spelling_trap === true || raw.spelling_trap === 'true',
+      spelling_note: (raw.spelling_note && String(raw.spelling_note).trim() !== '-') ? String(raw.spelling_note).trim() : '',
       origin: raw.origin ? String(raw.origin).trim() : '-'
     };
   }
@@ -1162,7 +1171,9 @@
       english_meaning: norm.english_meaning, hindi_meaning: norm.hindi_meaning,
       synonyms: norm.synonyms, antonyms: norm.antonyms, ssc_sentence: norm.ssc_sentence,
       mnemonic: norm.mnemonic, ssc_history: norm.ssc_history || '',
-      confusable_with: norm.confusable_with || '', root: norm.root || '', origin: norm.origin,
+      confusable_with: norm.confusable_with || '', root: norm.root || '',
+      spelling_trap: !!norm.spelling_trap, spelling_note: norm.spelling_note || '',
+      origin: norm.origin,
       tags: tag ? [tag] : (norm.tags || []),
       authorUid: currentUser.uid,
       authorName: currentUser.displayName || currentUser.email,
@@ -1204,6 +1215,8 @@ listBlock,
 '  "ssc_history": string (how frequently and in what way this term tends to appear in SSC exams - e.g. common in Cloze Test, Error Spotting, One Word Substitution, or Synonym-Antonym sections; roughly how often such terms come up; how a typical question uses it. Describe the general pattern honestly - do not invent specific exam dates, years, or fake direct quotations from past papers. If this is not a well-documented exam pattern, say so plainly instead of guessing.),',
 '  "confusable_with": string (a single other real word commonly confused with this one, e.g. "Affect" -> "Effect", "Complement" -> "Compliment"; use "-" if there is no well-known confusable counterpart),',
 '  "root": string (a shared Latin/Greek/other root that helps connect this word to others, stated as "root = meaning", e.g. "greg = flock/herd" for gregarious, "acu = sharp" for acumen; mainly applies to type "word" entries; use "-" if none is genuinely useful or applicable),',
+'  "spelling_trap": boolean (true if this term is commonly featured in SSC "spot the misspelled word" / spelling-correction questions, or if test-takers frequently misspell it; false otherwise),',
+'  "spelling_note": string (if spelling_trap is true, briefly note the common misspelling and how to avoid it, e.g. "often misspelled as \'existance\' - remember it ends in -ence"; use "-" if spelling_trap is false),',
 '  "origin": string (etymology or origin, especially for idioms/phrases; use "-" if not relevant)',
 '}',
 '',
@@ -1473,6 +1486,7 @@ listBlock,
       fieldBox('fb-history','ssc exam history', e.ssc_history) +
       fieldBox('fb-confusable','often confused with', e.confusable_with) +
       fieldBox('fb-root','root', e.root) +
+      fieldBox('fb-spelltrap','spelling note', e.spelling_note) +
       (e.type==='idiom' ? fieldBox('fb-origin','origin', e.origin) : '')
     ) : '<div style="text-align:center; color:var(--ink-faint); font-size:13px; font-style:italic; padding:16px 0;">Tap to reveal</div>';
     return '' +
@@ -1481,7 +1495,10 @@ listBlock,
         '<div><div class="term">'+escapeHtml(e.term)+' <button class="iconbtn" data-action="speak" data-id="'+e.id+'" title="Listen" style="font-size:14px; vertical-align:middle;">🔊</button></div><div class="pos">'+escapeHtml(e.part_of_speech||'-')+'</div></div>' +
         '<span class="badge '+e.type+'">'+TYPE_LABELS[e.type]+'</span>' +
       '</div>' +
-      (e.tags && e.tags.length ? '<div class="tagrow">'+e.tags.map(function(t){return '<span class="chip">'+escapeHtml(t)+'</span>';}).join('')+'</div>' : '') +
+      (e.tags && e.tags.length || e.spelling_trap ? '<div class="tagrow">' +
+        (e.spelling_trap ? '<span class="chip spelltrap-chip">✎ spelling trap</span>' : '') +
+        (e.tags||[]).map(function(t){return '<span class="chip">'+escapeHtml(t)+'</span>';}).join('') +
+      '</div>' : '') +
       detailsHtml +
       (revealed && e.authorName ? '<div class="meta-line">Added by '+escapeHtml(e.authorName)+'</div>' : '') +
       '<div class="conf-row"><span class="conf-label">'+confLabel(e.confidence)+'</span>'+confDotsHtml(e.id, e.confidence)+'</div>' +
@@ -1544,7 +1561,7 @@ listBlock,
   modalBg.addEventListener('click', function(ev){ if(ev.target === modalBg) closeModal(); });
 
   function entryFormHtml(e){
-    e = e || {term:'',type:'word',part_of_speech:'',english_meaning:'',hindi_meaning:'',synonyms:[],antonyms:[],ssc_sentence:'',mnemonic:'',ssc_history:'',confusable_with:'',root:'',origin:'',tags:[]};
+    e = e || {term:'',type:'word',part_of_speech:'',english_meaning:'',hindi_meaning:'',synonyms:[],antonyms:[],ssc_sentence:'',mnemonic:'',ssc_history:'',confusable_with:'',root:'',spelling_trap:false,spelling_note:'',origin:'',tags:[]};
     return '' +
     '<div class="field"><label class="field-label">Term</label><input type="text" id="f_term" value="'+escapeAttr(e.term)+'"></div>' +
     '<div class="field-2col">' +
@@ -1566,6 +1583,11 @@ listBlock,
       '<div class="field"><label class="field-label">Confusable with (e.g. "Effect")</label><input type="text" id="f_confuse" value="'+escapeAttr(e.confusable_with||'')+'"></div>' +
       '<div class="field"><label class="field-label">Root (e.g. "greg = flock/herd")</label><input type="text" id="f_root" value="'+escapeAttr(e.root||'')+'"></div>' +
     '</div>' +
+    '<div class="field"><label style="display:flex; gap:10px; align-items:flex-start; cursor:pointer;">' +
+      '<input type="checkbox" id="f_spelltrap" style="margin-top:3px; width:18px; height:18px;" '+(e.spelling_trap?'checked':'')+'>' +
+      '<span>Commonly appears in spelling-correction questions / has confusing spelling</span>' +
+    '</label></div>' +
+    '<div class="field"><label class="field-label">Spelling note (common misspelling &amp; how to avoid it)</label><textarea id="f_spellnote" style="min-height:50px;">'+escapeHtml(e.spelling_note||'')+'</textarea></div>' +
     '<div class="field"><label class="field-label">Origin (for idioms)</label><input type="text" id="f_ori" value="'+escapeAttr(e.origin||'')+'"></div>' +
     '<div class="field"><label class="field-label">Tags (comma separated)</label><input type="text" id="f_tags" value="'+escapeAttr((e.tags||[]).join(', '))+'"></div>';
   }
@@ -1584,6 +1606,8 @@ listBlock,
       ssc_history: document.getElementById('f_hist').value.trim(),
       confusable_with: document.getElementById('f_confuse').value.trim(),
       root: document.getElementById('f_root').value.trim(),
+      spelling_trap: document.getElementById('f_spelltrap').checked,
+      spelling_note: document.getElementById('f_spellnote').value.trim(),
       origin: document.getElementById('f_ori').value.trim() || '-',
       tags: asArray(document.getElementById('f_tags').value)
     };
@@ -2062,8 +2086,23 @@ listBlock,
     return word + 'x';
   }
 
-  document.getElementById('startSpellTypeBtn').addEventListener('click', function(){
+  function getSpellingPool(minCount){
+    var trapOnly = document.getElementById('spellTrapOnly').checked;
     var pool = viewEntries().filter(function(w){ return w.type === 'word'; });
+    if(trapOnly){
+      var trapPool = pool.filter(function(w){ return w.spelling_trap; });
+      if(trapPool.length < minCount){
+        showToast('Not enough words flagged as a spelling trap yet (' + trapPool.length + ' found) — flag more via Add words or Edit, or uncheck this option.');
+        return null;
+      }
+      return trapPool;
+    }
+    return pool;
+  }
+
+  document.getElementById('startSpellTypeBtn').addEventListener('click', function(){
+    var pool = getSpellingPool(1);
+    if(!pool) return;
     if(pool.length === 0){ showToast('No vocabulary words in your library yet.'); return; }
     quizQueue = shuffleArr(pool.slice());
     quizIdx = 0; quizScore = 0; quizResults = [];
@@ -2111,7 +2150,8 @@ listBlock,
   }
 
   document.getElementById('startSpellCorrectBtn').addEventListener('click', function(){
-    var pool = viewEntries().filter(function(w){ return w.type === 'word'; });
+    var pool = getSpellingPool(1);
+    if(!pool) return;
     if(pool.length === 0){ showToast('No vocabulary words in your library yet.'); return; }
     quizQueue = shuffleArr(pool.slice());
     quizIdx = 0; quizScore = 0; quizResults = [];
@@ -2165,7 +2205,8 @@ listBlock,
   }
 
   document.getElementById('startSpellWrongBtn').addEventListener('click', function(){
-    var pool = viewEntries().filter(function(w){ return w.type === 'word'; });
+    var pool = getSpellingPool(4);
+    if(!pool) return;
     if(pool.length < 4){ showToast('Need at least 4 vocabulary words in your library.'); return; }
     quizQueue = shuffleArr(pool.slice());
     quizIdx = 0; quizScore = 0; quizResults = [];
@@ -2276,6 +2317,7 @@ listBlock,
       fieldBox('fb-history','ssc exam history', w.ssc_history) +
       fieldBox('fb-confusable','often confused with', w.confusable_with) +
       fieldBox('fb-root','root', w.root) +
+      fieldBox('fb-spelltrap','spelling note', w.spelling_note) +
       (w.type==='idiom' ? fieldBox('fb-origin','origin', w.origin) : '') +
       '<div class="modal-actions"><button class="btn ghost" id="closeWordPreview">Close</button></div>';
     modalBgRef().classList.add('open');
@@ -2300,7 +2342,7 @@ listBlock,
   var lastEnrichPrompt = '';
   var enrichBatchWords = [];
   var enrichPendingReview = [];
-  var FIELD_LABELS_ENRICH = { ssc_history: 'SSC history', confusable_with: 'Confusable with', root: 'Root' };
+  var FIELD_LABELS_ENRICH = { ssc_history: 'SSC history', confusable_with: 'Confusable with', root: 'Root', spelling_trap: 'Spelling trap flag', spelling_note: 'Spelling note' };
 
   function wordsMissingEnrichFields(){
     return words.filter(function(w){ return !w.enrichedAt; });
@@ -2342,6 +2384,8 @@ listBlock,
 '  "ssc_history": string (how frequently and in what way this term tends to appear in SSC exams - e.g. common in Cloze Test, Error Spotting, One Word Substitution, or Synonym-Antonym sections; roughly how often such terms come up; how a typical question uses it. Describe the general pattern honestly - do not invent specific exam dates, years, or fake direct quotations from past papers. If this is not a well-documented exam pattern, say so plainly instead of guessing.),',
 '  "confusable_with": string (a single other real word commonly confused with this one, e.g. "Affect" -> "Effect"; use "-" if there is no well-known confusable counterpart),',
 '  "root": string (a shared Latin/Greek/other root that helps connect this word to others, stated as "root = meaning", e.g. "greg = flock/herd"; mainly applies to actual words, not idioms/phrasal verbs/one-word substitutions; use "-" if none is genuinely useful or applicable)',
+'  "spelling_trap": boolean (true if this term is commonly featured in SSC "spot the misspelled word" / spelling-correction questions, or is frequently misspelled by test-takers; false otherwise),',
+'  "spelling_note": string (if spelling_trap is true, briefly note the common misspelling and how to avoid it; use "-" if spelling_trap is false)',
 '}',
 '',
 'Output only the JSON array.'
@@ -2410,7 +2454,7 @@ listBlock,
       if(!match) return { term: clean || rawTerm, matched: false };
       var fields = [];
       var updates = {};
-      ['ssc_history','confusable_with','root'].forEach(function(key){
+      ['ssc_history','confusable_with','root','spelling_note'].forEach(function(key){
         var incoming = item[key] ? String(item[key]).trim() : '';
         if(incoming === '-') incoming = '';
         var already = match[key] || '';
@@ -2423,6 +2467,15 @@ listBlock,
           fields.push({key: key, value: '', action: 'none'});
         }
       });
+      var incomingTrap = item.spelling_trap === true || item.spelling_trap === 'true';
+      if(!match.spelling_trap && incomingTrap){
+        updates.spelling_trap = true;
+        fields.push({key: 'spelling_trap', value: 'yes', action: 'set'});
+      } else if(match.spelling_trap){
+        fields.push({key: 'spelling_trap', value: 'yes', action: 'skip'});
+      } else {
+        fields.push({key: 'spelling_trap', value: '', action: 'none'});
+      }
       return { term: match.term, matched: true, wordId: match.id, updates: updates, fields: fields, include: Object.keys(updates).length > 0 };
     }).filter(Boolean);
 
@@ -2606,6 +2659,7 @@ listBlock,
       fieldBox('fb-history','ssc exam history', e.ssc_history) +
       fieldBox('fb-confusable','often confused with', e.confusable_with) +
       fieldBox('fb-root','root', e.root) +
+      fieldBox('fb-spelltrap','spelling note', e.spelling_note) +
       (e.type==='idiom' ? fieldBox('fb-origin','origin', e.origin) : '');
 
     var body = document.getElementById('slideBody');
