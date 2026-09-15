@@ -1951,7 +1951,7 @@ listBlock,
     }).join('\n');
 
     lastEnrichPrompt = [
-'You are updating an existing SSC CGL vocabulary register. For each term below, provide ONLY three additional fields — do not regenerate the meaning or anything else, and match each term back using its exact original text.',
+'You are updating an existing SSC CGL vocabulary register. For each term below, provide ONLY three additional fields — do not regenerate the meaning or anything else. The list below is numbered with "N. Term (Type)" purely for readability — in your JSON, the "term" field must contain ONLY the bare term text itself, with no leading number and no trailing "(Type)" label.',
 '',
 'Terms:',
 listBlock,
@@ -1959,7 +1959,7 @@ listBlock,
 'Return ONLY a valid JSON array — no markdown code fences, no explanation before or after it.',
 'Each element must be an object with exactly these fields:',
 '{',
-'  "term": string (copy the term exactly as given above),',
+'  "term": string (the bare term only, exactly as it appears above but WITHOUT the leading number or the trailing type label in parentheses),',
 '  "ssc_history": string (how frequently and in what way this term tends to appear in SSC exams - e.g. common in Cloze Test, Error Spotting, One Word Substitution, or Synonym-Antonym sections; roughly how often such terms come up; how a typical question uses it. Describe the general pattern honestly - do not invent specific exam dates, years, or fake direct quotations from past papers. If this is not a well-documented exam pattern, say so plainly instead of guessing.),',
 '  "confusable_with": string (a single other real word commonly confused with this one, e.g. "Affect" -> "Effect"; use "-" if there is no well-known confusable counterpart),',
 '  "root": string (a shared Latin/Greek/other root that helps connect this word to others, stated as "root = meaning", e.g. "greg = flock/herd"; mainly applies to actual words, not idioms/phrasal verbs/one-word substitutions; use "-" if none is genuinely useful or applicable)',
@@ -2011,10 +2011,20 @@ listBlock,
     var byTermLower = {};
     words.forEach(function(w){ byTermLower[w.term.toLowerCase()] = w; });
 
+    function stripLeadingNumber(s){ return s.replace(/^\d+[\.\)]\s*/, '').trim(); }
+    function stripTrailingParen(s){ return s.replace(/\s*\([^)]*\)\s*$/, '').trim(); }
+
     enrichPendingReview = parsed.map(function(item){
       if(!item || !item.term) return null;
-      var match = byTermLower[String(item.term).trim().toLowerCase()];
-      if(!match) return { term: item.term, matched: false };
+      var rawTerm = String(item.term).trim();
+      var noNum = stripLeadingNumber(rawTerm);
+      var candidates = [rawTerm, noNum, stripTrailingParen(rawTerm), stripTrailingParen(noNum)];
+      var match = null;
+      for(var c = 0; c < candidates.length; c++){
+        var found = byTermLower[candidates[c].toLowerCase()];
+        if(found){ match = found; break; }
+      }
+      if(!match) return { term: noNum || rawTerm, matched: false };
       var fields = [];
       var updates = {};
       ['ssc_history','confusable_with','root'].forEach(function(key){
