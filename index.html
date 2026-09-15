@@ -19,9 +19,29 @@
     --ink:#242019; --ink-soft:#6B6255; --ink-faint:#948A78;
     --maroon:#8C2F39; --maroon-deep:#6E232B; --teal:#2F6F63; --teal-deep:#20544A;
     --mustard:#C99A2E; --mustard-deep:#A87E1F; --shadow: 2px 3px 0 rgba(36,32,25,0.08);
+    --bar-bg:#242019; --bar-fg:#EDE7D8;
   }
+  body.dark{
+    --paper:#1C1914; --paper-deep:#26211A; --rule:#40392B; --card:#282219;
+    --ink:#ECE3D0; --ink-soft:#B7AC90; --ink-faint:#8C826A;
+    --shadow: 2px 3px 0 rgba(0,0,0,0.35);
+  }
+  body.dark .fb-hindi{ background:#332C1E; color:#DFCFA6; }
+  body.dark .fb-syn{ background:#1D332C; color:#8FD8C4; }
+  body.dark .fb-anto{ background:#38221F; color:#E8A6A0; }
+  body.dark .fb-sentence{ background:#332B18; color:#E6C877; }
+  body.dark .fb-trick{ background:#2C2436; color:#D3B4EE; }
+  body.dark .fb-origin{ background:#1E2830; color:#9CC0DC; }
+  body.dark .fb-history{ background:#33261C; color:#E8A67C; }
+  body.dark .fb-confusable{ background:#332020; color:#EAA9A9; }
+  body.dark .fb-root{ background:#20302A; color:#9FDCC6; }
+  body.dark .badge.word{ background:#243020; color:#9BCB86; }
+  body.dark .badge.idiom{ background:#33261A; color:#E3A874; }
+  body.dark .badge.one_word_substitution{ background:#1D2A33; color:#8FC1E3; }
+  body.dark .badge.phrasal_verb{ background:#2A2032; color:#C99DE0; }
+  body.dark .badge.other{ background:#2A2619; color:var(--ink-soft); }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
-  html,body{margin:0;padding:0;}
+  html,body{margin:0;padding:0; transition:background-color .2s ease, color .2s ease;}
   body{
     background:var(--paper);
     background-image:repeating-linear-gradient(var(--paper) 0px, var(--paper) 27px, var(--rule) 28px);
@@ -105,6 +125,8 @@
   .fb-trick{ background:#EEE6F2; color:#5B3670; }
   .fb-origin{ background:#E7ECEF; color:#33495A; }
   .fb-history{ background:#F5DED0; color:#8A3B1E; }
+  .fb-confusable{ background:#F5E0DE; color:#8C3B3B; }
+  .fb-root{ background:#DDEFE6; color:#256A4C; }
   .fb-row2{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
 
   .conf-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:12px; padding-top:10px; border-top:1px dashed var(--rule); }
@@ -150,14 +172,14 @@
   .loading-overlay{ position:fixed; inset:0; background:var(--paper); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px; z-index:100; font-family:'Fraunces',serif; font-size:18px; color:var(--ink-soft); }
   .loading-overlay.hidden{ display:none; }
 
-  .authbar{ display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:8px 14px; background:var(--ink); color:var(--paper); font-size:13px; flex-wrap:wrap; }
+  .authbar{ display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:8px 14px; background:var(--bar-bg); color:var(--bar-fg); font-size:13px; flex-wrap:wrap; }
   .authbar .who{ display:flex; align-items:center; gap:8px; margin-right:auto; }
   .offline-badge{ background:var(--maroon); color:#fff; font-size:11px; padding:3px 10px; border-radius:20px; font-weight:600; }
   .notif-count{ position:absolute; top:-6px; right:-6px; background:var(--maroon); color:#fff; font-size:10px; font-weight:700; border-radius:20px; padding:1px 5px; line-height:1.3; }
   .admin-badge{ background:var(--mustard); color:var(--ink); font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; text-transform:lowercase; }
   .avatar{ width:22px; height:22px; border-radius:50%; }
 
-  .topnav{ display:flex; align-items:center; gap:2px; background:var(--ink); padding:0 8px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+  .topnav{ display:flex; align-items:center; gap:2px; background:var(--bar-bg); padding:0 8px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
   .topnav::-webkit-scrollbar{ display:none; }
   .topnav .brand{ color:var(--mustard); font-family:'Fraunces',serif; font-weight:600; font-size:17px; padding:12px 14px 12px 6px; flex-shrink:0; white-space:nowrap; }
   .topnav .tab{ background:transparent; border:none; color:#C9C1AE; padding:13px 13px; font-size:13px; white-space:nowrap; border-bottom:3px solid transparent; flex-shrink:0; }
@@ -173,8 +195,8 @@
   .pending-card{ background:var(--card); border:1px solid var(--rule); border-left:5px solid var(--mustard); border-radius:8px; padding:14px 16px; margin-bottom:10px; }
   .pending-meta{ font-size:12px; color:var(--ink-soft); margin-top:6px; }
 
-  .slide-overlay{ position:fixed; inset:0; background:var(--ink); z-index:200; display:none; flex-direction:column; padding:18px clamp(14px,3vw,40px); padding-top:max(18px, env(safe-area-inset-top)); padding-bottom:max(18px, env(safe-area-inset-bottom)); }
-  .slide-close{ position:absolute; top:16px; right:20px; background:none; border:none; color:var(--paper); font-size:26px; line-height:1; cursor:pointer; padding:6px; z-index:2; }
+  .slide-overlay{ position:fixed; inset:0; background:var(--bar-bg); z-index:200; display:none; flex-direction:column; padding:18px clamp(14px,3vw,40px); padding-top:max(18px, env(safe-area-inset-top)); padding-bottom:max(18px, env(safe-area-inset-bottom)); }
+  .slide-close{ position:absolute; top:16px; right:20px; background:none; border:none; color:var(--bar-fg); font-size:26px; line-height:1; cursor:pointer; padding:6px; z-index:2; }
   .slide-close:hover{ color:var(--mustard); }
   .slide-progress{ text-align:center; color:#B9AF95; font-size:13px; margin-bottom:10px; letter-spacing:.02em; flex-shrink:0; }
   .slide-body{ flex:1; min-height:0; width:100%; max-width:1400px; margin:0 auto; display:flex; flex-direction:column; }
@@ -200,6 +222,30 @@
   .stage-item label{ display:flex; gap:10px; align-items:flex-start; cursor:pointer; }
   .stage-item input[type=checkbox]{ width:18px; height:18px; margin-top:3px; flex-shrink:0; }
   .dup-flag{ font-size:11.5px; color:var(--maroon); font-weight:600; margin-top:4px; }
+
+  .quiz-wrap{ max-width:640px; margin:0 auto; }
+  .quiz-progress{ text-align:center; color:var(--ink-soft); font-size:13px; margin-bottom:10px; }
+  .quiz-question-card{ background:var(--card); border:1px solid var(--rule); border-radius:12px; padding:28px 26px; box-shadow:var(--shadow); text-align:center; }
+  .quiz-question-card .quiz-prompt{ font-size:17px; line-height:1.6; margin-bottom:22px; }
+  .quiz-question-card .quiz-prompt strong{ color:var(--maroon); }
+  .quiz-options{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .quiz-option{ background:var(--paper-deep); border:1.5px solid var(--rule); border-radius:8px; padding:14px 12px; font-size:15px; font-weight:600; color:var(--ink); text-align:center; }
+  .quiz-option:hover{ border-color:var(--ink); }
+  .quiz-option.correct{ background:var(--teal); border-color:var(--teal-deep); color:#fff; }
+  .quiz-option.wrong{ background:var(--maroon); border-color:var(--maroon-deep); color:#fff; }
+  .quiz-option:disabled{ cursor:default; opacity:.85; }
+  .quiz-score{ text-align:center; margin-top:18px; color:var(--ink-soft); font-size:13.5px; }
+  .quiz-actions{ display:flex; justify-content:center; gap:10px; margin-top:20px; }
+
+  .root-clusters-wrap{ display:flex; flex-wrap:wrap; gap:22px; justify-content:flex-start; }
+  .root-cluster{ background:var(--card); border:1px solid var(--rule); border-radius:12px; box-shadow:var(--shadow); padding:14px; text-align:center; }
+  .root-cluster svg text{ fill:var(--ink); font-family:'Work Sans', sans-serif; }
+  .root-cluster .root-node-circle{ fill:var(--mustard); }
+  .root-cluster .root-node-label{ fill:var(--ink); font-weight:700; font-size:12px; }
+  .root-cluster .word-node-circle{ fill:var(--card); stroke:var(--rule); stroke-width:1.5; cursor:pointer; }
+  .root-cluster .word-node-circle:hover{ stroke:var(--teal); }
+  .root-cluster .word-node-label{ font-size:10.5px; cursor:pointer; }
+  .root-cluster .link-line{ stroke:var(--rule); stroke-width:1.5; }
 
   @media (max-width: 760px){
     .main{ padding:16px 14px 60px; }
@@ -250,9 +296,11 @@
   <div class="authbar">
     <div class="who" id="whoBox"></div>
     <span class="offline-badge" id="onlineBadge" style="display:none;">Offline — showing cached data</span>
-    <button class="btn ghost sm" id="notifBtn" style="display:none; position:relative; color:var(--paper); border-color:var(--paper);">🔔<span class="notif-count" id="notifCount" style="display:none;"></span></button>
-    <button class="btn ghost sm" id="installBtn" style="display:none; color:var(--paper); border-color:var(--paper);">Install app</button>
-    <button class="btn ghost sm" id="signOutBtn" style="color:var(--paper); border-color:var(--paper);">Sign out</button>
+    <button class="btn ghost sm" id="notifBtn" style="display:none; position:relative; color:var(--bar-fg); border-color:var(--bar-fg);">🔔<span class="notif-count" id="notifCount" style="display:none;"></span></button>
+    <button class="btn ghost sm" id="alertsSettingsBtn" style="color:var(--bar-fg); border-color:var(--bar-fg);">🔔 Alerts</button>
+    <button class="btn ghost sm" id="darkModeBtn" style="color:var(--bar-fg); border-color:var(--bar-fg);">🌙 Dark</button>
+    <button class="btn ghost sm" id="installBtn" style="display:none; color:var(--bar-fg); border-color:var(--bar-fg);">Install app</button>
+    <button class="btn ghost sm" id="signOutBtn" style="color:var(--bar-fg); border-color:var(--bar-fg);">Sign out</button>
   </div>
 
   <nav class="topnav">
@@ -261,7 +309,10 @@
     <button class="tab" data-tab="add">Add words</button>
     <button class="tab" data-tab="paste">Paste result</button>
     <button class="tab" data-tab="review">Review</button>
+    <button class="tab" data-tab="enrich">Enrich</button>
     <button class="tab" data-tab="practice">Practice</button>
+    <button class="tab" data-tab="quiz">Quiz</button>
+    <button class="tab" data-tab="roots">Roots</button>
     <button class="tab" data-tab="stats">Stats</button>
     <button class="tab" data-tab="backup">Backup</button>
   </nav>
@@ -272,6 +323,7 @@
         <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
           <h1 style="margin:0;">CGL Vocabulary Register</h1>
           <button class="btn ghost sm" id="presentBtn" title="Open full-screen slide view">⛶ Present</button>
+          <button class="btn maroon sm" id="panicBtn" title="Build a cram list of your weakest words">🚨 Exam tomorrow</button>
         </div>
         <div class="sub">Build your word bank with any AI, then drill it here.</div>
       </div>
@@ -300,10 +352,13 @@
           <option value="new">Newest first</option>
           <option value="old">Oldest first</option>
           <option value="az">A → Z</option>
+          <option value="conf_low">Confidence (Level 1 → 2-4 → 5)</option>
         </select>
         <div class="spacer"></div>
+        <button class="btn ghost sm" id="coverModeBtn" title="Hide meanings until you tap a card">🙈 Cover mode: Off</button>
         <button class="btn mustard sm" id="addManualBtn">+ Add one manually</button>
       </div>
+      <div id="coverModeNote" class="help" style="display:none; margin:-8px 0 14px; color:var(--ink-soft); font-size:12.5px;">Cover mode is on — details are hidden. Tap a card to reveal it.</div>
       <div id="libraryGrid" class="grid"></div>
     </section>
 
@@ -371,13 +426,51 @@
       </div>
     </section>
 
+    <section class="view" id="view-enrich">
+      <div id="enrichAdmin" style="display:none;">
+        <div class="panel">
+          <h2><span class="step-badge">1</span>Find words missing details</h2>
+          <p class="help">Words added before the SSC exam history, confusable-word, and root-web fields existed are missing them. This finds those words and builds a prompt asking the AI to fill in just those three fields — nothing else gets touched, and anything you've already filled in by hand is left alone.</p>
+          <p class="help" id="enrichCount" style="font-weight:600; color:var(--ink);"></p>
+          <div class="row-actions"><button class="btn" id="generateEnrichBtn">Generate enrichment prompt</button></div>
+        </div>
+
+        <div class="panel" id="enrichPromptPanel" style="display:none;">
+          <h2><span class="step-badge">2</span>Send it to an AI</h2>
+          <p class="help">Paste this into ChatGPT, Gemini, or any AI chat, then bring the reply back below.</p>
+          <pre class="prompt-preview" id="enrichPromptPreview"></pre>
+          <div class="row-actions">
+            <button class="btn teal" id="copyEnrichPromptBtn">Copy prompt</button>
+            <button class="btn ghost" id="openEnrichChatGPTBtn">Open ChatGPT (copies prompt)</button>
+            <button class="btn ghost" id="openEnrichGeminiBtn">Open Gemini (copies prompt)</button>
+            <span class="copy-note" id="enrichCopyNote" style="display:none;">Copied ✓</span>
+          </div>
+        </div>
+
+        <div class="panel" id="enrichPastePanel" style="display:none; max-width:900px;">
+          <h2><span class="step-badge">3</span>Paste the AI's response</h2>
+          <p class="help">Paste the reply (fine if it's wrapped in ```json fences). You'll get to review exactly what will change before anything is saved.</p>
+          <textarea id="enrichResponseInput" style="min-height:200px;" placeholder="Paste the AI's JSON reply here…"></textarea>
+          <div class="row-actions">
+            <button class="btn maroon" id="parseEnrichBtn">Review changes</button>
+            <span id="enrichParseStatus" style="font-size:13px;"></span>
+          </div>
+        </div>
+
+        <div class="panel" id="enrichStagePanel" style="display:none; max-width:900px;"></div>
+      </div>
+      <div id="enrichNonAdmin" style="display:none;">
+        <p class="help">Filling in missing details for the shared library is limited to the admin account.</p>
+      </div>
+    </section>
+
     <section class="view" id="view-practice">
       <div class="practice-wrap" id="practiceWrap">
         <p class="help" style="text-align:left;">Practice uses whatever the Library filters are currently set to. Set a tag/type/confidence filter in Library first for a focused drill, then come back here.</p>
         <div class="row-actions" style="justify-content:center; margin-bottom:16px;">
-          <select id="practiceSortBy" style="max-width:200px;">
+          <select id="practiceSortBy" style="max-width:220px;">
             <option value="shuffle">Shuffled</option>
-            <option value="lowconf">Lowest confidence first</option>
+            <option value="conf_low">Confidence (Level 1 → 2-4 → 5)</option>
             <option value="highconf">Highest confidence first</option>
             <option value="new">Newest first</option>
             <option value="old">Oldest first</option>
@@ -388,6 +481,27 @@
         </div>
         <div id="practiceArea"></div>
       </div>
+    </section>
+
+    <section class="view" id="view-quiz">
+      <div id="quizHome">
+        <div class="panel">
+          <h2>Fill in the blank</h2>
+          <p class="help">Pulls from each word's SSC-style sentence, blanks out the term, and asks you to pick which word fits — same format as an SSC vocabulary question. Uses your current Library filters as the word pool.</p>
+          <button class="btn" id="startFillBlankBtn">Start fill-in-the-blank</button>
+        </div>
+        <div class="panel">
+          <h2>Confusable pairs (false friends)</h2>
+          <p class="help">Drills you on words your register has flagged as commonly confused with another (e.g. affect/effect) — the kind of trap SSC papers love. Needs both words of a pair to be in your library.</p>
+          <button class="btn" id="startConfusableBtn">Start confusable-pairs quiz</button>
+        </div>
+      </div>
+      <div id="quizArea"></div>
+    </section>
+
+    <section class="view" id="view-roots">
+      <p class="help">Words sharing a Latin/Greek/other root, clustered together — helps you guess unfamiliar words on exam day from a root you already know. Only roots shared by two or more words in your library show up here.</p>
+      <div id="rootsArea"></div>
     </section>
 
     <section class="view" id="view-stats">
@@ -425,6 +539,22 @@
 <script>
 (function(){
   "use strict";
+
+  // ---------------- dark mode (applied immediately, works even before sign-in) ----------------
+  var DARK_MODE_KEY = 'vocabRegisterDarkMode';
+  function applyDarkModePreference(){
+    var saved = localStorage.getItem(DARK_MODE_KEY);
+    var on = saved === '1' || (saved === null && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    document.body.classList.toggle('dark', on);
+    var btn = document.getElementById('darkModeBtn');
+    if(btn) btn.textContent = on ? '☀️ Light' : '🌙 Dark';
+  }
+  applyDarkModePreference();
+  document.getElementById('darkModeBtn').addEventListener('click', function(){
+    var nowOn = !document.body.classList.contains('dark');
+    localStorage.setItem(DARK_MODE_KEY, nowOn ? '1' : '0');
+    applyDarkModePreference();
+  });
 
   // ---------------- PWA install + service worker (works even before Firebase config) ----------------
   if('serviceWorker' in navigator){
@@ -549,6 +679,7 @@
   auth.onAuthStateChanged(function(user){
     currentUser = user;
     detachListeners();
+    stopHourlyAlerts();
     if(user){
       isAdminUser = ADMIN_EMAILS.indexOf(user.email) !== -1;
       document.getElementById('signedOutScreen').style.display = 'none';
@@ -556,6 +687,7 @@
       renderWhoBox();
       applyRoleUI();
       attachListeners();
+      if(anyAlertEnabled()){ startHourlyAlerts(); }
     } else {
       isAdminUser = false;
       document.getElementById('appShell').style.display = 'none';
@@ -582,6 +714,159 @@
       ? 'Paste the words you want to add, generate the prompt, run it through any AI, then bring the reply back here — it goes straight into the shared library.'
       : 'Paste the words you want to add, generate the prompt, run it through any AI, then bring the reply back here — it will wait for the admin to approve it before it appears for everyone.';
   }
+
+  // ---------------- hourly alerts (new words + word-to-remember reminders) ----------------
+  // Note on limits: these fire a browser notification about once an hour, but only while
+  // this tab/app is actually open (foreground or backgrounded) — browsers don't let a plain
+  // web page wake itself up on a schedule while fully closed. True closed-app push
+  // notifications would need a small server component (Firebase Cloud Messaging + a
+  // scheduled Cloud Function), which is a separate, heavier setup.
+  var NOTIF_LS_KEY = 'vocabRegisterLastWordCheck';
+  var ALERT_NEWWORDS_KEY = 'vocabRegisterAlertNewWords';
+  var ALERT_REMINDER_KEY = 'vocabRegisterAlertReminder';
+  var hourlyAlertTimer = null;
+  var notifSupported = ('Notification' in window);
+
+  function alertFlag(key){ return localStorage.getItem(key) === '1'; }
+  function setAlertFlag(key, on){ try{ localStorage.setItem(key, on ? '1' : '0'); }catch(e){} }
+
+  function getLastWordCheck(){
+    var v = localStorage.getItem(NOTIF_LS_KEY);
+    return v ? parseInt(v, 10) : 0;
+  }
+  function setLastWordCheck(ms){
+    try{ localStorage.setItem(NOTIF_LS_KEY, String(ms)); }catch(e){}
+  }
+
+  function checkForNewWordsAndNotify(){
+    if(!alertFlag(ALERT_NEWWORDS_KEY)) return;
+    if(words.length === 0) return;
+    var maxTs = words.reduce(function(m,w){ return Math.max(m, tsMillis(w.createdAt)); }, 0);
+    var last = getLastWordCheck();
+    if(!last){ setLastWordCheck(maxTs || Date.now()); return; }
+    var newer = words.filter(function(w){ return tsMillis(w.createdAt) > last; });
+    if(newer.length > 0 && notifSupported && Notification.permission === 'granted'){
+      var body = newer.length === 1
+        ? ('"'+newer[0].term+'" was just added to the register.')
+        : (newer.length + ' new words were added to the register.');
+      try{ new Notification('CGL Vocabulary Register', {body: body, icon: 'icon-192.png'}); }catch(e){}
+    }
+    if(maxTs > last) setLastWordCheck(maxTs);
+  }
+
+  function pickReminderWord(){
+    if(words.length === 0) return null;
+    var pool = words.filter(function(w){
+      var p = progressMap[w.id];
+      return !(p && p.confidence >= 5);
+    });
+    if(pool.length === 0) pool = words;
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  function sendReminderNotification(){
+    if(!alertFlag(ALERT_REMINDER_KEY)) return;
+    if(!notifSupported || Notification.permission !== 'granted') return;
+    var w = pickReminderWord();
+    if(!w) return;
+    var title = w.term + '  ·  ' + TYPE_LABELS[w.type];
+    var bodyParts = [];
+    if(w.english_meaning) bodyParts.push(w.english_meaning);
+    if(w.hindi_meaning) bodyParts.push(w.hindi_meaning);
+    var body = bodyParts.length ? bodyParts.join(' — ') : 'Open the register to review this one.';
+    try{ new Notification(title, {body: body, icon: 'icon-192.png'}); }catch(e){}
+  }
+
+  function hourlyAlertTick(){
+    checkForNewWordsAndNotify();
+    sendReminderNotification();
+  }
+
+  function anyAlertEnabled(){
+    return notifSupported && Notification.permission === 'granted' && (alertFlag(ALERT_NEWWORDS_KEY) || alertFlag(ALERT_REMINDER_KEY));
+  }
+
+  function startHourlyAlerts(){
+    if(hourlyAlertTimer) return;
+    hourlyAlertTick();
+    hourlyAlertTimer = setInterval(hourlyAlertTick, 60 * 60 * 1000);
+  }
+  function stopHourlyAlerts(){
+    if(hourlyAlertTimer){ clearInterval(hourlyAlertTimer); hourlyAlertTimer = null; }
+  }
+
+  // ---------------- background tab title flash ----------------
+  var ALERT_TABFLASH_KEY = 'vocabRegisterAlertTabFlash';
+  var tabFlashTimer = null;
+  var originalTitle = document.title;
+
+  function startTabFlash(){
+    if(tabFlashTimer) return;
+    var flipped = false;
+    tabFlashTimer = setInterval(function(){
+      var w = pickReminderWord();
+      flipped = !flipped;
+      if(flipped && w){
+        var snippet = w.english_meaning ? w.english_meaning.slice(0,36) : '';
+        document.title = '📖 ' + w.term + (snippet ? ' = ' + snippet : '');
+      } else {
+        document.title = originalTitle;
+      }
+    }, 4000);
+  }
+  function stopTabFlash(){
+    if(tabFlashTimer){ clearInterval(tabFlashTimer); tabFlashTimer = null; }
+    document.title = originalTitle;
+  }
+  document.addEventListener('visibilitychange', function(){
+    if(document.hidden){
+      if(alertFlag(ALERT_TABFLASH_KEY)) startTabFlash();
+    } else {
+      stopTabFlash();
+    }
+  });
+
+  document.getElementById('alertsSettingsBtn').addEventListener('click', function(){
+    modalBodyRef().innerHTML = '<h3>Notification alerts</h3>' +
+      '<p class="help">All of these run only while this app stays open (installed-app mode counts too) — not while it\'s fully closed.</p>' +
+      (notifSupported ? (
+      '<div class="field"><label style="display:flex; gap:10px; align-items:flex-start; cursor:pointer;">' +
+        '<input type="checkbox" id="chkNewWords" style="margin-top:3px; width:18px; height:18px;" '+(alertFlag(ALERT_NEWWORDS_KEY)?'checked':'')+'>' +
+        '<span>Notify me when new words are added to the library. (about once an hour)</span>' +
+      '</label></div>' +
+      '<div class="field"><label style="display:flex; gap:10px; align-items:flex-start; cursor:pointer;">' +
+        '<input type="checkbox" id="chkReminder" style="margin-top:3px; width:18px; height:18px;" '+(alertFlag(ALERT_REMINDER_KEY)?'checked':'')+'>' +
+        '<span>Send me a word to remember — picks one you haven\'t marked memorized yet, showing its meaning right in the notification. (about once an hour)</span>' +
+      '</label></div>'
+      ) : '<p class="help">Browser notifications aren\'t supported here, but the tab-title option below still works.</p>') +
+      '<div class="field"><label style="display:flex; gap:10px; align-items:flex-start; cursor:pointer;">' +
+        '<input type="checkbox" id="chkTabFlash" style="margin-top:3px; width:18px; height:18px;" '+(alertFlag(ALERT_TABFLASH_KEY)?'checked':'')+'>' +
+        '<span>While this tab is in the background, flash its title with a word to remember every few seconds — no permission needed, just glance at your open tabs.</span>' +
+      '</label></div>' +
+      '<div class="modal-actions"><button class="btn ghost" id="alertsCancel">Cancel</button><button class="btn teal" id="alertsSave">Save</button></div>';
+    modalBgRef().classList.add('open');
+    document.getElementById('alertsCancel').addEventListener('click', function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML=''; });
+    document.getElementById('alertsSave').addEventListener('click', async function(){
+      var wantNewWords = notifSupported && document.getElementById('chkNewWords') ? document.getElementById('chkNewWords').checked : false;
+      var wantReminder = notifSupported && document.getElementById('chkReminder') ? document.getElementById('chkReminder').checked : false;
+      var wantTabFlash = document.getElementById('chkTabFlash').checked;
+      if(wantNewWords || wantReminder){
+        var perm = Notification.permission;
+        if(perm === 'default'){ perm = await Notification.requestPermission(); }
+        if(perm !== 'granted'){
+          showToast('Notifications are blocked for this site — enable them in your browser settings to use this.');
+          return;
+        }
+      }
+      setAlertFlag(ALERT_NEWWORDS_KEY, wantNewWords);
+      setAlertFlag(ALERT_REMINDER_KEY, wantReminder);
+      setAlertFlag(ALERT_TABFLASH_KEY, wantTabFlash);
+      modalBgRef().classList.remove('open'); modalBodyRef().innerHTML='';
+      if(anyAlertEnabled()){ startHourlyAlerts(); } else { stopHourlyAlerts(); }
+      if(!wantTabFlash){ stopTabFlash(); }
+      showToast('Alerts saved.');
+    });
+  });
 
   // ---------------- Firestore listeners ----------------
   function attachListeners(){
@@ -675,6 +960,9 @@
     if(name === 'library') renderLibrary();
     if(name === 'stats') renderStats();
     if(name === 'review') renderReview();
+    if(name === 'quiz') renderQuizHome();
+    if(name === 'roots') renderRoots();
+    if(name === 'enrich') renderEnrichHome();
   }
 
   function normalizeType(t){
@@ -699,6 +987,8 @@
       ssc_sentence: raw.ssc_sentence ? String(raw.ssc_sentence).trim() : '',
       mnemonic: raw.mnemonic ? String(raw.mnemonic).trim() : '',
       ssc_history: raw.ssc_history ? String(raw.ssc_history).trim() : '',
+      confusable_with: (raw.confusable_with && String(raw.confusable_with).trim() !== '-') ? String(raw.confusable_with).trim() : '',
+      root: (raw.root && String(raw.root).trim() !== '-') ? String(raw.root).trim() : '',
       origin: raw.origin ? String(raw.origin).trim() : '-'
     };
   }
@@ -708,11 +998,13 @@
       term: norm.term, type: norm.type, part_of_speech: norm.part_of_speech,
       english_meaning: norm.english_meaning, hindi_meaning: norm.hindi_meaning,
       synonyms: norm.synonyms, antonyms: norm.antonyms, ssc_sentence: norm.ssc_sentence,
-      mnemonic: norm.mnemonic, ssc_history: norm.ssc_history || '', origin: norm.origin,
+      mnemonic: norm.mnemonic, ssc_history: norm.ssc_history || '',
+      confusable_with: norm.confusable_with || '', root: norm.root || '', origin: norm.origin,
       tags: tag ? [tag] : (norm.tags || []),
       authorUid: currentUser.uid,
       authorName: currentUser.displayName || currentUser.email,
       authorEmail: currentUser.email,
+      enrichedAt: firebase.firestore.FieldValue.serverTimestamp(),
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     };
   }
@@ -747,6 +1039,8 @@ listBlock,
 '  "ssc_sentence": string (one example sentence in the style of an SSC exam question, using the term),',
 '  "mnemonic": string (a short trick or mnemonic to remember the meaning),',
 '  "ssc_history": string (how frequently and in what way this term tends to appear in SSC exams - e.g. common in Cloze Test, Error Spotting, One Word Substitution, or Synonym-Antonym sections; roughly how often such terms come up; how a typical question uses it. Describe the general pattern honestly - do not invent specific exam dates, years, or fake direct quotations from past papers. If this is not a well-documented exam pattern, say so plainly instead of guessing.),',
+'  "confusable_with": string (a single other real word commonly confused with this one, e.g. "Affect" -> "Effect", "Complement" -> "Compliment"; use "-" if there is no well-known confusable counterpart),',
+'  "root": string (a shared Latin/Greek/other root that helps connect this word to others, stated as "root = meaning", e.g. "greg = flock/herd" for gregarious, "acu = sharp" for acumen; mainly applies to type "word" entries; use "-" if none is genuinely useful or applicable),',
 '  "origin": string (etymology or origin, especially for idioms/phrases; use "-" if not relevant)',
 '}',
 '',
@@ -932,6 +1226,7 @@ listBlock,
     if(sortBy.value === 'new') list.sort(function(a,b){ return tsMillis(b.createdAt) - tsMillis(a.createdAt); });
     if(sortBy.value === 'old') list.sort(function(a,b){ return tsMillis(a.createdAt) - tsMillis(b.createdAt); });
     if(sortBy.value === 'az') list.sort(function(a,b){ return a.term.localeCompare(b.term); });
+    if(sortBy.value === 'conf_low') list.sort(function(a,b){ return a.confidence - b.confidence; });
     return list;
   }
 
@@ -958,7 +1253,16 @@ listBlock,
       btn.addEventListener('click', function(ev){ ev.stopPropagation(); setProgress(btn.dataset.confId, {confidence: +btn.dataset.level}); });
     });
     grid.querySelectorAll('.vcard').forEach(function(card){
-      card.addEventListener('click', function(){ markVisited(card.dataset.id); });
+      card.addEventListener('click', function(){
+        var id = card.dataset.id;
+        if(coverModeOn && !coverRevealed[id]){
+          coverRevealed[id] = true;
+          markVisited(id);
+          renderLibrary();
+          return;
+        }
+        markVisited(id);
+      });
     });
   }
 
@@ -980,13 +1284,35 @@ listBlock,
     return '<div class="field-box '+cls+'"><div class="fb-label">'+escapeHtml(label)+'</div><div>'+escapeHtml(content)+'</div></div>';
   }
 
+  var coverModeOn = false;
+  var coverRevealed = {};
+  document.getElementById('coverModeBtn').addEventListener('click', function(){
+    coverModeOn = !coverModeOn;
+    coverRevealed = {};
+    document.getElementById('coverModeBtn').textContent = coverModeOn ? '🙈 Cover mode: On' : '🙈 Cover mode: Off';
+    document.getElementById('coverModeNote').style.display = coverModeOn ? 'block' : 'none';
+    renderLibrary();
+  });
+
   function cardHtml(e){
+    var revealed = !coverModeOn || !!coverRevealed[e.id];
     var synAnto = (e.synonyms&&e.synonyms.length) || (e.antonyms&&e.antonyms.length) ? (
       '<div class="fb-row2">' +
         fieldBox('fb-syn','synonyms', e.synonyms&&e.synonyms.length?e.synonyms.join(', '):'') +
         fieldBox('fb-anto','antonyms', e.antonyms&&e.antonyms.length?e.antonyms.join(', '):'') +
       '</div>'
     ) : '';
+    var detailsHtml = revealed ? (
+      '<div class="meaning-en">'+escapeHtml(e.english_meaning||'')+'</div>' +
+      fieldBox('fb-hindi','hindi', e.hindi_meaning) +
+      synAnto +
+      fieldBox('fb-sentence','ssc-style sentence', e.ssc_sentence) +
+      fieldBox('fb-trick','trick / mnemonic', e.mnemonic) +
+      fieldBox('fb-history','ssc exam history', e.ssc_history) +
+      fieldBox('fb-confusable','often confused with', e.confusable_with) +
+      fieldBox('fb-root','root', e.root) +
+      (e.type==='idiom' ? fieldBox('fb-origin','origin', e.origin) : '')
+    ) : '<div style="text-align:center; color:var(--ink-faint); font-size:13px; font-style:italic; padding:16px 0;">Tap to reveal</div>';
     return '' +
     '<div class="vcard conf-'+e.confidence+'" data-id="'+e.id+'">' +
       '<div class="vcard-top">' +
@@ -994,14 +1320,8 @@ listBlock,
         '<span class="badge '+e.type+'">'+TYPE_LABELS[e.type]+'</span>' +
       '</div>' +
       (e.tags && e.tags.length ? '<div class="tagrow">'+e.tags.map(function(t){return '<span class="chip">'+escapeHtml(t)+'</span>';}).join('')+'</div>' : '') +
-      '<div class="meaning-en">'+escapeHtml(e.english_meaning||'')+'</div>' +
-      fieldBox('fb-hindi','hindi', e.hindi_meaning) +
-      synAnto +
-      fieldBox('fb-sentence','ssc-style sentence', e.ssc_sentence) +
-      fieldBox('fb-trick','trick / mnemonic', e.mnemonic) +
-      fieldBox('fb-history','ssc exam history', e.ssc_history) +
-      (e.type==='idiom' ? fieldBox('fb-origin','origin', e.origin) : '') +
-      (e.authorName ? '<div class="meta-line">Added by '+escapeHtml(e.authorName)+'</div>' : '') +
+      detailsHtml +
+      (revealed && e.authorName ? '<div class="meta-line">Added by '+escapeHtml(e.authorName)+'</div>' : '') +
       '<div class="conf-row"><span class="conf-label">'+confLabel(e.confidence)+'</span>'+confDotsHtml(e.id, e.confidence)+'</div>' +
       '<div class="vcard-controls">' +
         '<button class="iconbtn '+(e.starred?'on':'')+'" data-action="star" data-id="'+e.id+'" title="Star">'+(e.starred?'★':'☆')+'</button>' +
@@ -1009,6 +1329,7 @@ listBlock,
       '</div>' +
     '</div>';
   }
+
 
   async function setProgress(id, patch){
     if(!currentUser) return;
@@ -1036,7 +1357,7 @@ listBlock,
   modalBg.addEventListener('click', function(ev){ if(ev.target === modalBg) closeModal(); });
 
   function entryFormHtml(e){
-    e = e || {term:'',type:'word',part_of_speech:'',english_meaning:'',hindi_meaning:'',synonyms:[],antonyms:[],ssc_sentence:'',mnemonic:'',ssc_history:'',origin:'',tags:[]};
+    e = e || {term:'',type:'word',part_of_speech:'',english_meaning:'',hindi_meaning:'',synonyms:[],antonyms:[],ssc_sentence:'',mnemonic:'',ssc_history:'',confusable_with:'',root:'',origin:'',tags:[]};
     return '' +
     '<div class="field"><label class="field-label">Term</label><input type="text" id="f_term" value="'+escapeAttr(e.term)+'"></div>' +
     '<div class="field-2col">' +
@@ -1054,6 +1375,10 @@ listBlock,
     '<div class="field"><label class="field-label">SSC-style sentence</label><textarea id="f_sent" style="min-height:55px;">'+escapeHtml(e.ssc_sentence||'')+'</textarea></div>' +
     '<div class="field"><label class="field-label">Trick / mnemonic</label><textarea id="f_mne" style="min-height:55px;">'+escapeHtml(e.mnemonic||'')+'</textarea></div>' +
     '<div class="field"><label class="field-label">SSC exam history / importance</label><textarea id="f_hist" style="min-height:55px;">'+escapeHtml(e.ssc_history||'')+'</textarea></div>' +
+    '<div class="field-2col">' +
+      '<div class="field"><label class="field-label">Confusable with (e.g. "Effect")</label><input type="text" id="f_confuse" value="'+escapeAttr(e.confusable_with||'')+'"></div>' +
+      '<div class="field"><label class="field-label">Root (e.g. "greg = flock/herd")</label><input type="text" id="f_root" value="'+escapeAttr(e.root||'')+'"></div>' +
+    '</div>' +
     '<div class="field"><label class="field-label">Origin (for idioms)</label><input type="text" id="f_ori" value="'+escapeAttr(e.origin||'')+'"></div>' +
     '<div class="field"><label class="field-label">Tags (comma separated)</label><input type="text" id="f_tags" value="'+escapeAttr((e.tags||[]).join(', '))+'"></div>';
   }
@@ -1070,6 +1395,8 @@ listBlock,
       ssc_sentence: document.getElementById('f_sent').value.trim(),
       mnemonic: document.getElementById('f_mne').value.trim(),
       ssc_history: document.getElementById('f_hist').value.trim(),
+      confusable_with: document.getElementById('f_confuse').value.trim(),
+      root: document.getElementById('f_root').value.trim(),
       origin: document.getElementById('f_ori').value.trim() || '-',
       tags: asArray(document.getElementById('f_tags').value)
     };
@@ -1285,11 +1612,18 @@ listBlock,
   function applyPracticeSort(){
     var mode = document.getElementById('practiceSortBy').value;
     if(mode === 'shuffle') shuffle(practiceSet);
-    else if(mode === 'lowconf') practiceSet.sort(function(a,b){ return a.confidence - b.confidence; });
+    else if(mode === 'conf_low') practiceSet.sort(function(a,b){ return a.confidence - b.confidence; });
     else if(mode === 'highconf') practiceSet.sort(function(a,b){ return b.confidence - a.confidence; });
     else if(mode === 'new') practiceSet.sort(function(a,b){ return tsMillis(b.createdAt) - tsMillis(a.createdAt); });
     else if(mode === 'old') practiceSet.sort(function(a,b){ return tsMillis(a.createdAt) - tsMillis(b.createdAt); });
     else if(mode === 'az') practiceSet.sort(function(a,b){ return a.term.localeCompare(b.term); });
+  }
+  function beginPracticeWithList(list){
+    practiceSet = list.slice();
+    practiceIdx = 0;
+    switchTab('practice');
+    document.getElementById('shufflePracticeBtn').style.display = 'inline-block';
+    renderPracticeCard();
   }
   function shuffle(arr){
     for(var i = arr.length - 1; i > 0; i--){
@@ -1318,6 +1652,8 @@ listBlock,
           fieldBox('fb-sentence','sentence', e.ssc_sentence) +
           fieldBox('fb-trick','trick', e.mnemonic) +
           fieldBox('fb-history','ssc exam history', e.ssc_history) +
+          fieldBox('fb-confusable','often confused with', e.confusable_with) +
+          fieldBox('fb-root','root', e.root) +
         '</div>' +
       '</div>' +
       '<div class="conf-row" style="border-top:none; justify-content:center;" id="practiceConfRow"></div>' +
@@ -1344,6 +1680,431 @@ listBlock,
     });
   }
 
+  // ---------------- quiz mode ----------------
+  var quizQueue = [];
+  var quizIdx = 0;
+  var quizScore = 0;
+  var quizAnswered = false;
+
+  function renderQuizHome(){
+    document.getElementById('quizHome').style.display = 'block';
+    document.getElementById('quizArea').innerHTML = '';
+  }
+  function backToQuizHome(){
+    document.getElementById('quizArea').innerHTML = '';
+    document.getElementById('quizHome').style.display = 'block';
+  }
+  function shuffleArr(arr){
+    for(var i = arr.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i+1));
+      var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+    return arr;
+  }
+  function blankSentence(sentence, term){
+    var idx = sentence.toLowerCase().indexOf(term.toLowerCase());
+    if(idx === -1) return sentence;
+    return sentence.slice(0, idx) + '_____' + sentence.slice(idx + term.length);
+  }
+  function showQuizSummary(){
+    var area = document.getElementById('quizArea');
+    area.innerHTML = '<div class="quiz-wrap"><div class="panel" style="margin:0 auto; text-align:center; max-width:420px;"><h2>Quiz complete</h2><p class="help">You scored '+quizScore+' out of '+quizQueue.length+'.</p><button class="btn teal" id="quizBackBtn">Back to quizzes</button></div></div>';
+    document.getElementById('quizBackBtn').addEventListener('click', backToQuizHome);
+  }
+  function adjustConfidenceFromQuiz(id, correct){
+    var p = progressMap[id] || {};
+    var current = p.confidence || 0;
+    var next = correct ? Math.min(5, current + 1) : Math.max(1, current - 1);
+    progressMap[id] = Object.assign({}, p, {confidence: next});
+    setProgress(id, {confidence: next});
+  }
+
+  document.getElementById('startFillBlankBtn').addEventListener('click', function(){
+    var pool = getFiltered().filter(function(w){
+      return w.ssc_sentence && w.ssc_sentence.toLowerCase().indexOf(w.term.toLowerCase()) !== -1;
+    });
+    if(pool.length < 2 || words.length < 2){
+      showToast('Need at least 2 words (matching your current filters) with a usable SSC sentence.');
+      return;
+    }
+    quizQueue = shuffleArr(pool.slice());
+    quizIdx = 0; quizScore = 0;
+    document.getElementById('quizHome').style.display = 'none';
+    renderFillBlankQuestion();
+  });
+
+  function renderFillBlankQuestion(){
+    var area = document.getElementById('quizArea');
+    if(quizIdx >= quizQueue.length){ showQuizSummary(); return; }
+    var w = quizQueue[quizIdx];
+    var blanked = blankSentence(w.ssc_sentence, w.term);
+    var distractorPool = shuffleArr(words.filter(function(x){ return x.term.toLowerCase() !== w.term.toLowerCase(); }).slice());
+    var options = shuffleArr([w.term].concat(distractorPool.slice(0,3).map(function(x){ return x.term; })));
+    quizAnswered = false;
+    area.innerHTML =
+      '<div class="quiz-wrap">' +
+        '<div class="quiz-progress">Question '+(quizIdx+1)+' / '+quizQueue.length+' · Score '+quizScore+'</div>' +
+        '<div class="quiz-question-card">' +
+          '<div class="quiz-prompt">'+escapeHtml(blanked)+'</div>' +
+          '<div class="quiz-options" id="quizOptions">' +
+            options.map(function(opt){ return '<button class="quiz-option" data-opt="'+escapeAttr(opt)+'">'+escapeHtml(opt)+'</button>'; }).join('') +
+          '</div>' +
+        '</div>' +
+        '<div class="quiz-actions"><button class="btn ghost" id="quizExitBtn">Exit quiz</button><button class="btn teal" id="quizNextBtn" style="display:none;">Next →</button></div>' +
+      '</div>';
+    document.querySelectorAll('#quizOptions .quiz-option').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        if(quizAnswered) return;
+        quizAnswered = true;
+        var correct = btn.dataset.opt.toLowerCase() === w.term.toLowerCase();
+        document.querySelectorAll('#quizOptions .quiz-option').forEach(function(b2){
+          b2.disabled = true;
+          if(b2.dataset.opt.toLowerCase() === w.term.toLowerCase()) b2.classList.add('correct');
+          else if(b2 === btn) b2.classList.add('wrong');
+        });
+        adjustConfidenceFromQuiz(w.id, correct);
+        if(correct) quizScore++;
+        document.getElementById('quizNextBtn').style.display = 'inline-flex';
+      });
+    });
+    document.getElementById('quizExitBtn').addEventListener('click', backToQuizHome);
+    document.getElementById('quizNextBtn').addEventListener('click', function(){ quizIdx++; renderFillBlankQuestion(); });
+  }
+
+  function buildConfusablePairs(){
+    var byTerm = {};
+    words.forEach(function(w){ byTerm[w.term.toLowerCase()] = w; });
+    var seen = {};
+    var pairs = [];
+    words.forEach(function(w){
+      if(!w.confusable_with) return;
+      var match = byTerm[w.confusable_with.toLowerCase()];
+      if(!match || match.id === w.id) return;
+      var key = [w.id, match.id].sort().join('|');
+      if(seen[key]) return;
+      seen[key] = true;
+      pairs.push({a: w, b: match});
+    });
+    return pairs;
+  }
+
+  document.getElementById('startConfusableBtn').addEventListener('click', function(){
+    var pairs = buildConfusablePairs();
+    if(pairs.length === 0){
+      showToast('No confusable pairs found yet — needs a "confusable with" value that matches another word already in the library.');
+      return;
+    }
+    quizQueue = shuffleArr(pairs);
+    quizIdx = 0; quizScore = 0;
+    document.getElementById('quizHome').style.display = 'none';
+    renderConfusableQuestion();
+  });
+
+  function renderConfusableQuestion(){
+    var area = document.getElementById('quizArea');
+    if(quizIdx >= quizQueue.length){ showQuizSummary(); return; }
+    var pair = quizQueue[quizIdx];
+    var target = Math.random() < 0.5 ? pair.a : pair.b;
+    var other = target === pair.a ? pair.b : pair.a;
+    var prompt;
+    if(target.ssc_sentence && target.ssc_sentence.toLowerCase().indexOf(target.term.toLowerCase()) !== -1){
+      prompt = blankSentence(target.ssc_sentence, target.term);
+    } else {
+      prompt = 'Which word means: "' + target.english_meaning + '"?';
+    }
+    var options = shuffleArr([target.term, other.term]);
+    quizAnswered = false;
+    area.innerHTML =
+      '<div class="quiz-wrap">' +
+        '<div class="quiz-progress">Pair '+(quizIdx+1)+' / '+quizQueue.length+' · Score '+quizScore+'</div>' +
+        '<div class="quiz-question-card">' +
+          '<div class="quiz-prompt">'+escapeHtml(prompt)+'</div>' +
+          '<div class="quiz-options" id="quizOptions">' +
+            options.map(function(opt){ return '<button class="quiz-option" data-opt="'+escapeAttr(opt)+'">'+escapeHtml(opt)+'</button>'; }).join('') +
+          '</div>' +
+        '</div>' +
+        '<div class="quiz-actions"><button class="btn ghost" id="quizExitBtn">Exit quiz</button><button class="btn teal" id="quizNextBtn" style="display:none;">Next →</button></div>' +
+      '</div>';
+    document.querySelectorAll('#quizOptions .quiz-option').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        if(quizAnswered) return;
+        quizAnswered = true;
+        var correct = btn.dataset.opt.toLowerCase() === target.term.toLowerCase();
+        document.querySelectorAll('#quizOptions .quiz-option').forEach(function(b2){
+          b2.disabled = true;
+          if(b2.dataset.opt.toLowerCase() === target.term.toLowerCase()) b2.classList.add('correct');
+          else if(b2 === btn) b2.classList.add('wrong');
+        });
+        adjustConfidenceFromQuiz(target.id, correct);
+        if(correct) quizScore++;
+        document.getElementById('quizNextBtn').style.display = 'inline-flex';
+      });
+    });
+    document.getElementById('quizExitBtn').addEventListener('click', backToQuizHome);
+    document.getElementById('quizNextBtn').addEventListener('click', function(){ quizIdx++; renderConfusableQuestion(); });
+  }
+
+  // ---------------- root web ----------------
+  function renderRoots(){
+    var area = document.getElementById('rootsArea');
+    var groups = {};
+    words.forEach(function(w){
+      if(!w.root) return;
+      var key = w.root.trim().toLowerCase();
+      if(!groups[key]) groups[key] = { label: w.root.trim(), items: [] };
+      groups[key].items.push(w);
+    });
+    var clusters = Object.keys(groups).map(function(k){ return groups[k]; }).filter(function(g){ return g.items.length >= 2; });
+    if(clusters.length === 0){
+      area.innerHTML = emptyStateHtml('No shared roots yet', 'Roots show up here once at least two words in your library share the same "root" value (added via the AI prompt or manual edit).');
+      return;
+    }
+    area.innerHTML = '<div class="root-clusters-wrap">' + clusters.map(clusterSvgHtml).join('') + '</div>';
+    area.querySelectorAll('[data-root-word]').forEach(function(el){
+      el.addEventListener('click', function(){ openWordPreviewModal(el.dataset.rootWord); });
+    });
+  }
+
+  function clusterSvgHtml(group){
+    var n = group.items.length;
+    var size = Math.min(420, Math.max(240, 70 + n * 46));
+    var cx = size/2, cy = size/2;
+    var radius = size/2 - 56;
+    var lines = '', nodes = '';
+    group.items.forEach(function(w, i){
+      var angle = (2*Math.PI*i/n) - Math.PI/2;
+      var x = cx + radius*Math.cos(angle);
+      var y = cy + radius*Math.sin(angle);
+      lines += '<line class="link-line" x1="'+cx+'" y1="'+cy+'" x2="'+x+'" y2="'+y+'"></line>';
+      var label = w.term.length > 12 ? w.term.slice(0,11)+'…' : w.term;
+      nodes += '<g data-root-word="'+escapeAttr(w.id)+'">' +
+        '<circle class="word-node-circle" cx="'+x+'" cy="'+y+'" r="30"></circle>' +
+        '<text class="word-node-label" x="'+x+'" y="'+y+'" text-anchor="middle" dominant-baseline="middle">'+escapeHtml(label)+'</text>' +
+      '</g>';
+    });
+    var svg = '<svg viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'">' +
+      lines +
+      '<circle class="root-node-circle" cx="'+cx+'" cy="'+cy+'" r="34"></circle>' +
+      '<text class="root-node-label" x="'+cx+'" y="'+cy+'" text-anchor="middle" dominant-baseline="middle">'+escapeHtml(group.label.length>14?group.label.slice(0,13)+'…':group.label)+'</text>' +
+      nodes +
+    '</svg>';
+    return '<div class="root-cluster">'+svg+'</div>';
+  }
+
+  function openWordPreviewModal(id){
+    var w = words.find(function(x){ return x.id === id; });
+    if(!w) return;
+    modalBodyRef().innerHTML = '<h3>'+escapeHtml(w.term)+'</h3>' +
+      '<p class="help">'+escapeHtml(w.part_of_speech||'-')+' · <span class="badge '+w.type+'">'+TYPE_LABELS[w.type]+'</span></p>' +
+      fieldBox('fb-hindi','hindi', w.hindi_meaning) +
+      '<div class="meaning-en" style="margin-top:8px;">'+escapeHtml(w.english_meaning||'')+'</div>' +
+      fieldBox('fb-root','root', w.root) +
+      '<div class="modal-actions"><button class="btn ghost" id="closeWordPreview">Close</button></div>';
+    modalBgRef().classList.add('open');
+    document.getElementById('closeWordPreview').addEventListener('click', function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML=''; });
+  }
+
+  // ---------------- enrich existing words (backfill ssc_history / confusable_with / root) ----------------
+  async function copyTextToClipboard(text){
+    try{ await navigator.clipboard.writeText(text); return true; }
+    catch(e){
+      var ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      var ok = false;
+      try{ ok = document.execCommand('copy'); }catch(e2){}
+      document.body.removeChild(ta);
+      return ok;
+    }
+  }
+
+  var ENRICH_BATCH_LIMIT = 40;
+  var lastEnrichPrompt = '';
+  var enrichBatchWords = [];
+  var enrichPendingReview = [];
+  var FIELD_LABELS_ENRICH = { ssc_history: 'SSC history', confusable_with: 'Confusable with', root: 'Root' };
+
+  function wordsMissingEnrichFields(){
+    return words.filter(function(w){ return !w.enrichedAt; });
+  }
+
+  function renderEnrichHome(){
+    document.getElementById('enrichAdmin').style.display = isAdminUser ? 'block' : 'none';
+    document.getElementById('enrichNonAdmin').style.display = isAdminUser ? 'none' : 'block';
+    if(!isAdminUser) return;
+    var missing = wordsMissingEnrichFields();
+    document.getElementById('enrichCount').textContent = missing.length === 0
+      ? "Every word has already been through this — nothing missing right now."
+      : missing.length + ' word' + (missing.length===1?'':'s') + " haven't been through this yet.";
+    document.getElementById('generateEnrichBtn').disabled = missing.length === 0;
+    document.getElementById('enrichPromptPanel').style.display = 'none';
+    document.getElementById('enrichPastePanel').style.display = 'none';
+    document.getElementById('enrichStagePanel').style.display = 'none';
+    document.getElementById('enrichStagePanel').innerHTML = '';
+  }
+
+  document.getElementById('generateEnrichBtn').addEventListener('click', function(){
+    var missing = wordsMissingEnrichFields();
+    if(missing.length === 0){ showToast('Nothing missing right now.'); return; }
+    enrichBatchWords = missing.slice(0, ENRICH_BATCH_LIMIT);
+    var listBlock = enrichBatchWords.map(function(w, i){
+      return (i+1) + '. ' + w.term + ' (' + TYPE_LABELS[w.type] + ') — meaning: ' + (w.english_meaning || 'n/a');
+    }).join('\n');
+
+    lastEnrichPrompt = [
+'You are updating an existing SSC CGL vocabulary register. For each term below, provide ONLY three additional fields — do not regenerate the meaning or anything else, and match each term back using its exact original text.',
+'',
+'Terms:',
+listBlock,
+'',
+'Return ONLY a valid JSON array — no markdown code fences, no explanation before or after it.',
+'Each element must be an object with exactly these fields:',
+'{',
+'  "term": string (copy the term exactly as given above),',
+'  "ssc_history": string (how frequently and in what way this term tends to appear in SSC exams - e.g. common in Cloze Test, Error Spotting, One Word Substitution, or Synonym-Antonym sections; roughly how often such terms come up; how a typical question uses it. Describe the general pattern honestly - do not invent specific exam dates, years, or fake direct quotations from past papers. If this is not a well-documented exam pattern, say so plainly instead of guessing.),',
+'  "confusable_with": string (a single other real word commonly confused with this one, e.g. "Affect" -> "Effect"; use "-" if there is no well-known confusable counterpart),',
+'  "root": string (a shared Latin/Greek/other root that helps connect this word to others, stated as "root = meaning", e.g. "greg = flock/herd"; mainly applies to actual words, not idioms/phrasal verbs/one-word substitutions; use "-" if none is genuinely useful or applicable)',
+'}',
+'',
+'Output only the JSON array.'
+    ].join('\n');
+
+    document.getElementById('enrichPromptPreview').textContent = lastEnrichPrompt;
+    document.getElementById('enrichPromptPanel').style.display = 'block';
+    document.getElementById('enrichPastePanel').style.display = 'block';
+    document.getElementById('enrichPromptPanel').scrollIntoView({behavior:'smooth', block:'start'});
+    if(missing.length > ENRICH_BATCH_LIMIT){
+      showToast('Showing the first ' + ENRICH_BATCH_LIMIT + ' of ' + missing.length + ' — run this again afterward to continue with the rest.');
+    }
+  });
+
+  document.getElementById('copyEnrichPromptBtn').addEventListener('click', async function(){
+    await copyTextToClipboard(lastEnrichPrompt);
+    var note = document.getElementById('enrichCopyNote');
+    note.style.display = 'inline';
+    setTimeout(function(){ note.style.display = 'none'; }, 2000);
+  });
+  document.getElementById('openEnrichChatGPTBtn').addEventListener('click', async function(){
+    await copyTextToClipboard(lastEnrichPrompt);
+    showToast('Prompt copied — paste it (Ctrl+V) into ChatGPT.');
+    window.open('https://chatgpt.com/', '_blank');
+  });
+  document.getElementById('openEnrichGeminiBtn').addEventListener('click', async function(){
+    await copyTextToClipboard(lastEnrichPrompt);
+    showToast('Prompt copied — paste it (Ctrl+V) into Gemini.');
+    window.open('https://gemini.google.com/app', '_blank');
+  });
+
+  document.getElementById('parseEnrichBtn').addEventListener('click', function(){
+    var statusEl = document.getElementById('enrichParseStatus');
+    var raw = document.getElementById('enrichResponseInput').value;
+    if(!raw.trim()){ statusEl.style.color = 'var(--maroon)'; statusEl.textContent = 'Paste the AI response first.'; return; }
+    var parsed;
+    try{
+      parsed = extractJson(raw);
+      if(!Array.isArray(parsed)) throw new Error('not an array');
+    }catch(e){
+      statusEl.style.color = 'var(--maroon)';
+      statusEl.textContent = "Couldn't read that as JSON. Check the reply is a JSON array and try again.";
+      return;
+    }
+
+    var byTermLower = {};
+    words.forEach(function(w){ byTermLower[w.term.toLowerCase()] = w; });
+
+    enrichPendingReview = parsed.map(function(item){
+      if(!item || !item.term) return null;
+      var match = byTermLower[String(item.term).trim().toLowerCase()];
+      if(!match) return { term: item.term, matched: false };
+      var fields = [];
+      var updates = {};
+      ['ssc_history','confusable_with','root'].forEach(function(key){
+        var incoming = item[key] ? String(item[key]).trim() : '';
+        if(incoming === '-') incoming = '';
+        var already = match[key] || '';
+        if(!already && incoming){
+          updates[key] = incoming;
+          fields.push({key: key, value: incoming, action: 'set'});
+        } else if(already){
+          fields.push({key: key, value: already, action: 'skip'});
+        } else {
+          fields.push({key: key, value: '', action: 'none'});
+        }
+      });
+      return { term: match.term, matched: true, wordId: match.id, updates: updates, fields: fields, include: Object.keys(updates).length > 0 };
+    }).filter(Boolean);
+
+    statusEl.textContent = '';
+    renderEnrichStage();
+  });
+
+  function renderEnrichStage(){
+    var wrap = document.getElementById('enrichStagePanel');
+    if(enrichPendingReview.length === 0){ wrap.style.display = 'none'; wrap.innerHTML=''; return; }
+    var updatable = enrichPendingReview.filter(function(i){ return i.matched && i.include; });
+    var notFound = enrichPendingReview.filter(function(i){ return !i.matched; });
+    wrap.style.display = 'block';
+    wrap.innerHTML =
+      '<h2><span class="step-badge">4</span>Review changes</h2>' +
+      '<p class="help">'+updatable.length+' word'+(updatable.length===1?'':'s')+' will be updated.'+(notFound.length ? ' '+notFound.length+" couldn't be matched to a word in your library and will be skipped." : '')+'</p>' +
+      '<div class="grid" id="enrichStageGrid">' + enrichPendingReview.map(enrichStageItemHtml).join('') + '</div>' +
+      '<div class="row-actions">' +
+        '<button class="btn ghost" id="enrichStageCancel">Cancel</button>' +
+        '<button class="btn maroon" id="enrichStageConfirm">Apply updates</button>' +
+      '</div>';
+    wrap.querySelectorAll('[data-enrich-toggle]').forEach(function(cb){
+      cb.addEventListener('change', function(){ enrichPendingReview[+cb.dataset.enrichToggle].include = cb.checked; });
+    });
+    document.getElementById('enrichStageCancel').addEventListener('click', function(){
+      enrichPendingReview = []; renderEnrichStage();
+    });
+    document.getElementById('enrichStageConfirm').addEventListener('click', confirmEnrichApply);
+    wrap.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  function enrichStageItemHtml(item, idx){
+    if(!item.matched){
+      return '<div class="stage-item"><div class="term" style="font-size:15px;">'+escapeHtml(item.term)+'</div><div class="dup-flag">Not found in your library — skipped</div></div>';
+    }
+    if(!item.include){
+      return '<div class="stage-item" style="opacity:.6;"><div class="term" style="font-size:15px;">'+escapeHtml(item.term)+'</div><div class="pending-meta">Nothing new to add — already complete, or the AI had nothing to offer.</div></div>';
+    }
+    var rows = item.fields.map(function(f){
+      var mark = f.action === 'set' ? '✓ will add' : (f.action === 'skip' ? '— already set, skipping' : '— nothing offered');
+      return '<div class="pending-meta"><strong>'+FIELD_LABELS_ENRICH[f.key]+':</strong> '+mark+(f.action==='set' ? ' — '+escapeHtml(f.value.length>90?f.value.slice(0,90)+'…':f.value) : '')+'</div>';
+    }).join('');
+    return '<div class="stage-item"><label style="align-items:flex-start;">' +
+      '<input type="checkbox" data-enrich-toggle="'+idx+'" checked>' +
+      '<div style="flex:1;"><div class="term" style="font-size:15px;">'+escapeHtml(item.term)+'</div>'+rows+'</div>' +
+    '</label></div>';
+  }
+
+  async function confirmEnrichApply(){
+    var seenIds = {};
+    var toApply = enrichPendingReview.filter(function(i){
+      if(!(i.matched && i.include)) return false;
+      if(seenIds[i.wordId]) return false;
+      seenIds[i.wordId] = true;
+      return true;
+    });
+    if(toApply.length === 0){ showToast('Nothing selected.'); return; }
+    try{
+      var CHUNK = 100;
+      for(var i = 0; i < toApply.length; i += CHUNK){
+        var batch = db.batch();
+        toApply.slice(i, i+CHUNK).forEach(function(item){
+          var payload = Object.assign({}, item.updates, {enrichedAt: firebase.firestore.FieldValue.serverTimestamp()});
+          batch.update(db.collection('words').doc(item.wordId), payload);
+        });
+        await batch.commit();
+      }
+      showToast(toApply.length + ' word' + (toApply.length===1?'':'s') + ' updated.');
+      enrichPendingReview = [];
+      document.getElementById('enrichResponseInput').value = '';
+      renderEnrichStage();
+      renderEnrichHome();
+    }catch(e){ showToast('Could not apply updates: ' + e.message); }
+  }
+
   // ---------------- full-screen slide view ----------------
   var slideDeck = [];
   var slideIdx = 0;
@@ -1367,6 +2128,29 @@ listBlock,
     document.getElementById('revealHide').addEventListener('click', function(){
       modalBgRef().classList.remove('open'); modalBodyRef().innerHTML='';
       startSlideshow(list, false);
+    });
+  });
+
+  document.getElementById('panicBtn').addEventListener('click', function(){
+    var CRAM_LIMIT = 30;
+    var pool = viewEntries().filter(function(e){ return e.confidence < 5; });
+    if(pool.length === 0){ showToast("Nothing to cram — every word is already marked memorized!"); return; }
+    pool.sort(function(a,b){ return a.confidence - b.confidence; });
+    var cram = pool.slice(0, CRAM_LIMIT);
+    modalBodyRef().innerHTML = '<h3>🚨 Cram list ready</h3>' +
+      '<p class="help">Your '+cram.length+' weakest word'+(cram.length===1?'':'s')+' (lowest confidence first), pulled from your whole library regardless of any Library filters currently set.</p>' +
+      '<div class="modal-actions" style="justify-content:flex-start; gap:10px; flex-wrap:wrap;">' +
+        '<button class="btn teal" id="panicPractice">Practice now</button>' +
+        '<button class="btn maroon" id="panicSlides">Full-screen (flash-note)</button>' +
+      '</div>';
+    modalBgRef().classList.add('open');
+    document.getElementById('panicPractice').addEventListener('click', function(){
+      modalBgRef().classList.remove('open'); modalBodyRef().innerHTML='';
+      beginPracticeWithList(cram);
+    });
+    document.getElementById('panicSlides').addEventListener('click', function(){
+      modalBgRef().classList.remove('open'); modalBodyRef().innerHTML='';
+      startSlideshow(cram, false);
     });
   });
 
@@ -1427,6 +2211,8 @@ listBlock,
       fieldBox('fb-sentence','ssc-style sentence', e.ssc_sentence) +
       fieldBox('fb-trick','trick / mnemonic', e.mnemonic) +
       fieldBox('fb-history','ssc exam history', e.ssc_history) +
+      fieldBox('fb-confusable','often confused with', e.confusable_with) +
+      fieldBox('fb-root','root', e.root) +
       (e.type==='idiom' ? fieldBox('fb-origin','origin', e.origin) : '');
 
     var body = document.getElementById('slideBody');
