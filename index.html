@@ -100,6 +100,9 @@
   label.field-label{ font-size:12.5px; font-weight:600; color:var(--ink-soft); display:block; margin-bottom:6px; text-transform:lowercase; letter-spacing:.02em; }
 
   .panel{ background:var(--card); border:1px solid var(--rule); border-radius:8px; padding:22px; box-shadow:var(--shadow); margin-bottom:20px; max-width:760px; }
+  .add-columns{ display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start; }
+  .add-col .panel{ max-width:none; }
+  @media (max-width: 900px){ .add-columns{ grid-template-columns:1fr; } }
   .panel h2{ margin-top:0; font-size:20px; }
   .panel p.help{ color:var(--ink-soft); font-size:13.5px; line-height:1.55; }
   .step-badge{ display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; background:var(--maroon); color:#fff; font-size:12px; font-weight:700; margin-right:8px; }
@@ -329,14 +332,11 @@
     <div class="brand">शब्दRegister</div>
     <button class="tab active" data-tab="library">Library</button>
     <button class="tab" data-tab="add">Add words</button>
-    <button class="tab" data-tab="paste">Paste result</button>
-    <button class="tab" data-tab="review">Review</button>
-    <button class="tab" data-tab="enrich">Enrich</button>
-    <button class="tab" data-tab="practice">Practice</button>
+    <button class="tab mod-only" data-tab="review" style="display:none;">Review</button>
+    <button class="tab mod-only" data-tab="enrich" style="display:none;">Enrich</button>
     <button class="tab" data-tab="quiz">Quiz</button>
     <button class="tab" data-tab="roots">Roots</button>
     <button class="tab" data-tab="stats">Stats</button>
-    <button class="tab" data-tab="leaderboard">Leaderboard</button>
     <button class="tab mod-only" data-tab="admin" style="display:none;">Admin</button>
     <button class="tab" data-tab="backup">Backup</button>
   </nav>
@@ -387,49 +387,47 @@
     </section>
 
     <section class="view" id="view-add">
-      <div class="panel">
-        <h2><span class="step-badge">1</span>Paste your word list</h2>
-        <p class="help" id="addPanelHelp">Paste the words you want to add, generate the prompt, run it through any AI, then bring the reply back here.</p>
-        <label class="field-label">Words / idioms / phrases</label>
-        <textarea id="wordListInput" placeholder="e.g.&#10;laconic&#10;bury the hatchet&#10;call off&#10;one who cannot be corrected"></textarea>
-        <div style="margin-top:12px; max-width:260px;">
-          <label class="field-label">Tag this batch</label>
-          <input type="text" id="batchTagInput" placeholder="e.g. Mock 1">
-        </div>
-        <div class="row-actions"><button class="btn" id="generatePromptBtn">Generate prompt</button></div>
+      <div style="margin-bottom:14px; max-width:260px;">
+        <label class="field-label">Tag this batch</label>
+        <input type="text" id="batchTagInput" placeholder="e.g. Mock 1">
       </div>
+      <div class="add-columns">
+        <div class="add-col">
+          <div class="panel">
+            <h2><span class="step-badge">1</span>Paste your word list</h2>
+            <p class="help" id="addPanelHelp">Paste the words you want to add, generate the prompt, run it through any AI, then paste the reply on the right.</p>
+            <label class="field-label">Words / idioms / phrases</label>
+            <textarea id="wordListInput" placeholder="e.g.&#10;laconic&#10;bury the hatchet&#10;call off&#10;one who cannot be corrected"></textarea>
+            <div class="row-actions"><button class="btn" id="generatePromptBtn">Generate prompt</button></div>
+          </div>
 
-      <div class="panel" id="promptPanel" style="display:none;">
-        <h2><span class="step-badge">2</span>Send it to an AI</h2>
-        <p class="help">Open ChatGPT or Gemini, paste this prompt in, and send it. Note: neither site currently supports auto-filling a prompt from a link, so these buttons copy the prompt to your clipboard and open the site — just press Ctrl+V (or Cmd+V) once it loads. Then bring the reply back to "Paste result".</p>
-        <pre class="prompt-preview" id="promptPreview"></pre>
-        <div class="row-actions">
-          <button class="btn teal" id="copyPromptBtn">Copy prompt</button>
-          <button class="btn ghost" id="openChatGPTBtn">Open ChatGPT (copies prompt)</button>
-          <button class="btn ghost" id="openGeminiBtn">Open Gemini (copies prompt)</button>
-          <span class="copy-note" id="copyNote" style="display:none;">Copied ✓</span>
+          <div class="panel" id="promptPanel" style="display:none;">
+            <h2><span class="step-badge">2</span>Send it to an AI</h2>
+            <p class="help">Open ChatGPT or Gemini, paste this prompt in, and send it. Neither site currently supports auto-filling a prompt from a link, so these buttons copy the prompt to your clipboard and open the site — press Ctrl+V (or Cmd+V) once it loads.</p>
+            <pre class="prompt-preview" id="promptPreview"></pre>
+            <div class="row-actions">
+              <button class="btn teal" id="copyPromptBtn">Copy prompt</button>
+              <button class="btn ghost" id="openChatGPTBtn">Open ChatGPT (copies prompt)</button>
+              <button class="btn ghost" id="openGeminiBtn">Open Gemini (copies prompt)</button>
+              <span class="copy-note" id="copyNote" style="display:none;">Copied ✓</span>
+            </div>
+          </div>
         </div>
-        <div class="row-actions">
-          <button class="btn maroon" id="goToPasteBtn">Go to "Paste result" →</button>
+
+        <div class="add-col">
+          <div class="panel" id="pasteInputPanel">
+            <h2><span class="step-badge">3</span>Paste the AI's response</h2>
+            <p class="help">Paste the reply you got back (the JSON). It's fine if it's wrapped in ```json fences — this handles that. You'll get a chance to review everything before it's actually added.</p>
+            <textarea id="responseInput" style="min-height:220px;" placeholder="Paste the AI's JSON reply here…"></textarea>
+            <div class="row-actions">
+              <button class="btn maroon" id="parseBtn">Review before adding</button>
+              <span id="parseStatus" style="font-size:13px;"></span>
+            </div>
+          </div>
+
+          <div class="panel" id="stagePanel" style="display:none;"></div>
         </div>
       </div>
-    </section>
-
-    <section class="view" id="view-paste">
-      <div class="panel" id="pasteInputPanel">
-        <h2><span class="step-badge">3</span>Paste the AI's response</h2>
-        <p class="help">Paste the reply you got back (the JSON). It's fine if it's wrapped in ```json fences — this handles that. You'll get a chance to review everything before it's actually added.</p>
-        <label class="field-label">Tag for this batch</label>
-        <input type="text" id="pasteTagInput" placeholder="e.g. Mock 1" style="max-width:260px; margin-bottom:12px;">
-        <label class="field-label">AI response</label>
-        <textarea id="responseInput" style="min-height:220px;" placeholder="Paste the AI's JSON reply here…"></textarea>
-        <div class="row-actions">
-          <button class="btn maroon" id="parseBtn">Review before adding</button>
-          <span id="parseStatus" style="font-size:13px;"></span>
-        </div>
-      </div>
-
-      <div class="panel" id="stagePanel" style="display:none; max-width:900px;"></div>
     </section>
 
     <section class="view" id="view-review">
@@ -488,25 +486,6 @@
       </div>
     </section>
 
-    <section class="view" id="view-practice">
-      <div class="practice-wrap" id="practiceWrap">
-        <p class="help" style="text-align:left;">Practice uses whatever the Library filters are currently set to. Set a tag/type/confidence filter in Library first for a focused drill, then come back here.</p>
-        <div class="row-actions" style="justify-content:center; margin-bottom:16px;">
-          <select id="practiceSortBy" style="max-width:220px;">
-            <option value="shuffle">Shuffled</option>
-            <option value="conf_low">Confidence (Level 1 → 2-4 → 5)</option>
-            <option value="highconf">Highest confidence first</option>
-            <option value="new">Newest first</option>
-            <option value="old">Oldest first</option>
-            <option value="az">A → Z</option>
-          </select>
-          <button class="btn" id="startPracticeBtn">Start practice session</button>
-          <button class="btn ghost" id="shufflePracticeBtn" style="display:none;">Shuffle</button>
-        </div>
-        <div id="practiceArea"></div>
-      </div>
-    </section>
-
     <section class="view" id="view-quiz">
       <div id="quizHome">
         <div class="panel">
@@ -521,7 +500,7 @@
         </div>
         <div class="panel">
           <h2>Spelling challenge</h2>
-          <p class="help">Hear a word aloud and prove you can spell it, three ways. Uses your current Library filters as the word pool.</p>
+          <p class="help">Hear a word aloud and prove you can spell it, three ways. Vocabulary words only (idioms and phrases are skipped). Uses your current Library filters as the word pool.</p>
           <div class="row-actions">
             <button class="btn" id="startSpellTypeBtn">Hear &amp; type</button>
             <button class="btn ghost" id="startSpellCorrectBtn">Choose the correct spelling</button>
@@ -541,11 +520,11 @@
       <div class="panel" style="max-width:560px;"><h2>By confidence</h2><div id="statsByConf"></div></div>
       <div class="panel" style="max-width:560px;"><h2>By type</h2><div id="statsByType"></div></div>
       <div class="panel" style="max-width:560px;"><h2>By tag</h2><div id="statsByTag"></div></div>
-    </section>
-
-    <section class="view" id="view-leaderboard">
-      <p class="help">Ranked by percentage of the shared library each person has marked memorized (level 5).</p>
-      <div id="leaderboardArea"></div>
+      <div style="max-width:900px;">
+        <h2>Leaderboard</h2>
+        <p class="help">Ranked by percentage of the shared library each person has marked memorized (level 5).</p>
+        <div id="leaderboardArea"></div>
+      </div>
     </section>
 
     <section class="view" id="view-admin">
@@ -1121,12 +1100,11 @@
     tabs.forEach(function(t){ t.classList.toggle('active', t.dataset.tab === name); });
     views.forEach(function(v){ v.classList.toggle('active', v.id === 'view-' + name); });
     if(name === 'library') renderLibrary();
-    if(name === 'stats') renderStats();
+    if(name === 'stats'){ renderStats(); renderLeaderboard(); }
     if(name === 'review') renderReview();
     if(name === 'quiz') renderQuizHome();
     if(name === 'roots') renderRoots();
     if(name === 'enrich') renderEnrichHome();
-    if(name === 'leaderboard') renderLeaderboard();
     if(name === 'admin') renderAdminPanel();
   }
 
@@ -1247,12 +1225,6 @@ listBlock,
     window.open('https://gemini.google.com/app', '_blank');
   });
 
-  document.getElementById('goToPasteBtn').addEventListener('click', function(){
-    var tag = document.getElementById('batchTagInput').value.trim();
-    if(tag) document.getElementById('pasteTagInput').value = tag;
-    switchTab('paste');
-  });
-
   // ---------------- parsing + review staging ----------------
   function extractJson(text){
     var t = text.trim();
@@ -1335,7 +1307,7 @@ listBlock,
   async function confirmStagedAdd(){
     var selected = pendingReview.filter(function(i){ return i.include; });
     if(selected.length === 0){ showToast('Nothing selected.'); return; }
-    var tag = document.getElementById('pasteTagInput').value.trim();
+    var tag = document.getElementById('batchTagInput').value.trim();
     try{
       var targetCollection = isModeratorUser ? db.collection('words') : db.collection('submissions');
       var batch = db.batch();
@@ -1786,96 +1758,6 @@ listBlock,
     }catch(e){ showToast('Could not reject: ' + e.message); }
   }
 
-  // ---------------- practice ----------------
-  var practiceSet = [];
-  var practiceIdx = 0;
-
-  document.getElementById('startPracticeBtn').addEventListener('click', function(){
-    practiceSet = getFiltered().slice();
-    if(practiceSet.length === 0){
-      document.getElementById('practiceArea').innerHTML = emptyStateHtml('Nothing to practice', 'Adjust your Library filters, or add some words first.');
-      document.getElementById('shufflePracticeBtn').style.display = 'none';
-      return;
-    }
-    applyPracticeSort();
-    practiceIdx = 0;
-    document.getElementById('shufflePracticeBtn').style.display = 'inline-block';
-    renderPracticeCard();
-  });
-  document.getElementById('shufflePracticeBtn').addEventListener('click', function(){
-    shuffle(practiceSet); practiceIdx = 0; renderPracticeCard();
-  });
-  function applyPracticeSort(){
-    var mode = document.getElementById('practiceSortBy').value;
-    if(mode === 'shuffle') shuffle(practiceSet);
-    else if(mode === 'conf_low') practiceSet.sort(function(a,b){ return a.confidence - b.confidence; });
-    else if(mode === 'highconf') practiceSet.sort(function(a,b){ return b.confidence - a.confidence; });
-    else if(mode === 'new') practiceSet.sort(function(a,b){ return tsMillis(b.createdAt) - tsMillis(a.createdAt); });
-    else if(mode === 'old') practiceSet.sort(function(a,b){ return tsMillis(a.createdAt) - tsMillis(b.createdAt); });
-    else if(mode === 'az') practiceSet.sort(function(a,b){ return a.term.localeCompare(b.term); });
-  }
-  function beginPracticeWithList(list){
-    practiceSet = list.slice();
-    practiceIdx = 0;
-    switchTab('practice');
-    document.getElementById('shufflePracticeBtn').style.display = 'inline-block';
-    renderPracticeCard();
-  }
-  function shuffle(arr){
-    for(var i = arr.length - 1; i > 0; i--){
-      var j = Math.floor(Math.random() * (i+1));
-      var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
-    }
-  }
-  function renderPracticeCard(){
-    var area = document.getElementById('practiceArea');
-    if(practiceIdx >= practiceSet.length){
-      area.innerHTML = '<div class="panel" style="margin:0 auto;"><h2>Session done</h2><p class="help">You went through '+practiceSet.length+' term'+(practiceSet.length===1?'':'s')+'. Start again anytime.</p></div>';
-      return;
-    }
-    var e = practiceSet[practiceIdx];
-    area.innerHTML =
-      '<div class="progress-line">'+(practiceIdx+1)+' / '+practiceSet.length+'</div>' +
-      '<div class="flashcard" id="fcCard">' +
-        '<div class="fc-front"><span class="badge fc-badge '+e.type+'">'+TYPE_LABELS[e.type]+'</span><div class="fc-term">'+escapeHtml(e.term)+'</div><button class="iconbtn" id="fcSpeakBtn" title="Listen" style="font-size:18px;">🔊</button><div class="fc-hint">Tap to reveal</div></div>' +
-        '<div class="fc-back">' +
-          fieldBox('fb-hindi','hindi', e.hindi_meaning) +
-          '<div class="meaning-en" style="margin-top:6px;">'+escapeHtml(e.english_meaning||'—')+'</div>' +
-          '<div class="fb-row2" style="margin-top:8px;">' +
-            fieldBox('fb-syn','synonyms', e.synonyms&&e.synonyms.length?e.synonyms.join(', '):'') +
-            fieldBox('fb-anto','antonyms', e.antonyms&&e.antonyms.length?e.antonyms.join(', '):'') +
-          '</div>' +
-          fieldBox('fb-sentence','sentence', e.ssc_sentence) +
-          fieldBox('fb-trick','trick', e.mnemonic) +
-          fieldBox('fb-history','ssc exam history', e.ssc_history) +
-          fieldBox('fb-confusable','often confused with', e.confusable_with) +
-          fieldBox('fb-root','root', e.root) +
-        '</div>' +
-      '</div>' +
-      '<div class="conf-row" style="border-top:none; justify-content:center;" id="practiceConfRow"></div>' +
-      '<div class="practice-actions"><button class="btn ghost" id="skipCard">Skip</button><button class="btn teal" id="nextCard">Next →</button></div>';
-    document.getElementById('fcCard').addEventListener('click', function(){ this.classList.toggle('flipped'); });
-    document.getElementById('fcSpeakBtn').addEventListener('click', function(ev){ ev.stopPropagation(); speakText(e.term); });
-    renderPracticeConfRow(e.id);
-    document.getElementById('nextCard').addEventListener('click', function(){ practiceIdx++; renderPracticeCard(); });
-    document.getElementById('skipCard').addEventListener('click', function(){ practiceIdx++; renderPracticeCard(); });
-  }
-
-  function renderPracticeConfRow(entryId){
-    var row = document.getElementById('practiceConfRow');
-    if(!row) return;
-    var level = (progressMap[entryId] && progressMap[entryId].confidence) || 0;
-    row.innerHTML = '<span class="conf-label">'+confLabel(level)+'</span>'+confDotsHtml(entryId, level);
-    row.querySelectorAll('.conf-dot').forEach(function(btn){
-      btn.addEventListener('click', function(ev){
-        ev.stopPropagation();
-        var lvl = +btn.dataset.level;
-        setProgress(entryId, {confidence: lvl});
-        renderPracticeConfRow(entryId);
-      });
-    });
-  }
-
   // ---------------- quiz mode ----------------
   var quizQueue = [];
   var quizIdx = 0;
@@ -1938,17 +1820,57 @@ listBlock,
   }
 
   document.getElementById('startFillBlankBtn').addEventListener('click', function(){
-    var pool = getFiltered().filter(function(w){
-      return w.ssc_sentence && w.ssc_sentence.toLowerCase().indexOf(w.term.toLowerCase()) !== -1;
+    var tags = allTags();
+    modalBodyRef().innerHTML = '<h3>Set up fill-in-the-blank</h3>' +
+      '<div class="field"><label class="field-label">Number of questions</label>' +
+        '<select id="fbCount">' +
+          '<option value="5">5</option><option value="10" selected>10</option>' +
+          '<option value="15">15</option><option value="20">20</option><option value="all">All</option>' +
+        '</select></div>' +
+      '<div class="field"><label class="field-label">Type</label>' +
+        '<select id="fbType">' +
+          '<option value="all">Mixed (all types)</option>' +
+          Object.keys(TYPE_LABELS).map(function(k){ return '<option value="'+k+'">'+TYPE_LABELS[k]+'</option>'; }).join('') +
+        '</select></div>' +
+      '<div class="field"><label class="field-label">Confidence level</label>' +
+        '<select id="fbConf">' +
+          '<option value="all">Mixed (all levels)</option>' +
+          '<option value="0">Not started</option>' +
+          '<option value="learning">In progress (1-4)</option>' +
+          '<option value="5">Memorized (5)</option>' +
+        '</select></div>' +
+      '<div class="field"><label class="field-label">Tag</label>' +
+        '<select id="fbTag"><option value="all">Mixed (all tags)</option>' +
+          tags.map(function(t){ return '<option value="'+escapeAttr(t)+'">'+escapeHtml(t)+'</option>'; }).join('') +
+        '</select></div>' +
+      '<div class="modal-actions"><button class="btn ghost" id="fbCancel">Cancel</button><button class="btn teal" id="fbStart">Start quiz</button></div>';
+    modalBgRef().classList.add('open');
+    document.getElementById('fbCancel').addEventListener('click', function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML=''; });
+    document.getElementById('fbStart').addEventListener('click', function(){
+      var count = document.getElementById('fbCount').value;
+      var typeSel = document.getElementById('fbType').value;
+      var confSel = document.getElementById('fbConf').value;
+      var tagSel = document.getElementById('fbTag').value;
+      var pool = viewEntries().filter(function(w){
+        if(typeSel !== 'all' && w.type !== typeSel) return false;
+        if(confSel === '0' && w.confidence !== 0) return false;
+        if(confSel === 'learning' && (w.confidence < 1 || w.confidence > 4)) return false;
+        if(confSel === '5' && w.confidence !== 5) return false;
+        if(tagSel !== 'all' && (w.tags||[]).indexOf(tagSel) === -1) return false;
+        return w.ssc_sentence && w.ssc_sentence.toLowerCase().indexOf(w.term.toLowerCase()) !== -1;
+      });
+      if(pool.length < 2 || words.length < 2){
+        showToast('Not enough matching words with a usable SSC sentence — try widening your choices.');
+        return;
+      }
+      shuffleArr(pool);
+      var finalPool = count === 'all' ? pool : pool.slice(0, parseInt(count, 10));
+      modalBgRef().classList.remove('open'); modalBodyRef().innerHTML='';
+      quizQueue = finalPool;
+      quizIdx = 0; quizScore = 0;
+      document.getElementById('quizHome').style.display = 'none';
+      renderFillBlankQuestion();
     });
-    if(pool.length < 2 || words.length < 2){
-      showToast('Need at least 2 words (matching your current filters) with a usable SSC sentence.');
-      return;
-    }
-    quizQueue = shuffleArr(pool.slice());
-    quizIdx = 0; quizScore = 0;
-    document.getElementById('quizHome').style.display = 'none';
-    renderFillBlankQuestion();
   });
 
   function renderFillBlankQuestion(){
@@ -2088,8 +2010,8 @@ listBlock,
   }
 
   document.getElementById('startSpellTypeBtn').addEventListener('click', function(){
-    var pool = getFiltered();
-    if(pool.length === 0){ showToast('No words match your current filters.'); return; }
+    var pool = getFiltered().filter(function(w){ return w.type === 'word'; });
+    if(pool.length === 0){ showToast('No vocabulary words match your current filters.'); return; }
     quizQueue = shuffleArr(pool.slice());
     quizIdx = 0; quizScore = 0;
     document.getElementById('quizHome').style.display = 'none';
@@ -2136,8 +2058,8 @@ listBlock,
   }
 
   document.getElementById('startSpellCorrectBtn').addEventListener('click', function(){
-    var pool = getFiltered();
-    if(pool.length === 0){ showToast('No words match your current filters.'); return; }
+    var pool = getFiltered().filter(function(w){ return w.type === 'word'; });
+    if(pool.length === 0){ showToast('No vocabulary words match your current filters.'); return; }
     quizQueue = shuffleArr(pool.slice());
     quizIdx = 0; quizScore = 0;
     document.getElementById('quizHome').style.display = 'none';
@@ -2190,8 +2112,8 @@ listBlock,
   }
 
   document.getElementById('startSpellWrongBtn').addEventListener('click', function(){
-    var pool = getFiltered();
-    if(pool.length < 4){ showToast('Need at least 4 words matching your current filters.'); return; }
+    var pool = getFiltered().filter(function(w){ return w.type === 'word'; });
+    if(pool.length < 4){ showToast('Need at least 4 vocabulary words matching your current filters.'); return; }
     quizQueue = shuffleArr(pool.slice());
     quizIdx = 0; quizScore = 0;
     document.getElementById('quizHome').style.display = 'none';
@@ -2545,15 +2467,15 @@ listBlock,
     modalBodyRef().innerHTML = '<h3>🚨 Cram list ready</h3>' +
       '<p class="help">Your '+cram.length+' weakest word'+(cram.length===1?'':'s')+' (lowest confidence first), pulled from your whole library regardless of any Library filters currently set.</p>' +
       '<div class="modal-actions" style="justify-content:flex-start; gap:10px; flex-wrap:wrap;">' +
-        '<button class="btn teal" id="panicPractice">Practice now</button>' +
-        '<button class="btn maroon" id="panicSlides">Full-screen (flash-note)</button>' +
+        '<button class="btn ghost" id="panicShow">Show meanings right away</button>' +
+        '<button class="btn maroon" id="panicHide">Hide meanings first (flash-note style)</button>' +
       '</div>';
     modalBgRef().classList.add('open');
-    document.getElementById('panicPractice').addEventListener('click', function(){
+    document.getElementById('panicShow').addEventListener('click', function(){
       modalBgRef().classList.remove('open'); modalBodyRef().innerHTML='';
-      beginPracticeWithList(cram);
+      startSlideshow(cram, true);
     });
-    document.getElementById('panicSlides').addEventListener('click', function(){
+    document.getElementById('panicHide').addEventListener('click', function(){
       modalBgRef().classList.remove('open'); modalBodyRef().innerHTML='';
       startSlideshow(cram, false);
     });
