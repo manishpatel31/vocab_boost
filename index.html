@@ -2013,18 +2013,22 @@ listBlock,
 
     function stripLeadingNumber(s){ return s.replace(/^\d+[\.\)]\s*/, '').trim(); }
     function stripTrailingParen(s){ return s.replace(/\s*\([^)]*\)\s*$/, '').trim(); }
+    function stripMeaningSuffix(s){ return s.split(/\s*[-–—]+\s*meaning\s*:/i)[0].trim(); }
+    function bareTerm(s){ return stripTrailingParen(stripLeadingNumber(stripMeaningSuffix(s))); }
 
     enrichPendingReview = parsed.map(function(item){
       if(!item || !item.term) return null;
       var rawTerm = String(item.term).trim();
-      var noNum = stripLeadingNumber(rawTerm);
-      var candidates = [rawTerm, noNum, stripTrailingParen(rawTerm), stripTrailingParen(noNum)];
+      var noMeaning = stripMeaningSuffix(rawTerm);
+      var noNum = stripLeadingNumber(noMeaning);
+      var clean = bareTerm(rawTerm);
+      var candidates = [rawTerm, noMeaning, noNum, stripTrailingParen(rawTerm), stripTrailingParen(noMeaning), clean];
       var match = null;
       for(var c = 0; c < candidates.length; c++){
         var found = byTermLower[candidates[c].toLowerCase()];
         if(found){ match = found; break; }
       }
-      if(!match) return { term: noNum || rawTerm, matched: false };
+      if(!match) return { term: clean || rawTerm, matched: false };
       var fields = [];
       var updates = {};
       ['ssc_history','confusable_with','root'].forEach(function(key){
