@@ -176,6 +176,15 @@
   .practice-actions{ display:flex; gap:10px; justify-content:center; margin-top:16px; flex-wrap:wrap; }
 
   .bar-row{ display:flex; align-items:center; gap:10px; margin-bottom:10px; font-size:13px; }
+  .mastery-columns{ display:grid; grid-template-columns:repeat(5, 1fr); gap:12px; align-items:start; }
+  .mastery-col{ background:var(--paper-deep); border:1px solid var(--rule); border-radius:8px; padding:10px; min-height:80px; }
+  .mastery-col-head{ font-weight:700; font-size:13px; text-align:center; padding-bottom:6px; border-bottom:1px solid var(--rule); margin-bottom:8px; }
+  .mastery-col-count{ text-align:center; font-size:11px; color:var(--ink-soft); margin-bottom:8px; }
+  .mastery-col-list{ display:flex; flex-direction:column; gap:6px; max-height:420px; overflow-y:auto; }
+  .mastery-word-chip{ background:var(--card); border:1px solid var(--rule); border-radius:6px; padding:6px 8px; font-size:12.5px; text-align:left; color:var(--ink); }
+  .mastery-word-chip:hover{ border-color:var(--teal); }
+  @media (max-width: 900px){ .mastery-columns{ grid-template-columns:repeat(2, 1fr); } }
+  @media (max-width: 500px){ .mastery-columns{ grid-template-columns:1fr; } }
   .bar-row .lbl{ width:150px; flex-shrink:0; color:var(--ink-soft); }
   .bar-track{ flex:1; background:var(--paper-deep); border-radius:20px; height:14px; overflow:hidden; }
   .bar-fill{ height:100%; background:var(--teal); border-radius:20px; }
@@ -259,6 +268,11 @@
   .quiz-option.wrong{ background:var(--maroon); border-color:var(--maroon-deep); color:#fff; }
   .quiz-option:disabled{ cursor:default; opacity:.85; }
   .quiz-score{ text-align:center; margin-top:18px; color:var(--ink-soft); font-size:13.5px; }
+  .report-card{ background:var(--card); border:1px solid var(--rule); border-radius:14px; padding:32px 28px; box-shadow:var(--shadow); text-align:center; max-width:440px; margin:0 auto; }
+  .report-score{ font-family:'Fraunces',serif; font-size:56px; font-weight:700; color:var(--teal); line-height:1; }
+  .report-sub{ font-size:15px; color:var(--ink-soft); margin-top:8px; font-weight:600; }
+  .report-missed{ margin-top:20px; padding-top:16px; border-top:1px dashed var(--rule); text-align:left; }
+  .report-missed .chip{ margin:3px 3px 0 0; display:inline-block; }
   .quiz-actions{ display:flex; justify-content:center; gap:10px; margin-top:20px; }
 
   .root-clusters-wrap{ display:flex; flex-wrap:wrap; gap:22px; justify-content:flex-start; }
@@ -383,6 +397,7 @@
         <button class="btn mustard sm" id="addManualBtn">+ Add one manually</button>
       </div>
       <div id="coverModeNote" class="help" style="display:none; margin:-8px 0 14px; color:var(--ink-soft); font-size:12.5px;">Cover mode is on — details are hidden. Tap a card to reveal it.</div>
+      <div id="libraryResultCount" class="help" style="font-weight:600; color:var(--ink); margin-bottom:10px;"></div>
       <div id="libraryGrid" class="grid"></div>
     </section>
 
@@ -567,9 +582,9 @@
         <div id="missedWordsArea"></div>
       </div>
 
-      <div class="panel" style="max-width:700px;">
+      <div class="panel" style="max-width:none;">
         <h2>Confidence breakdown by word</h2>
-        <p class="help">Of the people who've engaged with each word, what percentage sit at each confidence level.</p>
+        <p class="help">Every engaged word placed into one of five columns by its overall mastery score across everyone who's studied it. Click a word to see its full details.</p>
         <div id="masteryBreakdownArea"></div>
       </div>
     </section>
@@ -1371,12 +1386,16 @@ listBlock,
   function renderLibrary(){
     refreshTagFilter();
     var grid = document.getElementById('libraryGrid');
+    var countEl = document.getElementById('libraryResultCount');
     if(words.length === 0){
+      countEl.textContent = '';
       grid.style.display = 'block';
       grid.innerHTML = emptyStateHtml('Your register is empty', 'Head to "Add words" to build your first prompt, or add one manually above.');
       return;
     }
     var list = getFiltered();
+    var filtersActive = !!(searchBox.value.trim() || filterType.value !== 'all' || filterTag.value !== 'all' || filterStatus.value !== 'all');
+    countEl.textContent = list.length + ' word' + (list.length===1?'':'s') + (filtersActive ? ' matching your filters' : ' in your library');
     if(list.length === 0){
       grid.style.display = 'block';
       grid.innerHTML = emptyStateHtml('No matches', 'Try clearing a filter or search term.');
@@ -1763,6 +1782,7 @@ listBlock,
   var quizIdx = 0;
   var quizScore = 0;
   var quizAnswered = false;
+  var quizResults = [];
 
   function renderQuizHome(){
     document.getElementById('quizHome').style.display = 'block';
@@ -1786,8 +1806,34 @@ listBlock,
   }
   function showQuizSummary(){
     var area = document.getElementById('quizArea');
-    area.innerHTML = '<div class="quiz-wrap"><div class="panel" style="margin:0 auto; text-align:center; max-width:420px;"><h2>Quiz complete</h2><p class="help">You scored '+quizScore+' out of '+quizQueue.length+'.</p><button class="btn teal" id="quizBackBtn">Back to quizzes</button></div></div>';
+    var total = quizResults.length;
+    var correctCount = quizResults.filter(function(r){ return r.correct; }).length;
+    var pct = total ? Math.round(correctCount/total*100) : 0;
+    var missed = quizResults.filter(function(r){ return !r.correct; }).map(function(r){ return r.term; });
+    var grade = pct >= 90 ? 'Excellent!' : pct >= 75 ? 'Great job!' : pct >= 50 ? 'Good effort!' : 'Keep practicing!';
+    var shareText = 'I scored ' + correctCount + '/' + total + ' (' + pct + '%) on my CGL Vocabulary Register quiz — ' + grade;
+    area.innerHTML =
+      '<div class="quiz-wrap"><div class="report-card">' +
+        '<div class="report-score">'+pct+'%</div>' +
+        '<div class="report-sub">'+correctCount+' / '+total+' correct — '+grade+'</div>' +
+        (missed.length
+          ? '<div class="report-missed"><div class="fb-label" style="margin-bottom:8px;">words to revisit</div>' + missed.map(function(t){ return '<span class="chip">'+escapeHtml(t)+'</span>'; }).join(' ') + '</div>'
+          : '<p class="help">Perfect run — nothing to revisit!</p>') +
+        '<div class="row-actions" style="justify-content:center; margin-top:18px;">' +
+          '<button class="btn teal" id="shareReportBtn">Share result</button>' +
+          '<button class="btn ghost" id="quizBackBtn">Back to quizzes</button>' +
+        '</div>' +
+      '</div></div>';
     document.getElementById('quizBackBtn').addEventListener('click', backToQuizHome);
+    document.getElementById('shareReportBtn').addEventListener('click', async function(){
+      if(navigator.share){
+        try{ await navigator.share({ title: 'CGL Vocabulary Register', text: shareText }); }
+        catch(e){ /* user cancelled the share sheet, ignore */ }
+      } else {
+        await copyTextToClipboard(shareText);
+        showToast('Result copied — paste it anywhere to share.');
+      }
+    });
   }
   function adjustConfidenceFromQuiz(id, correct){
     var p = progressMap[id] || {};
@@ -1795,7 +1841,9 @@ listBlock,
     var next = correct ? Math.min(5, current + 1) : Math.max(1, current - 1);
     setProgress(id, {confidence: next});
     var w = words.find(function(x){ return x.id === id; });
-    logQuizAttempt(id, w ? w.term : '', correct);
+    var term = w ? w.term : '';
+    logQuizAttempt(id, term, correct);
+    quizResults.push({term: term, correct: !!correct});
   }
   function logQuizAttempt(wordId, term, correct){
     if(!currentUser) return;
@@ -1867,7 +1915,7 @@ listBlock,
       var finalPool = count === 'all' ? pool : pool.slice(0, parseInt(count, 10));
       modalBgRef().classList.remove('open'); modalBodyRef().innerHTML='';
       quizQueue = finalPool;
-      quizIdx = 0; quizScore = 0;
+      quizIdx = 0; quizScore = 0; quizResults = [];
       document.getElementById('quizHome').style.display = 'none';
       renderFillBlankQuestion();
     });
@@ -1935,7 +1983,7 @@ listBlock,
       return;
     }
     quizQueue = shuffleArr(pairs);
-    quizIdx = 0; quizScore = 0;
+    quizIdx = 0; quizScore = 0; quizResults = [];
     document.getElementById('quizHome').style.display = 'none';
     renderConfusableQuestion();
   });
@@ -2013,7 +2061,7 @@ listBlock,
     var pool = getFiltered().filter(function(w){ return w.type === 'word'; });
     if(pool.length === 0){ showToast('No vocabulary words match your current filters.'); return; }
     quizQueue = shuffleArr(pool.slice());
-    quizIdx = 0; quizScore = 0;
+    quizIdx = 0; quizScore = 0; quizResults = [];
     document.getElementById('quizHome').style.display = 'none';
     renderSpellTypeQuestion();
   });
@@ -2061,7 +2109,7 @@ listBlock,
     var pool = getFiltered().filter(function(w){ return w.type === 'word'; });
     if(pool.length === 0){ showToast('No vocabulary words match your current filters.'); return; }
     quizQueue = shuffleArr(pool.slice());
-    quizIdx = 0; quizScore = 0;
+    quizIdx = 0; quizScore = 0; quizResults = [];
     document.getElementById('quizHome').style.display = 'none';
     renderSpellCorrectQuestion();
   });
@@ -2115,7 +2163,7 @@ listBlock,
     var pool = getFiltered().filter(function(w){ return w.type === 'word'; });
     if(pool.length < 4){ showToast('Need at least 4 vocabulary words matching your current filters.'); return; }
     quizQueue = shuffleArr(pool.slice());
-    quizIdx = 0; quizScore = 0;
+    quizIdx = 0; quizScore = 0; quizResults = [];
     document.getElementById('quizHome').style.display = 'none';
     renderSpellSpotQuestion();
   });
@@ -2207,13 +2255,26 @@ listBlock,
   function openWordPreviewModal(id){
     var w = words.find(function(x){ return x.id === id; });
     if(!w) return;
-    modalBodyRef().innerHTML = '<h3>'+escapeHtml(w.term)+'</h3>' +
+    var synAnto = (w.synonyms&&w.synonyms.length) || (w.antonyms&&w.antonyms.length) ? (
+      '<div class="fb-row2">' +
+        fieldBox('fb-syn','synonyms', w.synonyms&&w.synonyms.length?w.synonyms.join(', '):'') +
+        fieldBox('fb-anto','antonyms', w.antonyms&&w.antonyms.length?w.antonyms.join(', '):'') +
+      '</div>'
+    ) : '';
+    modalBodyRef().innerHTML = '<h3>'+escapeHtml(w.term)+' <button class="iconbtn" id="previewSpeakBtn" title="Listen" style="font-size:15px; vertical-align:middle;">🔊</button></h3>' +
       '<p class="help">'+escapeHtml(w.part_of_speech||'-')+' · <span class="badge '+w.type+'">'+TYPE_LABELS[w.type]+'</span></p>' +
+      '<div class="meaning-en">'+escapeHtml(w.english_meaning||'')+'</div>' +
       fieldBox('fb-hindi','hindi', w.hindi_meaning) +
-      '<div class="meaning-en" style="margin-top:8px;">'+escapeHtml(w.english_meaning||'')+'</div>' +
+      synAnto +
+      fieldBox('fb-sentence','ssc-style sentence', w.ssc_sentence) +
+      fieldBox('fb-trick','trick / mnemonic', w.mnemonic) +
+      fieldBox('fb-history','ssc exam history', w.ssc_history) +
+      fieldBox('fb-confusable','often confused with', w.confusable_with) +
       fieldBox('fb-root','root', w.root) +
+      (w.type==='idiom' ? fieldBox('fb-origin','origin', w.origin) : '') +
       '<div class="modal-actions"><button class="btn ghost" id="closeWordPreview">Close</button></div>';
     modalBgRef().classList.add('open');
+    document.getElementById('previewSpeakBtn').addEventListener('click', function(){ speakText(w.term); });
     document.getElementById('closeWordPreview').addEventListener('click', function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML=''; });
   }
 
@@ -2941,19 +3002,35 @@ listBlock,
   function renderMasteryBreakdown(){
     var box = document.getElementById('masteryBreakdownArea');
     var withData = words.filter(function(w){ return w.confLevels && Object.keys(w.confLevels).length; });
-    if(withData.length === 0){ box.innerHTML = emptyStateHtml('No data yet', 'Fills in as people set a confidence level on words.'); return; }
+    var buckets = [
+      {label:'0–20%', items:[]}, {label:'21–40%', items:[]}, {label:'41–60%', items:[]},
+      {label:'61–80%', items:[]}, {label:'81–100%', items:[]}
+    ];
     withData.forEach(function(w){
-      w._total = Object.keys(w.confLevels).reduce(function(s,k){ return s + (w.confLevels[k]||0); }, 0);
+      var total = Object.keys(w.confLevels).reduce(function(s,k){ return s + (w.confLevels[k]||0); }, 0);
+      if(total === 0) return;
+      var weighted = Object.keys(w.confLevels).reduce(function(s,k){ return s + (parseInt(k,10) * (w.confLevels[k]||0)); }, 0);
+      var pct = Math.round(weighted / (5*total) * 100);
+      var idx = pct <= 20 ? 0 : pct <= 40 ? 1 : pct <= 60 ? 2 : pct <= 80 ? 3 : 4;
+      buckets[idx].items.push({id: w.id, term: w.term, pct: pct});
     });
-    withData.sort(function(a,b){ return b._total - a._total; });
-    box.innerHTML = withData.slice(0, 40).map(function(w){
-      var rows = [1,2,3,4,5].map(function(lvl){
-        var c = (w.confLevels && w.confLevels[lvl]) || 0;
-        var pct = w._total ? Math.round(c/w._total*100) : 0;
-        return '<div class="bar-row"><div class="lbl">Level '+lvl+'</div><div class="bar-track"><div class="bar-fill" style="width:'+pct+'%;"></div></div><div class="count">'+pct+'%</div></div>';
-      }).join('');
-      return '<div class="stage-item" style="margin-bottom:14px;"><div class="term" style="font-size:15px; margin-bottom:6px;">'+escapeHtml(w.term)+' <span style="font-size:12px; color:var(--ink-soft); font-weight:400;">('+w._total+' engaged)</span></div>'+rows+'</div>';
-    }).join('');
+    var anyWords = buckets.some(function(b){ return b.items.length > 0; });
+    if(!anyWords){ box.innerHTML = emptyStateHtml('No data yet', 'Fills in as people set a confidence level on words.'); return; }
+    buckets.forEach(function(b){ b.items.sort(function(a,b2){ return a.term.localeCompare(b2.term); }); });
+    box.innerHTML = '<div class="mastery-columns">' + buckets.map(function(b){
+      return '<div class="mastery-col">' +
+        '<div class="mastery-col-head">'+b.label+'</div>' +
+        '<div class="mastery-col-count">'+b.items.length+' word'+(b.items.length===1?'':'s')+'</div>' +
+        '<div class="mastery-col-list">' +
+          (b.items.length
+            ? b.items.map(function(it){ return '<button class="mastery-word-chip" data-mastery-word="'+it.id+'">'+escapeHtml(it.term)+'</button>'; }).join('')
+            : '<span class="pending-meta">—</span>') +
+        '</div>' +
+      '</div>';
+    }).join('') + '</div>';
+    box.querySelectorAll('[data-mastery-word]').forEach(function(btn){
+      btn.addEventListener('click', function(){ openWordPreviewModal(btn.dataset.masteryWord); });
+    });
   }
 
   // ---------------- render all ----------------
