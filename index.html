@@ -754,6 +754,9 @@
     word:"Word", idiom:"Idiom", one_word_substitution:"One-word sub",
     phrasal_verb:"Phrasal verb", other:"Other"
   };
+  // Bump this whenever new fields are added to the Enrich flow, so previously-enriched
+  // words get re-offered for just the new fields instead of being marked "done" forever.
+  var ENRICH_VERSION = 2;
 
   if(NOT_CONFIGURED){
     document.getElementById('loadingOverlay').classList.add('hidden');
@@ -1179,6 +1182,7 @@
       authorName: currentUser.displayName || currentUser.email,
       authorEmail: currentUser.email,
       enrichedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      enrichVersion: ENRICH_VERSION,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     };
   }
@@ -2345,7 +2349,7 @@ listBlock,
   var FIELD_LABELS_ENRICH = { ssc_history: 'SSC history', confusable_with: 'Confusable with', root: 'Root', spelling_trap: 'Spelling trap flag', spelling_note: 'Spelling note' };
 
   function wordsMissingEnrichFields(){
-    return words.filter(function(w){ return !w.enrichedAt; });
+    return words.filter(function(w){ return !(w.enrichVersion >= ENRICH_VERSION); });
   }
 
   function renderEnrichHome(){
@@ -2476,7 +2480,7 @@ listBlock,
       } else {
         fields.push({key: 'spelling_trap', value: '', action: 'none'});
       }
-      return { term: match.term, matched: true, wordId: match.id, updates: updates, fields: fields, include: Object.keys(updates).length > 0 };
+      return { term: match.term, matched: true, wordId: match.id, updates: updates, fields: fields, hasChanges: Object.keys(updates).length > 0, include: true };
     }).filter(Boolean);
 
     statusEl.textContent = '';
@@ -2491,7 +2495,7 @@ listBlock,
     wrap.style.display = 'block';
     wrap.innerHTML =
       '<h2><span class="step-badge">4</span>Review changes</h2>' +
-      '<p class="help">'+updatable.length+' word'+(updatable.length===1?'':'s')+' will be updated.'+(notFound.length ? ' '+notFound.length+" couldn't be matched to a word in your library and will be skipped." : '')+'</p>' +
+      '<p class="help">'+updatable.length+' word'+(updatable.length===1?'':'s')+' will be marked reviewed (with any new fields filled in).'+(notFound.length ? ' '+notFound.length+" couldn't be matched to a word in your library and will be skipped." : '')+'</p>' +
       '<div class="grid" id="enrichStageGrid">' + enrichPendingReview.map(enrichStageItemHtml).join('') + '</div>' +
       '<div class="row-actions">' +
         '<button class="btn ghost" id="enrichStageCancel">Cancel</button>' +
@@ -2511,13 +2515,10 @@ listBlock,
     if(!item.matched){
       return '<div class="stage-item"><div class="term" style="font-size:15px;">'+escapeHtml(item.term)+'</div><div class="dup-flag">Not found in your library — skipped</div></div>';
     }
-    if(!item.include){
-      return '<div class="stage-item" style="opacity:.6;"><div class="term" style="font-size:15px;">'+escapeHtml(item.term)+'</div><div class="pending-meta">Nothing new to add — already complete, or the AI had nothing to offer.</div></div>';
-    }
-    var rows = item.fields.map(function(f){
+    var rows = item.hasChanges ? item.fields.map(function(f){
       var mark = f.action === 'set' ? '✓ will add' : (f.action === 'skip' ? '— already set, skipping' : '— nothing offered');
       return '<div class="pending-meta"><strong>'+FIELD_LABELS_ENRICH[f.key]+':</strong> '+mark+(f.action==='set' ? ' — '+escapeHtml(f.value.length>90?f.value.slice(0,90)+'…':f.value) : '')+'</div>';
-    }).join('');
+    }).join('') : '<div class="pending-meta">No new fields to add — already complete. Will still be marked reviewed so it stops showing up here.</div>';
     return '<div class="stage-item"><label style="align-items:flex-start;">' +
       '<input type="checkbox" data-enrich-toggle="'+idx+'" checked>' +
       '<div style="flex:1;"><div class="term" style="font-size:15px;">'+escapeHtml(item.term)+'</div>'+rows+'</div>' +
@@ -2538,7 +2539,7 @@ listBlock,
       for(var i = 0; i < toApply.length; i += CHUNK){
         var batch = db.batch();
         toApply.slice(i, i+CHUNK).forEach(function(item){
-          var payload = Object.assign({}, item.updates, {enrichedAt: firebase.firestore.FieldValue.serverTimestamp()});
+          var payload = Object.assign({}, item.updates, {enrichedAt: firebase.firestore.FieldValue.serverTimestamp(), enrichVersion: ENRICH_VERSION});
           batch.update(db.collection('words').doc(item.wordId), payload);
         });
         await batch.commit();
