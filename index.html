@@ -143,12 +143,9 @@
   /* ---------- base ---------- */
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;}
-  body{
-    background-color:var(--paper);
-    background-image:var(--bg-pattern); background-size:var(--bg-pattern-size);
-    background-attachment:fixed; color:var(--ink); font-family:var(--font-body); min-height:100vh;
-    transition:background-color .3s ease, color .3s ease;
-  }
+  body{ background-color:var(--paper); color:var(--ink); font-family:var(--font-body); min-height:100vh; }
+  /* texture lives on its own fixed layer so scrolling / menus never repaint the whole page */
+  body::before{ content:''; position:fixed; inset:0; z-index:-1; pointer-events:none; background-image:var(--bg-pattern); background-size:var(--bg-pattern-size); transform:translateZ(0); }
   ::selection{ background:var(--mustard); color:#1B1203; }
   h1,h2,h3,.headword{ font-family:var(--font-display); font-weight:var(--h-weight); }
   button{ font-family:inherit; cursor:pointer; }
@@ -166,7 +163,7 @@
   .stat-chip .lbl{ font-size:11px; color:var(--ink-soft); text-transform:lowercase; }
 
   section.view{ display:none; }
-  section.view.active{ display:block; animation:viewIn .38s cubic-bezier(.2,.8,.2,1) both; }
+  section.view.active{ display:block; animation:fadeIn .2s ease both; }
 
   /* ---------- buttons ---------- */
   .btn{ background:var(--accent); color:var(--accent-fg); border:none; padding:10px 18px; border-radius:var(--radius); font-size:14px; font-weight:600; box-shadow:var(--shadow); transition:transform .15s ease, box-shadow .2s ease, background .2s ease, filter .2s ease; }
@@ -206,12 +203,13 @@
   body.theme-indigo .toolbar input, body.theme-indigo .toolbar select{ border-radius:var(--pill); padding-left:16px; }
 
   .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:16px; }
-  .grid.animate-in > *{ animation:rise .55s cubic-bezier(.2,.8,.2,1) backwards; }
+  .grid.animate-in > *{ animation:rise .5s cubic-bezier(.2,.8,.2,1) backwards; }
+  .grid.animate-in > *:nth-child(n+13){ animation:none; }
   .empty-state{ border:1.5px dashed var(--rule); border-radius:var(--radius-lg); padding:40px 20px; text-align:center; color:var(--ink-soft); max-width:520px; }
   .empty-state h3{ margin-bottom:6px; color:var(--ink); }
 
   /* ---------- word cards ---------- */
-  .vcard{ background:var(--card); border:1px solid var(--rule); border-radius:var(--radius-lg); box-shadow:var(--shadow); padding:18px 18px 12px; position:relative; cursor:pointer; transition:transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease, border-color .25s ease; }
+  .vcard{ background:var(--card); border:1px solid var(--rule); border-radius:var(--radius-lg); box-shadow:var(--shadow); padding:18px 18px 12px; position:relative; cursor:pointer; transition:transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease, border-color .25s ease; content-visibility:auto; contain-intrinsic-size:auto 340px; }
   .vcard:hover{ transform:translateY(-4px); box-shadow:var(--shadow-lg); }
   body.theme-indigo .vcard:hover{ border-color:var(--accent); }
   .vcard-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
@@ -287,7 +285,7 @@
   .bar-row .count{ width:36px; text-align:right; font-weight:600; }
 
   /* ---------- modal + toast ---------- */
-  .modal-bg{ position:fixed; inset:0; background:var(--overlay); display:none; align-items:center; justify-content:center; padding:20px; z-index:300; backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px); }
+  .modal-bg{ position:fixed; inset:0; background:var(--overlay); display:none; align-items:center; justify-content:center; padding:20px; z-index:300; }
   .modal-bg.open{ display:flex; animation:fadeIn .2s ease both; }
   .modal{ background:var(--card); color:var(--ink); border:1px solid var(--rule); border-radius:var(--radius-lg); padding:24px; max-width:540px; width:100%; max-height:86vh; overflow:auto; box-shadow:var(--shadow-lg); }
   .modal-bg.open .modal{ animation:modalIn .3s cubic-bezier(.2,.9,.3,1.15) both; }
@@ -668,6 +666,7 @@
       <datalist id="rootDatalist"></datalist>
       <div id="libraryResultCount" class="help" style="font-weight:600; color:var(--ink); margin-bottom:10px;"></div>
       <div id="libraryGrid" class="grid"></div>
+      <div id="libraryMore" style="display:flex; justify-content:center; margin-top:18px;"></div>
     </section>
 
     <section class="view" id="view-add">
@@ -1278,7 +1277,7 @@
       applyRoleUI();
       attachListeners();
       ensureUserProfile();
-      checkModeratorRole().then(function(){ renderWhoBox(); applyRoleUI(); renderLibrary(); renderReview(); });
+      checkModeratorRole().then(function(){ renderWhoBox(); applyRoleUI(); scheduleRender(); renderReview(); });
       if(anyAlertEnabled()){ startHourlyAlerts(); }
     } else {
       isAdminUser = false;
@@ -1485,16 +1484,35 @@
   // ---------------- Firestore listeners ----------------
   function attachListeners(){
     unsubWords = db.collection('words').orderBy('createdAt','desc').onSnapshot(function(snap){
+      var changes = typeof snap.docChanges === 'function' ? snap.docChanges() : null;
+      var prev = {};
+      words.forEach(function(w){ prev[w.id] = w; });
+      var hadWords = words.length > 0;
       words = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
-      renderAll();
-      if(document.getElementById('view-roots').classList.contains('active')) renderRoots();
+      if(changes && hadWords){
+        if(changes.length === 0) return;
+        var countersOnly = changes.every(function(c){
+          return c.type === 'modified' && prev[c.doc.id] && sameExceptCounters(prev[c.doc.id], Object.assign({id: c.doc.id}, c.doc.data()));
+        });
+        if(countersOnly) return;
+      }
+      scheduleRender();
     }, function(err){ showToast('Could not load the library: ' + err.message); });
 
     unsubProgress = db.collection('users').doc(currentUser.uid).collection('progress').onSnapshot(function(snap){
       var map = {};
       snap.forEach(function(d){ map[d.id] = d.data(); });
+      var changed = [], seen = {};
+      Object.keys(map).concat(Object.keys(progressMap)).forEach(function(id){
+        if(seen[id]) return;
+        seen[id] = true;
+        var a = progressMap[id] || {}, b = map[id] || {};
+        if((a.confidence || 0) !== (b.confidence || 0) || !!a.starred !== !!b.starred) changed.push(id);
+      });
       progressMap = map;
-      renderAll();
+      if(changed.length === 0) return;
+      if(changed.length <= 20 && libraryPatchable()){ changed.forEach(patchCard); renderStatStrip(); }
+      else scheduleRender();
     }, function(err){ showToast('Could not load your progress: ' + err.message); });
 
     var subsQuery = isModeratorUser
@@ -1515,13 +1533,12 @@
     unsubRootGroups = db.collection('rootGroups').onSnapshot(function(snap){
       rootGroups = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); }).filter(function(g){ return g.key; });
       rootGroups.sort(function(a,b){ return String(a.key).localeCompare(String(b.key)); });
-      renderLibrary();
-      if(document.getElementById('view-roots').classList.contains('active')) renderRoots();
+      scheduleRender();
     }, function(err){ /* root groups are optional; the filter simply stays hidden */ });
 
     unsubSpellWords = db.collection('spellwords').orderBy('createdAt','desc').onSnapshot(function(snap){
       spellWords = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
-      renderSpellBank();
+      if(isActive('spellbank')) renderSpellBank();
     }, function(err){ showToast('Could not load the Spelling Bank: ' + err.message); });
 
     var spellSubsQuery = isModeratorUser
@@ -2461,7 +2478,73 @@ listBlock,
   var libraryAnimatingRender = false;
   var libraryAnimateUntil = 0;
   var lastConfSet = null;
-  searchBox.addEventListener('input', renderLibrary);
+  var LIB_PAGE = 36;
+  var libraryShown = LIB_PAGE;
+  var libraryList = [];
+  var libraryGridEl = document.getElementById('libraryGrid');
+  var libraryMoreEl = document.getElementById('libraryMore');
+  var searchTimer = null;
+  searchBox.addEventListener('input', function(){
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(function(){ libraryShown = LIB_PAGE; renderLibrary(); }, 140);
+  });
+
+  function sameExceptCounters(a, b){
+    var keys = {};
+    Object.keys(a).concat(Object.keys(b)).forEach(function(k){ keys[k] = 1; });
+    delete keys.confLevels; delete keys.id;
+    return Object.keys(keys).every(function(k){ return JSON.stringify(a[k]) === JSON.stringify(b[k]); });
+  }
+  function entryFor(id){
+    var w = words.find(function(x){ return x.id === id; });
+    if(!w) return null;
+    var p = progressMap[id] || {};
+    return Object.assign({}, w, { confidence: p.confidence || 0, starred: !!p.starred });
+  }
+  function libraryPatchable(){ return isActive('library') && filterStatus.value === 'all' && sortBy.value !== 'conf_low'; }
+  function patchCard(id){
+    var el = libraryGridEl.querySelector('.vcard[data-id="' + id + '"]');
+    var e = entryFor(id);
+    if(!el || !e) return;
+    var tmp = document.createElement('div');
+    tmp.innerHTML = cardHtml(e, 999);
+    var fresh = tmp.firstElementChild;
+    if(!fresh) return;
+    fresh.style.animation = 'none';
+    el.parentNode.replaceChild(fresh, el);
+  }
+  function updateLibraryMore(){
+    var left = libraryList.length - libraryShown;
+    libraryMoreEl.innerHTML = left > 0 ? '<button class="btn ghost" id="libraryMoreBtn">Show ' + Math.min(LIB_PAGE, left) + ' more · ' + left + ' left</button>' : '';
+  }
+  function appendLibraryPage(){
+    if(libraryShown >= libraryList.length) return;
+    var next = libraryList.slice(libraryShown, libraryShown + LIB_PAGE);
+    libraryShown += next.length;
+    libraryGridEl.insertAdjacentHTML('beforeend', next.map(function(e){ return cardHtml(e, 999); }).join(''));
+    updateLibraryMore();
+  }
+  libraryMoreEl.addEventListener('click', function(ev){ if(ev.target.closest && ev.target.closest('#libraryMoreBtn')) appendLibraryPage(); });
+  if('IntersectionObserver' in window){
+    new IntersectionObserver(function(entries){
+      entries.forEach(function(en){ if(en.isIntersecting && isActive('library')) appendLibraryPage(); });
+    }, { rootMargin: '700px 0px' }).observe(libraryMoreEl);
+  }
+
+  // one click handler for every card (instead of wiring hundreds of buttons on each redraw)
+  libraryGridEl.addEventListener('click', function(ev){
+    var t = ev.target;
+    if(!t || !t.closest) return;
+    var act = t.closest('[data-action]');
+    if(act){ handleCardAction(act.dataset.action, act.dataset.id); return; }
+    var dot = t.closest('.conf-dot');
+    if(dot){ setProgress(dot.dataset.confId, {confidence: +dot.dataset.level}); return; }
+    var card = t.closest('.vcard');
+    if(!card) return;
+    var id = card.dataset.id;
+    if(coverModeOn && !coverRevealed[id]){ coverRevealed[id] = true; markVisited(id); patchCard(id); return; }
+    markVisited(id);
+  });
   [filterType, filterTag, filterStatus, sortBy, filterRoot].forEach(function(el){
     el.addEventListener('change', function(){ libraryAnimate = true; renderLibrary(); });
   });
@@ -2474,9 +2557,13 @@ listBlock,
     var head = String(part).split(/\s*(?:=|:|·|—|–|\s-\s|\()\s*/)[0];
     return head.toLowerCase().replace(/[^a-z\u00c0-\u024f]+/g, '');
   }
+  var rootKeysCache = {};
   function rootKeysOf(rootStr){
+    var src = String(rootStr || '');
+    if(rootKeysCache[src]) return rootKeysCache[src];
     var keys = [];
-    splitRootParts(rootStr).forEach(function(p){ var k = rootKeyOfPart(p); if(k && keys.indexOf(k) === -1) keys.push(k); });
+    splitRootParts(src).forEach(function(p){ var k = rootKeyOfPart(p); if(k && keys.indexOf(k) === -1) keys.push(k); });
+    rootKeysCache[src] = keys;
     return keys;
   }
   function allRootsMap(){
@@ -2604,6 +2691,7 @@ listBlock,
       countEl.textContent = '';
       grid.style.display = 'block';
       grid.innerHTML = emptyStateHtml('Your register is empty', 'Head to "Add words" to build your first prompt, or add one manually above.');
+      libraryList = []; libraryMoreEl.innerHTML = '';
       return;
     }
     var list = getFiltered();
@@ -2612,34 +2700,20 @@ listBlock,
     if(list.length === 0){
       grid.style.display = 'block';
       grid.innerHTML = emptyStateHtml('No matches', 'Try clearing a filter or search term.');
+      libraryList = []; libraryMoreEl.innerHTML = '';
       return;
     }
     grid.style.display = 'grid';
-    if(libraryAnimate){ libraryAnimateUntil = Date.now() + 700; }
+    if(libraryAnimate){ libraryAnimateUntil = Date.now() + 700; libraryShown = LIB_PAGE; }
     var animateNow = libraryAnimate || Date.now() < libraryAnimateUntil;
     libraryAnimate = false;
+    libraryList = list;
+    libraryShown = Math.max(LIB_PAGE, Math.min(libraryShown, list.length));
     grid.classList.toggle('animate-in', animateNow);
     libraryAnimatingRender = animateNow;
-    grid.innerHTML = list.map(cardHtml).join('');
+    grid.innerHTML = list.slice(0, libraryShown).map(cardHtml).join('');
     libraryAnimatingRender = false;
-    grid.querySelectorAll('[data-action]').forEach(function(btn){
-      btn.addEventListener('click', function(ev){ ev.stopPropagation(); handleCardAction(btn.dataset.action, btn.dataset.id); });
-    });
-    grid.querySelectorAll('.conf-dot').forEach(function(btn){
-      btn.addEventListener('click', function(ev){ ev.stopPropagation(); setProgress(btn.dataset.confId, {confidence: +btn.dataset.level}); });
-    });
-    grid.querySelectorAll('.vcard').forEach(function(card){
-      card.addEventListener('click', function(){
-        var id = card.dataset.id;
-        if(coverModeOn && !coverRevealed[id]){
-          coverRevealed[id] = true;
-          markVisited(id);
-          renderLibrary();
-          return;
-        }
-        markVisited(id);
-      });
-    });
+    updateLibraryMore();
   }
 
   function confDotsHtml(id, level){
@@ -2725,6 +2799,8 @@ listBlock,
         if(cw) celebrate(cw.term);
       }
     }
+    if(isActive('library')){ if(libraryPatchable()) patchCard(id); else scheduleRender(); }
+    renderStatStrip();
     var writes = [db.collection('users').doc(currentUser.uid).collection('progress').doc(id).set(patch, {merge:true})];
     if(typeof patch.confidence === 'number' && patch.confidence !== prevLevel){
       var incObj = {};
@@ -4129,7 +4205,10 @@ listBlock,
   });
 
   // ---------------- leaderboard ----------------
+  var fetchedAt = {};
+  function recentlyFetched(key, ms){ var t = fetchedAt[key]; if(t && Date.now() - t < ms) return true; fetchedAt[key] = Date.now(); return false; }
   async function renderLeaderboard(){
+    if(recentlyFetched('leaderboard', 60000)) return;
     var area = document.getElementById('leaderboardArea');
     area.innerHTML = '<p class="help">Loading…</p>';
     try{
@@ -4155,6 +4234,7 @@ listBlock,
   }
 
   async function renderAllUsers(){
+    if(recentlyFetched('allUsers', 60000)) return;
     var box = document.getElementById('allUsersArea');
     box.innerHTML = '<p class="help">Loading…</p>';
     try{
@@ -4192,8 +4272,9 @@ listBlock,
     document.getElementById('dupesArea').innerHTML = '';
   }
 
-  async function renderModeratorsList(){
+  async function renderModeratorsList(force){
     if(!isAdminUser) return;
+    if(!force && recentlyFetched('mods', 60000)) return;
     var box = document.getElementById('moderatorsList');
     box.innerHTML = '<p class="help">Loading…</p>';
     try{
@@ -4231,7 +4312,7 @@ listBlock,
         });
         showToast('Moderator added.');
       }
-      renderModeratorsList();
+      renderModeratorsList(true);
     }catch(e){ showToast('Could not update: ' + e.message); }
   }
 
@@ -4257,6 +4338,7 @@ listBlock,
     tag_to_root: 'moved a tag to a root'
   };
   async function renderActivityFeed(){
+    if(recentlyFetched('activity', 60000)) return;
     var box = document.getElementById('activityFeedArea');
     box.innerHTML = '<p class="help">Loading…</p>';
     try{
@@ -4397,6 +4479,7 @@ listBlock,
   });
 
   async function renderMissedWords(){
+    if(recentlyFetched('missed', 120000)) return;
     var box = document.getElementById('missedWordsArea');
     box.innerHTML = '<p class="help">Loading…</p>';
     try{
@@ -4454,7 +4537,18 @@ listBlock,
   }
 
   // ---------------- render all ----------------
-  function renderAll(){ renderStatStrip(); renderLibrary(); renderStats(); }
+  var renderTimer = null;
+  function scheduleRender(){
+    if(renderTimer) return;
+    renderTimer = setTimeout(function(){ renderTimer = null; renderAll(); }, 16);
+  }
+  function isActive(name){ var v = document.getElementById('view-' + name); return !!(v && v.classList.contains('active')); }
+  function renderAll(){
+    renderStatStrip();
+    if(isActive('library')) renderLibrary();
+    if(isActive('stats')) renderStats();
+    if(isActive('roots')) renderRoots();
+  }
 
 })();
 </script>
