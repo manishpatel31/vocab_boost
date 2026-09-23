@@ -451,6 +451,27 @@
   .root-cluster .word-node-label{ font-size:10.5px; cursor:pointer; }
   .root-cluster .link-line{ stroke:var(--rule); stroke-width:1.5; }
 
+  /* ---------- root groups ---------- */
+  .root-group-card{ background:var(--card); border:1px solid var(--rule); border-radius:var(--radius-lg); box-shadow:var(--shadow); padding:18px 20px; margin-bottom:16px; animation:rise .45s cubic-bezier(.2,.8,.2,1) backwards; }
+  .rg-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:14px; flex-wrap:wrap; margin-bottom:12px; }
+  .rg-key{ font-family:var(--font-display); font-size:28px; font-weight:var(--h-weight); letter-spacing:-.01em; line-height:1.1; }
+  .rg-meaning{ color:var(--ink-soft); font-size:14px; margin-top:3px; }
+  .rg-actions{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .rg-count{ font-size:13px; font-weight:700; color:var(--ink-soft); margin-right:4px; }
+  .rg-words{ display:flex; flex-wrap:wrap; gap:6px; }
+  .rg-word{ border:1px solid var(--rule); background:var(--paper-deep); color:var(--ink); border-radius:var(--pill); padding:6px 12px; font-size:13px; font-weight:600; transition:border-color .2s ease, transform .15s ease; }
+  .rg-word:hover{ border-color:var(--ink-faint); transform:translateY(-1px); }
+  .rg-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:10px 0; border-bottom:1px dashed var(--rule); }
+  .rg-row:last-child{ border-bottom:none; }
+  .rg-row-main{ flex:1 1 200px; min-width:170px; }
+  .rg-row-main b{ font-size:15px; }
+  .rg-row-main span{ display:block; font-size:12.5px; color:var(--ink-soft); margin-top:2px; }
+  .rg-row input[type=text]{ width:auto; flex:0 1 150px; padding:8px 10px; }
+  .rg-settings{ display:flex; gap:18px; flex-wrap:wrap; align-items:center; font-size:13.5px; margin:4px 0 6px; }
+  .rg-settings label{ display:flex; align-items:center; gap:8px; cursor:pointer; }
+  .rg-settings input[type=number]{ width:84px; background:var(--card); border:1.5px solid var(--rule); border-radius:var(--radius); padding:7px 9px; color:var(--ink); font:inherit; }
+  .panel h3.rg-h{ font-size:16px; margin:22px 0 2px; }
+
   /* ---------- motion ---------- */
   @keyframes rise{ from{ opacity:0; transform:translateY(16px) scale(.985); } to{ opacity:1; transform:none; } }
   @keyframes viewIn{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:none; } }
@@ -872,7 +893,8 @@
     </section>
 
     <section class="view" id="view-roots">
-      <p class="help">Words sharing a Latin/Greek/other root, clustered together — helps you guess unfamiliar words on exam day from a root you already know. Only roots shared by two or more words in your library show up here.</p>
+      <p class="help">Root-word groups — families of words that share a root, like <b>phobia</b> (fear) or <b>phile</b> (lover of). Only groups the admin creates appear here and in the Library's root filter.</p>
+      <div id="rootAdminArea" class="admin-only" style="display:none;"></div>
       <div id="rootsArea"></div>
     </section>
 
@@ -916,7 +938,7 @@
       </div>
 
       <div class="panel" style="max-width:700px;">
-        <h2>Bulk tag &amp; root tools</h2>
+        <h2>Bulk tag tools</h2>
         <div class="field-2col">
           <div class="field"><label class="field-label">Rename tag</label><select id="renameTagFrom"></select></div>
           <div class="field"><label class="field-label">To</label><input type="text" id="renameTagTo" placeholder="new tag name"></div>
@@ -924,16 +946,7 @@
         <div class="row-actions"><button class="btn teal sm" id="renameTagBtn">Rename everywhere</button></div>
         <div class="field" style="margin-top:18px;"><label class="field-label">Delete a tag from every word</label><select id="deleteTagSelect"></select></div>
         <div class="row-actions"><button class="btn maroon sm" id="deleteTagBtn">Remove tag everywhere</button></div>
-        <div style="margin-top:22px; padding-top:18px; border-top:1px dashed var(--rule);">
-          <h3 style="margin:0 0 6px; font-size:17px;">Move a tag to a root</h3>
-          <p class="help" style="margin-top:0;">For tags you've been using as a stand-in for a root (like “phobia”). Every word with the tag gets the root added — any root a word already has is kept.</p>
-          <div class="field-2col">
-            <div class="field"><label class="field-label">Tag</label><select id="tagToRootFrom"></select></div>
-            <div class="field"><label class="field-label">Root (e.g. "phobia = fear")</label><input type="text" id="tagToRootValue" list="rootDatalist" placeholder="root = meaning"></div>
-          </div>
-          <label style="display:flex; gap:8px; align-items:center; font-size:13px; cursor:pointer;"><input type="checkbox" id="tagToRootRemove" style="width:16px; height:16px;"> Remove the tag afterwards</label>
-          <div class="row-actions"><button class="btn teal sm" id="tagToRootBtn">Move tag to root</button></div>
-        </div>
+        <p class="help" style="margin-top:18px;">Root-word groups (PHOBIA, PHILE, LOGY…) are managed in <b>Library → Roots</b>.</p>
       </div>
 
       <div class="panel" style="max-width:700px;">
@@ -1138,7 +1151,7 @@
   }
 
   // ============ CONFIGURE THESE, THEN SEE THE SETUP GUIDE ============
-  var ADMIN_EMAILS = ["YOUR_ADMIN_EMAIL@gmail.com"]; // <-- your Google account email(s)
+  var ADMIN_EMAILS = ["47manish31@gmail.com"]; // <-- your Google account email(s)
 
   var firebaseConfig = {
     apiKey: "AIzaSyDiTH-7aVK8ojL1njbv3BmiHJujW4xsUvM",
@@ -1195,6 +1208,8 @@
   var spellSubmissions = [];
   var unsubWords = null, unsubProgress = null, unsubSubs = null, unsubNotif = null;
   var unsubSpellWords = null, unsubSpellSubs = null;
+  var rootGroups = [];
+  var unsubRootGroups = null;
 
   var toastTimer = null;
   function celebrate(term){
@@ -1472,6 +1487,7 @@
     unsubWords = db.collection('words').orderBy('createdAt','desc').onSnapshot(function(snap){
       words = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
       renderAll();
+      if(document.getElementById('view-roots').classList.contains('active')) renderRoots();
     }, function(err){ showToast('Could not load the library: ' + err.message); });
 
     unsubProgress = db.collection('users').doc(currentUser.uid).collection('progress').onSnapshot(function(snap){
@@ -1496,6 +1512,13 @@
       renderNotifBell();
     }, function(err){ /* notifications are a convenience feature, fail silently */ });
 
+    unsubRootGroups = db.collection('rootGroups').onSnapshot(function(snap){
+      rootGroups = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); }).filter(function(g){ return g.key; });
+      rootGroups.sort(function(a,b){ return String(a.key).localeCompare(String(b.key)); });
+      renderLibrary();
+      if(document.getElementById('view-roots').classList.contains('active')) renderRoots();
+    }, function(err){ /* root groups are optional; the filter simply stays hidden */ });
+
     unsubSpellWords = db.collection('spellwords').orderBy('createdAt','desc').onSnapshot(function(snap){
       spellWords = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
       renderSpellBank();
@@ -1517,6 +1540,8 @@
     if(unsubNotif) unsubNotif();
     if(unsubSpellWords) unsubSpellWords();
     if(unsubSpellSubs) unsubSpellSubs();
+    if(unsubRootGroups) unsubRootGroups();
+    unsubRootGroups = null; rootGroups = [];
     unsubWords = unsubProgress = unsubSubs = unsubNotif = unsubSpellWords = unsubSpellSubs = null;
     words = []; progressMap = {}; submissions = []; notifications = []; spellWords = []; spellSubmissions = [];
   }
@@ -2475,30 +2500,33 @@ listBlock,
     if(extra.length === 0) return existing;
     return (existing ? existing + '; ' : '') + extra.join('; ');
   }
+  // ---------------- curated root groups (admin-created only) ----------------
+  var KNOWN_ROOT_MEANINGS = { phobia:'fear', phobe:'one who fears', phile:'lover of', philia:'love of', philo:'love', logy:'study of', ology:'study of', logist:'one who studies', cide:'killing', cracy:'rule / government', crat:'ruler', archy:'rule by', graphy:'writing / description', graph:'writing', gram:'something written', mania:'madness / obsession', maniac:'one obsessed with', meter:'measure', scope:'instrument for viewing', pathy:'feeling / disease', path:'one who feels / suffers', phone:'sound', phony:'sound', gamy:'marriage', vore:'eater', phage:'eater', theism:'belief in god', anthrop:'human', bio:'life', chron:'time', geo:'earth', hydro:'water', morph:'form / shape', nym:'name', onym:'name', pod:'foot', ped:'foot / child', greg:'flock / herd', cred:'believe', dict:'say', duc:'lead', port:'carry', scrib:'write', script:'write', spect:'look', vert:'turn', vid:'see', vis:'see' };
+  function groupLabel(g){ return g.key + (g.meaning ? ' = ' + g.meaning : ''); }
+  function groupWords(key){ return words.filter(function(w){ return rootKeysOf(w.root).indexOf(key) !== -1; }); }
   function refreshRootFilter(){
     var current = filterRoot.value;
-    var map = allRootsMap();
-    var keys = Object.keys(map).sort();
-    filterRoot.innerHTML = '<option value="all">All roots</option>' + keys.map(function(k){ return '<option value="'+escapeAttr(k)+'">'+escapeHtml(map[k].label)+' ('+map[k].count+')</option>'; }).join('');
+    filterRoot.innerHTML = '<option value="all">All root groups</option>' + rootGroups.map(function(g){ return '<option value="'+escapeAttr(g.key)+'">'+escapeHtml(groupLabel(g))+' ('+groupWords(g.key).length+')</option>'; }).join('');
+    var keys = rootGroups.map(function(g){ return g.key; });
     if(keys.indexOf(current) !== -1) filterRoot.value = current;
+    filterRoot.style.display = rootGroups.length ? '' : 'none';
     var dl = document.getElementById('rootDatalist');
-    if(dl) dl.innerHTML = keys.map(function(k){ return '<option value="'+escapeAttr(map[k].label)+'"></option>'; }).join('');
+    if(dl) dl.innerHTML = rootGroups.map(function(g){ return '<option value="'+escapeAttr(groupLabel(g))+'"></option>'; }).join('');
   }
   function rootsPromptHint(batchRoot){
-    var map = allRootsMap();
-    var labels = Object.keys(map).sort().slice(0, 80).map(function(k){ return map[k].label; });
+    var labels = rootGroups.map(groupLabel);
     var lines = [];
     if(batchRoot){ lines.push('All of these terms share the root "' + batchRoot + '" - put exactly this text in each term\'s "root" field (add a second root after a semicolon only if one genuinely applies).'); }
-    if(labels.length){ lines.push('Roots already used in this register - reuse the exact same wording whenever one applies instead of inventing a new variant: ' + labels.join('; ') + '.'); }
+    if(labels.length){ lines.push('Root groups in this register: ' + labels.join('; ') + '. If a term belongs to one of these groups, include that root in its "root" field using exactly this wording (after a semicolon if the term also has another root).'); }
     return lines.length ? lines.join('\n') + '\n' : '';
   }
   function tagKey(t){ return String(t || '').toLowerCase().replace(/[^a-z\u00c0-\u024f]+/g, ''); }
   function renderRootBanner(){
     var box = document.getElementById('rootBanner');
     var rt = filterRoot.value;
-    if(!isModeratorUser || rt === 'all'){ box.innerHTML = ''; return; }
-    var map = allRootsMap();
-    var label = map[rt] ? map[rt].label : rt;
+    if(!isAdminUser || rt === 'all'){ box.innerHTML = ''; return; }
+    var grp = rootGroups.find(function(g){ return g.key === rt; });
+    var label = grp ? groupLabel(grp) : rt;
     var tagName = allTags().find(function(t){ return tagKey(t) === rt; });
     if(!tagName){ box.innerHTML = ''; return; }
     var lacking = words.filter(function(w){ return (w.tags||[]).indexOf(tagName) !== -1 && rootKeysOf(w.root).indexOf(rt) === -1; });
@@ -3434,24 +3462,144 @@ listBlock,
   }
 
   // ---------------- root web ----------------
+  var rootMinWords = 10;
+  var rootRemoveTag = false;
+  var rootExpanded = {};
+
+  function focusRootGroup(key){
+    searchBox.value = ''; filterType.value = 'all'; filterTag.value = 'all'; filterStatus.value = 'all';
+    refreshRootFilter();
+    filterRoot.value = key;
+  }
+
   function renderRoots(){
+    renderRootAdmin();
     var area = document.getElementById('rootsArea');
-    var groups = {};
-    var rmap = allRootsMap();
-    words.forEach(function(w){
-      rootKeysOf(w.root).forEach(function(key){
-        if(!groups[key]) groups[key] = { label: rmap[key] ? rmap[key].label : key, items: [] };
-        groups[key].items.push(w);
-      });
-    });
-    var clusters = Object.keys(groups).map(function(k){ return groups[k]; }).filter(function(g){ return g.items.length >= 2; });
-    if(clusters.length === 0){
-      area.innerHTML = emptyStateHtml('No shared roots yet', 'Roots show up here once at least two words in your library share the same "root" value (added via the AI prompt or manual edit).');
+    if(rootGroups.length === 0){
+      area.innerHTML = emptyStateHtml('No root groups yet', isAdminUser ? 'Create one above — move a tag like PHOBIA into a group, or promote a root the AI found once it has enough words.' : "The admin hasn't created any root-word groups yet.");
       return;
     }
-    area.innerHTML = '<div class="root-clusters-wrap">' + clusters.map(clusterSvgHtml).join('') + '</div>';
-    area.querySelectorAll('[data-root-word]').forEach(function(el){
-      el.addEventListener('click', function(){ openWordPreviewModal(el.dataset.rootWord); });
+    area.innerHTML = rootGroups.map(function(g){
+      var list = groupWords(g.key).sort(function(a, b){ return a.term.localeCompare(b.term); });
+      var showAll = !!rootExpanded[g.key];
+      var shown = showAll ? list : list.slice(0, 40);
+      return '<div class="root-group-card">' +
+        '<div class="rg-head"><div><div class="rg-key">' + escapeHtml(g.key) + '</div><div class="rg-meaning">' + escapeHtml(g.meaning || '') + '</div></div>' +
+        '<div class="rg-actions"><span class="rg-count">' + list.length + ' word' + (list.length === 1 ? '' : 's') + '</span>' +
+        (list.length ? '<button class="btn sm" data-rg-library="' + escapeAttr(g.key) + '">Show in Library</button><button class="btn ghost sm" data-rg-present="' + escapeAttr(g.key) + '">Present</button>' : '') +
+        '</div></div>' +
+        (list.length ? '<div class="rg-words">' + shown.map(function(w){ return '<button class="rg-word" data-rg-word="' + w.id + '">' + escapeHtml(w.term) + '</button>'; }).join('') + '</div>' : '<p class="help" style="margin:0;">No words carry this root yet.</p>') +
+        (list.length > 40 ? '<button class="btn ghost sm" style="margin-top:10px;" data-rg-toggle="' + escapeAttr(g.key) + '">' + (showAll ? 'Show fewer' : 'Show all ' + list.length) + '</button>' : '') +
+      '</div>';
+    }).join('');
+    area.querySelectorAll('[data-rg-word]').forEach(function(el){ el.addEventListener('click', function(){ openWordPreviewModal(el.dataset.rgWord); }); });
+    area.querySelectorAll('[data-rg-toggle]').forEach(function(el){ el.addEventListener('click', function(){ rootExpanded[el.dataset.rgToggle] = !rootExpanded[el.dataset.rgToggle]; renderRoots(); }); });
+    area.querySelectorAll('[data-rg-library]').forEach(function(el){ el.addEventListener('click', function(){ focusRootGroup(el.dataset.rgLibrary); switchTab('library'); }); });
+    area.querySelectorAll('[data-rg-present]').forEach(function(el){ el.addEventListener('click', function(){ focusRootGroup(el.dataset.rgPresent); renderLibrary(); document.getElementById('presentBtn').click(); }); });
+  }
+
+  function renderRootAdmin(){
+    var box = document.getElementById('rootAdminArea');
+    if(!isAdminUser){ box.innerHTML = ''; return; }
+    var groupKeys = rootGroups.map(function(g){ return g.key; });
+
+    var tagCounts = {};
+    words.forEach(function(w){ (w.tags || []).forEach(function(t){ tagCounts[t] = (tagCounts[t] || 0) + 1; }); });
+    var tagRows = Object.keys(tagCounts).filter(function(t){ return tagCounts[t] >= rootMinWords; }).map(function(t){
+      var k = tagKey(t);
+      var lacking = words.filter(function(w){ return (w.tags || []).indexOf(t) !== -1 && rootKeysOf(w.root).indexOf(k) === -1; }).length;
+      return { tag: t, key: k, count: tagCounts[t], lacking: lacking, exists: groupKeys.indexOf(k) !== -1 };
+    }).filter(function(r){ return !(r.exists && r.lacking === 0); })
+      .sort(function(a, b){ return (KNOWN_ROOT_MEANINGS[b.key] ? 1 : 0) - (KNOWN_ROOT_MEANINGS[a.key] ? 1 : 0) || b.count - a.count; });
+
+    var aiMap = allRootsMap();
+    var aiRows = Object.keys(aiMap).filter(function(k){ return aiMap[k].count >= rootMinWords && groupKeys.indexOf(k) === -1; })
+      .sort(function(a, b){ return aiMap[b].count - aiMap[a].count; }).map(function(k){
+        var label = aiMap[k].label;
+        var parts = label.split(/\s*(?:=|:|·|—|–|\s-\s)\s*/);
+        var meaning = parts.length > 1 ? parts.slice(1).join(' ').replace(/[()]/g, '').trim() : (KNOWN_ROOT_MEANINGS[k] || '');
+        var sample = groupWords(k).slice(0, 4).map(function(w){ return w.term; }).join(', ');
+        return { key: k, count: aiMap[k].count, meaning: meaning, sample: sample };
+      });
+
+    box.innerHTML = '<div class="panel" style="max-width:none;">' +
+      '<h2 style="margin-bottom:4px;">Manage root groups</h2>' +
+      '<p class="help" style="margin-top:0;">Only you can see this. A word belongs to a group when its root field carries that root — moving a tag writes it for you, and new words the AI gives the same root join automatically.</p>' +
+      '<div class="rg-settings">' +
+        '<label>Only show tags / roots with at least <input type="number" id="rootMinWords" min="1" value="' + rootMinWords + '"> words</label>' +
+        '<label><input type="checkbox" id="rootRemoveTag" style="width:16px; height:16px;"' + (rootRemoveTag ? ' checked' : '') + '> Remove the tag after moving</label>' +
+      '</div>' +
+      '<h3 class="rg-h">Move a tag into a root group</h3>' +
+      (tagRows.length ? tagRows.map(function(r, i){
+        return '<div class="rg-row"><div class="rg-row-main"><b>' + escapeHtml(r.tag) + '</b><span>' + r.count + ' word' + (r.count === 1 ? '' : 's') + (r.exists ? ' · ' + r.lacking + ' not in the group yet' : '') + '</span></div>' +
+          '<input type="text" data-tag-key="' + i + '" value="' + escapeAttr(r.key) + '" aria-label="Root for ' + escapeAttr(r.tag) + '" placeholder="root">' +
+          '<input type="text" data-tag-meaning="' + i + '" value="' + escapeAttr(KNOWN_ROOT_MEANINGS[r.key] || '') + '" aria-label="Meaning of the root" placeholder="meaning, e.g. fear">' +
+          '<button class="btn teal sm" data-tag-move="' + i + '">' + (r.exists ? 'Move remaining ' + r.lacking : 'Move to root group') + '</button></div>';
+      }).join('') : '<p class="help">No tag has ' + rootMinWords + '+ words that still need moving.</p>') +
+      '<h3 class="rg-h">Promote a root the AI found</h3>' +
+      (aiRows.length ? aiRows.map(function(r, i){
+        return '<div class="rg-row"><div class="rg-row-main"><b>' + escapeHtml(r.key) + '</b><span>' + r.count + ' words · ' + escapeHtml(r.sample) + '</span></div>' +
+          '<input type="text" data-ai-meaning="' + i + '" value="' + escapeAttr(r.meaning) + '" aria-label="Meaning of ' + escapeAttr(r.key) + '" placeholder="meaning">' +
+          '<button class="btn sm" data-ai-add="' + i + '">Add as root group</button></div>';
+      }).join('') : '<p class="help">No root the AI found has ' + rootMinWords + '+ words yet.</p>') +
+      '<h3 class="rg-h">Your root groups</h3>' +
+      (rootGroups.length ? rootGroups.map(function(g){
+        return '<div class="rg-row"><div class="rg-row-main"><b>' + escapeHtml(groupLabel(g)) + '</b><span>' + groupWords(g.key).length + ' words</span></div>' +
+          '<button class="btn ghost sm" data-group-remove="' + escapeAttr(g.key) + '">Remove group</button></div>';
+      }).join('') : '<p class="help">None yet.</p>') +
+    '</div>';
+
+    document.getElementById('rootMinWords').addEventListener('change', function(){ rootMinWords = Math.max(1, parseInt(this.value, 10) || 1); renderRootAdmin(); });
+    document.getElementById('rootRemoveTag').addEventListener('change', function(){ rootRemoveTag = this.checked; });
+    box.querySelectorAll('[data-tag-move]').forEach(function(btn){
+      btn.addEventListener('click', async function(){
+        var i = btn.dataset.tagMove;
+        btn.disabled = true;
+        await transferTagToGroup(tagRows[+i].tag, box.querySelector('[data-tag-key="' + i + '"]').value, box.querySelector('[data-tag-meaning="' + i + '"]').value, rootRemoveTag);
+        renderRoots();
+      });
+    });
+    box.querySelectorAll('[data-ai-add]').forEach(function(btn){
+      btn.addEventListener('click', async function(){
+        var i = btn.dataset.aiAdd;
+        btn.disabled = true;
+        await createRootGroup(aiRows[+i].key, box.querySelector('[data-ai-meaning="' + i + '"]').value);
+        renderRoots();
+      });
+    });
+    box.querySelectorAll('[data-group-remove]').forEach(function(btn){
+      btn.addEventListener('click', function(){ confirmRemoveRootGroup(btn.dataset.groupRemove); });
+    });
+  }
+
+  async function createRootGroup(key, meaning){
+    if(!isAdminUser){ showToast('Only the admin can create root groups.'); return false; }
+    key = tagKey(key);
+    if(!key){ showToast('Enter the root, e.g. phobia.'); return false; }
+    try{
+      await db.collection('rootGroups').doc(key).set({ key: key, meaning: String(meaning || '').trim(), createdBy: currentUser.email, createdAt: firebase.firestore.FieldValue.serverTimestamp() }, {merge: true});
+      showToast('Root group “' + key + '” is ready.');
+      return true;
+    }catch(e){ showToast('Could not create the root group: ' + e.message); return false; }
+  }
+
+  async function transferTagToGroup(tag, key, meaning, removeTag){
+    key = tagKey(key);
+    meaning = String(meaning || '').trim();
+    if(!(await createRootGroup(key, meaning))) return;
+    await migrateTagToRoot(tag, key + (meaning ? ' = ' + meaning : ''), removeTag);
+  }
+
+  function confirmRemoveRootGroup(key){
+    modalBodyRef().innerHTML = '<h3>Remove the “' + escapeHtml(key) + '” group?</h3><p class="help">It disappears from the root filter and this page. The words themselves and their root text stay exactly as they are, so you can recreate the group later.</p>' +
+      '<div class="modal-actions"><button class="btn ghost" id="rgCancel">Cancel</button><button class="btn maroon" id="rgConfirm">Remove group</button></div>';
+    modalBgRef().classList.add('open');
+    document.getElementById('rgCancel').addEventListener('click', function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML = ''; });
+    document.getElementById('rgConfirm').addEventListener('click', async function(){
+      try{ await db.collection('rootGroups').doc(key).delete(); showToast('Group removed.'); }
+      catch(e){ showToast('Could not remove: ' + e.message); }
+      modalBgRef().classList.remove('open'); modalBodyRef().innerHTML = '';
+      if(filterRoot.value === key){ filterRoot.value = 'all'; }
     });
   }
 
@@ -4201,20 +4349,7 @@ listBlock,
     var optsHtml = tags.map(function(t){ return '<option value="'+escapeAttr(t)+'">'+escapeHtml(t)+'</option>'; }).join('');
     document.getElementById('renameTagFrom').innerHTML = optsHtml || '<option value="">No tags yet</option>';
     document.getElementById('deleteTagSelect').innerHTML = optsHtml || '<option value="">No tags yet</option>';
-    document.getElementById('tagToRootFrom').innerHTML = optsHtml || '<option value="">No tags yet</option>';
   }
-
-  document.getElementById('tagToRootFrom').addEventListener('change', function(){
-    var k = tagKey(this.value);
-    var map = allRootsMap();
-    var v = document.getElementById('tagToRootValue');
-    if(map[k] && !v.value) v.value = map[k].label;
-  });
-  document.getElementById('tagToRootBtn').addEventListener('click', async function(){
-    await migrateTagToRoot(document.getElementById('tagToRootFrom').value, document.getElementById('tagToRootValue').value, document.getElementById('tagToRootRemove').checked);
-    document.getElementById('tagToRootValue').value = '';
-    renderTagToolSelects();
-  });
 
   document.getElementById('renameTagBtn').addEventListener('click', async function(){
     var from = document.getElementById('renameTagFrom').value;
