@@ -12,44 +12,122 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Vocab Register">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --paper:#EDE7D8; --paper-deep:#E4DCC8; --rule:#CFC3A3; --card:#FBF8F0;
-    --ink:#242019; --ink-soft:#6B6255; --ink-faint:#948A78;
+  /* ================= DESIGN TOKENS =================
+     Two designs (Refined Register = theme-paper, Indigo Night = theme-indigo),
+     each with light and dark (.dark). Every rule below reads these variables. */
+  :root, body.theme-paper{
+    --paper:#F3EEE3; --paper-deep:#E9E1CF; --rule:#DCCFB2; --card:#FFFCF6;
+    --ink:#221E17; --ink-soft:#5E5547; --ink-faint:#857B6A;
     --maroon:#8C2F39; --maroon-deep:#6E232B; --teal:#2F6F63; --teal-deep:#20544A;
-    --mustard:#C99A2E; --mustard-deep:#A87E1F; --shadow: 2px 3px 0 rgba(36,32,25,0.08);
-    --bar-bg:#242019; --bar-fg:#EDE7D8;
+    --mustard:#C99A2E; --mustard-deep:#A87E1F;
+    --accent:#221E17; --accent-fg:#FFF7E6; --accent-hover:#3A3327;
+    --gold:#2F6F63; --gold-fg:#FFFFFF;
+    --bar-bg:#221E17; --bar-fg:#F3EEE3; --bar-muted:#D9CFBC; --bar-hover:#3A3327; --bar-line:#3A3327;
+    --menu-bg:#FFFCF6; --menu-hover:#F2E9D6;
+    --font-display:'Fraunces', Georgia, serif; --font-body:'Instrument Sans', system-ui, sans-serif; --font-hindi:'Tiro Devanagari Hindi', serif;
+    --h-weight:600; --radius:12px; --radius-lg:18px; --pill:999px;
+    --shadow:0 1px 0 rgba(34,30,23,.04), 0 10px 24px -16px rgba(34,30,23,.24);
+    --shadow-lg:0 24px 48px -20px rgba(34,30,23,.45);
+    --bg-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(150,128,90,.12) 31px, rgba(150,128,90,.12) 32px);
+    --bg-pattern-size:auto;
+    --overlay:rgba(34,30,23,.5);
+    --code-bg:#2A241C; --code-fg:#EFE7D3;
   }
-  body.dark{
-    --paper:#1C1914; --paper-deep:#26211A; --rule:#40392B; --card:#282219;
-    --ink:#ECE3D0; --ink-soft:#B7AC90; --ink-faint:#8C826A;
-    --shadow: 2px 3px 0 rgba(0,0,0,0.35);
+  body.theme-paper.dark{
+    --paper:#1B1813; --paper-deep:#25201A; --rule:#3B3429; --card:#26211A;
+    --ink:#EFE6D2; --ink-soft:#BDB195; --ink-faint:#968C75;
+    --maroon:#B8515B; --maroon-deep:#9C414A; --teal:#2B7D6C; --teal-deep:#22685A;
+    --mustard:#D9AE4B; --mustard-deep:#C99A2E;
+    --accent:#EFE6D2; --accent-fg:#1B1813; --accent-hover:#FFFFFF;
+    --gold:#3F9A86; --gold-fg:#FFFFFF;
+    --bar-bg:#110F0B; --bar-fg:#EFE6D2; --bar-muted:#BDB195; --bar-hover:#2A241C; --bar-line:#2A241C;
+    --menu-bg:#26211A; --menu-hover:#322B22;
+    --shadow:0 1px 0 rgba(0,0,0,.2), 0 12px 28px -16px rgba(0,0,0,.6);
+    --shadow-lg:0 24px 48px -20px rgba(0,0,0,.75);
+    --bg-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.04) 31px, rgba(255,240,200,.04) 32px);
+    --overlay:rgba(0,0,0,.6);
+    --code-bg:#110F0B; --code-fg:#EFE6D2;
   }
-  body.dark .fb-hindi{ background:#332C1E; color:#DFCFA6; }
-  body.dark .fb-syn{ background:#1D332C; color:#8FD8C4; }
-  body.dark .fb-anto{ background:#38221F; color:#E8A6A0; }
-  body.dark .fb-sentence{ background:#332B18; color:#E6C877; }
-  body.dark .fb-trick{ background:#2C2436; color:#D3B4EE; }
-  body.dark .fb-origin{ background:#1E2830; color:#9CC0DC; }
-  body.dark .fb-history{ background:#33261C; color:#E8A67C; }
-  body.dark .fb-confusable{ background:#332020; color:#EAA9A9; }
-  body.dark .fb-root{ background:#20302A; color:#9FDCC6; }
-  body.dark .fb-spelltrap{ background:#332818; color:#E8C27C; }
-  body.dark .badge.word{ background:#243020; color:#9BCB86; }
-  body.dark .badge.idiom{ background:#33261A; color:#E3A874; }
-  body.dark .badge.one_word_substitution{ background:#1D2A33; color:#8FC1E3; }
-  body.dark .badge.phrasal_verb{ background:#2A2032; color:#C99DE0; }
-  body.dark .badge.other{ background:#2A2619; color:var(--ink-soft); }
+  body.theme-indigo{
+    --paper:#EEF1FA; --paper-deep:#E1E6F5; --rule:#CBD3EC; --card:#FFFFFF;
+    --ink:#0F1B3D; --ink-soft:#4A5680; --ink-faint:#67739C;
+    --maroon:#C8402F; --maroon-deep:#A83426; --teal:#147D53; --teal-deep:#0F6644;
+    --mustard:#F59E2E; --mustard-deep:#D9831A;
+    --accent:#3D5CF0; --accent-fg:#FFFFFF; --accent-hover:#2F4BD6;
+    --gold:#F7C548; --gold-fg:#1B1203;
+    --bar-bg:#0B1433; --bar-fg:#EEF2FF; --bar-muted:#A7B3DA; --bar-hover:#16224F; --bar-line:#1B2758;
+    --menu-bg:#FFFFFF; --menu-hover:#EEF1FA;
+    --font-display:'Bricolage Grotesque', system-ui, sans-serif; --font-body:'Figtree', system-ui, sans-serif; --font-hindi:'Noto Sans Devanagari', sans-serif;
+    --h-weight:700; --radius:14px; --radius-lg:20px;
+    --shadow:0 1px 2px rgba(15,27,61,.06), 0 12px 28px -18px rgba(15,27,61,.35);
+    --shadow-lg:0 28px 56px -22px rgba(15,27,61,.5);
+    --bg-pattern:radial-gradient(rgba(61,92,240,.10) 1px, transparent 1.4px);
+    --bg-pattern-size:24px 24px;
+    --overlay:rgba(11,20,51,.55);
+    --code-bg:#0B1433; --code-fg:#DCE3FF;
+  }
+  body.theme-indigo.dark{
+    --paper:#0B1433; --paper-deep:#0E1839; --rule:#22306A; --card:#121D47;
+    --ink:#EEF2FF; --ink-soft:#A7B3DA; --ink-faint:#8A97C4;
+    --maroon:#D9574A; --maroon-deep:#BF4A3E; --teal:#1E8A61; --teal-deep:#187251;
+    --mustard:#F59E2E; --mustard-deep:#F7B24D;
+    --accent:#3D5CF0; --accent-fg:#FFFFFF; --accent-hover:#5470F5;
+    --gold:#F7C548; --gold-fg:#1B1203;
+    --bar-bg:#0B1433; --bar-fg:#EEF2FF; --bar-muted:#A7B3DA; --bar-hover:#16224F; --bar-line:#1B2758;
+    --menu-bg:#121D47; --menu-hover:#1A2860;
+    --shadow:0 1px 0 rgba(0,0,0,.25), 0 14px 30px -18px rgba(0,0,0,.7);
+    --shadow-lg:0 28px 56px -20px rgba(0,0,0,.8);
+    --bg-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);
+    --overlay:rgba(3,7,20,.7);
+    --code-bg:#070E26; --code-fg:#DCE3FF;
+  }
 
-  /* text size + dyslexia-friendly font overrides */
-  body.text-lg .term{ font-size:21px; }
+  /* ---------- colored detail boxes + type badges (light) ---------- */
+  .fb-hindi{ background:#EFE9DA; color:#4A4030; font-family:var(--font-hindi); font-size:14px; }
+  .fb-syn{ background:#E1EFEA; color:#20544A; }
+  .fb-anto{ background:#F3E3E1; color:#7A2A2E; }
+  .fb-sentence{ background:#FBF1DD; color:#6E5112; font-style:italic; }
+  .fb-trick{ background:#EEE6F2; color:#5B3670; }
+  .fb-origin{ background:#E7ECEF; color:#33495A; }
+  .fb-history{ background:#F5DED0; color:#833719; }
+  .fb-confusable{ background:#F5E0DE; color:#853636; }
+  .fb-root{ background:#DDEFE6; color:#225F44; }
+  .fb-spelltrap{ background:#FBEBD2; color:#7E5210; }
+  body.theme-indigo .fb-hindi{ background:#EEF1FA; color:#27325A; }
+  .badge.word{ background:#E4E9E0; color:#3E5C34; }
+  .badge.idiom{ background:#EFE0D6; color:#7A3E1C; }
+  .badge.one_word_substitution{ background:#DDE6EC; color:#2A5878; }
+  .badge.phrasal_verb{ background:#EAE0EF; color:#6B3A82; }
+  .badge.fixed_preposition{ background:#F4E6C8; color:#6E4B0C; }
+  .badge.other{ background:#EAE5D8; color:#5E5547; }
+  /* dark: translucent tints work on both dark grounds */
+  body.dark .fb-hindi{ background:rgba(255,255,255,.05); color:var(--ink-soft); }
+  body.dark .fb-syn{ background:rgba(79,190,150,.14); color:#8FD8C4; }
+  body.dark .fb-anto{ background:rgba(230,110,110,.14); color:#F0A9A9; }
+  body.dark .fb-sentence{ background:rgba(233,190,90,.12); color:#E9CB7E; }
+  body.dark .fb-trick{ background:rgba(180,130,230,.15); color:#D3B4EE; }
+  body.dark .fb-origin{ background:rgba(110,160,210,.14); color:#A9C9E6; }
+  body.dark .fb-history{ background:rgba(230,140,90,.14); color:#EDB08A; }
+  body.dark .fb-confusable{ background:rgba(220,100,100,.14); color:#EFAAAA; }
+  body.dark .fb-root{ background:rgba(79,190,150,.12); color:#9FDCC6; }
+  body.dark .fb-spelltrap{ background:rgba(233,180,80,.14); color:#EBC680; }
+  body.dark .badge.word{ background:rgba(110,190,110,.16); color:#A5D892; }
+  body.dark .badge.idiom{ background:rgba(245,158,46,.16); color:#F8C27F; }
+  body.dark .badge.one_word_substitution{ background:rgba(76,140,255,.18); color:#A9C4FF; }
+  body.dark .badge.phrasal_verb{ background:rgba(186,120,255,.18); color:#D3AEFF; }
+  body.dark .badge.fixed_preposition{ background:rgba(247,197,72,.16); color:#F7D57E; }
+  body.dark .badge.other{ background:rgba(255,255,255,.08); color:var(--ink-soft); }
+
+  /* ---------- text size + dyslexia-friendly font ---------- */
+  body.text-lg .term{ font-size:22px; }
   body.text-lg .meaning-en{ font-size:15px; }
   body.text-lg .field-box{ font-size:14px; }
   body.text-lg .pos{ font-size:13px; }
   body.text-lg .badge{ font-size:11.5px; }
   body.text-lg p.help{ font-size:14.5px; }
-  body.text-xl .term{ font-size:24px; }
+  body.text-xl .term{ font-size:25px; }
   body.text-xl .meaning-en{ font-size:16.5px; }
   body.text-xl .field-box{ font-size:15.5px; }
   body.text-xl .pos{ font-size:14px; }
@@ -61,182 +139,263 @@
   }
   body.dyslexia-font{ letter-spacing:0.02em; line-height:1.7; }
   body.dyslexia-font .field-box, body.dyslexia-font .meaning-en, body.dyslexia-font p.help{ line-height:1.8; }
+
+  /* ---------- base ---------- */
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
-  html,body{margin:0;padding:0; transition:background-color .2s ease, color .2s ease;}
+  html,body{margin:0;padding:0;}
   body{
-    background:var(--paper);
-    background-image:repeating-linear-gradient(var(--paper) 0px, var(--paper) 27px, var(--rule) 28px);
-    background-attachment:local; color:var(--ink); font-family:'Work Sans', sans-serif; min-height:100vh;
+    background-color:var(--paper);
+    background-image:var(--bg-pattern); background-size:var(--bg-pattern-size);
+    background-attachment:fixed; color:var(--ink); font-family:var(--font-body); min-height:100vh;
+    transition:background-color .3s ease, color .3s ease;
   }
-  ::selection{ background:var(--mustard); color:var(--ink); }
-  h1,h2,h3,.headword{ font-family:'Fraunces', serif; }
+  ::selection{ background:var(--mustard); color:#1B1203; }
+  h1,h2,h3,.headword{ font-family:var(--font-display); font-weight:var(--h-weight); }
   button{ font-family:inherit; cursor:pointer; }
   input,select,textarea{ font-family:inherit; }
+  :focus-visible{ outline:2px solid var(--mustard); outline-offset:2px; }
 
-  .main{ padding:24px 28px 70px; max-width:1180px; margin:0 auto; }
-  header.top{ display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:14px; border-bottom:2px solid var(--ink); padding-bottom:14px; margin-bottom:22px; }
-  header.top h1{ font-size:28px; margin:0; font-weight:600; }
-  header.top .sub{ color:var(--ink-soft); font-size:13px; margin-top:4px; }
-  .stat-strip{ display:flex; gap:12px; }
-  .stat-chip{ background:var(--card); border:1px solid var(--rule); border-radius:6px; padding:7px 13px; text-align:center; box-shadow:var(--shadow); }
-  .stat-chip .num{ font-family:'Fraunces',serif; font-size:19px; font-weight:600; display:block; }
-  .stat-chip .lbl{ font-size:10.5px; color:var(--ink-soft); text-transform:lowercase; }
+  .main{ padding:28px 28px 70px; max-width:1240px; margin:0 auto; }
+  header.top{ display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:16px; padding-bottom:18px; margin-bottom:22px; border-bottom:1px solid var(--rule); }
+  header.top h1{ font-size:32px; margin:0; letter-spacing:-.02em; line-height:1.1; }
+  body.theme-indigo header.top h1{ font-weight:800; letter-spacing:-.03em; }
+  header.top .sub{ color:var(--ink-soft); font-size:13.5px; margin-top:6px; }
+  .stat-strip{ display:flex; gap:10px; }
+  .stat-chip{ background:var(--card); border:1px solid var(--rule); border-radius:var(--radius); padding:8px 14px; text-align:center; box-shadow:var(--shadow); min-width:74px; }
+  .stat-chip .num{ font-family:var(--font-display); font-size:21px; font-weight:var(--h-weight); display:block; }
+  .stat-chip .lbl{ font-size:11px; color:var(--ink-soft); text-transform:lowercase; }
 
   section.view{ display:none; }
-  section.view.active{ display:block; }
+  section.view.active{ display:block; animation:viewIn .38s cubic-bezier(.2,.8,.2,1) both; }
 
-  .btn{ background:var(--ink); color:var(--paper); border:none; padding:10px 18px; border-radius:5px; font-size:14px; font-weight:600; box-shadow:var(--shadow); }
-  .btn:hover{ background:#3a3428; }
-  .btn.teal{ background:var(--teal); } .btn.teal:hover{ background:var(--teal-deep); }
-  .btn.maroon{ background:var(--maroon); } .btn.maroon:hover{ background:var(--maroon-deep); }
-  .btn.mustard{ background:var(--mustard); color:var(--ink);} .btn.mustard:hover{ background:var(--mustard-deep); }
-  .btn.ghost{ background:transparent; color:var(--ink); border:1.5px solid var(--ink); box-shadow:none; }
-  .btn.ghost:hover{ background:var(--ink); color:var(--paper); }
-  .btn.sm{ padding:6px 12px; font-size:12.5px; }
-  .btn:disabled{ opacity:.45; cursor:not-allowed; }
+  /* ---------- buttons ---------- */
+  .btn{ background:var(--accent); color:var(--accent-fg); border:none; padding:10px 18px; border-radius:var(--radius); font-size:14px; font-weight:600; box-shadow:var(--shadow); transition:transform .15s ease, box-shadow .2s ease, background .2s ease, filter .2s ease; }
+  .btn:hover{ background:var(--accent-hover); transform:translateY(-1px); }
+  .btn:active{ transform:translateY(0) scale(.97); }
+  .btn.teal{ background:var(--teal); color:#fff; } .btn.teal:hover{ background:var(--teal-deep); }
+  .btn.maroon{ background:var(--maroon); color:#fff; } .btn.maroon:hover{ background:var(--maroon-deep); }
+  .btn.mustard{ background:var(--mustard); color:#1B1203; } .btn.mustard:hover{ background:var(--mustard-deep); }
+  .btn.ghost{ background:transparent; color:var(--ink); border:1.5px solid var(--rule); box-shadow:none; }
+  .btn.ghost:hover{ background:var(--paper-deep); border-color:var(--ink-faint); }
+  .btn.sm{ padding:7px 13px; font-size:12.5px; }
+  .btn:disabled{ opacity:.45; cursor:not-allowed; transform:none; }
+  body.theme-indigo .btn{ border-radius:var(--pill); }
 
-  textarea, input[type=text], input[type=search], select{ width:100%; background:var(--card); border:1.5px solid var(--rule); border-radius:6px; padding:10px 12px; font-size:14px; color:var(--ink); }
-  textarea:focus, input:focus, select:focus{ outline:2px solid var(--mustard); outline-offset:1px; }
+  textarea, input[type=text], input[type=search], select{ width:100%; background:var(--card); border:1.5px solid var(--rule); border-radius:var(--radius); padding:10px 12px; font-size:14px; color:var(--ink); transition:border-color .2s ease, box-shadow .2s ease; }
+  textarea:focus, input:focus, select:focus{ outline:none; border-color:var(--mustard); box-shadow:0 0 0 3px rgba(201,154,46,.22); }
+  body.theme-indigo textarea:focus, body.theme-indigo input:focus, body.theme-indigo select:focus{ border-color:var(--accent); box-shadow:0 0 0 3px rgba(61,92,240,.22); }
   textarea{ min-height:130px; resize:vertical; line-height:1.5; }
   label.field-label{ font-size:12.5px; font-weight:600; color:var(--ink-soft); display:block; margin-bottom:6px; text-transform:lowercase; letter-spacing:.02em; }
 
-  .panel{ background:var(--card); border:1px solid var(--rule); border-radius:8px; padding:22px; box-shadow:var(--shadow); margin-bottom:20px; max-width:760px; }
+  .panel{ background:var(--card); border:1px solid var(--rule); border-radius:var(--radius-lg); padding:22px; box-shadow:var(--shadow); margin-bottom:20px; max-width:760px; }
   .add-columns{ display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start; }
   .add-col .panel{ max-width:none; }
   @media (max-width: 900px){ .add-columns{ grid-template-columns:1fr; } }
-  .panel h2{ margin-top:0; font-size:20px; }
+  .panel h2{ margin-top:0; font-size:21px; }
   .panel p.help{ color:var(--ink-soft); font-size:13.5px; line-height:1.55; }
-  .step-badge{ display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; background:var(--maroon); color:#fff; font-size:12px; font-weight:700; margin-right:8px; }
+  .step-badge{ display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:50%; background:var(--maroon); color:#fff; font-size:12px; font-weight:700; margin-right:8px; vertical-align:2px; }
+  body.theme-indigo .step-badge{ background:var(--accent); }
   .row-actions{ display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; align-items:center; }
-  .copy-note{ font-size:12.5px; color:var(--teal-deep); font-weight:600; }
-  pre.prompt-preview{ background:#2A241C; color:#EFE7D3; padding:16px; border-radius:6px; font-size:12.5px; line-height:1.6; overflow:auto; max-height:340px; white-space:pre-wrap; }
+  .copy-note{ font-size:12.5px; color:var(--teal); font-weight:600; }
+  pre.prompt-preview{ background:var(--code-bg); color:var(--code-fg); padding:16px; border-radius:var(--radius); font-size:12.5px; line-height:1.6; overflow:auto; max-height:340px; white-space:pre-wrap; }
 
   .toolbar{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px; align-items:center; }
-  .toolbar input[type=search]{ max-width:230px; }
-  .toolbar select{ width:auto; max-width:170px; }
+  .toolbar input[type=search]{ max-width:260px; }
+  .toolbar select{ width:auto; max-width:190px; }
   .toolbar .spacer{ flex:1; }
+  body.theme-indigo .toolbar input, body.theme-indigo .toolbar select{ border-radius:var(--pill); padding-left:16px; }
 
-  .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(290px,1fr)); gap:14px; }
-  .empty-state{ border:1.5px dashed var(--rule); border-radius:8px; padding:40px 20px; text-align:center; color:var(--ink-soft); max-width:520px; }
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:16px; }
+  .grid.animate-in > *{ animation:rise .55s cubic-bezier(.2,.8,.2,1) backwards; }
+  .empty-state{ border:1.5px dashed var(--rule); border-radius:var(--radius-lg); padding:40px 20px; text-align:center; color:var(--ink-soft); max-width:520px; }
   .empty-state h3{ margin-bottom:6px; color:var(--ink); }
 
-  .vcard{ background:var(--card); border:1px solid var(--rule); border-radius:8px; box-shadow:var(--shadow); padding:16px 16px 14px; position:relative; border-left:5px solid #B9AF95; cursor:pointer; }
-  .vcard.conf-1, .vcard.conf-2{ border-left-color:var(--maroon); }
-  .vcard.conf-3, .vcard.conf-4{ border-left-color:var(--mustard-deep); }
-  .vcard.conf-5{ border-left-color:var(--teal); }
+  /* ---------- word cards ---------- */
+  .vcard{ background:var(--card); border:1px solid var(--rule); border-radius:var(--radius-lg); box-shadow:var(--shadow); padding:18px 18px 12px; position:relative; cursor:pointer; transition:transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease, border-color .25s ease; }
+  .vcard:hover{ transform:translateY(-4px); box-shadow:var(--shadow-lg); }
+  body.theme-indigo .vcard:hover{ border-color:var(--accent); }
   .vcard-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
-  .vcard .term{ font-size:19px; font-weight:600; line-height:1.2; }
-  .vcard .pos{ color:var(--ink-faint); font-size:12px; font-style:italic; margin-top:2px; }
-  .badge{ font-size:10.5px; font-weight:700; letter-spacing:.03em; text-transform:lowercase; padding:3px 8px; border-radius:20px; white-space:nowrap; flex-shrink:0; }
-  .badge.word{ background:#E4E9E0; color:#3E5C34; }
-  .badge.idiom{ background:#EFE0D6; color:#8C4A24; }
-  .badge.one_word_substitution{ background:#DDE6EC; color:#2A5878; }
-  .badge.phrasal_verb{ background:#EAE0EF; color:#6B3A82; }
-  .badge.other{ background:#EAE5D8; color:var(--ink-soft); }
+  .vcard .term, .term{ font-family:var(--font-display); }
+  .vcard .term{ font-size:21px; font-weight:var(--h-weight); line-height:1.2; letter-spacing:-.01em; }
+  body.theme-indigo .vcard .term{ letter-spacing:-.02em; }
+  .vcard .pos{ color:var(--ink-faint); font-size:12.5px; font-style:italic; margin-top:3px; }
+  .badge{ font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; padding:4px 9px; border-radius:var(--pill); white-space:nowrap; flex-shrink:0; }
 
   .tagrow{ display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
-  .chip{ font-size:11px; background:var(--paper-deep); color:var(--ink-soft); padding:3px 8px; border-radius:20px; }
+  .chip{ font-size:11.5px; background:var(--paper-deep); color:var(--ink-soft); padding:3px 9px; border-radius:var(--pill); }
+  .root-chip{ background:var(--maroon); color:#fff; font-weight:600; }
+  body.theme-indigo .root-chip{ background:var(--mustard); color:#1B1203; }
 
-  .vcard .meaning-en{ margin-top:10px; font-size:13.5px; line-height:1.45; }
-  .meta-line{ font-size:11px; color:var(--ink-faint); margin-top:8px; }
+  .vcard .meaning-en{ margin-top:10px; font-size:14px; line-height:1.5; }
+  .meta-line{ font-size:11.5px; color:var(--ink-faint); margin-top:8px; }
 
-  .field-box{ border-radius:6px; padding:8px 10px; margin-top:8px; font-size:12.8px; line-height:1.5; }
-  .field-box .fb-label{ font-size:10.5px; font-weight:700; opacity:.72; text-transform:lowercase; letter-spacing:.03em; margin-bottom:3px; }
-  .fb-hindi{ background:#EFE9DA; color:#4A4030; }
-  .fb-syn{ background:#E1EFEA; color:#20544A; }
-  .fb-anto{ background:#F3E3E1; color:#7A2A2E; }
-  .fb-sentence{ background:#FBF1DD; color:#7A5A16; font-style:italic; }
-  .fb-trick{ background:#EEE6F2; color:#5B3670; }
-  .fb-origin{ background:#E7ECEF; color:#33495A; }
-  .fb-history{ background:#F5DED0; color:#8A3B1E; }
-  .fb-confusable{ background:#F5E0DE; color:#8C3B3B; }
-  .fb-root{ background:#DDEFE6; color:#256A4C; }
-  .fb-spelltrap{ background:#FBEBD2; color:#8A5A12; }
-  .spelltrap-chip{ background:var(--mustard); color:var(--ink); font-weight:700; }
+  .field-box{ border-radius:10px; padding:8px 11px; margin-top:8px; font-size:13px; line-height:1.5; }
+  .field-box .fb-label{ font-family:var(--font-body); font-size:10.5px; font-weight:700; opacity:.75; text-transform:uppercase; letter-spacing:.07em; margin-bottom:3px; font-style:normal; }
+  .spelltrap-chip{ background:var(--mustard); color:#1B1203; font-weight:700; }
   .fb-row2{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
 
+  /* ---------- confidence: segment bar (Refined Register) / numbered dots (Indigo Night) ---------- */
   .conf-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:12px; padding-top:10px; border-top:1px dashed var(--rule); }
-  .conf-label{ font-size:11.5px; color:var(--ink-soft); font-weight:600; }
+  .conf-label{ font-size:12px; color:var(--ink-soft); font-weight:700; }
   .conf-dots{ display:flex; gap:4px; }
-  .conf-dot{ width:24px;height:24px;border-radius:50%;border:1.5px solid var(--rule); background:var(--card); font-size:10px; display:flex; align-items:center; justify-content:center; color:transparent; padding:0; }
-  .conf-dot.filled{ background:var(--mustard-deep); border-color:var(--mustard-deep); }
-  .conf-dots.mastered .conf-dot.filled{ background:var(--teal); border-color:var(--teal-deep); }
+  .conf-dot{ position:relative; width:34px; height:28px; padding:0; border:none; background:transparent; color:transparent; font-size:0; transition:transform .15s ease; }
+  .conf-dot::before{ content:''; position:absolute; left:0; right:0; top:50%; height:8px; margin-top:-4px; border-radius:var(--pill); background:var(--paper-deep); transform-origin:left center; transition:background .25s ease; }
+  .conf-dot:hover{ transform:translateY(-2px); }
+  .conf-dots.lv-low .conf-dot.filled::before{ background:var(--maroon); }
+  .conf-dots.lv-mid .conf-dot.filled::before{ background:var(--mustard-deep); }
+  .conf-dots.mastered .conf-dot.filled::before{ background:var(--teal); }
+  .conf-dots.just-set .conf-dot.filled::before{ animation:popBar .45s cubic-bezier(.2,.9,.3,1.3) backwards; }
+  .conf-dots.just-set .conf-dot.filled:nth-child(2)::before{ animation-delay:.05s; }
+  .conf-dots.just-set .conf-dot.filled:nth-child(3)::before{ animation-delay:.1s; }
+  .conf-dots.just-set .conf-dot.filled:nth-child(4)::before{ animation-delay:.15s; }
+  .conf-dots.just-set .conf-dot.filled:nth-child(5)::before{ animation-delay:.2s; }
+  body.theme-indigo .conf-dots{ gap:5px; }
+  body.theme-indigo .conf-dot{ width:30px; height:30px; border-radius:50%; border:1px solid var(--rule); background:var(--paper-deep); color:var(--ink-faint); font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  body.theme-indigo .conf-dot::before{ display:none; }
+  body.theme-indigo .conf-dot:hover{ transform:scale(1.12); }
+  body.theme-indigo .conf-dot.filled{ background:var(--accent); border-color:var(--accent); color:#fff; }
+  body.theme-indigo .conf-dots.mastered .conf-dot.filled{ background:var(--gold); border-color:var(--gold); color:var(--gold-fg); }
+  body.theme-indigo .conf-dots.just-set .conf-dot.filled{ animation:dotPop .45s cubic-bezier(.2,.9,.3,1.4) backwards; }
+  body.theme-indigo .conf-dots.just-set .conf-dot.filled:nth-child(2){ animation-delay:.05s; }
+  body.theme-indigo .conf-dots.just-set .conf-dot.filled:nth-child(3){ animation-delay:.1s; }
+  body.theme-indigo .conf-dots.just-set .conf-dot.filled:nth-child(4){ animation-delay:.15s; }
+  body.theme-indigo .conf-dots.just-set .conf-dot.filled:nth-child(5){ animation-delay:.2s; }
 
   .vcard-controls{ display:flex; justify-content:flex-start; gap:2px; margin-top:8px; }
-  .iconbtn{ background:none; border:none; font-size:16px; padding:6px 8px; color:var(--ink-soft); border-radius:4px; }
+  .iconbtn{ background:none; border:none; font-size:16px; padding:6px 8px; color:var(--ink-soft); border-radius:8px; transition:background .2s ease, color .2s ease; }
   .iconbtn:hover{ background:var(--paper-deep); color:var(--ink); }
   .iconbtn.on{ color:var(--mustard-deep); }
 
   .practice-wrap{ max-width:480px; margin:0 auto; text-align:center; }
-  .flashcard{ background:var(--card); border:1px solid var(--rule); border-radius:12px; box-shadow: 4px 5px 0 rgba(36,32,25,0.10); min-height:260px; padding:26px 22px; display:flex; flex-direction:column; justify-content:center; align-items:center; cursor:pointer; gap:10px; }
-  .flashcard .fc-badge{ margin-bottom:6px; }
-  .flashcard .fc-term{ font-size:28px; font-weight:600; }
-  .flashcard .fc-hint{ color:var(--ink-faint); font-size:12px; margin-top:14px; }
-  .flashcard .fc-back{ display:none; text-align:left; width:100%; }
-  .flashcard.flipped .fc-front{ display:none; }
-  .flashcard.flipped .fc-back{ display:block; }
   .progress-line{ color:var(--ink-soft); font-size:13px; margin:14px 0 10px; }
   .practice-actions{ display:flex; gap:10px; justify-content:center; margin-top:16px; flex-wrap:wrap; }
 
   .bar-row{ display:flex; align-items:center; gap:10px; margin-bottom:10px; font-size:13px; }
   .mastery-columns{ display:grid; grid-template-columns:repeat(5, 1fr); gap:12px; align-items:start; }
-  .mastery-col{ background:var(--paper-deep); border:1px solid var(--rule); border-radius:8px; padding:10px; min-height:80px; }
+  .mastery-col{ background:var(--paper-deep); border:1px solid var(--rule); border-radius:var(--radius); padding:10px; min-height:80px; }
   .mastery-col-head{ font-weight:700; font-size:13px; text-align:center; padding-bottom:6px; border-bottom:1px solid var(--rule); margin-bottom:8px; }
   .mastery-col-count{ text-align:center; font-size:11px; color:var(--ink-soft); margin-bottom:8px; }
   .mastery-col-list{ display:flex; flex-direction:column; gap:6px; max-height:420px; overflow-y:auto; }
-  .mastery-word-chip{ background:var(--card); border:1px solid var(--rule); border-radius:6px; padding:6px 8px; font-size:12.5px; text-align:left; color:var(--ink); }
-  .mastery-word-chip:hover{ border-color:var(--teal); }
+  .mastery-word-chip{ background:var(--card); border:1px solid var(--rule); border-radius:8px; padding:6px 8px; font-size:12.5px; text-align:left; color:var(--ink); transition:border-color .2s ease, transform .15s ease; }
+  .mastery-word-chip:hover{ border-color:var(--teal); transform:translateX(2px); }
   @media (max-width: 900px){ .mastery-columns{ grid-template-columns:repeat(2, 1fr); } }
   @media (max-width: 500px){ .mastery-columns{ grid-template-columns:1fr; } }
   .bar-row .lbl{ width:150px; flex-shrink:0; color:var(--ink-soft); }
-  .bar-track{ flex:1; background:var(--paper-deep); border-radius:20px; height:14px; overflow:hidden; }
-  .bar-fill{ height:100%; background:var(--teal); border-radius:20px; }
+  .bar-track{ flex:1; background:var(--paper-deep); border-radius:var(--pill); height:14px; overflow:hidden; }
+  .bar-fill{ height:100%; background:var(--teal); border-radius:var(--pill); transform-origin:left center; animation:popBar .7s cubic-bezier(.2,.8,.2,1) backwards; }
+  body.theme-indigo .bar-fill{ background:var(--accent); }
   .bar-row .count{ width:36px; text-align:right; font-weight:600; }
 
-  .modal-bg{ position:fixed; inset:0; background:rgba(36,32,25,0.45); display:none; align-items:center; justify-content:center; padding:20px; z-index:50; }
-  .modal-bg.open{ display:flex; }
-  .modal{ background:var(--card); border-radius:10px; padding:24px; max-width:520px; width:100%; max-height:86vh; overflow:auto; box-shadow:0 10px 40px rgba(0,0,0,0.25); }
+  /* ---------- modal + toast ---------- */
+  .modal-bg{ position:fixed; inset:0; background:var(--overlay); display:none; align-items:center; justify-content:center; padding:20px; z-index:300; backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px); }
+  .modal-bg.open{ display:flex; animation:fadeIn .2s ease both; }
+  .modal{ background:var(--card); color:var(--ink); border:1px solid var(--rule); border-radius:var(--radius-lg); padding:24px; max-width:540px; width:100%; max-height:86vh; overflow:auto; box-shadow:var(--shadow-lg); }
+  .modal-bg.open .modal{ animation:modalIn .3s cubic-bezier(.2,.9,.3,1.15) both; }
   .modal h3{ margin-top:0; }
   .field{ margin-bottom:12px; }
   .field-2col{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
   .modal-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:18px; }
 
-  .toast{ position:fixed; bottom:22px; left:50%; transform:translateX(-50%); background:var(--ink); color:var(--paper); padding:10px 18px; border-radius:6px; font-size:13.5px; opacity:0; pointer-events:none; transition:opacity .25s ease; z-index:80; box-shadow:0 4px 14px rgba(0,0,0,0.25); max-width:80vw; text-align:center; }
-  .toast.show{ opacity:1; }
+  .toast{ position:fixed; bottom:22px; left:50%; transform:translate(-50%, 16px); background:var(--ink); color:var(--paper); padding:11px 18px; border-radius:var(--radius); font-size:13.5px; opacity:0; pointer-events:none; transition:opacity .25s ease, transform .3s cubic-bezier(.2,.9,.3,1.2); z-index:400; box-shadow:var(--shadow-lg); max-width:80vw; text-align:center; }
+  .toast.show{ opacity:1; transform:translate(-50%, 0); }
 
-  .loading-overlay{ position:fixed; inset:0; background:var(--paper); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px; z-index:100; font-family:'Fraunces',serif; font-size:18px; color:var(--ink-soft); }
+  /* ---------- level-5 celebration ---------- */
+  .celebrate{ position:fixed; right:24px; bottom:24px; z-index:450; width:min(370px, calc(100vw - 32px)); display:flex; align-items:center; gap:14px; padding:16px 12px 16px 16px; background:var(--bar-bg); color:var(--bar-fg); border-radius:var(--radius-lg); box-shadow:var(--shadow-lg); animation:toastIn .55s cubic-bezier(.2,.9,.3,1.25) both; }
+  body.theme-indigo .celebrate{ border:1px solid rgba(247,197,72,.55); animation:toastIn .55s cubic-bezier(.2,.9,.3,1.25) both, glow 2.4s ease-in-out .6s 2; }
+  .celebrate.leaving{ animation:toastOut .35s ease both; }
+  .confetti-wrap{ position:absolute; left:0; right:0; top:0; height:10px; pointer-events:none; }
+  .confetti{ position:absolute; top:0; animation-duration:1.8s; animation-timing-function:cubic-bezier(.2,.7,.3,1); animation-fill-mode:both; }
+  .confetti.c0{ background:var(--maroon); } .confetti.c1{ background:var(--mustard); } .confetti.c2{ background:var(--teal); }
+  .confetti.c3{ background:var(--gold); } .confetti.c4{ background:var(--bar-fg); }
+  body.theme-indigo .confetti.c0{ background:#5B7CFF; }
+  .celebrate-badge{ width:46px; height:46px; flex-shrink:0; border-radius:13px; background:var(--gold); color:var(--gold-fg); display:flex; align-items:center; justify-content:center; animation:badgePop .65s cubic-bezier(.2,.9,.3,1.4) both .15s; }
+  .celebrate-text{ flex:1; display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .celebrate-kicker{ font-size:11.5px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--mustard); }
+  body.theme-indigo .celebrate-kicker{ color:#F7C548; }
+  .celebrate-term{ font-family:var(--font-display); font-size:18px; font-weight:var(--h-weight); overflow-wrap:anywhere; }
+  .celebrate-close{ width:40px; height:40px; flex-shrink:0; border:none; background:transparent; color:var(--bar-muted); border-radius:10px; display:flex; align-items:center; justify-content:center; }
+  .celebrate-close:hover{ background:var(--bar-hover); color:var(--bar-fg); }
+
+  .loading-overlay{ position:fixed; inset:0; background:var(--paper); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px; z-index:500; font-family:var(--font-display); font-size:19px; color:var(--ink-soft); }
   .loading-overlay.hidden{ display:none; }
 
-  .authbar{ display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:8px 14px; background:var(--bar-bg); color:var(--bar-fg); font-size:13px; flex-wrap:wrap; }
-  .authbar .who{ display:flex; align-items:center; gap:8px; margin-right:auto; }
-  .offline-badge{ background:var(--maroon); color:#fff; font-size:11px; padding:3px 10px; border-radius:20px; font-weight:600; }
-  .notif-count{ position:absolute; top:-6px; right:-6px; background:var(--maroon); color:#fff; font-size:10px; font-weight:700; border-radius:20px; padding:1px 5px; line-height:1.3; }
-  .admin-badge{ background:var(--mustard); color:var(--ink); font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; text-transform:lowercase; }
-  .mod-badge{ background:var(--teal); color:#fff; font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; text-transform:lowercase; }
-  .avatar{ width:22px; height:22px; border-radius:50%; }
-
-  .topnav{ display:flex; align-items:center; gap:2px; background:var(--bar-bg); padding:0 8px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
-  .topnav::-webkit-scrollbar{ display:none; }
-  .topnav .brand{ color:var(--mustard); font-family:'Fraunces',serif; font-weight:600; font-size:17px; padding:12px 14px 12px 6px; flex-shrink:0; white-space:nowrap; }
-  .topnav .tab{ background:transparent; border:none; color:#C9C1AE; padding:13px 13px; font-size:13px; white-space:nowrap; border-bottom:3px solid transparent; flex-shrink:0; }
-  .topnav .tab:hover{ color:#fff; }
-  .topnav .tab.active{ color:#fff; border-bottom-color:var(--mustard); font-weight:600; }
+  /* ---------- app bar with grouped navigation ---------- */
+  .appbar{ position:sticky; top:0; z-index:100; display:flex; align-items:center; gap:18px; height:64px; padding:0 20px; background:var(--bar-bg); color:var(--bar-fg); border-bottom:1px solid var(--bar-line); }
+  .brand{ flex-shrink:0; display:flex; align-items:center; gap:10px; white-space:nowrap; }
+  .brand-paper{ font-family:'Fraunces', Georgia, serif; font-size:21px; font-weight:600; color:var(--mustard); }
+  .brand-paper span{ color:var(--bar-fg); }
+  .brand-indigo{ display:none; align-items:center; gap:10px; font-family:'Bricolage Grotesque', system-ui, sans-serif; font-size:19px; font-weight:700; letter-spacing:-.02em; }
+  .brand-mark{ width:34px; height:34px; border-radius:10px; background:var(--mustard); color:var(--bar-bg); display:flex; align-items:center; justify-content:center; }
+  body.theme-indigo .brand-paper{ display:none; }
+  body.theme-indigo .brand-indigo{ display:flex; }
+  .navgroups{ display:flex; align-items:center; gap:2px; }
+  body.theme-indigo .navgroups{ padding:4px; border-radius:14px; background:rgba(255,255,255,.04); border:1px solid var(--bar-line); }
+  .navgroup{ position:relative; }
+  .nav-btn, .navgroups > .tab{ display:flex; align-items:center; gap:7px; height:40px; padding:0 13px; border:none; border-radius:10px; background:transparent; color:var(--bar-muted); font-size:14px; font-weight:600; white-space:nowrap; transition:background .2s ease, color .2s ease; }
+  .nav-btn:hover, .navgroups > .tab:hover{ color:var(--bar-fg); background:var(--bar-hover); }
+  .navgroup.has-active > .nav-btn, .navgroups > .tab.active{ color:var(--bar-fg); background:var(--bar-hover); }
+  body.theme-indigo .navgroup.has-active > .nav-btn, body.theme-indigo .navgroups > .tab.active{ background:var(--accent); color:#fff; }
+  .navgroup.open > .nav-btn{ color:var(--bar-fg); background:var(--bar-hover); }
+  .nav-btn .chev{ opacity:.7; transition:transform .2s ease; }
+  .navgroup.open > .nav-btn .chev{ transform:rotate(180deg); }
+  .nav-ico{ display:none; }
+  .navmenu{ display:none; position:absolute; top:calc(100% + 10px); left:0; min-width:290px; padding:8px; background:var(--menu-bg); color:var(--ink); border:1px solid var(--rule); border-radius:16px; box-shadow:var(--shadow-lg); flex-direction:column; gap:2px; z-index:120; transform-origin:top left; }
+  .navmenu.align-right{ left:auto; right:0; transform-origin:top right; }
+  .navgroup.open > .navmenu{ display:flex; animation:menuIn .22s cubic-bezier(.2,.8,.2,1) both; }
+  .navmenu > button{ display:flex; flex-direction:column; align-items:flex-start; gap:2px; width:100%; padding:10px 12px; border:none; border-radius:10px; background:transparent; color:var(--ink); text-align:left; font-size:14px; transition:background .15s ease; }
+  .navmenu > button:hover{ background:var(--menu-hover); }
+  .navmenu > button b{ font-weight:600; font-size:14.5px; }
+  .navmenu > button span{ font-size:12.5px; color:var(--ink-soft); font-weight:400; }
+  .navmenu > button.tab.active{ background:var(--menu-hover); }
+  .navmenu > button.tab.active b{ color:var(--maroon); }
+  body.theme-indigo .navmenu > button.tab.active b{ color:var(--accent); }
+  body.dark.theme-indigo .navmenu > button.tab.active b{ color:#A9BCFF; }
+  .menu-label{ font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint); padding:8px 10px 4px; }
+  .seg-toggle{ display:flex; gap:4px; padding:4px; margin:0 4px 6px; border-radius:12px; background:var(--paper-deep); }
+  .seg-toggle button{ flex:1; border:none; background:transparent; color:var(--ink-soft); font-size:13px; font-weight:600; padding:9px 8px; border-radius:9px; transition:background .2s ease, color .2s ease; }
+  .seg-toggle button:hover{ color:var(--ink); }
+  .seg-toggle button.on{ background:var(--card); color:var(--ink); box-shadow:var(--shadow); }
+  .theme-swatches{ display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:4px 4px 8px; }
+  .theme-swatch{ display:flex; flex-direction:column; gap:8px; align-items:flex-start; padding:10px; border-radius:12px; border:2px solid var(--rule); background:var(--card); color:var(--ink); text-align:left; transition:border-color .2s ease, transform .15s ease; }
+  .theme-swatch:hover{ transform:translateY(-2px); }
+  .theme-swatch.on{ border-color:var(--mustard); }
+  body.theme-indigo .theme-swatch.on{ border-color:var(--accent); }
+  .theme-swatch b{ font-size:13px; }
+  .swatch-dots{ display:flex; gap:4px; }
+  .swatch-dots i{ width:16px; height:16px; border-radius:50%; display:block; }
+  .appbar-right{ margin-left:auto; display:flex; align-items:center; gap:6px; }
+  .bar-icon{ position:relative; width:42px; height:42px; border:none; border-radius:10px; background:transparent; color:var(--bar-muted); display:flex; align-items:center; justify-content:center; transition:background .2s ease, color .2s ease; }
+  .bar-icon:hover, .navgroup.open > .bar-icon{ background:var(--bar-hover); color:var(--bar-fg); }
+  .account-btn{ display:flex; align-items:center; gap:8px; height:42px; padding:0 10px 0 5px; border:1px solid var(--bar-line); border-radius:999px; background:transparent; color:var(--bar-fg); font-size:13px; font-weight:600; max-width:260px; }
+  .account-btn:hover, .navgroup.open > .account-btn{ background:var(--bar-hover); }
+  .who{ display:flex; align-items:center; gap:8px; min-width:0; }
+  .who > span:not(.admin-badge):not(.mod-badge){ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:130px; }
+  .offline-badge{ background:var(--maroon); color:#fff; font-size:11px; padding:4px 10px; border-radius:var(--pill); font-weight:600; }
+  .notif-count{ position:absolute; top:4px; right:3px; background:var(--maroon); color:#fff; font-size:10px; font-weight:700; border-radius:var(--pill); padding:1px 5px; line-height:1.3; }
+  .admin-badge{ background:var(--mustard); color:#1B1203; font-size:10px; font-weight:700; padding:2px 8px; border-radius:var(--pill); text-transform:lowercase; }
+  .mod-badge{ background:var(--teal); color:#fff; font-size:10px; font-weight:700; padding:2px 8px; border-radius:var(--pill); text-transform:lowercase; }
+  .avatar{ width:30px; height:30px; border-radius:50%; object-fit:cover; }
 
   .gate-screen{ min-height:100vh; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:16px; text-align:center; padding:20px; }
-  .gate-card{ background:var(--card); border:1px solid var(--rule); border-radius:10px; padding:36px 34px; box-shadow:var(--shadow); max-width:400px; }
+  .gate-card{ background:var(--card); border:1px solid var(--rule); border-radius:var(--radius-lg); padding:36px 34px; box-shadow:var(--shadow-lg); max-width:400px; animation:modalIn .5s cubic-bezier(.2,.9,.3,1.15) both; }
   .gate-card.wide{ max-width:600px; text-align:left; }
   .gate-card code{ background:var(--paper-deep); padding:1px 6px; border-radius:4px; font-size:12.5px; }
-  .google-btn{ display:inline-flex; align-items:center; gap:10px; background:#fff; color:#3c4043; border:1px solid #dadce0; padding:10px 22px; border-radius:6px; font-weight:600; font-size:14px; box-shadow:var(--shadow); }
+  .google-btn{ display:inline-flex; align-items:center; gap:10px; background:#fff; color:#3c4043; border:1px solid #dadce0; padding:11px 22px; border-radius:var(--radius); font-weight:600; font-size:14px; box-shadow:var(--shadow); transition:transform .15s ease; }
+  .google-btn:hover{ transform:translateY(-1px); }
 
-  .pending-card{ background:var(--card); border:1px solid var(--rule); border-left:5px solid var(--mustard); border-radius:8px; padding:14px 16px; margin-bottom:10px; }
+  .pending-card{ background:var(--card); border:1px solid var(--rule); border-radius:var(--radius); padding:14px 16px; margin-bottom:10px; box-shadow:var(--shadow); }
   .pending-meta{ font-size:12px; color:var(--ink-soft); margin-top:6px; }
+  .root-banner{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; padding:14px 16px; margin-bottom:14px; background:var(--card); border:1px solid var(--mustard); border-radius:var(--radius); animation:rise .45s cubic-bezier(.2,.8,.2,1) both; }
+  .root-banner .rb-text{ flex:1; min-width:220px; font-size:14px; line-height:1.45; color:var(--ink-soft); }
+  .root-banner .rb-text b{ color:var(--ink); }
 
+  /* ---------- full-screen slides ---------- */
   .slide-overlay{ position:fixed; inset:0; background:var(--bar-bg); z-index:200; display:none; flex-direction:column; padding:18px clamp(14px,3vw,40px); padding-top:max(18px, env(safe-area-inset-top)); padding-bottom:max(18px, env(safe-area-inset-bottom)); }
   .slide-close{ position:absolute; top:16px; right:20px; background:none; border:none; color:var(--bar-fg); font-size:26px; line-height:1; cursor:pointer; padding:6px; z-index:2; }
   .slide-close:hover{ color:var(--mustard); }
-  .slide-progress{ text-align:center; color:#B9AF95; font-size:13px; margin-bottom:10px; letter-spacing:.02em; flex-shrink:0; }
+  .slide-progress{ text-align:center; color:var(--bar-muted); font-size:13px; margin-bottom:10px; letter-spacing:.02em; flex-shrink:0; }
   .slide-body{ flex:1; min-height:0; width:100%; max-width:1400px; margin:0 auto; display:flex; flex-direction:column; }
-  .slide-card{ flex:1; min-height:0; background:var(--card); color:var(--ink); border-radius:16px; padding:clamp(20px,3vw,44px); box-shadow:0 14px 44px rgba(0,0,0,.4); cursor:pointer; display:flex; flex-direction:column; }
+  .slide-card{ flex:1; min-height:0; background:var(--card); color:var(--ink); border-radius:var(--radius-lg); padding:clamp(20px,3vw,44px); box-shadow:0 14px 44px rgba(0,0,0,.4); cursor:pointer; display:flex; flex-direction:column; animation:slideIn .4s cubic-bezier(.2,.8,.2,1) both; }
   .slide-card-head{ flex-shrink:0; }
   .slide-card .term{ font-size:clamp(28px, 4vw, 48px); }
   .slide-card .pos{ font-size:clamp(13px, 1.4vw, 16px); }
@@ -248,62 +407,101 @@
   .slide-details-grid::-webkit-scrollbar{ width:8px; }
   .slide-details-grid::-webkit-scrollbar-thumb{ background:var(--rule); border-radius:20px; }
   .slide-details-grid{ scrollbar-width:thin; }
+  .slide-details-grid > *{ animation:rise .45s cubic-bezier(.2,.8,.2,1) backwards; }
   .fb-meaning-big{ grid-column:1/-1; background:var(--paper-deep); color:var(--ink); font-size:clamp(15px,1.6vw,19px); line-height:1.5; }
   .slide-details-grid .field-box{ font-size:clamp(13px,1.15vw,15px); margin-top:0; }
   .slide-reveal-hint{ flex:1; display:flex; align-items:center; justify-content:center; text-align:center; color:var(--ink-faint); font-size:clamp(16px,2vw,22px); font-style:italic; }
   .slide-nav{ display:flex; gap:14px; margin-top:16px; flex-shrink:0; max-width:1400px; width:100%; margin-left:auto; margin-right:auto; }
   .slide-nav .btn{ flex:1; padding:14px; font-size:15px; }
 
-  .stage-item{ background:var(--card); border:1px solid var(--rule); border-radius:8px; padding:12px 14px; }
+  .stage-item{ background:var(--card); border:1px solid var(--rule); border-radius:var(--radius); padding:12px 14px; }
   .stage-item label{ display:flex; gap:10px; align-items:flex-start; cursor:pointer; }
   .stage-item input[type=checkbox]{ width:18px; height:18px; margin-top:3px; flex-shrink:0; }
   .dup-flag{ font-size:11.5px; color:var(--maroon); font-weight:600; margin-top:4px; }
 
+  /* ---------- quiz ---------- */
   .quiz-wrap{ max-width:640px; margin:0 auto; }
   .quiz-progress{ text-align:center; color:var(--ink-soft); font-size:13px; margin-bottom:10px; }
-  .quiz-question-card{ background:var(--card); border:1px solid var(--rule); border-radius:12px; padding:28px 26px; box-shadow:var(--shadow); text-align:center; }
+  .quiz-question-card{ background:var(--card); border:1px solid var(--rule); border-radius:var(--radius-lg); padding:28px 26px; box-shadow:var(--shadow); text-align:center; animation:slideIn .4s cubic-bezier(.2,.8,.2,1) both; }
   .quiz-question-card .quiz-prompt{ font-size:17px; line-height:1.6; margin-bottom:22px; }
   .quiz-question-card .quiz-prompt strong{ color:var(--maroon); }
   .quiz-options{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-  .quiz-option{ background:var(--paper-deep); border:1.5px solid var(--rule); border-radius:8px; padding:14px 12px; font-size:15px; font-weight:600; color:var(--ink); text-align:center; }
-  .quiz-option:hover{ border-color:var(--ink); }
-  .quiz-option.correct{ background:var(--teal); border-color:var(--teal-deep); color:#fff; }
-  .quiz-option.wrong{ background:var(--maroon); border-color:var(--maroon-deep); color:#fff; }
-  .quiz-option:disabled{ cursor:default; opacity:.85; }
+  .quiz-option{ background:var(--paper-deep); border:1.5px solid var(--rule); border-radius:var(--radius); padding:14px 12px; font-size:15px; font-weight:600; color:var(--ink); text-align:center; transition:transform .15s ease, border-color .2s ease, background .2s ease; }
+  .quiz-option:hover{ border-color:var(--ink-faint); transform:translateY(-2px); }
+  .quiz-option.correct{ background:var(--teal); border-color:var(--teal-deep); color:#fff; animation:dotPop .4s cubic-bezier(.2,.9,.3,1.4); }
+  .quiz-option.wrong{ background:var(--maroon); border-color:var(--maroon-deep); color:#fff; animation:shake .4s ease; }
+  .quiz-option:disabled{ cursor:default; opacity:.9; transform:none; }
   .quiz-score{ text-align:center; margin-top:18px; color:var(--ink-soft); font-size:13.5px; }
-  .report-card{ background:var(--card); border:1px solid var(--rule); border-radius:14px; padding:32px 28px; box-shadow:var(--shadow); text-align:center; max-width:440px; margin:0 auto; }
-  .report-score{ font-family:'Fraunces',serif; font-size:56px; font-weight:700; color:var(--teal); line-height:1; }
+  .report-card{ background:var(--card); border:1px solid var(--rule); border-radius:var(--radius-lg); padding:32px 28px; box-shadow:var(--shadow-lg); text-align:center; max-width:440px; margin:0 auto; animation:modalIn .5s cubic-bezier(.2,.9,.3,1.15) both; }
+  .report-score{ font-family:var(--font-display); font-size:60px; font-weight:700; color:var(--teal); line-height:1; animation:badgePop .7s cubic-bezier(.2,.9,.3,1.4) both .1s; }
+  body.theme-indigo .report-score{ color:var(--accent); }
+  body.theme-indigo.dark .report-score{ color:#8FA6FF; }
   .report-sub{ font-size:15px; color:var(--ink-soft); margin-top:8px; font-weight:600; }
   .report-missed{ margin-top:20px; padding-top:16px; border-top:1px dashed var(--rule); text-align:left; }
   .report-missed .chip{ margin:3px 3px 0 0; display:inline-block; }
   .quiz-actions{ display:flex; justify-content:center; gap:10px; margin-top:20px; }
 
   .root-clusters-wrap{ display:flex; flex-wrap:wrap; gap:22px; justify-content:flex-start; }
-  .root-cluster{ background:var(--card); border:1px solid var(--rule); border-radius:12px; box-shadow:var(--shadow); padding:14px; text-align:center; }
-  .root-cluster svg text{ fill:var(--ink); font-family:'Work Sans', sans-serif; }
+  .root-cluster{ background:var(--card); border:1px solid var(--rule); border-radius:var(--radius-lg); box-shadow:var(--shadow); padding:14px; text-align:center; animation:rise .5s cubic-bezier(.2,.8,.2,1) backwards; }
+  .root-cluster svg text{ fill:var(--ink); font-family:var(--font-body); }
   .root-cluster .root-node-circle{ fill:var(--mustard); }
-  .root-cluster .root-node-label{ fill:var(--ink); font-weight:700; font-size:12px; }
-  .root-cluster .word-node-circle{ fill:var(--card); stroke:var(--rule); stroke-width:1.5; cursor:pointer; }
+  .root-cluster .root-node-label{ fill:#1B1203; font-weight:700; font-size:12px; }
+  .root-cluster .word-node-circle{ fill:var(--card); stroke:var(--rule); stroke-width:1.5; cursor:pointer; transition:stroke .2s ease; }
   .root-cluster .word-node-circle:hover{ stroke:var(--teal); }
   .root-cluster .word-node-label{ font-size:10.5px; cursor:pointer; }
   .root-cluster .link-line{ stroke:var(--rule); stroke-width:1.5; }
 
-  @media (max-width: 760px){
-    .main{ padding:16px 14px 60px; }
-    .topnav .brand{ display:none; }
+  /* ---------- motion ---------- */
+  @keyframes rise{ from{ opacity:0; transform:translateY(16px) scale(.985); } to{ opacity:1; transform:none; } }
+  @keyframes viewIn{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:none; } }
+  @keyframes slideIn{ from{ opacity:0; transform:translateX(26px) scale(.99); } to{ opacity:1; transform:none; } }
+  @keyframes fadeIn{ from{ opacity:0; } to{ opacity:1; } }
+  @keyframes modalIn{ from{ opacity:0; transform:translateY(14px) scale(.96); } to{ opacity:1; transform:none; } }
+  @keyframes menuIn{ from{ opacity:0; transform:translateY(-8px) scale(.97); } to{ opacity:1; transform:none; } }
+  @keyframes popBar{ 0%{ transform:scaleX(.15); } 70%{ transform:scaleX(1.06); } 100%{ transform:scaleX(1); } }
+  @keyframes dotPop{ 0%{ transform:scale(.45); } 65%{ transform:scale(1.16); } 100%{ transform:scale(1); } }
+  @keyframes shake{ 0%,100%{ transform:translateX(0); } 20%{ transform:translateX(-6px); } 40%{ transform:translateX(6px); } 60%{ transform:translateX(-4px); } 80%{ transform:translateX(4px); } }
+  @keyframes toastIn{ from{ opacity:0; transform:translateY(28px) scale(.94); } to{ opacity:1; transform:none; } }
+  @keyframes toastOut{ to{ opacity:0; transform:translateY(20px) scale(.96); } }
+  @keyframes badgePop{ 0%{ transform:scale(.3) rotate(-20deg); } 70%{ transform:scale(1.15) rotate(6deg); } 100%{ transform:scale(1) rotate(0); } }
+  @keyframes glow{ 0%,100%{ box-shadow:0 0 0 0 rgba(247,197,72,0), var(--shadow-lg); } 50%{ box-shadow:0 0 0 6px rgba(247,197,72,.16), var(--shadow-lg); } }
+  @keyframes fallA{ 0%{ opacity:0; transform:translate(0,-6px) rotate(0); } 12%{ opacity:1; } 100%{ opacity:0; transform:translate(-34px,120px) rotate(560deg); } }
+  @keyframes fallB{ 0%{ opacity:0; transform:translate(0,-6px) rotate(0); } 12%{ opacity:1; } 100%{ opacity:0; transform:translate(10px,130px) rotate(-420deg); } }
+  @keyframes fallC{ 0%{ opacity:0; transform:translate(0,-6px) rotate(0); } 12%{ opacity:1; } 100%{ opacity:0; transform:translate(38px,112px) rotate(620deg); } }
+  @media (prefers-reduced-motion: reduce){ *, *::before, *::after{ animation:none !important; transition:none !important; } }
+
+  /* ---------- phone ---------- */
+  @media (max-width: 860px){
+    .appbar{ gap:10px; padding:0 12px; height:58px; }
+    .brand-paper{ font-size:18px; }
+    .brand-indigo{ font-size:17px; }
+    .brand-mark{ width:30px; height:30px; }
+    .who > span:not(.admin-badge):not(.mod-badge){ display:none; }
+    .navgroups{ position:fixed; left:0; right:0; bottom:0; z-index:110; justify-content:space-around; gap:0; padding:6px 4px calc(8px + env(safe-area-inset-bottom)); background:var(--bar-bg); border-top:1px solid var(--bar-line); }
+    body.theme-indigo .navgroups{ left:10px; right:10px; bottom:10px; padding:6px 4px; border-radius:22px; background:var(--bar-bg); box-shadow:var(--shadow-lg); }
+    .navgroup{ position:static; }
+    .nav-btn, .navgroups > .tab{ flex-direction:column; gap:2px; height:auto; min-width:56px; padding:6px 6px; font-size:10.5px; border-radius:12px; }
+    .nav-btn .chev{ display:none; }
+    .nav-ico{ display:block; }
+    .navmenu{ position:fixed; top:auto; left:10px; right:10px; bottom:84px; min-width:0; transform-origin:bottom center; border-radius:18px; }
+    .appbar-right .navmenu{ top:64px; bottom:auto; transform-origin:top center; }
+    .main{ padding:18px 14px 110px; }
     .field-2col, .fb-row2{ grid-template-columns:1fr; }
     .btn{ padding:11px 16px; }
     .iconbtn{ padding:9px 10px; font-size:18px; }
-    .conf-dot{ width:27px; height:27px; }
-    header.top h1{ font-size:24px; }
-    .stat-chip{ padding:6px 10px; }
-    .slide-card{ padding:18px; border-radius:12px; }
+    header.top h1{ font-size:26px; }
+    .stat-chip{ padding:6px 10px; min-width:0; }
+    .toolbar input[type=search], .toolbar select{ max-width:none; flex:1 1 140px; }
+    .slide-card{ padding:18px; }
     .slide-details-grid{ grid-template-columns:1fr; }
     .slide-nav{ width:100%; }
+    .celebrate{ right:16px; bottom:96px; }
+    .toast{ bottom:96px; }
   }
 </style>
 </head>
 <body>
+<script>(function(){try{var t=localStorage.getItem("vocabRegisterTheme");var m=localStorage.getItem("vocabRegisterDarkMode");var d=m==="1"||(m===null&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.body.className=(t==="indigo"?"theme-indigo":"theme-paper")+(d?" dark":"");}catch(e){document.body.className="theme-paper";}})();</script>
 
 <div class="loading-overlay" id="loadingOverlay"><div>Opening your register…</div></div>
 <div class="modal-bg" id="modalBg"><div class="modal" id="modalBody"></div></div>
@@ -334,37 +532,80 @@
 </div>
 
 <div id="appShell" style="display:none;">
-  <div class="authbar">
-    <div class="who" id="whoBox"></div>
-    <span class="offline-badge" id="onlineBadge" style="display:none;">Offline — showing cached data</span>
-    <button class="btn ghost sm" id="notifBtn" style="display:none; position:relative; color:var(--bar-fg); border-color:var(--bar-fg);">🔔<span class="notif-count" id="notifCount" style="display:none;"></span></button>
-    <button class="btn ghost sm" id="alertsSettingsBtn" style="color:var(--bar-fg); border-color:var(--bar-fg);">🔔 Alerts</button>
-    <button class="btn ghost sm" id="darkModeBtn" style="color:var(--bar-fg); border-color:var(--bar-fg);">🌙 Dark</button>
-    <button class="btn ghost sm" id="displaySettingsBtn" style="color:var(--bar-fg); border-color:var(--bar-fg);">⚙️ Display</button>
-    <button class="btn ghost sm" id="installBtn" style="display:none; color:var(--bar-fg); border-color:var(--bar-fg);">Install app</button>
-    <button class="btn ghost sm" id="signOutBtn" style="color:var(--bar-fg); border-color:var(--bar-fg);">Sign out</button>
-  </div>
+  <header class="appbar">
+    <div class="brand">
+      <span class="brand-paper">शब्द<span>Register</span></span>
+      <span class="brand-indigo"><span class="brand-mark"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 5h6a4 4 0 0 1 4 4v11a3 3 0 0 0-3-3H2z"></path><path d="M22 5h-6a4 4 0 0 0-4 4v11a3 3 0 0 1 3-3h7z"></path></svg></span>Vocab Register</span>
+    </div>
 
-  <nav class="topnav">
-    <div class="brand">शब्दRegister</div>
-    <button class="tab active" data-tab="library">Library</button>
-    <button class="tab" data-tab="add">Add words</button>
-    <button class="tab mod-only" data-tab="review" style="display:none;">Review</button>
-    <button class="tab mod-only" data-tab="enrich" style="display:none;">Enrich</button>
-    <button class="tab" data-tab="quiz">Quiz</button>
-    <button class="tab" data-tab="roots">Roots</button>
-    <button class="tab" data-tab="stats">Stats</button>
-    <button class="tab mod-only" data-tab="admin" style="display:none;">Admin</button>
-    <button class="tab" data-tab="backup">Backup</button>
-  </nav>
+    <nav class="navgroups" aria-label="Main">
+      <div class="navgroup" data-group="library">
+        <button class="nav-btn" aria-haspopup="true" aria-expanded="false"><svg class="nav-ico" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5z"></path><path d="M4 19a2 2 0 0 1 2-2h13"></path></svg><span>Library</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+        <div class="navmenu">
+          <button class="tab active" data-tab="library"><b>All words</b><span>Your full register, with filters</span></button>
+          <button class="tab" data-tab="spellbank"><b>Spelling Bank</b><span>Words you know but keep misspelling</span></button>
+          <button class="tab" data-tab="roots"><b>Roots</b><span>Word families grouped by a shared root</span></button>
+        </div>
+      </div>
+      <div class="navgroup" data-group="practice">
+        <button class="nav-btn" aria-haspopup="true" aria-expanded="false"><svg class="nav-ico" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="3"></circle></svg><span>Practice</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+        <div class="navmenu">
+          <button class="tab" data-tab="quiz"><b>Quiz</b><span>Fill in the blank, confusables, spelling</span></button>
+          <button id="navPresentBtn"><b>Present</b><span>Full-screen flash cards of your current filters</span></button>
+          <button id="navPanicBtn"><b>Exam tomorrow</b><span>Cram your 30 weakest words</span></button>
+        </div>
+      </div>
+      <button class="tab" data-tab="add"><svg class="nav-ico" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg><span>Add words</span></button>
+      <button class="tab" data-tab="stats"><svg class="nav-ico" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7"></path></svg><span>Progress</span></button>
+      <div class="navgroup mod-only" data-group="manage" style="display:none;">
+        <button class="nav-btn" aria-haspopup="true" aria-expanded="false"><svg class="nav-ico" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path></svg><span>Manage</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+        <div class="navmenu">
+          <button class="tab" data-tab="review"><b>Review</b><span>Approve pending submissions</span></button>
+          <button class="tab" data-tab="enrich"><b>Enrich</b><span>Backfill missing details with AI</span></button>
+          <button class="tab" data-tab="admin"><b>Admin</b><span>Moderators, duplicates, tag and root tools</span></button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="appbar-right">
+      <span class="offline-badge" id="onlineBadge" style="display:none;">Offline</span>
+      <div class="navgroup" data-group="appearance">
+        <button class="bar-icon" aria-label="Appearance: design and light or dark mode" aria-haspopup="true" aria-expanded="false"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 2-.9 2-2 0-.6-.2-1-.5-1.4-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.3A4.7 4.7 0 0 0 21 9.6C21 5.9 17 3 12 3z"></path><circle cx="7.5" cy="11" r="1.2"></circle><circle cx="10" cy="7" r="1.2"></circle><circle cx="15" cy="7" r="1.2"></circle></svg></button>
+        <div class="navmenu align-right appearance-menu" style="min-width:300px;">
+          <div class="menu-label">Design</div>
+          <div class="theme-swatches">
+            <button class="theme-swatch" data-theme-pick="paper"><span class="swatch-dots"><i style="background:#F3EEE3; border:1px solid #CFC3A3;"></i><i style="background:#8C2F39;"></i><i style="background:#C99A2E;"></i><i style="background:#2F6F63;"></i></span><b>Refined Register</b></button>
+            <button class="theme-swatch" data-theme-pick="indigo"><span class="swatch-dots"><i style="background:#0B1433; border:1px solid #3D5CF0;"></i><i style="background:#3D5CF0;"></i><i style="background:#F59E2E;"></i><i style="background:#F7C548;"></i></span><b>Indigo Night</b></button>
+          </div>
+          <div class="menu-label">Mode</div>
+          <div class="seg-toggle">
+            <button data-mode-pick="light">Light</button>
+            <button data-mode-pick="dark">Dark</button>
+            <button data-mode-pick="system">Auto</button>
+          </div>
+        </div>
+      </div>
+      <button class="bar-icon" id="notifBtn" aria-label="Notifications" style="display:none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg><span class="notif-count" id="notifCount" style="display:none;"></span></button>
+      <div class="navgroup" data-group="account">
+        <button class="account-btn" aria-label="Account menu" aria-haspopup="true" aria-expanded="false"><span class="who" id="whoBox"></span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+        <div class="navmenu align-right">
+          <button id="alertsSettingsBtn"><b>Alerts</b><span>Word reminders and new-word notifications</span></button>
+          <button id="displaySettingsBtn"><b>Display</b><span>Text size and dyslexia-friendly font</span></button>
+          <button class="tab" data-tab="backup"><b>Backup</b><span>Export or import your register</span></button>
+          <button id="installBtn" style="display:none;"><b>Install app</b><span>Add to your home screen or desktop</span></button>
+          <button id="signOutBtn"><b>Sign out</b></button>
+        </div>
+      </div>
+    </div>
+  </header>
 
   <main class="main">
     <header class="top">
       <div>
         <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
           <h1 style="margin:0;">CGL Vocabulary Register</h1>
-          <button class="btn ghost sm" id="presentBtn" title="Open full-screen slide view">⛶ Present</button>
-          <button class="btn maroon sm" id="panicBtn" title="Build a cram list of your weakest words">🚨 Exam tomorrow</button>
+          <button class="btn ghost sm" id="presentBtn" title="Open full-screen slide view" style="display:inline-flex; align-items:center; gap:6px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg>Present</button>
+          <button class="btn maroon sm" id="panicBtn" title="Build a cram list of your weakest words" style="display:inline-flex; align-items:center; gap:6px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"></path></svg>Exam tomorrow</button>
         </div>
         <div class="sub">Build your word bank with any AI, then drill it here.</div>
       </div>
@@ -380,9 +621,11 @@
           <option value="idiom">Idiom</option>
           <option value="one_word_substitution">One-word sub</option>
           <option value="phrasal_verb">Phrasal verb</option>
+          <option value="fixed_preposition">Fixed preposition</option>
           <option value="other">Other</option>
         </select>
         <select id="filterTag"><option value="all">All tags</option></select>
+        <select id="filterRoot" aria-label="Filter by root"><option value="all">All roots</option></select>
         <select id="filterStatus">
           <option value="all">All confidence</option>
           <option value="0">Not started</option>
@@ -400,52 +643,131 @@
         <button class="btn mustard sm" id="addManualBtn">+ Add one manually</button>
       </div>
       <div id="coverModeNote" class="help" style="display:none; margin:-8px 0 14px; color:var(--ink-soft); font-size:12.5px;">Cover mode is on — details are hidden. Tap a card to reveal it.</div>
+      <div id="rootBanner"></div>
+      <datalist id="rootDatalist"></datalist>
       <div id="libraryResultCount" class="help" style="font-weight:600; color:var(--ink); margin-bottom:10px;"></div>
       <div id="libraryGrid" class="grid"></div>
     </section>
 
     <section class="view" id="view-add">
-      <div style="margin-bottom:14px; max-width:260px;">
-        <label class="field-label">Tag this batch</label>
-        <input type="text" id="batchTagInput" placeholder="e.g. Mock 1">
+      <div class="row-actions" style="margin-bottom:16px;">
+        <button class="btn teal sm" id="addModeVocabBtn">Vocabulary words</button>
+        <button class="btn ghost sm" id="addModeSpellBtn">Spelling-only words</button>
       </div>
-      <div class="add-columns">
-        <div class="add-col">
-          <div class="panel">
-            <h2><span class="step-badge">1</span>Paste your word list</h2>
-            <p class="help" id="addPanelHelp">Paste the words you want to add, generate the prompt, run it through any AI, then paste the reply on the right.</p>
-            <label class="field-label">Words / idioms / phrases</label>
-            <textarea id="wordListInput" placeholder="e.g.&#10;laconic&#10;bury the hatchet&#10;call off&#10;one who cannot be corrected"></textarea>
-            <div class="row-actions"><button class="btn" id="generatePromptBtn">Generate prompt</button></div>
-          </div>
 
-          <div class="panel" id="promptPanel" style="display:none;">
-            <h2><span class="step-badge">2</span>Send it to an AI</h2>
-            <p class="help">Open ChatGPT or Gemini, paste this prompt in, and send it. Neither site currently supports auto-filling a prompt from a link, so these buttons copy the prompt to your clipboard and open the site — press Ctrl+V (or Cmd+V) once it loads.</p>
-            <pre class="prompt-preview" id="promptPreview"></pre>
-            <div class="row-actions">
-              <button class="btn teal" id="copyPromptBtn">Copy prompt</button>
-              <button class="btn ghost" id="openChatGPTBtn">Open ChatGPT (copies prompt)</button>
-              <button class="btn ghost" id="openGeminiBtn">Open Gemini (copies prompt)</button>
-              <span class="copy-note" id="copyNote" style="display:none;">Copied ✓</span>
-            </div>
+      <div id="addModeVocab">
+        <div style="display:flex; gap:14px; flex-wrap:wrap; margin-bottom:14px;">
+          <div style="flex:1 1 220px; max-width:280px;">
+            <label class="field-label">Tag this batch</label>
+            <input type="text" id="batchTagInput" placeholder="e.g. Mock 1">
+          </div>
+          <div style="flex:1 1 260px; max-width:380px;">
+            <label class="field-label">Shared root for this batch (optional)</label>
+            <input type="text" id="batchRootInput" list="rootDatalist" placeholder="e.g. phobia = fear">
           </div>
         </div>
+        <div class="add-columns">
+          <div class="add-col">
+            <div class="panel">
+              <h2><span class="step-badge">1</span>Paste your word list</h2>
+              <p class="help" id="addPanelHelp">Paste the words you want to add, generate the prompt, run it through any AI, then paste the reply on the right.</p>
+              <label class="field-label">Words / idioms / phrases</label>
+              <textarea id="wordListInput" placeholder="e.g.&#10;laconic&#10;bury the hatchet&#10;call off&#10;one who cannot be corrected"></textarea>
+              <div class="row-actions"><button class="btn" id="generatePromptBtn">Generate prompt</button></div>
+            </div>
 
-        <div class="add-col">
-          <div class="panel" id="pasteInputPanel">
-            <h2><span class="step-badge">3</span>Paste the AI's response</h2>
-            <p class="help">Paste the reply you got back (the JSON). It's fine if it's wrapped in ```json fences — this handles that. You'll get a chance to review everything before it's actually added.</p>
-            <textarea id="responseInput" style="min-height:220px;" placeholder="Paste the AI's JSON reply here…"></textarea>
-            <div class="row-actions">
-              <button class="btn maroon" id="parseBtn">Review before adding</button>
-              <span id="parseStatus" style="font-size:13px;"></span>
+            <div class="panel" id="promptPanel" style="display:none;">
+              <h2><span class="step-badge">2</span>Send it to an AI</h2>
+              <p class="help">Open ChatGPT or Gemini, paste this prompt in, and send it. Neither site currently supports auto-filling a prompt from a link, so these buttons copy the prompt to your clipboard and open the site — press Ctrl+V (or Cmd+V) once it loads.</p>
+              <pre class="prompt-preview" id="promptPreview"></pre>
+              <div class="row-actions">
+                <button class="btn teal" id="copyPromptBtn">Copy prompt</button>
+                <button class="btn ghost" id="openChatGPTBtn">Open ChatGPT (copies prompt)</button>
+                <button class="btn ghost" id="openGeminiBtn">Open Gemini (copies prompt)</button>
+                <span class="copy-note" id="copyNote" style="display:none;">Copied ✓</span>
+              </div>
             </div>
           </div>
 
-          <div class="panel" id="stagePanel" style="display:none;"></div>
+          <div class="add-col">
+            <div class="panel" id="pasteInputPanel">
+              <h2><span class="step-badge">3</span>Paste the AI's response</h2>
+              <p class="help">Paste the reply you got back (the JSON). It's fine if it's wrapped in ```json fences — this handles that. You'll get a chance to review everything before it's actually added.</p>
+              <textarea id="responseInput" style="min-height:220px;" placeholder="Paste the AI's JSON reply here…"></textarea>
+              <div class="row-actions">
+                <button class="btn maroon" id="parseBtn">Review before adding</button>
+                <span id="parseStatus" style="font-size:13px;"></span>
+              </div>
+            </div>
+
+            <div class="panel" id="stagePanel" style="display:none;"></div>
+          </div>
         </div>
       </div>
+
+      <div id="addModeSpell" style="display:none;">
+        <p class="help" style="max-width:640px;">For words where you already know the meaning but keep mixing up the spelling — the kind that show up as "spot the misspelled word" traps in mocks and PYQs. These go into a separate Spelling Bank, not the main vocabulary library.</p>
+        <div style="margin-bottom:14px; max-width:260px;">
+          <label class="field-label">Tag this batch</label>
+          <input type="text" id="spellBatchTagInput" placeholder="e.g. Mock 1">
+        </div>
+        <div class="add-columns">
+          <div class="add-col">
+            <div class="panel">
+              <h2><span class="step-badge">1</span>Paste your spelling-trouble words</h2>
+              <p class="help">One per line or comma separated. No need to include the meaning — the prompt only asks about spelling.</p>
+              <label class="field-label">Words</label>
+              <textarea id="spellWordListInput" placeholder="e.g.&#10;occurrence&#10;questionnaire&#10;liaison"></textarea>
+              <div class="row-actions"><button class="btn" id="generateSpellPromptBtn">Generate prompt</button></div>
+            </div>
+
+            <div class="panel" id="spellPromptPanel" style="display:none;">
+              <h2><span class="step-badge">2</span>Send it to an AI</h2>
+              <p class="help">Same deal — paste into ChatGPT or Gemini, send it, then bring the reply back to the right.</p>
+              <pre class="prompt-preview" id="spellPromptPreview"></pre>
+              <div class="row-actions">
+                <button class="btn teal" id="copySpellPromptBtn">Copy prompt</button>
+                <button class="btn ghost" id="openSpellChatGPTBtn">Open ChatGPT (copies prompt)</button>
+                <button class="btn ghost" id="openSpellGeminiBtn">Open Gemini (copies prompt)</button>
+                <span class="copy-note" id="spellCopyNote" style="display:none;">Copied ✓</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="add-col">
+            <div class="panel">
+              <h2><span class="step-badge">3</span>Paste the AI's response</h2>
+              <p class="help">Paste the reply (JSON, fine if wrapped in ```json fences). You'll review before anything is saved.</p>
+              <textarea id="spellResponseInput" style="min-height:220px;" placeholder="Paste the AI's JSON reply here…"></textarea>
+              <div class="row-actions">
+                <button class="btn maroon" id="parseSpellBtn">Review before adding</button>
+                <span id="spellParseStatus" style="font-size:13px;"></span>
+              </div>
+            </div>
+
+            <div class="panel" id="spellStagePanel" style="display:none;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-spellbank">
+      <div id="spellBankHome">
+        <div class="toolbar">
+          <input type="search" id="spellSearchBox" placeholder="Search word…">
+          <select id="spellTagFilter"><option value="all">All tags</option></select>
+          <div class="spacer"></div>
+          <button class="btn mustard sm" id="addSpellManualBtn">+ Add one manually</button>
+        </div>
+        <div class="row-actions" style="margin-bottom:6px;">
+          <button class="btn" id="startSpellBankTypeBtn">🔊 Hear &amp; type</button>
+          <button class="btn ghost" id="startSpellBankCorrectBtn">Choose the correct spelling</button>
+          <button class="btn ghost" id="startSpellBankSpotBtn">Spot the misspelled one</button>
+        </div>
+        <div id="spellBankResultCount" class="help" style="font-weight:600; color:var(--ink); margin-bottom:10px;"></div>
+        <div id="spellBankGrid" class="grid"></div>
+      </div>
+      <div id="spellBankQuizArea"></div>
     </section>
 
     <section class="view" id="view-review">
@@ -463,6 +785,22 @@
         <h2>Your submissions</h2>
         <p class="help">Words you've submitted, waiting for the admin's approval.</p>
         <div id="mySubmissionsList"></div>
+      </div>
+
+      <div id="reviewSpellAdmin" style="display:none; margin-top:28px; border-top:2px dashed var(--rule); padding-top:20px;">
+        <h2>Pending spelling-bank submissions</h2>
+        <p class="help">Approve to add a word to the Spelling Bank, or reject to discard it.</p>
+        <div class="row-actions" id="bulkSpellReviewBar" style="display:none;">
+          <label style="display:flex; align-items:center; gap:6px; font-size:13px; margin:0;"><input type="checkbox" id="bulkSpellSelectAll"> Select all</label>
+          <button class="btn teal sm" id="bulkSpellApproveBtn">Approve selected</button>
+          <button class="btn maroon sm" id="bulkSpellRejectBtn">Reject selected</button>
+        </div>
+        <div id="reviewSpellList" class="grid"></div>
+      </div>
+      <div id="reviewSpellSelf" style="display:none; margin-top:28px; border-top:2px dashed var(--rule); padding-top:20px;">
+        <h2>Your spelling-bank submissions</h2>
+        <p class="help">Words you've submitted to the Spelling Bank, waiting for approval.</p>
+        <div id="mySpellSubmissionsList"></div>
       </div>
     </section>
 
@@ -578,7 +916,7 @@
       </div>
 
       <div class="panel" style="max-width:700px;">
-        <h2>Bulk tag tools</h2>
+        <h2>Bulk tag &amp; root tools</h2>
         <div class="field-2col">
           <div class="field"><label class="field-label">Rename tag</label><select id="renameTagFrom"></select></div>
           <div class="field"><label class="field-label">To</label><input type="text" id="renameTagTo" placeholder="new tag name"></div>
@@ -586,6 +924,16 @@
         <div class="row-actions"><button class="btn teal sm" id="renameTagBtn">Rename everywhere</button></div>
         <div class="field" style="margin-top:18px;"><label class="field-label">Delete a tag from every word</label><select id="deleteTagSelect"></select></div>
         <div class="row-actions"><button class="btn maroon sm" id="deleteTagBtn">Remove tag everywhere</button></div>
+        <div style="margin-top:22px; padding-top:18px; border-top:1px dashed var(--rule);">
+          <h3 style="margin:0 0 6px; font-size:17px;">Move a tag to a root</h3>
+          <p class="help" style="margin-top:0;">For tags you've been using as a stand-in for a root (like “phobia”). Every word with the tag gets the root added — any root a word already has is kept.</p>
+          <div class="field-2col">
+            <div class="field"><label class="field-label">Tag</label><select id="tagToRootFrom"></select></div>
+            <div class="field"><label class="field-label">Root (e.g. "phobia = fear")</label><input type="text" id="tagToRootValue" list="rootDatalist" placeholder="root = meaning"></div>
+          </div>
+          <label style="display:flex; gap:8px; align-items:center; font-size:13px; cursor:pointer;"><input type="checkbox" id="tagToRootRemove" style="width:16px; height:16px;"> Remove the tag afterwards</label>
+          <div class="row-actions"><button class="btn teal sm" id="tagToRootBtn">Move tag to root</button></div>
+        </div>
       </div>
 
       <div class="panel" style="max-width:700px;">
@@ -631,21 +979,75 @@
 (function(){
   "use strict";
 
-  // ---------------- dark mode (applied immediately, works even before sign-in) ----------------
+  // ---------------- appearance: design (Refined Register / Indigo Night) + light/dark, per device ----------------
+  var THEME_KEY = 'vocabRegisterTheme';
   var DARK_MODE_KEY = 'vocabRegisterDarkMode';
-  function applyDarkModePreference(){
-    var saved = localStorage.getItem(DARK_MODE_KEY);
-    var on = saved === '1' || (saved === null && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    document.body.classList.toggle('dark', on);
-    var btn = document.getElementById('darkModeBtn');
-    if(btn) btn.textContent = on ? '☀️ Light' : '🌙 Dark';
+  var darkMq = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  function lsSet(k, v){ try{ if(v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); }catch(e){} }
+  function currentTheme(){ return lsGet(THEME_KEY) === 'indigo' ? 'indigo' : 'paper'; }
+  function currentMode(){ var m = lsGet(DARK_MODE_KEY); return m === '1' ? 'dark' : (m === '0' ? 'light' : 'system'); }
+  function applyAppearance(){
+    var theme = currentTheme();
+    var mode = currentMode();
+    var dark = mode === 'dark' || (mode === 'system' && !!(darkMq && darkMq.matches));
+    document.body.classList.toggle('theme-indigo', theme === 'indigo');
+    document.body.classList.toggle('theme-paper', theme !== 'indigo');
+    document.body.classList.toggle('dark', dark);
+    document.querySelectorAll('[data-theme-pick]').forEach(function(b){ b.classList.toggle('on', b.dataset.themePick === theme); });
+    document.querySelectorAll('[data-mode-pick]').forEach(function(b){ b.classList.toggle('on', b.dataset.modePick === mode); });
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if(meta) meta.setAttribute('content', theme === 'indigo' ? '#0B1433' : (dark ? '#110F0B' : '#221E17'));
   }
-  applyDarkModePreference();
-  document.getElementById('darkModeBtn').addEventListener('click', function(){
-    var nowOn = !document.body.classList.contains('dark');
-    localStorage.setItem(DARK_MODE_KEY, nowOn ? '1' : '0');
-    applyDarkModePreference();
+  applyAppearance();
+  if(darkMq){
+    var onSystemChange = function(){ if(currentMode() === 'system') applyAppearance(); };
+    if(darkMq.addEventListener) darkMq.addEventListener('change', onSystemChange);
+    else if(darkMq.addListener) darkMq.addListener(onSystemChange);
+  }
+  document.querySelectorAll('[data-theme-pick]').forEach(function(b){
+    b.addEventListener('click', function(){ lsSet(THEME_KEY, b.dataset.themePick); applyAppearance(); });
   });
+  document.querySelectorAll('[data-mode-pick]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var m = b.dataset.modePick;
+      lsSet(DARK_MODE_KEY, m === 'system' ? null : (m === 'dark' ? '1' : '0'));
+      applyAppearance();
+    });
+  });
+
+  // ---------------- grouped navigation menus ----------------
+  function closeAllMenus(except){
+    document.querySelectorAll('.navgroup.open').forEach(function(g){
+      if(g === except) return;
+      g.classList.remove('open');
+      var b = g.querySelector(':scope > button');
+      if(b) b.setAttribute('aria-expanded', 'false');
+    });
+  }
+  function refreshNavActive(){
+    document.querySelectorAll('.navgroup').forEach(function(g){ g.classList.toggle('has-active', !!g.querySelector('.tab.active')); });
+  }
+  document.querySelectorAll('.navgroup').forEach(function(g){
+    var btn = g.querySelector(':scope > button');
+    if(!btn) return;
+    btn.addEventListener('click', function(ev){
+      ev.stopPropagation();
+      var willOpen = !g.classList.contains('open');
+      closeAllMenus(g);
+      g.classList.toggle('open', willOpen);
+      btn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+    });
+  });
+  document.addEventListener('click', function(ev){
+    var t = ev.target;
+    if(t && t.closest && t.closest('.appearance-menu')) return;
+    closeAllMenus();
+  });
+  document.addEventListener('keydown', function(ev){ if(ev.key === 'Escape') closeAllMenus(); });
+  document.getElementById('navPresentBtn').addEventListener('click', function(){ document.getElementById('presentBtn').click(); });
+  document.getElementById('navPanicBtn').addEventListener('click', function(){ document.getElementById('panicBtn').click(); });
+  refreshNavActive();
 
   // ---------------- text-to-speech ----------------
   var ttsSupported = ('speechSynthesis' in window);
@@ -736,7 +1138,7 @@
   }
 
   // ============ CONFIGURE THESE, THEN SEE THE SETUP GUIDE ============
-  var ADMIN_EMAILS = ["47manish31@gmail.com"]; // <-- your Google account email(s)
+  var ADMIN_EMAILS = ["YOUR_ADMIN_EMAIL@gmail.com"]; // <-- your Google account email(s)
 
   var firebaseConfig = {
     apiKey: "AIzaSyDiTH-7aVK8ojL1njbv3BmiHJujW4xsUvM",
@@ -752,7 +1154,7 @@
 
   var TYPE_LABELS = {
     word:"Word", idiom:"Idiom", one_word_substitution:"One-word sub",
-    phrasal_verb:"Phrasal verb", other:"Other"
+    phrasal_verb:"Phrasal verb", fixed_preposition:"Fixed preposition", other:"Other"
   };
   // Bump this whenever new fields are added to the Enrich flow, so previously-enriched
   // words get re-offered for just the new fields instead of being marked "done" forever.
@@ -789,9 +1191,34 @@
   var submissions = [];
   var notifications = [];
   var pendingReview = [];
+  var spellWords = [];
+  var spellSubmissions = [];
   var unsubWords = null, unsubProgress = null, unsubSubs = null, unsubNotif = null;
+  var unsubSpellWords = null, unsubSpellSubs = null;
 
   var toastTimer = null;
+  function celebrate(term){
+    var old = document.getElementById('celebrateToast');
+    if(old && old.parentNode) old.parentNode.removeChild(old);
+    var el = document.createElement('div');
+    el.id = 'celebrateToast';
+    el.className = 'celebrate';
+    el.setAttribute('role', 'status');
+    var falls = ['fallA', 'fallB', 'fallC'];
+    var conf = '';
+    for(var i = 0; i < 18; i++){
+      conf += '<span class="confetti c' + (i % 5) + '" style="left:' + (6 + (i * 29) % 88) + '%;width:' + (i % 3 === 0 ? 9 : 6) + 'px;height:' + (i % 2 ? 11 : 6) + 'px;border-radius:' + (i % 4 === 0 ? '50%' : '2px') + ';animation-name:' + falls[i % 3] + ';animation-delay:' + (i * 50) + 'ms;"></span>';
+    }
+    el.innerHTML = '<div class="confetti-wrap" aria-hidden="true">' + conf + '</div>' +
+      '<span class="celebrate-badge"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg></span>' +
+      '<div class="celebrate-text"><span class="celebrate-kicker">Memorized</span><span class="celebrate-term">' + escapeHtml(term) + ' hit level 5</span></div>' +
+      '<button class="celebrate-close" aria-label="Dismiss"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>';
+    document.body.appendChild(el);
+    var remove = function(){ if(el.parentNode) el.parentNode.removeChild(el); };
+    el.querySelector('.celebrate-close').addEventListener('click', remove);
+    setTimeout(function(){ el.classList.add('leaving'); setTimeout(remove, 380); }, 4200);
+  }
+
   function showToast(msg){
     var t = document.getElementById('toast');
     t.textContent = msg;
@@ -1068,14 +1495,30 @@
       notifications.sort(function(a,b){ return tsMillis(b.createdAt) - tsMillis(a.createdAt); });
       renderNotifBell();
     }, function(err){ /* notifications are a convenience feature, fail silently */ });
+
+    unsubSpellWords = db.collection('spellwords').orderBy('createdAt','desc').onSnapshot(function(snap){
+      spellWords = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+      renderSpellBank();
+    }, function(err){ showToast('Could not load the Spelling Bank: ' + err.message); });
+
+    var spellSubsQuery = isModeratorUser
+      ? db.collection('spellSubmissions')
+      : db.collection('spellSubmissions').where('authorUid','==', currentUser.uid);
+    unsubSpellSubs = spellSubsQuery.onSnapshot(function(snap){
+      spellSubmissions = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+      spellSubmissions.sort(function(a,b){ return tsMillis(b.createdAt) - tsMillis(a.createdAt); });
+      renderSpellReview();
+    }, function(err){ showToast('Could not load spelling submissions: ' + err.message); });
   }
   function detachListeners(){
     if(unsubWords) unsubWords();
     if(unsubProgress) unsubProgress();
     if(unsubSubs) unsubSubs();
     if(unsubNotif) unsubNotif();
-    unsubWords = unsubProgress = unsubSubs = unsubNotif = null;
-    words = []; progressMap = {}; submissions = []; notifications = [];
+    if(unsubSpellWords) unsubSpellWords();
+    if(unsubSpellSubs) unsubSpellSubs();
+    unsubWords = unsubProgress = unsubSubs = unsubNotif = unsubSpellWords = unsubSpellSubs = null;
+    words = []; progressMap = {}; submissions = []; notifications = []; spellWords = []; spellSubmissions = [];
   }
 
   // ---------------- notifications ----------------
@@ -1129,18 +1572,24 @@
   function switchTab(name){
     tabs.forEach(function(t){ t.classList.toggle('active', t.dataset.tab === name); });
     views.forEach(function(v){ v.classList.toggle('active', v.id === 'view-' + name); });
+    refreshNavActive();
+    closeAllMenus();
+    if(name === 'library') libraryAnimate = true;
+    window.scrollTo(0, 0);
     if(name === 'library') renderLibrary();
     if(name === 'stats'){ renderStats(); renderLeaderboard(); renderAllUsers(); }
-    if(name === 'review') renderReview();
+    if(name === 'review'){ renderReview(); renderSpellReview(); }
     if(name === 'quiz') renderQuizHome();
     if(name === 'roots') renderRoots();
     if(name === 'enrich') renderEnrichHome();
     if(name === 'admin') renderAdminPanel();
+    if(name === 'spellbank') renderSpellBank();
   }
 
   function normalizeType(t){
     if(!t) return 'other';
     var s = String(t).toLowerCase().replace(/[\s-]+/g, '_');
+    if(s.indexOf('preposition') !== -1) return 'fixed_preposition';
     if(s.indexOf('idiom') !== -1) return 'idiom';
     if(s.indexOf('one_word') !== -1 || s.indexOf('one word') !== -1) return 'one_word_substitution';
     if(s.indexOf('phrasal') !== -1) return 'phrasal_verb';
@@ -1187,6 +1636,20 @@
     };
   }
 
+  // ---------------- add-mode toggle (vocabulary vs spelling-only) ----------------
+  document.getElementById('addModeVocabBtn').addEventListener('click', function(){
+    document.getElementById('addModeVocab').style.display = 'block';
+    document.getElementById('addModeSpell').style.display = 'none';
+    document.getElementById('addModeVocabBtn').className = 'btn teal sm';
+    document.getElementById('addModeSpellBtn').className = 'btn ghost sm';
+  });
+  document.getElementById('addModeSpellBtn').addEventListener('click', function(){
+    document.getElementById('addModeVocab').style.display = 'none';
+    document.getElementById('addModeSpell').style.display = 'block';
+    document.getElementById('addModeVocabBtn').className = 'btn ghost sm';
+    document.getElementById('addModeSpellBtn').className = 'btn teal sm';
+  });
+
   // ---------------- prompt generation ----------------
   var lastPrompt = '';
   document.getElementById('generatePromptBtn').addEventListener('click', function(){
@@ -1201,6 +1664,7 @@
 'You are helping a student preparing for the SSC CGL exam build a vocabulary database.',
 'For each term in the list below, identify what kind of item it is, then give exam-focused details.',
 '',
+rootsPromptHint(document.getElementById('batchRootInput').value.trim()),
 'Terms:',
 listBlock,
 '',
@@ -1208,7 +1672,7 @@ listBlock,
 'Each element must be an object with exactly these fields:',
 '{',
 '  "term": string (the word/phrase exactly as given),',
-'  "type": one of "word", "idiom", "one_word_substitution", "phrasal_verb", "other",',
+'  "type": one of "word", "idiom", "one_word_substitution", "phrasal_verb", "fixed_preposition", "other" (use "fixed_preposition" for a word that must be followed by a particular preposition, e.g. "averse to", "abide by", "comply with" - write the term together with its preposition, make the ssc_sentence use that exact preposition, and use the mnemonic to say which preposition is correct and which wrong one SSC usually offers as a trap),',
 '  "part_of_speech": string (e.g. "noun", "verb", "adjective"; use "-" if not applicable),',
 '  "english_meaning": string (clear, concise English definition),',
 '  "hindi_meaning": string (Hindi meaning, in Devanagari script),',
@@ -1345,12 +1809,15 @@ listBlock,
     var selected = pendingReview.filter(function(i){ return i.include; });
     if(selected.length === 0){ showToast('Nothing selected.'); return; }
     var tag = document.getElementById('batchTagInput').value.trim();
+    var batchRoot = document.getElementById('batchRootInput').value.trim();
     try{
       var targetCollection = isModeratorUser ? db.collection('words') : db.collection('submissions');
       var batch = db.batch();
       selected.forEach(function(item){
         var ref = targetCollection.doc();
-        batch.set(ref, buildEntryData(item.data, tag));
+        var entry = buildEntryData(item.data, tag);
+        if(batchRoot) entry.root = mergeRoot(entry.root, batchRoot);
+        batch.set(ref, entry);
       });
       await batch.commit();
       logActivity(isModeratorUser ? 'words_added' : 'words_submitted', {count: selected.length});
@@ -1362,16 +1829,709 @@ listBlock,
     }catch(e){ showToast('Could not save: ' + e.message); }
   }
 
+  // ================= SPELLING BANK (separate word list, spelling-only) =================
+  var lastSpellPrompt = '';
+  var spellPendingReview = [];
+
+  function stripLeadingNumberSB(s){ return s.replace(/^\d+[\.\)]\s*/, '').trim(); }
+  function stripTrailingParenSB(s){ return s.replace(/\s*\([^)]*\)\s*$/, '').trim(); }
+  function bareTermSB(s){ return stripTrailingParenSB(stripLeadingNumberSB(String(s).trim())); }
+
+  document.getElementById('generateSpellPromptBtn').addEventListener('click', function(){
+    var raw = document.getElementById('spellWordListInput').value.trim();
+    if(!raw){ showToast('Paste at least one word first.'); return; }
+    var wordsList = raw.split(/\r?\n|,/).map(function(w){ return w.trim(); }).filter(Boolean);
+    if(wordsList.length === 0){ showToast('Paste at least one word first.'); return; }
+    var listBlock = wordsList.map(function(w,i){ return (i+1) + '. ' + w; }).join('\n');
+
+    lastSpellPrompt = [
+'You are helping build a spelling-practice bank for someone preparing for the SSC CGL exam. They already know the meaning of each word below — they only need help with spelling, so do NOT include meanings, synonyms, or anything else besides what is asked for.',
+'',
+'Words:',
+listBlock,
+'',
+'Return ONLY a valid JSON array — no markdown code fences, no explanation before or after it.',
+'Each element must be an object with exactly these fields:',
+'{',
+'  "term": string (the bare word only, exactly as given above, no leading number),',
+'  "correct_spelling": string (the confirmed correct spelling - normally identical to the term; if the term as given is itself misspelled, put the correct form here instead),',
+'  "common_mistakes": array of strings (1-3 commonly seen incorrect spellings of this word - the kind used as wrong options in SSC spelling-correction questions),',
+'  "trick": string (a short, memorable trick or mnemonic specifically for spelling this word correctly - e.g. a silent letter, a double letter, or a tricky vowel to watch for)',
+'}',
+'',
+'Output only the JSON array.'
+    ].join('\n');
+
+    document.getElementById('spellPromptPreview').textContent = lastSpellPrompt;
+    document.getElementById('spellPromptPanel').style.display = 'block';
+    document.getElementById('spellPromptPanel').scrollIntoView({behavior:'smooth', block:'start'});
+  });
+
+  document.getElementById('copySpellPromptBtn').addEventListener('click', async function(){
+    await copyTextToClipboard(lastSpellPrompt);
+    var note = document.getElementById('spellCopyNote');
+    note.style.display = 'inline';
+    setTimeout(function(){ note.style.display = 'none'; }, 2000);
+  });
+  document.getElementById('openSpellChatGPTBtn').addEventListener('click', async function(){
+    await copyTextToClipboard(lastSpellPrompt);
+    showToast('Prompt copied — paste it (Ctrl+V) into ChatGPT.');
+    window.open('https://chatgpt.com/', '_blank');
+  });
+  document.getElementById('openSpellGeminiBtn').addEventListener('click', async function(){
+    await copyTextToClipboard(lastSpellPrompt);
+    showToast('Prompt copied — paste it (Ctrl+V) into Gemini.');
+    window.open('https://gemini.google.com/app', '_blank');
+  });
+
+  document.getElementById('parseSpellBtn').addEventListener('click', function(){
+    var statusEl = document.getElementById('spellParseStatus');
+    var raw = document.getElementById('spellResponseInput').value;
+    if(!raw.trim()){ statusEl.style.color = 'var(--maroon)'; statusEl.textContent = 'Paste the AI response first.'; return; }
+    var parsed;
+    try{
+      parsed = extractJson(raw);
+      if(!Array.isArray(parsed)) throw new Error('not an array');
+    }catch(e){
+      statusEl.style.color = 'var(--maroon)';
+      statusEl.textContent = "Couldn't read that as JSON. Check the reply is a JSON array and try again.";
+      return;
+    }
+    var valid = parsed.filter(function(item){ return item && item.term; });
+    if(valid.length === 0){ statusEl.style.color = 'var(--maroon)'; statusEl.textContent = 'No usable entries found in that response.'; return; }
+
+    var existingKeys = {};
+    spellWords.forEach(function(w){ existingKeys[w.term.toLowerCase()] = true; });
+    var seenBatch = {};
+    spellPendingReview = valid.map(function(item){
+      var term = bareTermSB(item.term);
+      var norm = {
+        term: term,
+        correct_spelling: item.correct_spelling ? bareTermSB(item.correct_spelling) : term,
+        common_mistakes: asArray(item.common_mistakes),
+        trick: item.trick ? String(item.trick).trim() : ''
+      };
+      var key = norm.term.toLowerCase();
+      var isDup = !!existingKeys[key];
+      var batchDup = !!seenBatch[key];
+      seenBatch[key] = true;
+      return { data: norm, isDup: isDup, batchDup: batchDup, include: !(isDup || batchDup) };
+    });
+    statusEl.textContent = '';
+    renderSpellStagePanel();
+  });
+
+  function renderSpellStagePanel(){
+    var wrap = document.getElementById('spellStagePanel');
+    if(spellPendingReview.length === 0){ wrap.style.display = 'none'; wrap.innerHTML=''; return; }
+    var dupCount = spellPendingReview.filter(function(i){ return i.isDup || i.batchDup; }).length;
+    wrap.style.display = 'block';
+    wrap.innerHTML =
+      '<h2><span class="step-badge">4</span>Review before adding</h2>' +
+      '<p class="help">'+spellPendingReview.length+' word'+(spellPendingReview.length===1?'':'s')+' found'+(dupCount ? ', '+dupCount+' already in the Spelling Bank (unchecked below)' : '')+'.</p>' +
+      '<div class="grid" id="spellStageGrid">' + spellPendingReview.map(spellStageItemHtml).join('') + '</div>' +
+      '<div class="row-actions">' +
+        '<button class="btn ghost" id="spellStageCancel">Cancel</button>' +
+        '<button class="btn maroon" id="spellStageConfirm">'+(isModeratorUser ? 'Add selected to Spelling Bank' : 'Submit selected for approval')+'</button>' +
+      '</div>';
+    wrap.querySelectorAll('[data-spell-stage-toggle]').forEach(function(cb){
+      cb.addEventListener('change', function(){ spellPendingReview[+cb.dataset.spellStageToggle].include = cb.checked; });
+    });
+    document.getElementById('spellStageCancel').addEventListener('click', function(){ spellPendingReview = []; renderSpellStagePanel(); });
+    document.getElementById('spellStageConfirm').addEventListener('click', confirmSpellStagedAdd);
+    wrap.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  function spellStageItemHtml(item, idx){
+    var d = item.data;
+    return '<div class="stage-item"><label>' +
+      '<input type="checkbox" data-spell-stage-toggle="'+idx+'" '+(item.include?'checked':'')+'>' +
+      '<div style="flex:1;">' +
+        '<div class="term" style="font-size:16px;">'+escapeHtml(d.term)+'</div>' +
+        (d.common_mistakes.length ? '<div class="pending-meta">Common mistakes: '+escapeHtml(d.common_mistakes.join(', '))+'</div>' : '') +
+        ((item.isDup || item.batchDup) ? '<div class="dup-flag">'+(item.isDup ? 'Already in the Spelling Bank' : 'Repeated in this batch')+'</div>' : '') +
+      '</div>' +
+    '</label></div>';
+  }
+
+  function buildSpellEntryData(norm, tag){
+    return {
+      term: norm.term,
+      correct_spelling: norm.correct_spelling || norm.term,
+      common_mistakes: norm.common_mistakes || [],
+      trick: norm.trick || '',
+      tags: tag ? [tag] : (norm.tags || []),
+      authorUid: currentUser.uid,
+      authorName: currentUser.displayName || currentUser.email,
+      authorEmail: currentUser.email,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+  }
+
+  async function confirmSpellStagedAdd(){
+    var selected = spellPendingReview.filter(function(i){ return i.include; });
+    if(selected.length === 0){ showToast('Nothing selected.'); return; }
+    var tag = document.getElementById('spellBatchTagInput').value.trim();
+    try{
+      var targetCollection = isModeratorUser ? db.collection('spellwords') : db.collection('spellSubmissions');
+      var batch = db.batch();
+      selected.forEach(function(item){
+        var ref = targetCollection.doc();
+        batch.set(ref, buildSpellEntryData(item.data, tag));
+      });
+      await batch.commit();
+      logActivity(isModeratorUser ? 'spellwords_added' : 'spellwords_submitted', {count: selected.length});
+      showToast(selected.length + ' word' + (selected.length===1?'':'s') + (isModeratorUser ? ' added to the Spelling Bank.' : ' submitted for approval.'));
+      spellPendingReview = [];
+      renderSpellStagePanel();
+      document.getElementById('spellResponseInput').value = '';
+      setTimeout(function(){ switchTab(isModeratorUser ? 'spellbank' : 'review'); }, 600);
+    }catch(e){ showToast('Could not save: ' + e.message); }
+  }
+
+  // ---------------- spelling bank: grid ----------------
+  function allSpellTags(){
+    var set = {};
+    spellWords.forEach(function(w){ (w.tags||[]).forEach(function(t){ set[t] = true; }); });
+    return Object.keys(set).sort();
+  }
+  function refreshSpellTagFilter(){
+    var sel = document.getElementById('spellTagFilter');
+    var current = sel.value;
+    var tags = allSpellTags();
+    sel.innerHTML = '<option value="all">All tags</option>' + tags.map(function(t){ return '<option value="'+escapeAttr(t)+'">'+escapeHtml(t)+'</option>'; }).join('');
+    if(tags.indexOf(current) !== -1) sel.value = current;
+  }
+  function getFilteredSpellWords(){
+    var q = document.getElementById('spellSearchBox').value.trim().toLowerCase();
+    var tag = document.getElementById('spellTagFilter').value;
+    return spellWords.filter(function(w){
+      if(q && w.term.toLowerCase().indexOf(q) === -1) return false;
+      if(tag !== 'all' && (w.tags||[]).indexOf(tag) === -1) return false;
+      return true;
+    });
+  }
+  document.getElementById('spellSearchBox').addEventListener('input', renderSpellBank);
+  document.getElementById('spellTagFilter').addEventListener('change', renderSpellBank);
+
+  function renderSpellBank(){
+    refreshSpellTagFilter();
+    var grid = document.getElementById('spellBankGrid');
+    var countEl = document.getElementById('spellBankResultCount');
+    if(spellWords.length === 0){
+      countEl.textContent = '';
+      grid.innerHTML = emptyStateHtml('Spelling Bank is empty', 'Head to "Add words" → "Spelling-only words" to build your first prompt.');
+      return;
+    }
+    var list = getFilteredSpellWords();
+    countEl.textContent = list.length + ' word' + (list.length===1?'':'s') + (list.length !== spellWords.length ? ' matching your filters' : ' in the Spelling Bank');
+    if(list.length === 0){ grid.innerHTML = emptyStateHtml('No matches', 'Try clearing a filter or search term.'); return; }
+    grid.innerHTML = list.map(spellCardHtml).join('');
+    grid.querySelectorAll('[data-spell-action]').forEach(function(btn){
+      btn.addEventListener('click', function(ev){ ev.stopPropagation(); handleSpellCardAction(btn.dataset.spellAction, btn.dataset.id); });
+    });
+  }
+
+  function spellCardHtml(w){
+    return '<div class="vcard" data-id="'+w.id+'">' +
+      '<div class="vcard-top">' +
+        '<div><div class="term">'+escapeHtml(w.term)+' <button class="iconbtn" data-spell-action="speak" data-id="'+w.id+'" title="Listen" style="font-size:14px; vertical-align:middle;">🔊</button></div></div>' +
+      '</div>' +
+      (w.tags && w.tags.length ? '<div class="tagrow">'+w.tags.map(function(t){return '<span class="chip">'+escapeHtml(t)+'</span>';}).join('')+'</div>' : '') +
+      (w.common_mistakes && w.common_mistakes.length ? fieldBox('fb-anto','common mistakes', w.common_mistakes.join(', ')) : '') +
+      fieldBox('fb-trick','trick', w.trick) +
+      (w.authorName ? '<div class="meta-line">Added by '+escapeHtml(w.authorName)+'</div>' : '') +
+      '<div class="vcard-controls">' +
+        (isModeratorUser ? '<button class="iconbtn" data-spell-action="edit" data-id="'+w.id+'" title="Edit">✎</button><button class="iconbtn" data-spell-action="delete" data-id="'+w.id+'" title="Delete">🗑</button>' : '') +
+      '</div>' +
+    '</div>';
+  }
+
+  function handleSpellCardAction(action, id){
+    var w = spellWords.find(function(x){ return x.id === id; });
+    if(!w) return;
+    if(action === 'speak'){ speakText(w.term); }
+    else if(action === 'edit' && isModeratorUser){ openSpellEditModal(id); }
+    else if(action === 'delete' && isModeratorUser){ openSpellConfirmDelete(id); }
+  }
+
+  function spellEntryFormHtml(w){
+    w = w || {term:'', correct_spelling:'', common_mistakes:[], trick:'', tags:[]};
+    return '' +
+      '<div class="field"><label class="field-label">Term</label><input type="text" id="sf_term" value="'+escapeAttr(w.term)+'"></div>' +
+      '<div class="field"><label class="field-label">Correct spelling (usually same as term)</label><input type="text" id="sf_correct" value="'+escapeAttr(w.correct_spelling||w.term||'')+'"></div>' +
+      '<div class="field"><label class="field-label">Common mistakes (comma separated)</label><input type="text" id="sf_mistakes" value="'+escapeAttr((w.common_mistakes||[]).join(', '))+'"></div>' +
+      '<div class="field"><label class="field-label">Trick / mnemonic</label><textarea id="sf_trick" style="min-height:55px;">'+escapeHtml(w.trick||'')+'</textarea></div>' +
+      '<div class="field"><label class="field-label">Tags (comma separated)</label><input type="text" id="sf_tags" value="'+escapeAttr((w.tags||[]).join(', '))+'"></div>';
+  }
+  function readSpellForm(){
+    return {
+      term: document.getElementById('sf_term').value.trim(),
+      correct_spelling: document.getElementById('sf_correct').value.trim(),
+      common_mistakes: asArray(document.getElementById('sf_mistakes').value),
+      trick: document.getElementById('sf_trick').value.trim(),
+      tags: asArray(document.getElementById('sf_tags').value)
+    };
+  }
+
+  document.getElementById('addSpellManualBtn').addEventListener('click', function(){
+    modalBodyRef().innerHTML = '<h3>'+(isModeratorUser?'Add a spelling word manually':'Submit a spelling word manually')+'</h3>' + spellEntryFormHtml() +
+      '<div class="modal-actions"><button class="btn ghost" id="cancelEdit">Cancel</button><button class="btn teal" id="saveEdit">'+(isModeratorUser?'Add':'Submit')+'</button></div>';
+    modalBgRef().classList.add('open');
+    document.getElementById('cancelEdit').addEventListener('click', function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML=''; });
+    document.getElementById('saveEdit').addEventListener('click', async function(){
+      var data = readSpellForm();
+      if(!data.term){ showToast('Term cannot be empty.'); return; }
+      try{
+        var entryData = buildSpellEntryData(data, null);
+        entryData.tags = data.tags;
+        var target = isModeratorUser ? db.collection('spellwords') : db.collection('spellSubmissions');
+        await target.add(entryData);
+        logActivity(isModeratorUser ? 'spellwords_added' : 'spellwords_submitted', {term: data.term});
+        showToast(isModeratorUser ? 'Added.' : 'Submitted for approval.');
+        modalBgRef().classList.remove('open'); modalBodyRef().innerHTML='';
+      }catch(err){ showToast('Could not save: ' + err.message); }
+    });
+  });
+
+  function openSpellEditModal(id){
+    var w = spellWords.find(function(x){ return x.id === id; });
+    if(!w) return;
+    modalBodyRef().innerHTML = '<h3>Edit spelling entry</h3>' + spellEntryFormHtml(w) +
+      '<div class="modal-actions"><button class="btn ghost" id="cancelEdit">Cancel</button><button class="btn teal" id="saveEdit">Save</button></div>';
+    modalBgRef().classList.add('open');
+    document.getElementById('cancelEdit').addEventListener('click', function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML=''; });
+    document.getElementById('saveEdit').addEventListener('click', async function(){
+      var data = readSpellForm();
+      if(!data.term){ showToast('Term cannot be empty.'); return; }
+      try{
+        await db.collection('spellwords').doc(id).update(data);
+        modalBgRef().classList.remove('open'); modalBodyRef().innerHTML='';
+      }catch(err){ showToast('Could not save: ' + err.message); }
+    });
+  }
+
+  function openSpellConfirmDelete(id){
+    var w = spellWords.find(function(x){ return x.id === id; });
+    if(!w) return;
+    modalBodyRef().innerHTML = '<h3>Delete "'+escapeHtml(w.term)+'"?</h3><p class="help">This removes it from the Spelling Bank for everyone.</p>' +
+      '<div class="modal-actions"><button class="btn ghost" id="cancelDel">Cancel</button><button class="btn maroon" id="confirmDel">Delete</button></div>';
+    modalBgRef().classList.add('open');
+    document.getElementById('cancelDel').addEventListener('click', function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML=''; });
+    document.getElementById('confirmDel').addEventListener('click', async function(){
+      try{ await db.collection('spellwords').doc(id).delete(); modalBgRef().classList.remove('open'); modalBodyRef().innerHTML=''; }
+      catch(err){ showToast('Could not delete: ' + err.message); }
+    });
+  }
+
+  // ---------------- spelling bank: review (approve/reject) ----------------
+  function renderSpellReview(){
+    document.getElementById('reviewSpellAdmin').style.display = isModeratorUser ? 'block' : 'none';
+    document.getElementById('reviewSpellSelf').style.display = isModeratorUser ? 'none' : 'block';
+    if(isModeratorUser){
+      var bar = document.getElementById('bulkSpellReviewBar');
+      var list = document.getElementById('reviewSpellList');
+      bar.style.display = spellSubmissions.length ? 'flex' : 'none';
+      var selectAll = document.getElementById('bulkSpellSelectAll');
+      if(selectAll) selectAll.checked = false;
+      if(spellSubmissions.length === 0){ list.innerHTML = emptyStateHtml('Nothing pending', 'Spelling-bank submissions from other signed-in users will show up here.'); return; }
+      list.innerHTML = spellSubmissions.map(spellPendingCardHtml).join('');
+      list.querySelectorAll('[data-spell-approve]').forEach(function(b){ b.addEventListener('click', function(){ approveSpellSubmission(b.dataset.spellApprove); }); });
+      list.querySelectorAll('[data-spell-reject]').forEach(function(b){ b.addEventListener('click', function(){ rejectSpellSubmission(b.dataset.spellReject); }); });
+    } else {
+      var mine = document.getElementById('mySpellSubmissionsList');
+      if(spellSubmissions.length === 0){ mine.innerHTML = emptyStateHtml('Nothing pending', 'Spelling words you submit will show up here until approved.'); return; }
+      mine.innerHTML = spellSubmissions.map(function(s){
+        return '<div class="pending-card"><strong>'+escapeHtml(s.term)+'</strong>' +
+          '<div class="pending-meta">Awaiting review'+(s.tags&&s.tags.length?' · '+escapeHtml(s.tags.join(', ')):'')+'</div>' +
+          '<div style="margin-top:8px;"><button class="btn ghost sm" data-spell-withdraw="'+s.id+'">Withdraw</button></div></div>';
+      }).join('');
+      mine.querySelectorAll('[data-spell-withdraw]').forEach(function(b){ b.addEventListener('click', function(){ withdrawSpellSubmission(b.dataset.spellWithdraw); }); });
+    }
+  }
+
+  document.getElementById('bulkSpellSelectAll').addEventListener('change', function(){
+    var checked = document.getElementById('bulkSpellSelectAll').checked;
+    document.querySelectorAll('.bulk-spell-check').forEach(function(cb){ cb.checked = checked; });
+  });
+  document.getElementById('bulkSpellApproveBtn').addEventListener('click', function(){
+    var ids = Array.from(document.querySelectorAll('.bulk-spell-check:checked')).map(function(cb){ return cb.dataset.bulkSpellId; });
+    if(ids.length === 0){ showToast('Select at least one.'); return; }
+    bulkSpellApprove(ids);
+  });
+  document.getElementById('bulkSpellRejectBtn').addEventListener('click', function(){
+    var ids = Array.from(document.querySelectorAll('.bulk-spell-check:checked')).map(function(cb){ return cb.dataset.bulkSpellId; });
+    if(ids.length === 0){ showToast('Select at least one.'); return; }
+    bulkSpellReject(ids);
+  });
+
+  function spellPendingCardHtml(s){
+    return '<div class="pending-card">' +
+      '<label style="display:flex; gap:8px; align-items:flex-start; cursor:pointer;">' +
+        '<input type="checkbox" class="bulk-spell-check" data-bulk-spell-id="'+s.id+'" style="margin-top:4px; width:18px; height:18px; flex-shrink:0;">' +
+        '<div style="flex:1;">' +
+          '<div class="term" style="font-size:15px;">'+escapeHtml(s.term)+'</div>' +
+          (s.common_mistakes && s.common_mistakes.length ? '<div class="pending-meta">Common mistakes: '+escapeHtml(s.common_mistakes.join(', '))+'</div>' : '') +
+          '<div class="pending-meta">Submitted by '+escapeHtml(s.authorName||s.authorEmail||'someone')+(s.tags&&s.tags.length?' · '+escapeHtml(s.tags.join(', ')):'')+'</div>' +
+        '</div>' +
+      '</label>' +
+      '<div class="row-actions" style="margin-top:10px;">' +
+        '<button class="btn maroon sm" data-spell-reject="'+s.id+'">Reject</button>' +
+        '<button class="btn teal sm" data-spell-approve="'+s.id+'">Approve</button>' +
+      '</div></div>';
+  }
+
+  async function approveSpellSubmission(id){
+    var s = spellSubmissions.find(function(x){ return x.id === id; });
+    if(!s) return;
+    var data = Object.assign({}, s); delete data.id;
+    try{
+      var batch = db.batch();
+      batch.set(db.collection('spellwords').doc(), data);
+      batch.delete(db.collection('spellSubmissions').doc(id));
+      await batch.commit();
+      logActivity('spellword_approved', {term: s.term});
+      showToast('Approved "'+s.term+'".');
+    }catch(e){ showToast('Could not approve: ' + e.message); }
+  }
+  async function rejectSpellSubmission(id){
+    var s = spellSubmissions.find(function(x){ return x.id === id; });
+    try{
+      await db.collection('spellSubmissions').doc(id).delete();
+      logActivity('spellword_rejected', {term: s ? s.term : ''});
+      showToast('Rejected.');
+    }catch(e){ showToast('Could not reject: ' + e.message); }
+  }
+  async function withdrawSpellSubmission(id){
+    try{ await db.collection('spellSubmissions').doc(id).delete(); showToast('Withdrawn.'); }
+    catch(e){ showToast('Could not withdraw: ' + e.message); }
+  }
+  async function bulkSpellApprove(ids){
+    try{
+      for(var c = 0; c < chunkArr(ids, 100).length; c++){
+        var group = chunkArr(ids, 100)[c];
+        var batch = db.batch();
+        group.forEach(function(id){
+          var s = spellSubmissions.find(function(x){ return x.id === id; });
+          if(!s) return;
+          var data = Object.assign({}, s); delete data.id;
+          batch.set(db.collection('spellwords').doc(), data);
+          batch.delete(db.collection('spellSubmissions').doc(id));
+        });
+        await batch.commit();
+      }
+      logActivity('spellwords_approved', {count: ids.length});
+      showToast(ids.length + ' word' + (ids.length===1?'':'s') + ' approved.');
+    }catch(e){ showToast('Could not approve: ' + e.message); }
+  }
+  async function bulkSpellReject(ids){
+    try{
+      for(var c = 0; c < chunkArr(ids, 100).length; c++){
+        var group = chunkArr(ids, 100)[c];
+        var batch = db.batch();
+        group.forEach(function(id){ batch.delete(db.collection('spellSubmissions').doc(id)); });
+        await batch.commit();
+      }
+      logActivity('spellwords_rejected', {count: ids.length});
+      showToast(ids.length + ' rejected.');
+    }catch(e){ showToast('Could not reject: ' + e.message); }
+  }
+
+  // ---------------- spelling bank: practice quiz (own dedicated state) ----------------
+  var sbQuizQueue = [];
+  var sbQuizIdx = 0;
+  var sbQuizScore = 0;
+  var sbQuizAnswered = false;
+  var sbQuizResults = [];
+
+  function backToSpellBankHome(){
+    document.getElementById('spellBankQuizArea').innerHTML = '';
+    document.getElementById('spellBankHome').style.display = 'block';
+  }
+
+  document.getElementById('startSpellBankTypeBtn').addEventListener('click', function(){
+    if(spellWords.length === 0){ showToast('Spelling Bank is empty — add some words first.'); return; }
+    sbQuizQueue = shuffleArr(spellWords.slice());
+    sbQuizIdx = 0; sbQuizScore = 0; sbQuizResults = [];
+    document.getElementById('spellBankHome').style.display = 'none';
+    renderSpellBankTypeQuestion();
+  });
+  function renderSpellBankTypeQuestion(){
+    var area = document.getElementById('spellBankQuizArea');
+    if(sbQuizIdx >= sbQuizQueue.length){ showSpellBankSummary(); return; }
+    var w = sbQuizQueue[sbQuizIdx];
+    var correctSpelling = w.correct_spelling || w.term;
+    sbQuizAnswered = false;
+    area.innerHTML =
+      '<div class="quiz-wrap">' +
+        '<div class="quiz-progress">Word '+(sbQuizIdx+1)+' / '+sbQuizQueue.length+' · Score '+sbQuizScore+'</div>' +
+        '<div class="quiz-question-card">' +
+          '<div class="quiz-prompt">Listen, then type what you hear.</div>' +
+          '<button class="btn teal" id="sbPlayBtn" style="margin-bottom:16px;">🔊 Play word</button><br>' +
+          '<input type="text" id="sbInput" placeholder="Type the word…" style="max-width:280px; text-align:center; font-size:17px; padding:12px; margin:0 auto; display:block;" autocomplete="off" autocapitalize="off" spellcheck="false">' +
+          '<div class="row-actions" style="justify-content:center; margin-top:14px;"><button class="btn maroon" id="sbSubmitBtn">Check</button></div>' +
+        '</div>' +
+        '<div class="quiz-actions"><button class="btn ghost" id="sbExitBtn">Exit</button><button class="btn teal" id="sbNextBtn" style="display:none;">Next →</button></div>' +
+      '</div>';
+    document.getElementById('sbPlayBtn').addEventListener('click', function(){ speakText(correctSpelling); });
+    speakText(correctSpelling);
+    document.getElementById('sbInput').addEventListener('keydown', function(ev){ if(ev.key === 'Enter'){ document.getElementById('sbSubmitBtn').click(); } });
+    document.getElementById('sbSubmitBtn').addEventListener('click', function(){
+      if(sbQuizAnswered) return;
+      sbQuizAnswered = true;
+      var val = document.getElementById('sbInput').value.trim();
+      var correct = val.toLowerCase() === correctSpelling.toLowerCase();
+      sbQuizResults.push({term: w.term, correct: correct});
+      if(correct) sbQuizScore++;
+      document.getElementById('sbInput').disabled = true;
+      document.getElementById('sbSubmitBtn').disabled = true;
+      var fb = document.createElement('div');
+      fb.style.marginTop = '12px'; fb.style.fontWeight = '600';
+      fb.style.color = correct ? 'var(--teal-deep)' : 'var(--maroon)';
+      fb.textContent = correct ? 'Correct!' : ('Correct spelling: ' + correctSpelling);
+      document.querySelector('.quiz-question-card').appendChild(fb);
+      document.getElementById('sbNextBtn').style.display = 'inline-flex';
+    });
+    document.getElementById('sbExitBtn').addEventListener('click', backToSpellBankHome);
+    document.getElementById('sbNextBtn').addEventListener('click', function(){ sbQuizIdx++; renderSpellBankTypeQuestion(); });
+  }
+
+  document.getElementById('startSpellBankCorrectBtn').addEventListener('click', function(){
+    if(spellWords.length === 0){ showToast('Spelling Bank is empty — add some words first.'); return; }
+    sbQuizQueue = shuffleArr(spellWords.slice());
+    sbQuizIdx = 0; sbQuizScore = 0; sbQuizResults = [];
+    document.getElementById('spellBankHome').style.display = 'none';
+    renderSpellBankCorrectQuestion();
+  });
+  function renderSpellBankCorrectQuestion(){
+    var area = document.getElementById('spellBankQuizArea');
+    if(sbQuizIdx >= sbQuizQueue.length){ showSpellBankSummary(); return; }
+    var w = sbQuizQueue[sbQuizIdx];
+    var correctSpelling = w.correct_spelling || w.term;
+    var wrongs = (w.common_mistakes || []).slice(0, 3);
+    var guard = 0;
+    while(wrongs.length < 3 && guard < 30){
+      guard++;
+      var variant = generateMisspelling(correctSpelling);
+      if(wrongs.indexOf(variant) === -1 && variant.toLowerCase() !== correctSpelling.toLowerCase()) wrongs.push(variant);
+    }
+    wrongs = wrongs.slice(0, 3);
+    var options = shuffleArr([correctSpelling].concat(wrongs));
+    sbQuizAnswered = false;
+    area.innerHTML =
+      '<div class="quiz-wrap">' +
+        '<div class="quiz-progress">Word '+(sbQuizIdx+1)+' / '+sbQuizQueue.length+' · Score '+sbQuizScore+'</div>' +
+        '<div class="quiz-question-card">' +
+          '<div class="quiz-prompt">Which is the correct spelling?</div>' +
+          '<button class="btn teal" id="sbPlayBtn" style="margin-bottom:16px;">🔊 Play word</button>' +
+          '<div class="quiz-options" id="sbOptions">' +
+            options.map(function(opt){ return '<button class="quiz-option" data-opt="'+escapeAttr(opt)+'">'+escapeHtml(opt)+'</button>'; }).join('') +
+          '</div>' +
+        '</div>' +
+        '<div class="quiz-actions"><button class="btn ghost" id="sbExitBtn">Exit</button><button class="btn teal" id="sbNextBtn" style="display:none;">Next →</button></div>' +
+      '</div>';
+    document.getElementById('sbPlayBtn').addEventListener('click', function(){ speakText(correctSpelling); });
+    speakText(correctSpelling);
+    document.querySelectorAll('#sbOptions .quiz-option').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        if(sbQuizAnswered) return;
+        sbQuizAnswered = true;
+        var correct = btn.dataset.opt === correctSpelling;
+        document.querySelectorAll('#sbOptions .quiz-option').forEach(function(b2){
+          b2.disabled = true;
+          if(b2.dataset.opt === correctSpelling) b2.classList.add('correct');
+          else if(b2 === btn) b2.classList.add('wrong');
+        });
+        sbQuizResults.push({term: w.term, correct: correct});
+        if(correct) sbQuizScore++;
+        document.getElementById('sbNextBtn').style.display = 'inline-flex';
+      });
+    });
+    document.getElementById('sbExitBtn').addEventListener('click', backToSpellBankHome);
+    document.getElementById('sbNextBtn').addEventListener('click', function(){ sbQuizIdx++; renderSpellBankCorrectQuestion(); });
+  }
+
+  document.getElementById('startSpellBankSpotBtn').addEventListener('click', function(){
+    if(spellWords.length < 4){ showToast('Need at least 4 words in the Spelling Bank.'); return; }
+    sbQuizQueue = shuffleArr(spellWords.slice());
+    sbQuizIdx = 0; sbQuizScore = 0; sbQuizResults = [];
+    document.getElementById('spellBankHome').style.display = 'none';
+    renderSpellBankSpotQuestion();
+  });
+  function renderSpellBankSpotQuestion(){
+    var area = document.getElementById('spellBankQuizArea');
+    var remaining = sbQuizQueue.length - sbQuizIdx;
+    if(remaining < 4){ showSpellBankSummary(); return; }
+    var group = sbQuizQueue.slice(sbQuizIdx, sbQuizIdx+4);
+    var wrongIdx = Math.floor(Math.random()*4);
+    var options = group.map(function(w,i){
+      var correctSpelling = w.correct_spelling || w.term;
+      return i===wrongIdx ? generateMisspelling(correctSpelling) : correctSpelling;
+    });
+    sbQuizAnswered = false;
+    area.innerHTML =
+      '<div class="quiz-wrap">' +
+        '<div class="quiz-progress">Round '+(Math.floor(sbQuizIdx/4)+1)+' · Score '+sbQuizScore+'</div>' +
+        '<div class="quiz-question-card">' +
+          '<div class="quiz-prompt">Which one is misspelled?</div>' +
+          '<div class="quiz-options" id="sbOptions">' +
+            options.map(function(opt){ return '<button class="quiz-option" data-opt="'+escapeAttr(opt)+'">'+escapeHtml(opt)+'</button>'; }).join('') +
+          '</div>' +
+        '</div>' +
+        '<div class="quiz-actions"><button class="btn ghost" id="sbExitBtn">Exit</button><button class="btn teal" id="sbNextBtn" style="display:none;">Next round →</button></div>' +
+      '</div>';
+    document.querySelectorAll('#sbOptions .quiz-option').forEach(function(btn, idx){
+      btn.addEventListener('click', function(){
+        if(sbQuizAnswered) return;
+        sbQuizAnswered = true;
+        var pickedRight = (idx === wrongIdx);
+        document.querySelectorAll('#sbOptions .quiz-option').forEach(function(b2, i2){
+          b2.disabled = true;
+          if(i2 === wrongIdx) b2.classList.add(pickedRight ? 'correct' : 'wrong');
+        });
+        sbQuizResults.push({term: group[wrongIdx].term, correct: pickedRight});
+        if(pickedRight) sbQuizScore++;
+        document.getElementById('sbNextBtn').style.display = 'inline-flex';
+      });
+    });
+    document.getElementById('sbExitBtn').addEventListener('click', backToSpellBankHome);
+    document.getElementById('sbNextBtn').addEventListener('click', function(){ sbQuizIdx += 4; renderSpellBankSpotQuestion(); });
+  }
+
+  function showSpellBankSummary(){
+    var area = document.getElementById('spellBankQuizArea');
+    var total = sbQuizResults.length;
+    var correctCount = sbQuizResults.filter(function(r){ return r.correct; }).length;
+    var pct = total ? Math.round(correctCount/total*100) : 0;
+    var missed = sbQuizResults.filter(function(r){ return !r.correct; }).map(function(r){ return r.term; });
+    var grade = pct >= 90 ? 'Excellent!' : pct >= 75 ? 'Great job!' : pct >= 50 ? 'Good effort!' : 'Keep practicing!';
+    var shareText = 'I scored ' + correctCount + '/' + total + ' (' + pct + '%) on my Spelling Bank quiz — ' + grade;
+    area.innerHTML =
+      '<div class="quiz-wrap"><div class="report-card">' +
+        '<div class="report-score">'+pct+'%</div>' +
+        '<div class="report-sub">'+correctCount+' / '+total+' correct — '+grade+'</div>' +
+        (missed.length
+          ? '<div class="report-missed"><div class="fb-label" style="margin-bottom:8px;">words to revisit</div>' + missed.map(function(t){ return '<span class="chip">'+escapeHtml(t)+'</span>'; }).join(' ') + '</div>'
+          : '<p class="help">Perfect run — nothing to revisit!</p>') +
+        '<div class="row-actions" style="justify-content:center; margin-top:18px;">' +
+          '<button class="btn teal" id="sbShareBtn">Share result</button>' +
+          '<button class="btn ghost" id="sbBackBtn">Back to Spelling Bank</button>' +
+        '</div>' +
+      '</div></div>';
+    document.getElementById('sbBackBtn').addEventListener('click', backToSpellBankHome);
+    document.getElementById('sbShareBtn').addEventListener('click', async function(){
+      if(navigator.share){ try{ await navigator.share({ title: 'Spelling Bank', text: shareText }); }catch(e){} }
+      else { await copyTextToClipboard(shareText); showToast('Result copied — paste it anywhere to share.'); }
+    });
+  }
+
   // ---------------- library rendering ----------------
   var searchBox = document.getElementById('searchBox');
   var filterType = document.getElementById('filterType');
   var filterTag = document.getElementById('filterTag');
   var filterStatus = document.getElementById('filterStatus');
   var sortBy = document.getElementById('sortBy');
-  [searchBox, filterType, filterTag, filterStatus, sortBy].forEach(function(el){
-    el.addEventListener('input', renderLibrary);
-    el.addEventListener('change', renderLibrary);
+  var filterRoot = document.getElementById('filterRoot');
+  var libraryAnimate = true;
+  var libraryAnimatingRender = false;
+  var libraryAnimateUntil = 0;
+  var lastConfSet = null;
+  searchBox.addEventListener('input', renderLibrary);
+  [filterType, filterTag, filterStatus, sortBy, filterRoot].forEach(function(el){
+    el.addEventListener('change', function(){ libraryAnimate = true; renderLibrary(); });
   });
+
+  // ---------------- roots: parsing, filter, prompt hint, tag -> root ----------------
+  function splitRootParts(rootStr){
+    return String(rootStr || '').split(/\s*[;|]\s*/).map(function(p){ return p.trim(); }).filter(function(p){ return p && p !== '-'; });
+  }
+  function rootKeyOfPart(part){
+    var head = String(part).split(/\s*(?:=|:|·|—|–|\s-\s|\()\s*/)[0];
+    return head.toLowerCase().replace(/[^a-z\u00c0-\u024f]+/g, '');
+  }
+  function rootKeysOf(rootStr){
+    var keys = [];
+    splitRootParts(rootStr).forEach(function(p){ var k = rootKeyOfPart(p); if(k && keys.indexOf(k) === -1) keys.push(k); });
+    return keys;
+  }
+  function allRootsMap(){
+    var map = {};
+    words.forEach(function(w){
+      splitRootParts(w.root).forEach(function(p){
+        var k = rootKeyOfPart(p);
+        if(!k) return;
+        if(!map[k]) map[k] = { key: k, label: p, count: 0 };
+        map[k].count++;
+      });
+    });
+    return map;
+  }
+  function mergeRoot(existing, addition){
+    addition = String(addition || '').trim();
+    existing = (existing && existing !== '-') ? existing : '';
+    if(!addition) return existing;
+    var have = rootKeysOf(existing);
+    var extra = splitRootParts(addition).filter(function(p){ var k = rootKeyOfPart(p); return k && have.indexOf(k) === -1; });
+    if(extra.length === 0) return existing;
+    return (existing ? existing + '; ' : '') + extra.join('; ');
+  }
+  function refreshRootFilter(){
+    var current = filterRoot.value;
+    var map = allRootsMap();
+    var keys = Object.keys(map).sort();
+    filterRoot.innerHTML = '<option value="all">All roots</option>' + keys.map(function(k){ return '<option value="'+escapeAttr(k)+'">'+escapeHtml(map[k].label)+' ('+map[k].count+')</option>'; }).join('');
+    if(keys.indexOf(current) !== -1) filterRoot.value = current;
+    var dl = document.getElementById('rootDatalist');
+    if(dl) dl.innerHTML = keys.map(function(k){ return '<option value="'+escapeAttr(map[k].label)+'"></option>'; }).join('');
+  }
+  function rootsPromptHint(batchRoot){
+    var map = allRootsMap();
+    var labels = Object.keys(map).sort().slice(0, 80).map(function(k){ return map[k].label; });
+    var lines = [];
+    if(batchRoot){ lines.push('All of these terms share the root "' + batchRoot + '" - put exactly this text in each term\'s "root" field (add a second root after a semicolon only if one genuinely applies).'); }
+    if(labels.length){ lines.push('Roots already used in this register - reuse the exact same wording whenever one applies instead of inventing a new variant: ' + labels.join('; ') + '.'); }
+    return lines.length ? lines.join('\n') + '\n' : '';
+  }
+  function tagKey(t){ return String(t || '').toLowerCase().replace(/[^a-z\u00c0-\u024f]+/g, ''); }
+  function renderRootBanner(){
+    var box = document.getElementById('rootBanner');
+    var rt = filterRoot.value;
+    if(!isModeratorUser || rt === 'all'){ box.innerHTML = ''; return; }
+    var map = allRootsMap();
+    var label = map[rt] ? map[rt].label : rt;
+    var tagName = allTags().find(function(t){ return tagKey(t) === rt; });
+    if(!tagName){ box.innerHTML = ''; return; }
+    var lacking = words.filter(function(w){ return (w.tags||[]).indexOf(tagName) !== -1 && rootKeysOf(w.root).indexOf(rt) === -1; });
+    if(lacking.length === 0){ box.innerHTML = ''; return; }
+    box.innerHTML = '<div class="root-banner"><div class="rb-text"><b>' + lacking.length + ' more word' + (lacking.length === 1 ? ' is' : 's are') + ' tagged “' + escapeHtml(tagName) + '” but ' + (lacking.length === 1 ? "doesn't" : "don't") + ' carry this root yet.</b> Move them to the root so they group here automatically.</div>' +
+      '<button class="btn sm" id="rootBannerMove">Move tag to root</button><button class="btn ghost sm" id="rootBannerMoveRemove">Move and remove tag</button></div>';
+    document.getElementById('rootBannerMove').addEventListener('click', function(){ migrateTagToRoot(tagName, label, false); });
+    document.getElementById('rootBannerMoveRemove').addEventListener('click', function(){ migrateTagToRoot(tagName, label, true); });
+  }
+  async function migrateTagToRoot(tag, rootValue, removeTag){
+    if(!isModeratorUser){ showToast('Only moderators can do this.'); return; }
+    rootValue = String(rootValue || '').trim();
+    if(!tag || !rootValue){ showToast('Pick a tag and enter a root.'); return; }
+    var affected = words.filter(function(w){ return (w.tags||[]).indexOf(tag) !== -1; });
+    if(affected.length === 0){ showToast('No words have that tag.'); return; }
+    try{
+      var changed = 0;
+      for(var i = 0; i < affected.length; i += 300){
+        var batch = db.batch();
+        var any = false;
+        affected.slice(i, i + 300).forEach(function(w){
+          var upd = {};
+          var merged = mergeRoot(w.root, rootValue);
+          if(merged !== (w.root || '')) upd.root = merged;
+          if(removeTag) upd.tags = (w.tags || []).filter(function(t){ return t !== tag; });
+          if(Object.keys(upd).length){ batch.update(db.collection('words').doc(w.id), upd); any = true; changed++; }
+        });
+        if(any) await batch.commit();
+      }
+      logActivity('tag_to_root', {term: tag + ' → ' + rootValue, count: changed});
+      showToast('Moved ' + changed + ' word' + (changed === 1 ? '' : 's') + ' from tag “' + tag + '” to root ' + rootValue + (removeTag ? ' (tag removed).' : '.'));
+    }catch(e){ showToast('Could not move: ' + e.message); }
+  }
 
   function allTags(){
     var set = {};
@@ -1388,9 +2548,10 @@ listBlock,
 
   function getFiltered(){
     var q = searchBox.value.trim().toLowerCase();
-    var ty = filterType.value, tg = filterTag.value, st = filterStatus.value;
+    var ty = filterType.value, tg = filterTag.value, st = filterStatus.value, rt = filterRoot.value;
     var list = viewEntries().filter(function(e){
-      if(q && e.term.toLowerCase().indexOf(q) === -1) return false;
+      if(q && e.term.toLowerCase().indexOf(q) === -1 && String(e.root||'').toLowerCase().indexOf(q) === -1 && String(e.english_meaning||'').toLowerCase().indexOf(q) === -1) return false;
+      if(rt !== 'all' && rootKeysOf(e.root).indexOf(rt) === -1) return false;
       if(ty !== 'all' && e.type !== ty) return false;
       if(tg !== 'all' && (e.tags||[]).indexOf(tg) === -1) return false;
       if(st === '0' && e.confidence !== 0) return false;
@@ -1407,6 +2568,8 @@ listBlock,
 
   function renderLibrary(){
     refreshTagFilter();
+    refreshRootFilter();
+    renderRootBanner();
     var grid = document.getElementById('libraryGrid');
     var countEl = document.getElementById('libraryResultCount');
     if(words.length === 0){
@@ -1416,7 +2579,7 @@ listBlock,
       return;
     }
     var list = getFiltered();
-    var filtersActive = !!(searchBox.value.trim() || filterType.value !== 'all' || filterTag.value !== 'all' || filterStatus.value !== 'all');
+    var filtersActive = !!(searchBox.value.trim() || filterType.value !== 'all' || filterTag.value !== 'all' || filterStatus.value !== 'all' || filterRoot.value !== 'all');
     countEl.textContent = list.length + ' word' + (list.length===1?'':'s') + (filtersActive ? ' matching your filters' : ' in your library');
     if(list.length === 0){
       grid.style.display = 'block';
@@ -1424,7 +2587,13 @@ listBlock,
       return;
     }
     grid.style.display = 'grid';
+    if(libraryAnimate){ libraryAnimateUntil = Date.now() + 700; }
+    var animateNow = libraryAnimate || Date.now() < libraryAnimateUntil;
+    libraryAnimate = false;
+    grid.classList.toggle('animate-in', animateNow);
+    libraryAnimatingRender = animateNow;
     grid.innerHTML = list.map(cardHtml).join('');
+    libraryAnimatingRender = false;
     grid.querySelectorAll('[data-action]').forEach(function(btn){
       btn.addEventListener('click', function(ev){ ev.stopPropagation(); handleCardAction(btn.dataset.action, btn.dataset.id); });
     });
@@ -1448,9 +2617,11 @@ listBlock,
   function confDotsHtml(id, level){
     var dots = '';
     for(var i=1;i<=5;i++){
-      dots += '<button class="conf-dot '+(i<=level?'filled':'')+'" data-conf-id="'+id+'" data-level="'+i+'" title="Set to level '+i+'"></button>';
+      dots += '<button class="conf-dot '+(i<=level?'filled':'')+'" data-conf-id="'+id+'" data-level="'+i+'" title="Set to level '+i+'" aria-label="Set confidence to level '+i+'">'+i+'</button>';
     }
-    return '<div class="conf-dots'+(level>=5?' mastered':'')+'">'+dots+'</div>';
+    var lvCls = level >= 5 ? ' mastered' : (level >= 3 ? ' lv-mid' : (level >= 1 ? ' lv-low' : ''));
+    var just = (lastConfSet && lastConfSet.id === id && Date.now() - lastConfSet.t < 1500) ? ' just-set' : '';
+    return '<div class="conf-dots'+lvCls+just+'">'+dots+'</div>';
   }
   function confLabel(level){
     if(level >= 5) return 'Memorized';
@@ -1473,7 +2644,7 @@ listBlock,
     renderLibrary();
   });
 
-  function cardHtml(e){
+  function cardHtml(e, idx){
     var revealed = !coverModeOn || !!coverRevealed[e.id];
     var synAnto = (e.synonyms&&e.synonyms.length) || (e.antonyms&&e.antonyms.length) ? (
       '<div class="fb-row2">' +
@@ -1494,7 +2665,7 @@ listBlock,
       (e.type==='idiom' ? fieldBox('fb-origin','origin', e.origin) : '')
     ) : '<div style="text-align:center; color:var(--ink-faint); font-size:13px; font-style:italic; padding:16px 0;">Tap to reveal</div>';
     return '' +
-    '<div class="vcard conf-'+e.confidence+'" data-id="'+e.id+'">' +
+    '<div class="vcard conf-'+e.confidence+'" data-id="'+e.id+'"'+(libraryAnimatingRender && idx < 30 ? ' style="animation-delay:'+(idx*45)+'ms"' : '')+'>' +
       '<div class="vcard-top">' +
         '<div><div class="term">'+escapeHtml(e.term)+' <button class="iconbtn" data-action="speak" data-id="'+e.id+'" title="Listen" style="font-size:14px; vertical-align:middle;">🔊</button></div><div class="pos">'+escapeHtml(e.part_of_speech||'-')+'</div></div>' +
         '<span class="badge '+e.type+'">'+TYPE_LABELS[e.type]+'</span>' +
@@ -1519,6 +2690,13 @@ listBlock,
     var hadRecord = !!(progressMap[id] && typeof progressMap[id].confidence === 'number');
     var prevLevel = hadRecord ? progressMap[id].confidence : null;
     progressMap[id] = Object.assign({}, progressMap[id], patch);
+    if(typeof patch.confidence === 'number'){
+      lastConfSet = { id: id, t: Date.now() };
+      if(patch.confidence === 5 && prevLevel !== 5){
+        var cw = words.find(function(x){ return x.id === id; });
+        if(cw) celebrate(cw.term);
+      }
+    }
     var writes = [db.collection('users').doc(currentUser.uid).collection('progress').doc(id).set(patch, {merge:true})];
     if(typeof patch.confidence === 'number' && patch.confidence !== prevLevel){
       var incObj = {};
@@ -1585,7 +2763,7 @@ listBlock,
     '<div class="field"><label class="field-label">SSC exam history / importance</label><textarea id="f_hist" style="min-height:55px;">'+escapeHtml(e.ssc_history||'')+'</textarea></div>' +
     '<div class="field-2col">' +
       '<div class="field"><label class="field-label">Confusable with (e.g. "Effect")</label><input type="text" id="f_confuse" value="'+escapeAttr(e.confusable_with||'')+'"></div>' +
-      '<div class="field"><label class="field-label">Root (e.g. "greg = flock/herd")</label><input type="text" id="f_root" value="'+escapeAttr(e.root||'')+'"></div>' +
+      '<div class="field"><label class="field-label">Root (e.g. "greg = flock/herd")</label><input type="text" id="f_root" list="rootDatalist" value="'+escapeAttr(e.root||'')+'"></div>' +
     '</div>' +
     '<div class="field"><label style="display:flex; gap:10px; align-items:flex-start; cursor:pointer;">' +
       '<input type="checkbox" id="f_spelltrap" style="margin-top:3px; width:18px; height:18px;" '+(e.spelling_trap?'checked':'')+'>' +
@@ -2259,11 +3437,12 @@ listBlock,
   function renderRoots(){
     var area = document.getElementById('rootsArea');
     var groups = {};
+    var rmap = allRootsMap();
     words.forEach(function(w){
-      if(!w.root) return;
-      var key = w.root.trim().toLowerCase();
-      if(!groups[key]) groups[key] = { label: w.root.trim(), items: [] };
-      groups[key].items.push(w);
+      rootKeysOf(w.root).forEach(function(key){
+        if(!groups[key]) groups[key] = { label: rmap[key] ? rmap[key].label : key, items: [] };
+        groups[key].items.push(w);
+      });
     });
     var clusters = Object.keys(groups).map(function(k){ return groups[k]; }).filter(function(g){ return g.items.length >= 2; });
     if(clusters.length === 0){
@@ -2378,6 +3557,7 @@ listBlock,
     lastEnrichPrompt = [
 'You are updating an existing SSC CGL vocabulary register. For each term below, provide ONLY three additional fields — do not regenerate the meaning or anything else. The list below is numbered with "N. Term (Type)" purely for readability — in your JSON, the "term" field must contain ONLY the bare term text itself, with no leading number and no trailing "(Type)" label.',
 '',
+rootsPromptHint(''),
 'Terms:',
 listBlock,
 '',
@@ -2814,7 +3994,7 @@ listBlock,
         return '<div class="vcard" style="cursor:default;">' +
           '<div class="vcard-top">' +
             '<div style="display:flex; align-items:center; gap:10px;">' +
-              '<span style="font-family:\'Fraunces\',serif; font-size:18px; font-weight:600; color:var(--ink-faint); width:24px; flex-shrink:0;">#'+(i+1)+'</span>' +
+              '<span style="font-family:var(--font-display); font-size:18px; font-weight:600; color:var(--ink-faint); width:24px; flex-shrink:0;">#'+(i+1)+'</span>' +
               (u.photoURL ? '<img class="avatar" src="'+u.photoURL+'" style="width:32px;height:32px;">' : '') +
               '<div class="term" style="font-size:16px;">'+escapeHtml(u.displayName||u.email||'Someone')+'</div>' +
             '</div>' +
@@ -2922,7 +4102,11 @@ listBlock,
     word_added: 'added', words_added: 'added',
     word_submitted: 'submitted', words_submitted: 'submitted',
     word_approved: 'approved', words_approved: 'approved',
-    word_rejected: 'rejected', words_rejected: 'rejected'
+    word_rejected: 'rejected', words_rejected: 'rejected',
+    spellwords_added: 'added to the Spelling Bank', spellwords_submitted: 'submitted to the Spelling Bank',
+    spellword_approved: 'approved a Spelling Bank word', spellwords_approved: 'approved Spelling Bank words',
+    spellword_rejected: 'rejected a Spelling Bank word', spellwords_rejected: 'rejected Spelling Bank words',
+    tag_to_root: 'moved a tag to a root'
   };
   async function renderActivityFeed(){
     var box = document.getElementById('activityFeedArea');
@@ -3017,7 +4201,20 @@ listBlock,
     var optsHtml = tags.map(function(t){ return '<option value="'+escapeAttr(t)+'">'+escapeHtml(t)+'</option>'; }).join('');
     document.getElementById('renameTagFrom').innerHTML = optsHtml || '<option value="">No tags yet</option>';
     document.getElementById('deleteTagSelect').innerHTML = optsHtml || '<option value="">No tags yet</option>';
+    document.getElementById('tagToRootFrom').innerHTML = optsHtml || '<option value="">No tags yet</option>';
   }
+
+  document.getElementById('tagToRootFrom').addEventListener('change', function(){
+    var k = tagKey(this.value);
+    var map = allRootsMap();
+    var v = document.getElementById('tagToRootValue');
+    if(map[k] && !v.value) v.value = map[k].label;
+  });
+  document.getElementById('tagToRootBtn').addEventListener('click', async function(){
+    await migrateTagToRoot(document.getElementById('tagToRootFrom').value, document.getElementById('tagToRootValue').value, document.getElementById('tagToRootRemove').checked);
+    document.getElementById('tagToRootValue').value = '';
+    renderTagToolSelects();
+  });
 
   document.getElementById('renameTagBtn').addEventListener('click', async function(){
     var from = document.getElementById('renameTagFrom').value;
@@ -3095,9 +4292,9 @@ listBlock,
       {label:'61–80%', items:[]}, {label:'81–100%', items:[]}
     ];
     withData.forEach(function(w){
-      var total = Object.keys(w.confLevels).reduce(function(s,k){ return s + (w.confLevels[k]||0); }, 0);
+      var total = Object.keys(w.confLevels).reduce(function(s,k){ return s + Math.max(0, w.confLevels[k]||0); }, 0);
       if(total === 0) return;
-      var weighted = Object.keys(w.confLevels).reduce(function(s,k){ return s + (parseInt(k,10) * (w.confLevels[k]||0)); }, 0);
+      var weighted = Object.keys(w.confLevels).reduce(function(s,k){ return s + (parseInt(k,10) * Math.max(0, w.confLevels[k]||0)); }, 0);
       var pct = Math.round(weighted / (5*total) * 100);
       var idx = pct <= 20 ? 0 : pct <= 40 ? 1 : pct <= 60 ? 2 : pct <= 80 ? 3 : 4;
       buckets[idx].items.push({id: w.id, term: w.term, pct: pct});
