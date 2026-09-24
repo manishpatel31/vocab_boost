@@ -1088,6 +1088,13 @@
         <div id="moderatorsList" style="margin-top:14px;"></div>
       </div>
 
+      <div class="panel" style="max-width:700px;">
+        <h2>Lock-screen app</h2>
+        <p class="help" style="margin-top:0;">Publishes your whole library (word, meaning, Hindi, synonyms, sentence, trick, tags…) for the Vocab Lock Android app to download. Publish again whenever you add or edit words, then tap “Refresh words” in the app.</p>
+        <div class="row-actions"><button class="btn teal" id="publishLockFeedBtn">Publish words to lock-screen app</button></div>
+        <p class="help" id="lockFeedStatus" style="margin-bottom:0;"></p>
+      </div>
+
       <div class="panel" style="max-width:900px;">
         <h2>Activity feed</h2>
         <div id="activityFeedArea"></div>
@@ -5112,8 +5119,63 @@ listBlock,
     renderTagToolSelects();
     renderMissedWords();
     renderMasteryBreakdown();
+    renderLockFeedStatus();
     document.getElementById('dupesArea').innerHTML = '';
   }
+
+  // ---------------- lock-screen app feed ----------------
+  var LOCK_PART = 300;   // words per document, keeps each well under Firestore's 1 MB limit
+  function lockItem(w){
+    return {
+      t: w.term || '', y: w.type || 'other', p: (w.part_of_speech && w.part_of_speech !== '-') ? w.part_of_speech : '',
+      m: w.english_meaning || '', h: w.hindi_meaning || '',
+      s: (w.synonyms || []).join(', '), a: (w.antonyms || []).join(', '),
+      e: w.ssc_sentence || '', k: w.mnemonic || '', x: w.ssc_history || '', c: w.confusable_with || '',
+      r: w.root || '', n: w.spelling_note || '', o: (w.type === 'idiom' && w.origin && w.origin !== '-') ? w.origin : '',
+      g: w.tags || []
+    };
+  }
+  async function renderLockFeedStatus(force){
+    var el = document.getElementById('lockFeedStatus');
+    if(!el) return;
+    if(!force && recentlyFetched('lockfeed', 60000)) return;
+    try{
+      var meta = await db.collection('lockFeed').doc('meta').get();
+      if(!meta.exists){ el.textContent = 'Not published yet.'; return; }
+      var d = meta.data();
+      var when = d.updatedAt && d.updatedAt.toMillis ? new Date(d.updatedAt.toMillis()).toLocaleString() : 'just now';
+      el.textContent = 'Last published: ' + (d.count || 0) + ' words · ' + when + '.' + (words.length !== d.count ? ' Your library now has ' + words.length + ' — publish again to update the app.' : '');
+    }catch(e){ el.textContent = 'Could not check the feed: ' + e.message; }
+  }
+  document.getElementById('publishLockFeedBtn').addEventListener('click', async function(){
+    if(!isModeratorUser){ showToast('Only moderators can publish.'); return; }
+    var btn = this;
+    var el = document.getElementById('lockFeedStatus');
+    if(!words.length){ showToast('Your library is empty.'); return; }
+    btn.disabled = true;
+    el.textContent = 'Publishing…';
+    try{
+      var items = words.map(lockItem);
+      var parts = [];
+      for(var i = 0; i < items.length; i += LOCK_PART) parts.push(JSON.stringify(items.slice(i, i + LOCK_PART)));
+      var oldMeta = await db.collection('lockFeed').doc('meta').get();
+      var oldParts = oldMeta.exists ? (oldMeta.data().parts || 0) : 0;
+      var batch = db.batch();
+      parts.forEach(function(js, i){ batch.set(db.collection('lockFeed').doc('p' + i), { json: js }); });
+      for(var j = parts.length; j < oldParts; j++) batch.delete(db.collection('lockFeed').doc('p' + j));
+      batch.set(db.collection('lockFeed').doc('meta'), {
+        parts: parts.length, count: items.length,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(), updatedBy: currentUser.email
+      });
+      await batch.commit();
+      logActivity('lock_feed_published', { count: items.length });
+      showToast('Published ' + items.length + ' words — tap “Refresh words” in the Vocab Lock app.');
+      renderLockFeedStatus(true);
+    }catch(e){
+      el.textContent = 'Could not publish: ' + e.message + (String(e.message).indexOf('permission') !== -1 ? ' (add the lockFeed rule to your Firestore rules)' : '');
+    }
+    btn.disabled = false;
+  });
 
   async function renderModeratorsList(force){
     if(!isAdminUser) return;
@@ -5178,7 +5240,8 @@ listBlock,
     spellwords_added: 'added to the Spelling Bank', spellwords_submitted: 'submitted to the Spelling Bank',
     spellword_approved: 'approved a Spelling Bank word', spellwords_approved: 'approved Spelling Bank words',
     spellword_rejected: 'rejected a Spelling Bank word', spellwords_rejected: 'rejected Spelling Bank words',
-    tag_to_root: 'moved a tag to a root'
+    tag_to_root: 'moved a tag to a root',
+    lock_feed_published: 'published words to the lock-screen app'
   };
   async function renderActivityFeed(){
     if(recentlyFetched('activity', 60000)) return;
