@@ -541,10 +541,10 @@
   .aod-content.aod-swap{ animation:aodIn .45s ease backwards; }
   .aod-dim-1 .aod-content{ opacity:.72; }
   .aod-dim-2 .aod-content{ opacity:.45; }
-  .aod-term{ font-family:var(--font-display); font-size:clamp(34px, 8vw, 58px); font-weight:var(--h-weight); color:#D8D8D8; line-height:1.08; letter-spacing:-.01em; overflow-wrap:anywhere; }
+  .aod-term{ font-family:var(--font-display); font-size:clamp(34px, 8vw, 58px); font-weight:400; color:#D0D0D0; line-height:1.08; letter-spacing:-.01em; overflow-wrap:anywhere; }
   .aod-sub{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:10px; font-size:13px; color:#5C5C5C; }
   .aod-type{ border:1px solid #333; border-radius:999px; padding:3px 10px; text-transform:uppercase; letter-spacing:.07em; font-size:10.5px; font-weight:700; color:#6E6E6E; }
-  .aod-meaning{ font-size:clamp(17px, 4.4vw, 23px); line-height:1.45; color:#B4B4B4; margin-top:18px; }
+  .aod-meaning{ font-size:clamp(17px, 4.4vw, 23px); font-weight:400; line-height:1.45; color:#ABABAB; margin-top:18px; }
   .aod-hindi{ font-family:var(--font-hindi); font-size:clamp(17px, 4.2vw, 22px); color:#8E8E8E; margin-top:8px; }
   .aod-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:14px 22px; margin-top:22px; }
   .aod-field{ font-size:14.5px; line-height:1.5; color:#8C8C8C; }
@@ -561,6 +561,19 @@
   .aod-hint{ text-align:center; font-size:12px; color:#444; flex-shrink:0; padding-top:6px; transition:opacity 1.2s ease; }
   .aod-hint.gone{ opacity:0; }
   body.aod-on{ overflow:hidden; }
+  /* nothing behind the black screen keeps drawing or animating */
+  body.aod-on #appShell{ visibility:hidden; }
+  body.aod-on #appShell *, body.aod-on #appShell *::before, body.aod-on #appShell *::after{ animation-play-state:paused !important; }
+  /* low-power layout: word, meaning, Hindi only; details on request */
+  .aod-more{ display:none; margin-top:16px; border:1px solid #262626; background:transparent; color:#555; border-radius:999px; padding:9px 16px; font-size:13px; }
+  .aod-min .aod-more{ display:inline-block; }
+  .aod-min .aod-grid, .aod-min .aod-bottom{ display:none; }
+  .aod-min.aod-expanded .aod-grid{ display:grid; }
+  .aod-min.aod-expanded .aod-bottom{ display:flex; }
+  .aod-min.aod-expanded .aod-more{ display:none; }
+  .aod-min .aod-term{ font-size:clamp(30px, 7vw, 46px); }
+  .aod-min .aod-meaning{ font-size:clamp(16px, 4vw, 20px); }
+  #aodMinBtn.on{ color:#8C8C8C; }
   body.aod-on .celebrate, body.aod-on .toast{ z-index:700; }
   @keyframes aodIn{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:none; } }
 
@@ -624,6 +637,7 @@
   <div class="aod-top">
     <span id="aodCounter"></span>
     <span>
+      <button class="aod-ctl" id="aodMinBtn" aria-label="Low-power layout: show fewer lit pixels"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"></path></svg></button>
       <button class="aod-ctl" id="aodDimBtn" aria-label="Change dimness"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 3v18" ></path><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"></path></svg></button>
       <button class="aod-ctl" id="aodExitBtn" aria-label="Exit AOD mode"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
     </span>
@@ -4313,6 +4327,8 @@ listBlock,
   var aodShiftTimer = null;
   var aodHintTimer = null;
   var aodDim = parseInt(lsGet('vocabAodDim') || '1', 10) || 0;
+  var aodMin = lsGet('vocabAodMin') === '1';
+  function applyAodMin(){ aodOverlayEl.classList.toggle('aod-min', aodMin); document.getElementById('aodMinBtn').classList.toggle('on', aodMin); }
   var aodOverlayEl = document.getElementById('aodOverlay');
   function aodOpen(){ return aodOverlayEl.classList.contains('open'); }
   function aodField(cls, label, val){
@@ -4334,6 +4350,7 @@ listBlock,
     aodIdx = 0;
     aodOverlayEl.classList.remove('aod-dim-1', 'aod-dim-2');
     if(aodDim) aodOverlayEl.classList.add('aod-dim-' + aodDim);
+    applyAodMin();
     aodOverlayEl.classList.add('open');
     document.body.classList.add('aod-on');
     closeAllMenus();
@@ -4375,6 +4392,7 @@ listBlock,
       '<div class="aod-sub"><span class="aod-type">' + escapeHtml(TYPE_LABELS[e.type] || 'Other') + '</span>' + (e.part_of_speech && e.part_of_speech !== '-' ? '<span>' + escapeHtml(e.part_of_speech) + '</span>' : '') + '</div>' +
       (e.english_meaning ? '<div class="aod-meaning">' + escapeHtml(e.english_meaning) + '</div>' : '') +
       (e.hindi_meaning ? '<div class="aod-hindi">' + escapeHtml(e.hindi_meaning) + '</div>' : '') +
+      '<button class="aod-more" id="aodMoreBtn">Show details</button>' +
       '<div class="aod-grid">' +
         aodField('aod-syn', 'synonyms', e.synonyms && e.synonyms.length ? e.synonyms.join(', ') : '') +
         aodField('aod-anto', 'antonyms', e.antonyms && e.antonyms.length ? e.antonyms.join(', ') : '') +
@@ -4396,6 +4414,7 @@ listBlock,
   function aodStep(dir){
     if(!aodList.length) return;
     aodIdx += dir;
+    aodOverlayEl.classList.remove('aod-expanded');
     if(aodIdx >= aodList.length){ aodIdx = 0; showToast('Back to the first word.'); }
     if(aodIdx < 0) aodIdx = aodList.length - 1;
     paintAod();
@@ -4403,6 +4422,7 @@ listBlock,
   aodOverlayEl.addEventListener('click', function(ev){
     var t = ev.target;
     if(t.closest && t.closest('.aod-ctl')) return;
+    if(t.closest && t.closest('.aod-more')){ aodOverlayEl.classList.add('aod-expanded'); return; }
     var dot = t.closest && t.closest('.conf-dot');
     if(dot){
       var id = dot.dataset.confId, lvl = +dot.dataset.level;
@@ -4415,6 +4435,14 @@ listBlock,
     aodStep(ev.clientX < w * 0.22 ? -1 : 1);
   });
   document.getElementById('aodExitBtn').addEventListener('click', function(ev){ ev.stopPropagation(); exitAod(); });
+  document.getElementById('aodMinBtn').addEventListener('click', function(ev){
+    ev.stopPropagation();
+    aodMin = !aodMin;
+    lsSet('vocabAodMin', aodMin ? '1' : '0');
+    aodOverlayEl.classList.remove('aod-expanded');
+    applyAodMin();
+    showToast(aodMin ? 'Low-power layout: word, meaning and Hindi only' : 'Full layout: all details');
+  });
   document.getElementById('aodDimBtn').addEventListener('click', function(ev){
     ev.stopPropagation();
     aodDim = (aodDim + 1) % 3;
