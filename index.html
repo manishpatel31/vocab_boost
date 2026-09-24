@@ -470,6 +470,100 @@
   .rg-settings input[type=number]{ width:84px; background:var(--card); border:1.5px solid var(--rule); border-radius:var(--radius); padding:7px 9px; color:var(--ink); font:inherit; }
   .panel h3.rg-h{ font-size:16px; margin:22px 0 2px; }
 
+  /* ---------- daily goal + streak ---------- */
+  .top-right{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .goal-widget{ display:flex; align-items:center; gap:12px; padding:8px 14px 8px 8px; background:var(--card); border:1px solid var(--rule); border-radius:var(--radius-lg); box-shadow:var(--shadow); color:var(--ink); text-align:left; transition:transform .15s ease, box-shadow .2s ease, border-color .2s ease; }
+  .goal-widget:hover{ transform:translateY(-2px); box-shadow:var(--shadow-lg); }
+  .goal-widget.done{ border-color:var(--teal); }
+  body.theme-indigo .goal-widget.done{ border-color:var(--gold); }
+  .gw-ring{ position:relative; width:48px; height:48px; flex-shrink:0; }
+  .gw-ring svg{ transform:rotate(-90deg); display:block; }
+  .gw-arc{ stroke:var(--teal); transition:stroke-dasharray .6s cubic-bezier(.2,.8,.2,1); }
+  body.theme-indigo .gw-arc{ stroke:var(--accent); }
+  .goal-widget.done .gw-arc{ stroke:var(--gold); }
+  .gw-num{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px; }
+  .gw-text{ display:flex; flex-direction:column; line-height:1.2; }
+  .gw-label{ font-size:10.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint); }
+  .goal-widget.done .gw-label{ color:var(--teal); }
+  body.theme-indigo .goal-widget.done .gw-label{ color:var(--gold); }
+  .gw-val{ font-family:var(--font-display); font-size:16px; font-weight:var(--h-weight); white-space:nowrap; }
+  .gw-streak{ display:flex; align-items:center; gap:3px; font-weight:800; font-size:19px; padding-left:12px; border-left:1px solid var(--rule); color:var(--ink-faint); }
+  .gw-streak.alive{ color:var(--mustard-deep); }
+  body.theme-indigo .gw-streak.alive{ color:var(--mustard); }
+  .gw-streak.risk{ color:var(--maroon); }
+  .gw-streak.alive svg, .gw-streak.risk svg, .streak-big:not(.cold) svg, .celebrate-streak .celebrate-badge svg{ animation:flicker 1.6s ease-in-out infinite; transform-origin:50% 85%; }
+  .celebrate-streak .celebrate-badge{ background:var(--mustard); color:#1B1203; }
+  .goal-presets{ display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin:12px 0 14px; }
+  .goal-preset{ padding:12px 6px; border-radius:var(--radius); border:2px solid var(--rule); background:var(--card); color:var(--ink); font-size:22px; font-weight:800; font-family:var(--font-display); transition:border-color .2s ease, transform .15s ease; }
+  .goal-preset:hover{ transform:translateY(-2px); }
+  .goal-preset small{ display:block; font-size:11px; font-weight:600; font-family:var(--font-body); color:var(--ink-soft); margin-top:2px; }
+  .goal-preset.on{ border-color:var(--mustard); background:var(--paper-deep); }
+  body.theme-indigo .goal-preset.on{ border-color:var(--accent); }
+  .streak-hero{ display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
+  .streak-big{ display:flex; align-items:center; gap:6px; font-family:var(--font-display); font-size:48px; font-weight:800; line-height:1; color:var(--mustard-deep); }
+  body.theme-indigo .streak-big{ color:var(--mustard); }
+  .streak-big svg{ width:44px; height:44px; }
+  .streak-big.cold{ color:var(--ink-faint); }
+  .streak-meta{ display:flex; flex-direction:column; gap:3px; }
+  .streak-meta b{ font-size:17px; }
+  .streak-meta span{ font-size:13px; color:var(--ink-soft); }
+  .heatmap{ display:grid; grid-auto-flow:column; grid-template-rows:repeat(7, 14px); grid-auto-columns:14px; gap:4px; overflow-x:auto; padding:4px 0; }
+  .hm-cell{ width:14px; height:14px; border-radius:4px; background:var(--paper-deep); display:inline-block; }
+  .hm-cell.l1{ background:var(--teal); opacity:.35; }
+  .hm-cell.l2{ background:var(--teal); opacity:.65; }
+  .hm-cell.l3{ background:var(--teal); }
+  body.theme-indigo .hm-cell.l1, body.theme-indigo .hm-cell.l2{ background:var(--accent); }
+  body.theme-indigo .hm-cell.l3{ background:var(--gold); }
+  .hm-cell.today{ outline:2px solid var(--ink-faint); outline-offset:1px; }
+  .hm-legend{ display:flex; align-items:center; gap:4px; font-size:11.5px; color:var(--ink-faint); margin-top:6px; }
+  .hm-legend span:first-child{ margin-right:2px; } .hm-legend span:last-child{ margin-left:4px; }
+  .badges{ display:flex; gap:10px; flex-wrap:wrap; }
+  .badge-tile{ display:flex; flex-direction:column; align-items:center; gap:3px; width:96px; padding:10px 6px; border-radius:var(--radius); border:1px dashed var(--rule); background:var(--paper-deep); text-align:center; font-size:11.5px; color:var(--ink-faint); }
+  .badge-tile .bt-num{ font-family:var(--font-display); font-size:22px; font-weight:800; }
+  .badge-tile.earned{ background:var(--card); color:var(--ink); border:1px solid var(--mustard); box-shadow:var(--shadow); }
+  .badge-tile.earned .bt-num{ color:var(--mustard-deep); }
+  body.theme-indigo .badge-tile.earned .bt-num{ color:var(--mustard); }
+  .lb-streak{ display:inline-flex; align-items:center; gap:2px; color:var(--mustard-deep); font-weight:700; }
+  body.theme-indigo .lb-streak{ color:var(--mustard); }
+  .lb-streak svg{ width:13px; height:13px; }
+  @keyframes flicker{ 0%,100%{ transform:scale(1) rotate(-3deg); } 50%{ transform:scale(1.1) rotate(3deg); } }
+  @media (max-width: 860px){ .top-right{ width:100%; } .goal-widget{ flex:1 1 auto; } }
+
+  /* ---------- AOD mode (pure black, dim, stays awake) ---------- */
+  .aod-overlay{ position:fixed; inset:0; z-index:600; background:#000; color:#8C8C8C; display:none; flex-direction:column; font-family:var(--font-body); cursor:pointer; user-select:none; -webkit-user-select:none; padding:max(12px, env(safe-area-inset-top)) 18px max(12px, env(safe-area-inset-bottom)); }
+  .aod-overlay.open{ display:flex; animation:fadeIn .5s ease both; }
+  .aod-top{ display:flex; justify-content:space-between; align-items:center; color:#444; font-size:12px; letter-spacing:.08em; flex-shrink:0; }
+  .aod-ctl{ width:44px; height:44px; border:none; background:transparent; color:#444; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; }
+  .aod-ctl:hover{ color:#8C8C8C; }
+  .aod-stage{ flex:1; min-height:0; overflow-y:auto; display:flex; justify-content:center; scrollbar-width:none; }
+  .aod-stage::-webkit-scrollbar{ display:none; }
+  .aod-content{ width:100%; max-width:780px; margin:auto 0; padding:18px 4px; transition:transform 1.5s ease; }
+  .aod-content.aod-swap{ animation:aodIn .45s ease backwards; }
+  .aod-dim-1 .aod-content{ opacity:.72; }
+  .aod-dim-2 .aod-content{ opacity:.45; }
+  .aod-term{ font-family:var(--font-display); font-size:clamp(34px, 8vw, 58px); font-weight:var(--h-weight); color:#D8D8D8; line-height:1.08; letter-spacing:-.01em; overflow-wrap:anywhere; }
+  .aod-sub{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:10px; font-size:13px; color:#5C5C5C; }
+  .aod-type{ border:1px solid #333; border-radius:999px; padding:3px 10px; text-transform:uppercase; letter-spacing:.07em; font-size:10.5px; font-weight:700; color:#6E6E6E; }
+  .aod-meaning{ font-size:clamp(17px, 4.4vw, 23px); line-height:1.45; color:#B4B4B4; margin-top:18px; }
+  .aod-hindi{ font-family:var(--font-hindi); font-size:clamp(17px, 4.2vw, 22px); color:#8E8E8E; margin-top:8px; }
+  .aod-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:14px 22px; margin-top:22px; }
+  .aod-field{ font-size:14.5px; line-height:1.5; color:#8C8C8C; }
+  .aod-field .aod-lbl{ display:block; font-size:10.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; margin-bottom:2px; }
+  .aod-syn .aod-lbl{ color:#4F8A78; } .aod-anto .aod-lbl{ color:#9A5A5A; } .aod-sent .aod-lbl{ color:#9A8350; }
+  .aod-trick .aod-lbl{ color:#806C9A; } .aod-hist .aod-lbl{ color:#9A7350; } .aod-confu .aod-lbl{ color:#9A5A5A; }
+  .aod-root .aod-lbl{ color:#4F9A7E; } .aod-spell .aod-lbl{ color:#9A8350; } .aod-origin .aod-lbl{ color:#5A7A9A; } .aod-tags .aod-lbl{ color:#5C5C5C; }
+  .aod-sent{ font-style:italic; }
+  .aod-bottom{ display:flex; justify-content:center; margin-top:24px; }
+  .aod-overlay .conf-row{ border-top:1px solid #1A1A1A; justify-content:center; gap:14px; }
+  .aod-overlay .conf-label{ color:#5C5C5C; }
+  .aod-overlay .conf-dot::before{ background:#1C1C1C; }
+  body.theme-indigo .aod-overlay .conf-dot{ background:#0B0B0B; border-color:#2A2A2A; color:#555; }
+  .aod-hint{ text-align:center; font-size:12px; color:#444; flex-shrink:0; padding-top:6px; transition:opacity 1.2s ease; }
+  .aod-hint.gone{ opacity:0; }
+  body.aod-on{ overflow:hidden; }
+  body.aod-on .celebrate, body.aod-on .toast{ z-index:700; }
+  @keyframes aodIn{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:none; } }
+
   /* ---------- motion ---------- */
   @keyframes rise{ from{ opacity:0; transform:translateY(16px) scale(.985); } to{ opacity:1; transform:none; } }
   @keyframes viewIn{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:none; } }
@@ -526,6 +620,18 @@
 <div class="modal-bg" id="modalBg"><div class="modal" id="modalBody"></div></div>
 <div class="toast" id="toast"></div>
 
+<div class="aod-overlay" id="aodOverlay" role="dialog" aria-label="AOD revision mode">
+  <div class="aod-top">
+    <span id="aodCounter"></span>
+    <span>
+      <button class="aod-ctl" id="aodDimBtn" aria-label="Change dimness"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 3v18" ></path><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"></path></svg></button>
+      <button class="aod-ctl" id="aodExitBtn" aria-label="Exit AOD mode"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
+    </span>
+  </div>
+  <div class="aod-stage" id="aodStage"><div class="aod-content" id="aodContent"></div></div>
+  <div class="aod-hint" id="aodHint">Tap for the next word · tap the left edge to go back</div>
+</div>
+
 <div class="slide-overlay" id="slideOverlay" style="display:none;">
   <button class="slide-close" id="slideClose" title="Exit full-screen view">✕</button>
   <div class="slide-body" id="slideBody"></div>
@@ -571,6 +677,7 @@
         <div class="navmenu">
           <button class="tab" data-tab="quiz"><b>Quiz</b><span>Fill in the blank, confusables, spelling</span></button>
           <button id="navPresentBtn"><b>Present</b><span>Full-screen flash cards of your current filters</span></button>
+          <button id="navAodBtn"><b>AOD mode</b><span>Dim black screen that stays on — tap for the next word</span></button>
           <button id="navPanicBtn"><b>Exam tomorrow</b><span>Cram your 30 weakest words</span></button>
         </div>
       </div>
@@ -609,6 +716,7 @@
         <button class="account-btn" aria-label="Account menu" aria-haspopup="true" aria-expanded="false"><span class="who" id="whoBox"></span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
         <div class="navmenu align-right">
           <button id="alertsSettingsBtn"><b>Alerts</b><span>Word reminders and new-word notifications</span></button>
+          <button id="goalSettingsBtn"><b>Daily goal</b><span>Words per day and your streak</span></button>
           <button id="displaySettingsBtn"><b>Display</b><span>Text size and dyslexia-friendly font</span></button>
           <button class="tab" data-tab="backup"><b>Backup</b><span>Export or import your register</span></button>
           <button id="installBtn" style="display:none;"><b>Install app</b><span>Add to your home screen or desktop</span></button>
@@ -624,11 +732,12 @@
         <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
           <h1 style="margin:0;">CGL Vocabulary Register</h1>
           <button class="btn ghost sm" id="presentBtn" title="Open full-screen slide view" style="display:inline-flex; align-items:center; gap:6px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg>Present</button>
+          <button class="btn ghost sm" id="aodBtn" title="Dim black screen that stays on — tap for the next word" style="display:inline-flex; align-items:center; gap:6px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>AOD mode</button>
           <button class="btn maroon sm" id="panicBtn" title="Build a cram list of your weakest words" style="display:inline-flex; align-items:center; gap:6px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"></path></svg>Exam tomorrow</button>
         </div>
         <div class="sub">Build your word bank with any AI, then drill it here.</div>
       </div>
-      <div class="stat-strip" id="statStrip"></div>
+      <div class="top-right"><button class="goal-widget" id="goalWidget" style="display:none;" aria-label="Daily goal and streak"></button><div class="stat-strip" id="statStrip"></div></div>
     </header>
 
     <section class="view active" id="view-library">
@@ -898,6 +1007,7 @@
     </section>
 
     <section class="view" id="view-stats">
+      <div class="panel" style="max-width:900px;" id="streakPanel"></div>
       <div class="panel" style="max-width:560px;"><h2>By confidence</h2><div id="statsByConf"></div></div>
       <div class="panel" style="max-width:560px;"><h2>By type</h2><div id="statsByType"></div></div>
       <div class="panel" style="max-width:560px;"><h2>By tag</h2><div id="statsByTag"></div></div>
@@ -1209,14 +1319,18 @@
   var unsubSpellWords = null, unsubSpellSubs = null;
   var rootGroups = [];
   var unsubRootGroups = null;
+  var myProfile = null;
+  var unsubMe = null;
 
   var toastTimer = null;
-  function celebrate(term){
+  var CHECK_SVG = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg>';
+  var FLAME_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2c.6 3.4-1.2 5.3-2.8 7.1C7.6 10.9 6 12.7 6 15.5 6 19.1 8.7 22 12 22s6-2.9 6-6.5c0-2.3-1-4-2.2-5.4-.3 1.4-1.1 2.5-2.3 3 .5-2.9-.2-5.1-1.5-7.1z"></path></svg>';
+  function showCelebration(kicker, text, iconHtml, variant){
     var old = document.getElementById('celebrateToast');
     if(old && old.parentNode) old.parentNode.removeChild(old);
     var el = document.createElement('div');
     el.id = 'celebrateToast';
-    el.className = 'celebrate';
+    el.className = 'celebrate' + (variant ? ' celebrate-' + variant : '');
     el.setAttribute('role', 'status');
     var falls = ['fallA', 'fallB', 'fallC'];
     var conf = '';
@@ -1224,14 +1338,15 @@
       conf += '<span class="confetti c' + (i % 5) + '" style="left:' + (6 + (i * 29) % 88) + '%;width:' + (i % 3 === 0 ? 9 : 6) + 'px;height:' + (i % 2 ? 11 : 6) + 'px;border-radius:' + (i % 4 === 0 ? '50%' : '2px') + ';animation-name:' + falls[i % 3] + ';animation-delay:' + (i * 50) + 'ms;"></span>';
     }
     el.innerHTML = '<div class="confetti-wrap" aria-hidden="true">' + conf + '</div>' +
-      '<span class="celebrate-badge"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg></span>' +
-      '<div class="celebrate-text"><span class="celebrate-kicker">Memorized</span><span class="celebrate-term">' + escapeHtml(term) + ' hit level 5</span></div>' +
+      '<span class="celebrate-badge">' + (iconHtml || CHECK_SVG) + '</span>' +
+      '<div class="celebrate-text"><span class="celebrate-kicker">' + escapeHtml(kicker) + '</span><span class="celebrate-term">' + escapeHtml(text) + '</span></div>' +
       '<button class="celebrate-close" aria-label="Dismiss"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>';
     document.body.appendChild(el);
     var remove = function(){ if(el.parentNode) el.parentNode.removeChild(el); };
     el.querySelector('.celebrate-close').addEventListener('click', remove);
-    setTimeout(function(){ el.classList.add('leaving'); setTimeout(remove, 380); }, 4200);
+    setTimeout(function(){ el.classList.add('leaving'); setTimeout(remove, 380); }, variant === 'streak' ? 5200 : 4200);
   }
+  function celebrate(term){ showCelebration('Memorized', term + ' hit level 5', CHECK_SVG); }
 
   function showToast(msg){
     var t = document.getElementById('toast');
@@ -1483,6 +1598,13 @@
 
   // ---------------- Firestore listeners ----------------
   function attachListeners(){
+    unsubMe = db.collection('users').doc(currentUser.uid).onSnapshot(function(doc){
+      myProfile = doc.exists ? (doc.data() || {}) : {};
+      renderGoalWidget();
+      if(isActive('stats')) renderStreakPanel();
+      maybeAskGoal();
+    }, function(err){ /* streaks are optional; the widget just stays hidden */ });
+
     unsubWords = db.collection('words').orderBy('createdAt','desc').onSnapshot(function(snap){
       var changes = typeof snap.docChanges === 'function' ? snap.docChanges() : null;
       var prev = {};
@@ -1558,6 +1680,9 @@
     if(unsubSpellWords) unsubSpellWords();
     if(unsubSpellSubs) unsubSpellSubs();
     if(unsubRootGroups) unsubRootGroups();
+    if(unsubMe) unsubMe();
+    unsubMe = null; myProfile = null;
+    var gwEl = document.getElementById('goalWidget'); if(gwEl) gwEl.style.display = 'none';
     unsubRootGroups = null; rootGroups = [];
     unsubWords = unsubProgress = unsubSubs = unsubNotif = unsubSpellWords = unsubSpellSubs = null;
     words = []; progressMap = {}; submissions = []; notifications = []; spellWords = []; spellSubmissions = [];
@@ -1619,7 +1744,7 @@
     if(name === 'library') libraryAnimate = true;
     window.scrollTo(0, 0);
     if(name === 'library') renderLibrary();
-    if(name === 'stats'){ renderStats(); renderLeaderboard(); renderAllUsers(); }
+    if(name === 'stats'){ renderStreakPanel(); renderStats(); renderLeaderboard(); renderAllUsers(); }
     if(name === 'review'){ renderReview(); renderSpellReview(); }
     if(name === 'quiz') renderQuizHome();
     if(name === 'roots') renderRoots();
@@ -2787,7 +2912,7 @@ listBlock,
   }
 
 
-  function setProgress(id, patch){
+  function setProgress(id, patch, opts){
     if(!currentUser) return Promise.resolve();
     var hadRecord = !!(progressMap[id] && typeof progressMap[id].confidence === 'number');
     var prevLevel = hadRecord ? progressMap[id].confidence : null;
@@ -2798,6 +2923,7 @@ listBlock,
         var cw = words.find(function(x){ return x.id === id; });
         if(cw) celebrate(cw.term);
       }
+      if(!(opts && opts.auto)) countTowardGoal(id, prevLevel, patch.confidence);
     }
     if(isActive('library')){ if(libraryPatchable()) patchCard(id); else scheduleRender(); }
     renderStatStrip();
@@ -2825,9 +2951,184 @@ listBlock,
       }
     }, 1500);
   }
+  // ================= daily goal + streak =================
+  var goalAskedThisSession = false;
+  var STREAK_BADGES = [[3, 'Warming up'], [7, 'Week warrior'], [14, 'Fortnight focus'], [30, 'Monthly master'], [50, 'Half-century'], [100, 'Centurion']];
+  function pad2(n){ return (n < 10 ? '0' : '') + n; }
+  function dateKey(d){ return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+  function dayKey(offset){ var d = new Date(); d.setDate(d.getDate() + (offset || 0)); return dateKey(d); }
+  function todayKey(){ return dayKey(0); }
+  function streakOf(u){ u = u || {}; var last = u.lastMetDay || ''; return (last === todayKey() || last === dayKey(-1)) ? (u.streakCurrent || 0) : 0; }
+  function todayCount(){ return (myProfile && myProfile.goalDay === todayKey()) ? (myProfile.goalIds || []).length : 0; }
+  function streakBadgeHtml(u){ var n = streakOf(u); return n ? ' · <span class="lb-streak" title="' + n + '-day streak">' + FLAME_SVG + n + '</span>' : ''; }
+
+  function renderGoalWidget(){
+    var el = document.getElementById('goalWidget');
+    if(!el) return;
+    if(!currentUser || !myProfile){ el.style.display = 'none'; return; }
+    el.style.display = 'flex';
+    var goal = myProfile.dailyGoal || 0;
+    var streak = streakOf(myProfile);
+    if(!goal){
+      el.classList.remove('done');
+      el.innerHTML = '<span class="gw-text"><span class="gw-label">Daily goal</span><span class="gw-val">Set a goal</span></span><span class="gw-streak">' + FLAME_SVG + streak + '</span>';
+      return;
+    }
+    var count = todayCount();
+    var met = myProfile.lastMetDay === todayKey();
+    var circ = 2 * Math.PI * 19;
+    var frac = Math.min(1, count / goal);
+    var late = new Date().getHours() >= 20;
+    var streakCls = streak ? (!met && late ? 'risk' : 'alive') : '';
+    var tip = streak ? (streak + '-day streak' + (!met && late ? ' — finish today to keep it!' : '')) : 'Hit today\'s goal to start a streak';
+    el.classList.toggle('done', met);
+    el.innerHTML = '<span class="gw-ring"><svg width="48" height="48" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="19" fill="none" stroke="var(--paper-deep)" stroke-width="5"></circle><circle class="gw-arc" cx="24" cy="24" r="19" fill="none" stroke-width="5" stroke-linecap="round" stroke-dasharray="' + (frac * circ).toFixed(1) + ' ' + circ.toFixed(1) + '"></circle></svg><span class="gw-num">' + count + '</span></span>' +
+      '<span class="gw-text"><span class="gw-label">' + (met ? 'Goal done' : 'Today') + '</span><span class="gw-val">' + count + ' / ' + goal + ' words</span></span>' +
+      '<span class="gw-streak ' + streakCls + '" title="' + escapeAttr(tip) + '">' + FLAME_SVG + streak + '</span>';
+  }
+
+  function maybeAskGoal(){
+    if(goalAskedThisSession || !myProfile || myProfile.dailyGoal) return;
+    if(lsGet('vocabGoalAsked') === '1') return;
+    goalAskedThisSession = true;
+    setTimeout(function(){ if(!modalBgRef().classList.contains('open')) openGoalModal(true); }, 700);
+  }
+
+  function openGoalModal(isFirst){
+    var goal = (myProfile && myProfile.dailyGoal) || 10;
+    var mode = (myProfile && myProfile.goalMode) || 'levelup';
+    var presets = [5, 10, 15, 20, 30, 50];
+    var hints = {5: 'Gentle', 10: 'Steady', 15: 'Focused', 20: 'Serious', 30: 'Intense', 50: 'Exam mode'};
+    modalBodyRef().innerHTML = '<h3>' + (isFirst ? 'Set your daily goal' : 'Daily goal') + '</h3>' +
+      '<p class="help" style="margin-top:0;">How many words do you want to learn each day? Hit it every day to build a streak.</p>' +
+      '<div class="goal-presets">' + presets.map(function(n){ return '<button class="goal-preset' + (n === goal ? ' on' : '') + '" data-goal="' + n + '">' + n + '<small>' + hints[n] + '</small></button>'; }).join('') + '</div>' +
+      '<div class="field"><label class="field-label" for="goalCustom">Or your own number</label><input type="text" inputmode="numeric" id="goalCustom" placeholder="e.g. 25" value="' + (presets.indexOf(goal) === -1 ? goal : '') + '"></div>' +
+      '<div class="menu-label" style="padding-left:0;">What counts toward the goal</div>' +
+      '<div class="seg-toggle" style="margin:0 0 8px;"><button data-gmode="levelup" class="' + (mode === 'levelup' ? 'on' : '') + '">Any word I level up</button><button data-gmode="memorized" class="' + (mode === 'memorized' ? 'on' : '') + '">Only words I fully memorize</button></div>' +
+      '<p class="help" style="font-size:12.5px;">Each word counts once per day. Just opening a card doesn\'t count — rating it higher, or answering it right in a quiz, does.</p>' +
+      '<div class="modal-actions"><button class="btn ghost" id="goalLater">' + (isFirst ? 'Maybe later' : 'Cancel') + '</button><button class="btn teal" id="goalSave">Save goal</button></div>';
+    modalBgRef().classList.add('open');
+    var chosen = goal, chosenMode = mode;
+    var custom = document.getElementById('goalCustom');
+    modalBodyRef().querySelectorAll('.goal-preset').forEach(function(b){
+      b.addEventListener('click', function(){
+        chosen = +b.dataset.goal;
+        custom.value = '';
+        modalBodyRef().querySelectorAll('.goal-preset').forEach(function(x){ x.classList.toggle('on', x === b); });
+      });
+    });
+    custom.addEventListener('input', function(){
+      var n = parseInt(custom.value, 10);
+      if(n > 0){ chosen = n; modalBodyRef().querySelectorAll('.goal-preset').forEach(function(x){ x.classList.remove('on'); }); }
+    });
+    modalBodyRef().querySelectorAll('[data-gmode]').forEach(function(b){
+      b.addEventListener('click', function(){
+        chosenMode = b.dataset.gmode;
+        modalBodyRef().querySelectorAll('[data-gmode]').forEach(function(x){ x.classList.toggle('on', x === b); });
+      });
+    });
+    document.getElementById('goalLater').addEventListener('click', function(){
+      if(isFirst) lsSet('vocabGoalAsked', '1');
+      modalBgRef().classList.remove('open'); modalBodyRef().innerHTML = '';
+    });
+    document.getElementById('goalSave').addEventListener('click', function(){
+      if(!(chosen >= 1 && chosen <= 500)){ showToast('Pick a number between 1 and 500.'); return; }
+      var upd = { dailyGoal: chosen, goalMode: chosenMode };
+      myProfile = Object.assign({}, myProfile || {}, upd);
+      db.collection('users').doc(currentUser.uid).set(upd, {merge: true}).catch(function(e){ showToast('Could not save your goal: ' + e.message); });
+      lsSet('vocabGoalAsked', '1');
+      modalBgRef().classList.remove('open'); modalBodyRef().innerHTML = '';
+      showToast('Goal set: ' + chosen + ' word' + (chosen === 1 ? '' : 's') + ' a day.');
+      renderGoalWidget();
+      if(isActive('stats')) renderStreakPanel();
+      applyGoalUpdate({});
+    });
+  }
+  document.getElementById('goalWidget').addEventListener('click', function(){ openGoalModal(!(myProfile && myProfile.dailyGoal)); });
+  document.getElementById('goalSettingsBtn').addEventListener('click', function(){ openGoalModal(!(myProfile && myProfile.dailyGoal)); });
+
+  function countTowardGoal(id, prevLevel, newLevel){
+    if(!currentUser || !myProfile || !myProfile.dailyGoal) return;
+    var before = prevLevel || 0;
+    var qualifies = (myProfile.goalMode === 'memorized') ? (newLevel >= 5 && before < 5) : (newLevel > before);
+    if(!qualifies) return;
+    var t = todayKey();
+    var ids = myProfile.goalDay === t ? (myProfile.goalIds || []).slice() : [];
+    if(ids.indexOf(id) !== -1) return;
+    ids.push(id);
+    var upd = { goalDay: t, goalIds: ids, history: {} };
+    upd.history[t] = ids.length;
+    applyGoalUpdate(upd);
+  }
+
+  function applyGoalUpdate(upd){
+    if(!currentUser || !myProfile) return;
+    var t = todayKey();
+    var goal = myProfile.dailyGoal || 0;
+    var ids = upd.goalIds || (myProfile.goalDay === t ? (myProfile.goalIds || []) : []);
+    var milestone = null;
+    var justMet = false;
+    if(goal && ids.length >= goal && myProfile.lastMetDay !== t){
+      var cur = (myProfile.lastMetDay === dayKey(-1) ? (myProfile.streakCurrent || 0) : 0) + 1;
+      upd.streakCurrent = cur;
+      upd.streakBest = Math.max(cur, myProfile.streakBest || 0);
+      upd.lastMetDay = t;
+      justMet = true;
+      STREAK_BADGES.forEach(function(b){ if(b[0] === cur) milestone = b; });
+    }
+    if(Object.keys(upd).length === 0) return;
+    var hist = Object.assign({}, myProfile.history || {}, upd.history || {});
+    myProfile = Object.assign({}, myProfile, upd, { history: hist });
+    renderGoalWidget();
+    if(isActive('stats')) renderStreakPanel();
+    db.collection('users').doc(currentUser.uid).set(upd, {merge: true}).catch(function(e){ showToast('Could not save your streak: ' + e.message); });
+    if(justMet){
+      var n = upd.streakCurrent;
+      setTimeout(function(){
+        showCelebration(milestone ? 'New badge · ' + milestone[1] : 'Daily goal done',
+          n + '-day streak' + (n > 1 ? ' — keep it going!' : ' — see you tomorrow!'), FLAME_SVG, 'streak');
+      }, 400);
+    }
+  }
+
+  function renderStreakPanel(){
+    var box = document.getElementById('streakPanel');
+    if(!box) return;
+    if(!myProfile){ box.innerHTML = '<h2>Daily goal &amp; streak</h2><p class="help">Loading…</p>'; return; }
+    var goal = myProfile.dailyGoal || 0;
+    var streak = streakOf(myProfile);
+    var best = myProfile.streakBest || 0;
+    var count = todayCount();
+    var hist = myProfile.history || {};
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    var mondayOffset = (today.getDay() + 6) % 7;
+    var day = new Date(today); day.setDate(day.getDate() - (7 * 11 + mondayOffset));
+    var tKey = todayKey();
+    var cells = '';
+    while(day <= today){
+      var k = dateKey(day);
+      var c = hist[k] || 0;
+      var lvl = !c ? '' : (goal && c >= goal ? ' l3' : (goal && c >= goal / 2 ? ' l2' : ' l1'));
+      cells += '<span class="hm-cell' + lvl + (k === tKey ? ' today' : '') + '" title="' + day.toDateString().slice(4, 10) + ': ' + c + ' word' + (c === 1 ? '' : 's') + '"></span>';
+      day.setDate(day.getDate() + 1);
+    }
+    box.innerHTML = '<h2 style="margin-bottom:14px;">Daily goal &amp; streak</h2>' +
+      '<div class="streak-hero">' +
+        '<div class="streak-big' + (streak ? '' : ' cold') + '">' + FLAME_SVG + '<span>' + streak + '</span></div>' +
+        '<div class="streak-meta"><b>' + (streak ? streak + '-day streak' : 'No active streak') + '</b><span>Best: ' + best + ' day' + (best === 1 ? '' : 's') + (goal ? ' · Today: ' + count + ' / ' + goal + ' words' : ' · No goal set yet') + '</span></div>' +
+        '<button class="btn ghost sm" id="streakGoalBtn" style="margin-left:auto;">' + (goal ? 'Change goal' : 'Set a daily goal') + '</button>' +
+      '</div>' +
+      '<div class="menu-label" style="padding-left:0; margin-top:18px;">Last 12 weeks</div>' +
+      '<div class="heatmap">' + cells + '</div>' +
+      '<div class="hm-legend"><span>Less</span><span class="hm-cell"></span><span class="hm-cell l1"></span><span class="hm-cell l2"></span><span class="hm-cell l3"></span><span>Goal met</span></div>' +
+      '<div class="menu-label" style="padding-left:0; margin-top:18px;">Streak badges</div>' +
+      '<div class="badges">' + STREAK_BADGES.map(function(b){ return '<div class="badge-tile' + (best >= b[0] ? ' earned' : '') + '"><span class="bt-num">' + b[0] + '</span><span>' + b[1] + '</span></div>'; }).join('') + '</div>';
+    document.getElementById('streakGoalBtn').addEventListener('click', function(){ openGoalModal(!goal); });
+  }
+
   function markVisited(id){
     var p = progressMap[id] || {};
-    if(!p.confidence){ setProgress(id, {confidence:1}); }
+    if(!p.confidence){ setProgress(id, {confidence:1}, {auto:true}); }
   }
 
   function handleCardAction(action, id){
@@ -4005,6 +4306,135 @@ listBlock,
     });
   });
 
+  // ================= AOD mode: black screen, dim text, stays awake, tap to change =================
+  var aodList = [];
+  var aodIdx = 0;
+  var aodWakeLock = null;
+  var aodShiftTimer = null;
+  var aodHintTimer = null;
+  var aodDim = parseInt(lsGet('vocabAodDim') || '1', 10) || 0;
+  var aodOverlayEl = document.getElementById('aodOverlay');
+  function aodOpen(){ return aodOverlayEl.classList.contains('open'); }
+  function aodField(cls, label, val){
+    if(!val || val === '-') return '';
+    return '<div class="aod-field ' + cls + '"><span class="aod-lbl">' + escapeHtml(label) + '</span>' + escapeHtml(val) + '</div>';
+  }
+  async function aodRequestWakeLock(){
+    try{
+      if('wakeLock' in navigator){
+        aodWakeLock = await navigator.wakeLock.request('screen');
+        return true;
+      }
+    }catch(e){}
+    return false;
+  }
+  function startAod(list){
+    if(!list || !list.length){ showToast('No words match your current Library filters.'); return; }
+    aodList = list.slice();
+    aodIdx = 0;
+    aodOverlayEl.classList.remove('aod-dim-1', 'aod-dim-2');
+    if(aodDim) aodOverlayEl.classList.add('aod-dim-' + aodDim);
+    aodOverlayEl.classList.add('open');
+    document.body.classList.add('aod-on');
+    closeAllMenus();
+    var reqFs = aodOverlayEl.requestFullscreen || aodOverlayEl.webkitRequestFullscreen;
+    if(reqFs){ try{ var r = reqFs.call(aodOverlayEl); if(r && r.catch) r.catch(function(){}); }catch(e){} }
+    aodRequestWakeLock().then(function(ok){ if(!ok) showToast('Your browser may still switch the screen off — set a longer screen timeout for AOD mode.'); });
+    var hint = document.getElementById('aodHint');
+    hint.classList.remove('gone');
+    clearTimeout(aodHintTimer);
+    aodHintTimer = setTimeout(function(){ hint.classList.add('gone'); }, 4500);
+    clearInterval(aodShiftTimer);
+    aodShiftTimer = setInterval(function(){
+      var x = Math.round(Math.random() * 20 - 10), y = Math.round(Math.random() * 16 - 8);
+      document.getElementById('aodContent').style.transform = 'translate(' + x + 'px,' + y + 'px)';
+    }, 45000);
+    paintAod();
+  }
+  function exitAod(){
+    if(!aodOpen()) return;
+    aodOverlayEl.classList.remove('open');
+    document.body.classList.remove('aod-on');
+    clearInterval(aodShiftTimer);
+    clearTimeout(aodHintTimer);
+    if(aodWakeLock){ try{ aodWakeLock.release(); }catch(e){} aodWakeLock = null; }
+    if(document.fullscreenElement || document.webkitFullscreenElement){
+      var exitFs = document.exitFullscreen || document.webkitExitFullscreen;
+      try{ var r = exitFs.call(document); if(r && r.catch) r.catch(function(){}); }catch(e){}
+    }
+  }
+  function paintAod(){
+    var base = aodList[aodIdx];
+    if(!base) return;
+    var e = entryFor(base.id) || base;
+    var level = e.confidence || 0;
+    document.getElementById('aodCounter').textContent = (aodIdx + 1) + ' / ' + aodList.length;
+    var box = document.getElementById('aodContent');
+    box.innerHTML =
+      '<div class="aod-term">' + escapeHtml(e.term) + '</div>' +
+      '<div class="aod-sub"><span class="aod-type">' + escapeHtml(TYPE_LABELS[e.type] || 'Other') + '</span>' + (e.part_of_speech && e.part_of_speech !== '-' ? '<span>' + escapeHtml(e.part_of_speech) + '</span>' : '') + '</div>' +
+      (e.english_meaning ? '<div class="aod-meaning">' + escapeHtml(e.english_meaning) + '</div>' : '') +
+      (e.hindi_meaning ? '<div class="aod-hindi">' + escapeHtml(e.hindi_meaning) + '</div>' : '') +
+      '<div class="aod-grid">' +
+        aodField('aod-syn', 'synonyms', e.synonyms && e.synonyms.length ? e.synonyms.join(', ') : '') +
+        aodField('aod-anto', 'antonyms', e.antonyms && e.antonyms.length ? e.antonyms.join(', ') : '') +
+        aodField('aod-sent', 'ssc-style sentence', e.ssc_sentence) +
+        aodField('aod-trick', 'trick / mnemonic', e.mnemonic) +
+        aodField('aod-hist', 'ssc exam history', e.ssc_history) +
+        aodField('aod-confu', 'often confused with', e.confusable_with) +
+        aodField('aod-root', 'root', e.root) +
+        aodField('aod-spell', 'spelling note', e.spelling_note) +
+        (e.type === 'idiom' ? aodField('aod-origin', 'origin', e.origin) : '') +
+        aodField('aod-tags', 'tags', e.tags && e.tags.length ? e.tags.join(', ') : '') +
+      '</div>' +
+      '<div class="aod-bottom"><div class="conf-row" style="margin-top:0;"><span class="conf-label">' + confLabel(level) + '</span>' + confDotsHtml(e.id, level) + '</div></div>';
+    box.classList.remove('aod-swap');
+    void box.offsetWidth;
+    box.classList.add('aod-swap');
+    document.getElementById('aodStage').scrollTop = 0;
+  }
+  function aodStep(dir){
+    if(!aodList.length) return;
+    aodIdx += dir;
+    if(aodIdx >= aodList.length){ aodIdx = 0; showToast('Back to the first word.'); }
+    if(aodIdx < 0) aodIdx = aodList.length - 1;
+    paintAod();
+  }
+  aodOverlayEl.addEventListener('click', function(ev){
+    var t = ev.target;
+    if(t.closest && t.closest('.aod-ctl')) return;
+    var dot = t.closest && t.closest('.conf-dot');
+    if(dot){
+      var id = dot.dataset.confId, lvl = +dot.dataset.level;
+      setProgress(id, {confidence: lvl});
+      var row = aodOverlayEl.querySelector('.aod-bottom');
+      if(row) row.innerHTML = '<div class="conf-row" style="margin-top:0;"><span class="conf-label">' + confLabel(lvl) + '</span>' + confDotsHtml(id, lvl) + '</div>';
+      return;
+    }
+    var w = window.innerWidth || 1;
+    aodStep(ev.clientX < w * 0.22 ? -1 : 1);
+  });
+  document.getElementById('aodExitBtn').addEventListener('click', function(ev){ ev.stopPropagation(); exitAod(); });
+  document.getElementById('aodDimBtn').addEventListener('click', function(ev){
+    ev.stopPropagation();
+    aodDim = (aodDim + 1) % 3;
+    lsSet('vocabAodDim', String(aodDim));
+    aodOverlayEl.classList.remove('aod-dim-1', 'aod-dim-2');
+    if(aodDim) aodOverlayEl.classList.add('aod-dim-' + aodDim);
+    showToast(['Brightest', 'Dim', 'Dimmest'][aodDim] + ' text');
+  });
+  document.addEventListener('keydown', function(ev){
+    if(!aodOpen()) return;
+    if(ev.key === 'Escape'){ exitAod(); }
+    else if(ev.key === 'ArrowRight' || ev.key === ' '){ ev.preventDefault(); aodStep(1); }
+    else if(ev.key === 'ArrowLeft'){ aodStep(-1); }
+  });
+  document.addEventListener('visibilitychange', function(){
+    if(aodOpen() && document.visibilityState === 'visible') aodRequestWakeLock();
+  });
+  document.getElementById('aodBtn').addEventListener('click', function(){ startAod(getFiltered()); });
+  document.getElementById('navAodBtn').addEventListener('click', function(){ startAod(getFiltered()); });
+
   function startSlideshow(list, revealImmediately){
     slideDeck = list.slice();
     slideIdx = 0;
@@ -4227,7 +4657,7 @@ listBlock,
             '</div>' +
           '</div>' +
           '<div class="conf-row" style="border-top:none;"><span class="conf-label">'+pct+'% of the library memorized</span></div>' +
-          '<div class="meta-line">'+(u.masteredCount||0)+' memorized · '+(u.engagedCount||0)+' studied</div>' +
+          '<div class="meta-line">'+(u.masteredCount||0)+' memorized · '+(u.engagedCount||0)+' studied'+streakBadgeHtml(u)+'</div>' +
         '</div>';
       }).join('') + '</div>';
     }catch(e){ area.innerHTML = emptyStateHtml('Could not load the leaderboard', e.message); }
@@ -4256,7 +4686,7 @@ listBlock,
             (isAdminU ? '<span class="admin-badge">admin</span>' : (isModU ? '<span class="mod-badge">moderator</span>' : '')) +
           '</div>' +
           (isModeratorUser && u.email ? '<div class="meta-line">'+escapeHtml(u.email)+'</div>' : '') +
-          '<div class="meta-line">'+(u.masteredCount||0)+' memorized · '+(u.engagedCount||0)+' studied</div>' +
+          '<div class="meta-line">'+(u.masteredCount||0)+' memorized · '+(u.engagedCount||0)+' studied'+streakBadgeHtml(u)+'</div>' +
         '</div>';
       }).join('') + '</div>';
     }catch(e){ box.innerHTML = emptyStateHtml('Could not load users', e.message); }
