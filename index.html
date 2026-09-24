@@ -530,14 +530,14 @@
   @media (max-width: 860px){ .top-right{ width:100%; } .goal-widget{ flex:1 1 auto; } }
 
   /* ---------- AOD mode (pure black, dim, stays awake) ---------- */
-  .aod-overlay{ position:fixed; inset:0; z-index:600; background:#000; color:#8C8C8C; display:none; flex-direction:column; font-family:var(--font-body); cursor:pointer; user-select:none; -webkit-user-select:none; padding:max(12px, env(safe-area-inset-top)) 18px max(12px, env(safe-area-inset-bottom)); }
+  .aod-overlay{ position:fixed; inset:0; z-index:600; background:#000; color:#8C8C8C; display:none; flex-direction:column; font-family:var(--font-body); cursor:pointer; user-select:none; -webkit-user-select:none; padding:max(12px, env(safe-area-inset-top)) max(4px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(4px, env(safe-area-inset-left)); }
   .aod-overlay.open{ display:flex; animation:fadeIn .5s ease both; }
-  .aod-top{ display:flex; justify-content:space-between; align-items:center; color:#444; font-size:12px; letter-spacing:.08em; flex-shrink:0; }
+  .aod-top{ display:flex; justify-content:space-between; align-items:center; color:#444; font-size:12px; letter-spacing:.08em; flex-shrink:0; padding:0 8px 0 14px; }
   .aod-ctl{ width:44px; height:44px; border:none; background:transparent; color:#444; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; }
   .aod-ctl:hover{ color:#8C8C8C; }
   .aod-stage{ flex:1; min-height:0; overflow-y:auto; display:flex; justify-content:center; scrollbar-width:none; }
   .aod-stage::-webkit-scrollbar{ display:none; }
-  .aod-content{ width:100%; max-width:780px; margin:auto 0; padding:18px 4px; transition:transform 1.5s ease; }
+  .aod-content{ width:100%; max-width:780px; margin:auto 0; padding:18px 18px; transition:transform 1.5s ease; }
   .aod-content.aod-swap{ animation:aodIn .45s ease backwards; }
   .aod-dim-1 .aod-content{ opacity:.72; }
   .aod-dim-2 .aod-content{ opacity:.45; }
@@ -556,8 +556,8 @@
   .aod-bottom{ display:flex; justify-content:center; margin-top:24px; }
   .aod-overlay .conf-row{ border-top:1px solid #1A1A1A; justify-content:center; gap:14px; }
   .aod-overlay .conf-label{ color:#5C5C5C; }
-  .aod-overlay .conf-dot::before{ background:#1C1C1C; }
-  body.theme-indigo .aod-overlay .conf-dot{ background:#0B0B0B; border-color:#2A2A2A; color:#555; }
+  .aod-overlay .conf-dot::before{ background:#2E2E2E; }
+  body.theme-indigo .aod-overlay .conf-dot{ background:#111; border-color:#333; color:#666; }
   .aod-hint{ text-align:center; font-size:12px; color:#444; flex-shrink:0; padding-top:6px; transition:opacity 1.2s ease; }
   .aod-hint.gone{ opacity:0; }
   body.aod-on{ overflow:hidden; }
@@ -576,6 +576,41 @@
   #aodMinBtn.on{ color:#8C8C8C; }
   body.aod-on .celebrate, body.aod-on .toast{ z-index:700; }
   @keyframes aodIn{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:none; } }
+
+  /* ---------- revision rounds ---------- */
+  .rev-due-btn{ display:flex; align-items:center; gap:8px; padding:10px 14px; border-radius:var(--radius-lg); border:1.5px solid var(--maroon); background:var(--card); color:var(--ink); font-weight:700; font-size:13.5px; box-shadow:var(--shadow); animation:dotPop .5s cubic-bezier(.2,.9,.3,1.4) backwards; transition:transform .15s ease; }
+  .rev-due-btn:hover{ transform:translateY(-2px); }
+  .rev-due-btn svg{ color:var(--maroon); }
+  body.theme-indigo .rev-due-btn{ border-color:var(--mustard); }
+  body.theme-indigo .rev-due-btn svg{ color:var(--mustard); }
+  .rev-hero{ display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
+  .rev-due-num{ font-family:var(--font-display); font-size:58px; font-weight:800; line-height:1; color:var(--maroon); }
+  body.theme-indigo .rev-due-num{ color:var(--mustard); }
+  .rev-due-num.zero{ color:var(--ink-faint); }
+  .rh-text{ display:flex; flex-direction:column; gap:3px; }
+  .rh-text b{ font-size:17px; } .rh-text span{ font-size:13px; color:var(--ink-soft); }
+  .rev-actions{ margin-left:auto; display:flex; gap:8px; flex-wrap:wrap; }
+  .rev-rounds{ display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:12px; max-width:1100px; }
+  @media (max-width: 900px){ .rev-rounds{ grid-template-columns:1fr 1fr; } }
+  @media (max-width: 520px){ .rev-rounds{ grid-template-columns:1fr; } }
+  .rev-col{ background:var(--card); border:1px solid var(--rule); border-radius:var(--radius-lg); padding:14px; box-shadow:var(--shadow); min-height:120px; animation:rise .45s cubic-bezier(.2,.8,.2,1) backwards; }
+  .rev-col-head{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+  .rev-col h3{ margin:0; font-size:16px; }
+  .rc-count{ font-family:var(--font-display); font-weight:800; font-size:20px; }
+  .rc-sub{ font-size:12px; color:var(--ink-soft); margin:2px 0 8px; }
+  .rev-list{ max-height:320px; overflow-y:auto; }
+  .rev-word{ display:flex; justify-content:space-between; align-items:center; gap:8px; width:100%; padding:7px 0; border:none; border-bottom:1px dashed var(--rule); background:transparent; color:var(--ink); font-size:13.5px; text-align:left; }
+  .rev-word:last-child{ border-bottom:none; }
+  .rev-word span{ color:var(--ink-faint); font-size:11.5px; white-space:nowrap; }
+  .rev-word span.due-now{ color:var(--maroon); font-weight:700; }
+  body.theme-indigo .rev-word span.due-now{ color:var(--mustard-deep); }
+  body.theme-indigo.dark .rev-word span.due-now{ color:var(--mustard); }
+  .rev-card{ background:var(--card); border:1px solid var(--rule); border-radius:var(--radius-lg); padding:26px 24px; box-shadow:var(--shadow); animation:slideIn .4s cubic-bezier(.2,.8,.2,1) backwards; }
+  .rev-card .term{ font-size:clamp(28px, 6vw, 42px); font-weight:var(--h-weight); line-height:1.1; }
+  .rev-round-tag{ display:inline-block; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:3px 10px; border-radius:999px; background:var(--paper-deep); color:var(--ink-soft); }
+  .rev-answer-btns{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:18px; }
+  .rev-answer-btns .btn{ padding:14px; font-size:15px; }
+  .rev-reveal{ width:100%; margin-top:20px; padding:16px; font-size:15px; }
 
   /* ---------- motion ---------- */
   @keyframes rise{ from{ opacity:0; transform:translateY(16px) scale(.985); } to{ opacity:1; transform:none; } }
@@ -637,6 +672,7 @@
   <div class="aod-top">
     <span id="aodCounter"></span>
     <span>
+      <button class="aod-ctl" id="aodPlayBtn" aria-label="Read words aloud"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg></button>
       <button class="aod-ctl" id="aodMinBtn" aria-label="Low-power layout: show fewer lit pixels"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"></path></svg></button>
       <button class="aod-ctl" id="aodDimBtn" aria-label="Change dimness"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 3v18" ></path><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"></path></svg></button>
       <button class="aod-ctl" id="aodExitBtn" aria-label="Exit AOD mode"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
@@ -690,8 +726,10 @@
         <button class="nav-btn" aria-haspopup="true" aria-expanded="false"><svg class="nav-ico" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="3"></circle></svg><span>Practice</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
         <div class="navmenu">
           <button class="tab" data-tab="quiz"><b>Quiz</b><span>Fill in the blank, confusables, spelling</span></button>
+          <button class="tab" data-tab="revision"><b>Revision rounds</b><span>Memorized words come back after 7, 14 and 30 days</span></button>
           <button id="navPresentBtn"><b>Present</b><span>Full-screen flash cards of your current filters</span></button>
           <button id="navAodBtn"><b>AOD mode</b><span>Dim black screen that stays on — tap for the next word</span></button>
+          <button id="navAudioBtn"><b>Audio revision</b><span>Words read aloud one after another — hands-free</span></button>
           <button id="navPanicBtn"><b>Exam tomorrow</b><span>Cram your 30 weakest words</span></button>
         </div>
       </div>
@@ -729,7 +767,7 @@
       <div class="navgroup" data-group="account">
         <button class="account-btn" aria-label="Account menu" aria-haspopup="true" aria-expanded="false"><span class="who" id="whoBox"></span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
         <div class="navmenu align-right">
-          <button id="alertsSettingsBtn"><b>Alerts</b><span>Word reminders and new-word notifications</span></button>
+          <button id="alertsSettingsBtn"><b>Alerts</b><span>Evening streak nudge, word reminders, new words</span></button>
           <button id="goalSettingsBtn"><b>Daily goal</b><span>Words per day and your streak</span></button>
           <button id="displaySettingsBtn"><b>Display</b><span>Text size and dyslexia-friendly font</span></button>
           <button class="tab" data-tab="backup"><b>Backup</b><span>Export or import your register</span></button>
@@ -751,7 +789,7 @@
         </div>
         <div class="sub">Build your word bank with any AI, then drill it here.</div>
       </div>
-      <div class="top-right"><button class="goal-widget" id="goalWidget" style="display:none;" aria-label="Daily goal and streak"></button><div class="stat-strip" id="statStrip"></div></div>
+      <div class="top-right"><button class="rev-due-btn" id="revDueBtn" style="display:none;"></button><button class="goal-widget" id="goalWidget" style="display:none;" aria-label="Daily goal and streak"></button><div class="stat-strip" id="statStrip"></div></div>
     </header>
 
     <section class="view active" id="view-library">
@@ -1013,6 +1051,8 @@
       </div>
       <div id="quizArea"></div>
     </section>
+
+    <section class="view" id="view-revision"><div id="revisionArea"></div></section>
 
     <section class="view" id="view-roots">
       <p class="help">Root-word groups — families of words that share a root, like <b>phobia</b> (fear) or <b>phile</b> (lover of). Only groups the admin creates appear here and in the Library's root filter.</p>
@@ -1585,6 +1625,10 @@
         '<input type="checkbox" id="chkTabFlash" style="margin-top:3px; width:18px; height:18px;" '+(alertFlag(ALERT_TABFLASH_KEY)?'checked':'')+'>' +
         '<span>While this tab is in the background, flash its title with a word to remember every few seconds — no permission needed, just glance at your open tabs.</span>' +
       '</label></div>' +
+      '<div class="field"><label style="display:flex; gap:10px; align-items:flex-start; cursor:pointer;">' +
+        '<input type="checkbox" id="chkEvening" style="margin-top:3px; width:18px; height:18px;" '+(alertFlag(ALERT_EVENING_KEY)?'checked':'')+'>' +
+        '<span>Evening nudge — if my daily goal isn\'t done yet (streak at risk) or words are due for revision, remind me at <input type="time" id="eveningTime" value="'+escapeAttr(lsGet(EVENING_TIME_KEY)||'20:00')+'" style="width:auto; display:inline-block; padding:4px 8px; margin-left:4px;"></span>' +
+      '</label></div>' +
       '<div class="modal-actions"><button class="btn ghost" id="alertsCancel">Cancel</button><button class="btn teal" id="alertsSave">Save</button></div>';
     modalBgRef().classList.add('open');
     document.getElementById('alertsCancel').addEventListener('click', function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML=''; });
@@ -1600,6 +1644,11 @@
           return;
         }
       }
+      var wantEvening = document.getElementById('chkEvening').checked;
+      if(wantEvening && notifSupported && Notification.permission === 'default'){ try{ await Notification.requestPermission(); }catch(e){} }
+      setAlertFlag(ALERT_EVENING_KEY, wantEvening);
+      lsSet(EVENING_TIME_KEY, document.getElementById('eveningTime').value || '20:00');
+      if(wantEvening){ lsSet(EVENING_FIRED_KEY, ''); setTimeout(eveningCheck, 1500); }
       setAlertFlag(ALERT_NEWWORDS_KEY, wantNewWords);
       setAlertFlag(ALERT_REMINDER_KEY, wantReminder);
       setAlertFlag(ALERT_TABFLASH_KEY, wantTabFlash);
@@ -1632,6 +1681,7 @@
         });
         if(countersOnly) return;
       }
+      maybeBackfillRevisions();
       scheduleRender();
     }, function(err){ showToast('Could not load the library: ' + err.message); });
 
@@ -1646,6 +1696,9 @@
         if((a.confidence || 0) !== (b.confidence || 0) || !!a.starred !== !!b.starred) changed.push(id);
       });
       progressMap = map;
+      if(!progressLoaded) setTimeout(eveningCheck, 4000);
+      progressLoaded = true;
+      maybeBackfillRevisions();
       if(changed.length === 0) return;
       if(changed.length <= 20 && libraryPatchable()){ changed.forEach(patchCard); renderStatStrip(); }
       else scheduleRender();
@@ -1765,6 +1818,7 @@
     if(name === 'enrich') renderEnrichHome();
     if(name === 'admin') renderAdminPanel();
     if(name === 'spellbank') renderSpellBank();
+    if(name === 'revision') renderRevision();
   }
 
   function normalizeType(t){
@@ -2930,6 +2984,14 @@ listBlock,
     if(!currentUser) return Promise.resolve();
     var hadRecord = !!(progressMap[id] && typeof progressMap[id].confidence === 'number');
     var prevLevel = hadRecord ? progressMap[id].confidence : null;
+    if(typeof patch.confidence === 'number'){
+      if(patch.confidence >= 5 && prevLevel !== 5){
+        var nowMs = Date.now();
+        patch = Object.assign({}, patch, { memorizedAt: nowMs, revStage: 0, revDue: nowMs + REV_ROUNDS[0].days * DAY_MS, revDone: false });
+      } else if(patch.confidence < 5 && prevLevel === 5){
+        patch = Object.assign({}, patch, { revStage: null, revDue: null, revDone: false });
+      }
+    }
     progressMap[id] = Object.assign({}, progressMap[id], patch);
     if(typeof patch.confidence === 'number'){
       lastConfSet = { id: id, t: Date.now() };
@@ -2965,6 +3027,224 @@ listBlock,
       }
     }, 1500);
   }
+  // ================= revision rounds: memorized words return after 7, 14 and 30 days =================
+  var DAY_MS = 86400000;
+  var REV_ROUNDS = [ { label: 'Round 1', days: 7 }, { label: 'Round 2', days: 14 }, { label: 'Round 3', days: 30 } ];
+  var progressLoaded = false;
+  var revBackfillDone = false;
+  var revSession = null;
+  var REFRESH_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>';
+  function startOfDayMs(ms){ var x = new Date(ms); x.setHours(0, 0, 0, 0); return x.getTime(); }
+  function endOfTodayMs(){ var d = new Date(); d.setHours(23, 59, 59, 999); return d.getTime(); }
+  function revEntries(){
+    return viewEntries().filter(function(e){ return e.confidence >= 5; }).map(function(e){
+      var p = progressMap[e.id] || {};
+      return Object.assign({}, e, { revStage: p.revStage, revDue: p.revDue, revDone: !!p.revDone });
+    });
+  }
+  function dueRevisions(){
+    var eod = endOfTodayMs();
+    return revEntries().filter(function(e){ return !e.revDone && typeof e.revDue === 'number' && e.revDue <= eod; })
+      .sort(function(a, b){ return a.revDue - b.revDue; });
+  }
+  function roundLabel(e){ return e.revDone ? 'Locked in' : ((REV_ROUNDS[typeof e.revStage === 'number' ? e.revStage : 0] || REV_ROUNDS[0]).label); }
+  function dueText(ms){
+    if(typeof ms !== 'number') return 'scheduling…';
+    var d = Math.round((startOfDayMs(ms) - startOfDayMs(Date.now())) / DAY_MS);
+    if(d < 0) return 'overdue ' + (-d) + 'd';
+    if(d === 0) return 'due today';
+    if(d === 1) return 'tomorrow';
+    return 'in ' + d + ' days';
+  }
+
+  function maybeBackfillRevisions(){
+    if(revBackfillDone || !currentUser || !progressLoaded || !words.length) return;
+    revBackfillDone = true;
+    var known = {};
+    words.forEach(function(w){ known[w.id] = true; });
+    var now = Date.now();
+    var ids = Object.keys(progressMap).filter(function(id){
+      var p = progressMap[id];
+      return known[id] && p && p.confidence >= 5 && p.revDue === undefined && !p.revDone;
+    });
+    if(!ids.length) return;
+    var upd = { memorizedAt: now, revStage: 0, revDue: now + REV_ROUNDS[0].days * DAY_MS, revDone: false };
+    ids.forEach(function(id){ progressMap[id] = Object.assign({}, progressMap[id], upd); });
+    for(var i = 0; i < ids.length; i += 400){
+      var batch = db.batch();
+      ids.slice(i, i + 400).forEach(function(id){ batch.set(db.collection('users').doc(currentUser.uid).collection('progress').doc(id), upd, {merge: true}); });
+      batch.commit().catch(function(){});
+    }
+    renderRevDueBtn();
+  }
+
+  function markRevision(id, remembered){
+    var p = progressMap[id] || {};
+    if(remembered){
+      var stage = (typeof p.revStage === 'number' ? p.revStage : 0) + 1;
+      var upd = { revStage: stage, lastRevisedAt: Date.now() };
+      if(stage >= REV_ROUNDS.length){ upd.revDone = true; upd.revDue = null; }
+      else { upd.revDone = false; upd.revDue = Date.now() + REV_ROUNDS[stage].days * DAY_MS; }
+      progressMap[id] = Object.assign({}, p, upd);
+      db.collection('users').doc(currentUser.uid).collection('progress').doc(id).set(upd, {merge: true})
+        .catch(function(e){ showToast('Could not save the revision: ' + e.message); });
+      renderStatStrip();
+    } else {
+      setProgress(id, {confidence: 3});
+    }
+  }
+
+  function renderRevDueBtn(){
+    var btn = document.getElementById('revDueBtn');
+    if(!btn) return;
+    var n = currentUser ? dueRevisions().length : 0;
+    if(!n){ btn.style.display = 'none'; return; }
+    btn.style.display = 'flex';
+    btn.innerHTML = REFRESH_SVG + n + ' due for revision';
+  }
+  document.getElementById('revDueBtn').addEventListener('click', function(){ switchTab('revision'); });
+
+  function revDetailsHtml(e){
+    var synAnto = (e.synonyms && e.synonyms.length) || (e.antonyms && e.antonyms.length) ? (
+      '<div class="fb-row2">' + fieldBox('fb-syn', 'synonyms', e.synonyms && e.synonyms.length ? e.synonyms.join(', ') : '') +
+      fieldBox('fb-anto', 'antonyms', e.antonyms && e.antonyms.length ? e.antonyms.join(', ') : '') + '</div>') : '';
+    return '<div class="meaning-en" style="font-size:16px; margin-top:16px;">' + escapeHtml(e.english_meaning || '') + '</div>' +
+      fieldBox('fb-hindi', 'hindi', e.hindi_meaning) + synAnto +
+      fieldBox('fb-sentence', 'ssc-style sentence', e.ssc_sentence) +
+      fieldBox('fb-trick', 'trick / mnemonic', e.mnemonic) +
+      fieldBox('fb-confusable', 'often confused with', e.confusable_with) +
+      fieldBox('fb-root', 'root', e.root) +
+      fieldBox('fb-spelltrap', 'spelling note', e.spelling_note) +
+      (e.type === 'idiom' ? fieldBox('fb-origin', 'origin', e.origin) : '');
+  }
+
+  function renderRevision(){
+    var box = document.getElementById('revisionArea');
+    if(!box) return;
+    if(revSession){ renderRevisionSession(box); return; }
+    var all = revEntries();
+    var due = dueRevisions();
+    var eod = endOfTodayMs();
+    var weekAhead = all.filter(function(e){ return !e.revDone && typeof e.revDue === 'number' && e.revDue > eod && e.revDue <= eod + 7 * DAY_MS; }).length;
+    var cols = [
+      { title: 'Round 1', sub: '7 days after memorizing', items: [] },
+      { title: 'Round 2', sub: '14 days after round 1', items: [] },
+      { title: 'Round 3', sub: '30 days after round 2', items: [] },
+      { title: 'Locked in', sub: 'Passed all three rounds', items: [] }
+    ];
+    all.forEach(function(e){
+      if(e.revDone) cols[3].items.push(e);
+      else cols[Math.min(2, Math.max(0, typeof e.revStage === 'number' ? e.revStage : 0))].items.push(e);
+    });
+    cols.forEach(function(c, ci){
+      c.items.sort(function(a, b){ return ci === 3 ? a.term.localeCompare(b.term) : ((a.revDue || 0) - (b.revDue || 0)); });
+    });
+    box.innerHTML = '<div class="panel" style="max-width:1100px;">' +
+        '<h2 style="margin-bottom:6px;">Revision rounds</h2>' +
+        '<p class="help" style="margin-top:0;">Every word you memorize comes back after 7 days, then 14 days, then 30 days — about two months with three check-ins. Pass all three and it\'s locked in. Forget it once and it goes back to level 3 to relearn.</p>' +
+        '<div class="rev-hero"><div class="rev-due-num' + (due.length ? '' : ' zero') + '">' + due.length + '</div>' +
+          '<div class="rh-text"><b>' + (due.length === 1 ? 'word' : 'words') + ' due today</b><span>' + weekAhead + ' more coming up in the next 7 days</span></div>' +
+          (due.length ? '<div class="rev-actions"><button class="btn teal" data-rev="start">Start revision</button><button class="btn ghost" data-rev="audio">Read aloud</button><button class="btn ghost" data-rev="aod">AOD mode</button></div>' : '') +
+        '</div>' +
+      '</div>' +
+      (all.length ? '<div class="rev-rounds">' + cols.map(function(c){
+        return '<div class="rev-col"><div class="rev-col-head"><h3>' + c.title + '</h3><span class="rc-count">' + c.items.length + '</span></div><div class="rc-sub">' + c.sub + '</div>' +
+          '<div class="rev-list">' + (c.items.length ? c.items.map(function(e){
+            var dt = c.title === 'Locked in' ? '✓' : dueText(e.revDue);
+            var now = (dt === 'due today' || dt.indexOf('overdue') === 0);
+            return '<button class="rev-word" data-rev="word" data-id="' + e.id + '">' + escapeHtml(e.term) + '<span class="' + (now ? 'due-now' : '') + '">' + dt + '</span></button>';
+          }).join('') : '<p class="help" style="margin:0;">—</p>') + '</div></div>';
+      }).join('') + '</div>'
+      : emptyStateHtml('Nothing to revise yet', 'Words land here the moment you mark them Memorized (level 5). Their first round comes 7 days later.'));
+  }
+
+  function renderRevisionSession(box){
+    var S = revSession;
+    if(S.idx >= S.queue.length){
+      var total = S.remembered + S.forgot;
+      box.innerHTML = '<div class="quiz-wrap"><div class="report-card">' +
+        '<div class="report-score">' + S.remembered + '/' + total + '</div>' +
+        '<div class="report-sub">remembered' + (S.forgot ? ' · ' + S.forgot + ' back to learning' : ' — perfect!') + '</div>' +
+        '<p class="help">Remembered words move to their next round. Forgotten ones drop to level 3 — memorize them again and their rounds restart.</p>' +
+        '<div class="row-actions" style="justify-content:center;"><button class="btn teal" data-rev="home">Done</button></div>' +
+      '</div></div>';
+      return;
+    }
+    var id = S.queue[S.idx];
+    var e = entryFor(id);
+    if(!e){ S.idx++; renderRevisionSession(box); return; }
+    var p = progressMap[id] || {};
+    var tag = roundLabel({ revStage: p.revStage, revDone: p.revDone });
+    box.innerHTML = '<div class="quiz-wrap">' +
+      '<div class="quiz-progress">Word ' + (S.idx + 1) + ' / ' + S.queue.length + ' · ' + S.remembered + ' remembered</div>' +
+      '<div class="rev-card">' +
+        '<div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;"><span class="rev-round-tag">' + tag + '</span><button class="iconbtn" data-rev="speak" aria-label="Listen">🔊</button></div>' +
+        '<div class="term" style="margin-top:12px;">' + escapeHtml(e.term) + '</div>' +
+        '<div class="pos" style="margin-top:4px;">' + escapeHtml(e.part_of_speech || '-') + ' · <span class="badge ' + e.type + '">' + (TYPE_LABELS[e.type] || 'Other') + '</span></div>' +
+        (S.revealed
+          ? revDetailsHtml(e) + '<div class="rev-answer-btns"><button class="btn maroon" data-rev="forgot">Forgot</button><button class="btn teal" data-rev="remember">Remembered</button></div>'
+          : '<p class="help" style="margin-top:18px;">Say the meaning to yourself, then check.</p><button class="btn rev-reveal" data-rev="reveal">Show answer</button>') +
+      '</div>' +
+      '<div class="quiz-actions"><button class="btn ghost" data-rev="home">Exit</button></div>' +
+    '</div>';
+  }
+
+  document.getElementById('view-revision').addEventListener('click', function(ev){
+    var b = ev.target.closest && ev.target.closest('[data-rev]');
+    if(!b) return;
+    var a = b.dataset.rev;
+    if(a === 'start'){
+      var q = dueRevisions().map(function(e){ return e.id; });
+      if(!q.length){ showToast('Nothing is due right now.'); return; }
+      revSession = { queue: q, idx: 0, remembered: 0, forgot: 0, revealed: false };
+      renderRevision();
+    } else if(a === 'reveal'){ revSession.revealed = true; renderRevision(); }
+    else if(a === 'remember' || a === 'forgot'){
+      var id = revSession.queue[revSession.idx];
+      markRevision(id, a === 'remember');
+      if(a === 'remember') revSession.remembered++; else revSession.forgot++;
+      revSession.idx++; revSession.revealed = false;
+      renderRevision();
+    }
+    else if(a === 'speak'){ var cur = entryFor(revSession.queue[revSession.idx]); if(cur) speakText(cur.term); }
+    else if(a === 'home'){ revSession = null; renderRevision(); }
+    else if(a === 'audio'){ openAudioSetup(dueRevisions(), 'Words due for revision today.'); }
+    else if(a === 'aod'){ startAod(dueRevisions()); }
+    else if(a === 'word'){ openWordPreviewModal(b.dataset.id); }
+  });
+
+  // ================= evening nudge: streak at risk / revisions due =================
+  var ALERT_EVENING_KEY = 'vocabRegisterAlertEvening';
+  var EVENING_TIME_KEY = 'vocabRegisterEveningTime';
+  var EVENING_FIRED_KEY = 'vocabRegisterEveningFired';
+  function eveningCheck(){
+    if(!currentUser || !progressLoaded || !alertFlag(ALERT_EVENING_KEY)) return;
+    var t = (lsGet(EVENING_TIME_KEY) || '20:00').split(':');
+    var hh = parseInt(t[0], 10), mm = parseInt(t[1], 10);
+    var at = new Date(); at.setHours(isNaN(hh) ? 20 : hh, isNaN(mm) ? 0 : mm, 0, 0);
+    if(new Date() < at) return;
+    if(lsGet(EVENING_FIRED_KEY) === todayKey()) return;
+    lsSet(EVENING_FIRED_KEY, todayKey());
+    var parts = [];
+    var atRisk = false;
+    if(myProfile && myProfile.dailyGoal && myProfile.lastMetDay !== todayKey()){
+      var left = Math.max(0, myProfile.dailyGoal - todayCount());
+      var st = streakOf(myProfile);
+      atRisk = st > 0;
+      parts.push(left + ' word' + (left === 1 ? '' : 's') + ' to go today' + (st ? ' to keep your ' + st + '-day streak' : ''));
+    }
+    var due = dueRevisions().length;
+    if(due) parts.push(due + ' word' + (due === 1 ? '' : 's') + ' due for revision');
+    if(!parts.length) return;
+    var title = atRisk ? 'Your streak is at risk' : (due && parts.length === 1 ? 'Revision due' : 'Daily goal not done yet');
+    var body = parts.join(' · ');
+    if(notifSupported && Notification.permission === 'granted'){
+      try{ new Notification(title, { body: body, icon: 'icon-192.png', tag: 'vocab-evening' }); }catch(e){}
+    }
+    showToast(title + ' — ' + body);
+  }
+  setInterval(eveningCheck, 60000);
+
   // ================= daily goal + streak =================
   var goalAskedThisSession = false;
   var STREAK_BADGES = [[3, 'Warming up'], [7, 'Week warrior'], [14, 'Fortnight focus'], [30, 'Monthly master'], [50, 'Half-century'], [100, 'Centurion']];
@@ -4344,7 +4624,7 @@ listBlock,
     }catch(e){}
     return false;
   }
-  function startAod(list){
+  function startAod(list, opts){
     if(!list || !list.length){ showToast('No words match your current Library filters.'); return; }
     aodList = list.slice();
     aodIdx = 0;
@@ -4363,13 +4643,15 @@ listBlock,
     aodHintTimer = setTimeout(function(){ hint.classList.add('gone'); }, 4500);
     clearInterval(aodShiftTimer);
     aodShiftTimer = setInterval(function(){
-      var x = Math.round(Math.random() * 20 - 10), y = Math.round(Math.random() * 16 - 8);
+      var x = Math.round(Math.random() * 16 - 8), y = Math.round(Math.random() * 16 - 8);
       document.getElementById('aodContent').style.transform = 'translate(' + x + 'px,' + y + 'px)';
     }, 45000);
     paintAod();
+    setAodAudio(!!(opts && opts.audio));
   }
   function exitAod(){
     if(!aodOpen()) return;
+    setAodAudio(false);
     aodOverlayEl.classList.remove('open');
     document.body.classList.remove('aod-on');
     clearInterval(aodShiftTimer);
@@ -4418,6 +4700,7 @@ listBlock,
     if(aodIdx >= aodList.length){ aodIdx = 0; showToast('Back to the first word.'); }
     if(aodIdx < 0) aodIdx = aodList.length - 1;
     paintAod();
+    if(aodAudioOn) aodSpeakCurrent();
   }
   aodOverlayEl.addEventListener('click', function(ev){
     var t = ev.target;
@@ -4435,6 +4718,107 @@ listBlock,
     aodStep(ev.clientX < w * 0.22 ? -1 : 1);
   });
   document.getElementById('aodExitBtn').addEventListener('click', function(ev){ ev.stopPropagation(); exitAod(); });
+  // ---- audio revision: reads each word aloud, then moves on by itself ----
+  var AUDIO_PREF_KEY = 'vocabAudioPrefs';
+  var AUDIO_DEFAULTS = { meaning: true, hindi: true, synonyms: false, sentence: false, rate: 1, gap: 3 };
+  var PAUSE_SVG = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z"></path></svg>';
+  var PLAY_SVG = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg>';
+  var aodAudioOn = false, aodAudioToken = 0, aodAudioTimer = null;
+  if(ttsSupported){ try{ window.speechSynthesis.getVoices(); }catch(e){} }
+  function audioPrefs(){
+    try{ return Object.assign({}, AUDIO_DEFAULTS, JSON.parse(lsGet(AUDIO_PREF_KEY) || '{}')); }catch(e){ return Object.assign({}, AUDIO_DEFAULTS); }
+  }
+  function voiceFor(prefix){
+    if(!ttsSupported) return null;
+    var vs = [];
+    try{ vs = window.speechSynthesis.getVoices() || []; }catch(e){}
+    if(prefix === 'en'){ return vs.find(function(v){ return /^en[-_]IN/i.test(v.lang); }) || vs.find(function(v){ return /^en/i.test(v.lang); }) || null; }
+    return vs.find(function(v){ return String(v.lang).toLowerCase().indexOf(prefix) === 0; }) || null;
+  }
+  function setAodAudio(on){
+    aodAudioOn = !!on && ttsSupported;
+    var b = document.getElementById('aodPlayBtn');
+    b.innerHTML = aodAudioOn ? PAUSE_SVG : PLAY_SVG;
+    b.classList.toggle('on', aodAudioOn);
+    b.setAttribute('aria-label', aodAudioOn ? 'Stop reading aloud' : 'Read words aloud');
+    if(aodAudioOn) aodSpeakCurrent();
+    else { aodAudioToken++; clearTimeout(aodAudioTimer); if(ttsSupported){ try{ window.speechSynthesis.cancel(); }catch(e){} } }
+  }
+  function aodSpeakCurrent(){
+    if(!aodAudioOn || !ttsSupported) return;
+    var token = ++aodAudioToken;
+    clearTimeout(aodAudioTimer);
+    try{ window.speechSynthesis.cancel(); }catch(e){}
+    var base = aodList[aodIdx];
+    if(!base) return;
+    var e = entryFor(base.id) || base;
+    var pr = audioPrefs();
+    var parts = [{ t: e.term, lang: 'en' }];
+    if(pr.meaning && e.english_meaning) parts.push({ t: e.english_meaning, lang: 'en' });
+    if(pr.hindi && e.hindi_meaning && voiceFor('hi')) parts.push({ t: e.hindi_meaning, lang: 'hi' });
+    if(pr.synonyms && e.synonyms && e.synonyms.length) parts.push({ t: 'Synonyms: ' + e.synonyms.join(', '), lang: 'en' });
+    if(pr.sentence && e.ssc_sentence) parts.push({ t: e.ssc_sentence, lang: 'en' });
+    var i = 0;
+    function next(){
+      if(token !== aodAudioToken || !aodAudioOn) return;
+      if(i >= parts.length){
+        aodAudioTimer = setTimeout(function(){ if(token === aodAudioToken && aodAudioOn && aodOpen()) aodStep(1); }, pr.gap * 1000);
+        return;
+      }
+      var part = parts[i++];
+      var u = new SpeechSynthesisUtterance(part.t);
+      var v = voiceFor(part.lang);
+      if(v){ u.voice = v; u.lang = v.lang; } else { u.lang = part.lang === 'hi' ? 'hi-IN' : 'en-IN'; }
+      u.rate = pr.rate;
+      u.onend = function(){ setTimeout(next, 350); };
+      u.onerror = function(){ setTimeout(next, 350); };
+      try{ window.speechSynthesis.speak(u); }catch(err){ setTimeout(next, 350); }
+    }
+    next();
+  }
+  document.getElementById('aodPlayBtn').addEventListener('click', function(ev){
+    ev.stopPropagation();
+    if(!ttsSupported){ showToast('This browser can\'t read aloud.'); return; }
+    setAodAudio(!aodAudioOn);
+  });
+
+  function openAudioSetup(list, sourceLabel){
+    if(!ttsSupported){ showToast('This browser can\'t read aloud.'); return; }
+    if(!list || !list.length){ showToast('No words to read — adjust your Library filters first.'); return; }
+    var pr = audioPrefs();
+    var hasHindi = !!voiceFor('hi');
+    var chk = function(key, label, disabled){ return '<label style="display:flex; gap:10px; align-items:center; cursor:pointer; margin:6px 0;"><input type="checkbox" data-ap="' + key + '" style="width:18px; height:18px;"' + (pr[key] && !disabled ? ' checked' : '') + (disabled ? ' disabled' : '') + '> ' + label + '</label>'; };
+    var seg = function(key, opts){ return '<div class="seg-toggle" style="margin:4px 0 12px;">' + opts.map(function(o){ return '<button data-apseg="' + key + '" data-val="' + o[0] + '" class="' + (pr[key] === o[0] ? 'on' : '') + '">' + o[1] + '</button>'; }).join('') + '</div>'; };
+    modalBodyRef().innerHTML = '<h3>Audio revision</h3>' +
+      '<p class="help" style="margin-top:0;">Reads ' + list.length + ' word' + (list.length === 1 ? '' : 's') + ' aloud one after another on a dim screen that stays on — revise hands-free. ' + escapeHtml(sourceLabel || '') + '</p>' +
+      '<div class="menu-label" style="padding-left:0;">Read out</div>' +
+      '<p class="help" style="margin:0 0 4px;">The word itself, plus:</p>' +
+      chk('meaning', 'English meaning') +
+      chk('hindi', 'Hindi meaning' + (hasHindi ? '' : ' <span class="help">(no Hindi voice on this device)</span>'), !hasHindi) +
+      chk('synonyms', 'Synonyms') +
+      chk('sentence', 'SSC-style sentence') +
+      '<div class="menu-label" style="padding-left:0;">Speed</div>' + seg('rate', [[0.8, 'Slow'], [1, 'Normal'], [1.2, 'Fast']]) +
+      '<div class="menu-label" style="padding-left:0;">Pause between words</div>' + seg('gap', [[2, '2 sec'], [3, '3 sec'], [6, '6 sec']]) +
+      '<p class="help" style="font-size:12.5px;">Tap the screen to skip ahead, or use the pause button at the top to stop. Keep the phone unlocked — the screen stays on by itself.</p>' +
+      '<div class="modal-actions"><button class="btn ghost" id="audioCancel">Cancel</button><button class="btn teal" id="audioStart">Start</button></div>';
+    modalBgRef().classList.add('open');
+    modalBodyRef().querySelectorAll('[data-apseg]').forEach(function(b){
+      b.addEventListener('click', function(){
+        modalBodyRef().querySelectorAll('[data-apseg="' + b.dataset.apseg + '"]').forEach(function(x){ x.classList.toggle('on', x === b); });
+      });
+    });
+    document.getElementById('audioCancel').addEventListener('click', function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML = ''; });
+    document.getElementById('audioStart').addEventListener('click', function(){
+      var np = Object.assign({}, pr);
+      modalBodyRef().querySelectorAll('[data-ap]').forEach(function(c){ if(!c.disabled) np[c.dataset.ap] = c.checked; });
+      modalBodyRef().querySelectorAll('[data-apseg].on').forEach(function(b){ np[b.dataset.apseg] = parseFloat(b.dataset.val); });
+      lsSet(AUDIO_PREF_KEY, JSON.stringify(np));
+      modalBgRef().classList.remove('open'); modalBodyRef().innerHTML = '';
+      startAod(list, { audio: true });
+    });
+  }
+  document.getElementById('navAudioBtn').addEventListener('click', function(){ openAudioSetup(getFiltered(), 'Uses your current Library filters.'); });
+
   document.getElementById('aodMinBtn').addEventListener('click', function(ev){
     ev.stopPropagation();
     aodMin = !aodMin;
@@ -4592,6 +4976,7 @@ listBlock,
       '<div class="stat-chip"><span class="num">'+total+'</span><span class="lbl">words</span></div>' +
       '<div class="stat-chip"><span class="num">'+memorized+'</span><span class="lbl">memorized</span></div>' +
       '<div class="stat-chip"><span class="num">'+(total-memorized)+'</span><span class="lbl">to revise</span></div>';
+    renderRevDueBtn();
   }
 
   // ---------------- backup ----------------
@@ -5006,6 +5391,7 @@ listBlock,
     if(isActive('library')) renderLibrary();
     if(isActive('stats')) renderStats();
     if(isActive('roots')) renderRoots();
+    if(isActive('revision') && !revSession) renderRevision();
   }
 
 })();
