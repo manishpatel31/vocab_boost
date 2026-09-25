@@ -8,43 +8,43 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Instrument+Sans:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root, body.t-paper{
-    --bg:#F3EEE3; --bg2:#E9E1CF; --card:rgba(255,252,246,.86); --line:#DCCFB2;
+    --bg:#F3EEE3; --bg2:#E9E1CF; --card:rgba(255,252,246,.93); --line:#DCCFB2;
     --ink:#221E17; --soft:#5E5547; --faint:#857B6A;
     --accent:#2F6F63; --accent-fg:#fff; --warn:#8C2F39; --gold:#C99A2E;
     --chip:#FFFCF6; --chip-on:#221E17; --chip-on-fg:#FFF7E6;
     --display:'Fraunces', Georgia, serif; --body:'Instrument Sans', system-ui, sans-serif; --hindi:'Tiro Devanagari Hindi', serif;
     --pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(150,128,90,.12) 31px, rgba(150,128,90,.12) 32px);
-    --drift:rgba(34,30,23,.07);
+    --glow:rgba(201,154,46,.13); --glow2:rgba(47,111,99,.10); --drift:rgba(34,30,23,.07);
     --l-syn:#2F6F63; --l-ant:#8C2F39; --l-sen:#A87E1F; --l-trk:#6A4C93; --l-his:#9A6230; --l-cnf:#8C2F39; --l-root:#2F6F63; --l-spl:#A87E1F; --l-org:#3A5F8A;
   }
   body.t-paperdark{
-    --bg:#1B1813; --bg2:#25201A; --card:rgba(38,33,26,.86); --line:#3B3429;
+    --bg:#1B1813; --bg2:#25201A; --card:rgba(38,33,26,.92); --line:#3B3429;
     --ink:#EFE6D2; --soft:#BDB195; --faint:#968C75;
     --accent:#3F9A86; --accent-fg:#fff; --warn:#B8515B; --gold:#D9AE4B;
     --chip:#26211A; --chip-on:#EFE6D2; --chip-on-fg:#1B1813;
     --display:'Fraunces', Georgia, serif; --body:'Instrument Sans', system-ui, sans-serif; --hindi:'Tiro Devanagari Hindi', serif;
     --pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.04) 31px, rgba(255,240,200,.04) 32px);
-    --drift:rgba(239,230,210,.06);
+    --glow:rgba(217,174,75,.08); --glow2:rgba(63,154,134,.07); --drift:rgba(239,230,210,.06);
     --l-syn:#6FCFAE; --l-ant:#E58A8A; --l-sen:#E8C476; --l-trk:#B9A0E0; --l-his:#E0A970; --l-cnf:#E58A8A; --l-root:#6FD1A8; --l-spl:#E8C476; --l-org:#8FB5E0;
   }
   body.t-indigo{
-    --bg:#EEF1FA; --bg2:#E1E6F5; --card:rgba(255,255,255,.88); --line:#CBD3EC;
+    --bg:#EEF1FA; --bg2:#E1E6F5; --card:rgba(255,255,255,.93); --line:#CBD3EC;
     --ink:#0F1B3D; --soft:#4A5680; --faint:#67739C;
     --accent:#3D5CF0; --accent-fg:#fff; --warn:#C8402F; --gold:#F59E2E;
     --chip:#fff; --chip-on:#3D5CF0; --chip-on-fg:#fff;
     --display:'Bricolage Grotesque', system-ui, sans-serif; --body:'Figtree', system-ui, sans-serif; --hindi:'Noto Sans Devanagari', sans-serif;
     --pattern:radial-gradient(rgba(61,92,240,.10) 1px, transparent 1.4px);
-    --drift:rgba(61,92,240,.08);
+    --glow:rgba(61,92,240,.12); --glow2:rgba(247,197,72,.12); --drift:rgba(61,92,240,.08);
     --l-syn:#147D53; --l-ant:#C8402F; --l-sen:#D9831A; --l-trk:#6B4DD8; --l-his:#B8651B; --l-cnf:#C8402F; --l-root:#147D53; --l-spl:#D9831A; --l-org:#2F6FB8;
   }
   body.t-indigodark{
-    --bg:#0B1433; --bg2:#0E1839; --card:rgba(18,29,71,.86); --line:#22306A;
+    --bg:#0B1433; --bg2:#0E1839; --card:rgba(18,29,71,.92); --line:#22306A;
     --ink:#EEF2FF; --soft:#A7B3DA; --faint:#8A97C4;
     --accent:#5B77FF; --accent-fg:#fff; --warn:#D9574A; --gold:#F7C548;
     --chip:#121D47; --chip-on:#F7C548; --chip-on-fg:#1B1203;
     --display:'Bricolage Grotesque', system-ui, sans-serif; --body:'Figtree', system-ui, sans-serif; --hindi:'Noto Sans Devanagari', sans-serif;
     --pattern:radial-gradient(rgba(140,160,255,.10) 1px, transparent 1.4px);
-    --drift:rgba(200,210,255,.07);
+    --glow:rgba(91,119,255,.16); --glow2:rgba(247,197,72,.07); --drift:rgba(200,210,255,.07);
     --l-syn:#6FCFAE; --l-ant:#F08C80; --l-sen:#F7C548; --l-trk:#B9A0FF; --l-his:#F2B06A; --l-cnf:#F08C80; --l-root:#6FD1A8; --l-spl:#F7C548; --l-org:#8FB5FF;
   }
   body.t-black{
@@ -53,76 +53,87 @@
     --accent:#6FCFAE; --accent-fg:#000; --warn:#E58A8A; --gold:#E8C476;
     --chip:#0D0D0D; --chip-on:#F2F2F2; --chip-on-fg:#000;
     --display:'Fraunces', Georgia, serif; --body:'Instrument Sans', system-ui, sans-serif; --hindi:'Tiro Devanagari Hindi', serif;
-    --pattern:none; --drift:rgba(255,255,255,.05);
+    --pattern:none; --glow:rgba(255,255,255,.03); --glow2:rgba(111,207,174,.04); --drift:rgba(255,255,255,.05);
     --l-syn:#6FCFAE; --l-ant:#E58A8A; --l-sen:#E8C476; --l-trk:#B9A0E0; --l-his:#E0A970; --l-cnf:#E58A8A; --l-root:#6FD1A8; --l-spl:#E8C476; --l-org:#8FB5E0;
   }
   *{ box-sizing:border-box; }
   html, body{ margin:0; height:100%; overflow:hidden; }
   body{ background:var(--bg); color:var(--ink); font-family:var(--body); user-select:none; -webkit-font-smoothing:antialiased; transition:background .6s ease, color .6s ease; }
-  .pattern{ position:fixed; inset:0; background-image:var(--pattern); background-size:24px 24px; pointer-events:none; }
-  body.t-paper .pattern, body.t-paperdark .pattern{ background-size:auto; }
-  #drift{ position:fixed; inset:0; width:100%; height:100%; pointer-events:none; }
+  /* ---------- canvas: soft light, no busy lines ---------- */
+  body{ background:
+    radial-gradient(1100px 760px at 64% 38%, var(--glow), transparent 62%),
+    radial-gradient(900px 620px at 100% 100%, var(--glow2), transparent 60%),
+    var(--bg); }
+  .grain{ position:fixed; inset:0; pointer-events:none; opacity:.35; mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.5  0 0 0 0 0.45  0 0 0 0 0.4  0 0 0 .06 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+  body.t-paperdark .grain, body.t-indigodark .grain, body.t-black .grain{ mix-blend-mode:screen; opacity:.25; }
   button{ font:inherit; color:inherit; cursor:pointer; }
+  #drift{ position:fixed; inset:0; width:100%; height:100%; pointer-events:none; }
 
-  /* ---------- word stage ---------- */
-  .stage{ position:fixed; top:0; bottom:0; left:34vw; right:calc(clamp(270px, 19vw, 340px) + 56px); display:flex; align-items:center; justify-content:center; padding:90px 1.5vw 150px; }
-  .word{ width:100%; max-width:1000px; }
-  .word.swap{ animation:inword .5s ease backwards; }
-  @keyframes inword{ from{ opacity:0; transform:translateY(10px); } }
-  .w-sub{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; color:var(--faint); font-size:clamp(12px, .9vw, 15px); letter-spacing:.06em; text-transform:uppercase; font-weight:600; }
-  .w-pill{ border:1px solid var(--line); border-radius:999px; padding:3px 11px; background:var(--chip); }
-  .w-pill.lvl{ color:var(--accent); border-color:var(--accent); }
-  .w-pill.due{ color:var(--gold); border-color:var(--gold); }
-  .w-term{ font-family:var(--display); font-weight:600; font-size:clamp(40px, 5vw, 96px); line-height:1.02; letter-spacing:-.015em; margin:.18em 0 .12em; overflow-wrap:anywhere; }
-  .w-mean{ font-size:clamp(20px, 1.9vw, 34px); line-height:1.35; color:var(--ink); max-width:48ch; }
-  .w-hindi{ font-family:var(--hindi); font-size:clamp(19px, 1.75vw, 31px); color:var(--soft); margin-top:.35em; }
-  .w-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:clamp(12px, 1.4vw, 22px) clamp(18px, 2vw, 34px); margin-top:clamp(18px, 2.6vh, 34px); }
-  .f{ font-size:clamp(14px, 1.05vw, 18px); line-height:1.5; color:var(--soft); }
-  .f b{ display:block; font-size:clamp(10.5px, .72vw, 12.5px); letter-spacing:.12em; text-transform:uppercase; margin-bottom:3px; font-weight:700; }
+  /* ---------- layout: left side stays free for desktop icons ---------- */
+  .layout{ position:fixed; top:30px; bottom:64px; left:28vw; right:30px; display:grid; grid-template-columns:minmax(0, 1fr) clamp(300px, 19vw, 340px); gap:clamp(20px, 1.8vw, 32px); }
+  .side{ display:flex; flex-direction:column; justify-content:space-between; align-items:stretch; min-height:0; }
+
+  /* ---------- the word card ---------- */
+  .wcard{ align-self:end; max-height:100%; min-height:0; display:flex; flex-direction:column; background:var(--card); border:1px solid var(--line); border-radius:30px; box-shadow:0 1px 0 rgba(255,255,255,.04) inset, 0 40px 80px -46px rgba(0,0,0,.55); backdrop-filter:blur(14px); overflow:hidden; }
+  .word{ --k:1; flex:1 1 auto; min-height:0; overflow:hidden; padding:clamp(26px, 2.8vw, 46px) clamp(30px, 3.2vw, 56px) clamp(18px, 1.8vw, 28px); }
+  .word.swap{ animation:inword .55s cubic-bezier(.2,.7,.2,1) backwards; }
+  @keyframes inword{ from{ opacity:0; transform:translateY(8px); } }
+  .w-sub{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; color:var(--faint); font-size:12px; letter-spacing:.1em; text-transform:uppercase; font-weight:700; }
+  .w-pill{ border:1px solid var(--line); border-radius:999px; padding:4px 11px; }
+  .w-pill.lvl{ color:var(--accent); border-color:color-mix(in srgb, var(--accent) 55%, transparent); }
+  .w-pill.due{ color:var(--gold); border-color:color-mix(in srgb, var(--gold) 60%, transparent); }
+  .w-dot{ opacity:.5; }
+  .w-term{ font-family:var(--display); font-weight:600; font-size:calc(var(--k) * clamp(40px, 4.3vw, 82px)); line-height:1.04; letter-spacing:-.018em; margin:.22em 0 .2em; overflow-wrap:anywhere; text-wrap:balance; }
+  .w-mean{ font-size:calc(var(--k) * clamp(18px, 1.5vw, 27px)); line-height:1.42; color:var(--ink); max-width:44ch; text-wrap:pretty; }
+  .w-hindi{ font-family:var(--hindi); font-size:calc(var(--k) * clamp(17px, 1.38vw, 25px)); color:var(--soft); margin-top:.45em; }
+  .w-grid{ display:grid; grid-template-columns:1fr 1fr; gap:calc(var(--k) * 18px) clamp(22px, 2.4vw, 40px); margin-top:calc(var(--k) * 26px); padding-top:calc(var(--k) * 22px); border-top:1px solid var(--line); }
+  .f{ font-size:calc(var(--k) * clamp(13.5px, .92vw, 16.5px)); line-height:1.5; color:var(--soft); }
+  .f.wide{ grid-column:1 / -1; }
+  .f b{ display:block; font-size:11px; letter-spacing:.14em; text-transform:uppercase; margin-bottom:4px; font-weight:700; }
   .f.syn b{ color:var(--l-syn); } .f.ant b{ color:var(--l-ant); } .f.sen b{ color:var(--l-sen); } .f.trk b{ color:var(--l-trk); }
   .f.his b{ color:var(--l-his); } .f.cnf b{ color:var(--l-cnf); } .f.root b{ color:var(--l-root); } .f.spl b{ color:var(--l-spl); } .f.org b{ color:var(--l-org); }
   .f.sen{ font-style:italic; }
-  .hidden-part{ filter:blur(9px); opacity:.35; transition:filter .6s ease, opacity .6s ease; cursor:pointer; }
-  .reveal-hint{ margin-top:14px; font-size:14px; color:var(--faint); }
-  .reveal-hint button{ border:1px solid var(--line); background:var(--chip); border-radius:999px; padding:7px 16px; }
+  .hidden-part{ filter:blur(10px); opacity:.3; transition:filter .6s ease, opacity .6s ease; cursor:pointer; }
+  .reveal-hint{ margin-top:16px; font-size:14px; color:var(--faint); }
+  .reveal-hint button{ border:1px solid var(--line); background:var(--chip); border-radius:999px; padding:7px 16px; margin-left:4px; }
 
-  /* ---------- controls ---------- */
-  .controls{ position:fixed; left:34vw; right:calc(clamp(270px, 19vw, 340px) + 56px); bottom:64px; display:flex; justify-content:center; }
-  .bar{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:999px; background:var(--card); border:1px solid var(--line); backdrop-filter:blur(10px); box-shadow:0 18px 40px -26px rgba(0,0,0,.5); }
-  .nav{ width:46px; height:46px; border-radius:50%; border:1px solid var(--line); background:var(--chip); font-size:20px; display:flex; align-items:center; justify-content:center; transition:transform .15s ease; }
-  .nav:hover{ transform:scale(1.06); }
-  .count{ min-width:78px; text-align:center; font-size:13px; color:var(--faint); font-variant-numeric:tabular-nums; }
+  /* footer of the card: navigation + levels */
+  .wfoot{ position:relative; flex-shrink:0; display:flex; align-items:center; justify-content:space-between; gap:14px; padding:14px clamp(18px, 2vw, 30px) 16px; border-top:1px solid var(--line); background:color-mix(in srgb, var(--card) 70%, var(--bg)); }
+  .navgrp{ display:flex; align-items:center; gap:6px; }
+  .nav{ width:42px; height:42px; border-radius:50%; border:1px solid var(--line); background:var(--chip); font-size:19px; line-height:1; display:flex; align-items:center; justify-content:center; transition:transform .15s ease, border-color .2s ease; }
+  .nav:hover{ transform:scale(1.07); border-color:var(--ink); }
+  .count{ min-width:74px; text-align:center; font-size:13px; color:var(--faint); font-variant-numeric:tabular-nums; letter-spacing:.04em; }
   .lv{ display:flex; gap:6px; align-items:center; }
-  .lv span{ font-size:11px; letter-spacing:.1em; color:var(--faint); text-transform:uppercase; margin-right:4px; font-weight:700; }
-  .lv button{ width:38px; height:38px; border-radius:50%; border:1px solid var(--line); background:var(--chip); font-weight:700; font-size:15px; transition:transform .15s ease, background .2s ease; }
-  .lv button:hover{ transform:translateY(-2px); }
+  .lv span{ font-size:11px; letter-spacing:.14em; color:var(--faint); text-transform:uppercase; margin-right:6px; font-weight:700; }
+  .lv button{ width:38px; height:38px; border-radius:50%; border:1px solid var(--line); background:var(--chip); font-weight:700; font-size:14.5px; transition:transform .15s ease, background .2s ease, border-color .2s ease; }
+  .lv button:hover{ transform:translateY(-2px); border-color:var(--ink); }
   .lv button.on{ background:var(--chip-on); color:var(--chip-on-fg); border-color:var(--chip-on); }
   .lv button.five.on{ background:var(--accent); border-color:var(--accent); color:var(--accent-fg); }
-  .lv .rev{ width:auto; border-radius:999px; padding:0 16px; font-weight:600; }
+  .lv .rev{ width:auto; border-radius:999px; padding:0 18px; font-weight:600; }
   .lv .rev.no{ color:var(--warn); } .lv .rev.yes{ color:var(--accent); }
-  .timer{ position:absolute; left:28px; right:28px; bottom:3px; height:2px; border-radius:2px; overflow:hidden; }
-  .timer i{ display:block; height:100%; width:0; background:var(--accent); opacity:.6; }
+  .timer{ position:absolute; left:0; right:0; bottom:0; height:2px; overflow:hidden; }
+  .timer i{ display:block; height:100%; width:0; background:var(--accent); opacity:.55; transition:width .5s linear; }
 
-  /* ---------- progress card ---------- */
-  .card{ position:fixed; bottom:64px; right:28px; width:clamp(270px, 19vw, 340px); background:var(--card); border:1px solid var(--line); border-radius:22px; padding:20px 20px 16px; backdrop-filter:blur(10px); box-shadow:0 24px 48px -30px rgba(0,0,0,.55); }
-  .c-top{ display:flex; gap:16px; align-items:center; }
-  .ring{ position:relative; width:84px; height:84px; flex-shrink:0; }
-  .ring svg{ transform:rotate(-90deg); }
-  .ring .num{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; font-weight:700; font-size:19px; line-height:1; }
-  .ring .num small{ font-size:10.5px; color:var(--faint); font-weight:600; margin-top:3px; letter-spacing:.04em; }
-  .streak{ font-family:var(--display); font-size:30px; font-weight:600; line-height:1; }
-  .streak small{ display:block; font-family:var(--body); font-size:12.5px; color:var(--faint); font-weight:500; margin-top:5px; }
-  .c-rows{ margin-top:16px; display:grid; gap:8px; font-size:14px; }
-  .c-row{ display:flex; justify-content:space-between; gap:10px; color:var(--soft); }
-  .c-row b{ color:var(--ink); font-variant-numeric:tabular-nums; }
-  .c-row.exam b{ color:var(--warn); }
-  .c-deck{ margin-top:14px; padding-top:12px; border-top:1px solid var(--line); font-size:12.5px; color:var(--faint); line-height:1.45; }
-  .c-actions{ display:flex; gap:8px; margin-top:12px; }
-  .c-actions button{ flex:1; border:1px solid var(--line); background:var(--chip); border-radius:999px; padding:8px 10px; font-size:13px; font-weight:600; }
-  .c-actions button.primary{ background:var(--chip-on); color:var(--chip-on-fg); border-color:var(--chip-on); }
-  .topbar{ position:fixed; top:24px; right:28px; display:flex; gap:8px; }
-  .topbar button{ border:1px solid var(--line); background:var(--card); backdrop-filter:blur(10px); border-radius:999px; padding:9px 16px; font-size:13.5px; font-weight:600; box-shadow:0 12px 30px -22px rgba(0,0,0,.6); }
+  /* ---------- right column ---------- */
+  .topbar{ display:flex; gap:8px; justify-content:flex-end; flex-wrap:nowrap; white-space:nowrap; }
+  .topbar button{ border:1px solid var(--line); background:var(--card); backdrop-filter:blur(10px); border-radius:999px; padding:9px 15px; font-size:13px; font-weight:600; color:var(--ink); transition:transform .15s ease; }
+  .topbar button:hover{ transform:translateY(-1px); }
   .topbar button.primary{ background:var(--chip-on); color:var(--chip-on-fg); border-color:var(--chip-on); }
+  .card{ background:var(--card); border:1px solid var(--line); border-radius:26px; padding:22px 22px 18px; backdrop-filter:blur(14px); box-shadow:0 30px 60px -40px rgba(0,0,0,.55); }
+  .c-top{ display:flex; gap:16px; align-items:center; }
+  .ring{ position:relative; width:86px; height:86px; flex-shrink:0; }
+  .ring svg{ transform:rotate(-90deg); }
+  .ring .num{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; font-weight:700; font-size:22px; line-height:1; font-variant-numeric:tabular-nums; }
+  .ring .num small{ font-size:10.5px; color:var(--faint); font-weight:600; margin-top:4px; letter-spacing:.06em; text-transform:uppercase; }
+  .streak{ font-family:var(--display); font-size:34px; font-weight:600; line-height:1; }
+  .streak small{ white-space:nowrap; display:block; font-family:var(--body); font-size:12px; color:var(--faint); font-weight:600; margin-top:6px; letter-spacing:.04em; }
+  .c-rows{ margin-top:18px; display:grid; gap:9px; font-size:13.5px; }
+  .c-row{ display:flex; justify-content:space-between; gap:10px; color:var(--soft); white-space:nowrap; }
+  .c-row b{ color:var(--ink); font-variant-numeric:tabular-nums; }
+  .c-row.exam{ padding:9px 12px; margin:0 -4px 2px; border-radius:12px; background:color-mix(in srgb, var(--warn) 10%, transparent); }
+  .c-row.exam b{ color:var(--warn); }
+  .c-deck{ margin-top:14px; padding-top:12px; border-top:1px solid var(--line); font-size:12px; color:var(--faint); line-height:1.5; }
   .sync{ display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--accent); margin-right:6px; vertical-align:1px; }
   .sync.off{ background:var(--faint); }
   .sync.err{ background:var(--warn); }
@@ -155,23 +166,27 @@
 </style>
 </head>
 <body class="t-paperdark">
-<div class="pattern"></div>
+<div class="grain"></div>
 <canvas id="drift"></canvas>
 
-<div class="stage"><div class="word" id="word"></div></div>
-
-<div class="controls" id="controls" style="display:none;">
-  <div class="bar" id="bar">
-    <button class="nav" id="prevBtn" title="Previous word">‹</button>
-    <div class="count" id="count"></div>
-    <div class="lv" id="levels"></div>
-    <button class="nav" id="nextBtn" title="Next word">›</button>
-    <div class="timer"><i id="timerBar"></i></div>
-  </div>
+<div class="layout">
+  <main class="wcard" id="wcard">
+    <div class="word" id="word"></div>
+    <footer class="wfoot" id="controls" style="display:none;">
+      <div class="navgrp" id="bar">
+        <button class="nav" id="prevBtn" title="Previous word">‹</button>
+        <div class="count" id="count"></div>
+        <button class="nav" id="nextBtn" title="Next word">›</button>
+      </div>
+      <div class="lv" id="levels"></div>
+      <div class="timer"><i id="timerBar"></i></div>
+    </footer>
+  </main>
+  <aside class="side">
+    <div class="topbar" id="topbar"></div>
+    <div class="card" id="card"></div>
+  </aside>
 </div>
-
-<div class="topbar" id="topbar"></div>
-<aside class="card" id="card"></aside>
 
 <div class="setup" id="setup"><div class="panel" id="panel"></div></div>
 <div class="msg" id="msg"></div>
@@ -194,8 +209,9 @@
   if(params.get('code')) lsSet('vw_code', code);
   var EXAM = params.get('exam') || '2026-10-13';
 
-  var DEFAULT_CFG = { tags: [], types: [], mode: 'levels', levels: [0, 1, 2, 3, 4], order: 'shuffle', auto: 120, reveal: 'show', detail: 'full', theme: params.get('theme') || 'paperdark', drift: true };
+  var DEFAULT_CFG = { tags: [], types: [], mode: 'levels', levels: [0, 1, 2, 3, 4], order: 'shuffle', auto: 120, reveal: 'show', detail: 'full', theme: params.get('theme') || 'paperdark', drift: false };
   var cfg = Object.assign({}, DEFAULT_CFG, lsGet('vw_cfg', {}));
+  if(!cfg.v2){ cfg.drift = false; cfg.v2 = 1; lsSet('vw_cfg', cfg); }
   var session = lsGet('vw_session', null);   // { ids:[...], idx:n }
 
   var words = [], byId = {}, summary = {}, feedStamp = '', lastSync = 0, syncState = 'off';
@@ -363,7 +379,7 @@
   // ---------- word view ----------
   function field(cls, label, val){
     if(!val || val === '-') return '';
-    return '<div class="f ' + cls + '"><b>' + esc(label) + '</b>' + esc(val) + '</div>';
+    return '<div class="f ' + cls + (String(val).length > 70 ? ' wide' : '') + '"><b>' + esc(label) + '</b>' + esc(val) + '</div>';
   }
   function render(anim){
     var box = $('word');
@@ -382,12 +398,12 @@
     revealed = cfg.reveal === 'show';
     var sub = '<span class="w-pill">' + esc(TYPES[w.type] || 'Other') + '</span>' + (w.pos ? '<span>' + esc(w.pos) + '</span>' : '');
     if(code && w.id) sub += due ? '<span class="w-pill due">Due · round ' + (Math.max(st.p[w.id].stage, 0) + 1) + ' of 3</span>' : '<span class="w-pill lvl">' + (lvl >= 5 ? 'Memorized' : 'Level ' + lvl) + '</span>';
-    if(w.tags.length) sub += '<span>' + esc(w.tags.slice(0, 3).join(' · ')) + '</span>';
+    if(w.tags.length) sub += '<span class="w-dot">·</span><span>' + esc(w.tags.slice(0, 2).join(' · ')) + '</span>';
     var details = cfg.detail === 'compact'
       ? field('syn', 'Synonyms', w.syn) + field('ant', 'Antonyms', w.ant)
       : field('syn', 'Synonyms', w.syn) + field('ant', 'Antonyms', w.ant) + field('sen', 'SSC-style sentence', w.sen) + field('trk', 'Trick / mnemonic', w.trick) +
         field('root', 'Root', w.root) + field('cnf', 'Often confused with', w.conf) + field('spl', 'Spelling note', w.spell) +
-        (w.type === 'idiom' ? field('org', 'Origin', w.origin) : '') + field('his', 'SSC exam history', w.hist);
+        (w.type === 'idiom' ? field('org', 'Origin', w.origin) : '') + field('his', 'SSC exam history', w.hist);   // last = first to drop if space runs out
     box.innerHTML = '<div class="w-sub">' + sub + '</div>' +
       '<div class="w-term">' + esc(w.term) + '</div>' +
       '<div id="hid" class="' + (revealed ? '' : 'hidden-part') + '">' +
@@ -410,8 +426,26 @@
     renderControls(w, st);
     $('count').textContent = (idx + 1) + ' / ' + deck.length;
     $('controls').style.display = 'flex';
+    fit();
     restartAuto();
   }
+  /** Shrinks the text a little, then drops the least important details, so a word never overflows the card. */
+  function fit(){
+    var body = $('word');
+    var k = 1;
+    body.style.setProperty('--k', k);
+    var fields = Array.prototype.slice.call(body.querySelectorAll('.f'));
+    fields.forEach(function(f){ f.style.display = ''; });
+    var grid = body.querySelector('.w-grid');
+    if(grid) grid.style.display = '';
+    function over(){ return body.scrollHeight > body.clientHeight + 1; }
+    while(over() && k > 0.8){ k -= 0.04; body.style.setProperty('--k', k); }
+    for(var i = fields.length - 1; i >= 0 && over(); i--) fields[i].style.display = 'none';
+    if(grid && !fields.some(function(f){ return f.style.display !== 'none'; })) grid.style.display = 'none';
+    while(over() && k > 0.6){ k -= 0.04; body.style.setProperty('--k', k); }
+  }
+  window.addEventListener('resize', function(){ fit(); });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ fit(); });
   function reveal(){
     clearTimeout(revealTimer);
     revealed = true;
@@ -511,7 +545,7 @@
       (code ? '<div class="c-top">' + ring + '<div class="streak">🔥 ' + st.streak + '<small>day streak · best ' + st.best + (st.met ? ' · goal done ✓' : '') + '</small></div></div>'
             : '<div class="streak" style="font-size:22px;">Vocab Desktop<small>Link your account to see streak, goal and levels.</small></div>') +
       '<div class="c-rows">' +
-        (days >= 0 ? '<div class="c-row exam"><span>CGL exam (' + esc(new Date(EXAM + 'T00:00').toLocaleDateString([], { day: 'numeric', month: 'short' })) + ')</span><b>' + (days === 0 ? 'Today — all the best!' : days + ' day' + (days === 1 ? '' : 's') + ' left') + '</b></div>' : '') +
+        (days >= 0 ? '<div class="c-row exam"><span>📅 CGL · ' + esc(new Date(EXAM + 'T00:00').toLocaleDateString([], { day: 'numeric', month: 'short' })) + '</span><b>' + (days === 0 ? 'Today — best of luck!' : days + ' day' + (days === 1 ? '' : 's') + ' to go') + '</b></div>' : '') +
         (code ? '<div class="c-row"><span>🔁 Due for revision</span><b>' + st.due + '</b></div>' +
                 '<div class="c-row"><span>⭐ Memorized</span><b>' + st.mastered + ' / ' + (summary.total || words.length) + '</b></div>' : '') +
         '<div class="c-row"><span>In this set</span><b>' + deck.length + ' words</b></div>' +
@@ -570,7 +604,7 @@
           '<div class="sec"><h3>Meaning</h3>' + chips('reveal', [['show', 'Show right away'], ['timed', 'After 8 sec (recall first)'], ['click', 'When I click']], false) + '</div>' +
           '<div class="sec"><h3>Details</h3>' + chips('detail', [['full', 'Everything (like Present)'], ['compact', 'Meaning + synonyms only']], false) + '</div>' +
           '<div class="sec"><h3>Look</h3>' + chips('theme', [['paper', 'Paper'], ['paperdark', 'Paper dark'], ['indigo', 'Indigo'], ['indigodark', 'Indigo dark'], ['black', 'Pure black']], false) +
-            '<div style="margin-top:8px;">' + chips('drift', [[true, 'Drifting words in the background'], [false, 'Still background (saves power)']], false) + '</div></div>' +
+            '<div style="margin-top:8px;">' + chips('drift', [[false, 'Calm background'], [true, 'Floating words (subtle)']], false) + '</div></div>' +
         '</div>' +
       '</div>' +
       '<div class="p-foot"><div class="n"><b>' + n + '</b> word' + (n === 1 ? '' : 's') + ' in this set</div>' +
@@ -621,7 +655,7 @@
       var w = pool[Math.floor(Math.random() * pool.length)];
       return { t: w.term, x: cv.width * (0.34 + Math.random() * 0.5),   // keep the icon side (left third) clear
          y: anywhere ? Math.random() * cv.height : cv.height + 40 * dpr,
-        v: (0.12 + Math.random() * 0.22) * dpr, s: (14 + Math.random() * 26) * dpr, a: 0.4 + Math.random() * 0.6 };
+        v: (0.08 + Math.random() * 0.14) * dpr, s: (12 + Math.random() * 12) * dpr, a: 0.35 + Math.random() * 0.4 };
     }
     var last = 0;
     function frame(ts){
