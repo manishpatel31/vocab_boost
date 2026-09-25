@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vocab Desktop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Instrument+Sans:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root, body.t-paper{
+    --bg:#F3EEE3; --bg2:#E9E1CF; --card:rgba(255,252,246,.86); --line:#DCCFB2;
+    --ink:#221E17; --soft:#5E5547; --faint:#857B6A;
+    --accent:#2F6F63; --accent-fg:#fff; --warn:#8C2F39; --gold:#C99A2E;
+    --chip:#FFFCF6; --chip-on:#221E17; --chip-on-fg:#FFF7E6;
+    --display:'Fraunces', Georgia, serif; --body:'Instrument Sans', system-ui, sans-serif; --hindi:'Tiro Devanagari Hindi', serif;
+    --pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(150,128,90,.12) 31px, rgba(150,128,90,.12) 32px);
+    --drift:rgba(34,30,23,.07);
+    --l-syn:#2F6F63; --l-ant:#8C2F39; --l-sen:#A87E1F; --l-trk:#6A4C93; --l-his:#9A6230; --l-cnf:#8C2F39; --l-root:#2F6F63; --l-spl:#A87E1F; --l-org:#3A5F8A;
+  }
+  body.t-paperdark{
+    --bg:#1B1813; --bg2:#25201A; --card:rgba(38,33,26,.86); --line:#3B3429;
+    --ink:#EFE6D2; --soft:#BDB195; --faint:#968C75;
+    --accent:#3F9A86; --accent-fg:#fff; --warn:#B8515B; --gold:#D9AE4B;
+    --chip:#26211A; --chip-on:#EFE6D2; --chip-on-fg:#1B1813;
+    --display:'Fraunces', Georgia, serif; --body:'Instrument Sans', system-ui, sans-serif; --hindi:'Tiro Devanagari Hindi', serif;
+    --pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.04) 31px, rgba(255,240,200,.04) 32px);
+    --drift:rgba(239,230,210,.06);
+    --l-syn:#6FCFAE; --l-ant:#E58A8A; --l-sen:#E8C476; --l-trk:#B9A0E0; --l-his:#E0A970; --l-cnf:#E58A8A; --l-root:#6FD1A8; --l-spl:#E8C476; --l-org:#8FB5E0;
+  }
+  body.t-indigo{
+    --bg:#EEF1FA; --bg2:#E1E6F5; --card:rgba(255,255,255,.88); --line:#CBD3EC;
+    --ink:#0F1B3D; --soft:#4A5680; --faint:#67739C;
+    --accent:#3D5CF0; --accent-fg:#fff; --warn:#C8402F; --gold:#F59E2E;
+    --chip:#fff; --chip-on:#3D5CF0; --chip-on-fg:#fff;
+    --display:'Bricolage Grotesque', system-ui, sans-serif; --body:'Figtree', system-ui, sans-serif; --hindi:'Noto Sans Devanagari', sans-serif;
+    --pattern:radial-gradient(rgba(61,92,240,.10) 1px, transparent 1.4px);
+    --drift:rgba(61,92,240,.08);
+    --l-syn:#147D53; --l-ant:#C8402F; --l-sen:#D9831A; --l-trk:#6B4DD8; --l-his:#B8651B; --l-cnf:#C8402F; --l-root:#147D53; --l-spl:#D9831A; --l-org:#2F6FB8;
+  }
+  body.t-indigodark{
+    --bg:#0B1433; --bg2:#0E1839; --card:rgba(18,29,71,.86); --line:#22306A;
+    --ink:#EEF2FF; --soft:#A7B3DA; --faint:#8A97C4;
+    --accent:#5B77FF; --accent-fg:#fff; --warn:#D9574A; --gold:#F7C548;
+    --chip:#121D47; --chip-on:#F7C548; --chip-on-fg:#1B1203;
+    --display:'Bricolage Grotesque', system-ui, sans-serif; --body:'Figtree', system-ui, sans-serif; --hindi:'Noto Sans Devanagari', sans-serif;
+    --pattern:radial-gradient(rgba(140,160,255,.10) 1px, transparent 1.4px);
+    --drift:rgba(200,210,255,.07);
+    --l-syn:#6FCFAE; --l-ant:#F08C80; --l-sen:#F7C548; --l-trk:#B9A0FF; --l-his:#F2B06A; --l-cnf:#F08C80; --l-root:#6FD1A8; --l-spl:#F7C548; --l-org:#8FB5FF;
+  }
+  body.t-black{
+    --bg:#000; --bg2:#000; --card:rgba(12,12,12,.9); --line:#262626;
+    --ink:#F2F2F2; --soft:#BDBDBD; --faint:#8A8A8A;
+    --accent:#6FCFAE; --accent-fg:#000; --warn:#E58A8A; --gold:#E8C476;
+    --chip:#0D0D0D; --chip-on:#F2F2F2; --chip-on-fg:#000;
+    --display:'Fraunces', Georgia, serif; --body:'Instrument Sans', system-ui, sans-serif; --hindi:'Tiro Devanagari Hindi', serif;
+    --pattern:none; --drift:rgba(255,255,255,.05);
+    --l-syn:#6FCFAE; --l-ant:#E58A8A; --l-sen:#E8C476; --l-trk:#B9A0E0; --l-his:#E0A970; --l-cnf:#E58A8A; --l-root:#6FD1A8; --l-spl:#E8C476; --l-org:#8FB5E0;
+  }
+  *{ box-sizing:border-box; }
+  html, body{ margin:0; height:100%; overflow:hidden; }
+  body{ background:var(--bg); color:var(--ink); font-family:var(--body); user-select:none; -webkit-font-smoothing:antialiased; transition:background .6s ease, color .6s ease; }
+  .pattern{ position:fixed; inset:0; background-image:var(--pattern); background-size:24px 24px; pointer-events:none; }
+  body.t-paper .pattern, body.t-paperdark .pattern{ background-size:auto; }
+  #drift{ position:fixed; inset:0; width:100%; height:100%; pointer-events:none; }
+  button{ font:inherit; color:inherit; cursor:pointer; }
+
+  /* ---------- word stage ---------- */
+  .stage{ position:fixed; top:0; bottom:0; left:clamp(96px, 9vw, 160px); right:clamp(300px, 24vw, 400px); display:flex; align-items:center; justify-content:center; padding:4vh 3vw 150px; }
+  .word{ width:100%; max-width:1000px; }
+  .word.swap{ animation:inword .5s ease backwards; }
+  @keyframes inword{ from{ opacity:0; transform:translateY(10px); } }
+  .w-sub{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; color:var(--faint); font-size:clamp(12px, .9vw, 15px); letter-spacing:.06em; text-transform:uppercase; font-weight:600; }
+  .w-pill{ border:1px solid var(--line); border-radius:999px; padding:3px 11px; background:var(--chip); }
+  .w-pill.lvl{ color:var(--accent); border-color:var(--accent); }
+  .w-pill.due{ color:var(--gold); border-color:var(--gold); }
+  .w-term{ font-family:var(--display); font-weight:600; font-size:clamp(44px, 6.2vw, 110px); line-height:1.02; letter-spacing:-.015em; margin:.18em 0 .12em; overflow-wrap:anywhere; }
+  .w-mean{ font-size:clamp(20px, 1.9vw, 34px); line-height:1.35; color:var(--ink); max-width:48ch; }
+  .w-hindi{ font-family:var(--hindi); font-size:clamp(19px, 1.75vw, 31px); color:var(--soft); margin-top:.35em; }
+  .w-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:clamp(12px, 1.4vw, 22px) clamp(18px, 2vw, 34px); margin-top:clamp(18px, 2.6vh, 34px); }
+  .f{ font-size:clamp(14px, 1.05vw, 18px); line-height:1.5; color:var(--soft); }
+  .f b{ display:block; font-size:clamp(10.5px, .72vw, 12.5px); letter-spacing:.12em; text-transform:uppercase; margin-bottom:3px; font-weight:700; }
+  .f.syn b{ color:var(--l-syn); } .f.ant b{ color:var(--l-ant); } .f.sen b{ color:var(--l-sen); } .f.trk b{ color:var(--l-trk); }
+  .f.his b{ color:var(--l-his); } .f.cnf b{ color:var(--l-cnf); } .f.root b{ color:var(--l-root); } .f.spl b{ color:var(--l-spl); } .f.org b{ color:var(--l-org); }
+  .f.sen{ font-style:italic; }
+  .hidden-part{ filter:blur(9px); opacity:.35; transition:filter .6s ease, opacity .6s ease; cursor:pointer; }
+  .reveal-hint{ margin-top:14px; font-size:14px; color:var(--faint); }
+  .reveal-hint button{ border:1px solid var(--line); background:var(--chip); border-radius:999px; padding:7px 16px; }
+
+  /* ---------- controls ---------- */
+  .controls{ position:fixed; left:clamp(96px, 9vw, 160px); right:clamp(300px, 24vw, 400px); bottom:64px; display:flex; justify-content:center; }
+  .bar{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:999px; background:var(--card); border:1px solid var(--line); backdrop-filter:blur(10px); box-shadow:0 18px 40px -26px rgba(0,0,0,.5); }
+  .nav{ width:46px; height:46px; border-radius:50%; border:1px solid var(--line); background:var(--chip); font-size:20px; display:flex; align-items:center; justify-content:center; transition:transform .15s ease; }
+  .nav:hover{ transform:scale(1.06); }
+  .count{ min-width:78px; text-align:center; font-size:13px; color:var(--faint); font-variant-numeric:tabular-nums; }
+  .lv{ display:flex; gap:6px; align-items:center; }
+  .lv span{ font-size:11px; letter-spacing:.1em; color:var(--faint); text-transform:uppercase; margin-right:4px; font-weight:700; }
+  .lv button{ width:38px; height:38px; border-radius:50%; border:1px solid var(--line); background:var(--chip); font-weight:700; font-size:15px; transition:transform .15s ease, background .2s ease; }
+  .lv button:hover{ transform:translateY(-2px); }
+  .lv button.on{ background:var(--chip-on); color:var(--chip-on-fg); border-color:var(--chip-on); }
+  .lv button.five.on{ background:var(--accent); border-color:var(--accent); color:var(--accent-fg); }
+  .lv .rev{ width:auto; border-radius:999px; padding:0 16px; font-weight:600; }
+  .lv .rev.no{ color:var(--warn); } .lv .rev.yes{ color:var(--accent); }
+  .timer{ position:absolute; left:28px; right:28px; bottom:3px; height:2px; border-radius:2px; overflow:hidden; }
+  .timer i{ display:block; height:100%; width:0; background:var(--accent); opacity:.6; }
+
+  /* ---------- progress card ---------- */
+  .card{ position:fixed; top:28px; right:28px; width:clamp(260px, 20vw, 340px); background:var(--card); border:1px solid var(--line); border-radius:22px; padding:20px 20px 16px; backdrop-filter:blur(10px); box-shadow:0 24px 48px -30px rgba(0,0,0,.55); }
+  .c-top{ display:flex; gap:16px; align-items:center; }
+  .ring{ position:relative; width:84px; height:84px; flex-shrink:0; }
+  .ring svg{ transform:rotate(-90deg); }
+  .ring .num{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; font-weight:700; font-size:19px; line-height:1; }
+  .ring .num small{ font-size:10.5px; color:var(--faint); font-weight:600; margin-top:3px; letter-spacing:.04em; }
+  .streak{ font-family:var(--display); font-size:30px; font-weight:600; line-height:1; }
+  .streak small{ display:block; font-family:var(--body); font-size:12.5px; color:var(--faint); font-weight:500; margin-top:5px; }
+  .c-rows{ margin-top:16px; display:grid; gap:8px; font-size:14px; }
+  .c-row{ display:flex; justify-content:space-between; gap:10px; color:var(--soft); }
+  .c-row b{ color:var(--ink); font-variant-numeric:tabular-nums; }
+  .c-row.exam b{ color:var(--warn); }
+  .c-deck{ margin-top:14px; padding-top:12px; border-top:1px solid var(--line); font-size:12.5px; color:var(--faint); line-height:1.45; }
+  .c-actions{ display:flex; gap:8px; margin-top:12px; }
+  .c-actions button{ flex:1; border:1px solid var(--line); background:var(--chip); border-radius:999px; padding:8px 10px; font-size:13px; font-weight:600; }
+  .c-actions button.primary{ background:var(--chip-on); color:var(--chip-on-fg); border-color:var(--chip-on); }
+  .sync{ display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--accent); margin-right:6px; vertical-align:1px; }
+  .sync.off{ background:var(--faint); }
+  .sync.err{ background:var(--warn); }
+
+  /* ---------- setup ---------- */
+  .setup{ position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; align-items:center; justify-content:center; padding:40px 40px 90px; }
+  .setup.open{ display:flex; }
+  .panel{ width:min(980px, 100%); max-height:100%; overflow:auto; background:var(--bg); border:1px solid var(--line); border-radius:24px; padding:26px 30px; box-shadow:0 40px 80px -30px rgba(0,0,0,.6); }
+  .panel h2{ font-family:var(--display); font-weight:600; font-size:28px; margin:0 0 4px; }
+  .panel .help{ color:var(--faint); font-size:13.5px; margin:0 0 6px; }
+  .cols{ display:grid; grid-template-columns:1fr 1fr; gap:10px 34px; }
+  .sec{ margin-top:18px; }
+  .sec h3{ font-size:11.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--faint); margin:0 0 8px; }
+  .chips{ display:flex; flex-wrap:wrap; gap:7px; }
+  .chips button{ border:1px solid var(--line); background:var(--chip); border-radius:999px; padding:7px 13px; font-size:13.5px; }
+  .chips button.on{ background:var(--chip-on); color:var(--chip-on-fg); border-color:var(--chip-on); }
+  .chips button small{ opacity:.65; margin-left:4px; }
+  .tagbox{ max-height:170px; overflow:auto; padding:2px; }
+  .p-foot{ display:flex; justify-content:space-between; align-items:center; gap:14px; margin-top:22px; padding-top:16px; border-top:1px solid var(--line); flex-wrap:wrap; }
+  .p-foot .n{ font-size:15px; color:var(--soft); }
+  .p-foot .n b{ color:var(--ink); font-size:20px; }
+  .big{ border:none; background:var(--chip-on); color:var(--chip-on-fg); border-radius:999px; padding:12px 26px; font-size:15px; font-weight:700; }
+  .ghost{ border:1px solid var(--line); background:var(--chip); border-radius:999px; padding:11px 20px; font-size:14px; }
+  .msg{ position:fixed; left:50%; top:26px; transform:translateX(-50%); background:var(--card); border:1px solid var(--line); border-radius:999px; padding:9px 18px; font-size:13.5px; opacity:0; transition:opacity .3s ease; pointer-events:none; }
+  .msg.show{ opacity:1; }
+  .empty{ font-size:18px; color:var(--soft); line-height:1.6; max-width:60ch; }
+  .empty h1{ font-family:var(--display); font-size:44px; color:var(--ink); margin:0 0 10px; font-weight:600; }
+  .empty code{ background:var(--bg2); padding:2px 7px; border-radius:6px; font-size:15px; }
+  @media (max-width:1100px){ .cols{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body class="t-paperdark">
+<div class="pattern"></div>
+<canvas id="drift"></canvas>
+
+<div class="stage"><div class="word" id="word"></div></div>
+
+<div class="controls" id="controls" style="display:none;">
+  <div class="bar" id="bar">
+    <button class="nav" id="prevBtn" title="Previous word">‹</button>
+    <div class="count" id="count"></div>
+    <div class="lv" id="levels"></div>
+    <button class="nav" id="nextBtn" title="Next word">›</button>
+    <div class="timer"><i id="timerBar"></i></div>
+  </div>
+</div>
+
+<aside class="card" id="card"></aside>
+
+<div class="setup" id="setup"><div class="panel" id="panel"></div></div>
+<div class="msg" id="msg"></div>
+
+<script>
+(function(){
+  'use strict';
+  var PROJECT = 'cgl-vocab-register';
+  var API_KEY = 'AIzaSyDiTH-7aVK8ojL1njbv3BmiHJujW4xsUvM';
+  var DOCS = 'https://firestore.googleapis.com/v1/projects/' + PROJECT + '/databases/(default)/documents/';
+  var DAY = 86400000, ROUNDS = [7, 14, 30];
+  var TYPES = { word: 'Word', idiom: 'Idiom', one_word_substitution: 'One-word sub', phrasal_verb: 'Phrasal verb', fixed_preposition: 'Fixed preposition', other: 'Other' };
+
+  // ---------- storage (Lively keeps this between restarts; everything still works if it doesn't) ----------
+  function lsGet(k, d){ try{ var v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } }
+  function lsSet(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+
+  var params = new URLSearchParams(location.search);
+  var code = (params.get('code') || lsGet('vw_code', '') || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if(params.get('code')) lsSet('vw_code', code);
+  var EXAM = params.get('exam') || '2026-10-13';
+
+  var DEFAULT_CFG = { tags: [], types: [], mode: 'levels', levels: [0, 1, 2, 3, 4], order: 'shuffle', auto: 120, reveal: 'show', detail: 'full', theme: params.get('theme') || 'paperdark', drift: true };
+  var cfg = Object.assign({}, DEFAULT_CFG, lsGet('vw_cfg', {}));
+  var session = lsGet('vw_session', null);   // { ids:[...], idx:n }
+
+  var words = [], byId = {}, summary = {}, feedStamp = '', lastSync = 0, syncState = 'off';
+  var deck = [], idx = 0, revealed = true, revealTimer = null, autoTimer = null, autoStart = 0, pausedByHover = false;
+
+  // ---------- helpers ----------
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+  function dayKey(ms){ var d = new Date(ms); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function today(){ return dayKey(Date.now()); }
+  function yesterday(){ return dayKey(Date.now() - DAY); }
+  function endOfToday(){ var d = new Date(); d.setHours(23, 59, 59, 999); return d.getTime(); }
+  function say(t){ var m = $('msg'); m.textContent = t; m.classList.add('show'); clearTimeout(say.t); say.t = setTimeout(function(){ m.classList.remove('show'); }, 2600); }
+  function shuffle(a){ for(var i = a.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+
+  async function getDoc(path){
+    var r = await fetch(DOCS + path + '?key=' + API_KEY);
+    if(r.status === 404) return null;
+    if(!r.ok) throw new Error('Firebase ' + r.status);
+    var j = await r.json();
+    return j.fields || {};
+  }
+  function sv(f, k){ return f && f[k] ? (f[k].stringValue !== undefined ? f[k].stringValue : (f[k].integerValue !== undefined ? f[k].integerValue : (f[k].timestampValue || ''))) : ''; }
+
+  // ---------- words (the same list the phone app uses) ----------
+  function useFeed(list){
+    words = list.map(function(o){
+      return { id: o.i || '', term: o.t || '', type: o.y || 'other', pos: o.p || '', meaning: o.m || '', hindi: o.h || '',
+        syn: o.s || '', ant: o.a || '', sen: o.e || '', trick: o.k || '', hist: o.x || '', conf: o.c || '', root: o.r || '', spell: o.n || '', origin: o.o || '', tags: o.g || [] };
+    }).filter(function(w){ return w.term; });
+    byId = {};
+    words.forEach(function(w){ if(w.id) byId[w.id] = w; });
+  }
+  async function loadFeed(force){
+    var meta = await getDoc('lockFeed/meta');
+    if(!meta) throw new Error('No words published yet (web app → Manage ▾ → Admin → Publish words to lock-screen app).');
+    var stamp = sv(meta, 'updatedAt');
+    var cached = lsGet('vw_feed', null);
+    if(!force && cached && cached.stamp === stamp && cached.list){ if(!words.length) useFeed(cached.list); feedStamp = stamp; return false; }
+    var parts = parseInt(sv(meta, 'parts'), 10) || 0, all = [];
+    for(var i = 0; i < parts; i++){
+      var p = await getDoc('lockFeed/p' + i);
+      if(p) all = all.concat(JSON.parse(sv(p, 'json') || '[]'));
+    }
+    useFeed(all);
+    feedStamp = stamp;
+    lsSet('vw_feed', { stamp: stamp, list: all });
+    return true;
+  }
+
+  // ---------- your progress (link code) ----------
+  async function pullSummary(){
+    if(!code){ syncState = 'off'; return; }
+    try{
+      var f = await getDoc('lockSync/' + code);
+      if(!f){ syncState = 'err'; summary = {}; say('This link code is no longer linked — create a new one in the web app.'); return; }
+      summary = JSON.parse(sv(f, 'json') || '{}');
+      lsSet('vw_summary', summary);
+      lastSync = Date.now();
+      syncState = 'ok';
+      prune();
+    }catch(e){ syncState = 'err'; }
+  }
+  function events(){ return lsGet('vw_events', []); }
+  function prune(){
+    var last = summary.lastEventT || 0;
+    lsSet('vw_events', events().filter(function(e){ return !(e.s && e.t <= last); }));
+  }
+  function record(id, kind, value){
+    if(!code || !id) return;
+    var list = events();
+    var t = Math.max(Date.now(), list.reduce(function(m, e){ return Math.max(m, e.t); }, 0) + 1);
+    list.push({ w: id, k: kind, c: value, t: t, d: today(), s: false });
+    lsSet('vw_events', list);
+    flush();
+  }
+  var flushing = false;
+  async function flush(){
+    if(flushing || !code) return;
+    flushing = true;
+    try{
+      var unsent = events().filter(function(e){ return !e.s; });
+      for(var i = 0; i < unsent.length; i++){
+        var e = unsent[i];
+        var body = { fields: { w: { stringValue: e.w }, k: { stringValue: e.k }, c: { integerValue: String(e.c) }, t: { integerValue: String(e.t) }, d: { stringValue: e.d } } };
+        var r = await fetch(DOCS + 'lockSync/' + code + '/events?key=' + API_KEY, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        if(!r.ok) throw new Error('send ' + r.status);
+        lsSet('vw_events', events().map(function(x){ return (x.t === e.t && x.w === e.w) ? Object.assign({}, x, { s: true }) : x; }));
+      }
+    }catch(err){ syncState = 'err'; }
+    flushing = false;
+    renderCard();
+  }
+
+  /** Web summary + ratings made here that the web app hasn't applied yet (same rules as the web app). */
+  function state(){
+    var s = summary || {}, p = {};
+    Object.keys(s.p || {}).forEach(function(id){ var a = s.p[id]; p[id] = { conf: a[0] || 0, star: a[1] === 1, stage: typeof a[2] === 'number' ? a[2] : -1, due: a[3] || 0, done: a[4] === 1 }; });
+    var memMode = s.mode === 'memorized', t = today(), y = yesterday();
+    var todayIds = {};
+    if(s.goalDay === t) (s.goalIds || []).forEach(function(id){ todayIds[id] = true; });
+    events().filter(function(e){ return e.t > (s.lastEventT || 0); }).sort(function(a, b){ return a.t - b.t; }).forEach(function(e){
+      var cur = p[e.w] || { conf: 0, star: false, stage: -1, due: 0, done: false };
+      var prev = cur.conf, nextConf = prev, nx = Object.assign({}, cur);
+      if(e.k === 'rate') nextConf = e.c;
+      else if(e.k === 'rev' && prev === 5){
+        if(e.c === 1){
+          var st = Math.max(cur.stage, 0) + 1;
+          nx.stage = st;
+          if(st >= ROUNDS.length){ nx.due = 0; nx.done = true; } else { nx.due = e.t + ROUNDS[st] * DAY; nx.done = false; }
+        } else nextConf = 3;
+      }
+      if(nextConf !== prev){
+        if(nextConf >= 5){ nx.stage = 0; nx.due = e.t + ROUNDS[0] * DAY; nx.done = false; }
+        else if(prev === 5){ nx.stage = -1; nx.due = 0; nx.done = false; }
+        nx.conf = nextConf;
+        var q = memMode ? (nextConf >= 5 && prev < 5) : nextConf > prev;
+        if(q && e.d === t) todayIds[e.w] = true;
+      }
+      p[e.w] = nx;
+    });
+    var goal = s.goal || 0, count = Object.keys(todayIds).length;
+    var streak = (s.lastMet === t || s.lastMet === y) ? (s.streak || 0) : 0, met = s.lastMet === t;
+    if(goal > 0 && count >= goal && s.lastMet !== t){ streak = (s.lastMet === y ? (s.streak || 0) : 0) + 1; met = true; }
+    var eod = endOfToday();
+    function isDue(id){ var x = p[id]; return !!x && x.conf >= 5 && !x.done && x.due > 0 && x.due <= eod; }
+    return { p: p, goal: goal, count: count, streak: streak, best: Math.max(s.best || 0, streak), met: met,
+      level: function(id){ return p[id] ? p[id].conf : 0; }, isDue: isDue,
+      due: Object.keys(p).filter(isDue).length, mastered: Object.keys(p).filter(function(id){ return p[id].conf >= 5; }).length };
+  }
+
+  // ---------- deck ----------
+  function matches(w, st, c){
+    if(c.tags.length && !w.tags.some(function(t){ return c.tags.indexOf(t) !== -1; })) return false;
+    if(c.types.length && c.types.indexOf(w.type) === -1) return false;
+    if(c.mode === 'due') return st.isDue(w.id);
+    if(c.mode === 'starred') return !!(st.p[w.id] && st.p[w.id].star);
+    if(c.mode === 'levels' && code) return c.levels.indexOf(st.level(w.id)) !== -1;
+    return true;
+  }
+  function buildDeck(c){
+    var st = state();
+    var list = words.filter(function(w){ return matches(w, st, c || cfg); });
+    if(cfg.mode === 'due') list.sort(function(a, b){ return (st.p[a.id].due || 0) - (st.p[b.id].due || 0); });
+    else if(cfg.order === 'shuffle') shuffle(list);
+    else if(cfg.order === 'az') list.sort(function(a, b){ return a.term.localeCompare(b.term); });
+    return list;
+  }
+  function startDeck(){
+    deck = buildDeck();
+    idx = 0;
+    saveSession();
+  }
+  function saveSession(){ lsSet('vw_session', { ids: deck.map(function(w){ return w.id || w.term; }), idx: idx }); }
+  function restoreSession(){
+    if(!session || !session.ids || !session.ids.length) return false;
+    var map = {};
+    words.forEach(function(w){ map[w.id || w.term] = w; });
+    deck = session.ids.map(function(k){ return map[k]; }).filter(Boolean);
+    idx = Math.min(session.idx || 0, Math.max(deck.length - 1, 0));
+    return deck.length > 0;
+  }
+
+  // ---------- word view ----------
+  function field(cls, label, val){
+    if(!val || val === '-') return '';
+    return '<div class="f ' + cls + '"><b>' + esc(label) + '</b>' + esc(val) + '</div>';
+  }
+  function render(anim){
+    var box = $('word');
+    clearTimeout(revealTimer);
+    if(!words.length){
+      box.innerHTML = '<div class="empty"><h1>Loading your register…</h1>If this stays, check the internet connection.</div>';
+      $('controls').style.display = 'none';
+      return;
+    }
+    if(!deck.length){
+      box.innerHTML = '<div class="empty"><h1>No words in this set</h1>' + (cfg.mode === 'due' ? 'Nothing is due for revision right now. 🎉 ' : '') + 'Click <b>Change set</b> on the right and pick different tags or levels.</div>';
+      $('controls').style.display = 'none';
+      return;
+    }
+    var w = deck[idx], st = state(), lvl = st.level(w.id), due = st.isDue(w.id);
+    revealed = cfg.reveal === 'show';
+    var sub = '<span class="w-pill">' + esc(TYPES[w.type] || 'Other') + '</span>' + (w.pos ? '<span>' + esc(w.pos) + '</span>' : '');
+    if(code && w.id) sub += due ? '<span class="w-pill due">Due · round ' + (Math.max(st.p[w.id].stage, 0) + 1) + ' of 3</span>' : '<span class="w-pill lvl">' + (lvl >= 5 ? 'Memorized' : 'Level ' + lvl) + '</span>';
+    if(w.tags.length) sub += '<span>' + esc(w.tags.slice(0, 3).join(' · ')) + '</span>';
+    var details = cfg.detail === 'compact'
+      ? field('syn', 'Synonyms', w.syn) + field('ant', 'Antonyms', w.ant)
+      : field('syn', 'Synonyms', w.syn) + field('ant', 'Antonyms', w.ant) + field('sen', 'SSC-style sentence', w.sen) + field('trk', 'Trick / mnemonic', w.trick) +
+        field('root', 'Root', w.root) + field('cnf', 'Often confused with', w.conf) + field('spl', 'Spelling note', w.spell) +
+        (w.type === 'idiom' ? field('org', 'Origin', w.origin) : '') + field('his', 'SSC exam history', w.hist);
+    box.innerHTML = '<div class="w-sub">' + sub + '</div>' +
+      '<div class="w-term">' + esc(w.term) + '</div>' +
+      '<div id="hid" class="' + (revealed ? '' : 'hidden-part') + '">' +
+        (w.meaning ? '<div class="w-mean">' + esc(w.meaning) + '</div>' : '') +
+        (w.hindi ? '<div class="w-hindi">' + esc(w.hindi) + '</div>' : '') +
+        (details ? '<div class="w-grid">' + details + '</div>' : '') +
+      '</div>' +
+      (revealed ? '' : '<div class="reveal-hint" id="revealHint">' + (cfg.reveal === 'timed' ? 'Think of the meaning… it appears in <span id="rc">8</span>s · ' : 'Recall the meaning, then ') + '<button id="revealBtn">Show meaning</button></div>');
+    if(anim !== false){ box.classList.remove('swap'); void box.offsetWidth; box.classList.add('swap'); }
+    if(!revealed){
+      $('revealBtn').addEventListener('click', reveal);
+      $('hid').addEventListener('click', reveal);
+      if(cfg.reveal === 'timed'){
+        var left = 8;
+        (function tick(){
+          revealTimer = setTimeout(function(){ left--; var rc = $('rc'); if(rc) rc.textContent = left; if(left <= 0) reveal(); else tick(); }, 1000);
+        })();
+      }
+    }
+    renderControls(w, st);
+    $('count').textContent = (idx + 1) + ' / ' + deck.length;
+    $('controls').style.display = 'flex';
+    restartAuto();
+  }
+  function reveal(){
+    clearTimeout(revealTimer);
+    revealed = true;
+    var h = $('hid'); if(h) h.classList.remove('hidden-part');
+    var r = $('revealHint'); if(r) r.remove();
+  }
+  function renderControls(w, st){
+    var box = $('levels');
+    if(!code || !w.id){ box.innerHTML = code ? '' : '<span>Add your link code to mark levels</span>'; return; }
+    var lvl = st.level(w.id);
+    if(st.isDue(w.id)){
+      box.innerHTML = '<span>Revision</span><button class="rev no" data-rev="0">✗ Forgot</button><button class="rev yes" data-rev="1">✓ Remembered</button>';
+    } else {
+      var h = '<span>Level</span>';
+      for(var n = 0; n <= 5; n++) h += '<button data-lv="' + n + '" class="' + (n === lvl ? 'on' : '') + (n === 5 ? ' five' : '') + '" title="' + (n === 5 ? 'Memorized' : 'Level ' + n) + '">' + n + '</button>';
+      box.innerHTML = h;
+    }
+  }
+  $('levels').addEventListener('click', function(ev){
+    var b = ev.target.closest('button');
+    if(!b) return;
+    var w = deck[idx];
+    if(!w) return;
+    if(b.dataset.rev !== undefined){
+      record(w.id, 'rev', +b.dataset.rev);
+      say(+b.dataset.rev ? 'Nice — next round scheduled.' : 'Back to level 3 — it will come round again.');
+      setTimeout(function(){ step(1); }, 650);
+    } else if(b.dataset.lv !== undefined){
+      var n = +b.dataset.lv;
+      record(w.id, 'rate', n);
+      renderControls(w, state());
+      render(false);
+      if(n === 5){ say('Memorized! 🎉'); setTimeout(function(){ step(1); }, 700); }
+    }
+    renderCard();
+  });
+  function step(dir){
+    if(!deck.length) return;
+    idx = (idx + dir + deck.length) % deck.length;
+    if(idx === 0 && dir > 0) say('Back to the first word of this set.');
+    saveSession();
+    render();
+  }
+  $('prevBtn').addEventListener('click', function(){ step(-1); });
+  $('nextBtn').addEventListener('click', function(){ step(1); });
+  document.addEventListener('keydown', function(e){
+    if($('setup').classList.contains('open')) return;
+    if(e.key === 'ArrowRight' || e.key === ' ') step(1);
+    else if(e.key === 'ArrowLeft') step(-1);
+    else if(/^[0-5]$/.test(e.key)){ var b = document.querySelector('[data-lv="' + e.key + '"]'); if(b) b.click(); }
+  });
+
+  // auto-advance (pauses while the pointer is on the controls or the set-up is open)
+  function restartAuto(){
+    clearInterval(autoTimer);
+    var bar = $('timerBar');
+    bar.style.width = '0';
+    if(!cfg.auto || !deck.length) return;
+    autoStart = Date.now();
+    autoTimer = setInterval(function(){
+      if(pausedByHover || $('setup').classList.contains('open') || document.hidden){ autoStart += 500; return; }
+      var f = (Date.now() - autoStart) / (cfg.auto * 1000);
+      bar.style.width = Math.min(100, f * 100) + '%';
+      if(f >= 1) step(1);
+    }, 500);
+  }
+  $('bar').addEventListener('mouseenter', function(){ pausedByHover = true; });
+  $('bar').addEventListener('mouseleave', function(){ pausedByHover = false; });
+
+  // ---------- progress card ----------
+  function examDays(){
+    var p = EXAM.split('-'), d = new Date(+p[0], +p[1] - 1, +p[2]);
+    var t = new Date(); t.setHours(0, 0, 0, 0);
+    return Math.round((d - t) / DAY);
+  }
+  function deckLabel(){
+    var parts = [];
+    parts.push(cfg.tags.length ? cfg.tags.slice(0, 3).join(', ') + (cfg.tags.length > 3 ? ' +' + (cfg.tags.length - 3) : '') : 'All tags');
+    if(cfg.types.length) parts.push(cfg.types.map(function(t){ return TYPES[t]; }).join(', '));
+    if(cfg.mode === 'due') parts.push('Due for revision');
+    else if(cfg.mode === 'starred') parts.push('Starred');
+    else if(cfg.mode === 'levels' && code) parts.push(cfg.levels.length === 6 ? 'All levels' : 'Levels ' + cfg.levels.join(', '));
+    return parts.join(' · ');
+  }
+  function renderCard(){
+    var st = state();
+    var days = examDays();
+    var ring = '';
+    if(code){
+      var goal = st.goal, c = Math.min(st.count, goal || 1), R = 36, C = 2 * Math.PI * R, f = goal ? c / goal : 0;
+      ring = '<div class="ring"><svg width="84" height="84"><circle cx="42" cy="42" r="' + R + '" fill="none" stroke="var(--line)" stroke-width="7"/>' +
+        '<circle cx="42" cy="42" r="' + R + '" fill="none" stroke="' + (st.met ? 'var(--accent)' : 'var(--gold)') + '" stroke-width="7" stroke-linecap="round" stroke-dasharray="' + C + '" stroke-dashoffset="' + (C * (1 - f)) + '"/></svg>' +
+        '<div class="num">' + (goal ? st.count + '<small>of ' + goal + '</small>' : '—<small>no goal</small>') + '</div></div>';
+    }
+    var syncTxt = !code ? '<span class="sync off"></span>Not linked' : (syncState === 'err' ? '<span class="sync err"></span>Offline — will retry' : '<span class="sync"></span>Synced ' + (lastSync ? new Date(lastSync).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '…'));
+    $('card').innerHTML =
+      (code ? '<div class="c-top">' + ring + '<div class="streak">🔥 ' + st.streak + '<small>day streak · best ' + st.best + (st.met ? ' · goal done ✓' : '') + '</small></div></div>'
+            : '<div class="streak" style="font-size:22px;">Vocab Desktop<small>Link your account to see streak, goal and levels.</small></div>') +
+      '<div class="c-rows">' +
+        (days >= 0 ? '<div class="c-row exam"><span>CGL exam (' + esc(new Date(EXAM + 'T00:00').toLocaleDateString([], { day: 'numeric', month: 'short' })) + ')</span><b>' + (days === 0 ? 'Today — all the best!' : days + ' day' + (days === 1 ? '' : 's') + ' left') + '</b></div>' : '') +
+        (code ? '<div class="c-row"><span>🔁 Due for revision</span><b>' + st.due + '</b></div>' +
+                '<div class="c-row"><span>⭐ Memorized</span><b>' + st.mastered + ' / ' + (summary.total || words.length) + '</b></div>' : '') +
+        '<div class="c-row"><span>In this set</span><b>' + deck.length + ' words</b></div>' +
+      '</div>' +
+      '<div class="c-deck">' + esc(deckLabel()) + '<br>' + syncTxt + '</div>' +
+      '<div class="c-actions"><button class="primary" id="setBtn">Change set</button>' + (code && st.due ? '<button id="dueBtn">Revise ' + st.due + '</button>' : '<button id="shufBtn">Shuffle</button>') + '</div>';
+    $('setBtn').addEventListener('click', openSetup);
+    var db = $('dueBtn');
+    if(db) db.addEventListener('click', function(){ cfg.mode = 'due'; cfg.tags = []; cfg.types = []; lsSet('vw_cfg', cfg); startDeck(); render(); renderCard(); });
+    var sb = $('shufBtn');
+    if(sb) sb.addEventListener('click', function(){ shuffle(deck); idx = 0; saveSession(); render(); say('Shuffled.'); });
+  }
+
+  // ---------- set-up panel ----------
+  function chips(key, options, multi){
+    var cur = draft[key];
+    return '<div class="chips" data-key="' + key + '" data-multi="' + (multi ? 1 : 0) + '">' + options.map(function(o){
+      var on = multi ? cur.indexOf(o[0]) !== -1 : cur === o[0];
+      return '<button data-val="' + esc(JSON.stringify(o[0])) + '" class="' + (on ? 'on' : '') + '">' + o[1] + '</button>';
+    }).join('') + '</div>';
+  }
+  var draft = null;
+  function openSetup(){
+    draft = JSON.parse(JSON.stringify(cfg));
+    paintSetup();
+    $('setup').classList.add('open');
+  }
+  function paintSetup(){
+    var tagCount = {};
+    words.forEach(function(w){ w.tags.forEach(function(t){ tagCount[t] = (tagCount[t] || 0) + 1; }); });
+    var tags = Object.keys(tagCount).sort();
+    var typeCount = {};
+    words.forEach(function(w){ typeCount[w.type] = (typeCount[w.type] || 0) + 1; });
+    var n = words.filter(function(w){ return matches(w, state(), draft); }).length;
+    var lvlPresets = [['[0,1,2,3,4]', 'Not memorized (0–4)'], ['[0,1,2]', 'Weak (0–2)'], ['[0]', 'New (0)'], ['[1,2,3,4]', 'Learning (1–4)'], ['[5]', 'Memorized (5)'], ['[0,1,2,3,4,5]', 'All levels']];
+    $('panel').innerHTML =
+      '<h2>Choose what to study on your desktop</h2>' +
+      '<p class="help">Pick a set like in Present mode. The words play on your wallpaper; use ‹ › and the 0–5 buttons at the bottom.</p>' +
+      '<div class="cols">' +
+        '<div>' +
+          '<div class="sec"><h3>Tags <span style="text-transform:none; letter-spacing:0;">(none = all)</span></h3><div class="tagbox">' +
+            chips('tags', tags.map(function(t){ return [t, esc(t) + '<small>' + tagCount[t] + '</small>']; }), true) + '</div></div>' +
+          '<div class="sec"><h3>Type <span style="text-transform:none; letter-spacing:0;">(none = all)</span></h3>' +
+            chips('types', Object.keys(TYPES).filter(function(t){ return typeCount[t]; }).map(function(t){ return [t, TYPES[t] + '<small>' + typeCount[t] + '</small>']; }), true) + '</div>' +
+          '<div class="sec"><h3>Difficulty</h3>' +
+            (code ? chips('mode', [['levels', 'By level'], ['due', 'Due for revision'], ['starred', 'Starred'], ['all', 'Everything']], false) +
+              (draft.mode === 'levels' ? '<div style="margin-top:9px;">' + chips('levels', [[0, 'Level 0'], [1, '1'], [2, '2'], [3, '3'], [4, '4'], [5, '5 · memorized']], true) +
+                '<div class="chips" id="lvPresets" style="margin-top:8px;">' + lvlPresets.map(function(p){ return '<button data-preset="' + p[0] + '" class="' + (JSON.stringify(draft.levels.slice().sort()) === p[0] ? 'on' : '') + '">' + p[1] + '</button>'; }).join('') + '</div></div>' : '')
+              : '<p class="help">Levels, revisions and starred need your link code. In the web app: your name → <b>Phone app (Vocab Lock)</b> → copy the <b>desktop wallpaper link</b> and use it in Lively.</p>') +
+          '</div>' +
+        '</div>' +
+        '<div>' +
+          '<div class="sec"><h3>Order</h3>' + chips('order', [['shuffle', 'Shuffle'], ['newest', 'Newest first'], ['az', 'A → Z']], false) + '</div>' +
+          '<div class="sec"><h3>Next word automatically</h3>' + chips('auto', [[0, 'Off'], [30, '30 sec'], [60, '1 min'], [120, '2 min'], [300, '5 min'], [600, '10 min']], false) + '</div>' +
+          '<div class="sec"><h3>Meaning</h3>' + chips('reveal', [['show', 'Show right away'], ['timed', 'After 8 sec (recall first)'], ['click', 'When I click']], false) + '</div>' +
+          '<div class="sec"><h3>Details</h3>' + chips('detail', [['full', 'Everything (like Present)'], ['compact', 'Meaning + synonyms only']], false) + '</div>' +
+          '<div class="sec"><h3>Look</h3>' + chips('theme', [['paper', 'Paper'], ['paperdark', 'Paper dark'], ['indigo', 'Indigo'], ['indigodark', 'Indigo dark'], ['black', 'Pure black']], false) +
+            '<div style="margin-top:8px;">' + chips('drift', [[true, 'Drifting words in the background'], [false, 'Still background (saves power)']], false) + '</div></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="p-foot"><div class="n"><b>' + n + '</b> word' + (n === 1 ? '' : 's') + ' in this set</div>' +
+        '<div style="display:flex; gap:10px;"><button class="ghost" id="setupCancel">Cancel</button><button class="big" id="setupGo"' + (n ? '' : ' disabled style="opacity:.5"') + '>Start this set ›</button></div></div>';
+    $('panel').querySelectorAll('.chips[data-key] button').forEach(function(b){
+      b.addEventListener('click', function(){
+        var box = b.parentElement, key = box.dataset.key, val = JSON.parse(b.dataset.val);
+        if(box.dataset.multi === '1'){
+          var i = draft[key].indexOf(val);
+          if(i === -1) draft[key].push(val); else draft[key].splice(i, 1);
+        } else draft[key] = val;
+        if(key === 'theme'){ applyTheme(val); }
+        paintSetup();
+      });
+    });
+    var pr = $('lvPresets');
+    if(pr) pr.querySelectorAll('button').forEach(function(b){ b.addEventListener('click', function(){ draft.levels = JSON.parse(b.dataset.preset); paintSetup(); }); });
+    $('setupCancel').addEventListener('click', function(){ applyTheme(cfg.theme); $('setup').classList.remove('open'); });
+    $('setupGo').addEventListener('click', function(){
+      cfg = draft;
+      if(!code && cfg.mode !== 'all') cfg.mode = 'levels';
+      lsSet('vw_cfg', cfg);
+      applyTheme(cfg.theme);
+      startDeck();
+      $('setup').classList.remove('open');
+      render();
+      renderCard();
+      startDrift();
+    });
+  }
+  function applyTheme(t){ document.body.className = 't-' + t; }
+
+  // ---------- drifting words (very light; Lively pauses it under full-screen apps) ----------
+  var driftRaf = null;
+  function startDrift(){
+    var cv = $('drift'), ctx = cv.getContext('2d');
+    cancelAnimationFrame(driftRaf);
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    if(!cfg.drift || !words.length) return;
+    var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    function size(){ cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; }
+    size();
+    window.onresize = size;
+    var pool = (deck.length ? deck : words).slice(0, 400);
+    var items = [];
+    for(var i = 0; i < 16; i++) items.push(newItem(true));
+    function newItem(anywhere){
+      var w = pool[Math.floor(Math.random() * pool.length)];
+      return { t: w.term, x: Math.random() * cv.width, y: anywhere ? Math.random() * cv.height : cv.height + 40 * dpr,
+        v: (0.12 + Math.random() * 0.22) * dpr, s: (14 + Math.random() * 26) * dpr, a: 0.4 + Math.random() * 0.6 };
+    }
+    var last = 0;
+    function frame(ts){
+      driftRaf = requestAnimationFrame(frame);
+      if(ts - last < 50) return;         // ~20 fps is plenty for slow drift
+      last = ts;
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      var col = getComputedStyle(document.body).getPropertyValue('--drift').trim() || 'rgba(0,0,0,.06)';
+      ctx.fillStyle = col;
+      for(var i = 0; i < items.length; i++){
+        var it = items[i];
+        it.y -= it.v;
+        if(it.y < -40 * dpr) items[i] = it = newItem(false);
+        ctx.globalAlpha = it.a;
+        ctx.font = '600 ' + it.s + 'px ' + (getComputedStyle(document.body).getPropertyValue('--display') || 'serif');
+        ctx.fillText(it.t, it.x, it.y);
+      }
+      ctx.globalAlpha = 1;
+    }
+    driftRaf = requestAnimationFrame(frame);
+  }
+
+  // ---------- start ----------
+  async function boot(){
+    applyTheme(cfg.theme);
+    summary = lsGet('vw_summary', {}) || {};
+    var cached = lsGet('vw_feed', null);
+    if(cached && cached.list) useFeed(cached.list);
+    renderCard();
+    render();
+    try{ await loadFeed(false); }
+    catch(e){ if(!words.length){ $('word').innerHTML = '<div class="empty"><h1>Couldn’t load words</h1>' + esc(e.message) + '</div>'; return; } }
+    await pullSummary();
+    await flush();
+    if(!restoreSession()) startDeck();
+    render();
+    renderCard();
+    startDrift();
+    if(!lsGet('vw_setup_seen', false)){ lsSet('vw_setup_seen', true); openSetup(); }
+    // keep fresh: progress every 5 min, new words every 30 min, resend anything unsent every 2 min
+    setInterval(async function(){ await pullSummary(); renderCard(); var w = deck[idx]; if(w) renderControls(w, state()); }, 5 * 60000);
+    setInterval(async function(){ try{ if(await loadFeed(false)){ say('New words arrived in the register.'); renderCard(); } }catch(e){} }, 30 * 60000);
+    setInterval(flush, 2 * 60000);
+    setInterval(renderCard, 60 * 60000);   // day change / countdown
+  }
+  boot();
+})();
+</script>
+</body>
+</html>

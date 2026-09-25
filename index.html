@@ -5468,6 +5468,10 @@ listBlock,
       openLockLinkModal();
     }catch(e){ showToast('Could not unlink: ' + e.message); }
   }
+  function lockWallpaperUrl(){
+    var base = location.href.split('#')[0].split('?')[0].replace(/[^\/]*$/, '');
+    return base + 'wallpaper.html?code=' + (lockCode || '');
+  }
   function openLockLinkModal(){
     var body;
     if(!lockCode){
@@ -5482,7 +5486,10 @@ listBlock,
         '<p class="help" style="margin-top:0;">Type this code in the phone app (<b>0 · Your account</b>). It\'s the same code on all your devices.</p>' +
         '<div class="lock-code" id="lockCodeBox">' + escapeHtml(lockFmt(lockCode)) + '</div>' +
         '<p class="help" style="font-size:12.5px;">Progress last sent to the phone: ' + escapeHtml(when) + '. It updates by itself while this app is open.</p>' +
-        '<div class="modal-actions" style="flex-wrap:wrap;"><button class="btn maroon" id="lockUnlink">Unlink phone</button><button class="btn ghost" id="lockCopy">Copy code</button><button class="btn teal" id="lockClose">Done</button></div>';
+        '<div class="menu-label" style="padding-left:0; margin-top:14px;">Desktop wallpaper (Lively)</div>' +
+        '<p class="help" style="margin-top:0; font-size:12.5px;">In Lively Wallpaper, tap <b>+</b> and paste this link. Your words play on the desktop with levels and a progress card.</p>' +
+        '<div class="lock-code" style="font-size:12px; letter-spacing:0; text-align:left; padding:10px 12px;">' + escapeHtml(lockWallpaperUrl()) + '</div>' +
+        '<div class="modal-actions" style="flex-wrap:wrap;"><button class="btn maroon" id="lockUnlink">Unlink phone</button><button class="btn ghost" id="lockCopyWall">Copy wallpaper link</button><button class="btn ghost" id="lockCopy">Copy code</button><button class="btn teal" id="lockClose">Done</button></div>';
     }
     modalBodyRef().innerHTML = body;
     modalBgRef().classList.add('open');
@@ -5492,6 +5499,12 @@ listBlock,
     if(c) c.addEventListener('click', function(){ c.disabled = true; c.textContent = 'Creating…'; lockCreateLink(); });
     var u = document.getElementById('lockUnlink');
     if(u) u.addEventListener('click', function(){ if(confirm('Unlink the phone app? It will stop syncing until you link it again with a new code.')) lockUnlink(); });
+    var cw = document.getElementById('lockCopyWall');
+    if(cw) cw.addEventListener('click', function(){
+      var u = lockWallpaperUrl();
+      if(navigator.clipboard) navigator.clipboard.writeText(u).then(function(){ showToast('Wallpaper link copied — paste it in Lively.'); }, function(){ showToast(u); });
+      else showToast(u);
+    });
     var cp = document.getElementById('lockCopy');
     if(cp) cp.addEventListener('click', function(){
       var txt = lockFmt(lockCode);
