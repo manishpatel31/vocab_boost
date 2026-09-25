@@ -493,6 +493,8 @@
   .gw-streak.risk{ color:var(--maroon); }
   .gw-streak.alive svg, .gw-streak.risk svg, .streak-big:not(.cold) svg, .celebrate-streak .celebrate-badge svg{ animation:flicker 1.6s ease-in-out infinite; transform-origin:50% 85%; }
   .celebrate-streak .celebrate-badge{ background:var(--mustard); color:#1B1203; }
+  .lock-code{ font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:22px; letter-spacing:2px; text-align:center; padding:14px 10px; margin:12px 0; border:2px dashed var(--accent); border-radius:12px; background:var(--card); color:var(--ink); word-break:break-all; user-select:all; }
+  .lock-steps{ margin:8px 0 12px 18px; padding:0; font-size:14px; line-height:1.55; }
   .goal-presets{ display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin:12px 0 14px; }
   .goal-preset{ padding:12px 6px; border-radius:var(--radius); border:2px solid var(--rule); background:var(--card); color:var(--ink); font-size:22px; font-weight:800; font-family:var(--font-display); transition:border-color .2s ease, transform .15s ease; }
   .goal-preset:hover{ transform:translateY(-2px); }
@@ -769,6 +771,7 @@
         <div class="navmenu align-right">
           <button id="alertsSettingsBtn"><b>Alerts</b><span>Evening streak nudge, word reminders, new words</span></button>
           <button id="goalSettingsBtn"><b>Daily goal</b><span>Words per day and your streak</span></button>
+          <button id="lockLinkBtn"><b>Phone app (Vocab Lock)</b><span>Link it so your phone knows your progress</span></button>
           <button id="displaySettingsBtn"><b>Display</b><span>Text size and dyslexia-friendly font</span></button>
           <button class="tab" data-tab="backup"><b>Backup</b><span>Export or import your register</span></button>
           <button id="installBtn" style="display:none;"><b>Install app</b><span>Add to your home screen or desktop</span></button>
@@ -1453,6 +1456,7 @@
       applyRoleUI();
       attachListeners();
       ensureUserProfile();
+      lockSyncStart();
       checkModeratorRole().then(function(){ renderWhoBox(); applyRoleUI(); scheduleRender(); renderReview(); });
       if(anyAlertEnabled()){ startHourlyAlerts(); }
     } else {
@@ -1747,6 +1751,7 @@
     }, function(err){ showToast('Could not load spelling submissions: ' + err.message); });
   }
   function detachListeners(){
+    lockSyncStop();
     if(unsubWords) unsubWords();
     if(unsubProgress) unsubProgress();
     if(unsubSubs) unsubSubs();
@@ -3004,7 +3009,7 @@ listBlock,
       lastConfSet = { id: id, t: Date.now() };
       if(patch.confidence === 5 && prevLevel !== 5){
         var cw = words.find(function(x){ return x.id === id; });
-        if(cw) celebrate(cw.term);
+        if(cw && !(opts && opts.quiet)) celebrate(cw.term);
       }
       if(!(opts && opts.auto)) countTowardGoal(id, prevLevel, patch.confidence);
     }
@@ -3618,6 +3623,7 @@ listBlock,
       batch.set(db.collection('users').doc(s.authorUid).collection('notifications').doc(), {
         term: s.term, status: 'approved', read: false, createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
+      lockInboxAdd(batch, s.authorUid, s.term, 'approved');
     }
   }
   function notifyRejectIfNotSelf(batch, s){
@@ -3625,6 +3631,7 @@ listBlock,
       batch.set(db.collection('users').doc(s.authorUid).collection('notifications').doc(), {
         term: s.term, status: 'rejected', read: false, createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
+      lockInboxAdd(batch, s.authorUid, s.term, 'rejected');
     }
   }
 
@@ -5127,7 +5134,7 @@ listBlock,
   var LOCK_PART = 300;   // words per document, keeps each well under Firestore's 1 MB limit
   function lockItem(w){
     return {
-      t: w.term || '', y: w.type || 'other', p: (w.part_of_speech && w.part_of_speech !== '-') ? w.part_of_speech : '',
+      i: w.id, t: w.term || '', y: w.type || 'other', p: (w.part_of_speech && w.part_of_speech !== '-') ? w.part_of_speech : '',
       m: w.english_meaning || '', h: w.hindi_meaning || '',
       s: (w.synonyms || []).join(', '), a: (w.antonyms || []).join(', '),
       e: w.ssc_sentence || '', k: w.mnemonic || '', x: w.ssc_history || '', c: w.confusable_with || '',
@@ -5176,6 +5183,230 @@ listBlock,
     }
     btn.disabled = false;
   });
+
+  // ================= Vocab Lock phone app: account link + two-way progress sync =================
+  // The web app keeps one compact summary doc at lockSync/{code}. The phone reads it with the code
+  // and sends ratings back as lockSync/{code}/events, which are applied here and then deleted.
+  var LOCK_ALPH = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var lockCode = null, lockLastEventT = 0, lockLastJson = '', lockUnsubEvents = null, lockTimer = null;
+  var lockEventQueue = [], lockSeenEvents = {}, lockSyncedAt = 0, lockApplying = false;
+  function lockFmt(code){ return (code || '').replace(/(.{4})(?=.)/g, '$1-'); }
+  function lockNewCode(){
+    var a = new Uint32Array(20), out = '';
+    (window.crypto || window.msCrypto).getRandomValues(a);
+    for(var i = 0; i < 20; i++) out += LOCK_ALPH[a[i] % LOCK_ALPH.length];
+    return out;
+  }
+  function lockInboxAdd(batch, uid, term, status){
+    // Written on its own (not in the approval batch) so approvals keep working even before the new rules are added.
+    try{
+      db.collection('lockInbox').doc(uid).set({
+        items: firebase.firestore.FieldValue.arrayUnion({ term: term || '', status: status, at: Date.now() + Math.floor(Math.random() * 1000) }),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge: true}).catch(function(){});
+    }catch(e){}
+  }
+  function lockSyncStop(){
+    if(lockUnsubEvents) lockUnsubEvents();
+    lockUnsubEvents = null;
+    if(lockTimer) clearInterval(lockTimer);
+    lockTimer = null;
+    lockCode = null; lockLastEventT = 0; lockLastJson = ''; lockEventQueue = []; lockSeenEvents = {}; lockSyncedAt = 0;
+  }
+  async function lockSyncStart(){
+    lockSyncStop();
+    if(!currentUser) return;
+    var uid = currentUser.uid;
+    try{
+      var snap = await db.collection('lockSync').where('uid', '==', uid).limit(1).get();
+      if(!currentUser || currentUser.uid !== uid || snap.empty) return;
+      var d = snap.docs[0];
+      var data = d.data() || {};
+      try{ lockLastEventT = (JSON.parse(data.json || '{}').lastEventT) || 0; }catch(e){ lockLastEventT = 0; }
+      lockSyncedAt = data.updatedAt && data.updatedAt.toMillis ? data.updatedAt.toMillis() : 0;
+      lockAttach(d.id);
+    }catch(e){ /* rules not updated yet, or offline: the phone link simply stays idle */ }
+  }
+  function lockAttach(code){
+    lockCode = code;
+    lockUnsubEvents = db.collection('lockSync').doc(code).collection('events').onSnapshot(function(snap){
+      snap.forEach(function(doc){
+        if(lockSeenEvents[doc.id]) return;
+        lockSeenEvents[doc.id] = true;
+        var ev = doc.data() || {};
+        ev._id = doc.id;
+        lockEventQueue.push(ev);
+      });
+      lockApplyEvents();
+    }, function(){});
+    if(lockTimer) clearInterval(lockTimer);
+    lockTimer = setInterval(function(){ lockApplyEvents(); lockPushSummary(false); }, 20000);
+    setTimeout(function(){ lockPushSummary(false); }, 3000);
+  }
+  function lockReady(){ return !!(currentUser && lockCode && progressLoaded && myProfile && words.length); }
+
+  function streakFromHistory(hist, goal){
+    if(!goal) return { count: 0, last: '' };
+    var d = (hist[dayKey(0)] || 0) >= goal ? 0 : -1;
+    var last = dayKey(d), n = 0;
+    while((hist[dayKey(d)] || 0) >= goal && n < 1000){ n++; d--; }
+    return { count: n, last: n ? last : '' };
+  }
+  function creditGoalOnDay(id, prevLevel, newLevel, day){
+    if(!day || day === todayKey()){ countTowardGoal(id, prevLevel, newLevel); return; }
+    if(!myProfile || !myProfile.dailyGoal) return;
+    var before = prevLevel || 0;
+    var qualifies = (myProfile.goalMode === 'memorized') ? (newLevel >= 5 && before < 5) : (newLevel > before);
+    if(!qualifies || day > todayKey()) return;
+    var hist = Object.assign({}, myProfile.history || {});
+    hist[day] = (hist[day] || 0) + 1;
+    var upd = { history: {} };
+    upd.history[day] = hist[day];
+    var s = streakFromHistory(hist, myProfile.dailyGoal);
+    if(s.count > streakOf(myProfile)){
+      upd.streakCurrent = s.count;
+      upd.lastMetDay = s.last;
+      upd.streakBest = Math.max(s.count, myProfile.streakBest || 0);
+    }
+    applyGoalUpdate(upd);
+  }
+
+  function lockApplyEvents(){
+    if(lockApplying || !lockEventQueue.length || !lockReady()) return;
+    lockApplying = true;
+    var list = lockEventQueue.splice(0).sort(function(a, b){ return (a.t || 0) - (b.t || 0); });
+    var known = {};
+    words.forEach(function(w){ known[w.id] = true; });
+    var applied = 0;
+    list.forEach(function(ev){
+      try{
+        if(ev.w && known[ev.w]){
+          var cur = progressMap[ev.w];
+          var prev = (cur && typeof cur.confidence === 'number') ? cur.confidence : null;
+          if(ev.k === 'rate' && typeof ev.c === 'number' && ev.c >= 0 && ev.c <= 5 && ev.c !== prev){
+            setProgress(ev.w, { confidence: ev.c }, { auto: true, quiet: true });
+            creditGoalOnDay(ev.w, prev, ev.c, ev.d);
+            applied++;
+          } else if(ev.k === 'rev' && prev === 5){
+            markRevision(ev.w, ev.c === 1);
+            applied++;
+          }
+        }
+      }catch(e){}
+      if(typeof ev.t === 'number' && ev.t > lockLastEventT) lockLastEventT = ev.t;
+    });
+    var batch = db.batch();
+    list.forEach(function(ev){ batch.delete(db.collection('lockSync').doc(lockCode).collection('events').doc(ev._id)); });
+    batch.commit().catch(function(){});
+    lockApplying = false;
+    if(applied){
+      showToast('Synced ' + applied + ' rating' + (applied === 1 ? '' : 's') + ' from your phone.');
+      scheduleRender();
+      renderRevDueBtn();
+    }
+    setTimeout(function(){ lockPushSummary(true); }, 1500);
+  }
+
+  function buildLockSummary(){
+    var known = {};
+    words.forEach(function(w){ known[w.id] = true; });
+    var p = {};
+    Object.keys(progressMap).forEach(function(id){
+      var x = progressMap[id];
+      if(!x || !known[id]) return;
+      var c = typeof x.confidence === 'number' ? x.confidence : 0;
+      if(!c && !x.starred) return;
+      p[id] = [c, x.starred ? 1 : 0, typeof x.revStage === 'number' ? x.revStage : -1, typeof x.revDue === 'number' ? x.revDue : 0, x.revDone ? 1 : 0];
+    });
+    var t = todayKey();
+    var prof = myProfile || {};
+    return JSON.stringify({
+      v: 1, p: p, total: words.length,
+      goal: prof.dailyGoal || 0, mode: prof.goalMode || 'levelup',
+      goalDay: prof.goalDay || '', goalIds: prof.goalDay === t ? (prof.goalIds || []) : [],
+      streak: prof.streakCurrent || 0, lastMet: prof.lastMetDay || '', best: prof.streakBest || 0,
+      lastEventT: lockLastEventT, pushedAt: Date.now()
+    });
+  }
+  function lockPushSummary(force){
+    if(!lockReady()) return Promise.resolve();
+    var json = buildLockSummary();
+    var cmp = json.replace(/,"pushedAt":\d+/, '');
+    if(cmp === lockLastJson) return Promise.resolve();
+    lockLastJson = cmp;
+    return db.collection('lockSync').doc(lockCode).set({
+      uid: currentUser.uid, name: currentUser.displayName || currentUser.email || '', json: json,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(function(){ lockSyncedAt = Date.now(); }).catch(function(){ lockLastJson = ''; });
+  }
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState === 'hidden') lockPushSummary(false);
+  });
+
+  async function lockCreateLink(){
+    if(!currentUser) return;
+    if(!progressLoaded || !words.length){ showToast('Still loading your register — try again in a few seconds.'); return; }
+    var code = lockNewCode();
+    try{
+      await db.collection('lockSync').doc(code).set({
+        uid: currentUser.uid, name: currentUser.displayName || currentUser.email || '', json: '{}',
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      lockLastEventT = 0; lockLastJson = '';
+      if(lockUnsubEvents) lockUnsubEvents();
+      lockAttach(code);
+      await lockPushSummary(true);
+      openLockLinkModal();
+    }catch(e){
+      showToast('Could not create the link: ' + e.message + (String(e.message).indexOf('permission') !== -1 ? ' — add the new lockSync rules in Firebase first.' : ''));
+    }
+  }
+  async function lockUnlink(){
+    if(!lockCode) return;
+    var code = lockCode;
+    try{
+      var ev = await db.collection('lockSync').doc(code).collection('events').get();
+      var batch = db.batch();
+      ev.forEach(function(d){ batch.delete(d.ref); });
+      batch.delete(db.collection('lockSync').doc(code));
+      await batch.commit();
+      lockSyncStop();
+      showToast('Phone unlinked. That code no longer works.');
+      openLockLinkModal();
+    }catch(e){ showToast('Could not unlink: ' + e.message); }
+  }
+  function openLockLinkModal(){
+    var body;
+    if(!lockCode){
+      body = '<h3>Link the Vocab Lock phone app</h3>' +
+        '<p class="help" style="margin-top:0;">Once linked, the phone app knows your levels, memorized words, revision rounds, daily goal and streak. Ratings you give on the phone come back here and count toward your goal and streak.</p>' +
+        '<ol class="lock-steps"><li>Tap <b>Create link code</b> below.</li><li>Open Vocab Lock on your phone → <b>0 · Your account</b>.</li><li>Type the code and tap <b>Link</b>.</li></ol>' +
+        '<p class="help" style="font-size:12.5px;">The code works like a key to your progress — keep it to yourself. You can unlink any time here, which stops the old code working.</p>' +
+        '<div class="modal-actions"><button class="btn ghost" id="lockClose">Close</button><button class="btn teal" id="lockCreate">Create link code</button></div>';
+    } else {
+      var when = lockSyncedAt ? new Date(lockSyncedAt).toLocaleString() : 'not yet';
+      body = '<h3>Vocab Lock is linked</h3>' +
+        '<p class="help" style="margin-top:0;">Type this code in the phone app (<b>0 · Your account</b>). It\'s the same code on all your devices.</p>' +
+        '<div class="lock-code" id="lockCodeBox">' + escapeHtml(lockFmt(lockCode)) + '</div>' +
+        '<p class="help" style="font-size:12.5px;">Progress last sent to the phone: ' + escapeHtml(when) + '. It updates by itself while this app is open.</p>' +
+        '<div class="modal-actions" style="flex-wrap:wrap;"><button class="btn maroon" id="lockUnlink">Unlink phone</button><button class="btn ghost" id="lockCopy">Copy code</button><button class="btn teal" id="lockClose">Done</button></div>';
+    }
+    modalBodyRef().innerHTML = body;
+    modalBgRef().classList.add('open');
+    var close = function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML = ''; };
+    document.getElementById('lockClose').addEventListener('click', close);
+    var c = document.getElementById('lockCreate');
+    if(c) c.addEventListener('click', function(){ c.disabled = true; c.textContent = 'Creating…'; lockCreateLink(); });
+    var u = document.getElementById('lockUnlink');
+    if(u) u.addEventListener('click', function(){ if(confirm('Unlink the phone app? It will stop syncing until you link it again with a new code.')) lockUnlink(); });
+    var cp = document.getElementById('lockCopy');
+    if(cp) cp.addEventListener('click', function(){
+      var txt = lockFmt(lockCode);
+      if(navigator.clipboard) navigator.clipboard.writeText(txt).then(function(){ showToast('Code copied.'); }, function(){ showToast(txt); });
+      else showToast(txt);
+    });
+  }
+  document.getElementById('lockLinkBtn').addEventListener('click', function(){ openLockLinkModal(); });
 
   async function renderModeratorsList(force){
     if(!isAdminUser) return;
