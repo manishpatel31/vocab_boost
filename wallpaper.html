@@ -65,7 +65,7 @@
   button{ font:inherit; color:inherit; cursor:pointer; }
 
   /* ---------- word stage ---------- */
-  .stage{ position:fixed; top:0; bottom:0; left:clamp(96px, 9vw, 160px); right:clamp(300px, 24vw, 400px); display:flex; align-items:center; justify-content:center; padding:4vh 3vw 150px; }
+  .stage{ position:fixed; top:0; bottom:0; left:34vw; right:calc(clamp(270px, 19vw, 340px) + 56px); display:flex; align-items:center; justify-content:center; padding:90px 1.5vw 150px; }
   .word{ width:100%; max-width:1000px; }
   .word.swap{ animation:inword .5s ease backwards; }
   @keyframes inword{ from{ opacity:0; transform:translateY(10px); } }
@@ -73,10 +73,10 @@
   .w-pill{ border:1px solid var(--line); border-radius:999px; padding:3px 11px; background:var(--chip); }
   .w-pill.lvl{ color:var(--accent); border-color:var(--accent); }
   .w-pill.due{ color:var(--gold); border-color:var(--gold); }
-  .w-term{ font-family:var(--display); font-weight:600; font-size:clamp(44px, 6.2vw, 110px); line-height:1.02; letter-spacing:-.015em; margin:.18em 0 .12em; overflow-wrap:anywhere; }
+  .w-term{ font-family:var(--display); font-weight:600; font-size:clamp(40px, 5vw, 96px); line-height:1.02; letter-spacing:-.015em; margin:.18em 0 .12em; overflow-wrap:anywhere; }
   .w-mean{ font-size:clamp(20px, 1.9vw, 34px); line-height:1.35; color:var(--ink); max-width:48ch; }
   .w-hindi{ font-family:var(--hindi); font-size:clamp(19px, 1.75vw, 31px); color:var(--soft); margin-top:.35em; }
-  .w-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:clamp(12px, 1.4vw, 22px) clamp(18px, 2vw, 34px); margin-top:clamp(18px, 2.6vh, 34px); }
+  .w-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:clamp(12px, 1.4vw, 22px) clamp(18px, 2vw, 34px); margin-top:clamp(18px, 2.6vh, 34px); }
   .f{ font-size:clamp(14px, 1.05vw, 18px); line-height:1.5; color:var(--soft); }
   .f b{ display:block; font-size:clamp(10.5px, .72vw, 12.5px); letter-spacing:.12em; text-transform:uppercase; margin-bottom:3px; font-weight:700; }
   .f.syn b{ color:var(--l-syn); } .f.ant b{ color:var(--l-ant); } .f.sen b{ color:var(--l-sen); } .f.trk b{ color:var(--l-trk); }
@@ -87,7 +87,7 @@
   .reveal-hint button{ border:1px solid var(--line); background:var(--chip); border-radius:999px; padding:7px 16px; }
 
   /* ---------- controls ---------- */
-  .controls{ position:fixed; left:clamp(96px, 9vw, 160px); right:clamp(300px, 24vw, 400px); bottom:64px; display:flex; justify-content:center; }
+  .controls{ position:fixed; left:34vw; right:calc(clamp(270px, 19vw, 340px) + 56px); bottom:64px; display:flex; justify-content:center; }
   .bar{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:999px; background:var(--card); border:1px solid var(--line); backdrop-filter:blur(10px); box-shadow:0 18px 40px -26px rgba(0,0,0,.5); }
   .nav{ width:46px; height:46px; border-radius:50%; border:1px solid var(--line); background:var(--chip); font-size:20px; display:flex; align-items:center; justify-content:center; transition:transform .15s ease; }
   .nav:hover{ transform:scale(1.06); }
@@ -104,7 +104,7 @@
   .timer i{ display:block; height:100%; width:0; background:var(--accent); opacity:.6; }
 
   /* ---------- progress card ---------- */
-  .card{ position:fixed; top:28px; right:28px; width:clamp(260px, 20vw, 340px); background:var(--card); border:1px solid var(--line); border-radius:22px; padding:20px 20px 16px; backdrop-filter:blur(10px); box-shadow:0 24px 48px -30px rgba(0,0,0,.55); }
+  .card{ position:fixed; bottom:64px; right:28px; width:clamp(270px, 19vw, 340px); background:var(--card); border:1px solid var(--line); border-radius:22px; padding:20px 20px 16px; backdrop-filter:blur(10px); box-shadow:0 24px 48px -30px rgba(0,0,0,.55); }
   .c-top{ display:flex; gap:16px; align-items:center; }
   .ring{ position:relative; width:84px; height:84px; flex-shrink:0; }
   .ring svg{ transform:rotate(-90deg); }
@@ -120,6 +120,9 @@
   .c-actions{ display:flex; gap:8px; margin-top:12px; }
   .c-actions button{ flex:1; border:1px solid var(--line); background:var(--chip); border-radius:999px; padding:8px 10px; font-size:13px; font-weight:600; }
   .c-actions button.primary{ background:var(--chip-on); color:var(--chip-on-fg); border-color:var(--chip-on); }
+  .topbar{ position:fixed; top:24px; right:28px; display:flex; gap:8px; }
+  .topbar button{ border:1px solid var(--line); background:var(--card); backdrop-filter:blur(10px); border-radius:999px; padding:9px 16px; font-size:13.5px; font-weight:600; box-shadow:0 12px 30px -22px rgba(0,0,0,.6); }
+  .topbar button.primary{ background:var(--chip-on); color:var(--chip-on-fg); border-color:var(--chip-on); }
   .sync{ display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--accent); margin-right:6px; vertical-align:1px; }
   .sync.off{ background:var(--faint); }
   .sync.err{ background:var(--warn); }
@@ -167,6 +170,7 @@
   </div>
 </div>
 
+<div class="topbar" id="topbar"></div>
 <aside class="card" id="card"></aside>
 
 <div class="setup" id="setup"><div class="panel" id="panel"></div></div>
@@ -512,8 +516,9 @@
                 '<div class="c-row"><span>⭐ Memorized</span><b>' + st.mastered + ' / ' + (summary.total || words.length) + '</b></div>' : '') +
         '<div class="c-row"><span>In this set</span><b>' + deck.length + ' words</b></div>' +
       '</div>' +
-      '<div class="c-deck">' + esc(deckLabel()) + '<br>' + syncTxt + '</div>' +
-      '<div class="c-actions"><button class="primary" id="setBtn">Change set</button>' + (code && st.due ? '<button id="dueBtn">Revise ' + st.due + '</button>' : '<button id="shufBtn">Shuffle</button>') + '</div>';
+      '<div class="c-deck">' + esc(deckLabel()) + '<br>' + syncTxt + '</div>';
+    $('topbar').innerHTML = (code && st.due ? '<button id="dueBtn">🔁 Revise ' + st.due + '</button>' : '') +
+      '<button id="shufBtn">Shuffle</button><button class="primary" id="setBtn">⚙ Change set</button>';
     $('setBtn').addEventListener('click', openSetup);
     var db = $('dueBtn');
     if(db) db.addEventListener('click', function(){ cfg.mode = 'due'; cfg.tags = []; cfg.types = []; lsSet('vw_cfg', cfg); startDeck(); render(); renderCard(); });
@@ -614,7 +619,8 @@
     for(var i = 0; i < 16; i++) items.push(newItem(true));
     function newItem(anywhere){
       var w = pool[Math.floor(Math.random() * pool.length)];
-      return { t: w.term, x: Math.random() * cv.width, y: anywhere ? Math.random() * cv.height : cv.height + 40 * dpr,
+      return { t: w.term, x: cv.width * (0.34 + Math.random() * 0.5),   // keep the icon side (left third) clear
+         y: anywhere ? Math.random() * cv.height : cv.height + 40 * dpr,
         v: (0.12 + Math.random() * 0.22) * dpr, s: (14 + Math.random() * 26) * dpr, a: 0.4 + Math.random() * 0.6 };
     }
     var last = 0;
