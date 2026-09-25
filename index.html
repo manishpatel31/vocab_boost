@@ -534,8 +534,8 @@
   /* ---------- AOD mode (pure black, dim, stays awake) ---------- */
   .aod-overlay{ position:fixed; inset:0; z-index:600; background:#000; color:#8C8C8C; display:none; flex-direction:column; font-family:var(--font-body); cursor:pointer; user-select:none; -webkit-user-select:none; padding:max(12px, env(safe-area-inset-top)) max(4px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(4px, env(safe-area-inset-left)); }
   .aod-overlay.open{ display:flex; animation:fadeIn .5s ease both; }
-  .aod-top{ display:flex; justify-content:space-between; align-items:center; color:#444; font-size:12px; letter-spacing:.08em; flex-shrink:0; padding:0 8px 0 14px; }
-  .aod-ctl{ width:44px; height:44px; border:none; background:transparent; color:#444; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; }
+  .aod-top{ display:flex; justify-content:space-between; align-items:center; color:#888; font-size:12px; letter-spacing:.08em; flex-shrink:0; padding:0 8px 0 14px; }
+  .aod-ctl{ width:44px; height:44px; border:none; background:transparent; color:#8A8A8A; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; }
   .aod-ctl:hover{ color:#8C8C8C; }
   .aod-stage{ flex:1; min-height:0; overflow-y:auto; display:flex; justify-content:center; scrollbar-width:none; }
   .aod-stage::-webkit-scrollbar{ display:none; }
@@ -543,35 +543,36 @@
   .aod-content.aod-swap{ animation:aodIn .45s ease backwards; }
   .aod-dim-1 .aod-content{ opacity:.72; }
   .aod-dim-2 .aod-content{ opacity:.45; }
-  .aod-term{ font-family:var(--font-display); font-size:clamp(34px, 8vw, 58px); font-weight:400; color:#D0D0D0; line-height:1.08; letter-spacing:-.01em; overflow-wrap:anywhere; }
-  .aod-sub{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:10px; font-size:13px; color:#5C5C5C; }
-  .aod-type{ border:1px solid #333; border-radius:999px; padding:3px 10px; text-transform:uppercase; letter-spacing:.07em; font-size:10.5px; font-weight:700; color:#6E6E6E; }
-  .aod-meaning{ font-size:clamp(17px, 4.4vw, 23px); font-weight:400; line-height:1.45; color:#ABABAB; margin-top:18px; }
-  .aod-hindi{ font-family:var(--font-hindi); font-size:clamp(17px, 4.2vw, 22px); color:#8E8E8E; margin-top:8px; }
+  .aod-term{ font-family:var(--font-display); font-size:clamp(34px, 8vw, 58px); font-weight:400; color:#FFFFFF; line-height:1.08; letter-spacing:-.01em; overflow-wrap:anywhere; }
+  .aod-sub{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:10px; font-size:13px; color:#9A9A9A; }
+  .aod-type{ border:1px solid #333; border-radius:999px; padding:3px 10px; text-transform:uppercase; letter-spacing:.07em; font-size:10.5px; font-weight:700; color:#A0A0A0; }
+  .aod-meaning{ font-size:clamp(17px, 4.4vw, 23px); font-weight:400; line-height:1.45; color:#EDEDED; margin-top:18px; }
+  .aod-hindi{ font-family:var(--font-hindi); font-size:clamp(17px, 4.2vw, 22px); color:#D6D6D6; margin-top:8px; }
   .aod-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:14px 22px; margin-top:22px; }
-  .aod-field{ font-size:14.5px; line-height:1.5; color:#8C8C8C; }
+  .aod-field{ font-size:14.5px; line-height:1.5; color:#CFCFCF; }
   .aod-field .aod-lbl{ display:block; font-size:10.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; margin-bottom:2px; }
-  .aod-syn .aod-lbl{ color:#4F8A78; } .aod-anto .aod-lbl{ color:#9A5A5A; } .aod-sent .aod-lbl{ color:#9A8350; }
-  .aod-trick .aod-lbl{ color:#806C9A; } .aod-hist .aod-lbl{ color:#9A7350; } .aod-confu .aod-lbl{ color:#9A5A5A; }
-  .aod-root .aod-lbl{ color:#4F9A7E; } .aod-spell .aod-lbl{ color:#9A8350; } .aod-origin .aod-lbl{ color:#5A7A9A; } .aod-tags .aod-lbl{ color:#5C5C5C; }
+  .aod-syn .aod-lbl{ color:#6FCFAE; } .aod-anto .aod-lbl{ color:#E58A8A; } .aod-sent .aod-lbl{ color:#E8C476; }
+  .aod-trick .aod-lbl{ color:#B9A0E0; } .aod-hist .aod-lbl{ color:#E0A970; } .aod-confu .aod-lbl{ color:#E58A8A; }
+  .aod-root .aod-lbl{ color:#6FD1A8; } .aod-spell .aod-lbl{ color:#E8C476; } .aod-origin .aod-lbl{ color:#8FB5E0; } .aod-tags .aod-lbl{ color:#9A9A9A; }
   .aod-sent{ font-style:italic; }
   .aod-bottom{ display:flex; justify-content:center; margin-top:24px; }
-  .aod-overlay .conf-row{ border-top:1px solid #1A1A1A; justify-content:center; gap:14px; }
-  .aod-overlay .conf-label{ color:#5C5C5C; }
-  .aod-overlay .conf-dot::before{ background:#2E2E2E; }
-  body.theme-indigo .aod-overlay .conf-dot{ background:#111; border-color:#333; color:#666; }
-  .aod-hint{ text-align:center; font-size:12px; color:#444; flex-shrink:0; padding-top:6px; transition:opacity 1.2s ease; }
+  .aod-min .aod-bottom{ margin-top:14px; }
+  .aod-overlay .conf-row{ border-top:1px solid #2A2A2A; justify-content:center; gap:14px; }
+  .aod-overlay .conf-label{ color:#B0B0B0; }
+  .aod-overlay .conf-dot{ opacity:1; }
+  .aod-overlay .conf-dot::before{ background:#5A5A5A; }
+  body.theme-indigo .aod-overlay .conf-dot{ background:#111; border-color:#555; color:#BBB; }
+  .aod-hint{ text-align:center; font-size:12px; color:#777; flex-shrink:0; padding-top:6px; transition:opacity 1.2s ease; }
   .aod-hint.gone{ opacity:0; }
   body.aod-on{ overflow:hidden; }
   /* nothing behind the black screen keeps drawing or animating */
   body.aod-on #appShell{ visibility:hidden; }
   body.aod-on #appShell *, body.aod-on #appShell *::before, body.aod-on #appShell *::after{ animation-play-state:paused !important; }
   /* low-power layout: word, meaning, Hindi only; details on request */
-  .aod-more{ display:none; margin-top:16px; border:1px solid #262626; background:transparent; color:#555; border-radius:999px; padding:9px 16px; font-size:13px; }
+  .aod-more{ display:none; margin-top:16px; border:1px solid #262626; background:transparent; color:#9A9A9A; border-radius:999px; padding:9px 16px; font-size:13px; }
   .aod-min .aod-more{ display:inline-block; }
-  .aod-min .aod-grid, .aod-min .aod-bottom{ display:none; }
+  .aod-min .aod-grid{ display:none; }
   .aod-min.aod-expanded .aod-grid{ display:grid; }
-  .aod-min.aod-expanded .aod-bottom{ display:flex; }
   .aod-min.aod-expanded .aod-more{ display:none; }
   .aod-min .aod-term{ font-size:clamp(30px, 7vw, 46px); }
   .aod-min .aod-meaning{ font-size:clamp(16px, 4vw, 20px); }
