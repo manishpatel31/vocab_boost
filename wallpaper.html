@@ -209,12 +209,13 @@
   if(params.get('code')) lsSet('vw_code', code);
   var EXAM = params.get('exam') || '2026-10-13';
 
-  var DEFAULT_CFG = { tags: [], types: [], mode: 'levels', levels: [0, 1, 2, 3, 4], order: 'shuffle', auto: 120, reveal: 'show', detail: 'full', theme: params.get('theme') || 'paperdark', drift: false };
+  var DEFAULT_CFG = { tags: [], types: [], roots: [], mode: 'levels', levels: [0, 1, 2, 3, 4], order: 'shuffle', auto: 120, reveal: 'show', detail: 'full', theme: params.get('theme') || 'paperdark', drift: false };
   var cfg = Object.assign({}, DEFAULT_CFG, lsGet('vw_cfg', {}));
+  if(!Array.isArray(cfg.roots)) cfg.roots = [];
   if(!cfg.v2){ cfg.drift = false; cfg.v2 = 1; lsSet('vw_cfg', cfg); }
   var session = lsGet('vw_session', null);   // { ids:[...], idx:n }
 
-  var words = [], byId = {}, summary = {}, feedStamp = '', lastSync = 0, syncState = 'off';
+  var words = [], rootGroups = [], byId = {}, summary = {}, feedStamp = '', lastSync = 0, syncState = 'off';
   var deck = [], idx = 0, revealed = true, revealTimer = null, autoTimer = null, autoStart = 0, pausedByHover = false;
 
   // ---------- helpers ----------
@@ -238,10 +239,15 @@
   function sv(f, k){ return f && f[k] ? (f[k].stringValue !== undefined ? f[k].stringValue : (f[k].integerValue !== undefined ? f[k].integerValue : (f[k].timestampValue || ''))) : ''; }
 
   // ---------- words (the same list the phone app uses) ----------
+  function splitRootParts(str){ return String(str || '').split(/\s*[;|]\s*/).map(function(p){ return p.trim(); }).filter(function(p){ return p && p !== '-'; }); }
+  function rootKeyOfPart(part){ return String(part).split(/\s*(?:=|:|·|—|–|\s-\s|\()\s*/)[0].toLowerCase().replace(/[^a-z\u00c0-\u024f]+/g, ''); }
+  function rootKeysOf(str){ var keys = []; splitRootParts(str).forEach(function(p){ var k = rootKeyOfPart(p); if(k && keys.indexOf(k) === -1) keys.push(k); }); return keys; }
+  function useRoots(json){ try{ rootGroups = (JSON.parse(json || '[]') || []).filter(function(g){ return g && g.k; }); }catch(e){ rootGroups = []; } }
   function useFeed(list){
     words = list.map(function(o){
       return { id: o.i || '', term: o.t || '', type: o.y || 'other', pos: o.p || '', meaning: o.m || '', hindi: o.h || '',
-        syn: o.s || '', ant: o.a || '', sen: o.e || '', trick: o.k || '', hist: o.x || '', conf: o.c || '', root: o.r || '', spell: o.n || '', origin: o.o || '', tags: o.g || [] };
+        syn: o.s || '', ant: o.a || '', sen: o.e || '', trick: o.k || '', hist: o.x || '', conf: o.c || '', root: o.r || '', spell: o.n || '', origin: o.o || '', tags: o.g || [],
+        rootKeys: rootKeysOf(o.r) };
     }).filter(function(w){ return w.term; });
     byId = {};
     words.forEach(function(w){ if(w.id) byId[w.id] = w; });
@@ -250,8 +256,10 @@
     var meta = await getDoc('lockFeed/meta');
     if(!meta) throw new Error('No words published yet (web app → Manage ▾ → Admin → Publish words to lock-screen app).');
     var stamp = sv(meta, 'updatedAt');
+    var rootsJson = sv(meta, 'roots');
+    useRoots(rootsJson);
     var cached = lsGet('vw_feed', null);
-    if(!force && cached && cached.stamp === stamp && cached.list){ if(!words.length) useFeed(cached.list); feedStamp = stamp; return false; }
+    if(!force && cached && cached.stamp === stamp && cached.list){ if(!words.length) useFeed(cached.list); feedStamp = stamp; if(cached.roots !== rootsJson) lsSet('vw_feed', Object.assign({}, cached, { roots: rootsJson })); return false; }
     var parts = parseInt(sv(meta, 'parts'), 10) || 0, all = [];
     for(var i = 0; i < parts; i++){
       var p = await getDoc('lockFeed/p' + i);
@@ -259,7 +267,7 @@
     }
     useFeed(all);
     feedStamp = stamp;
-    lsSet('vw_feed', { stamp: stamp, list: all });
+    lsSet('vw_feed', { stamp: stamp, list: all, roots: rootsJson });
     return true;
   }
 
@@ -348,6 +356,7 @@
   function matches(w, st, c){
     if(c.tags.length && !w.tags.some(function(t){ return c.tags.indexOf(t) !== -1; })) return false;
     if(c.types.length && c.types.indexOf(w.type) === -1) return false;
+    if(c.roots && c.roots.length && !w.rootKeys.some(function(k){ return c.roots.indexOf(k) !== -1; })) return false;
     if(c.mode === 'due') return st.isDue(w.id);
     if(c.mode === 'starred') return !!(st.p[w.id] && st.p[w.id].star);
     if(c.mode === 'levels' && code) return c.levels.indexOf(st.level(w.id)) !== -1;
@@ -525,6 +534,7 @@
     var parts = [];
     parts.push(cfg.tags.length ? cfg.tags.slice(0, 3).join(', ') + (cfg.tags.length > 3 ? ' +' + (cfg.tags.length - 3) : '') : 'All tags');
     if(cfg.types.length) parts.push(cfg.types.map(function(t){ return TYPES[t]; }).join(', '));
+    if(cfg.roots.length) parts.push('Roots: ' + cfg.roots.slice(0, 3).join(', ') + (cfg.roots.length > 3 ? ' +' + (cfg.roots.length - 3) : ''));
     if(cfg.mode === 'due') parts.push('Due for revision');
     else if(cfg.mode === 'starred') parts.push('Starred');
     else if(cfg.mode === 'levels' && code) parts.push(cfg.levels.length === 6 ? 'All levels' : 'Levels ' + cfg.levels.join(', '));
@@ -591,6 +601,13 @@
             chips('tags', tags.map(function(t){ return [t, esc(t) + '<small>' + tagCount[t] + '</small>']; }), true) + '</div></div>' +
           '<div class="sec"><h3>Type <span style="text-transform:none; letter-spacing:0;">(none = all)</span></h3>' +
             chips('types', Object.keys(TYPES).filter(function(t){ return typeCount[t]; }).map(function(t){ return [t, TYPES[t] + '<small>' + typeCount[t] + '</small>']; }), true) + '</div>' +
+          '<div class="sec"><h3>Root word groups <span style="text-transform:none; letter-spacing:0;">(none = all)</span></h3>' +
+            (rootGroups.length ? '<div class="tagbox" style="max-height:130px;">' + chips('roots', rootGroups.map(function(g){
+                var n = words.filter(function(w){ return w.rootKeys.indexOf(g.k) !== -1; }).length;
+                return [g.k, esc(g.k) + (g.m ? ' <small>= ' + esc(g.m) + '</small>' : '') + '<small>' + n + '</small>'];
+              }), true) + '</div>'
+              : '<p class="help">No root groups here yet. In the web app, publish the words again (Manage ▾ → Admin → Publish words to lock-screen app) — your root groups come along with them.</p>') +
+          '</div>' +
           '<div class="sec"><h3>Difficulty</h3>' +
             (code ? chips('mode', [['levels', 'By level'], ['due', 'Due for revision'], ['starred', 'Starred'], ['all', 'Everything']], false) +
               (draft.mode === 'levels' ? '<div style="margin-top:9px;">' + chips('levels', [[0, 'Level 0'], [1, '1'], [2, '2'], [3, '3'], [4, '4'], [5, '5 · memorized']], true) +
@@ -683,7 +700,7 @@
     applyTheme(cfg.theme);
     summary = lsGet('vw_summary', {}) || {};
     var cached = lsGet('vw_feed', null);
-    if(cached && cached.list) useFeed(cached.list);
+    if(cached && cached.list){ useFeed(cached.list); useRoots(cached.roots); }
     renderCard();
     render();
     try{ await loadFeed(false); }

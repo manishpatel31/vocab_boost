@@ -5265,6 +5265,7 @@ listBlock,
       for(var j = parts.length; j < oldParts; j++) batch.delete(db.collection('lockFeed').doc('p' + j));
       batch.set(db.collection('lockFeed').doc('meta'), {
         parts: parts.length, count: items.length,
+        roots: JSON.stringify(rootGroups.map(function(g){ return { k: g.key, m: g.meaning || '' }; })),
         updatedAt: firebase.firestore.FieldValue.serverTimestamp(), updatedBy: currentUser.email
       });
       await batch.commit();
