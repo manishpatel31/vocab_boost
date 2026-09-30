@@ -1,0 +1,735 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>
+/* शब्दRegister bridge: follows the app's Light / Dark / Auto choice when opened inside the app. */
+(function(){
+  var root = document.documentElement;
+  function apply(t){ if(t === 'dark' || t === 'light') root.setAttribute('data-theme', t); else root.removeAttribute('data-theme'); }
+  try{
+    var q = new URLSearchParams(location.search);
+    if(q.get('theme')) apply(q.get('theme'));
+    if(q.get('embed')) root.classList.add('in-shabd');
+  }catch(e){}
+  window.addEventListener('message', function(e){
+    if(e.origin !== location.origin || !e.data) return;
+    if(e.data.type === 'shabd-theme') apply(e.data.theme);
+  });
+})();
+</script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BNS BNSS BSA Revision</title>
+<meta name="theme-color" content="#1E4F8F">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@600;700&family=Noto+Sans+Devanagari:wght@400;600&display=swap">
+<style>
+:root{
+  --bg:#EEF1F5; --surface:#FFFFFF; --ink:#18202C; --muted:#586577; --line:#D6DDE6;
+  --accent:#1E4F8F; --accent-ink:#FFFFFF; --accent-soft:#E2EAF5;
+  --stamp:#A8372B; --stamp-soft:#F8E5E2;
+  --marker:#FFE68A; --marker-ink:#3A2E00;
+  --ok:#1F6B45; --ok-soft:#E0F2E8; --bad:#A8372B; --bad-soft:#F8E5E2;
+  --sans:"IBM Plex Sans","Noto Sans Devanagari",system-ui,sans-serif;
+  --serif:"IBM Plex Serif","Noto Sans Devanagari",Georgia,serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0E131A; --surface:#161D27; --ink:#E4E9F0; --muted:#9AA7B8; --line:#2A3544;
+    --accent:#86ADE6; --accent-ink:#0E131A; --accent-soft:#1B2A40;
+    --stamp:#E8877B; --stamp-soft:#3A1F1C;
+    --marker:#4A3D0E; --marker-ink:#FFE9A3;
+    --ok:#7FD1A4; --ok-soft:#15301F; --bad:#E8877B; --bad-soft:#3A1F1C;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E131A; --surface:#161D27; --ink:#E4E9F0; --muted:#9AA7B8; --line:#2A3544;
+  --accent:#86ADE6; --accent-ink:#0E131A; --accent-soft:#1B2A40;
+  --stamp:#E8877B; --stamp-soft:#3A1F1C;
+  --marker:#4A3D0E; --marker-ink:#FFE9A3;
+  --ok:#7FD1A4; --ok-soft:#15301F; --bad:#E8877B; --bad-soft:#3A1F1C;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 var(--sans);padding-inline:0;padding-block:0}
+button{font:inherit;color:inherit}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.app{max-width:560px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+main{flex:1;padding-inline:16px;padding-block:16px 120px;display:grid;gap:14px;align-content:start}
+h1,h2,h3{font-family:var(--serif);line-height:1.25;margin:0;text-wrap:balance}
+h1{font-size:26px}
+h2{font-size:22px}
+h3{font-size:17px}
+p{margin:0}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+.eyebrow{font:600 11.5px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.hin{font-family:"Noto Sans Devanagari",var(--sans)}
+.sec{font:600 13.5px/1 var(--mono);background:var(--accent-soft);color:var(--accent);padding:3px 6px;border-radius:4px;white-space:nowrap}
+b{font-weight:600}
+
+/* top bar */
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--bg);padding:10px 16px 10px;border-bottom:1px solid var(--line);display:grid;gap:8px}
+.toprow{display:flex;align-items:center;gap:10px}
+.iconbtn{width:38px;height:38px;flex:0 0 38px;border-radius:10px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;cursor:pointer;font-size:18px;line-height:1}
+.toptitle{flex:1;min-width:0;display:grid}
+.toptitle .t{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.toptitle .s{font-size:12.5px;color:var(--muted)}
+.bar{height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .3s}
+@media (prefers-reduced-motion:reduce){.bar>i{transition:none}}
+
+/* bottom bar */
+.bottom{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--surface);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px))}
+.bottom .in{max-width:528px;margin:0 auto;display:flex;gap:10px}
+.btn{flex:1;min-height:50px;border-radius:12px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:16px;cursor:pointer;padding:0 14px}
+.btn.ghost{background:transparent;color:var(--accent);flex:0 0 auto;min-width:88px}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.tabs{display:flex;gap:6px}
+.tab{flex:1;min-height:52px;border-radius:12px;border:0;background:transparent;cursor:pointer;display:grid;place-items:center;gap:2px;font-size:12.5px;font-weight:500;color:var(--muted);padding:6px 0}
+.tab .ic{font:700 16px/1 var(--mono)}
+.tab[aria-current="true"]{background:var(--accent-soft);color:var(--accent)}
+
+/* cards */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:10px}
+ul.pts{margin:0;padding-left:20px;display:grid;gap:8px}
+ul.pts li::marker{color:var(--accent)}
+.trick{background:var(--marker);color:var(--marker-ink);border-radius:12px;padding:12px 14px;display:grid;gap:4px}
+.trick .lbl,.note .lbl{font:600 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.note{border-left:3px solid var(--stamp);background:var(--stamp-soft);padding:12px 14px;border-radius:0 12px 12px 0;display:grid;gap:4px}
+.note .lbl{color:var(--stamp)}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 11px/1.3 var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td.n{font-family:var(--mono);font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+.pair{display:grid;gap:8px}
+.pair>div{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;gap:2px}
+.pair .k{font-weight:600}
+
+/* home */
+.hero{display:grid;gap:10px;padding-top:6px}
+.stats{display:flex;gap:10px;align-items:center}
+.stats .bar{flex:1}
+.lesson{display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer;text-align:left;width:100%}
+.lesson .num{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font:600 15px/1 var(--mono);background:var(--accent-soft);color:var(--accent)}
+.lesson.done .num{background:var(--ok-soft);color:var(--ok)}
+.lesson .lt{font-weight:600;line-height:1.3}
+.lesson .ls{font-size:13px;color:var(--muted);line-height:1.35}
+.lesson .st{font:600 12px/1 var(--mono);color:var(--muted);white-space:nowrap}
+.lesson.done .st{color:var(--ok)}
+.lesson.next{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.group{font:600 12px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-top:8px}
+
+/* quiz */
+.qhead{display:grid;gap:6px}
+.q{font-size:18px;font-weight:600;line-height:1.4}
+.opts{display:grid;gap:10px}
+.opt{text-align:left;width:100%;min-height:52px;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);cursor:pointer;display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:center;line-height:1.4}
+.opt .l{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font:600 13px/1 var(--mono);background:var(--bg);color:var(--muted)}
+.opt:hover:not([disabled]){border-color:var(--accent)}
+.opt[disabled]{cursor:default}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.right .l{background:var(--ok);color:var(--surface)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt.wrong .l{background:var(--bad);color:var(--surface)}
+.fb{border-radius:12px;padding:12px 14px;display:grid;gap:4px}
+.fb.good{background:var(--ok-soft)}
+.fb.good .h{color:var(--ok)}
+.fb.bad{background:var(--bad-soft)}
+.fb.bad .h{color:var(--bad)}
+.fb .h{font-weight:700}
+.score{display:flex;align-items:baseline;gap:8px}
+.score .big{font:700 40px/1 var(--serif);color:var(--accent);font-variant-numeric:tabular-nums}
+
+/* finder & tricks */
+.search{width:100%;font:inherit;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:8px 14px;border-radius:99px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-size:14px;font-weight:500}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.rows{display:grid;gap:8px}
+.row{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;align-items:baseline}
+.row .law{font:600 11px/1 var(--mono);color:var(--muted);grid-column:1/-1}
+.row .n{font:700 17px/1.2 var(--mono);color:var(--accent);white-space:nowrap}
+.mn{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;align-items:baseline}
+.mn .k{font:700 18px/1.2 var(--mono);color:var(--accent);white-space:nowrap}
+</style>
+
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script>
+const S = n => `<span class="sec">§${n}</span>`;
+const TRICK = t => `<div class="trick"><span class="lbl">Memory trick</span><p>${t}</p></div>`;
+const NOTE = t => `<div class="note"><span class="lbl">Exam alert</span><p>${t}</p></div>`;
+
+const COURSE = [
+{ id:"l1", part:"Foundation", title:"The three new laws", sub:"What replaced what, dates, section counts",
+  cards:[
+  {h:"Crime → Police → Court", b:`<p>A criminal case always moves in this order, and so do the three laws.</p>
+   <div class="pair">
+    <div><span class="k">1. BNS — Bharatiya Nyaya Sanhita</span><span class="muted">What is a crime and its punishment. <b>Substantive law.</b></span></div>
+    <div><span class="k">2. BNSS — Bharatiya Nagarik Suraksha Sanhita</span><span class="muted">FIR, arrest, investigation, bail, trial. <b>Procedural law.</b></span></div>
+    <div><span class="k">3. BSA — Bharatiya Sakshya Adhiniyam</span><span class="muted">Which evidence the court accepts. <b>Procedural law.</b></span></div>
+   </div>
+   <p><b>Example:</b> your phone is snatched. BNS ${S(304)} says snatching is a crime. BNSS governs the FIR and CCTV collection. BSA decides whether the CCTV footage is valid evidence.</p>`},
+  {h:"What replaced what", b:`<div class="tbl"><table><thead><tr><th>Old law</th><th>New law</th></tr></thead><tbody>
+   <tr><td>Indian Penal Code, <b>1860</b></td><td><b>BNS</b></td></tr>
+   <tr><td>Code of Criminal Procedure (CrPC), <b>1973</b></td><td><b>BNSS</b></td></tr>
+   <tr><td>Indian Evidence Act, <b>1872</b></td><td><b>BSA</b></td></tr></tbody></table></div>
+   <p>IPC was a colonial law drafted under <b>Thomas Babington Macaulay</b>, first Law Member of the Governor-General's Council (post created by the Charter Act 1833). CrPC was first made in 1861; independent India replaced it in 1973.</p>
+   <p>Aim of the new laws: <b>modernise and decolonise</b> criminal justice, make it victim-centric, faster and tech-enabled.</p>`},
+  {h:"Numbers you must know", b:`<div class="tbl"><table><thead><tr><th>Law</th><th>Chapters</th><th>Sections</th><th>Act no.</th></tr></thead><tbody>
+   <tr><td><b>BNS</b></td><td class="n">20</td><td class="n">358</td><td class="n">45</td></tr>
+   <tr><td><b>BNSS</b></td><td class="n">39</td><td class="n">531</td><td class="n">46</td></tr>
+   <tr><td><b>BSA</b></td><td class="n">12</td><td class="n">170</td><td class="n">47</td></tr></tbody></table></div>
+   ${TRICK(`<b>358</b>: justice (<span class="hin">न्याय</span>) must be equal, 3 + 5 = 8.<br><b>531</b>: police work backwards and look for odd things: 1, 3, 5 reversed.<br><b>170</b>: the judge wants all evidence <span class="hin">एक साथ</span> (1-7), and the accused's chance of escape is 0.<br><b>45 · 46 · 47</b>: act numbers in case order, crime → police → court.`)}`},
+  {h:"Three dates", b:`<ul class="pts">
+   <li><b>11 Aug 2023</b> — introduced in Lok Sabha by Home Minister <b>Amit Shah</b> (Ministry of Home Affairs).</li>
+   <li><b>25 Dec 2023</b> — President <b>Droupadi Murmu</b> gave assent. This is the date they were <b>enacted</b>.</li>
+   <li><b>1 Jul 2024</b> — came into force.</li></ul>
+   ${NOTE(`Also on 1 July: GST launched (2017) and National Doctors' Day (Dr B.C. Roy's birthday). All asked in SSC.`)}`},
+  {h:"Old case or new law?", b:`<ul class="pts">
+   <li>Crime committed <b>before 1 Jul 2024</b> → punished under <b>IPC</b>.</li>
+   <li>Trial or investigation <b>already pending</b> on 1 Jul 2024 → continues under the <b>old CrPC</b>, because of the <b>repeal and savings clause</b> (BNSS ${S(531)}). If 25 of 30 witnesses were heard under the old code, switching midway would create chaos.</li>
+   <li>Proceedings that <b>start after</b> 1 Jul 2024 follow BNSS and BSA.</li></ul>`}
+  ],
+  quiz:[
+   {q:"IPC, 1860 was replaced by?", o:["BNSS","BNS","BSA","BNSS and BSA together"], a:1, e:"BNS replaced IPC. BNSS replaced CrPC 1973; BSA replaced the Evidence Act 1872."},
+   {q:"How many sections does the BNSS have?", o:["358","170","531","511"], a:2, e:"BNS 358, BNSS 531, BSA 170."},
+   {q:"When was the BNS enacted?", o:["11 Aug 2023","1 Jul 2024","25 Dec 2023","26 Jan 2024"], a:2, e:"Enacted on presidential assent, 25 Dec 2023. In force from 1 Jul 2024."},
+   {q:"Act numbers of BNS, BNSS and BSA (2023)?", o:["45, 46, 47","47, 46, 45","46, 45, 47","1, 2, 3"], a:0, e:"Crime → police → court: 45, 46, 47."},
+   {q:"A trial pending on 1 July 2024 continues under which law?", o:["BNSS immediately","The old CrPC, due to the repeal and savings clause","Whichever the accused chooses","The trial restarts from zero"], a:1, e:"BNSS §531 saves pending proceedings under the old code."},
+   {q:"A man snatches a phone, an FIR is filed, CCTV is produced in court. In what order do the laws apply?", o:["BSA → BNSS → BNS","BNSS → BNS → BSA","BNS → BNSS → BSA","BNS → BSA → BNSS"], a:2, e:"Crime (BNS) → process (BNSS) → proof (BSA)."}
+  ],
+  rev:[`IPC 1860 → <b>BNS</b> · 20 chapters · 358 sections · Act 45`,`CrPC 1973 → <b>BNSS</b> · 39 chapters · 531 sections · Act 46`,`Evidence Act 1872 → <b>BSA</b> · 12 chapters · 170 sections · Act 47`,`Introduced 11 Aug 2023 (Amit Shah) · assent 25 Dec 2023 · in force 1 Jul 2024`,`Pending cases on 1 Jul 2024 → old law (repeal & savings)`]
+},
+{ id:"l2", part:"Foundation", title:"Legal basics", sub:"Cognizable, compoundable, courts, Magistrate",
+  cards:[
+  {h:"Cognizable vs non-cognizable", b:`<div class="pair">
+   <div><span class="k">Cognizable <span class="hin">(संज्ञेय)</span></span><span class="muted">Serious crimes: murder, rape, kidnapping, robbery. Police can <b>arrest without warrant</b> and investigate without the Magistrate's approval (when legal conditions are met).</span></div>
+   <div><span class="k">Non-cognizable</span><span class="muted">Less serious. Police need the Magistrate's approval to investigate and a warrant to arrest.</span></div></div>`},
+  {h:"Compoundable, criminal and civil", b:`<div class="pair">
+   <div><span class="k">Compoundable</span><span class="muted">Parties can settle, e.g. out of court or in a Lok Adalat. Small theft in the mohalla.</span></div>
+   <div><span class="k">Non-compoundable</span><span class="muted">No settlement allowed: murder, rape.</span></div>
+   <div><span class="k">Criminal vs civil</span><span class="muted">Murder, dowry harassment, theft are criminal. <b>Divorce is civil</b> <span class="hin">(दीवानी)</span>.</span></div></div>`},
+  {h:"Who is a Magistrate?", b:`<p>A Magistrate is a judge of the lowest criminal court. Court hierarchy:</p>
+   <div class="tbl"><table><tbody>
+   <tr><td class="n">1</td><td>Supreme Court</td></tr>
+   <tr><td class="n">2</td><td>High Court</td></tr>
+   <tr><td class="n">3</td><td>District / Sessions Judge</td></tr>
+   <tr><td class="n">4</td><td><b>Magistrates</b> (Chief Judicial Magistrate appointed by the High Court)</td></tr></tbody></table></div>
+   <p>Smaller offences go to Magistrates. They also grant default bail and receive search-and-seizure videos.</p>`}
+  ],
+  quiz:[
+   {q:"In which type of offence can police arrest without a warrant?", o:["Non-cognizable","Cognizable","Compoundable only","Civil"], a:1, e:"Cognizable = serious; police act on their own."},
+   {q:"Which of these is NOT a criminal law case?", o:["Murder","Harassment for dowry","Theft","Divorce"], a:3, e:"Divorce is a civil matter."},
+   {q:"In which offences can parties settle between themselves?", o:["Compoundable","Non-compoundable","Only cognizable","None"], a:0, e:"Compoundable offences can be settled."},
+   {q:"Magistrates rank directly below?", o:["High Court","District / Sessions Judge","Supreme Court","Lok Adalat"], a:1, e:"SC → HC → District Judge → Magistrate."}
+  ],
+  rev:[`Cognizable = serious, arrest without warrant`,`Non-cognizable = needs Magistrate approval and warrant`,`Compoundable = settlement allowed`,`Divorce = civil case`,`SC → HC → District Judge → Magistrate`]
+},
+{ id:"l3", part:"BNS · Crime", title:"BNS: the new offences", sub:"Sedition, terrorism, organised crime, mob lynching",
+  cards:[
+  {h:"Firsts in BNS", b:`<ul class="pts">
+   <li><b>Child</b> defined for the first time: below <b>18 years</b> ${S(2)}. All definitions are in section 2.</li>
+   <li>Terrorism, organised crime, petty organised crime and mob lynching defined.</li>
+   <li><b>Community service</b> added as a punishment ${S(4)}.</li></ul>`},
+  {h:"Sedition is gone", b:`<p>Colonial sedition <span class="hin">(राजद्रोह)</span>, IPC ${S("124A")}, has been <b>removed</b>.</p>
+   <p>In its place: BNS ${S(152)} — acts <b>endangering the sovereignty, unity and integrity of India</b>.</p>`},
+  {h:"Terrorism and organised crime", b:`<div class="pair">
+   <div><span class="k">${S(113)} Terrorist act</span><span class="muted">Intends to threaten unity, integrity, security of India, intimidate the public or disturb public order. <b>Death or life</b> if death results. Conspiring, organising or assisting: 5 years to life + fine of at least ₹5 lakh.</span></div>
+   <div><span class="k">${S(111)} Organised crime</span><span class="muted">Continuing unlawful activity on behalf of a <b>crime syndicate</b>: kidnapping, extortion, contract killing, land grabbing, financial scams, cyber crime. Death or life if anyone dies; otherwise 5 years to life.</span></div></div>`},
+  {h:"Petty organised crime and mob lynching", b:`<div class="pair">
+   <div><span class="k">${S(112)} Petty organised crime</span><span class="muted">Causes general insecurity: chain snatching, pickpocketing, <b>theft by a gang</b>. 1 to 7 years + fine.</span></div>
+   <div><span class="k">${S("103(2)")} Mob lynching</span><span class="muted">Murder by a group of <b>5 or more</b> on grounds of race, caste, sex, language, place of birth or belief. <b>Death or life</b> + fine.</span></div></div>
+   ${TRICK(`<b>111</b> organised (all ones, everyone organised) → <b>112</b> petty organised → <b>113</b> terrorist → remove the middle 1 from 113 = <b>103</b> mob lynching.`)}`},
+  {h:"More new provisions", b:`<ul class="pts">
+   <li>${S(69)} Sexual intercourse by <b>deceitful means</b>: false promise of marriage or job.</li>
+   <li>${S("70(2)")} <b>Death</b> possible for gang rape of a woman <b>under 18</b> (IPC: under 12).</li>
+   <li>${S("106(2)")} <b>Hit and run</b>: causing death by rash driving and fleeing without informing police/Magistrate → up to <b>10 years + fine</b>.</li>
+   <li>${S(95)} Hiring a child to commit an offence: 3 to 10 years + fine.</li>
+   <li>${S(141)} Importing a girl under 21 <b>or a boy under 18</b> for illicit intercourse (boys added).</li></ul>`}
+  ],
+  quiz:[
+   {q:"BNS §152 deals with?", o:["Sedition, unchanged","Acts endangering sovereignty, unity and integrity of India","Defamation","Terrorist act"], a:1, e:"Sedition (IPC 124A) was removed; §152 replaces it."},
+   {q:"For mob lynching, the group must have at least?", o:["3 persons","5 persons","10 persons","2 persons"], a:1, e:"BNS §103(2): five or more."},
+   {q:"Punishment for murder by mob lynching?", o:["Up to 7 years","Up to 10 years","Death or life imprisonment","Community service"], a:2, e:"Death or life, plus fine."},
+   {q:"Organised crime (§111) is committed on behalf of?", o:["A trade association","A registered charity","A crime syndicate","A public sector company"], a:2, e:"Crime syndicate."},
+   {q:"Which is an example of petty organised crime?", o:["Terrorist act","Theft committed by a gang","Contract killing","Mob lynching"], a:1, e:"§112 covers crimes like gang theft, snatching, pickpocketing."},
+   {q:"Hit and run under §106(2): maximum punishment?", o:["5 years or fine","7 years or fine","Up to 10 years and fine","Life imprisonment"], a:2, e:"Up to 10 years and fine."},
+   {q:"BNS defines a child as a person below?", o:["12 years","16 years","18 years","21 years"], a:2, e:"BNS §2."}
+  ],
+  rev:[`§152 replaces sedition (IPC 124A)`,`§113 terrorism · §111 organised · §112 petty organised · §103(2) mob lynching (5+)`,`§69 deceitful intercourse · §70(2) death for gang rape under 18`,`§106(2) hit and run: up to 10 years + fine`,`Child = below 18 (§2)`]
+},
+{ id:"l4", part:"BNS · Crime", title:"BNS: women, body, property", sub:"Chapter V, murder, theft vs snatching",
+  cards:[
+  {h:"Chapter V: women and children", b:`<p><b>Sections 63–99</b>. IPC scattered these; BNS puts them in one chapter. If a question on rape, stalking or cruelty gives an option outside 63–99, eliminate it.</p>
+   <ul class="pts"><li>${S(63)} Rape definition · ${S(69)} deceitful intercourse · ${S(70)} gang rape</li>
+   <li>${S(77)} <b>Voyeurism</b>: secretly watching or recording</li>
+   <li>${S(78)} <b>Stalking</b>: following a woman</li>
+   <li>SSC answer for "first time" in sexual offences: <b>gender neutrality</b> in certain offences (child offences now cover boys).</li></ul>`},
+  {h:"Offences against the body (Ch VI)", b:`<div class="tbl"><table><tbody>
+   <tr><td class="n">100</td><td>Culpable homicide</td></tr>
+   <tr><td class="n">101/103</td><td>Murder / punishment: death or life + fine</td></tr>
+   <tr><td class="n">108</td><td>Abetment of suicide</td></tr>
+   <tr><td class="n">137/138</td><td>Kidnapping / abduction (abduction is by force or deceit)</td></tr>
+   <tr><td class="n">143</td><td>Trafficking of persons (Fundamental Right, Art. 23)</td></tr></tbody></table></div>`},
+  {h:"Your phone: theft or snatching?", b:`<div class="tbl"><table><tbody>
+   <tr><td class="n">303</td><td><b>Theft</b> <span class="hin">(चोरी)</span>: taken quietly from your pocket while you slept</td></tr>
+   <tr><td class="n">304</td><td><b>Snatching</b> <span class="hin">(छिनैती)</span>: grabbed from your hand by a biker. New.</td></tr>
+   <tr><td class="n">308</td><td><b>Extortion</b>: taken by blackmail or threat</td></tr>
+   <tr><td class="n">309</td><td><b>Robbery</b> <span class="hin">(लूट)</span>: taken at knifepoint</td></tr>
+   <tr><td class="n">310</td><td><b>Dacoity</b> <span class="hin">(डकैती)</span>: robbery by 5 or more</td></tr></tbody></table></div>
+   ${TRICK(`303 then 304: quiet first, then grab.`)}`}
+  ],
+  quiz:[
+   {q:"Which BNS chapter covers offences against women and children?", o:["Chapter V (sections 63–99)","Chapter VI (sections 100–146)","Chapter II","Chapter XX"], a:0, e:"Chapter V, 63–99."},
+   {q:"Snatching is in which BNS section?", o:["303","304","308","309"], a:1, e:"303 theft, 304 snatching."},
+   {q:"Stalking is in which BNS section?", o:["69","77","78","63"], a:2, e:"77 voyeurism, 78 stalking."},
+   {q:"Which provision is new regarding crimes against women?", o:["Community service for domestic violence","Death penalty for gang rape of a woman under 18","Marital rape made legal","Lower age of consent"], a:1, e:"IPC allowed death only for gang rape of girls under 12."},
+   {q:"What was emphasised for the first time in sexual offences?", o:["Gender neutrality in certain offences","Abolition of rape laws","Community service for rape","Trials only in High Courts"], a:0, e:"E.g. child offences now cover boys."}
+  ],
+  rev:[`Chapter V = §63–99 (women & children)`,`§77 voyeurism · §78 stalking`,`§100 culpable homicide · §103 murder punishment`,`§137 kidnapping · §138 abduction · §143 trafficking`,`§303 theft · §304 snatching · §308 extortion · §309 robbery · §310 dacoity`]
+},
+{ id:"l5", part:"BNS · Crime", title:"BNS: punishments & exceptions", sub:"Community service, defamation, general exceptions",
+  cards:[
+  {h:"Community service", b:`<ul class="pts">
+   <li>${S(4)} lists punishments: death, life, imprisonment, forfeiture, fine and now <b>community service</b>.</li>
+   <li>Unpaid work for society: cleaning, planting trees, helping in orphanages.</li>
+   <li>Only for <b>petty offences</b> (6 offences). Keeps jails from overcrowding. Never for murder, mob lynching or domestic violence.</li>
+   <li>Defined in BNSS ${S(23)}.</li></ul>`},
+  {h:"Defamation and unpaid fines", b:`<ul class="pts">
+   <li>${S(356)} <b>Defamation</b>: up to <b>2 years, or fine, or both, or community service</b>.</li>
+   <li>${S("8(5)")} Jail for not paying a fine: up to ₹5,000 → <b>2 months</b>; up to ₹10,000 → <b>4 months</b>.</li></ul>
+   ${TRICK(`356 is also Article 356, President's Rule. The President is quick to feel defamed.`)}`},
+  {h:"What BNS changed, in numbers", b:`<div class="tbl"><table><tbody>
+   <tr><td>Imprisonment increased</td><td class="n">33 offences</td></tr>
+   <tr><td>Fine increased</td><td class="n">83 offences</td></tr>
+   <tr><td>Mandatory minimum sentence</td><td class="n">23 offences</td></tr>
+   <tr><td>Community service</td><td class="n">6 offences</td></tr></tbody></table></div>`},
+  {h:"When it's not an offence", b:`<ul class="pts">
+   <li>${S(20)} Child <b>under 7</b>: nothing is an offence. ${S(21)} Child <b>7–12</b> without maturity to understand: no offence.</li>
+   <li>${S(14)} Soldier firing on a mob on a superior's <b>lawful</b> order: no offence.</li>
+   <li>${S(18)} Accident while doing a lawful act with care.</li>
+   <li>${S(27)} Guardian who, in good faith and for the child's benefit, allows a risky surgery: <b>not guilty</b>.</li>
+   <li>${S(45)} <b>Abetment</b> <span class="hin">(उकसाना)</span>: instigating, conspiring or aiding. Liable even if not at the scene.</li></ul>`}
+  ],
+  quiz:[
+   {q:"New punishment in BNS to keep petty offenders out of jail?", o:["Community service","Exile","Flogging","House arrest"], a:0, e:"BNS §4."},
+   {q:"Punishment for defamation under BNS?", o:["Up to 5 years, no fine","Up to 1 year and mandatory community service","Up to 2 years, or fine, or both, or community service","Life imprisonment"], a:2, e:"BNS §356."},
+   {q:"Fine up to ₹10,000 not paid: maximum simple imprisonment?", o:["2 months","4 months","6 months","1 year"], a:1, e:"≤₹5,000 → 2 months; ≤₹10,000 → 4 months."},
+   {q:"How many offences had their imprisonment term increased?", o:["23","33","83","6"], a:1, e:"33 imprisonment, 83 fine, 23 mandatory minimum, 6 community service."},
+   {q:"Guardian A, in good faith, lets a surgeon do a risky operation to cure a child. Position?", o:["Guilty of grievous hurt","Guilty of culpable homicide","Not guilty, act done in good faith for the child's benefit","Liable for endangering a minor"], a:2, e:"BNS §27."},
+   {q:"A soldier fires on a mob on his superior's lawful order. Offence?", o:["Yes, murder","Yes, rioting","No offence","Abetment"], a:2, e:"BNS §14."},
+   {q:"Who can be liable for abetment?", o:["Only the one who physically helps","Only someone present at the scene","Only the one who commits it","Anyone who instigates, conspires or intentionally aids"], a:3, e:"BNS §45."}
+  ],
+  rev:[`Community service §4 · for 6 petty offences`,`Defamation §356: 2 yrs / fine / both / community service`,`Unpaid fine: ₹5k → 2 months, ₹10k → 4 months`,`33 · 83 · 23 · 6`,`§20 under 7 · §21 7–12 · §14 soldier · §27 good-faith surgery · §45 abetment`]
+},
+{ id:"l6", part:"BNSS · Police", title:"Police stations & FIR", sub:"Thana, chowki, e-FIR, zero FIR, CCTNS",
+  cards:[
+  {h:"Thana vs chowki", b:`<ul class="pts">
+   <li>A city is divided into areas, each under a <b>thana</b> (police station) with a fixed jurisdiction. Head: <b>SHO / Thanedar</b> (Inspector).</li>
+   <li>Each thana area has several <b>chowkis</b> (police posts) nearby. Head: <b>Daroga</b> (Sub-Inspector).</li>
+   <li><b>FIR is registered only at a thana.</b> A chowki only writes your complaint in its <b>General Diary (GD)</b>.</li>
+   <li>A real FIR gets you a <b>free copy</b>. A GD entry gives no receipt.</li></ul>`},
+  {h:"FIR under BNSS §173", b:`<ul class="pts">
+   <li>Information on a cognizable offence can be given <b>orally, in writing or electronically</b>.</li>
+   <li><b>e-FIR</b>: lodge online; <b>sign within 3 days</b> at the station.</li>
+   <li>Offences punishable with 3 to 7 years: police may do a <b>preliminary inquiry</b> (DSP-level permission) first.</li></ul>
+   ${TRICK(`173 = <span class="hin">एक साथ तीन</span>: information can be given <b>1 (ek) saath 3</b> ways. e-FIR signed in 3 days.`)}`},
+  {h:"Zero FIR", b:`<p>You're robbed at knifepoint on a highway. You won't stop to find the local thana; you escape. At the next safe thana, 70 km away, you file an FIR.</p>
+   <p>That is a <b>zero FIR</b>: file at <b>any police station, regardless of where the crime happened</b>. The station transfers it to the right one. "Zero" = zero boundaries.</p>`},
+  {h:"CCTNS", b:`<p><b>Crime and Criminal Tracking Network & Systems</b>: a national portal linking every police station. All FIRs and investigation records are on it.</p>
+   <p>A stolen car found near the Nepal border can be matched to an FIR in Bhopal. An unidentified body in Kanpur can be matched to a missing-person report in Uttarakhand. BNSS gives access to FIR through CCTNS.</p>`},
+  {h:"§530: electronic mode", b:`<p>Trials and all proceedings, including <b>e-summons</b>, <b>e-warrant</b>, witness examination and judgment, may be held in <b>electronic mode</b>.</p>
+   ${TRICK(`530: your <b>5</b> fingers on the keyboard get <b>3</b> e-powers (e-FIR, e-summons, e-warrant) with <b>0</b> boundaries.`)}`}
+  ],
+  quiz:[
+   {q:"Which statement about FIR under BNSS is correct?", o:["FIR must be lodged physically at the station","Information on a cognizable offence may be given orally or electronically","Only judges can register FIRs","FIR is no longer needed for cognizable offences"], a:1, e:"BNSS §173."},
+   {q:"An e-FIR must be signed within?", o:["24 hours","3 days","7 days","15 days"], a:1, e:"3 days."},
+   {q:"Main benefit of a zero FIR?", o:["It costs nothing","It can be filed at any police station regardless of crime location","It means zero punishment","It skips investigation"], a:1, e:"Zero boundaries."},
+   {q:"Through which portal can an FIR be accessed?", o:["e-Courts","CCTNS","DigiLocker","UMANG"], a:1, e:"Crime and Criminal Tracking Network & Systems."},
+   {q:"Which technology system did BNSS introduce?", o:["AI judgment generator","Mandatory drone scanning","Virtual courts only for every offence","e-FIR, e-summons and e-warrant"], a:3, e:"BNSS §173 and §530."},
+   {q:"Where is an FIR registered?", o:["Police chowki","Police thana","DM office","Any court"], a:1, e:"Only at a thana; a chowki uses the General Diary."}
+  ],
+  rev:[`FIR only at a thana; chowki = General Diary`,`§173: oral / written / electronic; e-FIR signed in 3 days`,`Zero FIR = any police station`,`CCTNS = national crime records portal`,`§530 = electronic trials, e-summons, e-warrant`]
+},
+{ id:"l7", part:"BNSS · Police", title:"Arrest, custody & bail", sub:"24 hours, 15 days, 60/90 days, bail vs parole",
+  cards:[
+  {h:"Rights on arrest", b:`<ul class="pts">
+   <li>${S(47)} Grounds of arrest must be told <b>immediately upon arrest</b>.</li>
+   <li>${S(58)} No detention beyond <b>24 hours</b> without a Magistrate's order (also Art. 22).</li>
+   <li>${S(38)} Right to <b>meet an advocate</b> of your choice <b>during interrogation</b> (not throughout it).</li></ul>
+   ${TRICK(`"I won't say anything till my lawyer comes." He <span class="hin">अड़ जाता है</span> → <span class="hin">अड़तीस</span> = 38.`)}`},
+  {h:"Police custody in parts", b:`<ul class="pts">
+   <li><b>Police custody</b> = lock-up; police can question any time. <b>Judicial custody</b> = jail; police need court permission.</li>
+   <li>${S(187)} Police custody is still <b>15 days max</b>, but it can now be taken <b>in parts</b> (e.g. 8 days, later 7) during the first 40 or 60 days.</li>
+   <li>Effect: the accused may be <b>denied bail for the full 60/90 days</b>, since police can call him back.</li></ul>
+   ${TRICK(`187: 8 + 7 = 15 days, in two parts.`)}`},
+  {h:"Default bail", b:`<p>Police must file a <b>charge sheet</b> (motive, weapon, relationship, progress) within:</p>
+   <ul class="pts"><li><b>60 days</b> if the offence carries under 10 years</li><li><b>90 days</b> if 10+ years, life or death</li></ul>
+   <p>If not, the accused gets <b>default bail</b> as a right. It is granted by the <b>Magistrate</b>.</p>`},
+  {h:"Bail, parole, bail bond", b:`<div class="pair">
+   <div><span class="k">Bail</span><span class="muted">No conviction yet; released while the case continues.</span></div>
+   <div><span class="k">Parole</span><span class="muted">Already convicted. Good conduct can earn temporary leave (say 20 days), then back to jail.</span></div>
+   <div><span class="k">Bail bond</span><span class="muted">An <b>undertaking for release with a surety</b>: money deposited so you won't run. Abscond and it is forfeited.</span></div></div>`},
+  {h:"Other bail sections", b:`<ul class="pts">
+   <li>${S(479)} Undertrial cap: <b>first-time offender</b> released on bond after <b>1/3</b> of maximum sentence; others after <b>1/2</b>. Not for death/life offences.</li>
+   <li>${S(480)} Bail in non-bailable offences · ${S(482)} <b>Anticipatory bail</b> (before arrest).</li>
+   <li>${S(218)} Government must decide on sanction to prosecute an officer within <b>120 days</b>, or sanction is <b>deemed granted</b>.</li></ul>`}
+  ],
+  quiz:[
+   {q:"How long can a suspect be held without a Magistrate's approval?", o:["12 hours","24 hours","48 hours","72 hours"], a:1, e:"BNSS §58; Constitution Art. 22."},
+   {q:"Maximum total police custody, even if remanded periodically?", o:["7 days","15 days","30 days","60 days"], a:1, e:"15 days, now allowed in parts (§187)."},
+   {q:"Allowing police custody in instalments may result in?", o:["Automatic anticipatory bail","Denial of bail for the full 60/90-day period","Mandatory discharge after 15 days","Immediate release on surety"], a:1, e:"Police can recall the accused within the period."},
+   {q:"Default bail period for offences punishable with under 10 years?", o:["30 days","60 days","90 days","120 days"], a:1, e:"90 days for 10+ years."},
+   {q:"Who grants default bail?", o:["Supreme Court","High Court","Magistrate","Police"], a:2, e:"The Magistrate."},
+   {q:"Which BNSS section gives the right to meet an advocate during interrogation?", o:["35","38","47","58"], a:1, e:"अड़तीस = 38."},
+   {q:"A bail bond is?", o:["An undertaking for release with a surety","A fine after conviction","Parole","Anticipatory bail"], a:0, e:"Security so you don't abscond."},
+   {q:"The accused must be informed of the grounds of arrest?", o:["After trial","Immediately upon arrest","Only if asked","Within 7 days"], a:1, e:"BNSS §47."},
+   {q:"Anticipatory bail is in which section?", o:["479","480","482","530"], a:2, e:"§482."}
+  ],
+  rev:[`§47 grounds immediately · §58 24 hours · §38 advocate`,`§187 police custody 15 days, in parts`,`Charge sheet: 60 days (<10 yrs) / 90 days (10+) else default bail by Magistrate`,`Bail = before conviction · Parole = after conviction`,`§479 1/3 first-timer · §482 anticipatory bail · §218 deemed sanction 120 days`]
+},
+{ id:"l8", part:"BNSS · Police", title:"Investigation & technology", sub:"Video search, forensics, witness protection",
+  cards:[
+  {h:"§105: video of search & seizure", b:`<ul class="pts">
+   <li>In films, a corrupt officer plants drugs during a raid. §105 stops this: every <b>search and seizure must be audio-video recorded</b>.</li>
+   <li>Without a warrant, police can't even cross your gate. With one, officers keep cameras on the whole time. Mobile phones are fine.</li>
+   <li>Recording goes to the <b>Magistrate</b> without delay. If police don't record, you may record them.</li></ul>
+   ${TRICK(`105: the officer holds <b>1</b> camera with a round lens (<b>0</b>) in his <b>5</b> fingers.`)}`},
+  {h:"Forensics and medical reports", b:`<ul class="pts">
+   <li>${S(176)} For offences punishable with <b>7 years or more</b> (a "big crime"), <b>forensic experts must visit the crime scene</b> and video-record evidence collection.</li>
+   <li>${S(184)} Medical report of a rape victim goes to the investigating officer within <b>7 days</b>.</li>
+   <li>${S(193)} Investigation of sexual offences within <b>2 months</b>; victim told of progress within <b>90 days</b>.</li></ul>
+   ${TRICK(`176 has the 7 inside it: forensics for 7+ years.`)}`},
+  {h:"Samples, summons, witnesses", b:`<ul class="pts">
+   <li>${S(349)} Magistrate can order specimen signatures, handwriting, fingerprints and now <b>voice samples</b>.</li>
+   <li>${S(63)} Summons: in duplicate, signed and sealed, <b>or in encrypted electronic form</b>.</li>
+   <li>${S(398)} <b>Witness protection scheme</b>: States must protect witnesses; they can depose by video conferencing. Vulnerable witnesses can have identity concealed.</li>
+   <li>Cyber crimes are investigated by <b>cyber crime cells set up by government</b>.</li></ul>
+   ${TRICK(`398: the State posts <b>3</b> guards from <b>9</b> am to <b>8</b> pm.`)}`}
+  ],
+  quiz:[
+   {q:"Which BNSS section mandates video recording of search and seizure?", o:["50","62","105","176"], a:2, e:"§105."},
+   {q:"Forensic experts must visit the crime scene for offences punishable with?", o:["3 years or more","7 years or more","10 years or more","All offences"], a:1, e:"§176."},
+   {q:"Medical report of a rape victim must be submitted within?", o:["24 hours","3 days","7 days","30 days"], a:2, e:"§184."},
+   {q:"Additional specimen that can now be collected with handwriting and fingerprints?", o:["Voice samples","Family DNA","Retina scan","Social media passwords"], a:0, e:"§349."},
+   {q:"Which BNSS section provides the witness protection scheme?", o:["173","398","530","38"], a:1, e:"3 guards, 9 to 8."},
+   {q:"Investigation of sexual offences must be completed within?", o:["6 months","1 year","2 months","3 months"], a:2, e:"§193."},
+   {q:"How must a court summons be issued?", o:["Handwritten only","Verbal instruction by an officer","In duplicate, signed and sealed, or in encrypted electronic form","Sealed envelope signed by any officer"], a:2, e:"§63."}
+  ],
+  rev:[`§105 video of search & seizure → Magistrate`,`§176 forensics for 7+ years · §184 rape medical report 7 days`,`§193 sexual offences probe 2 months`,`§349 voice samples · §63 e-summons form`,`§398 witness protection`]
+},
+{ id:"l9", part:"BNSS · Police", title:"Trials & timelines", sub:"60 days charges, 30/45 days judgment, summary trial",
+  cards:[
+  {h:"Timeline table", b:`<div class="tbl"><table><thead><tr><th>Step</th><th>Limit</th><th>§</th></tr></thead><tbody>
+   <tr><td>Produce before Magistrate</td><td class="n">24 h</td><td class="n">58</td></tr>
+   <tr><td>Sign e-FIR</td><td class="n">3 days</td><td class="n">173</td></tr>
+   <tr><td>Rape medical report</td><td class="n">7 days</td><td class="n">184</td></tr>
+   <tr><td>Police custody total</td><td class="n">15 days</td><td class="n">187</td></tr>
+   <tr><td>Charge sheet (under 10 yrs)</td><td class="n">60 days</td><td class="n">187</td></tr>
+   <tr><td>Charge sheet (10+ yrs)</td><td class="n">90 days</td><td class="n">187</td></tr>
+   <tr><td>Sexual offence probe</td><td class="n">2 months</td><td class="n">193</td></tr>
+   <tr><td>Victim progress update</td><td class="n">90 days</td><td class="n">193</td></tr>
+   <tr><td>Sanction to prosecute officer</td><td class="n">120 days</td><td class="n">218</td></tr>
+   <tr><td>Frame charges after first hearing</td><td class="n">60 days</td><td class="n">251</td></tr>
+   <tr><td>Judgment after arguments</td><td class="n">30 (max 45)</td><td class="n">258</td></tr>
+   <tr><td>Plea bargaining application</td><td class="n">30 days</td><td class="n">290</td></tr></tbody></table></div>`},
+  {h:"Courts", b:`<ul class="pts">
+   <li>${S(6)} (Chapter II) <b>Classes of criminal courts</b>: Court of Session, Judicial Magistrates, Executive Magistrates.</li>
+   <li>${S(21)} Offences under BNS 64–71 are tried, <b>as far as practicable, by a court presided over by a woman</b>.</li>
+   <li>${S(258)} Judges can't sit on a decision: judgment within <b>30 days</b> of arguments ending, extendable to <b>45</b>.</li></ul>`},
+  {h:"Special trials", b:`<ul class="pts">
+   <li>${S(356)} <b>Trial in absentia</b> of a <b>proclaimed offender</b>: accused of an offence punishable with 10+ years, life or death, who absconded to avoid trial. Not "any person", not someone who is ill.</li>
+   <li>${S(283)} <b>Summary trial</b>: quick trial for <b>non-serious</b> offences. Maximum sentence <b>3 months</b>.</li>
+   <li>${S("25(1)")} Several offences proved in one trial: the court <b>may</b> make sentences run <b>concurrently or consecutively</b>.</li></ul>`},
+  {h:"Plea bargaining", b:`<ul class="pts">
+   <li>Accused admits guilt in exchange for a lesser punishment.</li>
+   <li>First added to CrPC by the <b>2005 amendment</b>.</li>
+   <li>${S(290)} Application within <b>30 days</b> of framing of charges.</li></ul>
+   ${NOTE(`Options that cover every case with commas or brackets ("30 days, extendable to 45") are usually correct. "May" often marks the right legal option.`)}`}
+  ],
+  quiz:[
+   {q:"A Sessions Court must frame charges within how many days of the first hearing?", o:["30","45","60","90"], a:2, e:"§251."},
+   {q:"Time limit to pronounce judgment after arguments?", o:["15 days","30 days, extendable to 45","60 days","90 days"], a:1, e:"§258."},
+   {q:"Trial in the absence of the accused applies to?", o:["Any accused","Proclaimed offenders","Accused who are ill","Juveniles"], a:1, e:"§356."},
+   {q:"Maximum imprisonment in a summary trial?", o:["1 month","3 months","6 months","2 years"], a:1, e:"§283."},
+   {q:"Plea bargaining application must be filed within how many days of framing charges?", o:["15","30","60","90"], a:1, e:"§290."},
+   {q:"Major change in the 2005 CrPC amendment?", o:["e-FIR","Zero FIR","Plea bargaining","Community service"], a:2, e:"Plea bargaining."},
+   {q:"Several offences proved in one trial. The court?", o:["Gives only one punishment","Must give the harshest only","Suspends all sentences","May order sentences to run concurrently or consecutively"], a:3, e:"§25(1)."},
+   {q:"Trial of BNS §64–71 offences (BNSS §21)?", o:["By any police officer","Only in High Court","As far as practicable, by a court presided over by a woman","By jury"], a:2, e:"§21."},
+   {q:"If government doesn't grant sanction to prosecute an officer in time, sanction is deemed after?", o:["30 days","90 days","120 days","180 days"], a:2, e:"§218."}
+  ],
+  rev:[`Charges 60 days (§251) · judgment 30→45 days (§258)`,`§356 trial in absentia: proclaimed offender`,`§283 summary trial: max 3 months`,`Plea bargaining: CrPC 2005 · §290 30 days`,`§6 classes of courts · §21 woman judge for BNS 64–71`]
+},
+{ id:"l10", part:"BSA · Court", title:"Evidence & electronic records", sub:"Document, primary vs secondary, §57, §63",
+  cards:[
+  {h:"What BSA changed", b:`<ul class="pts">
+   <li>Replaced the Indian Evidence Act, <b>1872</b> (which predates electronics). 12 chapters, 170 sections.</li>
+   <li>Aligns evidence law with <b>forensic science and digital technology</b>.</li>
+   <li><b>Digital evidence can be primary evidence.</b></li>
+   <li><b>Joint trial</b>: a proven confession by one accused that affects others counts against all.</li></ul>`},
+  {h:"Document now means more", b:`<p>${S(2)} <b>Document</b> includes electronic and digital records: emails, server logs, computer and phone files, messages, websites, location data, voicemails.</p>
+   <p>Someone messages "send ₹500, I'll get you a job" and keeps the money. The WhatsApp chat is evidence; it doesn't need to be on paper. Tip: get any paid promise confirmed on email.</p>
+   <p>What counts as an electronic record is defined by the <b>IT Act, 2000</b>.</p>`},
+  {h:"Primary vs secondary", b:`<div class="pair">
+   <div><span class="k">${S(57)} Primary</span><span class="muted">The original itself. A CCTV clip saved at once on the DVR, office computer and cloud: <b>each copy is primary</b>, even if the DVR is destroyed. Same for your WhatsApp backup on Drive.</span></div>
+   <div><span class="k">${S(58)} Secondary</span><span class="muted">Proves what the original said: certified copies, counterparts, oral account. You lose your signed agreement; the other party's copy works.</span></div></div>`},
+  {h:"§63: the certificate", b:`<p>A screenshot alone isn't enough; it could be edited or AI-made. Electronic records need a <b>certificate</b> (including from a digital forensic expert) that the device worked properly and the record wasn't tampered with.</p>
+   ${TRICK(`63 is also the rape definition in BNS. In BSA, 63 is the electronic-record certificate.`)}`}
+  ],
+  quiz:[
+   {q:"BSA was enacted to replace?", o:["Indian Contract Act","IPC","Indian Evidence Act, 1872","Consumer Protection Act"], a:2, e:"1872."},
+   {q:"New definition of 'document' under BSA includes?", o:["Only paper","Electronic and digital records","Verbal agreements","Only signatures"], a:1, e:"BSA §2."},
+   {q:"Electronic evidence under BSA relies on the definition of electronic records in?", o:["BSA alone","IT Act, 2000","Companies Act","RTI Act"], a:1, e:"IT Act 2000."},
+   {q:"Which statement about BSA is true?", o:["It allows digital evidence as primary evidence","It replaces the courts","It limits all evidence","It applies only to civil cases"], a:0, e:"Digital can be primary."},
+   {q:"Key requirement to admit an electronic record?", o:["A certificate under §63","Notarised photo","Police stamp","Nothing"], a:0, e:"§63."},
+   {q:"CCTV clip saved at once on DVR, office PC and cloud; DVR destroyed. The other copies are?", o:["Inadmissible","Secondary evidence only","Each primary evidence","Hearsay"], a:2, e:"§57."}
+  ],
+  rev:[`BSA replaced IEA 1872 · 170 sections`,`§2 document includes digital records`,`Electronic record defined in IT Act 2000`,`§57 primary (simultaneous copies too) · §58 secondary`,`§63 certificate for electronic records`]
+},
+{ id:"l11", part:"BSA · Court", title:"Witnesses, admissions, confessions", sub:"Direct evidence, §23, expert opinion",
+  cards:[
+  {h:"Oral evidence must be direct", b:`<p>${S(55)} Sonam slaps Archana outside the office. In court:</p>
+   <div class="tbl"><table><tbody>
+   <tr><td><b>Riya</b></td><td>"I saw it myself."</td><td><b>Direct</b> ✓</td></tr>
+   <tr><td><b>Mohan</b></td><td>"I wasn't there; Riya told me."</td><td>Hearsay ✗</td></tr>
+   <tr><td><b>Vishal</b></td><td>"I didn't see, but she slaps everyone."</td><td>Assumption ✗</td></tr></tbody></table></div>
+   <p>Only what the witness <b>personally saw, heard or perceived</b> counts.</p>`},
+  {h:"Admission vs confession", b:`<div class="pair">
+   <div><span class="k">${S(15)} Admission</span><span class="muted">Facts that raise an <b>inference</b>, without accepting guilt: "I alone had the computer-room key and opened the paper file at 10 pm, but I didn't leak it."</span></div>
+   <div><span class="k">Confession</span><span class="muted">Directly <b>accepting the crime</b>: "I leaked it on Telegram because my raise was refused."</span></div></div>`},
+  {h:"Confession to police: §23", b:`<ul class="pts">
+   <li>Rohan tells police "I stole the necklace and hid it in my water tank." In court this <b>cannot be proved against him</b>, because police could beat or threaten a confession out. An SMS confession to a police officer is treated the same.</li>
+   <li><b>Exception: discovery.</b> Police recover the necklace from the tank. That part is proved by the discovery.</li>
+   <li>A confession recorded <b>before a Magistrate</b> under the proper procedure (BNSS ${S(183)}) can be used.</li></ul>
+   ${TRICK(`Police can't get a confession with <b>2–3</b> slaps → §23.`)}`},
+  {h:"Expert opinion and more", b:`<ul class="pts">
+   <li>${S(39)} Tea served by Rohan has poison, says the forensic expert. Rohan isn't automatically guilty; the expert answers only the scientific question. Opinion is <b>relevant but not conclusive</b>; the court decides.</li>
+   <li>${S(26)} <b>Dying declaration</b>: statements of persons who are dead or can't be found.</li>
+   <li>${S(24)} Confession of co-accused in a joint trial.</li>
+   <li>${S(121)} <b>Estoppel</b>: you can't deny what you made someone believe and act on.</li></ul>`}
+  ],
+  quiz:[
+   {q:"Under BSA, oral evidence must be?", o:["Based on assumption","Hearsay","Direct","Always written"], a:2, e:"§55: what the witness personally perceived."},
+   {q:"'I had the only key and opened the file, but I didn't leak the paper.' This is?", o:["A confession","An admission","Hearsay","A dying declaration"], a:1, e:"Raises inference, doesn't accept guilt."},
+   {q:"Status of a confession made to a police officer?", o:["Fully admissible","Not provable against the accused, except the part leading to discovery","Always conclusive","Admissible only in traffic cases"], a:1, e:"BSA §23."},
+   {q:"Evidentiary value of an expert's opinion?", o:["Conclusive","Relevant but not conclusive","Irrelevant","Binding on the court"], a:1, e:"§39."},
+   {q:"Estoppel is in which BSA section?", o:["23","26","63","121"], a:3, e:"§121."}
+  ],
+  rev:[`§55 oral evidence must be direct (no hearsay, no assumption)`,`§15 admission ≠ confession`,`§23 confession to police inadmissible, except discovery`,`BNSS §183 confession before Magistrate`,`§39 expert opinion · §26 dying declaration · §121 estoppel`]
+},
+{ id:"l12", part:"Wrap-up", title:"Old laws still asked", sub:"IPC 124A, 377, 497, 510 and food safety",
+  cards:[
+  {h:"IPC provisions in questions", b:`<div class="tbl"><table><tbody>
+   <tr><td class="n">124A</td><td>Sedition. Removed; replaced by BNS 152.</td></tr>
+   <tr><td class="n">377</td><td>Criminalised "unnatural offences" incl. consensual same-sex relations. Decriminalised for adults in <b>Navtej Singh Johar (2018)</b>.</td></tr>
+   <tr><td class="n">497</td><td>Adultery. Struck down in Joseph Shine (2018).</td></tr>
+   <tr><td class="n">510</td><td>Drunken misconduct in public: simple imprisonment up to <b>24 hours</b> or fine up to <b>₹10</b>, or both.</td></tr></tbody></table></div>`},
+  {h:"Food safety", b:`<ul class="pts">
+   <li>BNS ${S(274)} food adulteration: up to 6 months.</li>
+   <li>The special law with <b>life imprisonment</b> for making or selling unsafe food: <b>Food Safety and Standards Act, 2006</b>.</li></ul>`}
+  ],
+  quiz:[
+   {q:"What did IPC §377 signify?", o:["Sedition","Criminalised unnatural offences","Adultery","Defamation"], a:1, e:"Read down in Navtej Singh Johar (2018)."},
+   {q:"IPC §510: drunken misconduct in public?", o:["Simple imprisonment up to 24 hours, or fine up to ₹10, or both","1 year","₹1,000 fine","7 days"], a:0, e:"24 hours / ₹10."},
+   {q:"Which special law prescribes life imprisonment for unsafe food?", o:["Essential Commodities Act","Food Safety and Standards Act, 2006","Consumer Protection Act","BNS"], a:1, e:"FSSA 2006."},
+   {q:"Sedition was in which IPC section?", o:["124A","377","497","510"], a:0, e:"Now replaced by BNS 152."}
+  ],
+  rev:[`IPC 124A sedition → BNS 152`,`IPC 377 → Navtej Singh Johar 2018`,`IPC 497 adultery → Joseph Shine 2018`,`IPC 510: 24 hours / ₹10`,`FSSA 2006: life for unsafe food`]
+}
+];
+
+const SECTIONS = [
+ ["BNS","2","Definitions; child = below 18"],["BNS","4","Punishments incl. community service"],["BNS","8(5)","Unpaid fine: ₹5k→2 months, ₹10k→4 months"],["BNS","14","Soldier acting on lawful order"],["BNS","18","Accident in lawful act"],["BNS","20","Child under 7"],["BNS","21","Child 7–12, immature"],["BNS","27","Good-faith surgery for child"],["BNS","45","Abetment"],["BNS","63–99","Chapter V: women & children"],["BNS","63","Rape definition"],["BNS","69","Deceitful intercourse / false marriage promise"],["BNS","70(2)","Gang rape under 18: death possible"],["BNS","77","Voyeurism"],["BNS","78","Stalking"],["BNS","95","Hiring a child to commit offence"],["BNS","100","Culpable homicide"],["BNS","101","Murder"],["BNS","103","Punishment for murder"],["BNS","103(2)","Mob lynching (5+)"],["BNS","106(2)","Hit and run: 10 yrs + fine"],["BNS","108","Abetment of suicide"],["BNS","111","Organised crime"],["BNS","112","Petty organised crime"],["BNS","113","Terrorist act"],["BNS","137","Kidnapping"],["BNS","138","Abduction"],["BNS","141","Importing girl <21 / boy <18"],["BNS","143","Trafficking"],["BNS","152","Sovereignty, unity, integrity (replaces sedition)"],["BNS","274","Food adulteration"],["BNS","303","Theft"],["BNS","304","Snatching"],["BNS","308","Extortion"],["BNS","309","Robbery"],["BNS","310","Dacoity"],["BNS","356","Defamation"],
+ ["BNSS","6","Classes of criminal courts"],["BNSS","21","BNS 64–71 tried by woman judge"],["BNSS","23","Community service defined"],["BNSS","25(1)","Concurrent / consecutive sentences"],["BNSS","38","Meet advocate during interrogation"],["BNSS","47","Grounds of arrest immediately"],["BNSS","58","24-hour rule"],["BNSS","63","Summons form incl. encrypted e-form"],["BNSS","105","Video of search & seizure"],["BNSS","163","Urgent nuisance orders (old 144)"],["BNSS","173","FIR, e-FIR (3 days), zero FIR"],["BNSS","176","Forensics for 7+ years"],["BNSS","183","Confession before Magistrate"],["BNSS","184","Rape medical report 7 days"],["BNSS","187","Custody 15 days in parts; 60/90 days"],["BNSS","193","Sexual offence probe 2 months"],["BNSS","218","Deemed sanction 120 days"],["BNSS","251","Charges in 60 days"],["BNSS","258","Judgment 30 (45) days"],["BNSS","283","Summary trial, max 3 months"],["BNSS","290","Plea bargaining in 30 days"],["BNSS","349","Voice samples"],["BNSS","356","Trial in absentia"],["BNSS","398","Witness protection"],["BNSS","479","Undertrial cap 1/3, 1/2"],["BNSS","480","Bail, non-bailable"],["BNSS","482","Anticipatory bail"],["BNSS","530","Electronic mode trials"],["BNSS","531","Repeal and savings"],
+ ["BSA","2","Document includes digital records"],["BSA","15","Admission"],["BSA","23","Confession to police inadmissible"],["BSA","24","Co-accused confession, joint trial"],["BSA","26","Dying declaration"],["BSA","39","Expert opinion"],["BSA","55","Oral evidence must be direct"],["BSA","57","Primary evidence"],["BSA","58","Secondary evidence"],["BSA","63","Electronic record certificate"],["BSA","121","Estoppel"]
+];
+
+const TRICKS = [
+ ["358","BNS sections: justice is equal, 3 + 5 = 8"],["531","BNSS: police work backwards, odd numbers 1-3-5 reversed"],["170","BSA: all evidence एक साथ (1-7), escape chance 0"],["45·46·47","Act numbers: crime → police → court"],["111→113","111 organised · 112 petty · 113 terrorist · 103 mob (drop the middle 1)"],["356","Defamation = Art. 356, the President feels defamed"],["303·304","Theft then snatching: quiet, then grab"],["63–99","Chapter V: all women & children offences"],["173","FIR: एक साथ तीन ways; e-FIR signed in 3 days"],["530","5 fingers, 3 e-powers, 0 boundaries"],["105","1 camera, round lens 0, held by 5 fingers"],["176","Forensics for 7+ years: the 7 is inside"],["187","Custody 15 days in two parts: 8 + 7"],["38","अड़ जाता है till lawyer comes → अड़तीस"],["398","3 guards, 9 am to 8 pm: witness protection"],["23","2–3 slaps can't get a valid confession"],["7 · 7","Forensics 7+ yrs; rape medical report 7 days"]
+];
+
+/* ---------- state ---------- */
+const KEY="crimlaw-course-v1";
+let prog={done:{}};
+try{const s=localStorage.getItem(KEY); if(s) prog=JSON.parse(s)||prog;}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(prog));}catch(e){}}
+let view={name:"home"};
+const app=document.getElementById("app");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function nextLessonIndex(){const i=COURSE.findIndex(l=>!(l.id in prog.done));return i<0?0:i;}
+function tabsBar(active){
+  const t=(id,ic,label)=>`<button class="tab" data-tab="${id}" aria-current="${active===id}"><span class="ic">${ic}</span>${label}</button>`;
+  return `<nav class="bottom"><div class="in tabs">${t("home","≡","Lessons")}${t("mock","?","Mock test")}${t("tricks","✦","Tricks")}${t("finder","§","Sections")}</div></nav>`;
+}
+function render(){
+  const v=view.name;
+  if(v==="home") renderHome();
+  else if(v==="lesson") renderLesson();
+  else if(v==="tricks") renderTricks();
+  else if(v==="finder") renderFinder();
+  else if(v==="mock") renderMock();
+  window.scrollTo(0,0);
+}
+function go(v){view=v;render();}
+
+/* ---------- home ---------- */
+function renderHome(){
+  const done=Object.keys(prog.done).length, n=COURSE.length, ni=nextLessonIndex();
+  let parts="",last="";
+  COURSE.forEach((l,i)=>{
+    if(l.part!==last){parts+=`<div class="group">${esc(l.part)}</div>`;last=l.part;}
+    const d=prog.done[l.id];
+    const st=d?`✓ ${d.s}/${d.t}`:(i===ni?"Start":`${l.cards.length + l.quiz.length + 1} steps`);
+    parts+=`<button class="lesson ${d?"done":""} ${(!d&&i===ni)?"next":""}" data-l="${i}"><span class="num">${d?"✓":i+1}</span><span><span class="lt">${esc(l.title)}</span><br><span class="ls">${esc(l.sub)}</span></span><span class="st">${st}</span></button>`;
+  });
+  app.innerHTML=`<main>
+   <div class="hero"><span class="eyebrow">SSC CGL 2026 · Polity</span><h1>BNS · BNSS · BSA</h1>
+   <p class="muted">12 short lessons. Each one: learn a few cards, answer a quick quiz, revise, move on.</p>
+   <div class="stats"><div class="bar"><i style="width:${done/n*100}%"></i></div><span class="small muted">${done}/${n} done</span></div>
+   <button class="btn" data-l="${ni}" style="flex:none">${done?(done===n?"Review from lesson 1":"Continue: lesson "+(ni+1)):"Start lesson 1"}</button></div>
+   ${parts}
+   <p class="small muted" style="padding-top:10px">Built from three SSC lectures. Corrected lecture slips: petty organised crime is §112; the 24-hour rule is BNSS §58; deemed sanction is 120 days; adultery was IPC 497, not 377; robbery §309, dacoity §310; after 60/90 days it's default bail, not parole.</p>
+  </main>${tabsBar("home")}`;
+  app.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{let i=+b.dataset.l; if(done===n && b.classList.contains("btn")) i=0; go({name:"lesson",li:i,step:0,ans:{},score:0});});
+  bindTabs();
+}
+function bindTabs(){app.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{const t=b.dataset.tab; if(t==="mock") go(newMock()); else go({name:t});});}
+
+/* ---------- lesson ---------- */
+function renderLesson(){
+  const L=COURSE[view.li], nc=L.cards.length, nq=L.quiz.length, total=nc+nq+1, st=view.step;
+  let phase, body, canNext=true, nextLabel="Continue";
+  if(st<nc){
+    phase=`Learn ${st+1} of ${nc}`;
+    const c=L.cards[st];
+    body=`<div class="card"><span class="eyebrow">Lesson ${view.li+1} · Learn</span><h2>${c.h}</h2>${c.b}</div>`;
+    if(st===nc-1) nextLabel="Start quiz";
+  } else if(st<nc+nq){
+    const qi=st-nc, Q=L.quiz[qi], chosen=view.ans[qi];
+    phase=`Quiz ${qi+1} of ${nq}`;
+    body=quizBlock(Q,chosen,`Lesson ${view.li+1} · Quiz · ${qi+1}/${nq}`);
+    canNext=chosen!==undefined;
+    if(qi===nq-1) nextLabel="See revision";
+  } else {
+    phase="Revision";
+    const sc=Object.entries(view.ans).filter(([i,a])=>L.quiz[i].a===a).length;
+    const wrong=L.quiz.map((q,i)=>view.ans[i]!==q.a?q:null).filter(Boolean);
+    body=`<div class="card"><span class="eyebrow">Lesson ${view.li+1} · Revision</span>
+      <div class="score"><span class="big">${sc}/${nq}</span><span class="muted">${sc===nq?"Perfect. Lock these in:":"Revise these before moving on:"}</span></div>
+      <ul class="pts">${L.rev.map(r=>`<li>${r}</li>`).join("")}</ul></div>
+      ${wrong.length?`<div class="card"><h3>Your mistakes</h3><ul class="pts">${wrong.map(q=>`<li>${esc(q.q)}<br><b>${esc(q.o[q.a])}</b></li>`).join("")}</ul></div>`:""}`;
+    nextLabel=view.li<COURSE.length-1?"Finish · next lesson":"Finish course";
+  }
+  const pct=(st+1)/total*100;
+  app.innerHTML=`<header class="topbar"><div class="toprow"><button class="iconbtn" id="close" aria-label="Back to lessons">✕</button>
+   <div class="toptitle"><span class="t">${view.li+1}. ${esc(L.title)}</span><span class="s">${phase}</span></div></div>
+   <div class="bar"><i style="width:${pct}%"></i></div></header>
+   <main>${body}</main>
+   <nav class="bottom"><div class="in">
+    ${st>0?`<button class="btn ghost" id="back">Back</button>`:""}
+    ${st===total-1?`<button class="btn ghost" id="retry">Retry quiz</button>`:""}
+    <button class="btn" id="next" ${canNext?"":"disabled"}>${nextLabel}</button></div></nav>`;
+  document.getElementById("close").onclick=()=>go({name:"home"});
+  const bk=document.getElementById("back"); if(bk) bk.onclick=()=>{view.step--;render();};
+  const rt=document.getElementById("retry"); if(rt) rt.onclick=()=>{view.ans={};view.step=nc;render();};
+  document.getElementById("next").onclick=()=>{
+    if(st<total-1){view.step++;render();return;}
+    const sc=Object.entries(view.ans).filter(([i,a])=>L.quiz[i].a===a).length;
+    prog.done[L.id]={s:sc,t:nq}; save();
+    if(view.li<COURSE.length-1) go({name:"lesson",li:view.li+1,step:0,ans:{}}); else go({name:"home"});
+  };
+  app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{const qi=st-nc; if(view.ans[qi]!==undefined) return; view.ans[qi]=+b.dataset.o; const y=window.scrollY; render(); window.scrollTo(0,y);});
+}
+function quizBlock(Q,chosen,label){
+  const L="ABCD";
+  const opts=Q.o.map((o,i)=>{
+    let cls=""; if(chosen!==undefined){ if(i===Q.a) cls="right"; else if(i===chosen) cls="wrong"; }
+    return `<button class="opt ${cls}" data-o="${i}" ${chosen!==undefined?"disabled":""}><span class="l">${L[i]}</span><span>${esc(o)}</span></button>`;
+  }).join("");
+  let fb="";
+  if(chosen!==undefined){
+    const ok=chosen===Q.a;
+    fb=`<div class="fb ${ok?"good":"bad"}"><span class="h">${ok?"Correct":"Not quite — answer: "+esc(Q.o[Q.a])}</span>${Q.e?`<span>${esc(Q.e)}</span>`:""}</div>`;
+  }
+  return `<div class="qhead"><span class="eyebrow">${label}</span><p class="q">${esc(Q.q)}</p></div><div class="opts">${opts}</div>${fb}`;
+}
+
+/* ---------- mock ---------- */
+function newMock(){
+  const pool=[]; COURSE.forEach(l=>l.quiz.forEach(q=>pool.push(q)));
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  return {name:"mock",qs:pool.slice(0,20),i:0,ans:{},started:false};
+}
+function renderMock(){
+  const m=view;
+  if(!m.started){
+    const total=COURSE.reduce((a,l)=>a+l.quiz.length,0);
+    app.innerHTML=`<main><div class="card"><span class="eyebrow">Mixed practice</span><h2>Mock test</h2>
+     <p>20 random questions from all ${total} lesson questions (SSC 2025 PYQs and lecture questions). Instant feedback after each one.</p>
+     ${prog.mock?`<p class="muted">Best score so far: <b>${prog.mock}/20</b></p>`:""}
+     <button class="btn" id="startm" style="flex:none">Start mock test</button></div></main>${tabsBar("mock")}`;
+    document.getElementById("startm").onclick=()=>{m.started=true;render();};
+    bindTabs(); return;
+  }
+  const n=m.qs.length;
+  if(m.i>=n){
+    const sc=m.qs.filter((q,i)=>m.ans[i]===q.a).length;
+    if(!prog.mock||sc>prog.mock){prog.mock=sc;save();}
+    const wrong=m.qs.map((q,i)=>m.ans[i]!==q.a?q:null).filter(Boolean);
+    app.innerHTML=`<main><div class="card"><span class="eyebrow">Mock result</span><div class="score"><span class="big">${sc}/${n}</span><span class="muted">${sc>=16?"Exam-ready on this topic.":sc>=12?"Good. Revise the misses.":"Go back through the lessons below."}</span></div></div>
+     ${wrong.length?`<div class="card"><h3>Revise these</h3><ul class="pts">${wrong.map(q=>`<li>${esc(q.q)}<br><b>${esc(q.o[q.a])}</b>${q.e?` <span class="muted small">${esc(q.e)}</span>`:""}</li>`).join("")}</ul></div>`:""}
+     <button class="btn" id="again" style="flex:none">New mock test</button></main>${tabsBar("mock")}`;
+    document.getElementById("again").onclick=()=>{const nm=newMock();nm.started=true;go(nm);};
+    bindTabs(); return;
+  }
+  const Q=m.qs[m.i], chosen=m.ans[m.i];
+  app.innerHTML=`<header class="topbar"><div class="toprow"><button class="iconbtn" id="close" aria-label="Quit mock">✕</button>
+   <div class="toptitle"><span class="t">Mock test</span><span class="s">Question ${m.i+1} of ${n}</span></div></div>
+   <div class="bar"><i style="width:${(m.i+1)/n*100}%"></i></div></header>
+   <main>${quizBlock(Q,chosen,`Q ${m.i+1}`)}</main>
+   <nav class="bottom"><div class="in"><button class="btn" id="next" ${chosen===undefined?"disabled":""}>${m.i===n-1?"See result":"Next question"}</button></div></nav>`;
+  document.getElementById("close").onclick=()=>go({name:"home"});
+  document.getElementById("next").onclick=()=>{m.i++;render();};
+  app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{if(m.ans[m.i]!==undefined)return; m.ans[m.i]=+b.dataset.o; const y=window.scrollY; render(); window.scrollTo(0,y);});
+}
+
+/* ---------- tricks & finder ---------- */
+function renderTricks(){
+  app.innerHTML=`<main><div class="hero"><span class="eyebrow">Quick revision</span><h1>Memory tricks</h1><p class="muted">The mnemonics from the lectures, in one place.</p></div>
+   ${TRICKS.map(([k,t])=>`<div class="mn"><span class="k">${esc(k)}</span><span>${esc(t)}</span></div>`).join("")}</main>${tabsBar("tricks")}`;
+  bindTabs();
+}
+let fLaw="all", fTerm="";
+function renderFinder(){
+  app.innerHTML=`<main><div class="hero"><span class="eyebrow">Look up</span><h1>Section finder</h1></div>
+   <input class="search" id="fq" type="search" placeholder="Type a number or word, e.g. 105 or bail" aria-label="Search sections" value="${esc(fTerm)}">
+   <div class="chips">${["all","BNS","BNSS","BSA"].map(l=>`<button class="chip" data-law="${l}" aria-pressed="${fLaw===l}">${l==="all"?"All":l}</button>`).join("")}</div>
+   <p class="small muted" id="fc"></p><div class="rows" id="fr"></div></main>${tabsBar("finder")}`;
+  const draw=()=>{
+    const t=fTerm.trim().toLowerCase();
+    const list=SECTIONS.filter(([l,s,d])=>(fLaw==="all"||l===fLaw)&&(!t||s.toLowerCase().includes(t)||d.toLowerCase().includes(t)));
+    document.getElementById("fr").innerHTML=list.map(([l,s,d])=>`<div class="row"><span class="law">${l}</span><span class="n">§${esc(s)}</span><span>${esc(d)}</span></div>`).join("")||`<p class="muted">No match. Try a number like 173 or a word like bail.</p>`;
+    document.getElementById("fc").textContent=`${list.length} of ${SECTIONS.length} sections`;
+  };
+  document.getElementById("fq").oninput=e=>{fTerm=e.target.value;draw();};
+  app.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{fLaw=b.dataset.law;app.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed",x===b));draw();});
+  draw(); bindTabs();
+}
+
+render();
+</script>
+
+</body>
+</html>

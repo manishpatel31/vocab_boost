@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script>
+/* शब्दRegister bridge: follows the app's Light / Dark / Auto choice when opened inside the app. */
+(function(){
+  var root = document.documentElement;
+  function apply(t){ if(t === 'dark' || t === 'light') root.setAttribute('data-theme', t); else root.removeAttribute('data-theme'); }
+  try{
+    var q = new URLSearchParams(location.search);
+    if(q.get('theme')) apply(q.get('theme'));
+    if(q.get('embed')) root.classList.add('in-shabd');
+  }catch(e){}
+  window.addEventListener('message', function(e){
+    if(e.origin !== location.origin || !e.data) return;
+    if(e.data.type === 'shabd-theme') apply(e.data.theme);
+  });
+})();
+</script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#edf1f4">
+<title>Census & Population Workbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Martel:wght@700;800&family=Mukta:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: an enumerator's register — pale form paper, ink-blue rules, saffron figures; one-column app with a bottom tab bar. */
+:root{
+  --paper:#edf1f4; --sheet:#fbfcfd; --sunk:#e3e9ef;
+  --ink:#16293f; --ink2:#4d5d72; --rule:#d2dae3;
+  --blue:#1d4e89; --on-blue:#ffffff; --blue-bg:#dde8f6;
+  --accent:#a95400; --accent-bg:#fbe7cc;
+  --good:#1b7547; --good-bg:#dff1e6; --bad:#b0271f; --bad-bg:#f8e1de;
+  --warn-bg:#fff2d2;
+  --f-display:"Martel", "Noto Serif Devanagari", Georgia, serif;
+  --f-body:"Mukta", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-num:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r:10px; --nav-h:64px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#0d141e; --sheet:#152030; --sunk:#1b2839;
+  --ink:#e3eaf3; --ink2:#9fb0c4; --rule:#2a3a4f;
+  --blue:#86b4ef; --on-blue:#0d141e; --blue-bg:#1c3050;
+  --accent:#f0a647; --accent-bg:#3a2a12;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#0d141e; --sheet:#152030; --sunk:#1b2839;
+  --ink:#e3eaf3; --ink2:#9fb0c4; --rule:#2a3a4f;
+  --blue:#86b4ef; --on-blue:#0d141e; --blue-bg:#1c3050;
+  --accent:#f0a647; --accent-bg:#3a2a12;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
+.wrap{max-width:640px;margin:0 auto;padding-inline:16px;padding-block:0 calc(var(--nav-h) + 28px + env(safe-area-inset-bottom,0px))}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);border-bottom:1px solid var(--rule)}
+.top-in{max-width:640px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px}
+.brand{font-family:var(--f-display);font-weight:800;font-size:17px;line-height:1.2;flex:1;min-width:0}
+.brand small{display:block;font-family:var(--f-body);font-weight:500;font-size:12px;color:var(--ink2);letter-spacing:.02em}
+.stat{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right;white-space:nowrap}
+.stat b{color:var(--ink);font-weight:600}
+
+/* bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--sheet);border-top:1px solid var(--rule);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);height:var(--nav-h)}
+.nav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer}
+.nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav button[aria-current="page"]{color:var(--blue)}
+.nav button[aria-current="page"] span{border-bottom:2px solid var(--blue)}
+
+/* type */
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.25;margin:0}
+h1{font-size:24px;font-weight:800}
+h2{font-size:19px;font-weight:800}
+h3{font-size:16px;font-weight:700}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--ink2)}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+p{margin:0}
+.stack{display:flex;flex-direction:column;gap:14px}
+.view{padding-top:18px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--rule);background:var(--sheet);font-weight:600;cursor:pointer;text-decoration:none}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:var(--on-blue)}
+.btn.ghost{background:transparent}
+.btn.sm{min-height:36px;padding:0 14px;font-size:14px}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.end{justify-content:flex-end}
+.row.between{justify-content:space-between}
+
+/* hero */
+.hero{display:grid;gap:10px;padding:4px 0 6px}
+.hero p{color:var(--ink2)}
+.meter{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--blue);border-radius:99px}
+
+/* lesson list */
+.lessons{display:flex;flex-direction:column;border-top:1px solid var(--rule)}
+.les{display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;padding:14px 2px;border-bottom:1px solid var(--rule);background:none;border-left:0;border-right:0;border-top:0;text-align:left;cursor:pointer;width:100%}
+.les .no{font-family:var(--f-num);font-weight:600;font-size:15px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--rule);color:var(--ink2)}
+.les.done .no{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.les .t{min-width:0}
+.les .t b{display:block;font-weight:700;font-size:16px;line-height:1.3}
+.les .t span{font-size:13px;color:var(--ink2)}
+.les .sc{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right}
+.les.next .no{border-color:var(--blue);color:var(--blue)}
+
+/* lesson reader */
+.lhead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.back{background:none;border:0;padding:8px 8px 8px 0;cursor:pointer;color:var(--blue);font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0 4px}
+.steps button{border:1px solid var(--rule);background:var(--sheet);border-radius:8px;padding:8px 4px;font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer}
+.steps button[aria-current="step"]{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.block{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;min-width:0}
+.block h3{margin-bottom:8px}
+.block p + p{margin-top:8px}
+.plain{padding:0 2px}
+.facts{display:grid;gap:0}
+.facts div{display:grid;grid-template-columns:minmax(0,42%) minmax(0,1fr);gap:10px;padding:7px 0;border-top:1px dashed var(--rule)}
+.facts div:first-child{border-top:0}
+.facts dt{font-size:14px;color:var(--ink2);margin:0}
+.facts dd{margin:0;font-weight:600;min-width:0}
+.tl{display:grid;gap:0;margin:0;padding:0;list-style:none}
+.tl li{display:grid;grid-template-columns:92px 1fr;gap:10px;padding:8px 0;border-top:1px dashed var(--rule)}
+.tl li:first-child{border-top:0}
+.tl .y{font-family:var(--f-num);font-weight:600;font-size:13px;color:var(--accent);padding-top:2px}
+.trick,.trap{border-radius:var(--r);padding:12px 14px 12px 14px;border:1px solid var(--rule)}
+.trick{background:var(--accent-bg);border-color:transparent}
+.trap{background:var(--bad-bg);border-color:transparent}
+.trick .lab,.trap .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.trick .lab{color:var(--accent)}
+.trap .lab{color:var(--bad)}
+.tbl{overflow-x:auto;margin:0 -2px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);font-weight:700}
+td.n{font-family:var(--f-num);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fig{margin:0}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-size:13px;color:var(--ink2);margin-top:6px}
+.pyr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pyr div{text-align:center;font-size:13px}
+.pyr b{display:block;font-size:14px}
+.pm{fill:var(--blue)} .pf{fill:var(--accent)}
+.sum{margin:0;padding-left:20px;display:grid;gap:6px}
+
+/* questions */
+.qcard{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px;min-width:0}
+.qmeta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}
+.qno{font-family:var(--f-num);font-weight:600;color:var(--ink2)}
+.tag{background:var(--sunk);color:var(--ink2);border-radius:99px;padding:1px 9px;font-weight:600}
+.tag.pyq{background:var(--accent-bg);color:var(--accent)}
+.bm{margin-left:auto;background:none;border:0;cursor:pointer;color:var(--ink2);font-size:20px;line-height:1;padding:4px}
+.bm[aria-pressed="true"]{color:var(--accent)}
+.qt{font-weight:600;font-size:16px}
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:start;text-align:left;width:100%;border:1.5px solid var(--rule);background:var(--paper);border-radius:9px;padding:10px 12px;cursor:pointer;min-height:44px}
+.opt .k{font-family:var(--f-num);font-weight:600;color:var(--ink2);font-size:14px;padding-top:1px}
+.opt.sel{border-color:var(--blue);background:var(--blue-bg)}
+.opt.ok{border-color:var(--good);background:var(--good-bg)}
+.opt.no{border-color:var(--bad);background:var(--bad-bg)}
+.opt.ok .k{color:var(--good)} .opt.no .k{color:var(--bad)}
+.opt:disabled{cursor:default;color:inherit}
+.exp{font-size:15px;border-left:3px solid var(--blue);padding:4px 0 4px 12px;color:var(--ink)}
+.exp b.okl{color:var(--good)} .exp b.nol{color:var(--bad)}
+
+/* chips */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 13px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.seg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--rule)}
+.seg::-webkit-scrollbar{display:none}
+.seg button{flex:none;background:none;border:0;border-bottom:2px solid transparent;padding:10px 8px;font-weight:600;color:var(--ink2);cursor:pointer}
+.seg button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+
+/* score panel */
+.scorebig{display:flex;align-items:baseline;gap:8px}
+.scorebig .num{font-size:44px;font-weight:600;line-height:1;color:var(--blue)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.kpi{background:var(--sunk);border-radius:8px;padding:8px;text-align:center}
+.kpi .num{display:block;font-size:20px;font-weight:600}
+.kpi span{font-size:12px;color:var(--ink2)}
+.kpi.g .num{color:var(--good)} .kpi.b .num{color:var(--bad)}
+
+/* mock */
+.mbar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 57px);z-index:10;background:var(--paper);padding:10px 0;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--rule)}
+.timer{font-family:var(--f-num);font-weight:600;font-size:18px;padding:4px 10px;border-radius:8px;background:var(--sunk)}
+.timer.low{background:var(--bad-bg);color:var(--bad)}
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px}
+.pal button{height:40px;border-radius:8px;border:1px solid var(--rule);background:var(--sheet);font-family:var(--f-num);font-weight:600;font-size:13px;cursor:pointer}
+.pal button.a{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.pal button.m{box-shadow:inset 0 -4px 0 var(--accent)}
+.pal button.cur{outline:2px solid var(--ink);outline-offset:1px}
+.pal button.ok{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.pal button.no{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.confirm{background:var(--warn-bg);border-radius:var(--r);padding:12px 14px;display:grid;gap:10px}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}
+legend{font-weight:700;margin-bottom:6px;padding:0}
+.radios{display:flex;gap:8px;flex-wrap:wrap}
+.radios label{border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 14px;font-weight:600;cursor:pointer;font-size:14px}
+.radios input{position:absolute;opacity:0;pointer-events:none}
+.radios input:checked + span{color:var(--blue)}
+.radios label:has(input:checked){border-color:var(--blue);background:var(--blue-bg)}
+.radios label:has(input:focus-visible){outline:2px solid var(--blue);outline-offset:2px}
+select{font:inherit;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:8px;padding:8px 10px;max-width:100%}
+.hist{display:grid;gap:0}
+.hist div{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:14px}
+
+/* revise */
+.search{width:100%;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:10px;padding:10px 12px;font:inherit}
+.rk{display:grid;gap:0}
+.rk div{display:grid;grid-template-columns:96px 1fr;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:15px}
+.rk div:first-child{border-top:0}
+.rk dt{font-size:13px;color:var(--ink2);margin:0}
+.rk dt.up{color:var(--good)} .rk dt.dn{color:var(--bad)}
+.rk dd{margin:0;font-weight:600;min-width:0}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px}
+.tile .num{display:block;font-size:24px;font-weight:600;color:var(--accent);line-height:1.2}
+.tile span{font-size:13px;color:var(--ink2)}
+.gbar{display:grid;grid-template-columns:78px 1fr 52px;gap:8px;align-items:center;font-size:13px;padding:3px 0}
+.gbar .tr{height:12px;background:var(--sunk);border-radius:3px;position:relative;overflow:hidden}
+.gbar .tr i{position:absolute;left:0;top:0;bottom:0;background:var(--blue);border-radius:3px}
+.gbar .tr i.neg{background:var(--bad)}
+.gbar .v{font-family:var(--f-num);text-align:right}
+.flash{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;min-height:240px;padding:20px 18px;display:grid;align-content:center;gap:12px;cursor:pointer;text-align:left;width:100%}
+.flash .side{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.flash .front{font-size:18px;font-weight:600}
+.flash .ans{font-size:20px;font-weight:700;color:var(--good)}
+.empty{padding:24px 4px;color:var(--ink2);text-align:center}
+.foot{font-size:13px;color:var(--ink2);padding-top:10px}
+@media (prefers-reduced-motion: no-preference){ .opt,.chip,.btn{transition:background-color .15s, border-color .15s} }
+</style>
+<style>[hidden]{display:none!important}img{max-width:100%}:root{padding-top:env(safe-area-inset-top,0px)}</style>
+</head>
+<body>
+
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">Census &amp; Population<small>जनगणना · SSC CGL workbook</small></div>
+    <div class="stat" id="topstat"></div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<nav class="nav" aria-label="Sections">
+  <div class="nav-in">
+    <button type="button" id="nav-learn" data-tab="learn"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg><span>Learn</span></button>
+    <button type="button" id="nav-practice" data-tab="practice"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span>Practice</span></button>
+    <button type="button" id="nav-mock" data-tab="mock"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6M12 2v3"/></svg><span>Mock test</span></button>
+    <button type="button" id="nav-revise" data-tab="revise"><svg viewBox="0 0 24 24"><path d="M12 3 2 8l10 5 10-5z"/><path d="m2 13 10 5 10-5"/></svg><span>Revise</span></button>
+  </div>
+</nav>
+
+<script>
+"use strict";
+/* ============================================================
+   LESSONS
+   ============================================================ */
+const PYR = (rows) => {
+  // rows: widths from top (old) to bottom (young), 0-100
+  const h = 8, g = 2, W = 120;
+  let out = `<svg viewBox="0 0 ${W} ${rows.length*(h+g)+2}" role="img" aria-hidden="true">`;
+  rows.forEach((w, i) => {
+    const half = w * 0.55, y = i*(h+g)+1;
+    out += `<rect class="pm" x="${60-half}" y="${y}" width="${half-0.8}" height="${h}" rx="1.5"/>`;
+    out += `<rect class="pf" x="${60.8}" y="${y}" width="${half-0.8}" height="${h}" rx="1.5"/>`;
+  });
+  return out + `</svg>`;
+};
+const DTM_SVG = `<svg viewBox="0 0 330 170" role="img" aria-label="Demographic transition: birth and death rates across three stages">
+<line x1="30" y1="140" x2="320" y2="140" stroke="var(--rule)" stroke-width="1.5"/>
+<line x1="30" y1="14" x2="30" y2="140" stroke="var(--rule)" stroke-width="1.5"/>
+<line x1="125" y1="14" x2="125" y2="140" stroke="var(--rule)" stroke-dasharray="4 4"/>
+<line x1="225" y1="14" x2="225" y2="140" stroke="var(--rule)" stroke-dasharray="4 4"/>
+<path d="M30 32 L125 30 C160 30 185 60 225 105 L320 110" fill="none" stroke="var(--accent)" stroke-width="3"/>
+<path d="M30 40 L45 28 L60 44 L75 30 L90 46 L105 32 L125 38 C140 80 160 110 225 118 L320 114" fill="none" stroke="var(--blue)" stroke-width="3"/>
+<text x="77" y="158" text-anchor="middle" font-size="11" fill="var(--ink2)" font-family="Mukta, sans-serif">Stage 1</text>
+<text x="175" y="158" text-anchor="middle" font-size="11" fill="var(--ink2)" font-family="Mukta, sans-serif">Stage 2</text>
+<text x="272" y="158" text-anchor="middle" font-size="11" fill="var(--ink2)" font-family="Mukta, sans-serif">Stage 3</text>
+<text x="176" y="62" text-anchor="middle" font-size="11" fill="var(--ink)" font-family="Mukta, sans-serif">gap = explosion</text>
+<rect x="236" y="20" width="12" height="4" fill="var(--accent)"/><text x="252" y="25" font-size="11" fill="var(--ink)" font-family="Mukta, sans-serif">Birth rate</text>
+<rect x="236" y="36" width="12" height="4" fill="var(--blue)"/><text x="252" y="41" font-size="11" fill="var(--ink)" font-family="Mukta, sans-serif">Death rate</text>
+<text x="14" y="80" font-size="10" fill="var(--ink2)" font-family="Mukta, sans-serif" transform="rotate(-90 14 80)" text-anchor="middle">per 1,000</text>
+</svg>`;
+
+const LESSONS = [
+{ id:"L1", title:"Basics & history", hi:"जनगणना का इतिहास", blocks:[
+ {k:"p", h:"<b>Census (जनगणना)</b> is the official count of every person in the country, with details such as age, sex, literacy, religion, language, work, housing and migration. India takes it every <b>10 years</b> (decennial). The data decides schemes, SC/ST reservation, redrawing of constituencies and sharing of taxes between Centre and states."},
+ {k:"tl", title:"Timeline", rows:[
+  ["c. 300 BCE","Kautilya's <i>Arthashastra</i> mentions collecting population data for taxation."],
+  ["16th cent.","<i>Ain-i-Akbari</i> (Abul Fazl) records population, industry and wealth under Akbar."],
+  ["1824, 1827–28","James Prinsep counts Allahabad and Banaras."],
+  ["1830","Henry Walter counts Dacca (Dhaka) city → called the <b>Father of Indian Census</b>."],
+  ["1872","First census of India under <b>Lord Mayo</b>. Non-synchronous: regions counted at different times."],
+  ["17 Feb 1881","First <b>synchronous</b> (regular) census under <b>Lord Ripon</b>. Census Commissioner <b>W.C. Plowden</b>. Every 10 years without a break since."],
+  ["1921","<b>Year of Great Divide</b>: the last time population fell."],
+  ["1931","Last census to count all castes (until 2027). Commissioner J.H. Hutton."],
+  ["1941","Held during World War II; tabulation was cut short."],
+  ["1951","First census of independent India, under the Census Act 1948. Commissioner R.A. Gopalaswami."],
+  ["2011","15th census overall, 7th after independence."],
+  ["2027","16th overall, 8th after independence; first digital census."]]},
+ {k:"trick", h:"<b>“May I start?”</b> → Mayo started it (1872). <b>“Ripon cut the ribbon”</b> → made it regular (1881).<br><b>प से पूरी = पंद्रह</b>: 2011 is the 15th overall. <b>स से स्वतंत्र = सातवीं</b>: 7th after independence."},
+ {k:"facts", title:"Counting check", rows:[["Overall (from 1872)","1872 + 14 censuses from 1881 to 2011 = 15"],["After independence","1951, 61, 71, 81, 91, 2001, 2011 = 7"],["Census 2027","16th overall · 8th after independence"]]},
+ {k:"facts", title:"Around the world", rows:[["First modern national census","Sweden, 1749"],["First regular decennial census","USA, 1790"],["Britain's first census","1801 (India follows the British model)"]]},
+ {k:"p", h:"<b>Lord Ripon cross-question (History):</b> first Factory Act 1881, repeal of the Vernacular Press Act 1882, Hunter Education Commission 1882, Ilbert Bill controversy 1883 and the 1882 local self-government resolution → called the <b>Father of Local Self-Government</b>."},
+ {k:"trap", h:"One lecture dates Mayo's census to 1862. The correct year is <b>1872</b>."}],
+ sum:["1872: Mayo, non-synchronous · 17 Feb 1881: Ripon, synchronous, Commissioner W.C. Plowden","Henry Walter (Dacca, 1830) = Father of Indian Census; James Prinsep = Allahabad 1824, Banaras 1827–28","1921 = Year of Great Divide","1951 = first census after independence (Commissioner R.A. Gopalaswami)","2011 = 15th overall, 7th after independence; 2027 = 16th and 8th","Sweden 1749 first modern census; USA 1790 first decennial"]},
+
+{ id:"L2", title:"Law, office & how 2011 ran", hi:"कानून और संचालन", blocks:[
+ {k:"facts", title:"Legal base", rows:[["Constitution","Union List, Entry 69 (Seventh Schedule)"],["Law","Census Act, 1948 + Census Rules, 1990"],["Ministry","Ministry of Home Affairs (MHA)"],["Office","Registrar General & Census Commissioner, India (ORGI), permanent since 1961. Also runs SRS and the Civil Registration System."],["Secrecy","Individual answers are confidential and cannot be used as evidence in court"]]},
+ {k:"trick", h:"<b>Act → “Eight”</b>: Census Act <b>1948</b>, one year after independence and before the 1951 census."},
+ {k:"facts", title:"Census Commissioners to remember", rows:[["1881 (first)","W.C. Plowden"],["1951 (first after independence)","R.A. Gopalaswami"],["2011","Dr C. Chandramouli"],["Now (Census 2027)","Mritunjay Kumar Narayan"]]},
+ {k:"trick", h:"<b>C से Census, C से Commissioner, C से Chandramouli</b> (2011). Asked in MTS 2024 with options Vivek Joshi, Shailesh, C. Chandramouli, T.N. Seshan."},
+ {k:"facts", title:"Census 2011 at a glance", rows:[["Motto","Our Census, Our Future (हमारी जनगणना, हमारा भविष्य)"],["Mascot","A woman enumerator"],["Coverage","35 States/UTs (28 + 7) · 640 districts · 5,924 sub-districts"],["Settlements","7,935 towns · about 6.41 lakh villages"],["Schedules","Canvassed in 16 languages"],["Staff","About 27 lakh enumerators"],["Firsts","National Population Register (NPR) created; ‘Other’ option for gender"]]},
+ {k:"table", title:"Two phases of Census 2011", head:["Phase","When"], rows:[["1 · Houselisting & Housing Census","April – September 2010 (a 45-day window in each state)"],["2 · Population Enumeration","9 – 28 February 2011"],["Revisional round","1 – 5 March 2011"],["Reference date","00:00 hrs, 1 March 2011"]]},
+ {k:"p", h:"<b>Provisional vs final figures.</b> Provisional totals came out on 31 March 2011; final tables in 2013. Books quote both (literacy 74.04% vs 72.98%, sex ratio 940 vs 943). SSC options usually carry only one, so learn the pair."},
+ {k:"facts", title:"Census and delimitation (Polity link)", rows:[["Article 82","Readjust Lok Sabha seats after every census"],["Article 170","Same for State Assemblies"],["Delimitation Commissions","4 so far: 1952, 1963, 1973, 2002"],["42nd Amendment (1976)","Froze seats on the 1971 census till 2000"],["84th Amendment (2001)","Extended the freeze till the first census after 2026"],["87th Amendment (2003)","Let constituency boundaries be redrawn on the 2001 census"]]},
+ {k:"p", h:"Why the freeze? Southern states that controlled population said they would lose seats to faster-growing northern states, which would punish them for good work."},
+ {k:"trap", h:"A lecture says the 84th Amendment fixed constituencies on the 2001 census. The 84th only extended the freeze; using 2001 data for boundaries came through the <b>87th Amendment</b>."}],
+ sum:["Census: Union List Entry 69 · Census Act 1948 · Census Rules 1990 · under MHA","2011: C. Chandramouli; now: Mritunjay Kumar Narayan","Motto ‘Our Census, Our Future’; mascot a woman enumerator","2011 phases: HLO Apr–Sep 2010; PE 9–28 Feb 2011; reference date 1 Mar 2011","35 States/UTs · 640 districts · NPR created","Art 82/170 · Delimitation Commissions 1952, 63, 73, 2002 · 84th and 87th Amendments"]},
+
+{ id:"L3", title:"Population size & distribution", hi:"जनसंख्या और वितरण", blocks:[
+ {k:"facts", title:"Headline numbers (2011)", rows:[["Total","121.09 crore (final) · 121.02 crore = 1210.2 million (provisional)"],["Males","62.33 crore · 51.47% (provisional 51.54%)"],["Females","58.76 crore · 48.53% (provisional 48.46%)"],["Share of world population","17.5% (China then about 19.4%)"],["Share of world area","2.4%"],["Added in 2001–11","About 18.2 crore, nearly the population of Brazil"]]},
+ {k:"table", title:"Most and least populous states", head:["Rank","Most","Least"], rows:[["1","Uttar Pradesh · 19.98 cr (16.5%)","Sikkim · 6.1 lakh"],["2","Maharashtra · 11.24 cr (9.3%)","Mizoram · 11 lakh"],["3","Bihar · 10.41 cr (8.6%)","Arunachal Pradesh · 13.8 lakh"],["4","West Bengal · 9.13 cr (7.5%)","Goa · 14.6 lakh"],["5","Andhra Pradesh (undivided) · 8.46 cr","Nagaland · 19.8 lakh"]]},
+ {k:"facts", title:"Other extremes", rows:[["UT, most","Delhi (1.68 crore)"],["UT, least","Lakshadweep (64,473)"],["District, most","Thane, Maharashtra (1.1 crore)"],["District, least","Dibang Valley, Arunachal (about 8,000)"],["City, most","Greater Mumbai"],["States above 10 crore","Only UP, Maharashtra and Bihar"],["Largest state by area","Rajasthan (10.4%); smallest: Goa"],["Smallest UT","Lakshadweep, by area and population"]]},
+ {k:"trick", h:"Top 5 in order: <b>UP → Maharashtra → Bihar → West Bengal → Andhra</b> (“उ-म-बि-ब-आ”). Bottom 3: <b>Sikkim → Mizoram → Arunachal</b>."},
+ {k:"p", h:"A line from the 2011 report that gets asked: 2001–11 is the first decade (apart from 1911–21) that added <b>fewer</b> people than the decade before it."},
+ {k:"p", h:"Today India is the most populous country: it overtook China in April 2023 (UN estimates). Census 2011 still shows China ahead."},
+ {k:"trap", h:"One lecture gives females as 585.5 million. The provisional figure is <b>586.5 million</b> (final 587.6 million)."}],
+ sum:["121.09 crore (final) / 121.02 crore (provisional)","17.5% of world population on 2.4% of world area","UP 16.5% > Maharashtra > Bihar > WB > AP; only these top 3 crossed 10 crore","Least: Sikkim < Mizoram < Arunachal","Delhi most populous UT, Lakshadweep least; Thane most populous district; Dibang Valley least","Greater Mumbai most populous city"]},
+
+{ id:"L4", title:"Growth: decades & milestones", hi:"जनसंख्या वृद्धि", blocks:[
+ {k:"facts", title:"Growth in 2001–11", rows:[["Decadal growth","17.7% (final) · 17.64% (provisional)"],["1991–2001","21.54%, so a fall of about 3.9 points, the sharpest since independence"],["Average annual (exponential)","1.64% (1991–2001: 1.97%)"],["Male vs female","Males 17.19%, females 18.12% (provisional)"]]},
+ {k:"table", title:"Decadal growth since 1901", head:["Decade","Growth %","Note"], rows:[["1901–11","5.75",""],["1911–21","−0.31","Only fall → 1921 Great Divide"],["1921–31","11.00",""],["1931–41","14.22",""],["1941–51","13.31",""],["1951–61","21.64",""],["1961–71","24.80","Highest ever"],["1971–81","24.66",""],["1981–91","23.87",""],["1991–2001","21.54",""],["2001–11","17.70","Lowest since independence"]], numcol:1},
+ {k:"trick", h:"<b>1961–71 is the peak</b> (24.80%): lecture hook “Indira Gandhi's early years, before the Emergency”. <b>1911–21 is the only fall</b> (−0.31%) → 1921 is the Great Divide."},
+ {k:"p", h:"<b>Lowest growth does not mean population fell.</b> In 2011 the <i>rate</i> slowed while numbers still rose. Economics parallel: disinflation means prices still rise, just more slowly."},
+ {k:"table", title:"Extremes of growth, 2001–11", head:["","Highest","Lowest"], rows:[["State","Meghalaya 27.9% → Arunachal 26.0% → Bihar 25.4%","Nagaland −0.58% → Kerala 4.9% → Goa 8.2%"],["UT","Dadra & Nagar Haveli 55.9% → Daman & Diu 53.8%","Lakshadweep 6.3%"],["District","Kurung Kumey (Arunachal) 111%","Longleng (Nagaland) −58.4%"]]},
+ {k:"trick", h:"<b>Meghalaya</b>: मेघ → बारिश → पकौड़े → सब घर पर → आबादी बढ़ी. <b>Nagaland</b>: बाहर निकले तो नाग काट लेगा → आबादी घटी. <b>Dadra & Nagar Haveli</b>: हवेली बड़ी हो गई."},
+ {k:"facts", title:"Population through the years", rows:[["1901","23.8 crore"],["1951","36.1 crore"],["1971","54.8 crore"],["2001","102.9 crore"],["2011","121.1 crore"]]},
+ {k:"trap", h:"Nagaland's growth is <b>−0.58%</b> (final) or −0.47% (provisional). The “−58%” in one lecture is Longleng <i>district</i>; the “−47%” in another is a slip for −0.47%."},
+ {k:"trap", h:"1911–21 growth was <b>−0.31%</b>, not −0.03%."}],
+ sum:["2001–11: 17.7% (final) / 17.64% (prov.); annual 1.64%","Highest decade 1961–71 (24.80%); only negative 1911–21 (−0.31%)","Meghalaya highest state; Nagaland only negative (−0.58%); Kerala lowest positive","D&NH highest UT; Lakshadweep lowest UT","Kurung Kumey highest district; Longleng lowest (−58.4%)","1901: 23.8 cr → 1951: 36.1 cr → 2011: 121.1 cr"]},
+
+{ id:"L5", title:"Population density", hi:"जनसंख्या घनत्व", blocks:[
+ {k:"p", h:"<b>Density = population ÷ area</b>, measured in persons per km². It shows how crowded a region is."},
+ {k:"facts", title:"India", rows:[["1951","117 per km²"],["2001","325 per km²"],["2011","382 per km²"]]},
+ {k:"table", title:"Extremes (2011)", head:["","Highest","Lowest"], rows:[["State","Bihar 1,106 → West Bengal 1,028 → Kerala 860","Arunachal 17 → Mizoram 52 → Sikkim 86"],["UT","Delhi 11,320 → Chandigarh 9,258","Andaman & Nicobar 46"],["District","North East Delhi 37,346","Dibang Valley 1"]]},
+ {k:"trick", h:"Delhi is about <b>10 × Bihar</b>. Bihar: लोग चिपक-चिपक कर रहते हैं. Arunachal: only <b>17</b> people per km²."},
+ {k:"p", h:"Provisional figures you may see: Bihar 1,102 and Delhi 11,297."},
+ {k:"p", h:"Why so uneven? Plains, water and fertile alluvial soil pull people to UP, Bihar and Bengal; hills, cold and forests keep the Himalaya and the North-East thin. The factors are in Lesson 10."}],
+ sum:["India 382 (2011) · 325 (2001) · 117 (1951)","Bihar 1,106 highest; West Bengal 2nd; Kerala 3rd","Arunachal 17 lowest","Delhi 11,320 highest UT; Andaman & Nicobar 46 lowest UT","North East Delhi highest district"]},
+
+{ id:"L6", title:"Sex ratio & child sex ratio", hi:"लिंगानुपात", blocks:[
+ {k:"p", h:"In India, <b>sex ratio = females per 1,000 males</b>. (Most other countries use males per 100 females.)"},
+ {k:"facts", title:"National", rows:[["2011","943 (final) · 940 (provisional)"],["2001","933, so 2011 rose by 10"],["1951","946"],["Highest ever","972 in 1901"],["Lowest ever","927 in 1991"]]},
+ {k:"table", title:"States and UTs (2011)", head:["","Highest","Lowest"], rows:[["State","Kerala 1,084 → Tamil Nadu 996","Haryana 879 → J&K 889 → Sikkim 890 → Punjab 895"],["UT","Puducherry 1,037 → Lakshadweep 947","Daman & Diu 618 → D&NH 774 → Chandigarh 818 → Delhi 868 → A&N 876"],["District","Mahe (Puducherry)","Daman"]]},
+ {k:"p", h:"<b>Lowest of all States and UTs:</b> Daman & Diu (618). The five lowest are all UTs; Haryana comes 6th overall but 1st among states. <b>Kerala</b> is the only state above 1,000."},
+ {k:"trick", h:"<b>Daman</b> = लड़कियों का <b>दमन</b> → lowest. <b>Kerala</b>, the literate state, is highest in both literacy and sex ratio."},
+ {k:"p", h:"<b>Puducherry's four pieces:</b> Puducherry and Karaikal on the Tamil Nadu coast, <b>Mahe inside Kerala</b>, Yanam in Andhra Pradesh. Karaikal is the part nearest Sri Lanka."},
+ {k:"facts", title:"Child sex ratio (0–6 years)", rows:[["2011","918 (final) · 914 (provisional) · some books print 919"],["2001","927 (1961 was 976)"],["Highest state","Arunachal 972 → Mizoram 970, Meghalaya 970 (provisional ranking put Mizoram first)"],["Lowest state","Haryana 834 → Punjab 846"],["UT","Highest Andaman & Nicobar 968 · lowest Delhi 871"],["District","Highest Lahaul & Spiti (HP) · lowest Jhajjar (Haryana)"]]},
+ {k:"p", h:"The overall ratio rose while the child ratio fell to its lowest ever, a sign of sex-selective abortion. <b>Beti Bachao Beti Padhao</b> was launched on 22 January 2015 at <b>Panipat, Haryana</b> in response."},
+ {k:"trap", h:"Kerala tops the overall sex ratio but <b>not</b> the child sex ratio. There the top state is Arunachal (final) or Mizoram (provisional)."},
+ {k:"trap", h:"One lecture gives Puducherry as 1,034. It is <b>1,037</b> (final) or 1,038 (provisional)."}],
+ sum:["943 (2011) vs 933 (2001); 972 in 1901 highest, 927 in 1991 lowest","Kerala 1,084 > TN 996; Haryana 879 lowest state, then J&K","Puducherry 1,037 highest UT; Daman & Diu 618 lowest overall","Mahe highest district; Daman lowest","Child SR 918 (914 prov.); Arunachal/Mizoram top, Haryana 834 bottom; A&N top UT, Delhi bottom UT","Lahaul & Spiti highest CSR district; Jhajjar lowest"]},
+
+{ id:"L7", title:"Literacy", hi:"साक्षरता", blocks:[
+ {k:"p", h:"A person aged <b>7 years or more</b> who can <b>read and write with understanding in any language</b> is literate. No school certificate is needed. Children 0–6 are left out of the rate."},
+ {k:"facts", title:"National (2011)", rows:[["Total","74.04% (provisional) · 72.98% (final)"],["Male","82.14%"],["Female","65.46%"],["Gap","16.68 points (2001: 21.59)"],["2001","64.83%, so up 9.21 points"],["Biggest improvement","Rural females"]]},
+ {k:"table", title:"Literacy since 1951", head:["Year","Total","Male","Female"], rows:[["1951","18.33","27.16","8.86"],["1961","28.30","40.40","15.35"],["1971","34.45","45.96","21.97"],["1981","43.57","56.38","29.76"],["1991","52.21","64.13","39.29"],["2001","64.83","75.26","53.67"],["2011","74.04","82.14","65.46"]], numcol:"all"},
+ {k:"table", title:"Extremes (2011)", head:["","Highest","Lowest"], rows:[["State","Kerala 93.91% → Mizoram 91.58% → Goa 88.70%","Bihar 63.82% → Arunachal 66.95% → Rajasthan 67.06%"],["UT","Lakshadweep 92.28%","Dadra & Nagar Haveli 77.65%"],["District","Serchhip (Mizoram) 98.76% → Aizawl","Alirajpur (Madhya Pradesh) 37.22%"],["Male","Lakshadweep 96.11% (state: Kerala 96.02%)","Bihar 73.39%"],["Female","Kerala 91.98%","Rajasthan 52.66%"],["Gender gap","Rajasthan 27.85 pts → Jharkhand","Meghalaya 3.39 pts → Kerala"]]},
+ {k:"trick", h:"<b>Rajasthan</b>: घूंघट → girls kept from school → biggest male–female gap and lowest female literacy. <b>Serchhip</b>: Mizoram's “sir-chip” district tops India."},
+ {k:"p", h:"The overall second place goes to Lakshadweep, a UT. <b>Among states</b>, Mizoram is second."},
+ {k:"trap", h:"Bihar is 63.82% in provisional data and 61.80% in final data; Kerala 93.91% is rounded to 94%. Both versions appear in papers."}],
+ sum:["Literate = age 7+, read and write with understanding, any language","74.04%: M 82.14, F 65.46, gap 16.68; 2001: 64.83; 1951: 18.33 (F 8.86)","Kerala top, Mizoram 2nd state; Bihar bottom, Arunachal 2nd bottom","Lakshadweep top UT; D&NH bottom UT; Serchhip top district; Alirajpur bottom","Rajasthan largest gender gap and lowest female literacy; Meghalaya smallest gap","Rural females improved most"]},
+
+{ id:"L8", title:"Urban, age & work", hi:"शहरीकरण, आयु, कार्य", blocks:[
+ {k:"facts", title:"Urban India (2011)", rows:[["Urban share","31.16% = 37.7 crore (final 31.14%) · 2001: 27.81%"],["Rural share","68.84% = 83.3 crore"],["A first","Absolute rise in urban population (9.1 cr) beat rural (9.0 cr) for the first time since independence"],["Towns","7,935 = 4,041 statutory + 3,894 census towns"],["Million-plus UAs/cities","53 (2001: 35)"],["Largest UAs","Greater Mumbai 18.4 m → Delhi 16.3 m → Kolkata 14.1 m"]]},
+ {k:"table", title:"Urbanisation extremes", head:["","Highest","Lowest"], rows:[["State (share)","Goa 62.2% → Mizoram 52.1% → Tamil Nadu 48.4%","Himachal 10.0% → Bihar 11.3%"],["UT (share)","Delhi 97.5% → Chandigarh 97.3%",""],["By number","Urban: Maharashtra · Rural: Uttar Pradesh",""]]},
+ {k:"facts", title:"Census town: all three needed", rows:[["Population","At least 5,000"],["Density","At least 400 per km²"],["Work","At least 75% of male main workers outside agriculture"]]},
+ {k:"facts", title:"Age structure (2011)", rows:[["0–14 years","30.8% (30.76%)"],["15–59 years","About 60.3%, the largest group"],["60+ years","8.6% (10.4 crore)"],["Elderly by 2031","193.4 million (Technical Group projection, July 2020)"],["0–6 years","13.1% = 15.88 crore (prov.) · final 13.6% · down 3.08% from 2001"]]},
+ {k:"facts", title:"Workers (2011)", rows:[["Work participation rate","39.8% (male 53.3%, female 25.5%)"],["Main vs marginal","75.2% vs 24.8% of workers"],["Categories","Agricultural labourers 30.0% · cultivators 24.6% · household industry 3.8% · others 41.6%"],["A first","Agricultural labourers outnumbered cultivators"]]},
+ {k:"facts", title:"Other groups", rows:[["Persons with disability","2.68 crore = 2.21%; ‘in movement’ the largest type"],["Transgender","Counted separately (‘Other’) for the first time: about 4.88 lakh"]]}],
+ sum:["Urban 31.16% (Goa most, Himachal least; Delhi top UT)","First time urban absolute increase > rural","53 million-plus cities; Greater Mumbai largest UA","Census town: 5,000 people + 400/km² + 75% male non-farm workers","0–14: 30.8% · 15–59: ~60% · 60+: 8.6%; elderly 193.4 m by 2031","WPR 39.8%; agricultural labourers > cultivators for the first time"]},
+
+{ id:"L9", title:"Religion, SC/ST & language", hi:"धर्म, SC/ST, भाषा", blocks:[
+ {k:"table", title:"Religion (Census 2011, released 2015)", head:["Group","Share","Number"], rows:[["Hindu","79.80%","96.63 cr"],["Muslim","14.23%","17.22 cr"],["Christian","2.30%","2.78 cr"],["Sikh","1.72%","2.08 cr"],["Buddhist","0.70%","84 lakh"],["Jain","0.37%","45 lakh"],["Others","0.66%",""],["Not stated","0.24%",""]], numcol:"12"},
+ {k:"trick", h:"Order: <b>H-M-C-S-B-J</b> → “<b>H</b>ari <b>M</b>ama <b>C</b>hai <b>S</b>e <b>B</b>iscuit <b>J</b>odte”. Christians come <b>before</b> Sikhs."},
+ {k:"facts", title:"Where each group stands out", rows:[["Hindu, highest share","Himachal Pradesh 95.2%; Hindus fell below 80% nationally for the first time"],["Muslim majority","J&K 68.3% (a state then); UT Lakshadweep 96.6%; Assam next 34.2%; most by number UP"],["Christian majority","Nagaland 87.9% → Mizoram 87.2% → Meghalaya 74.6%; most by number Kerala"],["Sikh majority","Punjab 57.7%, the only one"],["Buddhist","Most by number Maharashtra (about 77% of all); highest share Sikkim 27.4%"],["Jain","Most by number Maharashtra; also Rajasthan, Gujarat"],["Growth 2001–11","Muslims 24.6% highest; Hindus 16.8%; Jains 5.4% lowest"],["Sex ratio","Christians highest (1,023); Sikhs lowest (903)"]]},
+ {k:"facts", title:"Notified minorities (NCM Act 1992): 6", rows:[["1993","Muslims, Christians, Sikhs, Buddhists, Parsis (Zoroastrians)"],["2014","Jains added"]]},
+ {k:"table", title:"SC and ST", head:["","Scheduled Castes","Scheduled Tribes"], rows:[["Number, share","20.14 cr · 16.6%","10.43 cr · 8.6%"],["Highest share","Punjab 31.9%","Mizoram 94.4% (UT Lakshadweep 94.8%)"],["Most by number","Uttar Pradesh","Madhya Pradesh"],["None notified","Arunachal, Nagaland, A&N Islands, Lakshadweep","Punjab, Haryana, Delhi, Chandigarh, Puducherry"],["Also","","705 groups; largest tribe Bhil; ST sex ratio 990"]]},
+ {k:"facts", title:"Language (released 2018)", rows:[["Languages","121 = 22 scheduled + 99 non-scheduled"],["Mother tongues","19,569 raw returns → 1,369 rationalised"],["Most spoken","Hindi 43.63% (52.83 crore)"],["Next","Bengali 8.03% → Marathi 6.86% → Telugu 6.70% → Tamil 5.70% → Gujarati 4.58% → Urdu 4.19%"],["Change","Marathi overtook Telugu for 3rd place"],["Fewest (scheduled)","Sanskrit, about 24,800 speakers"],["Largest non-scheduled","Bhili/Bhilodi, about 1.04 crore"]]},
+ {k:"trap", h:"One lecture ranks Sikhs 3rd and Christians 4th. It is the reverse: <b>Christians 2.3% &gt; Sikhs 1.7%</b>. The same lecture's list of six religions is not the list of six notified minorities: Hindus are not a minority, and Parsis are."}],
+ sum:["Hindu 79.8 > Muslim 14.2 > Christian 2.3 > Sikh 1.7 > Buddhist 0.7 > Jain 0.4","HP highest Hindu share; J&K Muslim-majority state; Nagaland highest Christian share; Punjab only Sikh-majority","Maharashtra: most Buddhists and most Jains; Sikkim highest Buddhist share","6 minorities: Muslim, Christian, Sikh, Buddhist, Parsi, Jain (2014)","SC 16.6% (Punjab share, UP number); ST 8.6% (Mizoram share, MP number)","No ST: Punjab, Haryana, Delhi, Chandigarh, Puducherry · No SC: Arunachal, Nagaland, A&N, Lakshadweep","Hindi 43.63% > Bengali > Marathi > Telugu; Sanskrit fewest"]},
+
+{ id:"L10", title:"Population geography", hi:"मानव भूगोल · जनसंख्या", blocks:[
+ {k:"p", h:"This part of <b>Human Geography</b> is new in recent SSC papers. Questions on India's growth phases and on Malthus came in the Stenographer exam."},
+ {k:"facts", title:"World distribution", rows:[["Top 10 countries","About 60% of the world's people; 6 of them in Asia"],["Top 3 today","India, China, USA (India overtook China in 2023)"],["World milestones","7 billion on 31 Oct 2011 · 8 billion on 15 Nov 2022"],["Speed-up","Over a million years to reach 1 billion; only 12 years to go from 5 to 6 billion"]]},
+ {k:"table", title:"Factors that decide where people live", head:["Type","Examples"], rows:[["Geographical","Water (Ganga plains), landforms (plains vs hills), climate (deserts, Antarctica empty), soil (fertile alluvium)"],["Economic","Minerals (Chota Nagpur), urbanisation, industrialisation (Mumbai, Bengaluru)"],["Social & cultural","Religious and cultural centres (Varanasi, Mathura), social life (Goa)"]]},
+ {k:"facts", title:"Population change", rows:[["Three components","Births, deaths, migration"],["Natural growth","Births − deaths"],["Actual growth","Births − deaths + in-migration − out-migration"],["Crude Birth Rate (CBR)","Live births per 1,000 people in a year"],["Crude Death Rate (CDR)","Deaths per 1,000 people in a year"],["India, 2011","CBR 21.8 · CDR 7.1 (from the Sample Registration System, not the census)"]]},
+ {k:"facts", title:"Migration", rows:[["Direction","Place of origin → place of destination"],["Immigrant","Moves <i>into</i> a place (for the destination)"],["Emigrant","Moves <i>out of</i> a place (for the origin)"],["Push factors (origin)","Unemployment, poor living conditions, political turmoil, bad climate, disasters, epidemics, backwardness"],["Pull factors (destination)","Better jobs and living conditions, peace and stability, safety of life and property, pleasant climate"]]},
+ {k:"trick", h:"<b>I</b>mmigrant = <b>I</b>n. <b>E</b>migrant = <b>E</b>xit. Someone moving Kanpur → Delhi is an emigrant for Kanpur and an immigrant for Delhi."},
+ {k:"fig", title:"Demographic transition (3 stages)", svg:DTM_SVG, cap:"Stage 1: both rates high, slow growth. Stage 2: death rate falls fast while birth rate stays high, so population explodes. Stage 3: both low, population stable."},
+ {k:"table", title:"India's four growth phases (NCERT)", head:["Phase","Name","Why"], rows:[["1901–1921","Stagnant / stationary","High birth and death rates; famines, epidemics (1918 flu), poor health care"],["1921–1951","Steady growth","Death rate fell with better health and sanitation"],["1951–1981","Population explosion","Death rate fell fast, birth rate stayed high, plus migrants from Tibet, Bangladesh, Nepal, Pakistan"],["1981–present","High growth, slowing down","Falling birth rate, female literacy, later marriage"]]},
+ {k:"facts", title:"Malthus (1798)", rows:[["Book","An Essay on the Principle of Population"],["Population","Grows in geometric progression (1, 2, 4, 8…)"],["Food","Grows in arithmetic progression (1, 2, 3, 4…)"],["Result","People outrun food → crash"],["Positive checks","Famine, disease, war"],["Preventive checks","Late marriage, moral restraint"]]},
+ {k:"facts", title:"Composition", rows:[["Dependent","0–14 (young) and 60+ (old)"],["Working age","15–59"],["Dependency ratio","(0–14 + 60+) ÷ (15–59) × 100"],["Demographic dividend","Growth boost from a large working-age share"],["Population control","Access to family planning, free contraceptives, female education"]]},
+ {k:"pyr", title:"Age-sex pyramids", items:[
+   {name:"Expanding", rows:[8,14,22,32,44,58,72,86,100], note:"Wide base, high birth rate: Nigeria (NCERT), Kenya, Bangladesh"},
+   {name:"Constant", rows:[40,62,74,80,84,86,88,88,88], note:"Bell/rectangular: Australia, USA"},
+   {name:"Declining", rows:[40,62,80,90,94,88,76,66,58], note:"Narrow base, ageing: Japan, Italy"}]},
+ {k:"trap", h:"Four slips in this lecture: (1) India overtook <b>China</b>, not the other way round. (2) Someone leaving a place is an <b>emigrant</b> for it. (3) India's family planning programme began in <b>1952</b> (First Five Year Plan); India was the first country to have one. The 4th Plan (1969–74) only stepped it up. (4) China's ageing comes from its <b>One-Child Policy</b> (1980–2015); the “One China policy” is about Taiwan."}],
+ sum:["10 most populous countries ≈ 60% of world; 6 in Asia","Factors: geographical (water, land, climate, soil), economic (minerals, cities, industry), socio-cultural","Change = births, deaths, migration; CBR/CDR per 1,000 per year","Push at origin, pull at destination; immigrant in, emigrant out","India: 1901–21 stagnant, 1921–51 steady, 1951–81 explosion, 1981– slowing","Malthus 1798: population GP, food AP; positive vs preventive checks","Pyramids: expanding (Nigeria), constant (Australia), declining (Japan)"]},
+
+{ id:"L11", title:"Census 2027 & population policy", hi:"जनगणना 2027 · करंट अफेयर्स", blocks:[
+ {k:"p", h:"Census 2021 was postponed because of COVID-19. Its replacement, <b>Census 2027</b>, is under way and is the most likely current-affairs question on this topic."},
+ {k:"facts", title:"Key facts", rows:[["Number","16th census overall, 8th after independence"],["Caste","Comprehensive caste count, the first since 1931 (CCPA decision, 30 April 2025), done in the Population Enumeration phase"],["Notification","Gazette notification on 16 June 2025"],["Cost","₹11,718.24 crore approved by the Union Cabinet on 12 Dec 2025"],["Office","RGI & Census Commissioner Mritunjay Kumar Narayan (MHA)"],["Staff","About 30 lakh field functionaries"]]},
+ {k:"facts", title:"Firsts", rows:[["Digital","First digital census: enumerators use mobile apps (Android and iOS), no paper schedules"],["Self-enumeration","Households can fill their own details on a web portal, in 16 languages, during the 15 days before the house visit"],["Monitoring","CMMS: Census Management & Monitoring System, near real-time"],["Mapping","HLB Creator: houselisting blocks drawn digitally on satellite imagery"]]},
+ {k:"table", title:"Schedule", head:["Stage","Dates"], rows:[["Phase I: Houselisting & Housing Census","1 April – 30 September 2026 (each State/UT picks a 30-day window)"],["Self-enumeration","15 days before each State's HLO window"],["Phase II: Population Enumeration","February 2027"],["Reference date","00:00 hrs, 1 March 2027"],["Snow-bound areas*: self-enumeration","17 – 31 August 2026"],["Snow-bound areas*: enumeration","1 – 30 September 2026; revisional round 1 – 5 October 2026"],["Snow-bound areas*: reference date","00:00 hrs, 1 October 2026"]]},
+ {k:"p", h:"*Ladakh and snow-bound areas of J&K, Himachal Pradesh and Uttarakhand. <b>Ladakh</b> will be the first UT to be fully enumerated."},
+ {k:"tl", title:"What has happened so far", rows:[["1 Apr 2026","Phase I began. President Droupadi Murmu was the first person enumerated, through self-enumeration. Self-enumeration opened in 8 States/UTs: A&N, Goa, Karnataka, Lakshadweep, Mizoram, Odisha, Sikkim and Delhi's NDMC and Cantonment areas."],["Aug 2026","HLO over in 31 States/UTs; ₹4,102 crore released to States/UTs (told to Rajya Sabha). West Bengal HLO 16 Aug – 14 Sep; Assam 17 Aug – 15 Sep."],["15 Aug 2026","From the Red Fort, the PM urged people to self-enumerate."],["Sep 2026","Population enumeration in Ladakh and snow-bound areas."]]},
+ {k:"facts", title:"Why it matters", rows:[["Delimitation","The 84th Amendment freeze lasts till the first census after 2026, which is this one"],["Women's reservation","106th Amendment (2023) takes effect after delimitation based on the first census after it"]]},
+ {k:"facts", title:"Population policy", rows:[["Family planning","India was the first country with a national programme: 1952"],["NPP 2000: immediate","Meet contraception needs, health infrastructure"],["NPP 2000: medium term","Bring TFR to replacement level (2.1) by 2010"],["NPP 2000: long term","Stable population by 2045"],["National Commission on Population","Set up in 2000, chaired by the Prime Minister"],["World Population Day","11 July"],["TFR now","2.0 (NFHS-5, 2019–21), below replacement"]]}],
+ sum:["16th census, 8th after independence; first digital; first self-enumeration; caste count first since 1931","HLO 1 Apr – 30 Sep 2026; PE Feb 2027; reference date 1 Mar 2027","Snow-bound: PE 1–30 Sep 2026, reference date 1 Oct 2026; Ladakh first UT done","₹11,718.24 crore (Cabinet, 12 Dec 2025); notification 16 June 2025; CCPA caste decision 30 Apr 2025","President Droupadi Murmu first enumerated; CMMS portal; 16 languages","NPP 2000: TFR 2.1 by 2010, stable population by 2045; family planning since 1952"]}
+];
+
+/* ============================================================
+   QUESTION BANK — correct answer is always written first; options are shuffled on screen.
+   [lesson, question, [options], explanation, flags]   flags: p = asked in exams (per lectures)
+   ============================================================ */
+const QB = [
+/* L1 */
+["L1","The first census in India (non-synchronous) was held in which year?",["1872","1881","1891","1951"],"Under Viceroy Lord Mayo. Regions were counted at different times, so it is called non-synchronous. Trick: “May I start?” → Mayo.","p"],
+["L1","Under which Viceroy was India's first census (1872) conducted?",["Lord Mayo","Lord Ripon","Lord Lytton","Lord Curzon"],"Mayo started it; Ripon made it regular in 1881.","p"],
+["L1","The first synchronous (regular) census of India was held in",["1881","1872","1901","1911"],"17 February 1881, under Lord Ripon. India has held a census every 10 years since then.","p"],
+["L1","Who was the Viceroy during the first synchronous census of 1881?",["Lord Ripon","Lord Mayo","Lord Dufferin","Lord Lansdowne"],"“Ripon cut the ribbon” → he made the census regular.","p"],
+["L1","Who was the Census Commissioner of the 1881 census?",["W.C. Plowden","H.H. Risley","J.H. Hutton","R.A. Gopalaswami"],"Plowden was India's first Census Commissioner. Risley: 1901; Hutton: 1931; Gopalaswami: 1951.","p"],
+["L1","On which date was the first synchronous census of 1881 taken?",["17 February 1881","1 March 1881","15 August 1881","10 April 1881"],"17 February 1881 under Lord Ripon."],
+["L1","Who is commonly called the ‘Father of Indian Census’?",["Henry Walter","W.C. Plowden","James Prinsep","Lord Ripon"],"Henry Walter counted Dacca (Dhaka) city in 1830, by sex and broad age groups.","p"],
+["L1","Henry Walter conducted the census of which city in 1830?",["Dacca (Dhaka)","Calcutta","Allahabad","Madras"],"Dacca, now the capital of Bangladesh, then part of British India."],
+["L1","James Prinsep counted the population of which two cities (1824 and 1827–28)?",["Allahabad and Banaras","Dacca and Calcutta","Delhi and Agra","Madras and Bombay"],"Allahabad in 1824 and Banaras in 1827–28."],
+["L1","The first census of independent India was held in",["1951","1947","1948","1961"],"1951, conducted under the Census Act 1948. Lecture hook: ‘51’ is a शुभ number.","p"],
+["L1","Counting from 1872, Census 2011 was India's ____ census.",["15th","7th","14th","16th"],"1872 + 14 censuses from 1881 to 2011 = 15. Trick: प से पूरी = पंद्रह.","p"],
+["L1","Census 2011 was the ____ census after independence.",["7th","6th","8th","15th"],"1951, 61, 71, 81, 91, 2001, 2011 = 7. Trick: स से स्वतंत्र = सातवीं.","p"],
+["L1","Which year is called the ‘Year of Great Divide’ in India's demographic history?",["1921","1911","1947","1951"],"1911–21 was the only decade with a fall (−0.31%). After 1921 population rose every decade.","p"],
+["L1","Why is 1921 called the ‘Year of Great Divide’?",["Population fell before it and rose continuously after it","It was the first census after World War I","India was partitioned that year","Caste was counted for the first time"],"The 1911–21 decade recorded −0.31% growth; from 1921 onward growth never turned negative again."],
+["L1","Which country conducted the first modern national census, in 1749?",["Sweden","USA","England","France"],"Sweden 1749. The USA began the regular 10-year census in 1790; England in 1801."],
+["L1","Which ancient text describes collecting population data for taxation, around the 3rd century BCE?",["Kautilya's Arthashastra","Ain-i-Akbari","Indica","Rajatarangini"],"Ain-i-Akbari (Abul Fazl) also has population data, but it is from the 16th century."],
+["L1","The Viceroy of the first synchronous census is also known as the",["Father of Local Self-Government","Father of Indian Census","Father of Indian Railways","Father of Civil Services"],"Lord Ripon. Railways = Dalhousie; Civil Services = Cornwallis; Indian Census = Henry Walter."],
+["L1","The 1872 census is called ‘non-synchronous’ because",["It was not taken at the same time across all regions","It left out women","It covered only towns","It was done by sampling"],"Different parts of British India were counted in different years."],
+["L1","Before Census 2027, in which census were all castes last enumerated?",["1931","1941","1951","2011"],"After independence censuses counted only SCs and STs. SECC 2011 was a separate exercise."],
+["L1","Who was the Census Commissioner of the 1951 census?",["R.A. Gopalaswami","C. Chandramouli","W.C. Plowden","J.H. Hutton"],"The first census of independent India."],
+/* L2 */
+["L2","Under which Act is the Census of India conducted?",["Census Act, 1948","Census Act, 1951","Registration of Births and Deaths Act, 1969","Collection of Statistics Act, 2008"],"Trick: Act → ‘Eight’ → 1948. The Census Rules are of 1990.","p"],
+["L2","The Census of India is conducted under which ministry?",["Ministry of Home Affairs","Ministry of Statistics & Programme Implementation","Ministry of Rural Development","NITI Aayog"],"The Office of the Registrar General & Census Commissioner is under MHA.","p"],
+["L2","In which list of the Seventh Schedule is ‘Census’ placed?",["Union List","State List","Concurrent List","Residuary powers"],"Entry 69 of the Union List."],
+["L2","Who was the Registrar General & Census Commissioner for Census 2011?",["C. Chandramouli","Vivek Joshi","T.N. Seshan","Mritunjay Kumar Narayan"],"Trick: C से Census, C से Commissioner, C से Chandramouli. Asked in MTS 2024. T.N. Seshan was a Chief Election Commissioner.","p"],
+["L2","Who is the Registrar General & Census Commissioner of India for Census 2027?",["Mritunjay Kumar Narayan","C. Chandramouli","Vivek Joshi","Rajiv Kumar"],"Mritunjay Kumar Narayan heads the ORGI for Census 2027.","p"],
+["L2","What was the motto of Census 2011?",["Our Census, Our Future","Count Every Indian","Har Ghar Ginti","Janganana se Vikas"],"हमारी जनगणना, हमारा भविष्य."],
+["L2","The mascot of Census 2011 was",["A woman enumerator","A tiger","A peacock","A pigeon"],"A female enumerator. Many enumerators were school teachers, which is why a lecture calls her a शिक्षिका.","p"],
+["L2","Census 2011 had two phases. The first phase was",["Houselisting and Housing Census","Population Enumeration","Caste enumeration","National Register of Citizens"],"Phase 1: Houselisting (Apr–Sep 2010). Phase 2: Population Enumeration (Feb 2011)."],
+["L2","Population Enumeration for Census 2011 was carried out during",["9 – 28 February 2011","1 – 15 March 2011","April – September 2010","1 – 30 October 2010"],"A revisional round followed on 1–5 March 2011."],
+["L2","Houselisting operations of Census 2011 were held during",["April – September 2010","February 2011","January – March 2010","October – December 2011"],"Each state used a 45-day window within April–September 2010."],
+["L2","What was the reference moment of Census 2011?",["00:00 hrs, 1 March 2011","00:00 hrs, 1 January 2011","00:00 hrs, 9 February 2011","00:00 hrs, 15 August 2010"],"Figures describe India as it stood at the start of 1 March 2011."],
+["L2","Census 2011 covered how many States and UTs?",["35","28","36","29"],"28 States + 7 UTs. Telangana was formed later, in 2014."],
+["L2","How many districts were covered in Census 2011?",["640","593","707","766"],"2001 had 593 districts."],
+["L2","The office of the Registrar General & Census Commissioner has been permanent since",["1961","1948","1951","1971"],"Until 1961 a temporary set-up was created for each census and wound up afterwards."],
+["L2","Under the Census Act 1948, an individual's census answers are",["Confidential and not admissible as evidence in court","Available to police on request","Published household-wise","Shared with the Income Tax Department"],"This secrecy is what makes people answer honestly."],
+["L2","Which Article provides for readjusting Lok Sabha seats after every census?",["Article 82","Article 81","Article 170","Article 330"],"Article 170 does the same for State Assemblies."],
+["L2","How many times has a Delimitation Commission been set up in India?",["4","3","5","2"],"1952, 1963, 1973 and 2002."],
+["L2","Which Amendment froze the allocation of Lok Sabha seats until the first census after 2026?",["84th (2001)","42nd (1976)","87th (2003)","91st (2003)"],"The 42nd had frozen it till 2000; the 84th extended it."],
+["L2","Which Amendment allowed constituency boundaries to be redrawn on the basis of the 2001 census?",["87th","84th","42nd","61st"],"Seat numbers per state stayed frozen; only boundaries changed."],
+["L2","The National Population Register (NPR) was first prepared along with which census?",["2011","2001","1991","2027"],"NPR data was collected with the 2010 houselisting phase of Census 2011."],
+["L2","The Census 2011 schedules were canvassed in how many languages?",["16","22","14","18"],"16 languages (training manuals were in 18)."],
+["L2","Consider: 1. Census is a Union subject. 2. An individual's census data can be produced as evidence in court. Which is correct?",["Only 1","Only 2","Both 1 and 2","Neither 1 nor 2"],"Census is in the Union List; individual data is confidential under the Census Act.","",0,1],
+["L2","Which office publishes the Sample Registration System (SRS) birth and death rates?",["Office of the Registrar General of India","National Statistical Office","NITI Aayog","ICMR"],"ORGI runs the Census, SRS and the Civil Registration System."],
+/* L3 */
+["L3","According to Census 2011 (final), India's population was about",["121.09 crore","102.87 crore","128.6 crore","138 crore"],"Provisional: 121.02 crore (1210.2 million). 2001: 102.87 crore."],
+["L3","India's share of world population in 2011 was",["17.5%","2.4%","19.4%","12.5%"],"On only 2.4% of the world's area. China then had about 19.4%.","p"],
+["L3","India's share of the world's land area is about",["2.4%","17.5%","5.2%","6.4%"],"2.4% of area, 17.5% of people.","p"],
+["L3","Which state had the largest population in 2011?",["Uttar Pradesh","Maharashtra","Bihar","West Bengal"],"19.98 crore, about 16.5% of India.","p"],
+["L3","Uttar Pradesh accounts for about what share of India's population (2011)?",["16.5%","9.3%","8.6%","12.3%"],"Nearly 20 crore people. Maharashtra 9.3%, Bihar 8.6%.","p"],
+["L3","Which state had the smallest population in 2011?",["Sikkim","Goa","Mizoram","Arunachal Pradesh"],"About 6.1 lakh.","p"],
+["L3","Which is the second least populous state (2011)?",["Mizoram","Sikkim","Goa","Nagaland"],"Sikkim < Mizoram < Arunachal Pradesh."],
+["L3","Which Union Territory had the largest population in 2011?",["Delhi","Puducherry","Chandigarh","Lakshadweep"],"About 1.68 crore.","p"],
+["L3","Which UT had the smallest population in 2011?",["Lakshadweep","Daman & Diu","Andaman & Nicobar Islands","Dadra & Nagar Haveli"],"64,473 people. It is also the smallest UT by area."],
+["L3","The most populous district in Census 2011 was",["Thane","Mumbai Suburban","North 24 Parganas","Bengaluru"],"About 1.1 crore people, in Maharashtra.","p"],
+["L3","The least populous district in Census 2011 was",["Dibang Valley","Longleng","Lahaul & Spiti","Kurung Kumey"],"In Arunachal Pradesh, about 8,000 people."],
+["L3","Which city had the largest population in 2011?",["Greater Mumbai","Delhi","Kolkata","Chennai"],"Greater Mumbai is also the largest urban agglomeration.","p"],
+["L3","Which of these states had more than 100 million (10 crore) people in 2011?",["Bihar","West Bengal","Madhya Pradesh","Tamil Nadu"],"Only UP, Maharashtra and Bihar crossed 10 crore.","p"],
+["L3","Arrange in decreasing order of population (2011): 1. Bihar 2. Maharashtra 3. West Bengal 4. Uttar Pradesh",["4, 2, 1, 3","4, 1, 2, 3","2, 4, 1, 3","4, 2, 3, 1"],"UP > Maharashtra > Bihar > West Bengal."],
+["L3","Males formed about what share of India's population in 2011?",["51.5%","48.5%","50.2%","53.1%"],"51.47% final (51.54% provisional). Females 48.5%."],
+["L3","Which is the largest state of India by area?",["Rajasthan","Madhya Pradesh","Maharashtra","Uttar Pradesh"],"About 10.4% of India's area. Smallest state by area: Goa."],
+["L3","Which statement about the decade 2001–11 is correct?",["It added slightly fewer people than 1991–2001, a first since 1911–21","India's population declined","It added the largest number of people ever","Its growth rate was the highest since independence"],"The growth rate and even the absolute addition fell slightly."],
+["L3","According to UN estimates, in 2023 India became",["The world's most populous country","The second most populous country","The third most populous country","The most densely populated country"],"India overtook China in April 2023. Census 2011 data still showed China ahead."],
+["L3","The smallest State of India by area is",["Goa","Sikkim","Tripura","Nagaland"],"Goa. The smallest UT is Lakshadweep."],
+/* L4 */
+["L4","India's decadal population growth during 2001–11 was about",["17.7%","21.54%","24.8%","13.3%"],"17.70% final, 17.64% provisional. 1991–2001 was 21.54%."],
+["L4","Decadal growth of India's population during 1991–2001 was",["21.54%","17.64%","23.87%","24.66%"],"It fell to 17.7% in 2001–11."],
+["L4","India's average annual exponential growth rate during 2001–11 was",["1.64%","1.97%","2.2%","1.2%"],"It was 1.97% in 1991–2001."],
+["L4","Which decade recorded India's highest decadal growth rate?",["1961–71","1951–61","1971–81","1981–91"],"24.80%. Lecture hook: Indira Gandhi's early years.","p"],
+["L4","The only decade in which India's population fell was",["1911–21","1901–11","1921–31","1941–51"],"−0.31%: influenza pandemic of 1918, famines, World War I.","p"],
+["L4","India's population growth in 1911–21 was",["−0.31%","+5.75%","−0.03%","+11.00%"],"Some lectures say −0.03%; the correct figure is −0.31%."],
+["L4","Which state had the highest decadal growth in 2001–11?",["Meghalaya","Bihar","Arunachal Pradesh","Uttar Pradesh"],"27.9% (provisional 27.8%). Then Arunachal 26.0%, Bihar 25.4%. Trick: मेघ → बारिश → पकौड़े.","p"],
+["L4","Which state had the second highest decadal growth in 2001–11?",["Arunachal Pradesh","Bihar","Meghalaya","Jharkhand"],"Meghalaya 27.9% > Arunachal 26.0% > Bihar 25.4%."],
+["L4","Which was the only state with negative population growth in 2001–11?",["Nagaland","Kerala","Goa","Manipur"],"−0.58% (final) / −0.47% (provisional). Trick: नाग काट लेगा.","p"],
+["L4","Nagaland's population growth in 2001–11 was about",["−0.58%","−58%","−4.7%","+0.58%"],"−58% is Longleng district, not the state."],
+["L4","Among states with positive growth, which grew the least in 2001–11?",["Kerala","Goa","Tamil Nadu","Andhra Pradesh"],"Kerala 4.9%, then Goa 8.2%."],
+["L4","Which UT recorded the highest decadal growth in 2001–11?",["Dadra & Nagar Haveli","Daman & Diu","Delhi","Puducherry"],"55.9% (provisional 55.5%). Daman & Diu was next at 53.8%."],
+["L4","Which UT recorded the lowest decadal growth in 2001–11?",["Lakshadweep","Chandigarh","Andaman & Nicobar Islands","Puducherry"],"6.3%."],
+["L4","Which district had the highest decadal growth in 2001–11?",["Kurung Kumey","Longleng","Thane","Dibang Valley"],"About 111%, in Arunachal Pradesh."],
+["L4","Which district recorded the lowest (negative) growth in 2001–11?",["Longleng","Kurung Kumey","Kiphire","Zunheboto"],"About −58.4%, in Nagaland."],
+["L4","India's population in 1951 was about",["36.1 crore","23.8 crore","43.9 crore","54.8 crore"],"1901: 23.8 crore; 1961: 43.9 crore; 1971: 54.8 crore."],
+["L4","India's population in 1901 was about",["23.8 crore","36.1 crore","25.2 crore","31.9 crore"],"238 million."],
+["L4","India added about how many people during 2001–11?",["18.2 crore","10.2 crore","24.8 crore","12.1 crore"],"About 181–182 million, nearly equal to the population of Brazil."],
+["L4","‘Census 2011 recorded the lowest growth since independence’ means that",["The rate of growth fell, but population still increased","Population decreased","The birth rate became zero","Population stopped growing"],"Like disinflation: prices still rise, only more slowly."],
+["L4","During 2001–11, which grew faster?",["Female population (18.1%)","Male population","Both grew equally","Female population declined"],"Provisional: females 18.12%, males 17.19%."],
+/* L5 */
+["L5","Population density refers to",["Number of people per square kilometre","Total population of a region","Ratio of urban to rural people","Number of people per household"],"Density = population ÷ area.","p"],
+["L5","India's population density in 2011 was",["382","325","117","412"],"2001: 325; 1951: 117.","p"],
+["L5","India's population density in 2001 was",["325","382","267","216"],"It rose to 382 by 2011."],
+["L5","India's population density in 1951 was",["117","142","77","382"],"117 per km² in 1951.","p"],
+["L5","Which state had the highest population density in 2011?",["Bihar","West Bengal","Kerala","Uttar Pradesh"],"1,106 per km² (provisional 1,102).","p"],
+["L5","Which state had the second highest density in 2011?",["West Bengal","Kerala","Uttar Pradesh","Haryana"],"1,028 per km²; Kerala third at 860."],
+["L5","Which state had the lowest population density in 2011?",["Arunachal Pradesh","Mizoram","Sikkim","Himachal Pradesh"],"Only 17 per km².","p"],
+["L5","Delhi's population density in 2011 was about",["11,320 per km²","1,106 per km²","9,258 per km²","37,346 per km²"],"About 10 times Bihar. Chandigarh: 9,258.","p"],
+["L5","Which UT had the lowest density in 2011?",["Andaman & Nicobar Islands","Lakshadweep","Dadra & Nagar Haveli","Daman & Diu"],"46 per km²."],
+["L5","Which district had the highest density in 2011?",["North East Delhi","Kolkata","Chennai","Mumbai"],"37,346 per km²."],
+["L5","Population density is calculated as",["Total population ÷ total area","Total area ÷ total population","Births ÷ deaths × 1,000","Urban ÷ rural population"],"Expressed as persons per km²."],
+/* L6 */
+["L6","In India, sex ratio is defined as",["Number of females per 1,000 males","Number of males per 1,000 females","Females per 100 males","Girl births per 1,000 births"],"India uses females per 1,000 males.","p"],
+["L6","India's sex ratio in Census 2011 was",["943","933","927","918"],"943 final (940 provisional). 2001: 933, so a rise of 10."],
+["L6","India's sex ratio in Census 2001 was",["933","943","927","946"],"933 → 943 in 2011.","p"],
+["L6","Which state had the highest sex ratio in 2011?",["Kerala","Tamil Nadu","Andhra Pradesh","Chhattisgarh"],"1,084, the only state above 1,000."],
+["L6","Which state had the second highest sex ratio in 2011?",["Tamil Nadu","Andhra Pradesh","Chhattisgarh","Meghalaya"],"996 (final)."],
+["L6","Which state had the lowest sex ratio in 2011?",["Haryana","Punjab","Jammu & Kashmir","Sikkim"],"879. Then J&K 889 (a state in 2011), Sikkim 890, Punjab 895.","p"],
+["L6","Which State/UT had the lowest sex ratio of all in 2011?",["Daman & Diu","Haryana","Dadra & Nagar Haveli","Chandigarh"],"618. Then D&NH 774, Chandigarh 818, Delhi 868, A&N 876, Haryana 879. Trick: लड़कियों का दमन.","p"],
+["L6","Which UT had the highest sex ratio in 2011?",["Puducherry","Lakshadweep","Delhi","Chandigarh"],"1,037 final (1,038 provisional).","p"],
+["L6","Which district had the highest sex ratio in 2011?",["Mahe","Almora","Karaikal","Yanam"],"Mahe, part of Puducherry UT."],
+["L6","Mahe, a district of Puducherry, lies geographically within",["Kerala","Tamil Nadu","Andhra Pradesh","Karnataka"],"Puducherry & Karaikal: Tamil Nadu coast; Mahe: Kerala; Yanam: Andhra Pradesh."],
+["L6","Which district had the lowest sex ratio in 2011?",["Daman","Gurgaon","Jhajjar","Mahe"],"Daman, in the UT of Daman & Diu."],
+["L6","India's child sex ratio (0–6 years) in Census 2011 (final) was",["918","927","943","976"],"Provisional 914; some books print 919. 2001: 927."],
+["L6","India's child sex ratio in 2001 was",["927","933","945","918"],"It fell to 918 in 2011."],
+["L6","Which state had the lowest child sex ratio in 2011?",["Haryana","Punjab","Delhi","Rajasthan"],"834; Punjab 846."],
+["L6","Which state had the highest child sex ratio in 2011 (final data)?",["Arunachal Pradesh","Kerala","Haryana","Punjab"],"972. Mizoram and Meghalaya (970) follow; provisional data put Mizoram first. Kerala is not the top here."],
+["L6","Which UT had the lowest child sex ratio in 2011?",["Delhi","Puducherry","Lakshadweep","Andaman & Nicobar Islands"],"871."],
+["L6","Which UT had the highest child sex ratio in 2011?",["Andaman & Nicobar Islands","Delhi","Chandigarh","Lakshadweep"],"968."],
+["L6","Which district had the lowest child sex ratio in 2011?",["Jhajjar","Mahe","Lahaul & Spiti","Thane"],"Jhajjar, Haryana. Highest: Lahaul & Spiti, Himachal Pradesh."],
+["L6","In which census since 1901 was India's overall sex ratio the lowest?",["1991","1971","2001","1901"],"927 in 1991. The highest was 972 in 1901."],
+["L6","India's sex ratio in 1951 was",["946","972","930","943"],"946 in 1951."],
+["L6","Which is the only State with a sex ratio above 1,000 in 2011?",["Kerala","Tamil Nadu","Goa","Andhra Pradesh"],"Puducherry (1,037) is above 1,000 too, but it is a UT."],
+["L6","Beti Bachao Beti Padhao, started in response to the falling child sex ratio, was launched at",["Panipat, Haryana","Jhajjar, Haryana","Jaipur, Rajasthan","New Delhi"],"22 January 2015."],
+["L6","Which statement about Census 2011 is correct?",["Overall sex ratio rose but child sex ratio fell","Both overall and child sex ratio rose","Both fell","Overall fell but child sex ratio rose"],"Overall 933 → 943; child 927 → 918."],
+/* L7 */
+["L7","For the Census, a ‘literate’ person is one who",["Is 7 or older and can read and write with understanding in any language","Has passed Class 5","Is 6 or older and can sign their name","Can read and write a scheduled language"],"No formal schooling is required.","p"],
+["L7","India's literacy rate as per Census 2011 was",["74.04%","64.83%","82.14%","65.46%"],"Provisional 74.04% (final 72.98%).","p"],
+["L7","India's male literacy rate in 2011 was",["82.14%","74.04%","75.26%","65.46%"],"75.26% was the 2001 male rate.","p"],
+["L7","India's female literacy rate in 2011 was",["65.46%","53.67%","74.04%","82.14%"],"53.67% was the 2001 female rate.","p"],
+["L7","The gap between male and female literacy in 2011 was",["16.68 points","21.59 points","9.21 points","27.85 points"],"It was 21.59 points in 2001. 27.85 is Rajasthan's gap."],
+["L7","India's literacy rate in 2001 was",["64.83%","52.21%","74.04%","43.57%"],"It rose 9.21 points to 74.04% in 2011."],
+["L7","India's literacy rate in 1951 was",["18.33%","8.86%","27.16%","28.30%"],"Male 27.16%, female 8.86%.","p"],
+["L7","Female literacy in 1951 was",["8.86%","18.33%","27.16%","15.35%"],"It rose to 65.46% by 2011."],
+["L7","Which state had the highest literacy rate in 2011?",["Kerala","Mizoram","Goa","Tripura"],"93.91%, rounded to 94%.","p"],
+["L7","Among states, which had the second highest literacy rate in 2011?",["Mizoram","Goa","Tripura","Himachal Pradesh"],"91.58%. Lakshadweep (92.28%) is higher but it is a UT.","p"],
+["L7","Which state had the lowest literacy rate in 2011?",["Bihar","Arunachal Pradesh","Rajasthan","Jharkhand"],"63.82% provisional, 61.80% final."],
+["L7","Which state had the second lowest literacy rate in 2011?",["Arunachal Pradesh","Rajasthan","Jharkhand","Andhra Pradesh"],"Bihar < Arunachal < Rajasthan."],
+["L7","Which UT had the highest literacy rate in 2011?",["Lakshadweep","Delhi","Chandigarh","Puducherry"],"92.28%."],
+["L7","Which UT had the lowest literacy rate in 2011?",["Dadra & Nagar Haveli","Daman & Diu","Andaman & Nicobar Islands","Delhi"],"77.65%."],
+["L7","Which district had the highest literacy rate in 2011?",["Serchhip","Aizawl","Kottayam","Pathanamthitta"],"98.76%, then Aizawl."],
+["L7","Serchhip, the most literate district in 2011, is in",["Mizoram","Kerala","Tripura","Nagaland"],"Both top districts, Serchhip and Aizawl, are in Mizoram."],
+["L7","Which district had the lowest literacy rate in 2011?",["Alirajpur","Bijapur","Dantewada","Jhabua"],"Alirajpur, Madhya Pradesh: 37.22%."],
+["L7","Which state had the largest gap between male and female literacy in 2011?",["Rajasthan","Jharkhand","Bihar","Uttar Pradesh"],"27.85 points (male 80.51%, female 52.66%). Jharkhand is second. Trick: घूंघट.","p"],
+["L7","Which state had the smallest gap between male and female literacy in 2011?",["Meghalaya","Kerala","Mizoram","Goa"],"3.39 points; Kerala next."],
+["L7","Which state had the lowest female literacy in 2011?",["Rajasthan","Bihar","Jharkhand","Uttar Pradesh"],"52.66%."],
+["L7","Which state had the lowest male literacy in 2011?",["Bihar","Rajasthan","Arunachal Pradesh","Jharkhand"],"73.39%."],
+["L7","During 2001–11 the largest improvement in literacy was among",["Rural females","Urban males","Urban females","Rural males"],"Female literacy rose faster than male literacy, most of all in villages."],
+["L7","Which state had the highest female literacy in 2011?",["Kerala","Mizoram","Goa","Tripura"],"91.98%."],
+["L7","Male literacy in 1951 was",["27.16%","18.33%","8.86%","40.40%"],"40.40% was the 1961 figure."],
+/* L8 */
+["L8","What share of India's population lived in urban areas in 2011?",["31.16%","27.81%","68.84%","37.7%"],"31.16% provisional (31.14% final). 2001: 27.81%. Rural: 68.84%.","p"],
+["L8","Which state was the most urbanised in 2011?",["Goa","Mizoram","Tamil Nadu","Maharashtra"],"62.17%; Mizoram 52.1%."],
+["L8","Which state was the least urbanised in 2011?",["Himachal Pradesh","Bihar","Assam","Odisha"],"10.03%; Bihar 11.29%."],
+["L8","Which state had the largest urban population by number in 2011?",["Maharashtra","Uttar Pradesh","Tamil Nadu","West Bengal"],"About 5.08 crore. UP has the largest rural population."],
+["L8","Which UT was the most urbanised in 2011?",["Delhi","Chandigarh","Puducherry","Lakshadweep"],"97.5%; Chandigarh 97.3%."],
+["L8","How many million-plus cities/urban agglomerations were there in 2011?",["53","35","46","23"],"35 in 2001."],
+["L8","The largest urban agglomeration in 2011 was",["Greater Mumbai","Delhi","Kolkata","Chennai"],"18.4 million; Delhi 16.3 m; Kolkata 14.1 m."],
+["L8","Which is NOT a criterion for a ‘census town’?",["Population of at least 1,00,000","Population of at least 5,000","Density of at least 400 per km²","At least 75% of male main workers in non-farm work"],"All three of the other conditions must hold together."],
+["L8","In Census 2011, for the first time since independence,",["The absolute increase in urban population exceeded that in rural population","Urban population exceeded rural population","Rural population declined","The urban share crossed 50%"],"Urban +9.1 crore vs rural +9.0 crore."],
+["L8","The 0–14 age group formed about what share of India's population in 2011?",["30.8%","60.3%","8.6%","13.1%"],"30.76%. 15–59: about 60.3%; 60+: 8.6%.","p"],
+["L8","Which age group made up the largest share of India's population in 2011?",["15–59 years","0–14 years","60 years and above","0–6 years"],"About 60%, which is why India talks of a demographic dividend."],
+["L8","Elderly people (60+) formed about what share of India's population in 2011?",["8.6%","13.1%","30.8%","4.2%"],"About 10.4 crore people."],
+["L8","As per the Technical Group on Population Projections (July 2020), India's elderly population by 2031 is projected at about",["193.4 million","103.8 million","138 million","250 million"],"It was about 104 million in 2011 and about 138 million in 2021.","p"],
+["L8","Children aged 0–6 formed about what share of the population in 2011?",["13.1%","30.8%","8.6%","18.3%"],"13.12% provisional (13.6% final). The 0–6 population fell 3.08% compared with 2001."],
+["L8","India's work participation rate in 2011 was about",["39.8%","53.3%","25.5%","60.3%"],"Male 53.3%, female 25.5%."],
+["L8","What happened for the first time in Census 2011 regarding workers?",["Agricultural labourers outnumbered cultivators","Cultivators outnumbered all other workers","Women outnumbered men among workers","Household industry became the largest category"],"Agricultural labourers 30.0% of workers vs cultivators 24.6%."],
+["L8","Persons with disability formed about what share of the population in 2011?",["2.21%","5.4%","1.1%","8.6%"],"2.68 crore people; disability ‘in movement’ was the largest type."],
+["L8","In which census was the transgender population counted separately for the first time?",["2011","2001","1991","2027"],"Under ‘Other’: about 4.88 lakh."],
+/* L9 */
+["L9","Hindus formed what share of India's population in 2011?",["79.8%","82.2%","14.2%","75.5%"],"It fell below 80% for the first time."],
+["L9","Which is the second largest religious group in India (2011)?",["Muslims","Christians","Sikhs","Buddhists"],"14.2%.","p"],
+["L9","Which is the third largest religious group in India (2011)?",["Christians","Sikhs","Buddhists","Jains"],"Christians 2.3% > Sikhs 1.7%. One lecture puts Sikhs third; that is wrong."],
+["L9","Arrange religious groups by population (2011), largest first",["Hindu > Muslim > Christian > Sikh > Buddhist > Jain","Hindu > Muslim > Sikh > Christian > Buddhist > Jain","Hindu > Muslim > Christian > Buddhist > Sikh > Jain","Hindu > Christian > Muslim > Sikh > Jain > Buddhist"],"Trick: Hari Mama Chai Se Biscuit Jodte."],
+["L9","Muslims formed what share of India's population in 2011?",["14.2%","13.4%","16.6%","8.6%"],"13.4% was the 2001 figure."],
+["L9","Which state has the highest proportion of Hindus (2011)?",["Himachal Pradesh","Uttar Pradesh","Odisha","Chhattisgarh"],"95.17%; Odisha 93.6%.","p"],
+["L9","In 2011, which State had a Muslim majority?",["Jammu & Kashmir","Assam","West Bengal","Kerala"],"68.3% (J&K was a state then). Assam was next at 34.2%."],
+["L9","Which UT had the highest proportion of Muslims in 2011?",["Lakshadweep","Delhi","Puducherry","Daman & Diu"],"96.6%."],
+["L9","Which state has the highest percentage of Christians (2011)?",["Nagaland","Kerala","Goa","Manipur"],"87.9%; Mizoram 87.2%; Meghalaya 74.6%. Kerala has the largest number."],
+["L9","Which state has the largest number of Christians (2011)?",["Kerala","Nagaland","Tamil Nadu","Goa"],"About 61 lakh."],
+["L9","Which is the only Sikh-majority state?",["Punjab","Haryana","Himachal Pradesh","Rajasthan"],"57.7%."],
+["L9","Which state has the largest number of Buddhists?",["Maharashtra","Sikkim","Arunachal Pradesh","Bihar"],"About 77% of India's Buddhists. Highest share: Sikkim (27.4%)."],
+["L9","Which state has the highest proportion of Buddhists?",["Sikkim","Maharashtra","Arunachal Pradesh","Mizoram"],"27.4%."],
+["L9","Which state has the largest number of Jains?",["Maharashtra","Rajasthan","Gujarat","Karnataka"],"About 14 lakh.","p"],
+["L9","Which statement about religious composition (2011) is correct?",["Most Buddhists live in Maharashtra, and Jains are concentrated in Maharashtra, Rajasthan and Gujarat","Muslims are not a majority in any State or UT","Christians live only in towns","Sikhs are the third largest group"],"Muslims are a majority in J&K and Lakshadweep; Christians live in villages too; Christians outnumber Sikhs.","p"],
+["L9","How many religious communities are notified as national minorities?",["6","5","4","7"],"Muslims, Christians, Sikhs, Buddhists, Parsis (1993) and Jains (2014), under the NCM Act 1992.","p"],
+["L9","Which community was notified as a minority in 2014?",["Jains","Parsis","Buddhists","Sikhs"],"The other five were notified in 1993."],
+["L9","Which religious group grew fastest during 2001–11?",["Muslims","Hindus","Christians","Jains"],"24.6%; Hindus 16.8%; Jains slowest at 5.4%."],
+["L9","Which religious group had the highest sex ratio in 2011?",["Christians","Hindus","Sikhs","Jains"],"1,023; Sikhs had the lowest (903)."],
+["L9","Scheduled Castes formed what share of India's population in 2011?",["16.6%","8.6%","14.2%","22.5%"],"20.14 crore."],
+["L9","Scheduled Tribes formed what share of India's population in 2011?",["8.6%","16.6%","10.4%","6.2%"],"10.43 crore."],
+["L9","Which state has the highest proportion of Scheduled Castes?",["Punjab","Uttar Pradesh","West Bengal","Himachal Pradesh"],"31.9%. UP has the largest number."],
+["L9","According to Census 2011, which State/UT has no notified Scheduled Tribe?",["Puducherry","Kerala","Goa","Chhattisgarh"],"Also Punjab, Haryana, Delhi and Chandigarh.","p"],
+["L9","Which state has no Scheduled Caste population (2011)?",["Nagaland","Punjab","Bihar","Uttar Pradesh"],"Also Arunachal Pradesh, Andaman & Nicobar Islands and Lakshadweep."],
+["L9","Which state has the highest proportion of Scheduled Tribes?",["Mizoram","Madhya Pradesh","Jharkhand","Odisha"],"94.4% (UT Lakshadweep 94.8%). Madhya Pradesh has the largest number."],
+["L9","Which state has the largest ST population by number?",["Madhya Pradesh","Mizoram","Odisha","Jharkhand"],"About 14.7% of India's STs."],
+["L9","The largest tribe in India by population is",["Bhil","Gond","Santhal","Munda"],"Gond is second."],
+["L9","According to Census 2011, Hindi is the mother tongue of about",["43.6% of Indians","26.6% of Indians","35.2% of Indians","60.4% of Indians"],"52.83 crore people."],
+["L9","Which is the second most spoken mother tongue in India (Census 2011)?",["Bengali","Marathi","Telugu","Tamil"],"8.03%."],
+["L9","Which language became the third most spoken in 2011, overtaking Telugu?",["Marathi","Tamil","Urdu","Gujarati"],"Marathi 6.86% vs Telugu 6.70%."],
+["L9","Which scheduled language has the fewest speakers (Census 2011)?",["Sanskrit","Bodo","Manipuri","Dogri"],"About 24,800 speakers."],
+["L9","How many languages did Census 2011 record (scheduled + non-scheduled)?",["121","122","99","1,369"],"22 scheduled + 99 non-scheduled = 121. 1,369 is the number of rationalised mother tongues."],
+["L9","Which is the largest non-scheduled language (2011)?",["Bhili/Bhilodi","Gondi","English","Tulu"],"About 1.04 crore speakers."],
+/* L10 */
+["L10","About what share of the world's people live in the 10 most populous countries?",["60%","40%","75%","50%"],"Six of those 10 countries are in Asia (NCERT)."],
+["L10","Of the 10 most populous countries, how many are in Asia?",["6","4","7","5"],"About 60% of the world's people live in these 10 countries."],
+["L10","Which is an economic factor affecting population distribution?",["Minerals and industrialisation","Climate","Soil fertility","Landforms"],"Climate, soil and landforms are geographical factors."],
+["L10","Which is a geographical factor affecting population distribution?",["Availability of water","Urbanisation","Industrialisation","Religious importance"],"Water, landforms, climate and soil are geographical."],
+["L10","The three components of population change are",["Births, deaths and migration","Births, literacy and density","Deaths, sex ratio and migration","Urbanisation, births and density"],"Natural growth = births − deaths; actual growth adds net migration."],
+["L10","Crude Birth Rate (CBR) is measured as",["Live births per 1,000 people in a year","Births per 100 women","Births per 1,000 women aged 15–49","Births per square kilometre"],"CDR is deaths per 1,000 people in a year."],
+["L10","India's crude birth rate and crude death rate for 2011 were",["21.8 and 7.1","17.5 and 2.4","24.8 and 9.1","18.3 and 6.2"],"From the Sample Registration System (SRS) of the RGI, not from the census itself."],
+["L10","A person moving INTO a new place is, for that place, called a/an",["Immigrant","Emigrant","Refugee","Commuter"],"Immigrant = In. For the place left behind, the same person is an emigrant."],
+["L10","A person leaving Kanpur to live in Delhi is, for Kanpur, a/an",["Emigrant","Immigrant","Commuter","Settler"],"Emigrant = Exit."],
+["L10","Which is a pull factor of migration?",["Better job opportunities at the destination","Unemployment at the place of origin","Natural disasters at the place of origin","Political turmoil at the place of origin"],"Pull factors make the destination attractive; push factors make the origin unattractive."],
+["L10","Which is a push factor of migration?",["Epidemics at the place of origin","Peace and stability at the destination","Pleasant climate at the destination","Safety of life and property at the destination"],"The other three are pull factors."],
+["L10","It took over a million years for world population to reach 1 billion, but only about ____ years to go from 5 to 6 billion.",["12","50","100","30"],"This speed-up is called the population explosion (NCERT)."],
+["L10","Demographic transition theory explains population change using",["Birth rate and death rate","Literacy and sex ratio","Density and urbanisation","Migration only"],"It tracks a society from high birth and death rates to low ones."],
+["L10","In the first stage of demographic transition",["Both birth rate and death rate are high","Birth rate is high and death rate is low","Both are low","Birth rate is low and death rate is high"],"Growth is slow; epidemics and famine keep deaths high."],
+["L10","A population explosion occurs in the stage when",["Death rate falls sharply while birth rate stays high","Both birth and death rates are low","Both rates are high","Birth rate falls faster than death rate"],"This is Stage 2."],
+["L10","In India, the period 1901–1921 is called the",["Period of stagnant (stationary) population","Period of steady growth","Period of population explosion","Period of high growth with signs of slowing"],"Both birth and death rates were high. Asked in the Stenographer exam.","p"],
+["L10","The period 1921–1951 in India is called the",["Period of steady population growth","Period of stagnant population","Period of population explosion","Period of declining population"],"Health and sanitation cut the death rate.","p"],
+["L10","The period 1951–1981 in India is known as the",["Period of population explosion","Period of steady growth","Period of stagnant population","Period of declining growth"],"Death rate fell fast while the birth rate stayed high.","p"],
+["L10","India's growth after 1981 is best described as",["High growth but with definite signs of slowing down","Population explosion","Stagnant population","Negative growth"],"Birth rate is falling with female literacy and later marriage.","p"],
+["L10","The fall in India's death rate during 1921–51 was mainly due to",["Better health care and sanitation","Large-scale emigration","The family planning programme","A rising birth rate"],"Fewer deaths with a steady birth rate meant steady growth.","p"],
+["L10","India launched its national family planning programme in",["1952","1969","1976","2000"],"India was the first country in the world to do so. The 4th Plan (1969–74) gave it high priority, but the launch was in 1952."],
+["L10","Thomas Malthus put forward his theory of population in",["1798","1898","1776","1817"],"In ‘An Essay on the Principle of Population’. Asked in the Stenographer exam.","p"],
+["L10","According to Malthus, population grows in ____ progression while food supply grows in ____ progression.",["geometric; arithmetic","arithmetic; geometric","geometric; geometric","arithmetic; arithmetic"],"People multiply (1, 2, 4, 8); food adds (1, 2, 3, 4).","p"],
+["L10","Which are ‘positive checks’ on population according to Malthus?",["Famine, disease and war","Late marriage and moral restraint","Contraception","Migration"],"Late marriage and moral restraint are ‘preventive checks’."],
+["L10","The working-age population is usually taken as",["15–59 years","0–14 years","60 years and above","18–65 years"],"0–14 and 60+ are the dependent groups."],
+["L10","The dependency ratio compares",["People aged 0–14 and 60+ with people aged 15–59","Urban with rural people","Females with males","Literates with illiterates"],"Dependency ratio = (0–14 + 60+) ÷ (15–59) × 100."],
+["L10","The economic boost from a large working-age share of the population is called",["Demographic dividend","Demographic trap","Population explosion","Brain drain"],"India's 15–59 group is about 60% of its people."],
+["L10","A triangular age-sex pyramid with a wide base shows",["An expanding population with a high birth rate","A declining population","A constant population","An ageing population"],"Typical of developing countries such as Nigeria, Kenya, Bangladesh."],
+["L10","Which country is NCERT's example of an expanding (triangular) population pyramid?",["Nigeria","Japan","Australia","Italy"],"Australia: constant; Japan: declining."],
+["L10","A pyramid with a narrow base and a broad top is typical of",["Japan","Nigeria","Bangladesh","Kenya"],"Low birth rate and an ageing population; Italy too."],
+["L10","A bell-shaped pyramid showing a nearly constant population is associated with",["Australia","Nigeria","Kenya","Bangladesh"],"Birth and death rates are nearly equal. The USA is similar."],
+["L10","China's ageing population is mainly linked to its",["One-Child Policy (1980–2015)","One China Policy","Great Leap Forward","Belt and Road Initiative"],"A lecture calls it the ‘One China policy’, which is China's stand on Taiwan."],
+["L10","World population crossed 8 billion on",["15 November 2022","11 July 2023","31 October 2011","1 January 2020"],"It reached 7 billion on 31 October 2011."],
+/* L11 */
+["L11","Census 2027 will be India's",["16th census overall and 8th after independence","15th overall and 7th after independence","17th overall and 9th after independence","16th overall and 7th after independence"],"2011 was 15th and 7th; add one to each."],
+["L11","What is the reference date of Census 2027 for most of India?",["00:00 hrs, 1 March 2027","00:00 hrs, 1 October 2026","00:00 hrs, 1 January 2027","00:00 hrs, 1 April 2026"],"1 October 2026 applies only to snow-bound areas."],
+["L11","The reference date of Census 2027 for Ladakh and snow-bound areas of J&K, Himachal Pradesh and Uttarakhand is",["00:00 hrs, 1 October 2026","00:00 hrs, 1 March 2027","00:00 hrs, 1 September 2026","00:00 hrs, 15 August 2026"],"Enumeration there ran 1–30 September 2026."],
+["L11","Phase I (Houselisting & Housing Census) of Census 2027 ran during",["1 April – 30 September 2026","February 2027","1 March – 31 August 2025","October 2026 – January 2027"],"Each State/UT chose its own 30-day window within this period."],
+["L11","Phase II (Population Enumeration) of Census 2027 is scheduled, for most of India, in",["February 2027","April 2026","September 2026","December 2027"],"The count refers to 00:00 hrs on 1 March 2027."],
+["L11","How long is the optional self-enumeration window before the house-to-house visit?",["15 days","30 days","7 days","45 days"],"The house-to-house phase itself lasts 30 days per State/UT."],
+["L11","Which of these is a first for Census 2027?",["Digital data capture on mobile apps, with a self-enumeration option","First census after independence","First census to count Scheduled Castes","First census under the Census Act 1948"],"It is India's first digital census and the first with self-enumeration."],
+["L11","In Census 2027, caste will be enumerated during which phase?",["Population Enumeration","Houselisting","Self-enumeration only","A separate SECC survey"],"The houselisting phase covers buildings, amenities and assets."],
+["L11","The Cabinet Committee on Political Affairs decided to include caste enumeration in the census on",["30 April 2025","16 June 2025","12 December 2025","1 April 2026"],"16 June 2025 was the gazette notification; 12 Dec 2025 the cost approval."],
+["L11","The caste count in Census 2027 will be the first comprehensive one since",["1931","1951","1941","2011"],"Censuses since 1951 counted only SCs and STs."],
+["L11","The gazette notification declaring Census 2027 was issued on",["16 June 2025","30 April 2025","1 April 2026","12 December 2025"],"It replaced the March 2019 notification for Census 2021."],
+["L11","How much did the Union Cabinet approve for Census 2027 on 12 December 2025?",["₹11,718.24 crore","₹2,200 crore","₹8,754 crore","₹4,102 crore"],"₹8,754 crore was approved in 2019 for Census 2021; ₹4,102 crore is what had been released to States/UTs by August 2026."],
+["L11","Census 2027 operations are monitored in near real time through",["CMMS (Census Management & Monitoring System)","The CRS portal","The NPR portal","PM Gati Shakti"],"CRS is the Civil Registration System for births and deaths."],
+["L11","Who was the first person enumerated in Census 2027, through self-enumeration?",["President Droupadi Murmu","PM Narendra Modi","Home Minister Amit Shah","Vice-President C.P. Radhakrishnan"],"Following the tradition of starting with the First Citizen, on 1 April 2026."],
+["L11","Which will be the first UT to be completely enumerated in Census 2027?",["Ladakh","Lakshadweep","Puducherry","Andaman & Nicobar Islands"],"The whole of Ladakh is snow-bound in winter, so it was counted in September 2026."],
+["L11","Population enumeration in the snow-bound areas was held during",["1 – 30 September 2026","9 – 28 February 2027","1 – 15 August 2026","1 – 5 October 2026"],"Revisional round 1–5 Oct 2026; self-enumeration 17–31 Aug 2026."],
+["L11","In how many languages are the Census 2027 self-enumeration portal and apps available?",["16","22","12","18"],"Census 2011 schedules were also in 16 languages."],
+["L11","Why was the census due in 2021 postponed?",["COVID-19 pandemic","A delimitation dispute","Lack of funds","A change in the Census Act"],"The 2019 notification for Census 2021 was later superseded."],
+["L11","Census 2027 matters for delimitation because the 84th Amendment freeze lasts until",["The first census after 2026","The 2031 census","The 2021 census","The next general election"],"Census 2027 is that first census after 2026."],
+["L11","The women's reservation law (106th Amendment, 2023) will take effect after",["Delimitation based on the first census after the Act","The 2029 general election, automatically","A review of Census 2011 data","Approval by half the states"],"So Census 2027 data is linked to it."],
+["L11","Under the National Population Policy 2000, the long-term goal is a stable population by",["2045","2010","2030","2060"],"Medium-term goal: TFR of 2.1 by 2010.","p"],
+["L11","The medium-term goal of NPP 2000 was to bring the total fertility rate to 2.1 by",["2010","2045","2020","2000"],"2.1 is the replacement level."],
+["L11","Which was the first country to launch a national family planning programme?",["India","China","USA","Japan"],"In 1952, during the First Five Year Plan.","p"],
+["L11","World Population Day is observed on",["11 July","5 June","8 March","2 October"],"5 June is World Environment Day."],
+["L11","About how many field functionaries are deployed for Census 2027?",["About 30 lakh","About 3 lakh","About 1 crore","About 50,000"],"Enumerators, supervisors, master trainers, charge officers and district census officers."],
+["L11","The HLB Creator, a new tool in Census 2027, is used to",["Draw houselisting blocks digitally on satellite imagery","Print census forms","Capture fingerprints","Verify caste certificates"],"It helps avoid gaps and double counting of areas."]
+];
+
+/* ============================================================
+   REVISION DATA
+   ============================================================ */
+const RANKERS = [
+ {p:"Population", rows:[["State ↑","Uttar Pradesh → Maharashtra → Bihar"],["State ↓","Sikkim → Mizoram → Arunachal"],["UT ↑","Delhi"],["UT ↓","Lakshadweep"],["District ↑","Thane"],["District ↓","Dibang Valley"],["City ↑","Greater Mumbai"]]},
+ {p:"Density", rows:[["State ↑","Bihar 1,106 → West Bengal 1,028 → Kerala 860"],["State ↓","Arunachal 17 → Mizoram 52 → Sikkim 86"],["UT ↑","Delhi 11,320"],["UT ↓","Andaman & Nicobar 46"],["District ↑","North East Delhi 37,346"],["District ↓","Dibang Valley 1"]]},
+ {p:"Decadal growth 2001–11", rows:[["State ↑","Meghalaya 27.9 → Arunachal 26.0 → Bihar 25.4"],["State ↓","Nagaland −0.58 → Kerala 4.9 → Goa 8.2"],["UT ↑","Dadra & Nagar Haveli 55.9"],["UT ↓","Lakshadweep 6.3"],["District ↑","Kurung Kumey 111"],["District ↓","Longleng −58.4"]]},
+ {p:"Sex ratio", rows:[["State ↑","Kerala 1,084 → Tamil Nadu 996"],["State ↓","Haryana 879 → J&K 889"],["UT ↑","Puducherry 1,037"],["UT ↓","Daman & Diu 618 (lowest overall)"],["District ↑","Mahe"],["District ↓","Daman"]]},
+ {p:"Child sex ratio (0–6)", rows:[["State ↑","Arunachal 972 → Mizoram 970"],["State ↓","Haryana 834 → Punjab 846"],["UT ↑","Andaman & Nicobar 968"],["UT ↓","Delhi 871"],["District ↑","Lahaul & Spiti"],["District ↓","Jhajjar"]]},
+ {p:"Literacy", rows:[["State ↑","Kerala 93.91 → Mizoram 91.58 → Goa"],["State ↓","Bihar 63.82 → Arunachal → Rajasthan"],["UT ↑","Lakshadweep 92.28"],["UT ↓","Dadra & Nagar Haveli 77.65"],["District ↑","Serchhip 98.76"],["District ↓","Alirajpur 37.22"],["Gap ↑","Rajasthan 27.85 → Jharkhand"],["Gap ↓","Meghalaya 3.39 → Kerala"],["Female ↓","Rajasthan 52.66"],["Male ↓","Bihar 73.39"]]},
+ {p:"Urbanisation", rows:[["State ↑","Goa 62.2 → Mizoram 52.1 → Tamil Nadu"],["State ↓","Himachal 10.0 → Bihar 11.3"],["UT ↑","Delhi 97.5"],["Number ↑","Maharashtra (urban) · UP (rural)"]]},
+ {p:"Religion", rows:[["Hindu % ↑","Himachal Pradesh 95.2"],["Muslim % ↑","Lakshadweep 96.6 · state: J&K 68.3"],["Christian % ↑","Nagaland 87.9 (number: Kerala)"],["Sikh % ↑","Punjab 57.7"],["Buddhist","Share: Sikkim · number: Maharashtra"],["Jain","Number: Maharashtra"]]},
+ {p:"SC / ST", rows:[["SC % ↑","Punjab 31.9"],["SC number ↑","Uttar Pradesh"],["No SC","Arunachal, Nagaland, A&N, Lakshadweep"],["ST % ↑","Lakshadweep 94.8 · state: Mizoram 94.4"],["ST number ↑","Madhya Pradesh"],["No ST","Punjab, Haryana, Delhi, Chandigarh, Puducherry"]]}
+];
+const TILES = [["121.09 cr","Population 2011 (final)"],["17.7%","Decadal growth 2001–11"],["1.64%","Annual growth"],["382","Density per km²"],["943","Sex ratio"],["918","Child sex ratio (0–6)"],["74.04%","Literacy"],["16.68","Male–female literacy gap"],["31.16%","Urban share"],["17.5%","Share of world population"],["2.4%","Share of world area"],["16.6% · 8.6%","SC · ST share"]];
+const DECADES = [
+ ["1901","23.8","—","972","—","77"],["1911","25.2","5.75","964","—","82"],["1921","25.1","−0.31","955","—","81"],["1931","27.9","11.00","950","—","90"],["1941","31.9","14.22","945","—","103"],["1951","36.1","13.31","946","18.33","117"],["1961","43.9","21.64","941","28.30","142"],["1971","54.8","24.80","930","34.45","177"],["1981","68.3","24.66","934","43.57","216"],["1991","84.6","23.87","927","52.21","267"],["2001","102.9","21.54","933","64.83","325"],["2011","121.1","17.70","943","74.04","382"]];
+
+/* ============================================================
+   HELPERS & STATE
+   ============================================================ */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const hash = s => { let h = 5381; for (let i=0;i<s.length;i++) h = ((h<<5)+h + s.charCodeAt(i))|0; return "q"+(h>>>0).toString(36); };
+const shuffle = a => { const b=a.slice(); for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]];} return b; };
+const L = id => LESSONS.find(l => l.id === id);
+const LNUM = id => LESSONS.findIndex(l => l.id === id) + 1;
+
+const QS = QB.map(r => {
+  const fixed = !!r[6];
+  return { t:r[0], q:r[1], o:r[2], e:r[3], p:(r[4]||"").includes("p"), a: fixed ? (r[5]||0) : 0, fixed, id:hash(r[1]) };
+});
+const byLesson = id => QS.filter(q => q.t === id);
+// order of options to show: array of original indexes
+const makePerm = q => q.fixed ? q.o.map((_,i)=>i) : shuffle(q.o.map((_,i)=>i));
+
+const KEY = "census_workbook_v1";
+let S = { ans:{}, bm:{}, les:{}, mocks:[] };
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch(e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
+const record = (q, ok) => { S.ans[q.id] = ok ? 1 : 0; save(); renderTop(); };
+
+function renderTop(){
+  const ids = Object.keys(S.ans).filter(k => QS.some(q => q.id === k));
+  const right = ids.filter(k => S.ans[k] === 1).length;
+  const pct = ids.length ? Math.round(right*100/ids.length) : 0;
+  $("#topstat").innerHTML = `<b>${ids.length}</b>/${QS.length} tried<br><b>${pct}%</b> right now`;
+}
+
+/* ============================================================
+   ROUTING
+   ============================================================ */
+let TAB = "learn";
+let timerId = null;
+function go(tab){
+  TAB = tab;
+  document.querySelectorAll(".nav button").forEach(b => b.setAttribute("aria-current", b.dataset.tab===tab ? "page" : "false"));
+  if (tab === "learn") renderLearn();
+  if (tab === "practice") renderPractice();
+  if (tab === "mock") renderMock();
+  if (tab === "revise") renderRevise();
+  window.scrollTo(0,0);
+  try { history.replaceState(null, "", "#"+tab); } catch(e) {}
+}
+document.querySelectorAll(".nav button").forEach(b => b.addEventListener("click", () => {
+  if (TAB === "mock" && M && M.running && b.dataset.tab !== "mock") { go("mock"); showMockLeave(b.dataset.tab); return; }
+  go(b.dataset.tab);
+}));
+
+/* ============================================================
+   LEARN
+   ============================================================ */
+function renderLearn(){
+  const done = LESSONS.filter(l => S.les[l.id] && S.les[l.id].done).length;
+  const nextIdx = LESSONS.findIndex(l => !(S.les[l.id] && S.les[l.id].done));
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="hero">
+      <span class="eyebrow">Census 2011 · Census 2027 · Human geography</span>
+      <h1>Learn it, test it, revise it</h1>
+      <p>11 short lessons from your three census lectures and two population-geography lectures, with ${QS.length} exam-style questions. Each lesson ends with a quiz and a one-screen summary.</p>
+      <div class="meter" aria-label="Lessons done"><i style="width:${done/LESSONS.length*100}%"></i></div>
+      <div class="row between"><span class="muted num" style="font-size:13px">${done}/${LESSONS.length} lessons done</span>
+      ${nextIdx>=0 ? `<button class="btn pri sm" type="button" data-open="${LESSONS[nextIdx].id}">${done? "Continue" : "Start"}: Lesson ${nextIdx+1}</button>` : `<span class="muted" style="font-size:13px">All lessons done. Try a mock test.</span>`}</div>
+    </div>
+    <div class="lessons">${LESSONS.map((l,i) => {
+      const st = S.les[l.id] || {}; const n = byLesson(l.id).length;
+      return `<button type="button" class="les ${st.done?"done":""} ${i===nextIdx?"next":""}" data-open="${l.id}">
+        <span class="no">${st.done ? "✓" : i+1}</span>
+        <span class="t"><b>${esc(l.title)}</b><span>${l.hi} · ${n} questions</span></span>
+        <span class="sc">${st.best!=null ? `best<br>${st.best}/${n}` : ""}</span></button>`;}).join("")}
+    </div>
+    <p class="foot">Figures are Census 2011 unless marked. Where the lectures got a number wrong, the lesson flags it in a red “Trap” box.</p>
+  </section>`;
+  $("#app").querySelectorAll("[data-open]").forEach(b => b.addEventListener("click", () => openLesson(b.dataset.open, "learn")));
+}
+
+function blockHTML(b){
+  if (b.k==="p") return `<div class="plain"><p>${b.h}</p></div>`;
+  if (b.k==="trick") return `<div class="trick"><span class="lab">Trick</span>${b.h}</div>`;
+  if (b.k==="trap") return `<div class="trap"><span class="lab">Trap · correction</span>${b.h}</div>`;
+  if (b.k==="facts") return `<div class="block"><h3>${b.title}</h3><dl class="facts">${b.rows.map(r=>`<div><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join("")}</dl></div>`;
+  if (b.k==="tl") return `<div class="block"><h3>${b.title}</h3><ul class="tl">${b.rows.map(r=>`<li><span class="y">${r[0]}</span><span>${r[1]}</span></li>`).join("")}</ul></div>`;
+  if (b.k==="table") {
+    const isNum = (ci) => b.numcol==="all" ? ci>0 : (b.numcol===1 && ci===1) || (typeof b.numcol==="string" && b.numcol.includes(String(ci)));
+    return `<div class="block"><h3>${b.title}</h3><div class="tbl"><table><thead><tr>${b.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${b.rows.map(r=>`<tr>${r.map((c,ci)=>`<td class="${isNum(ci)?"n":""}">${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+  }
+  if (b.k==="fig") return `<div class="block"><h3>${b.title}</h3><figure class="fig">${b.svg}<figcaption>${b.cap}</figcaption></figure></div>`;
+  if (b.k==="pyr") return `<div class="block"><h3>${b.title}</h3><div class="pyr">${b.items.map(it=>`<div>${PYR(it.rows)}<b>${it.name}</b><span class="muted">${it.note}</span></div>`).join("")}</div><p class="muted" style="font-size:13px;margin-top:8px"><span style="color:var(--blue)">■</span> males · <span style="color:var(--accent)">■</span> females · top = old, base = young</p></div>`;
+  return "";
+}
+
+let LQ = null;
+function openLesson(id, step){
+  const l = L(id), i = LNUM(id);
+  if (step === "quiz") { LQ = { id, list: shuffle(byLesson(id)).map(q => ({q, perm:makePerm(q)})), i:0, score:0, picked:null }; }
+  const head = `<div class="lhead"><button class="back" type="button" id="lback">‹ Lessons</button></div>
+    <span class="eyebrow">Lesson ${i} of ${LESSONS.length} · ${l.hi}</span><h1>${esc(l.title)}</h1>
+    <div class="steps" role="tablist">
+      <button type="button" data-step="learn" aria-current="${step==="learn"?"step":"false"}">1 · Learn</button>
+      <button type="button" data-step="quiz" aria-current="${step==="quiz"?"step":"false"}">2 · Quiz</button>
+      <button type="button" data-step="sum" aria-current="${step==="sum"?"step":"false"}">3 · Summary</button>
+    </div>`;
+  let body = "";
+  if (step === "learn") {
+    body = `<div class="stack">${l.blocks.map(blockHTML).join("")}
+      <div class="row end"><button class="btn pri" type="button" id="toquiz">Take the quiz · ${byLesson(id).length} questions</button></div></div>`;
+  } else if (step === "quiz") {
+    body = `<div id="lq"></div>`;
+  } else {
+    const nxt = LESSONS[i];
+    body = `<div class="stack"><div class="block"><h3>Remember these</h3><ul class="sum">${l.sum.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>
+      <div class="row between"><button class="btn" type="button" id="relearn">Read again</button>
+      ${nxt ? `<button class="btn pri" type="button" id="nextles">Next: ${esc(nxt.title)}</button>` : `<button class="btn pri" type="button" id="tomock">Take a mock test</button>`}</div></div>`;
+    S.les[id] = Object.assign(S.les[id]||{}, {done:1}); save();
+  }
+  $("#app").innerHTML = `<section class="view stack">${head}${body}</section>`;
+  $("#lback").onclick = () => renderLearn();
+  $("#app").querySelectorAll("[data-step]").forEach(b => b.onclick = () => openLesson(id, b.dataset.step));
+  if (step==="learn") $("#toquiz").onclick = () => openLesson(id,"quiz");
+  if (step==="quiz") renderLQ();
+  if (step==="sum") {
+    $("#relearn").onclick = () => openLesson(id,"learn");
+    const n = $("#nextles"); if (n) n.onclick = () => openLesson(LESSONS[i].id,"learn");
+    const m = $("#tomock"); if (m) m.onclick = () => go("mock");
+  }
+  window.scrollTo(0,0);
+}
+
+function optsHTML(q, perm, state){
+  // state: {picked: originalIndex|null, reveal: bool, sel: originalIndex|null}
+  return perm.map((oi, k) => {
+    let cls = "opt";
+    if (state.reveal) { if (oi === q.a) cls += " ok"; else if (oi === state.picked) cls += " no"; }
+    else if (state.sel === oi) cls += " sel";
+    return `<button type="button" class="${cls}" data-oi="${oi}" ${state.reveal?"disabled":""}><span class="k">${"ABCD"[k]}</span><span>${esc(q.o[oi])}</span></button>`;
+  }).join("");
+}
+function expHTML(q, picked){
+  const ok = picked === q.a;
+  return `<div class="exp">${ok ? `<b class="okl">Correct.</b>` : `<b class="nol">Answer: ${esc(q.o[q.a])}.</b>`} ${esc(q.e)}</div>`;
+}
+function metaHTML(q, no){
+  return `<div class="qmeta"><span class="qno">${no}</span><span class="tag">L${LNUM(q.t)} · ${esc(L(q.t).title)}</span>${q.p?`<span class="tag pyq">Exam-asked</span>`:""}
+  <button type="button" class="bm" data-bm="${q.id}" aria-pressed="${S.bm[q.id]?"true":"false"}" aria-label="Bookmark">${S.bm[q.id]?"★":"☆"}</button></div>`;
+}
+
+function renderLQ(){
+  const box = $("#lq");
+  if (LQ.i >= LQ.list.length) {
+    const n = LQ.list.length, l = L(LQ.id);
+    const st = S.les[LQ.id] || {}; st.best = Math.max(st.best||0, LQ.score); S.les[LQ.id] = st; save();
+    box.innerHTML = `<div class="stack"><div class="block stack"><span class="eyebrow">Quiz done</span>
+      <div class="scorebig"><span class="num">${LQ.score}</span><span class="muted">/ ${n} correct</span></div>
+      <p class="muted">${LQ.score===n ? "Full marks." : LQ.score >= n*0.8 ? "Strong. Review the ones you missed in Practice → Mistakes." : "Read the lesson once more, then retry. Missed questions are saved under Practice → Mistakes."}</p></div>
+      <div class="row between"><button class="btn" type="button" id="retry">Retry quiz</button><button class="btn pri" type="button" id="tosum">See summary</button></div></div>`;
+    $("#retry").onclick = () => openLesson(LQ.id,"quiz");
+    $("#tosum").onclick = () => openLesson(LQ.id,"sum");
+    return;
+  }
+  const it = LQ.list[LQ.i], q = it.q;
+  const reveal = LQ.picked !== null;
+  box.innerHTML = `<div class="stack"><div class="meter"><i style="width:${LQ.i/LQ.list.length*100}%"></i></div>
+    <article class="qcard">${metaHTML(q, `Q${LQ.i+1}/${LQ.list.length}`)}
+    <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {picked:LQ.picked, reveal})}</div>
+    ${reveal ? expHTML(q, LQ.picked) : ""}</article>
+    ${reveal ? `<div class="row end"><button class="btn pri" type="button" id="lqnext">${LQ.i+1 < LQ.list.length ? "Next question" : "Finish"}</button></div>` : `<p class="muted" style="font-size:13px">Score so far: <span class="num">${LQ.score}</span></p>`}</div>`;
+  box.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    if (LQ.picked !== null) return;
+    LQ.picked = +b.dataset.oi; const ok = LQ.picked === q.a; if (ok) LQ.score++; record(q, ok); renderLQ();
+  });
+  bindBM(box);
+  const nx = $("#lqnext"); if (nx) nx.onclick = () => { LQ.i++; LQ.picked = null; renderLQ(); window.scrollTo(0,0); };
+}
+
+function bindBM(root){
+  root.querySelectorAll("[data-bm]").forEach(b => b.onclick = (ev) => {
+    ev.stopPropagation();
+    const id = b.dataset.bm; if (S.bm[id]) delete S.bm[id]; else S.bm[id] = 1; save();
+    b.setAttribute("aria-pressed", S.bm[id] ? "true":"false"); b.textContent = S.bm[id] ? "★" : "☆";
+  });
+}
+
+/* ============================================================
+   PRACTICE
+   ============================================================ */
+let PF = "all", PSHOW = 20, PORDER = null, PPERM = {}, PPICK = {};
+function practiceList(){
+  let list = QS;
+  if (PF === "pyq") list = QS.filter(q => q.p);
+  else if (PF === "wrong") list = QS.filter(q => S.ans[q.id] === 0);
+  else if (PF === "new") list = QS.filter(q => S.ans[q.id] === undefined);
+  else if (PF === "bm") list = QS.filter(q => S.bm[q.id]);
+  else if (PF !== "all") list = QS.filter(q => q.t === PF);
+  if (PORDER) { const pos = new Map(PORDER.map((id,i)=>[id,i])); list = list.slice().sort((a,b)=>(pos.get(a.id)??0)-(pos.get(b.id)??0)); }
+  return list;
+}
+function renderPractice(){
+  const wrongN = QS.filter(q => S.ans[q.id] === 0).length, bmN = QS.filter(q=>S.bm[q.id]).length, pyqN = QS.filter(q=>q.p).length;
+  const chips = [["all",`All ${QS.length}`],["new","Not tried"],["wrong",`Mistakes ${wrongN}`],["pyq",`Exam-asked ${pyqN}`],["bm",`Starred ${bmN}`]].concat(LESSONS.map((l,i)=>[l.id,`L${i+1} ${l.title}`]));
+  const list = practiceList();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Question bank</span><h1>Practice</h1>
+    <p class="muted">Tap an option to check it. Wrong answers go to <b>Mistakes</b> until you get them right.</p></div>
+    <div class="chips" role="group" aria-label="Filter">${chips.map(c=>`<button type="button" class="chip" data-f="${c[0]}" aria-pressed="${PF===c[0]}">${esc(c[1])}</button>`).join("")}</div>
+    <div class="row between"><span class="muted num" style="font-size:13px">${list.length} questions</span>
+      <div class="row"><button class="btn sm ghost" type="button" id="pshuf">${PORDER?"In order":"Shuffle"}</button></div></div>
+    <div class="stack" id="plist"></div>
+  </section>`;
+  $("#app").querySelectorAll("[data-f]").forEach(b => b.onclick = () => { PF = b.dataset.f; PSHOW = 20; PPICK = {}; renderPractice(); });
+  $("#pshuf").onclick = () => { PORDER = PORDER ? null : shuffle(QS.map(q=>q.id)); PSHOW = 20; renderPractice(); };
+  const chipOn = $(`.chip[aria-pressed="true"]`); if (chipOn) chipOn.scrollIntoView({block:"nearest", inline:"center"});
+  drawPList();
+}
+function pCard(q, idx){
+  if (!PPERM[q.id]) PPERM[q.id] = makePerm(q);
+  const picked = PPICK[q.id]; const reveal = picked !== undefined;
+  return `<article class="qcard" data-q="${q.id}">${metaHTML(q, "Q"+(idx+1))}<p class="qt">${esc(q.q)}</p>
+    <div class="opts">${optsHTML(q, PPERM[q.id], {picked: reveal?picked:null, reveal})}</div>${reveal?expHTML(q,picked):""}</article>`;
+}
+function drawPList(){
+  const list = practiceList(), box = $("#plist");
+  if (!list.length) { box.innerHTML = `<p class="empty">${PF==="wrong"?"No mistakes saved. Answer some questions first, or you've cleared them all.":PF==="bm"?"Nothing starred yet. Tap ☆ on any question.":"Nothing here."}</p>`; return; }
+  box.innerHTML = list.slice(0, PSHOW).map((q,i)=>pCard(q,i)).join("") + (list.length > PSHOW ? `<button class="btn" type="button" id="pmore">Show 20 more (${list.length-PSHOW} left)</button>` : "");
+  bindP(box);
+  const more = $("#pmore"); if (more) more.onclick = () => { PSHOW += 20; drawPList(); };
+}
+function bindP(box){ box.querySelectorAll(".qcard").forEach(bindCard); }
+function bindCard(card){
+  card.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    const q = QS.find(x => x.id === card.dataset.q); if (PPICK[q.id] !== undefined) return;
+    PPICK[q.id] = +b.dataset.oi; record(q, PPICK[q.id] === q.a);
+    const idx = +card.querySelector(".qno").textContent.slice(1) - 1;
+    const tmp = document.createElement("div"); tmp.innerHTML = pCard(q, idx); const nc = tmp.firstElementChild;
+    card.replaceWith(nc); bindCard(nc);
+  });
+  bindBM(card);
+}
+
+/* ============================================================
+   MOCK TEST
+   ============================================================ */
+let M = null, MCFG = {n:25, scope:"all", neg:1}, LEAVE_TO = null;
+function renderMock(){
+  if (M && M.running) return drawMockRun();
+  if (M && M.done) return drawMockResult();
+  const hist = (S.mocks||[]).slice(-6).reverse();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Timed, SSC pattern</span><h1>Mock test</h1>
+    <p class="muted">+2 for a right answer, −0.5 for a wrong one, 36 seconds per question (CGL Tier-1 pace). Answers show only after you submit.</p></div>
+    <div class="block stack">
+      <fieldset><legend>Questions</legend><div class="radios">${[10,25,50,100].map(n=>`<label><input type="radio" name="mn" id="mn${n}" value="${n}" ${MCFG.n===n?"checked":""}><span>${n} · ${Math.round(n*36/60)} min</span></label>`).join("")}</div></fieldset>
+      <fieldset><legend>From</legend><select id="mscope" aria-label="Lessons to draw from"><option value="all">All lessons</option><option value="pyq">Exam-asked only</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}" ${MCFG.scope===l.id?"selected":""}>L${i+1} · ${esc(l.title)}</option>`).join("")}</select></fieldset>
+      <label class="row" style="gap:8px;font-weight:600"><input type="checkbox" id="mneg" ${MCFG.neg?"checked":""}> Negative marking (−0.5)</label>
+      <div id="merr" class="muted" style="font-size:14px"></div>
+      <div class="row end"><button class="btn pri" type="button" id="mstart">Start test</button></div>
+    </div>
+    ${hist.length ? `<div class="block"><h3>Recent attempts</h3><div class="hist">${hist.map(h=>`<div><span>${esc(h.d)} · ${h.n} Q</span><span class="num">${h.score}/${h.max} · ${h.acc}%</span></div>`).join("")}</div></div>` : ""}
+  </section>`;
+  $("#mscope").value = MCFG.scope;
+  $("#mstart").onclick = () => {
+    MCFG.n = +(document.querySelector('input[name="mn"]:checked')||{value:25}).value;
+    MCFG.scope = $("#mscope").value; MCFG.neg = $("#mneg").checked ? 1 : 0;
+    let pool = MCFG.scope==="all" ? QS : MCFG.scope==="pyq" ? QS.filter(q=>q.p) : MCFG.scope==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===MCFG.scope);
+    if (!pool.length) { $("#merr").textContent = "No questions in that set yet. Pick another source."; return; }
+    const qs = shuffle(pool).slice(0, MCFG.n);
+    M = { running:true, list: qs.map(q=>({q, perm:makePerm(q)})), ans: qs.map(()=>null), mark: qs.map(()=>false), i:0, neg:MCFG.neg, secs: qs.length*36, start: Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000;
+    startTimer(); drawMockRun();
+  };
+}
+function startTimer(){
+  clearInterval(timerId);
+  timerId = setInterval(() => {
+    if (!M || !M.running) { clearInterval(timerId); return; }
+    const left = Math.max(0, Math.round((M.end - Date.now())/1000));
+    const el = $("#mtime"); if (el) { el.textContent = fmt(left); el.classList.toggle("low", left <= 60); }
+    if (left <= 0) submitMock();
+  }, 1000);
+}
+const fmt = s => `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+function drawMockRun(){
+  const it = M.list[M.i], q = it.q, left = Math.max(0, Math.round((M.end-Date.now())/1000));
+  const answered = M.ans.filter(a=>a!==null).length;
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="mbar"><span class="timer num ${left<=60?"low":""}" id="mtime">${fmt(left)}</span>
+      <span class="muted num" style="font-size:13px;flex:1">Q ${M.i+1}/${M.list.length} · ${answered} answered</span>
+      <button class="btn sm" type="button" id="mpal">${M.showPal?"Hide":"All Qs"}</button></div>
+    ${LEAVE_TO ? `<div class="confirm"><b>Leave the test?</b><span>Your answers so far will be scored now.</span><div class="row"><button class="btn sm pri" type="button" id="lvy">Submit and leave</button><button class="btn sm" type="button" id="lvn">Stay</button></div></div>` : ""}
+    ${M.showPal ? `<div class="block"><div class="pal">${M.list.map((_,k)=>`<button type="button" data-j="${k}" class="${M.ans[k]!==null?"a":""} ${M.mark[k]?"m":""} ${k===M.i?"cur":""}" aria-label="Question ${k+1}">${k+1}</button>`).join("")}</div>
+      <p class="muted" style="font-size:12px;margin-top:8px">Filled = answered · orange line = marked for review</p></div>` : ""}
+    <article class="qcard"><div class="qmeta"><span class="qno">Q${M.i+1}</span><span class="tag">L${LNUM(q.t)}</span>${M.mark[M.i]?`<span class="tag pyq">Marked</span>`:""}</div>
+      <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {sel:M.ans[M.i], reveal:false})}</div></article>
+    <div class="row between"><button class="btn" type="button" id="mprev" ${M.i===0?"disabled":""}>‹ Prev</button>
+      <button class="btn ghost" type="button" id="mmark">${M.mark[M.i]?"Unmark":"Mark"}</button>
+      <button class="btn ghost" type="button" id="mclr" ${M.ans[M.i]===null?"disabled":""}>Clear</button>
+      <button class="btn ${M.i<M.list.length-1?"pri":""}" type="button" id="mnext" ${M.i===M.list.length-1?"disabled":""}>Next ›</button></div>
+    ${M.confirm ? `<div class="confirm"><b>Submit the test?</b><span>${M.list.length-answered} unanswered${M.mark.filter(Boolean).length?`, ${M.mark.filter(Boolean).length} marked for review`:""}.</span><div class="row"><button class="btn sm pri" type="button" id="msubY">Submit</button><button class="btn sm" type="button" id="msubN">Keep going</button></div></div>`
+      : `<button class="btn pri" type="button" id="msub">Submit test</button>`}
+  </section>`;
+  $("#app").querySelectorAll(".opt").forEach(b => b.onclick = () => { M.ans[M.i] = +b.dataset.oi; drawMockRun(); });
+  $("#mprev").onclick = () => { if (M.i>0){M.i--; drawMockRun();} };
+  $("#mnext").onclick = () => { if (M.i<M.list.length-1){M.i++; drawMockRun(); window.scrollTo(0,0);} };
+  $("#mmark").onclick = () => { M.mark[M.i] = !M.mark[M.i]; drawMockRun(); };
+  $("#mclr").onclick = () => { M.ans[M.i] = null; drawMockRun(); };
+  $("#mpal").onclick = () => { M.showPal = !M.showPal; drawMockRun(); };
+  $("#app").querySelectorAll("[data-j]").forEach(b => b.onclick = () => { M.i = +b.dataset.j; drawMockRun(); });
+  const s = $("#msub"); if (s) s.onclick = () => { M.confirm = true; drawMockRun(); };
+  const y = $("#msubY"); if (y) y.onclick = submitMock;
+  const n = $("#msubN"); if (n) n.onclick = () => { M.confirm = false; drawMockRun(); };
+  const lvy = $("#lvy"); if (lvy) lvy.onclick = () => { const t = LEAVE_TO; LEAVE_TO = null; submitMock(); go(t); };
+  const lvn = $("#lvn"); if (lvn) lvn.onclick = () => { LEAVE_TO = null; drawMockRun(); };
+}
+function showMockLeave(tab){ LEAVE_TO = tab; drawMockRun(); }
+function submitMock(){
+  if (!M || !M.running) return;
+  clearInterval(timerId);
+  M.running = false; M.done = true; M.confirm = false;
+  let c=0,w=0,sk=0; const per = {};
+  M.list.forEach((it,k) => {
+    const a = M.ans[k]; const t = it.q.t; per[t] = per[t] || {c:0,n:0}; per[t].n++;
+    if (a===null) sk++; else if (a===it.q.a) { c++; per[t].c++; S.ans[it.q.id]=1; } else { w++; S.ans[it.q.id]=0; }
+  });
+  const max = M.list.length*2, score = +(c*2 - (M.neg? w*0.5 : 0)).toFixed(1);
+  const used = Math.min(M.secs, Math.round((Date.now()-M.start)/1000));
+  M.res = {c,w,sk,score,max,used,per, acc: (c+w) ? Math.round(c*100/(c+w)) : 0};
+  const d = new Date(); const ds = d.toLocaleDateString("en-IN",{day:"numeric",month:"short"})+" "+d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
+  S.mocks = (S.mocks||[]).concat([{d:ds, n:M.list.length, score, max, acc:M.res.acc}]).slice(-20); save(); renderTop();
+  M.filter = "wrong";
+  if (TAB==="mock") drawMockResult();
+}
+function drawMockResult(){
+  const r = M.res;
+  const per = Object.keys(r.per).sort((a,b)=>LNUM(a)-LNUM(b)).map(t => `<div><span>L${LNUM(t)} · ${esc(L(t).title)}</span><span class="num">${r.per[t].c}/${r.per[t].n}</span></div>`).join("");
+  const rows = M.list.map((it,k)=>({it,k})).filter(({it,k}) => M.filter==="all" ? true : M.filter==="wrong" ? (M.ans[k]!==null && M.ans[k]!==it.q.a) : M.ans[k]===null);
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Result</span>
+    <div class="scorebig"><span class="num">${r.score}</span><span class="muted">/ ${r.max} marks</span></div></div>
+    <div class="kpis"><div class="kpi g"><span class="num">${r.c}</span><span>right</span></div><div class="kpi b"><span class="num">${r.w}</span><span>wrong</span></div><div class="kpi"><span class="num">${r.sk}</span><span>skipped</span></div><div class="kpi"><span class="num">${r.acc}%</span><span>accuracy</span></div></div>
+    <p class="muted num" style="font-size:13px">Time used ${fmt(r.used)} of ${fmt(M.secs)}</p>
+    <div class="block"><h3>By lesson</h3><div class="hist">${per}</div></div>
+    <div class="row between"><button class="btn" type="button" id="mnew">New test</button><button class="btn pri" type="button" id="mretry">Retake same questions</button></div>
+    <h2>Review</h2>
+    <div class="chips">${[["wrong",`Wrong ${r.w}`],["skip",`Skipped ${r.sk}`],["all",`All ${M.list.length}`]].map(c=>`<button class="chip" type="button" data-rf="${c[0]}" aria-pressed="${M.filter===c[0]}">${c[1]}</button>`).join("")}</div>
+    <div class="stack">${rows.length ? rows.map(({it,k}) => `<article class="qcard">${metaHTML(it.q, "Q"+(k+1))}<p class="qt">${esc(it.q.q)}</p><div class="opts">${optsHTML(it.q, it.perm, {picked:M.ans[k], reveal:true})}</div>${M.ans[k]===null?`<div class="exp"><b class="nol">Skipped. Answer: ${esc(it.q.o[it.q.a])}.</b> ${esc(it.q.e)}</div>`:expHTML(it.q, M.ans[k])}</article>`).join("") : `<p class="empty">Nothing in this list.</p>`}</div>
+  </section>`;
+  bindBM($("#app"));
+  $("#app").querySelectorAll("[data-rf]").forEach(b => b.onclick = () => { M.filter = b.dataset.rf; drawMockResult(); });
+  $("#mnew").onclick = () => { M = null; renderMock(); };
+  $("#mretry").onclick = () => {
+    const list = M.list.map(it=>({q:it.q, perm:makePerm(it.q)}));
+    M = { running:true, list, ans:list.map(()=>null), mark:list.map(()=>false), i:0, neg:MCFG.neg, secs:list.length*36, start:Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000; startTimer(); drawMockRun();
+  };
+}
+
+/* ============================================================
+   REVISE
+   ============================================================ */
+let RV = "rank", FC = null, FCSCOPE = "all";
+function renderRevise(){
+  const tabs = [["rank","Toppers"],["nums","Numbers"],["time","Timeline"],["tricks","Tricks"],["traps","Traps"],["flash","Flashcards"]];
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Last-day revision</span><h1>Revise</h1></div>
+    <div class="seg" role="tablist">${tabs.map(t=>`<button type="button" role="tab" data-rv="${t[0]}" aria-selected="${RV===t[0]}">${t[1]}</button>`).join("")}</div>
+    <div id="rv" class="stack"></div></section>`;
+  $("#app").querySelectorAll("[data-rv]").forEach(b => b.onclick = () => { RV = b.dataset.rv; renderRevise(); });
+  const box = $("#rv");
+  if (RV === "rank") {
+    box.innerHTML = `<input class="search" id="rks" type="search" placeholder="Search a state, UT or district (e.g. Mizoram)" aria-label="Search toppers"><div id="rkl" class="stack"></div>`;
+    const draw = () => {
+      const s = $("#rks").value.trim().toLowerCase();
+      const cards = RANKERS.map(g => { const rows = g.rows.filter(r => !s || r[1].toLowerCase().includes(s) || g.p.toLowerCase().includes(s)); return rows.length ? `<div class="block"><h3>${esc(g.p)}</h3><dl class="rk">${rows.map(r=>`<div><dt class="${r[0].includes("↑")?"up":r[0].includes("↓")?"dn":""}">${esc(r[0])}</dt><dd>${esc(r[1])}</dd></div>`).join("")}</dl></div>` : ""; }).join("");
+      $("#rkl").innerHTML = cards || `<p class="empty">No match.</p>`;
+    };
+    $("#rks").oninput = draw; draw();
+  }
+  if (RV === "nums") {
+    box.innerHTML = `<div class="tiles">${TILES.map(t=>`<div class="tile"><span class="num">${t[0]}</span><span>${t[1]}</span></div>`).join("")}</div>
+    <div class="block"><h3>Provisional vs final (both appear in papers)</h3><div class="tbl"><table><thead><tr><th>Item</th><th>Provisional</th><th>Final</th></tr></thead><tbody>
+    ${[["Population","121.02 cr","121.09 cr"],["Growth 2001–11","17.64%","17.70%"],["Sex ratio","940","943"],["Child sex ratio","914","918"],["Literacy","74.04%","72.98%"],["Male / female literacy","82.14 / 65.46","80.9 / 64.6"],["Bihar literacy","63.82%","61.80%"],["Nagaland growth","−0.47%","−0.58%"],["Bihar density","1,102","1,106"],["Delhi density","11,297","11,320"],["Urban share","31.16%","31.14%"]].map(r=>`<tr><td>${r[0]}</td><td class="n">${r[1]}</td><td class="n">${r[2]}</td></tr>`).join("")}</tbody></table></div></div>`;
+  }
+  if (RV === "time") {
+    const mx = 25;
+    box.innerHTML = `<div class="block"><h3>Decadal growth %</h3>${DECADES.slice(1).map(d=>{ const v = parseFloat(d[2].replace("−","-")); return `<div class="gbar"><span class="num">${+d[0]-10}–${d[0].slice(2)}</span><span class="tr"><i class="${v<0?"neg":""}" style="width:${Math.max(3,Math.abs(v)/mx*100)}%"></i></span><span class="v">${d[2]}</span></div>`; }).join("")}
+      <p class="muted" style="font-size:13px;margin-top:6px">Peak 1961–71; only fall 1911–21.</p></div>
+      <div class="block"><h3>Census by census</h3><div class="tbl"><table><thead><tr><th>Year</th><th>Pop. (cr)</th><th>Growth %</th><th>Sex ratio</th><th>Literacy %</th><th>Density</th></tr></thead><tbody>${DECADES.map(d=>`<tr>${d.map(c=>`<td class="n">${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div>
+      <p class="muted" style="font-size:13px;margin-top:6px">Literacy is counted in comparable form from 1951. 2011 growth is final (17.64% provisional).</p></div>`;
+  }
+  if (RV === "tricks" || RV === "traps") {
+    const kind = RV==="tricks" ? "trick" : "trap";
+    const items = LESSONS.flatMap((l,i) => l.blocks.filter(b=>b.k===kind).map(b=>({l:i+1, t:l.title, h:b.h})));
+    box.innerHTML = items.map(x => `<div class="${kind}"><span class="lab">L${x.l} · ${esc(x.t)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "flash") drawFlash(box);
+}
+function drawFlash(box){
+  if (!FC) { const pool = FCSCOPE==="all" ? QS : FCSCOPE==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===FCSCOPE); FC = {list: shuffle(pool), i:0, flip:false, known:0}; }
+  const sel = `<select id="fcs" aria-label="Flashcard set"><option value="all">All questions</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}">L${i+1} · ${esc(l.title)}</option>`).join("")}</select>`;
+  if (!FC.list.length || FC.i >= FC.list.length) {
+    box.innerHTML = `<div class="row">${sel}</div><div class="block stack"><h3>${FC.list.length ? "Deck finished" : "No cards in this set"}</h3>${FC.list.length?`<p class="muted">You knew ${FC.known} of ${FC.list.length} on first look.</p>`:""}<div class="row"><button class="btn pri" type="button" id="fcr">Shuffle and restart</button></div></div>`;
+    $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+    $("#fcr").onclick = () => { FC = null; drawFlash(box); }; return;
+  }
+  const q = FC.list[FC.i];
+  box.innerHTML = `<div class="row between">${sel}<span class="muted num" style="font-size:13px">${FC.i+1}/${FC.list.length}</span></div>
+    <button type="button" class="flash" id="fcard" aria-label="Flip card">
+      <span class="side">${FC.flip?"Answer":"Question · tap to flip"}</span>
+      <span class="front">${esc(q.q)}</span>
+      ${FC.flip ? `<span class="ans">${esc(q.o[q.a])}</span><span class="muted">${esc(q.e)}</span>` : ""}
+    </button>
+    <div class="row between"><button class="btn" type="button" id="fca" ${FC.flip?"":"disabled"}>Again later</button><button class="btn pri" type="button" id="fck" ${FC.flip?"":"disabled"}>Got it</button></div>`;
+  $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+  $("#fcard").onclick = () => { FC.flip = !FC.flip; drawFlash(box); };
+  $("#fca").onclick = () => { FC.list.push(q); FC.list.splice(FC.i,1); FC.flip=false; drawFlash(box); };
+  $("#fck").onclick = () => { FC.known++; FC.i++; FC.flip=false; drawFlash(box); };
+}
+
+/* boot */
+renderTop();
+const start = (location.hash||"").replace("#","");
+go(["learn","practice","mock","revise"].includes(start) ? start : "learn");
+</script>
+
+</body>
+</html>

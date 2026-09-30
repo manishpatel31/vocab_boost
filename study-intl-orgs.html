@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script>
+/* शब्दRegister bridge: follows the app's Light / Dark / Auto choice when opened inside the app. */
+(function(){
+  var root = document.documentElement;
+  function apply(t){ if(t === 'dark' || t === 'light') root.setAttribute('data-theme', t); else root.removeAttribute('data-theme'); }
+  try{
+    var q = new URLSearchParams(location.search);
+    if(q.get('theme')) apply(q.get('theme'));
+    if(q.get('embed')) root.classList.add('in-shabd');
+  }catch(e){}
+  window.addEventListener('message', function(e){
+    if(e.origin !== location.origin || !e.data) return;
+    if(e.data.type === 'shabd-theme') apply(e.data.theme);
+  });
+})();
+</script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>International Organisations Workbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Martel:wght@700;800&family=Mukta:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: a diplomatic briefing file — pale teal paper, deep teal ink, claret highlights; one-column app with a bottom tab bar. */
+:root{
+  --paper:#eef2f1; --sheet:#fbfcfc; --sunk:#e1e9e8;
+  --ink:#16293f; --ink2:#4d5d72; --rule:#d2dae3;
+  --blue:#135a6b; --on-blue:#ffffff; --blue-bg:#d9ecef;
+  --accent:#9b2f45; --accent-bg:#f7dfe4;
+  --good:#1b7547; --good-bg:#dff1e6; --bad:#b0271f; --bad-bg:#f8e1de;
+  --warn-bg:#fff2d2;
+  --f-display:"Martel", "Noto Serif Devanagari", Georgia, serif;
+  --f-body:"Mukta", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-num:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r:10px; --nav-h:64px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#0d141e; --sheet:#152030; --sunk:#1b2839;
+  --ink:#e3eaf3; --ink2:#9fb0c4; --rule:#2a3a4f;
+  --blue:#7fcadb; --on-blue:#0d141e; --blue-bg:#173a42;
+  --accent:#f2a0b0; --accent-bg:#3d1c24;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#0d141e; --sheet:#152030; --sunk:#1b2839;
+  --ink:#e3eaf3; --ink2:#9fb0c4; --rule:#2a3a4f;
+  --blue:#7fcadb; --on-blue:#0d141e; --blue-bg:#173a42;
+  --accent:#f2a0b0; --accent-bg:#3d1c24;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
+.wrap{max-width:640px;margin:0 auto;padding-inline:16px;padding-block:0 calc(var(--nav-h) + 28px + env(safe-area-inset-bottom,0px))}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);border-bottom:1px solid var(--rule)}
+.top-in{max-width:640px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px}
+.brand{font-family:var(--f-display);font-weight:800;font-size:17px;line-height:1.2;flex:1;min-width:0}
+.brand small{display:block;font-family:var(--f-body);font-weight:500;font-size:12px;color:var(--ink2);letter-spacing:.02em}
+.stat{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right;white-space:nowrap}
+.stat b{color:var(--ink);font-weight:600}
+
+/* bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--sheet);border-top:1px solid var(--rule);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);height:var(--nav-h)}
+.nav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer}
+.nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav button[aria-current="page"]{color:var(--blue)}
+.nav button[aria-current="page"] span{border-bottom:2px solid var(--blue)}
+
+/* type */
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.25;margin:0}
+h1{font-size:24px;font-weight:800}
+h2{font-size:19px;font-weight:800}
+h3{font-size:16px;font-weight:700}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--ink2)}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+p{margin:0}
+.stack{display:flex;flex-direction:column;gap:14px}
+.view{padding-top:18px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--rule);background:var(--sheet);font-weight:600;cursor:pointer;text-decoration:none}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:var(--on-blue)}
+.btn.ghost{background:transparent}
+.btn.sm{min-height:36px;padding:0 14px;font-size:14px}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.end{justify-content:flex-end}
+.row.between{justify-content:space-between}
+
+/* hero */
+.hero{display:grid;gap:10px;padding:4px 0 6px}
+.hero p{color:var(--ink2)}
+.meter{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--blue);border-radius:99px}
+
+/* lesson list */
+.lessons{display:flex;flex-direction:column;border-top:1px solid var(--rule)}
+.les{display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;padding:14px 2px;border-bottom:1px solid var(--rule);background:none;border-left:0;border-right:0;border-top:0;text-align:left;cursor:pointer;width:100%}
+.les .no{font-family:var(--f-num);font-weight:600;font-size:15px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--rule);color:var(--ink2)}
+.les.done .no{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.les .t{min-width:0}
+.les .t b{display:block;font-weight:700;font-size:16px;line-height:1.3}
+.les .t span{font-size:13px;color:var(--ink2)}
+.les .sc{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right}
+.les.next .no{border-color:var(--blue);color:var(--blue)}
+
+/* lesson reader */
+.lhead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.back{background:none;border:0;padding:8px 8px 8px 0;cursor:pointer;color:var(--blue);font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0 4px}
+.steps button{border:1px solid var(--rule);background:var(--sheet);border-radius:8px;padding:8px 4px;font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer}
+.steps button[aria-current="step"]{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.block{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;min-width:0}
+.block h3{margin-bottom:8px}
+.block p + p{margin-top:8px}
+.plain{padding:0 2px}
+.facts{display:grid;gap:0}
+.facts div{display:grid;grid-template-columns:minmax(0,42%) minmax(0,1fr);gap:10px;padding:7px 0;border-top:1px dashed var(--rule)}
+.facts div:first-child{border-top:0}
+.facts dt{font-size:14px;color:var(--ink2);margin:0}
+.facts dd{margin:0;font-weight:600;min-width:0}
+.tl{display:grid;gap:0;margin:0;padding:0;list-style:none}
+.tl li{display:grid;grid-template-columns:92px 1fr;gap:10px;padding:8px 0;border-top:1px dashed var(--rule)}
+.tl li:first-child{border-top:0}
+.tl .y{font-family:var(--f-num);font-weight:600;font-size:13px;color:var(--accent);padding-top:2px}
+.trick,.trap{border-radius:var(--r);padding:12px 14px 12px 14px;border:1px solid var(--rule)}
+.trick{background:var(--accent-bg);border-color:transparent}
+.trap{background:var(--bad-bg);border-color:transparent}
+.trick .lab,.trap .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.trick .lab{color:var(--accent)}
+.trap .lab{color:var(--bad)}
+.tbl{overflow-x:auto;margin:0 -2px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);font-weight:700}
+td.n{font-family:var(--f-num);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fig{margin:0}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-size:13px;color:var(--ink2);margin-top:6px}
+.pyr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pyr div{text-align:center;font-size:13px}
+.pyr b{display:block;font-size:14px}
+.pm{fill:var(--blue)} .pf{fill:var(--accent)}
+.sum{margin:0;padding-left:20px;display:grid;gap:6px}
+
+/* questions */
+.qcard{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px;min-width:0}
+.qmeta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}
+.qno{font-family:var(--f-num);font-weight:600;color:var(--ink2)}
+.tag{background:var(--sunk);color:var(--ink2);border-radius:99px;padding:1px 9px;font-weight:600}
+.tag.pyq{background:var(--accent-bg);color:var(--accent)}
+.bm{margin-left:auto;background:none;border:0;cursor:pointer;color:var(--ink2);font-size:20px;line-height:1;padding:4px}
+.bm[aria-pressed="true"]{color:var(--accent)}
+.qt{font-weight:600;font-size:16px}
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:start;text-align:left;width:100%;border:1.5px solid var(--rule);background:var(--paper);border-radius:9px;padding:10px 12px;cursor:pointer;min-height:44px}
+.opt .k{font-family:var(--f-num);font-weight:600;color:var(--ink2);font-size:14px;padding-top:1px}
+.opt.sel{border-color:var(--blue);background:var(--blue-bg)}
+.opt.ok{border-color:var(--good);background:var(--good-bg)}
+.opt.no{border-color:var(--bad);background:var(--bad-bg)}
+.opt.ok .k{color:var(--good)} .opt.no .k{color:var(--bad)}
+.opt:disabled{cursor:default;color:inherit}
+.exp{font-size:15px;border-left:3px solid var(--blue);padding:4px 0 4px 12px;color:var(--ink)}
+.exp b.okl{color:var(--good)} .exp b.nol{color:var(--bad)}
+
+/* chips */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 13px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.seg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--rule)}
+.seg::-webkit-scrollbar{display:none}
+.seg button{flex:none;background:none;border:0;border-bottom:2px solid transparent;padding:10px 8px;font-weight:600;color:var(--ink2);cursor:pointer}
+.seg button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+
+/* score panel */
+.scorebig{display:flex;align-items:baseline;gap:8px}
+.scorebig .num{font-size:44px;font-weight:600;line-height:1;color:var(--blue)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.kpi{background:var(--sunk);border-radius:8px;padding:8px;text-align:center}
+.kpi .num{display:block;font-size:20px;font-weight:600}
+.kpi span{font-size:12px;color:var(--ink2)}
+.kpi.g .num{color:var(--good)} .kpi.b .num{color:var(--bad)}
+
+/* mock */
+.mbar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 57px);z-index:10;background:var(--paper);padding:10px 0;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--rule)}
+.timer{font-family:var(--f-num);font-weight:600;font-size:18px;padding:4px 10px;border-radius:8px;background:var(--sunk)}
+.timer.low{background:var(--bad-bg);color:var(--bad)}
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px}
+.pal button{height:40px;border-radius:8px;border:1px solid var(--rule);background:var(--sheet);font-family:var(--f-num);font-weight:600;font-size:13px;cursor:pointer}
+.pal button.a{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.pal button.m{box-shadow:inset 0 -4px 0 var(--accent)}
+.pal button.cur{outline:2px solid var(--ink);outline-offset:1px}
+.pal button.ok{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.pal button.no{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.confirm{background:var(--warn-bg);border-radius:var(--r);padding:12px 14px;display:grid;gap:10px}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}
+legend{font-weight:700;margin-bottom:6px;padding:0}
+.radios{display:flex;gap:8px;flex-wrap:wrap}
+.radios label{border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 14px;font-weight:600;cursor:pointer;font-size:14px}
+.radios input{position:absolute;opacity:0;pointer-events:none}
+.radios input:checked + span{color:var(--blue)}
+.radios label:has(input:checked){border-color:var(--blue);background:var(--blue-bg)}
+.radios label:has(input:focus-visible){outline:2px solid var(--blue);outline-offset:2px}
+select{font:inherit;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:8px;padding:8px 10px;max-width:100%}
+.hist{display:grid;gap:0}
+.hist div{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:14px}
+
+/* revise */
+.search{width:100%;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:10px;padding:10px 12px;font:inherit}
+.rk{display:grid;gap:0}
+.rk div{display:grid;grid-template-columns:minmax(0,48%) 1fr;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:15px}
+.rk div:first-child{border-top:0}
+.rk dt{font-size:13px;color:var(--ink2);margin:0}
+.rk dt.up{color:var(--good)} .rk dt.dn{color:var(--bad)}
+.rk dd{margin:0;font-weight:600;min-width:0}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px}
+.tile .num{display:block;font-size:24px;font-weight:600;color:var(--accent);line-height:1.2}
+.tile span{font-size:13px;color:var(--ink2)}
+.gbar{display:grid;grid-template-columns:78px 1fr 52px;gap:8px;align-items:center;font-size:13px;padding:3px 0}
+.gbar .tr{height:12px;background:var(--sunk);border-radius:3px;position:relative;overflow:hidden}
+.gbar .tr i{position:absolute;left:0;top:0;bottom:0;background:var(--blue);border-radius:3px}
+.gbar .tr i.neg{background:var(--bad)}
+.gbar .v{font-family:var(--f-num);text-align:right}
+.flash{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;min-height:240px;padding:20px 18px;display:grid;align-content:center;gap:12px;cursor:pointer;text-align:left;width:100%}
+.flash .side{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.flash .front{font-size:18px;font-weight:600}
+.flash .ans{font-size:20px;font-weight:700;color:var(--good)}
+.empty{padding:24px 4px;color:var(--ink2);text-align:center}
+.foot{font-size:13px;color:var(--ink2);padding-top:10px}
+@media (prefers-reduced-motion: no-preference){ .opt,.chip,.btn{transition:background-color .15s, border-color .15s} }
+</style>
+<style>[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">International Organisations<small>अंतरराष्ट्रीय संगठन · SSC CGL workbook</small></div>
+    <div class="stat" id="topstat"></div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<nav class="nav" aria-label="Sections">
+  <div class="nav-in">
+    <button type="button" id="nav-learn" data-tab="learn"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg><span>Learn</span></button>
+    <button type="button" id="nav-practice" data-tab="practice"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span>Practice</span></button>
+    <button type="button" id="nav-mock" data-tab="mock"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6M12 2v3"/></svg><span>Mock test</span></button>
+    <button type="button" id="nav-revise" data-tab="revise"><svg viewBox="0 0 24 24"><path d="M12 3 2 8l10 5 10-5z"/><path d="m2 13 10 5 10-5"/></svg><span>Revise</span></button>
+  </div>
+</nav>
+
+<script>
+"use strict";
+/* ============================================================
+   LESSONS — International Organisations
+   ============================================================ */
+const LESSONS = [
+{ id:"L1", title:"United Nations system", hi:"संयुक्त राष्ट्र", blocks:[
+ {k:"p", h:"The lecture skips the UN because fewer questions come from it, but HQ-matching questions on UN agencies are a CGL favourite, so the essentials are here."},
+ {k:"facts", title:"The UN", rows:[["Charter signed","26 June 1945, San Francisco"],["Came into force","24 October 1945 → UN Day"],["HQ","New York"],["Members","193 (latest: South Sudan, 2011)"],["India","Founding member (one of 51 original members)"],["Official languages","6: English, French, Spanish, Russian, Chinese, Arabic"],["Secretary-General","António Guterres (Portugal), 9th SG, since 2017; term ends 31 Dec 2026"],["First SG","Trygve Lie (Norway)"]]},
+ {k:"table", title:"Six principal organs", head:["Organ","Key fact"], rows:[["General Assembly","All 193 members, one vote each"],["Security Council","15 members: 5 permanent with veto (USA, UK, France, Russia, China) + 10 elected for 2 years"],["ECOSOC","54 members; coordinates economic and social work"],["Trusteeship Council","Suspended in 1994 (last trust territory Palau became independent)"],["International Court of Justice","The Hague, Netherlands; 15 judges, 9-year terms. The only principal organ outside New York"],["Secretariat","Headed by the Secretary-General"]]},
+ {k:"trick", h:"<b>P5 = “CRUFU”</b>: China, Russia, UK, France, USA. <b>ICJ</b> is the only principal organ not in New York → The Hague."},
+ {k:"facts", title:"India and the UN", rows:[["UNSC non-permanent seat","8 times; latest 2021–22"],["G4","India, Brazil, Germany, Japan: back each other for permanent seats"],["Uniting for Consensus","‘Coffee Club’ led by Italy (Pakistan a member) opposes new permanent seats"],["First woman UNGA President","Vijaya Lakshmi Pandit (India), 1953"]]},
+ {k:"table", title:"Where UN agencies sit", head:["City","Agencies"], rows:[["Geneva","WHO, ILO, WTO*, UNHCR, WIPO, ITU, WMO, UNCTAD, Human Rights Council"],["Rome","FAO, IFAD, WFP (the food trio)"],["Vienna","IAEA, UNIDO, UNODC (also OPEC*)"],["Paris","UNESCO (also OECD*)"],["New York","UN HQ, UNICEF, UNDP, UNFPA, UN Women"],["Nairobi","UNEP, UN-Habitat"],["Others","ICAO Montreal · IMO London · UPU Bern · UN Tourism Madrid · ICJ & ICC* The Hague"]]},
+ {k:"p", h:"* Not UN agencies but based in that city. ITU (1865) is the oldest agency; ILO (1919) is the only tripartite one (governments, employers, workers) and won the 1969 Nobel Peace Prize. WFP won the Nobel in 2020, IAEA in 2005, UNHCR in 1954 and 1981."},
+ {k:"trick", h:"<b>Rome = खाना</b> (FAO, IFAD, WFP). <b>Nairobi = नेचर</b> (UNEP, UN-Habitat). <b>Vienna = Atom + Drugs + Industry</b> (IAEA, UNODC, UNIDO). <b>Geneva = Health, Labour, Trade, Refugees</b>."},
+ {k:"p", h:"<b>Selection 2026:</b> Guterres's term ends on 31 Dec 2026. The Security Council held straw polls in July, August and September 2026; Rebeca Grynspan (Costa Rica) led the September poll. A Latin American candidate is favoured by rotation. No one has been appointed yet."}],
+ sum:["UN: Charter 26 June 1945; in force 24 Oct 1945; HQ New York; 193 members","6 organs; ICJ at The Hague; Trusteeship Council suspended 1994","P5 with veto: China, Russia, UK, France, USA; India non-permanent 8 times, latest 2021–22","SG António Guterres (9th), term ends 31 Dec 2026","Rome: FAO, IFAD, WFP · Nairobi: UNEP · Vienna: IAEA · Paris: UNESCO · Geneva: WHO, ILO, WTO","G4: India, Brazil, Germany, Japan"]},
+
+{ id:"L2", title:"WTO, IMF, World Bank & development banks", hi:"व्यापार और बैंक", blocks:[
+ {k:"tl", title:"GATT to WTO", rows:[["1947","GATT signed in Geneva by 23 countries, India among them"],["1 Jan 1948","GATT comes into force"],["1986–94","Uruguay Round"],["15 Apr 1994","Marrakesh Agreement signed in Marrakesh, <b>Morocco</b>"],["1 Jan 1995","WTO established; India a founding member"]]},
+ {k:"facts", title:"WTO today", rows:[["HQ","Geneva, Switzerland"],["Members","166"],["Director-General","Ngozi Okonjo-Iweala (Nigeria): first woman and first African DG; second term from Sept 2025"],["Top body","Ministerial Conference, at least every 2 years. MC13 Abu Dhabi (2024), MC14 Yaoundé, Cameroon (March 2026)"],["Peace clause","Bali 2013: protects India's public food stockholding from challenge"]]},
+ {k:"table", title:"WTO farm subsidy boxes", head:["Box","What it holds"], rows:[["Green","No or minimal trade distortion: research, extension, environment programmes, income support not linked to output. No limit"],["Blue","Payments that require farmers to <b>limit production</b>. No limit"],["Amber","Trade-distorting support, e.g. MSP/price support and input subsidies. Capped (de minimis: 10% of output value for developing countries, 5% for developed)"]]},
+ {k:"trick", h:"Traffic light: <b>Green</b> = go (allowed), <b>Amber</b> = slow down (cut it), <b>Blue</b> = amber with a condition (limit production)."},
+ {k:"facts", title:"MSP link (Economy)", rows:[["Who recommends","CACP: Commission for Agricultural Costs and Prices (1965)"],["Who approves","Cabinet Committee on Economic Affairs (CCEA)"],["Crops","22 mandated crops"],["Sugarcane","No MSP; it gets FRP (Fair and Remunerative Price)"]]},
+ {k:"table", title:"Bretton Woods twins and development banks", head:["Body","Founded · HQ","Remember"], rows:[["IMF","1944 Bretton Woods conference; 1945 · Washington DC","MD Kristalina Georgieva; SDR basket: USD, EUR, CNY, JPY, GBP; World Economic Outlook"],["World Bank","1944 (IBRD) · Washington DC","President Ajay Banga; 5 arms: IBRD, IDA, IFC, MIGA, ICSID (India not in ICSID)"],["ADB","1966 · Manila, Philippines","India founding member; President always Japanese: Masato Kanda (2025)"],["AIIB","2015 (operations 2016) · Beijing","China largest shareholder, India 2nd; President Zou Jiayi (2026)"],["NDB","2014 Fortaleza agreement (operations 2015) · Shanghai","Set up by BRICS; first president K.V. Kamath (India); now Dilma Rousseff; India office at GIFT City"]]},
+ {k:"trick", h:"<b>Three banks, three Chinese cities?</b> No: AIIB → <b>Beijing</b>, NDB → <b>Shanghai</b>, ADB → <b>Manila</b>. The SCO is named after Shanghai but sits in Beijing."},
+ {k:"trap", h:"The lecture says China contributed most to NDB, so its HQ is in China. In the <b>NDB</b> the five founders hold <b>equal</b> shares. China's big share (US$41 bn of 100 bn) is in the <b>Contingent Reserve Arrangement (CRA)</b>."}],
+ sum:["GATT 1947 → in force 1 Jan 1948 → Marrakesh (Morocco) 1994 → WTO 1 Jan 1995, Geneva","WTO DG Ngozi Okonjo-Iweala; MC14 Yaoundé, Cameroon 2026","Green = allowed, Blue = limits production, Amber = distorting (MSP)","MSP: CACP recommends; sugarcane gets FRP","IMF & World Bank: Bretton Woods 1944, Washington DC","ADB Manila 1966 · AIIB Beijing 2015/16 · NDB Shanghai 2014"]},
+
+{ id:"L3", title:"SAARC", hi:"सार्क", blocks:[
+ {k:"facts", title:"Basics", rows:[["Founded","8 December 1985 in Dhaka, Bangladesh (SAARC Charter Day)"],["Secretariat","Kathmandu, Nepal (1987)"],["Members","8"],["Founders (7)","Bangladesh, Bhutan, India, Maldives, Nepal, Pakistan, Sri Lanka"],["Newest member","Afghanistan, 2007 (14th summit, New Delhi)"],["Observers","9, incl. China, USA, EU, Japan, Iran, Australia"],["Secretary-General","Md. Golam Sarwar (Bangladesh)"]]},
+ {k:"trick", h:"<b>Born in Dhaka, lives in Kathmandu.</b> BIMSTEC is the reverse story: its secretariat is in Dhaka.<br>Members: <b>“MBBS PAIN”</b> → Maldives, Bangladesh, Bhutan, Sri Lanka, Pakistan, Afghanistan, India, Nepal."},
+ {k:"facts", title:"Status", rows:[["Last summit","18th, Kathmandu, 2014"],["19th summit","Islamabad 2016, cancelled after India's boycott following the Uri attack"],["SAFTA","South Asian Free Trade Area, signed 2004, in force 2006"],["Institutions","South Asian University (New Delhi); SAARC Development Fund (Thimphu)"],["2025","After the Pahalgam attack, India cancelled SAARC visa exemption for Pakistani nationals"]]},
+ {k:"p", h:"Because SAARC is stalled by India–Pakistan tensions, India has shifted regional energy to <b>BIMSTEC</b>, which does not include Pakistan."}],
+ sum:["SAARC: 8 Dec 1985, founded in Dhaka; secretariat Kathmandu","8 members; Afghanistan joined 2007 (newest)","India founding member; Pakistan member","Last summit 18th Kathmandu 2014; Islamabad 2016 cancelled","SAFTA 2004/2006; South Asian University in Delhi"]},
+
+{ id:"L4", title:"BIMSTEC", hi:"बिम्सटेक", blocks:[
+ {k:"facts", title:"Basics", rows:[["Full form","Bay of Bengal Initiative for Multi-Sectoral Technical and Economic Cooperation"],["Founded","6 June 1997, Bangkok Declaration, as BIST-EC"],["Secretariat","Dhaka, Bangladesh (2014)"],["Members","7: Bangladesh, Bhutan, India, Myanmar, Nepal, Sri Lanka, Thailand"],["Region","5 South Asian + 2 South-East Asian (Myanmar, Thailand)"],["Not members","Pakistan, Maldives, Afghanistan"],["Secretary-General","Indra Mani Pandey (India)"]]},
+ {k:"tl", title:"How the name grew", rows:[["June 1997","BIST-EC: Bangladesh, India, Sri Lanka, Thailand"],["Dec 1997","Myanmar joins → BIMST-EC"],["Feb 2004","Nepal and Bhutan join (newest members) → renamed BIMSTEC"]]},
+ {k:"trick", h:"The letters give the members: <b>B</b>angladesh, <b>I</b>ndia, <b>M</b>yanmar, <b>S</b>ri Lanka, <b>T</b>hailand, and the two “silent” <b>N</b>epal + <b>B</b>hutan (they came last, in 2004). BIMSTEC has 7 letters and 7 members."},
+ {k:"table", title:"Summits", head:["No.","Place","Year"], rows:[["1st","Bangkok, Thailand","2004"],["2nd","New Delhi, India","2008"],["3rd","Nay Pyi Taw, Myanmar","2014"],["4th","Kathmandu, Nepal","2018"],["5th","Colombo, Sri Lanka (hybrid): BIMSTEC Charter adopted","2022"],["6th","Bangkok, Thailand: Bangkok Vision 2030, maritime transport pact; chair passed to Bangladesh","April 2025"]]},
+ {k:"table", title:"7 sectors, one lead country each (since 2022)", head:["Lead","Sector"], rows:[["India","Security: counter-terrorism, transnational crime, disaster management, energy"],["Bangladesh","Trade, investment & development"],["Bhutan","Environment & climate change"],["Myanmar","Agriculture & food security"],["Nepal","People-to-people contact"],["Sri Lanka","Science, technology & innovation"],["Thailand","Connectivity"]]},
+ {k:"facts", title:"Centres in India", rows:[["BIMSTEC Energy Centre","Bengaluru"],["Centre for Weather & Climate","Noida (NCMRWF)"]]},
+ {k:"p", h:"History link from the lecture: the <b>Simon Commission</b> (1928–30) recommended separating Burma (Myanmar) from India; separation came in 1937 under the Government of India Act 1935."}],
+ sum:["BIMSTEC: 6 June 1997, Bangkok Declaration; secretariat Dhaka","7 members: BIMST + Nepal, Bhutan; no Pakistan, no Maldives","Myanmar joined Dec 1997; Nepal & Bhutan 2004 (newest)","Charter at 5th summit Colombo 2022; 6th summit Bangkok April 2025","India leads Security (CT, crime, disaster, energy); Energy Centre in Bengaluru"]},
+
+{ id:"L5", title:"IORA & Indian Ocean", hi:"हिंद महासागर", blocks:[
+ {k:"facts", title:"IORA basics", rows:[["Full form","Indian Ocean Rim Association (earlier IOR-ARC: … for Regional Cooperation)"],["Founded","March 1997, Mauritius"],["Secretariat","Ebene (Cybercity), Mauritius"],["Members","23; about 12 dialogue partners"],["Spread","Africa, West Asia, South & South-East Asia, Indian Ocean islands and Australia"],["France","Member since 2020 through Réunion Island"],["India","Founding member; chair 2011–13; chair again 2025–27"]]},
+ {k:"facts", title:"India's ocean vision", rows:[["SAGAR (2015)","Security And Growth for All in the Region, announced by PM Modi in Mauritius"],["MAHASAGAR (2025)","Mutual and Holistic Advancement for Security and Growth Across Regions, announced in Mauritius, March 2025"]]},
+ {k:"trick", h:"<b>Indian Ocean → Mauritius.</b> IORA was born in Mauritius and sits in Ebene; SAGAR (2015) and MAHASAGAR (2025) were both announced in Mauritius."},
+ {k:"facts", title:"Related groups", rows:[["Colombo Security Conclave","India, Sri Lanka, Maldives, Mauritius, Bangladesh; secretariat Colombo"],["Indian Ocean Naval Symposium (IONS)","Started by the Indian Navy, 2008"],["Mekong–Ganga Cooperation","2000, Vientiane: India + Cambodia, Laos, Myanmar, Thailand, Vietnam"],["BBIN","Bangladesh, Bhutan, India, Nepal; Motor Vehicles Agreement 2015"]]}],
+ sum:["IORA: 1997, Mauritius; secretariat Ebene; 23 members","France member via Réunion (2020); Australia member","India founding member; chair 2011–13 and 2025–27","SAGAR 2015 → MAHASAGAR 2025, both in Mauritius","Mekong–Ganga 2000: India + 5 Mekong nations"]},
+
+{ id:"L6", title:"ASEAN & India's Act East", hi:"आसियान", blocks:[
+ {k:"facts", title:"ASEAN basics", rows:[["Founded","8 August 1967, Bangkok Declaration"],["Secretariat","Jakarta, Indonesia"],["Founders (5)","Indonesia, Malaysia, Philippines, Singapore, Thailand"],["Later","Brunei 1984 · Vietnam 1995 · Laos, Myanmar 1997 · Cambodia 1999 · Timor-Leste 2025 (11th)"],["Members","11"],["Secretary-General","Kao Kim Hourn (Cambodia)"],["Chair 2026","Philippines"]]},
+ {k:"trick", h:"Founders <b>“MIST-P”</b>: Malaysia, Indonesia, Singapore, Thailand, Philippines. All 11: <b>“PMT CLIMBS VT”</b> → Philippines, Malaysia, Thailand, Cambodia, Laos, Indonesia, Myanmar, Brunei, Singapore, Vietnam, Timor-Leste."},
+ {k:"tl", title:"India and ASEAN", rows:[["1991","Look East Policy (P.V. Narasimha Rao)"],["1992","Sectoral dialogue partner"],["1995","Full dialogue partner"],["1996","Joins ASEAN Regional Forum"],["2002","Summit-level partner"],["2005","Founding member of the East Asia Summit"],["2012","Strategic partnership"],["2014","Act East Policy"],["2019","India walks out of RCEP"],["2022","Comprehensive Strategic Partnership"]]},
+ {k:"facts", title:"Forums around ASEAN", rows:[["ASEAN Regional Forum (ARF)","1994; security dialogue; 27 members; India since 1996"],["East Asia Summit (EAS)","2005; 18 countries; India a founding member"],["RCEP","Trade pact of ASEAN + 5 (China, Japan, S. Korea, Australia, NZ); India left in 2019"]]},
+ {k:"trap", h:"India is <b>not</b> a member of ASEAN. The lecture calls India a founding participant of the ASEAN Regional Forum, but the ARF began in 1994 and India joined in 1996."}],
+ sum:["ASEAN: 8 Aug 1967, Bangkok; secretariat Jakarta","5 founders: Indonesia, Malaysia, Philippines, Singapore, Thailand","11 members: Timor-Leste joined 2025","India not a member; dialogue partner 1995; CSP 2022","Look East 1991 → Act East 2014; ARF 1994 (India 1996); EAS 2005 (India founder)"]},
+
+{ id:"L7", title:"BRICS", hi:"ब्रिक्स", blocks:[
+ {k:"tl", title:"Timeline", rows:[["2001","Jim O'Neill of Goldman Sachs coins “BRIC”"],["2006","First BRIC foreign ministers' meeting (UNGA sidelines)"],["2009","1st summit: Yekaterinburg, Russia"],["2010–11","South Africa invited (Dec 2010); attends 3rd summit, Sanya, China (2011) → BRICS"],["2014","6th summit, Fortaleza, Brazil: NDB and CRA agreed"],["2023","15th summit, Johannesburg: 6 countries invited"],["1 Jan 2024","Egypt, Ethiopia, Iran, UAE join (Saudi Arabia listed but has not formally confirmed; Argentina declined)"],["2024","16th summit, Kazan, Russia: ‘partner country’ category created"],["Jan 2025","Indonesia joins (newest member)"],["June 2025","Vietnam becomes a partner (newest partner)"],["July 2025","17th summit, Rio de Janeiro"],["12–13 Sep 2026","18th summit, New Delhi, Bharat Mandapam"]]},
+ {k:"facts", title:"Members (11) and partners (10)", rows:[["Original 5","Brazil, Russia, India, China, South Africa"],["2024","Egypt, Ethiopia, Iran, UAE, Saudi Arabia"],["2025","Indonesia"],["Partners","Belarus, Bolivia, Cuba, Kazakhstan, Malaysia, Nigeria, Thailand, Uganda, Uzbekistan, Vietnam"],["Member vs partner","Members vote and decide; partners join outreach sessions"],["HQ","None; no permanent secretariat"]]},
+ {k:"trick", h:"New members <b>“SEE U II”</b>: Saudi Arabia, Egypt, Ethiopia, UAE, Iran, Indonesia."},
+ {k:"table", title:"NDB vs CRA (asked in CGL Mains)", head:["","New Development Bank","Contingent Reserve Arrangement"], rows:[["Job","Funds infrastructure and sustainable development","Short-term dollar support in a balance-of-payments crisis"],["Size","US$50 bn initial subscribed (US$100 bn authorised)","US$100 bn"],["Shares","Equal among the five founders","China 41, Brazil 18, Russia 18, India 18, South Africa 5"],["HQ","Shanghai","No HQ (a pooled commitment)"]]},
+ {k:"table", title:"BRICS summits hosted by India", head:["Summit","Place","Year"], rows:[["4th","New Delhi","2012"],["8th","Goa","2016"],["13th","New Delhi (virtual)","2021"],["18th","New Delhi","2026"]]},
+ {k:"facts", title:"18th summit, New Delhi 2026", rows:[["Dates","12–13 September 2026, Bharat Mandapam"],["Theme","Building for Resilience, Innovation, Cooperation and Sustainability (spells B-R-I-C-S)"],["Outcome","New Delhi Declaration; payment-system interoperability; no common currency; BRICS startup network"]]},
+ {k:"trap", h:"The lecture calls 2026 India's fifth BRICS summit, but its own list has four: 2012, 2016, 2021 and 2026. So <b>2026 is the 4th time</b> India has hosted."}],
+ sum:["BRIC coined by Jim O'Neill 2001; 1st summit Yekaterinburg 2009","South Africa joined 2010–11 (Sanya summit); no HQ","11 members: +Egypt, Ethiopia, Iran, UAE, Saudi (2024), Indonesia (2025)","10 partners since Kazan 2024; Vietnam newest (June 2025)","NDB (Shanghai, equal shares) + CRA ($100 bn, China 41) at Fortaleza 2014","India hosted 2012, 2016, 2021, 2026 (18th, Bharat Mandapam)"]},
+
+{ id:"L8", title:"SCO", hi:"शंघाई सहयोग संगठन", blocks:[
+ {k:"tl", title:"Timeline", rows:[["1996","‘Shanghai Five’: China, Kazakhstan, Kyrgyzstan, Russia, Tajikistan"],["15 Jun 2001","SCO founded in Shanghai; Uzbekistan added → 6 members"],["2002","SCO Charter, St Petersburg"],["2005","India becomes an observer"],["2017","India and Pakistan become full members (Astana summit)"],["2023","Iran joins; India chairs (virtual summit, theme ‘Towards a SECURE SCO’)"],["2024","Belarus joins (Astana) → 10 members"],["Aug–Sep 2025","25th summit, Tianjin, China: Modi attends; declaration condemns Pahalgam attack"],["Aug–Sep 2026","26th summit, Bishkek, Kyrgyzstan: 25 years of SCO; Pakistan chairs next (2027)"]]},
+ {k:"facts", title:"Basics", rows:[["Secretariat","Beijing, China"],["RATS","Regional Anti-Terrorist Structure, Tashkent, Uzbekistan"],["Members (10)","China, Russia, Kazakhstan, Kyrgyzstan, Tajikistan, Uzbekistan, India, Pakistan, Iran, Belarus"],["Observers","Afghanistan, Mongolia"],["Languages","Russian and Chinese"],["SECURE","Security, Economy, Connectivity, Unity, Respect for sovereignty, Environment (PM Modi, 2018)"]]},
+ {k:"trick", h:"<b>Named after Shanghai, lives in Beijing.</b> The bank that does live in Shanghai is the NDB. Anti-terror desk (RATS) is in <b>T</b>ashkent → <b>T</b>error."},
+ {k:"p", h:"India is not a founding member of the SCO. India has refused to endorse China's Belt and Road Initiative in SCO statements."}],
+ sum:["Shanghai Five 1996 → SCO 15 June 2001 in Shanghai","Secretariat Beijing; RATS Tashkent","10 members: India & Pakistan 2017, Iran 2023, Belarus 2024","India chaired 2023 (SECURE SCO); observers Afghanistan, Mongolia","25th Tianjin 2025; 26th Bishkek 2026; next Pakistan"]},
+
+{ id:"L9", title:"QUAD & I2U2", hi:"क्वाड और I2U2", blocks:[
+ {k:"p", h:"The lecture says a QUAD question is almost certain. It has no HQ or secretariat."},
+ {k:"tl", title:"QUAD timeline", rows:[["2004","Tsunami Core Group: India, USA, Japan, Australia coordinate relief"],["2007","Idea pushed by Japan's PM Shinzo Abe; first meeting in Manila"],["2008","Australia pulls out; the group goes quiet"],["Nov 2017","Revived at officials' level (Manila, ASEAN sidelines)"],["Mar 2021","First leaders' summit (virtual)"],["Sep 2021","First in-person summit, Washington"],["2022 · 2023","Tokyo · Hiroshima (on G7 sidelines; Sydney summit cancelled)"],["Sep 2024","Wilmington, Delaware, USA"],["July 2025","Foreign ministers, Washington: Quad Critical Minerals Initiative"],["2026","India's turn to host the leaders' summit is still pending; a meeting on the G20 sidelines in Miami (Dec) is being explored"]]},
+ {k:"facts", title:"QUAD facts", rows:[["Members","India, USA, Japan, Australia"],["Formal name","Quadrilateral Security Dialogue"],["Aim","A free, open, inclusive Indo-Pacific"],["Initiatives","Quad Vaccine Partnership, Cancer Moonshot, IPMDA (maritime domain awareness, 2022), Critical Minerals Initiative (2025)"],["Malabar exercise","India–US naval drill from 1992; Japan permanent 2015; Australia 2020 → all four Quad navies"]]},
+ {k:"trick", h:"<b>“JAI US”</b> = Japan, Australia, India, US."},
+ {k:"facts", title:"I2U2", rows:[["Members","<b>I</b>ndia, <b>I</b>srael, <b>U</b>SA, <b>U</b>AE"],["Nickname","‘West Asian Quad’"],["Began","October 2021 (foreign ministers), after the Abraham Accords"],["First leaders' summit","14 July 2022, virtual"],["Focus","Six areas: water, energy, transport, space, health, food security"],["Projects","Food parks in India with UAE investment; hybrid renewable energy project in Gujarat"],["HQ","None"]]},
+ {k:"p", h:"<b>Abraham Accords (2020)</b>: US-brokered deals by which the UAE and Bahrain (later Morocco and Sudan) normalised ties with Israel."}],
+ sum:["QUAD: India, USA, Japan, Australia; no HQ","Roots 2004 tsunami; Abe 2007; revived 2017; first leaders' summit 2021 (virtual)","Summits: Washington 2021, Tokyo 2022, Hiroshima 2023, Wilmington 2024; India's summit pending","Malabar: all four navies since 2020","I2U2: India, Israel, USA, UAE; 2021; first summit July 2022; after Abraham Accords"]},
+
+{ id:"L10", title:"G20 & G7", hi:"G20 और G7", blocks:[
+ {k:"facts", title:"G20 basics", rows:[["Founded","1999, after the Asian financial crisis, as a forum of finance ministers and central bank governors"],["First leaders' summit","Washington, November 2008 (global financial crisis)"],["Members","19 countries + European Union + African Union (21)"],["Weight","About 85% of world GDP, 75% of trade, two-thirds of people"],["Secretariat","None; run by the ‘troika’ of past, current and next presidents"],["India","Founding member"]]},
+ {k:"p", h:"<b>The 19 countries:</b> Argentina, Australia, Brazil, Canada, China, France, Germany, India, Indonesia, Italy, Japan, Mexico, Russia, Saudi Arabia, South Africa, South Korea, Türkiye, UK, USA."},
+ {k:"trick", h:"Count by letters: <b>A2 B1 C2 F1 G1 I3 J1 M1 R1 S3 T1 U2</b> = 19. Three I's (India, Indonesia, Italy), three S's (Saudi, South Africa, South Korea). Countries often wrongly added: Spain, Nigeria, Pakistan, Iran, Singapore (not members)."},
+ {k:"facts", title:"India's presidency (2023)", rows:[["Term","1 Dec 2022 – 30 Nov 2023"],["Summit","18th, New Delhi, 9–10 Sep 2023, Bharat Mandapam"],["Theme","Vasudhaiva Kutumbakam: One Earth, One Family, One Future"],["Outcomes","African Union made permanent member; Global Biofuels Alliance; India–Middle East–Europe Economic Corridor (IMEC)"],["Sherpa","Amitabh Kant"]]},
+ {k:"table", title:"Recent and next G20 summits", head:["Year","Host","Note"], rows:[["2023","New Delhi, India","AU joins"],["2024","Rio de Janeiro, Brazil",""],["2025","Johannesburg, South Africa","First G20 summit in Africa; USA stayed away"],["2026","Miami (Doral), USA, 14–15 Dec","USA has barred South Africa"]]},
+ {k:"facts", title:"G7", rows:[["Origin","1975 Rambouillet, France as G6; Canada 1976 → G7"],["Members","USA, UK, France, Germany, Italy, Canada, Japan (+ EU attends)"],["G8","Russia joined 1997; suspended 2014 over Crimea → back to G7"],["2025","Kananaskis, Canada; Modi attended as a guest"],["2026","Évian-les-Bains, France, June 2026"],["India","Not a member; often invited to outreach sessions"]]},
+ {k:"trick", h:"G7 = <b>USA + UK + Canada + Japan + three EU big economies (France, Germany, Italy)</b>. No Russia, no China, no India."},
+ {k:"facts", title:"Other ‘G’ groups", rows:[["G4","India, Brazil, Germany, Japan: UNSC reform"],["G77","1964, at UNCTAD; now about 134 developing countries (name unchanged)"],["G15","Developing-country summit group, 1989 (India a founder)"]]}],
+ sum:["G20: 1999 finance forum; leaders' summits since 2008; 19 + EU + AU","India presidency 2023: New Delhi summit, Vasudhaiva Kutumbakam, AU joined","2024 Rio · 2025 Johannesburg · 2026 Miami (South Africa barred)","G7: 1975 G6 at Rambouillet; G8 1997–2014; 2025 Canada, 2026 Évian","India: G20 founder, not in G7; G4 for UNSC reform"]},
+
+{ id:"L11", title:"Other groupings & bodies", hi:"अन्य संगठन", blocks:[
+ {k:"table", title:"Security & political blocs", head:["Body","Founded · HQ","Remember"], rows:[["NATO","1949 Washington Treaty · Brussels","32 members (Finland 2023, Sweden 2024); Article 5 = attack on one is attack on all; SG Mark Rutte"],["European Union","Maastricht Treaty 1992 · Brussels","27 members; UK left 31 Jan 2020 (Brexit); euro in 21 (Bulgaria 2026)"],["African Union","2002 (OAU 1963) · Addis Ababa","55 members; G20 member since 2023"],["Commonwealth","London Declaration 1949 · London","56 members; head King Charles III; latest Gabon, Togo (2022)"],["NAM","1961 Belgrade","Nehru, Tito, Nasser, Sukarno, Nkrumah; roots in Bandung 1955; 120 members"],["GCC","1981 · Riyadh","Saudi Arabia, UAE, Qatar, Kuwait, Bahrain, Oman"]]},
+ {k:"table", title:"Economic bodies", head:["Body","Founded · HQ","Remember"], rows:[["OPEC","1960 Baghdad · Vienna","Founders Iran, Iraq, Kuwait, Saudi Arabia, Venezuela; 12 members; OPEC+ from 2016 with Russia"],["OECD","1961 · Paris","38 rich economies; India not a member"],["APEC","1989 · Singapore","21 Pacific economies; India not a member"],["FATF","1989 (G7 Paris) · Paris","Anti-money laundering; India member since 2010; grey and black lists"]]},
+ {k:"table", title:"Export control regimes", head:["Regime","Year","India"], rows:[["NSG (Nuclear Suppliers Group)","1974, after India's Pokhran test","Not a member (China blocks)"],["MTCR (missiles)","1987","Joined 2016"],["Wassenaar (arms, dual-use)","1996","Joined 2017"],["Australia Group (chemical & biological)","1985","Joined 2018"]]},
+ {k:"trick", h:"India joined <b>M-W-A in 16-17-18</b>: MTCR 2016, Wassenaar 2017, Australia Group 2018. NSG: still outside."},
+ {k:"table", title:"Bodies India started or hosts", head:["Body","Facts"], rows:[["International Solar Alliance (ISA)","Launched by India and France at COP21, Paris, 2015; HQ Gurugram: first treaty-based international body headquartered in India"],["CDRI","Coalition for Disaster Resilient Infrastructure, 2019, New Delhi"],["Global Biofuels Alliance","Launched at G20 New Delhi, 2023"],["IBSA","India, Brazil, South Africa; Brasilia Declaration 2003"]]},
+ {k:"facts", title:"Interpol", rows:[["Founded · HQ","1923 · Lyon, France"],["India","Member since 1949; CBI is the national contact"],["Notices","Red: arrest a wanted person · Blue: information · Yellow: missing person · Black: unidentified body · Purple: crime methods · Silver (2025 pilot): trace criminal assets"]]}],
+ sum:["NATO 1949 Brussels, 32 members; EU 27, Brussels; AU Addis Ababa","Commonwealth 56, London; NAM 1961 Belgrade; GCC 6, Riyadh","OPEC 1960 Baghdad, HQ Vienna; OECD Paris; APEC Singapore (India in neither)","MTCR 2016, Wassenaar 2017, Australia Group 2018; not NSG","ISA HQ Gurugram (India–France, 2015); Interpol Lyon, Red Notice = arrest"]},
+
+{ id:"L12", title:"Who heads what & 2025–26 news", hi:"करंट अफेयर्स", blocks:[
+ {k:"table", title:"Heads (September 2026)", head:["Body","Head"], rows:[["UN Secretary-General","António Guterres (term ends 31 Dec 2026)"],["WHO","Tedros Adhanom Ghebreyesus"],["WTO","Ngozi Okonjo-Iweala"],["IMF","Kristalina Georgieva"],["World Bank","Ajay Banga"],["ADB","Masato Kanda"],["AIIB","Zou Jiayi"],["NDB","Dilma Rousseff"],["UNESCO","Khaled El-Enany"],["IAEA","Rafael Grossi"],["NATO","Mark Rutte"],["ASEAN","Kao Kim Hourn"],["SAARC","Md. Golam Sarwar"],["BIMSTEC","Indra Mani Pandey"]]},
+ {k:"table", title:"Summits to remember", head:["Grouping","Latest","Where"], rows:[["BRICS","18th, 12–13 Sep 2026","New Delhi"],["SCO","26th, 31 Aug–1 Sep 2026","Bishkek, Kyrgyzstan"],["G7","June 2026","Évian, France"],["G20","14–15 Dec 2026 (upcoming)","Miami, USA"],["BIMSTEC","6th, April 2025","Bangkok, Thailand"],["ASEAN","47th, Oct 2025: Timor-Leste joins","Kuala Lumpur"],["WTO","MC14, March 2026","Yaoundé, Cameroon"],["QUAD","Last leaders' summit Sep 2024","Wilmington, USA"]]},
+ {k:"trap", h:"In the lecture: “Mumbai/Bengaluru” come out as “Bor”; the BIMSTEC Energy Centre is in <b>Bengaluru</b>. Also, Nepal and Bhutan joined BIMSTEC in <b>February 2004</b> (the lecture says both 2002 and 2004)."}],
+ sum:["UN SG Guterres (till 31 Dec 2026); WTO Okonjo-Iweala; IMF Georgieva; WB Banga","ADB Masato Kanda; AIIB Zou Jiayi; NDB Dilma Rousseff; NATO Mark Rutte","BRICS 2026 New Delhi; SCO 2026 Bishkek; G7 2026 Évian; G20 2026 Miami","ASEAN 11 with Timor-Leste (Oct 2025); WTO MC14 Yaoundé"]}
+];
+
+/* ============================================================
+   QUESTION BANK — first option is correct; shown shuffled.
+   [lesson, q, [opts], expl, flags, ansIdx(for fixed), fixed]
+   ============================================================ */
+const QB = [
+/* L1 UN */
+["L1","The UN Charter came into force on",["24 October 1945","26 June 1945","10 December 1948","1 January 1942"],"24 October is UN Day. 26 June 1945 is when it was signed in San Francisco. 10 Dec 1948 is the Human Rights Declaration.","p"],
+["L1","Where was the UN Charter signed?",["San Francisco","New York","Geneva","London"],"26 June 1945."],
+["L1","How many member states does the UN have?",["193","195","191","190"],"South Sudan (2011) was the latest to join."],
+["L1","Which was the latest country to join the UN?",["South Sudan","Montenegro","East Timor","Switzerland"],"South Sudan joined in 2011."],
+["L1","Which principal organ of the UN is NOT located in New York?",["International Court of Justice","Security Council","ECOSOC","Secretariat"],"The ICJ sits at the Peace Palace, The Hague.","p"],
+["L1","How many judges does the International Court of Justice have?",["15","9","11","21"],"Elected for 9-year terms."],
+["L1","Which UN principal organ suspended its work in 1994?",["Trusteeship Council","ECOSOC","General Assembly","ICJ"],"Its last trust territory, Palau, became independent."],
+["L1","How many members does the UN Security Council have?",["15","5","10","20"],"5 permanent + 10 non-permanent elected for 2 years."],
+["L1","Which of these is NOT a permanent member of the UN Security Council?",["Germany","France","China","Russia"],"P5: USA, UK, France, Russia, China. Trick: CRUFU."],
+["L1","Non-permanent members of the UNSC are elected for",["2 years","1 year","3 years","5 years"],"By the General Assembly, 5 each year."],
+["L1","How many times has India been a non-permanent member of the UNSC?",["8","7","6","9"],"The latest term was 2021–22."],
+["L1","Which group of four countries backs each other's bid for permanent UNSC seats?",["India, Brazil, Germany, Japan","India, Brazil, South Africa, Japan","India, Germany, Italy, Japan","India, Brazil, Germany, Egypt"],"The G4. Italy leads the opposing ‘Uniting for Consensus’ group."],
+["L1","Who was the first woman President of the UN General Assembly?",["Vijaya Lakshmi Pandit","Indira Gandhi","Sarojini Naidu","Hansa Mehta"],"In 1953."],
+["L1","Which is NOT an official language of the UN?",["Hindi","Arabic","Spanish","Russian"],"The six: English, French, Spanish, Russian, Chinese, Arabic."],
+["L1","Who is the UN Secretary-General in 2026?",["António Guterres","Ban Ki-moon","Kofi Annan","Rebeca Grynspan"],"9th SG, since 2017. His term ends 31 Dec 2026; Grynspan is a candidate to succeed him."],
+["L1","Who was the first Secretary-General of the UN?",["Trygve Lie","Dag Hammarskjöld","U Thant","Kurt Waldheim"],"Norway, 1946–52."],
+["L1","The headquarters of the Food and Agriculture Organization (FAO) is in",["Rome","Geneva","Paris","Nairobi"],"Rome hosts the food trio: FAO, IFAD, WFP.","p"],
+["L1","Where is UNESCO headquartered?",["Paris","Geneva","New York","Vienna"],"Founded 1945.","p"],
+["L1","Where is the World Health Organization headquartered?",["Geneva","New York","Rome","Vienna"],"Founded 7 April 1948: World Health Day.","p"],
+["L1","UNEP, the UN Environment Programme, is headquartered in",["Nairobi","Geneva","Paris","Bonn"],"Set up after the 1972 Stockholm Conference. UN-Habitat is also in Nairobi.","p"],
+["L1","The International Atomic Energy Agency is headquartered in",["Vienna","Geneva","The Hague","New York"],"Founded 1957; Nobel Peace Prize 2005.","p"],
+["L1","Where is the International Labour Organization headquartered?",["Geneva","Rome","New York","Paris"],"Founded 1919; the only tripartite UN agency."],
+["L1","Which UN agency is the oldest?",["ITU","ILO","UPU","WHO"],"International Telecommunication Union, 1865 (Geneva). UPU 1874, ILO 1919."],
+["L1","Which UN agency has a tripartite structure of governments, employers and workers?",["ILO","WHO","UNICEF","FAO"],"The ILO won the Nobel Peace Prize in 1969."],
+["L1","The World Food Programme won the Nobel Peace Prize in",["2020","2019","2015","2005"],"WFP is based in Rome."],
+["L1","Match the agency with its HQ: ICAO",["Montreal","London","Bern","Madrid"],"IMO: London · UPU: Bern · UN Tourism: Madrid."],
+["L1","The Universal Postal Union is headquartered in",["Bern","Geneva","Brussels","Vienna"],"Founded 1874."],
+["L1","The International Maritime Organization is headquartered in",["London","Rome","Hamburg","Montreal"],"The only UN agency in the UK."],
+["L1","Which pair is correctly matched?",["UNICEF – New York","UNHCR – Rome","UNIDO – Paris","WIPO – Nairobi"],"UNHCR, WIPO: Geneva; UNIDO: Vienna."],
+["L1","Which of these cities hosts the most UN agencies listed below: WHO, ILO, WIPO, ITU, WMO?",["Geneva","Vienna","Rome","Paris"],"All five are in Geneva."],
+["L1","Consider: 1. The ICJ is a principal organ of the UN. 2. The International Criminal Court (ICC) is a principal organ of the UN. Which is correct?",["Only 1","Only 2","Both 1 and 2","Neither 1 nor 2"],"The ICC (Rome Statute, 2002) is a separate treaty body; India is not a party. Both sit in The Hague.","",0,1],
+["L1","Which UN agency won the Nobel Peace Prize twice (1954 and 1981)?",["UNHCR","UNICEF","WFP","IAEA"],"UN refugee agency, Geneva."],
+/* L2 WTO etc */
+["L2","GATT was signed in",["1947","1944","1948","1995"],"By 23 countries in Geneva; it came into force on 1 January 1948.","p"],
+["L2","The World Trade Organization came into existence on",["1 January 1995","1 January 1948","15 April 1994","1 January 2001"],"The Marrakesh Agreement was signed on 15 April 1994.","p"],
+["L2","The WTO was created by which agreement?",["Marrakesh Agreement","Havana Charter","Bretton Woods Agreement","Doha Declaration"],"Signed in Marrakesh, Morocco, at the end of the Uruguay Round.","p"],
+["L2","Marrakesh, where the WTO agreement was signed, is in",["Morocco","Tunisia","Egypt","Algeria"],"April 1994."],
+["L2","Which round of GATT talks led to the creation of the WTO?",["Uruguay Round","Doha Round","Tokyo Round","Kennedy Round"],"1986–94. The Doha Round began in 2001."],
+["L2","Where is the WTO headquartered?",["Geneva","New York","Washington DC","Brussels"],"Geneva, Switzerland.","p"],
+["L2","Who is the Director-General of the WTO?",["Ngozi Okonjo-Iweala","Roberto Azevêdo","Kristalina Georgieva","Pascal Lamy"],"From Nigeria: first woman and first African DG; second term from September 2025."],
+["L2","The 14th WTO Ministerial Conference (MC14) was held in 2026 at",["Yaoundé, Cameroon","Abu Dhabi, UAE","Geneva, Switzerland","Nairobi, Kenya"],"MC13 was held in Abu Dhabi in 2024."],
+["L2","Under WTO rules, subsidies that cause no or minimal trade distortion fall in the",["Green Box","Amber Box","Blue Box","Red Box"],"Green Box support has no limit.","p"],
+["L2","WTO ‘Blue Box’ subsidies are those that",["Require farmers to limit production","Cause no trade distortion","Are banned outright","Support only exports"],"Blue = Amber with conditions to limit production.","p"],
+["L2","India's Minimum Support Price comes under which WTO box?",["Amber Box","Green Box","Blue Box","Development Box"],"Price support distorts trade, so it is capped."],
+["L2","Which body recommends the Minimum Support Price in India?",["CACP","NITI Aayog","FCI","RBI"],"Commission for Agricultural Costs and Prices, 1965. The CCEA approves."],
+["L2","Sugarcane growers get which price instead of MSP?",["Fair and Remunerative Price (FRP)","State Advised Price only","Market Intervention Price","Economic Price"],"FRP is fixed by the Centre on CACP's recommendation."],
+["L2","The ‘peace clause’ that protects India's food stockholding was agreed at the WTO conference in",["Bali, 2013","Nairobi, 2015","Doha, 2001","Buenos Aires, 2017"],"MC9, Bali."],
+["L2","The IMF and the World Bank were planned at a conference held in",["Bretton Woods, 1944","Geneva, 1947","San Francisco, 1945","Paris, 1919"],"Bretton Woods, New Hampshire, USA. Both are headquartered in Washington DC."],
+["L2","Who heads the IMF?",["Kristalina Georgieva","Christine Lagarde","Gita Gopinath","Ajay Banga"],"Managing Director, from Bulgaria."],
+["L2","Who is the President of the World Bank?",["Ajay Banga","David Malpass","Kristalina Georgieva","Masato Kanda"],"Since June 2023."],
+["L2","Which of these is NOT in the IMF's SDR currency basket?",["Indian rupee","Chinese renminbi","Japanese yen","British pound"],"Basket: US dollar, euro, renminbi, yen, pound."],
+["L2","The World Economic Outlook report is published by",["IMF","World Bank","WTO","WEF"],"The World Bank publishes the World Development Report."],
+["L2","Which World Bank Group institution is India NOT a member of?",["ICSID","IDA","IFC","MIGA"],"International Centre for Settlement of Investment Disputes."],
+["L2","The International Development Association (IDA) is known for",["Soft loans to the poorest countries","Loans to private companies","Insurance against political risk","Settling investment disputes"],"IFC: private sector; MIGA: risk insurance; ICSID: disputes."],
+["L2","The Asian Development Bank was set up in",["1966","1944","1991","2015"],"HQ Manila, Philippines. India is a founding member.","p"],
+["L2","Where is the Asian Development Bank headquartered?",["Manila","Tokyo","Beijing","Jakarta"],"Manila, Philippines.","p"],
+["L2","The President of the ADB has always come from",["Japan","USA","China","India"],"Current President: Masato Kanda (2025). Japan and the USA are the largest shareholders."],
+["L2","Where is the Asian Infrastructure Investment Bank headquartered?",["Beijing","Shanghai","Hong Kong","Singapore"],"Set up 2015, operations from 2016.","p"],
+["L2","Which country is the second-largest shareholder in the AIIB?",["India","Russia","Japan","Germany"],"China is the largest. Japan and the USA are not members."],
+["L2","The New Development Bank is headquartered in",["Shanghai","Beijing","New Delhi","Johannesburg"],"Johannesburg has its first regional office; India's office is at GIFT City.","p"],
+["L2","The New Development Bank was agreed at the BRICS summit in",["Fortaleza, 2014","Durban, 2013","New Delhi, 2012","Ufa, 2015"],"The 6th BRICS summit, Brazil.","p"],
+["L2","Who was the first President of the New Development Bank?",["K.V. Kamath","Dilma Rousseff","Marcos Troyjo","Raghuram Rajan"],"From India. Dilma Rousseff (Brazil) heads it now."],
+["L2","Arrange by founding year, earliest first: 1. AIIB 2. ADB 3. World Bank 4. NDB",["3, 2, 4, 1","2, 3, 1, 4","3, 2, 1, 4","2, 3, 4, 1"],"World Bank 1944, ADB 1966, NDB 2014, AIIB 2015."],
+["L2","Consider: 1. India is a founding member of both GATT and WTO. 2. The WTO headquarters is in Washington DC. Which is correct?",["Only 1","Only 2","Both 1 and 2","Neither 1 nor 2"],"The WTO is in Geneva.","",0,1],
+/* L3 SAARC */
+["L3","SAARC was established in",["1985","1997","1967","1991"],"8 December 1985.","p"],
+["L3","SAARC was founded in which city?",["Dhaka","Kathmandu","New Delhi","Colombo"],"The secretariat is in Kathmandu.","p"],
+["L3","The SAARC Secretariat is located in",["Kathmandu","Dhaka","Colombo","Islamabad"],"Set up in 1987.","p"],
+["L3","How many members does SAARC have?",["8","7","9","10"],"Afghanistan was the 8th, in 2007."],
+["L3","Which country joined SAARC in 2007?",["Afghanistan","Myanmar","Maldives","Bhutan"],"At the 14th summit in New Delhi. It is the newest member.","p"],
+["L3","Which of these is NOT a member of SAARC?",["Myanmar","Maldives","Afghanistan","Bhutan"],"Myanmar is in BIMSTEC and ASEAN."],
+["L3","Which country is a member of SAARC but NOT of BIMSTEC?",["Pakistan","Nepal","Bhutan","Sri Lanka"],"Also Maldives and Afghanistan."],
+["L3","The last SAARC summit (18th) was held in",["Kathmandu, 2014","Islamabad, 2016","New Delhi, 2007","Male, 2011"],"The 2016 Islamabad summit was cancelled after the Uri attack."],
+["L3","SAFTA, signed under SAARC, stands for",["South Asian Free Trade Area","South Asian Fund for Trade and Agriculture","SAARC Agreement on Free Tariffs","South Asian Financial Transaction Act"],"Signed 2004, in force 2006."],
+["L3","The South Asian University set up by SAARC is in",["New Delhi","Kathmandu","Dhaka","Colombo"],"The SAARC Development Fund is in Thimphu."],
+["L3","SAARC Charter Day is observed on",["8 December","6 June","8 August","24 October"],"6 June: BIMSTEC; 8 August: ASEAN; 24 Oct: UN Day."],
+["L3","Which is an observer (not a member) of SAARC?",["China","Afghanistan","Maldives","Bhutan"],"There are 9 observers, including China, USA, EU and Japan."],
+/* L4 BIMSTEC */
+["L4","BIMSTEC was founded in 1997 through the",["Bangkok Declaration","Dhaka Declaration","Colombo Declaration","Kathmandu Declaration"],"6 June 1997. ASEAN too was born through a Bangkok Declaration (1967).","p"],
+["L4","Where is the BIMSTEC Secretariat?",["Dhaka","Bangkok","Kathmandu","New Delhi"],"Set up in 2014. SAARC was founded in Dhaka.","p"],
+["L4","How many members does BIMSTEC have?",["7","8","5","10"],"Bangladesh, Bhutan, India, Myanmar, Nepal, Sri Lanka, Thailand.","p"],
+["L4","Which country is NOT a member of BIMSTEC?",["Maldives","Myanmar","Thailand","Bhutan"],"Pakistan and Afghanistan are also not members."],
+["L4","Which two countries joined BIMSTEC in 2004?",["Nepal and Bhutan","Myanmar and Thailand","Bhutan and Maldives","Nepal and Sri Lanka"],"They are its newest members. Myanmar joined in December 1997.","p"],
+["L4","When BIMSTEC began in June 1997, it was called",["BIST-EC","BIMST-EC","BISTEC","BBIN"],"Myanmar's entry later in 1997 made it BIMST-EC."],
+["L4","Which two BIMSTEC members are South-East Asian?",["Myanmar and Thailand","Thailand and Sri Lanka","Myanmar and Bangladesh","Thailand and Nepal"],"The other five are South Asian."],
+["L4","Under BIMSTEC's 7-pillar arrangement, India leads which sector?",["Security (incl. counter-terrorism, disaster management, energy)","Connectivity","Trade and investment","Agriculture"],"Thailand leads connectivity; Bangladesh trade; Myanmar agriculture.","p"],
+["L4","Which country leads the ‘Connectivity’ pillar of BIMSTEC?",["Thailand","India","Bangladesh","Sri Lanka"],"Sri Lanka leads science, technology and innovation."],
+["L4","The BIMSTEC Charter was adopted at the 5th summit held in",["Colombo, 2022","Kathmandu, 2018","Bangkok, 2025","New Delhi, 2008"],"It was a hybrid meeting."],
+["L4","The 6th BIMSTEC summit (April 2025) was held in",["Bangkok","Dhaka","New Delhi","Colombo"],"It adopted the Bangkok Vision 2030; Bangladesh took over as chair."],
+["L4","The BIMSTEC Energy Centre is located in",["Bengaluru","Dhaka","Bangkok","Kolkata"],"The BIMSTEC Centre for Weather & Climate is in Noida."],
+["L4","Which is correct about BIMSTEC?",["Its secretariat is in Dhaka and Pakistan is not a member","Its secretariat is in Kathmandu and it has 8 members","It was founded in 1985 in Dhaka","Maldives joined it in 2004"],"SAARC is the one founded in Dhaka (1985) with its secretariat in Kathmandu."],
+["L4","Who is the Secretary-General of BIMSTEC?",["Indra Mani Pandey","Tenzin Lekphell","Md. Golam Sarwar","Kao Kim Hourn"],"From India. Golam Sarwar heads SAARC; Kao Kim Hourn ASEAN."],
+["L4","Which commission recommended separating Burma (Myanmar) from British India?",["Simon Commission","Hunter Commission","Cripps Mission","Butler Committee"],"Separation took effect in 1937."],
+["L4","Match: SAARC founded – BIMSTEC founded",["1985 – 1997","1997 – 1985","1985 – 2004","1967 – 1997"],"ASEAN was 1967; Nepal and Bhutan joined BIMSTEC in 2004."],
+/* L5 IORA */
+["L5","The Indian Ocean Rim Association (IORA) was established in",["1997","1985","2005","1967"],"In Mauritius, in March 1997.","p"],
+["L5","Where is the IORA Secretariat?",["Ebene, Mauritius","Port Louis, Seychelles","Colombo, Sri Lanka","Perth, Australia"],"Ebene Cybercity, Mauritius.","p"],
+["L5","Which European country is a member of IORA through an island territory?",["France","UK","Portugal","Netherlands"],"Through Réunion, since 2020.","p"],
+["L5","Which of these is a member of IORA?",["Australia","China","Japan","USA"],"IORA spans Africa, West Asia, South & South-East Asia and Australia. China, Japan and the USA are dialogue partners."],
+["L5","How many member states does IORA have?",["23","19","21","27"],"About 12 dialogue partners as well."],
+["L5","India chairs IORA for the period",["2025–27","2021–23","2019–21","2023–25"],"India also chaired it in 2011–13."],
+["L5","SAGAR, India's Indian Ocean vision (2015), stands for",["Security And Growth for All in the Region","South Asian Growth and Regional cooperation","Strategic Alliance for Growth Across the Region","Sea And Growth Around the Region"],"Announced by PM Modi in Mauritius.","p"],
+["L5","MAHASAGAR, which expanded SAGAR in 2025, was announced in",["Mauritius","Sri Lanka","Maldives","Seychelles"],"Mutual and Holistic Advancement for Security and Growth Across Regions."],
+["L5","The Mekong–Ganga Cooperation includes India and",["Cambodia, Laos, Myanmar, Thailand, Vietnam","Bangladesh, Nepal, Bhutan, Myanmar","China, Laos, Vietnam, Thailand","Indonesia, Malaysia, Thailand, Vietnam"],"Launched in Vientiane, 2000. China is not a member."],
+["L5","BBIN stands for",["Bangladesh, Bhutan, India, Nepal","Bangladesh, Burma, India, Nepal","Bhutan, Burma, India, Nepal","Bangladesh, Bhutan, Indonesia, Nepal"],"Known for its 2015 Motor Vehicles Agreement."],
+["L5","Where is the secretariat of the Colombo Security Conclave?",["Colombo","Male","New Delhi","Port Louis"],"Members: India, Sri Lanka, Maldives, Mauritius, Bangladesh."],
+/* L6 ASEAN */
+["L6","ASEAN was established on",["8 August 1967","8 December 1985","6 June 1997","15 June 2001"],"Through the Bangkok Declaration.","p"],
+["L6","Where is the ASEAN Secretariat?",["Jakarta","Bangkok","Singapore","Kuala Lumpur"],"Jakarta, Indonesia.","p"],
+["L6","Which of these was NOT a founding member of ASEAN?",["Vietnam","Indonesia","Philippines","Singapore"],"Founders: Indonesia, Malaysia, Philippines, Singapore, Thailand. Vietnam joined 1995."],
+["L6","Which country became the 11th member of ASEAN in 2025?",["Timor-Leste","Papua New Guinea","Bangladesh","Sri Lanka"],"At the 47th summit in Kuala Lumpur, October 2025."],
+["L6","Is India a member of ASEAN?",["No; India is a dialogue partner","Yes, a founding member","Yes, since 1995","Yes, since 2014"],"India became a full dialogue partner in 1995.","p"],
+["L6","India's Look East Policy (1991) was upgraded to the Act East Policy in",["2014","2004","2019","2010"],"Look East came under P.V. Narasimha Rao."],
+["L6","India and ASEAN upgraded ties to a Comprehensive Strategic Partnership in",["2022","2012","2002","2018"],"Strategic partnership came in 2012."],
+["L6","The ASEAN Regional Forum began in 1994. India joined it in",["1996","1994","2005","1992"],"The lecture calls India a founding participant, which is not correct."],
+["L6","Which forum, set up in 2005, counts India among its founding members?",["East Asia Summit","ASEAN Regional Forum","APEC","RCEP"],"The EAS has 18 countries."],
+["L6","India withdrew from negotiations on which trade pact in 2019?",["RCEP","CPTPP","SAFTA","BIMSTEC FTA"],"Regional Comprehensive Economic Partnership."],
+["L6","Arrange the ASEAN entries in order: 1. Cambodia 2. Brunei 3. Vietnam 4. Timor-Leste",["2, 3, 1, 4","3, 2, 1, 4","2, 1, 3, 4","1, 2, 3, 4"],"Brunei 1984, Vietnam 1995, Cambodia 1999, Timor-Leste 2025."],
+["L6","Which country chairs ASEAN in 2026?",["Philippines","Malaysia","Laos","Singapore"],"Malaysia chaired in 2025."],
+/* L7 BRICS */
+["L7","Who coined the term ‘BRIC’?",["Jim O'Neill","Joseph Stiglitz","Paul Krugman","Jeffrey Sachs"],"An economist at Goldman Sachs, in 2001.","p"],
+["L7","The first BRIC summit was held in 2009 in",["Yekaterinburg, Russia","Brasília, Brazil","Sanya, China","New Delhi, India"],"The lecture calls it the first summit.","p"],
+["L7","South Africa joined the group, turning BRIC into BRICS, in",["2010–11","2009","2014","2024"],"Invited in December 2010; attended the Sanya summit in 2011.","p"],
+["L7","How many member countries does BRICS have in 2026?",["11","5","10","9"],"The original 5, plus Egypt, Ethiopia, Iran, UAE, Saudi Arabia (2024) and Indonesia (2025).","p"],
+["L7","Which country joined BRICS as a full member in January 2025?",["Indonesia","Argentina","Malaysia","Turkey"],"It is the newest member. Argentina declined its 2023 invitation.","p"],
+["L7","Which country was invited to BRICS in 2023 but declined to join?",["Argentina","Egypt","Ethiopia","UAE"],"The others joined on 1 January 2024."],
+["L7","Which of these is a BRICS ‘partner country’, not a member?",["Vietnam","Iran","Egypt","Indonesia"],"Vietnam became the newest partner in June 2025."],
+["L7","The ‘partner country’ category of BRICS was created at the 2024 summit in",["Kazan, Russia","Johannesburg, South Africa","Rio de Janeiro, Brazil","Beijing, China"],"The 16th summit."],
+["L7","What is the main difference between a BRICS member and a partner country?",["Members take part in decisions; partners do not","Partners pay more","Members must be in the southern hemisphere","There is no difference"],"Partners join outreach sessions."],
+["L7","Where is the BRICS permanent secretariat?",["BRICS has no permanent secretariat","Shanghai","New Delhi","Moscow"],"The NDB, set up by BRICS, is in Shanghai."],
+["L7","The BRICS Contingent Reserve Arrangement (CRA) has a size of",["US$100 billion","US$50 billion","US$10 billion","US$1 trillion"],"China 41, Brazil 18, Russia 18, India 18, South Africa 5 (billion).","p"],
+["L7","Which country contributes the most to the BRICS Contingent Reserve Arrangement?",["China","India","Russia","Brazil"],"US$41 billion. In the NDB, the founders hold equal shares."],
+["L7","The purpose of the BRICS Contingent Reserve Arrangement is to",["Give short-term support during balance-of-payments pressure","Fund infrastructure projects","Create a single BRICS currency","Settle trade disputes"],"The NDB funds infrastructure."],
+["L7","Where was the 18th BRICS summit held?",["New Delhi","Rio de Janeiro","Kazan","Goa"],"12–13 September 2026 at Bharat Mandapam."],
+["L7","Where was the 17th BRICS summit held in July 2025?",["Rio de Janeiro","Brasília","Kazan","Johannesburg"],"Brazil hosted in 2025, India in 2026."],
+["L7","The theme of India's 2026 BRICS chairship spells out BRICS. What does the ‘R’ stand for?",["Resilience","Reform","Regional","Resources"],"Building for Resilience, Innovation, Cooperation and Sustainability."],
+["L7","The 2026 BRICS summit adopted the",["New Delhi Declaration","Bharat Declaration","Goa Declaration","Kazan Declaration"],"A 140-paragraph declaration."],
+["L7","India hosted the 8th BRICS summit in 2016 at",["Goa","New Delhi","Mumbai","Bengaluru"],"India also hosted in 2012, 2021 and 2026."],
+["L7","How many times has India hosted a BRICS summit, counting 2026?",["4","5","3","6"],"2012, 2016, 2021, 2026. The lecture says ‘fifth’, but its own list gives four."],
+["L7","Which set lists only the BRICS members admitted in 2024?",["Egypt, Ethiopia, Iran, UAE","Egypt, Argentina, Iran, UAE","Indonesia, Iran, Egypt, Ethiopia","Nigeria, Egypt, Iran, UAE"],"Saudi Arabia was invited too but has not formally confirmed. Indonesia joined 2025."],
+["L7","Consider: 1. BRICS has created a common currency. 2. India hosted the 18th BRICS summit. Which is correct?",["Only 1","Only 2","Both 1 and 2","Neither 1 nor 2"],"The New Delhi summit backed linking payment systems, not a common currency.","",1,1],
+["L7","Which of these is NOT a BRICS member?",["Argentina","Ethiopia","Iran","Egypt"],"Argentina declined its invitation."],
+/* L8 SCO */
+["L8","The Shanghai Cooperation Organisation was founded in",["2001","1996","2005","2017"],"On 15 June 2001. The ‘Shanghai Five’ group dates from 1996.","p"],
+["L8","Where is the SCO Secretariat?",["Beijing","Shanghai","Moscow","Tashkent"],"Named after Shanghai, where it was founded; the NDB is the one in Shanghai.","p"],
+["L8","The SCO's Regional Anti-Terrorist Structure (RATS) is in",["Tashkent","Beijing","Astana","Bishkek"],"Uzbekistan's capital."],
+["L8","Which country was NOT a member of the ‘Shanghai Five’ (1996)?",["Uzbekistan","Kazakhstan","Tajikistan","Kyrgyzstan"],"Uzbekistan joined when the SCO was founded in 2001."],
+["L8","India became a full member of the SCO in",["2017","2001","2005","2023"],"Along with Pakistan, at the Astana summit. India was an observer from 2005.","p"],
+["L8","How many member states does the SCO have?",["10","8","9","6"],"Iran joined 2023 and Belarus 2024."],
+["L8","Which country became the 10th member of the SCO in 2024?",["Belarus","Iran","Mongolia","Turkey"],"At the Astana summit."],
+["L8","Which is an observer state of the SCO?",["Mongolia","Iran","Belarus","Pakistan"],"The observers are Afghanistan and Mongolia."],
+["L8","India chaired the SCO in 2023 under the theme",["Towards a SECURE SCO","One Earth, One Family","SCO for Peace","Shared Future SCO"],"SECURE: Security, Economy, Connectivity, Unity, Respect for sovereignty, Environment."],
+["L8","Where was the 25th SCO summit (2025) held?",["Tianjin, China","Astana, Kazakhstan","Bishkek, Kyrgyzstan","New Delhi, India"],"PM Modi attended; the declaration condemned the Pahalgam attack."],
+["L8","The 2026 SCO summit, marking 25 years of the SCO, was held in",["Bishkek","Tashkent","Astana","Dushanbe"],"31 August – 1 September 2026. Pakistan chairs next."],
+["L8","The official languages of the SCO are",["Russian and Chinese","English and Chinese","Russian and English","Chinese only"],"Both working languages."],
+["L8","Which of these is a member of both BRICS and the SCO?",["Iran","Pakistan","Brazil","Belarus"],"India, China and Russia too. Pakistan and Belarus are SCO-only; Brazil is BRICS-only."],
+["L8","Consider: 1. The SCO is headquartered in Shanghai. 2. India is a founding member of the SCO. Which is correct?",["Only 1","Only 2","Both 1 and 2","Neither 1 nor 2"],"Secretariat Beijing; India joined in 2017.","",3,1],
+/* L9 QUAD I2U2 */
+["L9","Which of these countries is NOT a member of the QUAD?",["China","Japan","Australia","USA"],"QUAD: India, USA, Japan, Australia. Trick: JAI US.","p"],
+["L9","QUAD stands for",["Quadrilateral Security Dialogue","Quadrilateral Strategic Alliance","Quad Union for Asian Defence","Quadrilateral Trade Agreement"],"It is a dialogue, not a formal military alliance.","p"],
+["L9","The idea of the QUAD was first proposed in 2007 by",["Shinzo Abe","Barack Obama","Manmohan Singh","John Howard"],"Then Prime Minister of Japan."],
+["L9","The roots of QUAD cooperation lie in coordinating relief after the",["2004 Indian Ocean tsunami","2015 Nepal earthquake","2011 Fukushima disaster","COVID-19 pandemic"],"The ‘Tsunami Core Group’."],
+["L9","The QUAD was revived in",["2017","2007","2021","2012"],"At officials' level in Manila, November 2017."],
+["L9","The first QUAD leaders' summit (virtual) was held in",["March 2021","September 2021","2017","2007"],"The first in-person summit followed in Washington, September 2021."],
+["L9","Where was the QUAD leaders' summit of September 2024 held?",["Wilmington, Delaware","Tokyo","Sydney","New Delhi"],"India was due to host the next one; it is still pending."],
+["L9","Where is the QUAD headquartered?",["It has no headquarters","Washington DC","Tokyo","Canberra"],"There is no secretariat either."],
+["L9","Which naval exercise brings together all four QUAD navies?",["Malabar","Varuna","RIMPAC","Milan"],"India–US since 1992; Japan permanent 2015; Australia joined 2020. Varuna is India–France."],
+["L9","The Quad Critical Minerals Initiative was launched in",["July 2025","March 2021","September 2024","2017"],"At the foreign ministers' meeting in Washington."],
+["L9","IPMDA, a QUAD initiative launched in 2022, is about",["Maritime domain awareness","Vaccine supply","Cancer care","Semiconductors"],"Indo-Pacific Partnership for Maritime Domain Awareness."],
+["L9","I2U2 is made up of",["India, Israel, USA, UAE","India, Iran, USA, UK","India, Indonesia, USA, UAE","India, Israel, UK, UAE"],"Called the ‘West Asian Quad’.","p"],
+["L9","The first leaders' summit of I2U2 was held in",["July 2022","October 2021","2020","2024"],"Virtually. The group was formed in October 2021.","p"],
+["L9","I2U2 was formed after which agreements normalised Israel's ties with Arab states?",["Abraham Accords","Oslo Accords","Camp David Accords","Doha Agreement"],"2020: UAE and Bahrain, later Morocco and Sudan."],
+["L9","Which is NOT a focus area of I2U2?",["Military alliance","Water","Food security","Space"],"Six areas: water, energy, transport, space, health, food security."],
+["L9","Which country is common to QUAD and I2U2 besides India?",["USA","Japan","Israel","Australia"],"The USA is in both."],
+["L9","Consider: 1. QUAD has a permanent secretariat. 2. I2U2 includes Israel and the UAE. Which is correct?",["Only 1","Only 2","Both 1 and 2","Neither 1 nor 2"],"Neither QUAD nor I2U2 has a secretariat.","",1,1],
+/* L10 G20 G7 */
+["L10","The G20 was formed in",["1999","2008","1975","1989"],"After the Asian financial crisis. Leaders' summits began in 2008.","p"],
+["L10","The first G20 leaders' summit was held in 2008 in",["Washington DC","London","Pittsburgh","Toronto"],"During the global financial crisis."],
+["L10","Which organisation became a permanent member of the G20 in 2023?",["African Union","ASEAN","European Union","Arab League"],"At the New Delhi summit under India's presidency.","p"],
+["L10","The G20 consists of",["19 countries, the EU and the African Union","20 countries","19 countries and the EU only","20 countries and the UN"],"21 members in all."],
+["L10","Which of these countries is NOT a member of the G20?",["Spain","Argentina","Indonesia","Türkiye"],"Spain attends as a permanent guest but is not a member. Also not members: Nigeria, Pakistan, Iran."],
+["L10","Which of these countries is a member of the G20?",["Saudi Arabia","Egypt","Nigeria","Iran"],"The three S's: Saudi Arabia, South Africa, South Korea."],
+["L10","The theme of India's G20 presidency was",["Vasudhaiva Kutumbakam: One Earth, One Family, One Future","Building Resilience","Recover Together, Recover Stronger","People, Planet, Prosperity"],"2023.","p"],
+["L10","India's G20 leaders' summit in September 2023 was held at",["Bharat Mandapam, New Delhi","Yashobhoomi, New Delhi","Mahatma Mandir, Gandhinagar","Vigyan Bhawan, New Delhi"],"The 18th G20 summit."],
+["L10","Which of these was launched during India's G20 presidency?",["Global Biofuels Alliance","International Solar Alliance","CDRI","Quad Vaccine Partnership"],"Also the India–Middle East–Europe Economic Corridor. ISA was 2015; CDRI 2019."],
+["L10","The first G20 summit held in Africa was in",["Johannesburg, 2025","Cairo, 2024","Nairobi, 2023","Lagos, 2025"],"Hosted by South Africa."],
+["L10","The 2026 G20 summit will be hosted by",["USA, in Miami","Brazil, in Rio","UK, in London","India, in New Delhi"],"14–15 December 2026. The USA has barred South Africa."],
+["L10","The ‘troika’ in the G20 refers to",["The past, current and next presidencies","The three largest economies","The three founding members","The EU, AU and UN"],"The G20 has no permanent secretariat."],
+["L10","Who was India's G20 Sherpa?",["Amitabh Kant","S. Jaishankar","Arvind Panagariya","Nirmala Sitharaman"],"The Sherpa leads negotiations for the leader."],
+["L10","The G7 began in 1975 as the G6 at a meeting in",["Rambouillet, France","Bonn, Germany","London, UK","Tokyo, Japan"],"Canada joined in 1976."],
+["L10","Which of these is NOT a G7 member?",["Russia","Canada","Italy","Japan"],"Russia joined in 1997 (G8) but was suspended in 2014 over Crimea.","p"],
+["L10","Russia was suspended from the G8 in",["2014","2008","2022","1998"],"After annexing Crimea."],
+["L10","The 2026 G7 summit was hosted by",["France, at Évian","Canada, at Kananaskis","Italy, at Apulia","Japan, at Hiroshima"],"Canada hosted in 2025; Italy in 2024; Japan in 2023."],
+["L10","Is India a member of the G7?",["No, but it is regularly invited as a guest","Yes, since 2019","Yes, a founding member","Yes, since 2023"],"PM Modi attended the 2025 Kananaskis summit as a guest."],
+["L10","The G77 was formed in 1964 at",["UNCTAD","The UN General Assembly","Bandung","Belgrade"],"It now has about 134 developing countries but kept its name."],
+["L10","Match the grouping with its members: G4",["India, Brazil, Germany, Japan","India, China, Brazil, Russia","USA, UK, France, Russia","India, Brazil, South Africa, China"],"G4 countries seek permanent UNSC seats."],
+/* L11 others */
+["L11","NATO was formed in",["1949","1945","1955","1991"],"By the Washington Treaty. HQ Brussels.","p"],
+["L11","Where is NATO headquartered?",["Brussels","Washington DC","Geneva","The Hague"],"The EU is also headquartered in Brussels."],
+["L11","Which country became NATO's 32nd member in 2024?",["Sweden","Finland","Ukraine","Austria"],"Finland joined in 2023 as the 31st."],
+["L11","NATO's Article 5 is about",["Collective defence: an attack on one is an attack on all","Free trade among members","Nuclear disarmament","Joining procedure"],"Invoked only once, after 9/11."],
+["L11","Who is the Secretary-General of NATO?",["Mark Rutte","Jens Stoltenberg","Ursula von der Leyen","Antonio Costa"],"Former Dutch PM, since October 2024."],
+["L11","How many member countries does the European Union have?",["27","28","25","30"],"The UK left on 31 January 2020."],
+["L11","The African Union is headquartered in",["Addis Ababa","Nairobi","Cairo","Johannesburg"],"It replaced the Organisation of African Unity in 2002."],
+["L11","OPEC was founded in 1960 at a conference in",["Baghdad","Vienna","Riyadh","Caracas"],"Its HQ is in Vienna, Austria.","p"],
+["L11","Where is OPEC headquartered?",["Vienna","Riyadh","Baghdad","Geneva"],"Austria is not itself a member."],
+["L11","Which of these was NOT a founding member of OPEC?",["UAE","Iran","Venezuela","Kuwait"],"Founders: Iran, Iraq, Kuwait, Saudi Arabia, Venezuela."],
+["L11","Which country left OPEC in January 2024?",["Angola","Qatar","Ecuador","Nigeria"],"Qatar left in 2019 and Ecuador in 2020."],
+["L11","How many members does the Commonwealth of Nations have?",["56","54","53","60"],"Gabon and Togo joined in 2022."],
+["L11","The Non-Aligned Movement held its first summit in 1961 at",["Belgrade","Bandung","Cairo","New Delhi"],"Bandung (1955) was the Asian-African conference that inspired it."],
+["L11","Which of these leaders was NOT a founder of NAM?",["Zhou Enlai","Jawaharlal Nehru","Josip Broz Tito","Gamal Abdel Nasser"],"The fifth founders were Sukarno and Kwame Nkrumah."],
+["L11","Which of these is NOT a member of the Gulf Cooperation Council?",["Iran","Oman","Bahrain","Qatar"],"GCC: Saudi Arabia, UAE, Qatar, Kuwait, Bahrain, Oman. HQ Riyadh."],
+["L11","India is NOT a member of which of these?",["APEC","G20","East Asia Summit","IORA"],"Asia-Pacific Economic Cooperation, 1989, 21 economies; HQ Singapore."],
+["L11","The OECD is headquartered in",["Paris","Geneva","Brussels","London"],"38 members; India is not one."],
+["L11","The Financial Action Task Force (FATF) deals with",["Money laundering and terror financing","Tax collection","Trade disputes","Aviation safety"],"Set up at the 1989 G7 summit; HQ Paris. India joined in 2010."],
+["L11","Which export control regime is India NOT a member of?",["Nuclear Suppliers Group","MTCR","Wassenaar Arrangement","Australia Group"],"China blocks India's NSG bid."],
+["L11","India joined the Missile Technology Control Regime in",["2016","2017","2018","2008"],"Trick: M-W-A in 16-17-18."],
+["L11","India joined the Australia Group, which controls chemical and biological exports, in",["2018","2016","2017","2020"],"Wassenaar: 2017."],
+["L11","The Nuclear Suppliers Group was formed in 1974 in response to",["India's Pokhran nuclear test","China's first nuclear test","The Cuban missile crisis","Chernobyl"],"‘Smiling Buddha’, May 1974."],
+["L11","The International Solar Alliance was launched in 2015 by India and",["France","USA","Japan","Germany"],"At COP21 in Paris.","p"],
+["L11","The International Solar Alliance is headquartered in",["Gurugram","New Delhi","Paris","Bengaluru"],"The first treaty-based international body with its HQ in India."],
+["L11","Interpol is headquartered in",["Lyon","Paris","The Hague","Geneva"],"Founded 1923; India joined in 1949."],
+["L11","Which Interpol notice seeks the arrest of a wanted person?",["Red Notice","Blue Notice","Yellow Notice","Black Notice"],"Yellow: missing person; Black: unidentified body; Blue: information."],
+["L11","In India, which agency is the national contact point for Interpol?",["CBI","NIA","IB","ED"],"Central Bureau of Investigation."],
+["L11","IBSA is a grouping of",["India, Brazil, South Africa","India, Bangladesh, Sri Lanka","Indonesia, Brazil, South Africa","India, Bhutan, Sri Lanka"],"Brasilia Declaration, 2003."],
+["L11","Match correctly: 1. OPEC 2. NATO 3. AU 4. ASEAN with a. Jakarta b. Addis Ababa c. Brussels d. Vienna",["1-d, 2-c, 3-b, 4-a","1-c, 2-d, 3-a, 4-b","1-d, 2-b, 3-c, 4-a","1-a, 2-c, 3-b, 4-d"],"OPEC Vienna, NATO Brussels, AU Addis Ababa, ASEAN Jakarta."],
+/* L12 current */
+["L12","Who heads the Asian Infrastructure Investment Bank in 2026?",["Zou Jiayi","Jin Liqun","Dilma Rousseff","Masato Kanda"],"She succeeded Jin Liqun, the first president, in January 2026."],
+["L12","Who is the President of the New Development Bank?",["Dilma Rousseff","K.V. Kamath","Zou Jiayi","Ajay Banga"],"Former President of Brazil."],
+["L12","Who is the President of the Asian Development Bank?",["Masato Kanda","Takehiko Nakao","Ajay Banga","Zou Jiayi"],"From Japan, since February 2025."],
+["L12","Who became Director-General of UNESCO in November 2025?",["Khaled El-Enany","Audrey Azoulay","Irina Bokova","Tedros Adhanom Ghebreyesus"],"From Egypt; he succeeded Audrey Azoulay."],
+["L12","Who heads the IAEA and is also a candidate for UN Secretary-General in 2026?",["Rafael Grossi","Rebeca Grynspan","Macky Sall","Tedros Adhanom"],"From Argentina."],
+["L12","The next UN Secretary-General will take office on",["1 January 2027","24 October 2026","1 January 2026","15 September 2026"],"Guterres's second term ends on 31 December 2026."],
+["L12","By custom, the 2026 UN Secretary-General race favours a candidate from",["Latin America and the Caribbean","Africa","Asia-Pacific","Western Europe"],"Regional rotation."],
+["L12","Which grouping held its 26th summit in Bishkek in 2026?",["SCO","BRICS","BIMSTEC","CICA"],"Kyrgyzstan's capital."],
+["L12","In which city was the 18th BRICS summit held?",["New Delhi","Goa","Kazan","Rio de Janeiro"],"12–13 September 2026."],
+["L12","Which country will chair the SCO after Kyrgyzstan?",["Pakistan","India","Russia","Tajikistan"],"For the 2027 summit."],
+["L12","The 2026 G20 summit host has barred which member from attending?",["South Africa","Russia","China","Argentina"],"The USA cited its dispute with South Africa."],
+["L12","Which grouping gained its 11th member, Timor-Leste, in 2025?",["ASEAN","BRICS","SAARC","SCO"],"BRICS also has 11 members, but its 11th was Indonesia."],
+["L12","Match the heads: 1. WTO 2. IMF 3. World Bank 4. WHO",["Okonjo-Iweala, Georgieva, Banga, Tedros","Georgieva, Okonjo-Iweala, Banga, Tedros","Okonjo-Iweala, Banga, Georgieva, Tedros","Tedros, Georgieva, Banga, Okonjo-Iweala"],"Worth writing on one flashcard."],
+["L12","Which organisation held its Ministerial Conference in Yaoundé in 2026?",["WTO","UNCTAD","OPEC","WHO"],"MC14, Cameroon."],
+["L12","Which pair of groupings both have exactly 11 members in 2026?",["ASEAN and BRICS","SAARC and BIMSTEC","SCO and G7","IORA and ASEAN"],"SAARC 8, BIMSTEC 7, SCO 10, G7 7, IORA 23."],
+["L12","The QUAD leaders' summit that India was due to host",["Has not yet been held as of September 2026","Was held in New Delhi in 2025","Was held in Goa in 2026","Was cancelled permanently"],"A meeting on the G20 sidelines in Miami in December 2026 is being explored."]
+];
+
+/* ============================================================
+   REVISE DATA
+   ============================================================ */
+const ORGS = [
+ ["UN","1945","New York","Founding member"],["WTO","1995 (GATT 1947/48)","Geneva","Founding member"],["IMF","1945","Washington DC","Founding member"],["World Bank","1944/45","Washington DC","Founding member"],
+ ["ADB","1966","Manila","Founding member"],["AIIB","2015/16","Beijing","Founding member (2nd-largest shareholder)"],["NDB","2014/15","Shanghai","Founding member"],
+ ["SAARC","1985 (Dhaka)","Kathmandu","Founding member"],["BIMSTEC","1997 (Bangkok)","Dhaka","Founding member"],["IORA","1997","Ebene, Mauritius","Founding member"],
+ ["ASEAN","1967 (Bangkok)","Jakarta","Not a member (dialogue partner)"],["ARF","1994","—","Member since 1996"],["EAS","2005","—","Founding member"],
+ ["BRICS","2009 summit","None","Founding member"],["SCO","2001 (Shanghai)","Beijing; RATS Tashkent","Member since 2017"],["QUAD","2007; revived 2017","None","Member"],["I2U2","2021","None","Member"],
+ ["G20","1999","None (troika)","Founding member"],["G7","1975","None","Not a member (guest)"],["NATO","1949","Brussels","Not a member"],["EU","1992/93","Brussels","Not a member"],["AU","2002","Addis Ababa","Not a member"],
+ ["OPEC","1960 (Baghdad)","Vienna","Not a member"],["OECD","1961","Paris","Not a member"],["APEC","1989","Singapore","Not a member"],["Commonwealth","1949","London","Member"],
+ ["NAM","1961 (Belgrade)","None","Founding member"],["GCC","1981","Riyadh","Not a member"],["FATF","1989","Paris","Member since 2010"],["Interpol","1923","Lyon","Member since 1949"],
+ ["ISA","2015","Gurugram","Co-founder"],["CDRI","2019","New Delhi","Founder"],["WHO","1948","Geneva","Member"],["UNESCO","1945","Paris","Member"],["FAO","1945","Rome","Member"],["IAEA","1957","Vienna","Member"],["UNEP","1972","Nairobi","Member"],["ILO","1919","Geneva","Founding member"]
+];
+const TILES = [["193","UN members"],["166","WTO members"],["11","BRICS members · 10 partners"],["10","SCO members"],["8","SAARC members"],["7","BIMSTEC members"],["11","ASEAN members"],["23","IORA members"],["19+2","G20: countries + EU + AU"],["32","NATO members"],["27","EU members"],["56","Commonwealth members"]];
+const PAIRS = [["Named after Shanghai, HQ Beijing","SCO"],["HQ in Shanghai","NDB (BRICS bank)"],["Founded in Dhaka, HQ Kathmandu","SAARC"],["HQ in Dhaka","BIMSTEC"],["Born through a Bangkok Declaration","ASEAN (1967) and BIMSTEC (1997)"],["HQ in Mauritius","IORA (Ebene)"],["Oil cartel HQ in a non-member country","OPEC → Vienna"],["Rome trio","FAO, IFAD, WFP"],["Nairobi pair","UNEP, UN-Habitat"],["Only UN organ outside New York","ICJ → The Hague"],["First intl treaty body HQ in India","ISA → Gurugram"],["No HQ / secretariat","BRICS, QUAD, I2U2, G20, G7"]];
+
+/* app strings */
+const APP = { key:"intl_orgs_workbook_v1", brand:"International Organisations", sub:"अंतरराष्ट्रीय संगठन · SSC CGL workbook",
+  eyebrow:"UN · Banks · SAARC · BIMSTEC · BRICS · SCO · QUAD · G20",
+  intro:"12 short lessons from your lecture plus the groupings it skipped (UN agencies, G20, G7, NATO, OPEC and more), with 2025–26 updates. Every lesson ends with a quiz and a one-screen summary." };
+
+/* ============================================================
+   HELPERS & STATE
+   ============================================================ */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const hash = s => { let h = 5381; for (let i=0;i<s.length;i++) h = ((h<<5)+h + s.charCodeAt(i))|0; return "q"+(h>>>0).toString(36); };
+const shuffle = a => { const b=a.slice(); for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]];} return b; };
+const L = id => LESSONS.find(l => l.id === id);
+const LNUM = id => LESSONS.findIndex(l => l.id === id) + 1;
+
+const QS = QB.map(r => {
+  const fixed = !!r[6];
+  return { t:r[0], q:r[1], o:r[2], e:r[3], p:(r[4]||"").includes("p"), a: fixed ? (r[5]||0) : 0, fixed, id:hash(r[1]) };
+});
+const byLesson = id => QS.filter(q => q.t === id);
+// order of options to show: array of original indexes
+const makePerm = q => q.fixed ? q.o.map((_,i)=>i) : shuffle(q.o.map((_,i)=>i));
+
+const KEY = APP.key;
+let S = { ans:{}, bm:{}, les:{}, mocks:[] };
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch(e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
+const record = (q, ok) => { S.ans[q.id] = ok ? 1 : 0; save(); renderTop(); };
+
+function renderTop(){
+  const ids = Object.keys(S.ans).filter(k => QS.some(q => q.id === k));
+  const right = ids.filter(k => S.ans[k] === 1).length;
+  const pct = ids.length ? Math.round(right*100/ids.length) : 0;
+  $("#topstat").innerHTML = `<b>${ids.length}</b>/${QS.length} tried<br><b>${pct}%</b> right now`;
+}
+
+/* ============================================================
+   ROUTING
+   ============================================================ */
+let TAB = "learn";
+let timerId = null;
+function go(tab){
+  TAB = tab;
+  document.querySelectorAll(".nav button").forEach(b => b.setAttribute("aria-current", b.dataset.tab===tab ? "page" : "false"));
+  if (tab === "learn") renderLearn();
+  if (tab === "practice") renderPractice();
+  if (tab === "mock") renderMock();
+  if (tab === "revise") renderRevise();
+  window.scrollTo(0,0);
+  try { history.replaceState(null, "", "#"+tab); } catch(e) {}
+}
+document.querySelectorAll(".nav button").forEach(b => b.addEventListener("click", () => {
+  if (TAB === "mock" && M && M.running && b.dataset.tab !== "mock") { go("mock"); showMockLeave(b.dataset.tab); return; }
+  go(b.dataset.tab);
+}));
+
+/* ============================================================
+   LEARN
+   ============================================================ */
+function renderLearn(){
+  const done = LESSONS.filter(l => S.les[l.id] && S.les[l.id].done).length;
+  const nextIdx = LESSONS.findIndex(l => !(S.les[l.id] && S.les[l.id].done));
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="hero">
+      <span class="eyebrow">${APP.eyebrow}</span>
+      <h1>Learn it, test it, revise it</h1>
+      <p>${APP.intro} ${QS.length} exam-style questions in all.</p>
+      <div class="meter" aria-label="Lessons done"><i style="width:${done/LESSONS.length*100}%"></i></div>
+      <div class="row between"><span class="muted num" style="font-size:13px">${done}/${LESSONS.length} lessons done</span>
+      ${nextIdx>=0 ? `<button class="btn pri sm" type="button" data-open="${LESSONS[nextIdx].id}">${done? "Continue" : "Start"}: Lesson ${nextIdx+1}</button>` : `<span class="muted" style="font-size:13px">All lessons done. Try a mock test.</span>`}</div>
+    </div>
+    <div class="lessons">${LESSONS.map((l,i) => {
+      const st = S.les[l.id] || {}; const n = byLesson(l.id).length;
+      return `<button type="button" class="les ${st.done?"done":""} ${i===nextIdx?"next":""}" data-open="${l.id}">
+        <span class="no">${st.done ? "✓" : i+1}</span>
+        <span class="t"><b>${esc(l.title)}</b><span>${l.hi} · ${n} questions</span></span>
+        <span class="sc">${st.best!=null ? `best<br>${st.best}/${n}` : ""}</span></button>`;}).join("")}
+    </div>
+    <p class="foot">Current affairs are updated to September 2026. Where the lecture got a fact wrong, the lesson flags it in a red “Trap” box.</p>
+  </section>`;
+  $("#app").querySelectorAll("[data-open]").forEach(b => b.addEventListener("click", () => openLesson(b.dataset.open, "learn")));
+}
+
+function blockHTML(b){
+  if (b.k==="p") return `<div class="plain"><p>${b.h}</p></div>`;
+  if (b.k==="trick") return `<div class="trick"><span class="lab">Trick</span>${b.h}</div>`;
+  if (b.k==="trap") return `<div class="trap"><span class="lab">Trap · correction</span>${b.h}</div>`;
+  if (b.k==="facts") return `<div class="block"><h3>${b.title}</h3><dl class="facts">${b.rows.map(r=>`<div><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join("")}</dl></div>`;
+  if (b.k==="tl") return `<div class="block"><h3>${b.title}</h3><ul class="tl">${b.rows.map(r=>`<li><span class="y">${r[0]}</span><span>${r[1]}</span></li>`).join("")}</ul></div>`;
+  if (b.k==="table") {
+    const isNum = (ci) => b.numcol==="all" ? ci>0 : (b.numcol===1 && ci===1) || (typeof b.numcol==="string" && b.numcol.includes(String(ci)));
+    return `<div class="block"><h3>${b.title}</h3><div class="tbl"><table><thead><tr>${b.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${b.rows.map(r=>`<tr>${r.map((c,ci)=>`<td class="${isNum(ci)?"n":""}">${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+  }
+  if (b.k==="fig") return `<div class="block"><h3>${b.title}</h3><figure class="fig">${b.svg}<figcaption>${b.cap}</figcaption></figure></div>`;
+  if (b.k==="pyr") return `<div class="block"><h3>${b.title}</h3><div class="pyr">${b.items.map(it=>`<div>${PYR(it.rows)}<b>${it.name}</b><span class="muted">${it.note}</span></div>`).join("")}</div><p class="muted" style="font-size:13px;margin-top:8px"><span style="color:var(--blue)">■</span> males · <span style="color:var(--accent)">■</span> females · top = old, base = young</p></div>`;
+  return "";
+}
+
+let LQ = null;
+function openLesson(id, step){
+  const l = L(id), i = LNUM(id);
+  if (step === "quiz") { LQ = { id, list: shuffle(byLesson(id)).map(q => ({q, perm:makePerm(q)})), i:0, score:0, picked:null }; }
+  const head = `<div class="lhead"><button class="back" type="button" id="lback">‹ Lessons</button></div>
+    <span class="eyebrow">Lesson ${i} of ${LESSONS.length} · ${l.hi}</span><h1>${esc(l.title)}</h1>
+    <div class="steps" role="tablist">
+      <button type="button" data-step="learn" aria-current="${step==="learn"?"step":"false"}">1 · Learn</button>
+      <button type="button" data-step="quiz" aria-current="${step==="quiz"?"step":"false"}">2 · Quiz</button>
+      <button type="button" data-step="sum" aria-current="${step==="sum"?"step":"false"}">3 · Summary</button>
+    </div>`;
+  let body = "";
+  if (step === "learn") {
+    body = `<div class="stack">${l.blocks.map(blockHTML).join("")}
+      <div class="row end"><button class="btn pri" type="button" id="toquiz">Take the quiz · ${byLesson(id).length} questions</button></div></div>`;
+  } else if (step === "quiz") {
+    body = `<div id="lq"></div>`;
+  } else {
+    const nxt = LESSONS[i];
+    body = `<div class="stack"><div class="block"><h3>Remember these</h3><ul class="sum">${l.sum.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>
+      <div class="row between"><button class="btn" type="button" id="relearn">Read again</button>
+      ${nxt ? `<button class="btn pri" type="button" id="nextles">Next: ${esc(nxt.title)}</button>` : `<button class="btn pri" type="button" id="tomock">Take a mock test</button>`}</div></div>`;
+    S.les[id] = Object.assign(S.les[id]||{}, {done:1}); save();
+  }
+  $("#app").innerHTML = `<section class="view stack">${head}${body}</section>`;
+  $("#lback").onclick = () => renderLearn();
+  $("#app").querySelectorAll("[data-step]").forEach(b => b.onclick = () => openLesson(id, b.dataset.step));
+  if (step==="learn") $("#toquiz").onclick = () => openLesson(id,"quiz");
+  if (step==="quiz") renderLQ();
+  if (step==="sum") {
+    $("#relearn").onclick = () => openLesson(id,"learn");
+    const n = $("#nextles"); if (n) n.onclick = () => openLesson(LESSONS[i].id,"learn");
+    const m = $("#tomock"); if (m) m.onclick = () => go("mock");
+  }
+  window.scrollTo(0,0);
+}
+
+function optsHTML(q, perm, state){
+  // state: {picked: originalIndex|null, reveal: bool, sel: originalIndex|null}
+  return perm.map((oi, k) => {
+    let cls = "opt";
+    if (state.reveal) { if (oi === q.a) cls += " ok"; else if (oi === state.picked) cls += " no"; }
+    else if (state.sel === oi) cls += " sel";
+    return `<button type="button" class="${cls}" data-oi="${oi}" ${state.reveal?"disabled":""}><span class="k">${"ABCD"[k]}</span><span>${esc(q.o[oi])}</span></button>`;
+  }).join("");
+}
+function expHTML(q, picked){
+  const ok = picked === q.a;
+  return `<div class="exp">${ok ? `<b class="okl">Correct.</b>` : `<b class="nol">Answer: ${esc(q.o[q.a])}.</b>`} ${esc(q.e)}</div>`;
+}
+function metaHTML(q, no){
+  return `<div class="qmeta"><span class="qno">${no}</span><span class="tag">L${LNUM(q.t)} · ${esc(L(q.t).title)}</span>${q.p?`<span class="tag pyq">Exam-asked</span>`:""}
+  <button type="button" class="bm" data-bm="${q.id}" aria-pressed="${S.bm[q.id]?"true":"false"}" aria-label="Bookmark">${S.bm[q.id]?"★":"☆"}</button></div>`;
+}
+
+function renderLQ(){
+  const box = $("#lq");
+  if (LQ.i >= LQ.list.length) {
+    const n = LQ.list.length, l = L(LQ.id);
+    const st = S.les[LQ.id] || {}; st.best = Math.max(st.best||0, LQ.score); S.les[LQ.id] = st; save();
+    box.innerHTML = `<div class="stack"><div class="block stack"><span class="eyebrow">Quiz done</span>
+      <div class="scorebig"><span class="num">${LQ.score}</span><span class="muted">/ ${n} correct</span></div>
+      <p class="muted">${LQ.score===n ? "Full marks." : LQ.score >= n*0.8 ? "Strong. Review the ones you missed in Practice → Mistakes." : "Read the lesson once more, then retry. Missed questions are saved under Practice → Mistakes."}</p></div>
+      <div class="row between"><button class="btn" type="button" id="retry">Retry quiz</button><button class="btn pri" type="button" id="tosum">See summary</button></div></div>`;
+    $("#retry").onclick = () => openLesson(LQ.id,"quiz");
+    $("#tosum").onclick = () => openLesson(LQ.id,"sum");
+    return;
+  }
+  const it = LQ.list[LQ.i], q = it.q;
+  const reveal = LQ.picked !== null;
+  box.innerHTML = `<div class="stack"><div class="meter"><i style="width:${LQ.i/LQ.list.length*100}%"></i></div>
+    <article class="qcard">${metaHTML(q, `Q${LQ.i+1}/${LQ.list.length}`)}
+    <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {picked:LQ.picked, reveal})}</div>
+    ${reveal ? expHTML(q, LQ.picked) : ""}</article>
+    ${reveal ? `<div class="row end"><button class="btn pri" type="button" id="lqnext">${LQ.i+1 < LQ.list.length ? "Next question" : "Finish"}</button></div>` : `<p class="muted" style="font-size:13px">Score so far: <span class="num">${LQ.score}</span></p>`}</div>`;
+  box.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    if (LQ.picked !== null) return;
+    LQ.picked = +b.dataset.oi; const ok = LQ.picked === q.a; if (ok) LQ.score++; record(q, ok); renderLQ();
+  });
+  bindBM(box);
+  const nx = $("#lqnext"); if (nx) nx.onclick = () => { LQ.i++; LQ.picked = null; renderLQ(); window.scrollTo(0,0); };
+}
+
+function bindBM(root){
+  root.querySelectorAll("[data-bm]").forEach(b => b.onclick = (ev) => {
+    ev.stopPropagation();
+    const id = b.dataset.bm; if (S.bm[id]) delete S.bm[id]; else S.bm[id] = 1; save();
+    b.setAttribute("aria-pressed", S.bm[id] ? "true":"false"); b.textContent = S.bm[id] ? "★" : "☆";
+  });
+}
+
+/* ============================================================
+   PRACTICE
+   ============================================================ */
+let PF = "all", PSHOW = 20, PORDER = null, PPERM = {}, PPICK = {};
+function practiceList(){
+  let list = QS;
+  if (PF === "pyq") list = QS.filter(q => q.p);
+  else if (PF === "wrong") list = QS.filter(q => S.ans[q.id] === 0);
+  else if (PF === "new") list = QS.filter(q => S.ans[q.id] === undefined);
+  else if (PF === "bm") list = QS.filter(q => S.bm[q.id]);
+  else if (PF !== "all") list = QS.filter(q => q.t === PF);
+  if (PORDER) { const pos = new Map(PORDER.map((id,i)=>[id,i])); list = list.slice().sort((a,b)=>(pos.get(a.id)??0)-(pos.get(b.id)??0)); }
+  return list;
+}
+function renderPractice(){
+  const wrongN = QS.filter(q => S.ans[q.id] === 0).length, bmN = QS.filter(q=>S.bm[q.id]).length, pyqN = QS.filter(q=>q.p).length;
+  const chips = [["all",`All ${QS.length}`],["new","Not tried"],["wrong",`Mistakes ${wrongN}`],["pyq",`Exam-asked ${pyqN}`],["bm",`Starred ${bmN}`]].concat(LESSONS.map((l,i)=>[l.id,`L${i+1} ${l.title}`]));
+  const list = practiceList();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Question bank</span><h1>Practice</h1>
+    <p class="muted">Tap an option to check it. Wrong answers go to <b>Mistakes</b> until you get them right.</p></div>
+    <div class="chips" role="group" aria-label="Filter">${chips.map(c=>`<button type="button" class="chip" data-f="${c[0]}" aria-pressed="${PF===c[0]}">${esc(c[1])}</button>`).join("")}</div>
+    <div class="row between"><span class="muted num" style="font-size:13px">${list.length} questions</span>
+      <div class="row"><button class="btn sm ghost" type="button" id="pshuf">${PORDER?"In order":"Shuffle"}</button></div></div>
+    <div class="stack" id="plist"></div>
+  </section>`;
+  $("#app").querySelectorAll("[data-f]").forEach(b => b.onclick = () => { PF = b.dataset.f; PSHOW = 20; PPICK = {}; renderPractice(); });
+  $("#pshuf").onclick = () => { PORDER = PORDER ? null : shuffle(QS.map(q=>q.id)); PSHOW = 20; renderPractice(); };
+  const chipOn = $(`.chip[aria-pressed="true"]`); if (chipOn) chipOn.scrollIntoView({block:"nearest", inline:"center"});
+  drawPList();
+}
+function pCard(q, idx){
+  if (!PPERM[q.id]) PPERM[q.id] = makePerm(q);
+  const picked = PPICK[q.id]; const reveal = picked !== undefined;
+  return `<article class="qcard" data-q="${q.id}">${metaHTML(q, "Q"+(idx+1))}<p class="qt">${esc(q.q)}</p>
+    <div class="opts">${optsHTML(q, PPERM[q.id], {picked: reveal?picked:null, reveal})}</div>${reveal?expHTML(q,picked):""}</article>`;
+}
+function drawPList(){
+  const list = practiceList(), box = $("#plist");
+  if (!list.length) { box.innerHTML = `<p class="empty">${PF==="wrong"?"No mistakes saved. Answer some questions first, or you've cleared them all.":PF==="bm"?"Nothing starred yet. Tap ☆ on any question.":"Nothing here."}</p>`; return; }
+  box.innerHTML = list.slice(0, PSHOW).map((q,i)=>pCard(q,i)).join("") + (list.length > PSHOW ? `<button class="btn" type="button" id="pmore">Show 20 more (${list.length-PSHOW} left)</button>` : "");
+  bindP(box);
+  const more = $("#pmore"); if (more) more.onclick = () => { PSHOW += 20; drawPList(); };
+}
+function bindP(box){ box.querySelectorAll(".qcard").forEach(bindCard); }
+function bindCard(card){
+  card.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    const q = QS.find(x => x.id === card.dataset.q); if (PPICK[q.id] !== undefined) return;
+    PPICK[q.id] = +b.dataset.oi; record(q, PPICK[q.id] === q.a);
+    const idx = +card.querySelector(".qno").textContent.slice(1) - 1;
+    const tmp = document.createElement("div"); tmp.innerHTML = pCard(q, idx); const nc = tmp.firstElementChild;
+    card.replaceWith(nc); bindCard(nc);
+  });
+  bindBM(card);
+}
+
+/* ============================================================
+   MOCK TEST
+   ============================================================ */
+let M = null, MCFG = {n:25, scope:"all", neg:1}, LEAVE_TO = null;
+function renderMock(){
+  if (M && M.running) return drawMockRun();
+  if (M && M.done) return drawMockResult();
+  const hist = (S.mocks||[]).slice(-6).reverse();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Timed, SSC pattern</span><h1>Mock test</h1>
+    <p class="muted">+2 for a right answer, −0.5 for a wrong one, 36 seconds per question (CGL Tier-1 pace). Answers show only after you submit.</p></div>
+    <div class="block stack">
+      <fieldset><legend>Questions</legend><div class="radios">${[10,25,50,100].map(n=>`<label><input type="radio" name="mn" id="mn${n}" value="${n}" ${MCFG.n===n?"checked":""}><span>${n} · ${Math.round(n*36/60)} min</span></label>`).join("")}</div></fieldset>
+      <fieldset><legend>From</legend><select id="mscope" aria-label="Lessons to draw from"><option value="all">All lessons</option><option value="pyq">Exam-asked only</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}" ${MCFG.scope===l.id?"selected":""}>L${i+1} · ${esc(l.title)}</option>`).join("")}</select></fieldset>
+      <label class="row" style="gap:8px;font-weight:600"><input type="checkbox" id="mneg" ${MCFG.neg?"checked":""}> Negative marking (−0.5)</label>
+      <div id="merr" class="muted" style="font-size:14px"></div>
+      <div class="row end"><button class="btn pri" type="button" id="mstart">Start test</button></div>
+    </div>
+    ${hist.length ? `<div class="block"><h3>Recent attempts</h3><div class="hist">${hist.map(h=>`<div><span>${esc(h.d)} · ${h.n} Q</span><span class="num">${h.score}/${h.max} · ${h.acc}%</span></div>`).join("")}</div></div>` : ""}
+  </section>`;
+  $("#mscope").value = MCFG.scope;
+  $("#mstart").onclick = () => {
+    MCFG.n = +(document.querySelector('input[name="mn"]:checked')||{value:25}).value;
+    MCFG.scope = $("#mscope").value; MCFG.neg = $("#mneg").checked ? 1 : 0;
+    let pool = MCFG.scope==="all" ? QS : MCFG.scope==="pyq" ? QS.filter(q=>q.p) : MCFG.scope==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===MCFG.scope);
+    if (!pool.length) { $("#merr").textContent = "No questions in that set yet. Pick another source."; return; }
+    const qs = shuffle(pool).slice(0, MCFG.n);
+    M = { running:true, list: qs.map(q=>({q, perm:makePerm(q)})), ans: qs.map(()=>null), mark: qs.map(()=>false), i:0, neg:MCFG.neg, secs: qs.length*36, start: Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000;
+    startTimer(); drawMockRun();
+  };
+}
+function startTimer(){
+  clearInterval(timerId);
+  timerId = setInterval(() => {
+    if (!M || !M.running) { clearInterval(timerId); return; }
+    const left = Math.max(0, Math.round((M.end - Date.now())/1000));
+    const el = $("#mtime"); if (el) { el.textContent = fmt(left); el.classList.toggle("low", left <= 60); }
+    if (left <= 0) submitMock();
+  }, 1000);
+}
+const fmt = s => `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+function drawMockRun(){
+  const it = M.list[M.i], q = it.q, left = Math.max(0, Math.round((M.end-Date.now())/1000));
+  const answered = M.ans.filter(a=>a!==null).length;
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="mbar"><span class="timer num ${left<=60?"low":""}" id="mtime">${fmt(left)}</span>
+      <span class="muted num" style="font-size:13px;flex:1">Q ${M.i+1}/${M.list.length} · ${answered} answered</span>
+      <button class="btn sm" type="button" id="mpal">${M.showPal?"Hide":"All Qs"}</button></div>
+    ${LEAVE_TO ? `<div class="confirm"><b>Leave the test?</b><span>Your answers so far will be scored now.</span><div class="row"><button class="btn sm pri" type="button" id="lvy">Submit and leave</button><button class="btn sm" type="button" id="lvn">Stay</button></div></div>` : ""}
+    ${M.showPal ? `<div class="block"><div class="pal">${M.list.map((_,k)=>`<button type="button" data-j="${k}" class="${M.ans[k]!==null?"a":""} ${M.mark[k]?"m":""} ${k===M.i?"cur":""}" aria-label="Question ${k+1}">${k+1}</button>`).join("")}</div>
+      <p class="muted" style="font-size:12px;margin-top:8px">Filled = answered · orange line = marked for review</p></div>` : ""}
+    <article class="qcard"><div class="qmeta"><span class="qno">Q${M.i+1}</span><span class="tag">L${LNUM(q.t)}</span>${M.mark[M.i]?`<span class="tag pyq">Marked</span>`:""}</div>
+      <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {sel:M.ans[M.i], reveal:false})}</div></article>
+    <div class="row between"><button class="btn" type="button" id="mprev" ${M.i===0?"disabled":""}>‹ Prev</button>
+      <button class="btn ghost" type="button" id="mmark">${M.mark[M.i]?"Unmark":"Mark"}</button>
+      <button class="btn ghost" type="button" id="mclr" ${M.ans[M.i]===null?"disabled":""}>Clear</button>
+      <button class="btn ${M.i<M.list.length-1?"pri":""}" type="button" id="mnext" ${M.i===M.list.length-1?"disabled":""}>Next ›</button></div>
+    ${M.confirm ? `<div class="confirm"><b>Submit the test?</b><span>${M.list.length-answered} unanswered${M.mark.filter(Boolean).length?`, ${M.mark.filter(Boolean).length} marked for review`:""}.</span><div class="row"><button class="btn sm pri" type="button" id="msubY">Submit</button><button class="btn sm" type="button" id="msubN">Keep going</button></div></div>`
+      : `<button class="btn pri" type="button" id="msub">Submit test</button>`}
+  </section>`;
+  $("#app").querySelectorAll(".opt").forEach(b => b.onclick = () => { M.ans[M.i] = +b.dataset.oi; drawMockRun(); });
+  $("#mprev").onclick = () => { if (M.i>0){M.i--; drawMockRun();} };
+  $("#mnext").onclick = () => { if (M.i<M.list.length-1){M.i++; drawMockRun(); window.scrollTo(0,0);} };
+  $("#mmark").onclick = () => { M.mark[M.i] = !M.mark[M.i]; drawMockRun(); };
+  $("#mclr").onclick = () => { M.ans[M.i] = null; drawMockRun(); };
+  $("#mpal").onclick = () => { M.showPal = !M.showPal; drawMockRun(); };
+  $("#app").querySelectorAll("[data-j]").forEach(b => b.onclick = () => { M.i = +b.dataset.j; drawMockRun(); });
+  const s = $("#msub"); if (s) s.onclick = () => { M.confirm = true; drawMockRun(); };
+  const y = $("#msubY"); if (y) y.onclick = submitMock;
+  const n = $("#msubN"); if (n) n.onclick = () => { M.confirm = false; drawMockRun(); };
+  const lvy = $("#lvy"); if (lvy) lvy.onclick = () => { const t = LEAVE_TO; LEAVE_TO = null; submitMock(); go(t); };
+  const lvn = $("#lvn"); if (lvn) lvn.onclick = () => { LEAVE_TO = null; drawMockRun(); };
+}
+function showMockLeave(tab){ LEAVE_TO = tab; drawMockRun(); }
+function submitMock(){
+  if (!M || !M.running) return;
+  clearInterval(timerId);
+  M.running = false; M.done = true; M.confirm = false;
+  let c=0,w=0,sk=0; const per = {};
+  M.list.forEach((it,k) => {
+    const a = M.ans[k]; const t = it.q.t; per[t] = per[t] || {c:0,n:0}; per[t].n++;
+    if (a===null) sk++; else if (a===it.q.a) { c++; per[t].c++; S.ans[it.q.id]=1; } else { w++; S.ans[it.q.id]=0; }
+  });
+  const max = M.list.length*2, score = +(c*2 - (M.neg? w*0.5 : 0)).toFixed(1);
+  const used = Math.min(M.secs, Math.round((Date.now()-M.start)/1000));
+  M.res = {c,w,sk,score,max,used,per, acc: (c+w) ? Math.round(c*100/(c+w)) : 0};
+  const d = new Date(); const ds = d.toLocaleDateString("en-IN",{day:"numeric",month:"short"})+" "+d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
+  S.mocks = (S.mocks||[]).concat([{d:ds, n:M.list.length, score, max, acc:M.res.acc}]).slice(-20); save(); renderTop();
+  M.filter = "wrong";
+  if (TAB==="mock") drawMockResult();
+}
+function drawMockResult(){
+  const r = M.res;
+  const per = Object.keys(r.per).sort((a,b)=>LNUM(a)-LNUM(b)).map(t => `<div><span>L${LNUM(t)} · ${esc(L(t).title)}</span><span class="num">${r.per[t].c}/${r.per[t].n}</span></div>`).join("");
+  const rows = M.list.map((it,k)=>({it,k})).filter(({it,k}) => M.filter==="all" ? true : M.filter==="wrong" ? (M.ans[k]!==null && M.ans[k]!==it.q.a) : M.ans[k]===null);
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Result</span>
+    <div class="scorebig"><span class="num">${r.score}</span><span class="muted">/ ${r.max} marks</span></div></div>
+    <div class="kpis"><div class="kpi g"><span class="num">${r.c}</span><span>right</span></div><div class="kpi b"><span class="num">${r.w}</span><span>wrong</span></div><div class="kpi"><span class="num">${r.sk}</span><span>skipped</span></div><div class="kpi"><span class="num">${r.acc}%</span><span>accuracy</span></div></div>
+    <p class="muted num" style="font-size:13px">Time used ${fmt(r.used)} of ${fmt(M.secs)}</p>
+    <div class="block"><h3>By lesson</h3><div class="hist">${per}</div></div>
+    <div class="row between"><button class="btn" type="button" id="mnew">New test</button><button class="btn pri" type="button" id="mretry">Retake same questions</button></div>
+    <h2>Review</h2>
+    <div class="chips">${[["wrong",`Wrong ${r.w}`],["skip",`Skipped ${r.sk}`],["all",`All ${M.list.length}`]].map(c=>`<button class="chip" type="button" data-rf="${c[0]}" aria-pressed="${M.filter===c[0]}">${c[1]}</button>`).join("")}</div>
+    <div class="stack">${rows.length ? rows.map(({it,k}) => `<article class="qcard">${metaHTML(it.q, "Q"+(k+1))}<p class="qt">${esc(it.q.q)}</p><div class="opts">${optsHTML(it.q, it.perm, {picked:M.ans[k], reveal:true})}</div>${M.ans[k]===null?`<div class="exp"><b class="nol">Skipped. Answer: ${esc(it.q.o[it.q.a])}.</b> ${esc(it.q.e)}</div>`:expHTML(it.q, M.ans[k])}</article>`).join("") : `<p class="empty">Nothing in this list.</p>`}</div>
+  </section>`;
+  bindBM($("#app"));
+  $("#app").querySelectorAll("[data-rf]").forEach(b => b.onclick = () => { M.filter = b.dataset.rf; drawMockResult(); });
+  $("#mnew").onclick = () => { M = null; renderMock(); };
+  $("#mretry").onclick = () => {
+    const list = M.list.map(it=>({q:it.q, perm:makePerm(it.q)}));
+    M = { running:true, list, ans:list.map(()=>null), mark:list.map(()=>false), i:0, neg:MCFG.neg, secs:list.length*36, start:Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000; startTimer(); drawMockRun();
+  };
+}
+
+/* ============================================================
+   REVISE
+   ============================================================ */
+let RV = "where", FC = null, FCSCOPE = "all";
+function renderRevise(){
+  const tabs = [["where","HQ & year"],["nums","Numbers"],["tricks","Tricks"],["traps","Traps"],["flash","Flashcards"]];
+  if (!tabs.some(t=>t[0]===RV)) RV = "where";
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Last-day revision</span><h1>Revise</h1></div>
+    <div class="seg" role="tablist">${tabs.map(t=>`<button type="button" role="tab" data-rv="${t[0]}" aria-selected="${RV===t[0]}">${t[1]}</button>`).join("")}</div>
+    <div id="rv" class="stack"></div></section>`;
+  $("#app").querySelectorAll("[data-rv]").forEach(b => b.onclick = () => { RV = b.dataset.rv; renderRevise(); });
+  const box = $("#rv");
+  if (RV === "where") {
+    box.innerHTML = `<input class="search" id="rks" type="search" placeholder="Search a body, city or year (e.g. Vienna, 1997)" aria-label="Search organisations">
+      <div class="chips" role="group" aria-label="India status">${[["all","All"],["mem","India a member"],["no","India not a member"]].map(c=>`<button type="button" class="chip" data-is="${c[0]}" aria-pressed="${ISF===c[0]}">${c[1]}</button>`).join("")}</div>
+      <div class="block"><div class="tbl"><table><thead><tr><th>Body</th><th>Founded</th><th>HQ</th><th>India</th></tr></thead><tbody id="orgb"></tbody></table></div></div>`;
+    const draw = () => {
+      const q = $("#rks").value.trim().toLowerCase();
+      const rows = ORGS.filter(r => (!q || r.join(" ").toLowerCase().includes(q)) && (ISF==="all" || (ISF==="no" ? /^Not/.test(r[3]) : !/^Not/.test(r[3]))));
+      $("#orgb").innerHTML = rows.length ? rows.map(r=>`<tr><td><b>${esc(r[0])}</b></td><td class="n">${esc(r[1])}</td><td>${esc(r[2])}</td><td style="color:${/^Not/.test(r[3])?"var(--bad)":"var(--good)"}">${esc(r[3])}</td></tr>`).join("") : `<tr><td colspan="4" class="muted">No match.</td></tr>`;
+    };
+    $("#rks").oninput = draw;
+    box.querySelectorAll("[data-is]").forEach(b => b.onclick = () => { ISF = b.dataset.is; box.querySelectorAll("[data-is]").forEach(x=>x.setAttribute("aria-pressed", x.dataset.is===ISF)); draw(); });
+    draw();
+  }
+  if (RV === "nums") {
+    box.innerHTML = `<div class="tiles">${TILES.map(t=>`<div class="tile"><span class="num">${t[0]}</span><span>${t[1]}</span></div>`).join("")}</div>
+    <div class="block"><h3>Confusing pairs</h3><dl class="rk">${PAIRS.map(p=>`<div><dt>${esc(p[0])}</dt><dd>${esc(p[1])}</dd></div>`).join("")}</dl></div>`;
+  }
+  if (RV === "tricks" || RV === "traps") {
+    const kind = RV==="tricks" ? "trick" : "trap";
+    const items = LESSONS.flatMap((l,i) => l.blocks.filter(b=>b.k===kind).map(b=>({l:i+1, t:l.title, h:b.h})));
+    box.innerHTML = items.map(x => `<div class="${kind}"><span class="lab">L${x.l} · ${esc(x.t)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "flash") drawFlash(box);
+}
+let ISF = "all";
+function drawFlash(box){
+  if (!FC) { const pool = FCSCOPE==="all" ? QS : FCSCOPE==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===FCSCOPE); FC = {list: shuffle(pool), i:0, flip:false, known:0}; }
+  const sel = `<select id="fcs" aria-label="Flashcard set"><option value="all">All questions</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}">L${i+1} · ${esc(l.title)}</option>`).join("")}</select>`;
+  if (!FC.list.length || FC.i >= FC.list.length) {
+    box.innerHTML = `<div class="row">${sel}</div><div class="block stack"><h3>${FC.list.length ? "Deck finished" : "No cards in this set"}</h3>${FC.list.length?`<p class="muted">You knew ${FC.known} of ${FC.list.length} on first look.</p>`:""}<div class="row"><button class="btn pri" type="button" id="fcr">Shuffle and restart</button></div></div>`;
+    $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+    $("#fcr").onclick = () => { FC = null; drawFlash(box); }; return;
+  }
+  const q = FC.list[FC.i];
+  box.innerHTML = `<div class="row between">${sel}<span class="muted num" style="font-size:13px">${FC.i+1}/${FC.list.length}</span></div>
+    <button type="button" class="flash" id="fcard" aria-label="Flip card">
+      <span class="side">${FC.flip?"Answer":"Question · tap to flip"}</span>
+      <span class="front">${esc(q.q)}</span>
+      ${FC.flip ? `<span class="ans">${esc(q.o[q.a])}</span><span class="muted">${esc(q.e)}</span>` : ""}
+    </button>
+    <div class="row between"><button class="btn" type="button" id="fca" ${FC.flip?"":"disabled"}>Again later</button><button class="btn pri" type="button" id="fck" ${FC.flip?"":"disabled"}>Got it</button></div>`;
+  $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+  $("#fcard").onclick = () => { FC.flip = !FC.flip; drawFlash(box); };
+  $("#fca").onclick = () => { FC.list.push(q); FC.list.splice(FC.i,1); FC.flip=false; drawFlash(box); };
+  $("#fck").onclick = () => { FC.known++; FC.i++; FC.flip=false; drawFlash(box); };
+}
+
+/* boot */
+renderTop();
+const start = (location.hash||"").replace("#","");
+go(["learn","practice","mock","revise"].includes(start) ? start : "learn");
+</script>
+
+</body>
+</html>

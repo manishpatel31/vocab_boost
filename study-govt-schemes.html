@@ -1,0 +1,1436 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<script>
+/* शब्दRegister bridge: follows the app's Light / Dark / Auto choice when opened inside the app. */
+(function(){
+  var root = document.documentElement;
+  function apply(t){ if(t === 'dark' || t === 'light') root.setAttribute('data-theme', t); else root.removeAttribute('data-theme'); }
+  try{
+    var q = new URLSearchParams(location.search);
+    if(q.get('theme')) apply(q.get('theme'));
+    if(q.get('embed')) root.classList.add('in-shabd');
+  }catch(e){}
+  window.addEventListener('message', function(e){
+    if(e.origin !== location.origin || !e.data) return;
+    if(e.data.type === 'shabd-theme') apply(e.data.theme);
+  });
+})();
+</script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Government Schemes Workbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Martel:wght@700;800&family=Mukta:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: a government gazette — warm ivory paper, deep forest-green ink, saffron highlights; one-column app with a bottom tab bar. */
+:root{
+  --paper:#f6f3ea; --sheet:#fffdf7; --sunk:#ebe6d8;
+  --ink:#1d2a22; --ink2:#56625a; --rule:#dcd5c3;
+  --blue:#1f5c3d; --on-blue:#ffffff; --blue-bg:#dcebdf;
+  --accent:#b4530f; --accent-bg:#fbe7d3;
+  --good:#1b7547; --good-bg:#dff1e6; --bad:#b0271f; --bad-bg:#f8e1de;
+  --warn-bg:#fff2d2;
+  --f-display:"Martel", "Noto Serif Devanagari", Georgia, serif;
+  --f-body:"Mukta", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-num:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r:10px; --nav-h:64px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#111612; --sheet:#1a211c; --sunk:#222b25;
+  --ink:#e8eee9; --ink2:#a3b0a7; --rule:#2f3a33;
+  --blue:#86cfa2; --on-blue:#111612; --blue-bg:#1d3a29;
+  --accent:#f3a764; --accent-bg:#3b2614;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#111612; --sheet:#1a211c; --sunk:#222b25;
+  --ink:#e8eee9; --ink2:#a3b0a7; --rule:#2f3a33;
+  --blue:#86cfa2; --on-blue:#111612; --blue-bg:#1d3a29;
+  --accent:#f3a764; --accent-bg:#3b2614;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
+.wrap{max-width:640px;margin:0 auto;padding-inline:16px;padding-block:0 calc(var(--nav-h) + 28px + env(safe-area-inset-bottom,0px))}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);border-bottom:1px solid var(--rule)}
+.top-in{max-width:640px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px}
+.brand{font-family:var(--f-display);font-weight:800;font-size:17px;line-height:1.2;flex:1;min-width:0}
+.brand small{display:block;font-family:var(--f-body);font-weight:500;font-size:12px;color:var(--ink2);letter-spacing:.02em}
+.stat{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right;white-space:nowrap}
+.stat b{color:var(--ink);font-weight:600}
+
+/* bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--sheet);border-top:1px solid var(--rule);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);height:var(--nav-h)}
+.nav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer}
+.nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav button[aria-current="page"]{color:var(--blue)}
+.nav button[aria-current="page"] span{border-bottom:2px solid var(--blue)}
+
+/* type */
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.25;margin:0}
+h1{font-size:24px;font-weight:800}
+h2{font-size:19px;font-weight:800}
+h3{font-size:16px;font-weight:700}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--ink2)}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+p{margin:0}
+.stack{display:flex;flex-direction:column;gap:14px}
+.view{padding-top:18px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--rule);background:var(--sheet);font-weight:600;cursor:pointer;text-decoration:none}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:var(--on-blue)}
+.btn.ghost{background:transparent}
+.btn.sm{min-height:36px;padding:0 14px;font-size:14px}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.end{justify-content:flex-end}
+.row.between{justify-content:space-between}
+
+/* hero */
+.hero{display:grid;gap:10px;padding:4px 0 6px}
+.hero p{color:var(--ink2)}
+.meter{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--blue);border-radius:99px}
+
+/* lesson list */
+.lessons{display:flex;flex-direction:column;border-top:1px solid var(--rule)}
+.les{display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;padding:14px 2px;border-bottom:1px solid var(--rule);background:none;border-left:0;border-right:0;border-top:0;text-align:left;cursor:pointer;width:100%}
+.les .no{font-family:var(--f-num);font-weight:600;font-size:15px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--rule);color:var(--ink2)}
+.les.done .no{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.les .t{min-width:0}
+.les .t b{display:block;font-weight:700;font-size:16px;line-height:1.3}
+.les .t span{font-size:13px;color:var(--ink2)}
+.les .sc{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right}
+.les.next .no{border-color:var(--blue);color:var(--blue)}
+
+/* lesson reader */
+.lhead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.back{background:none;border:0;padding:8px 8px 8px 0;cursor:pointer;color:var(--blue);font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0 4px}
+.steps button{border:1px solid var(--rule);background:var(--sheet);border-radius:8px;padding:8px 4px;font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer}
+.steps button[aria-current="step"]{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.block{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;min-width:0}
+.block h3{margin-bottom:8px}
+.block p + p{margin-top:8px}
+.plain{padding:0 2px}
+.facts{display:grid;gap:0}
+.facts div{display:grid;grid-template-columns:minmax(0,42%) minmax(0,1fr);gap:10px;padding:7px 0;border-top:1px dashed var(--rule)}
+.facts div:first-child{border-top:0}
+.facts dt{font-size:14px;color:var(--ink2);margin:0}
+.facts dd{margin:0;font-weight:600;min-width:0}
+.tl{display:grid;gap:0;margin:0;padding:0;list-style:none}
+.tl li{display:grid;grid-template-columns:92px 1fr;gap:10px;padding:8px 0;border-top:1px dashed var(--rule)}
+.tl li:first-child{border-top:0}
+.tl .y{font-family:var(--f-num);font-weight:600;font-size:13px;color:var(--accent);padding-top:2px}
+.trick,.trap{border-radius:var(--r);padding:12px 14px 12px 14px;border:1px solid var(--rule)}
+.trick{background:var(--accent-bg);border-color:transparent}
+.trap{background:var(--bad-bg);border-color:transparent}
+.trick .lab,.trap .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.trick .lab{color:var(--accent)}
+.trap .lab{color:var(--bad)}
+.tbl{overflow-x:auto;margin:0 -2px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);font-weight:700}
+td.n{font-family:var(--f-num);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fig{margin:0}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-size:13px;color:var(--ink2);margin-top:6px}
+.pyr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pyr div{text-align:center;font-size:13px}
+.pyr b{display:block;font-size:14px}
+.pm{fill:var(--blue)} .pf{fill:var(--accent)}
+.sum{margin:0;padding-left:20px;display:grid;gap:6px}
+
+/* questions */
+.qcard{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px;min-width:0}
+.qmeta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}
+.qno{font-family:var(--f-num);font-weight:600;color:var(--ink2)}
+.tag{background:var(--sunk);color:var(--ink2);border-radius:99px;padding:1px 9px;font-weight:600}
+.tag.pyq{background:var(--accent-bg);color:var(--accent)}
+.bm{margin-left:auto;background:none;border:0;cursor:pointer;color:var(--ink2);font-size:20px;line-height:1;padding:4px}
+.bm[aria-pressed="true"]{color:var(--accent)}
+.qt{font-weight:600;font-size:16px}
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:start;text-align:left;width:100%;border:1.5px solid var(--rule);background:var(--paper);border-radius:9px;padding:10px 12px;cursor:pointer;min-height:44px}
+.opt .k{font-family:var(--f-num);font-weight:600;color:var(--ink2);font-size:14px;padding-top:1px}
+.opt.sel{border-color:var(--blue);background:var(--blue-bg)}
+.opt.ok{border-color:var(--good);background:var(--good-bg)}
+.opt.no{border-color:var(--bad);background:var(--bad-bg)}
+.opt.ok .k{color:var(--good)} .opt.no .k{color:var(--bad)}
+.opt:disabled{cursor:default;color:inherit}
+.exp{font-size:15px;border-left:3px solid var(--blue);padding:4px 0 4px 12px;color:var(--ink)}
+.exp b.okl{color:var(--good)} .exp b.nol{color:var(--bad)}
+
+/* chips */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 13px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.seg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--rule)}
+.seg::-webkit-scrollbar{display:none}
+.seg button{flex:none;background:none;border:0;border-bottom:2px solid transparent;padding:10px 8px;font-weight:600;color:var(--ink2);cursor:pointer}
+.seg button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+
+/* score panel */
+.scorebig{display:flex;align-items:baseline;gap:8px}
+.scorebig .num{font-size:44px;font-weight:600;line-height:1;color:var(--blue)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.kpi{background:var(--sunk);border-radius:8px;padding:8px;text-align:center}
+.kpi .num{display:block;font-size:20px;font-weight:600}
+.kpi span{font-size:12px;color:var(--ink2)}
+.kpi.g .num{color:var(--good)} .kpi.b .num{color:var(--bad)}
+
+/* mock */
+.mbar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 57px);z-index:10;background:var(--paper);padding:10px 0;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--rule)}
+.timer{font-family:var(--f-num);font-weight:600;font-size:18px;padding:4px 10px;border-radius:8px;background:var(--sunk)}
+.timer.low{background:var(--bad-bg);color:var(--bad)}
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px}
+.pal button{height:40px;border-radius:8px;border:1px solid var(--rule);background:var(--sheet);font-family:var(--f-num);font-weight:600;font-size:13px;cursor:pointer}
+.pal button.a{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.pal button.m{box-shadow:inset 0 -4px 0 var(--accent)}
+.pal button.cur{outline:2px solid var(--ink);outline-offset:1px}
+.pal button.ok{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.pal button.no{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.confirm{background:var(--warn-bg);border-radius:var(--r);padding:12px 14px;display:grid;gap:10px}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}
+legend{font-weight:700;margin-bottom:6px;padding:0}
+.radios{display:flex;gap:8px;flex-wrap:wrap}
+.radios label{border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 14px;font-weight:600;cursor:pointer;font-size:14px}
+.radios input{position:absolute;opacity:0;pointer-events:none}
+.radios input:checked + span{color:var(--blue)}
+.radios label:has(input:checked){border-color:var(--blue);background:var(--blue-bg)}
+.radios label:has(input:focus-visible){outline:2px solid var(--blue);outline-offset:2px}
+select{font:inherit;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:8px;padding:8px 10px;max-width:100%}
+.hist{display:grid;gap:0}
+.hist div{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:14px}
+
+/* revise */
+.search{width:100%;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:10px;padding:10px 12px;font:inherit}
+.rk{display:grid;gap:0}
+.rk div{display:grid;grid-template-columns:minmax(0,48%) 1fr;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:15px}
+.rk div:first-child{border-top:0}
+.rk dt{font-size:13px;color:var(--ink2);margin:0}
+.rk dt.up{color:var(--good)} .rk dt.dn{color:var(--bad)}
+.rk dd{margin:0;font-weight:600;min-width:0}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px}
+.tile .num{display:block;font-size:24px;font-weight:600;color:var(--accent);line-height:1.2}
+.tile span{font-size:13px;color:var(--ink2)}
+.gbar{display:grid;grid-template-columns:78px 1fr 52px;gap:8px;align-items:center;font-size:13px;padding:3px 0}
+.gbar .tr{height:12px;background:var(--sunk);border-radius:3px;position:relative;overflow:hidden}
+.gbar .tr i{position:absolute;left:0;top:0;bottom:0;background:var(--blue);border-radius:3px}
+.gbar .tr i.neg{background:var(--bad)}
+.gbar .v{font-family:var(--f-num);text-align:right}
+.flash{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;min-height:240px;padding:20px 18px;display:grid;align-content:center;gap:12px;cursor:pointer;text-align:left;width:100%}
+.flash .side{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.flash .front{font-size:18px;font-weight:600}
+.flash .ans{font-size:20px;font-weight:700;color:var(--good)}
+.empty{padding:24px 4px;color:var(--ink2);text-align:center}
+.foot{font-size:13px;color:var(--ink2);padding-top:10px}
+@media (prefers-reduced-motion: no-preference){ .opt,.chip,.btn{transition:background-color .15s, border-color .15s} }
+.link{background:var(--blue-bg);border-radius:var(--r);padding:12px 14px}
+.link .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;color:var(--blue)}
+.icheck{background:var(--sheet);border:1.5px dashed var(--blue);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px}
+.icheck .lab{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue)}
+.cat{font-size:12px;font-weight:700;border-radius:99px;padding:1px 8px;white-space:nowrap}
+.cat.CS{background:var(--blue-bg);color:var(--blue)} .cat.CSS{background:var(--accent-bg);color:var(--accent)} .cat.ST{background:var(--sunk);color:var(--ink)} .cat.OT{background:var(--sunk);color:var(--ink2)}
+</style>
+
+</head><body>
+<header class="top">
+  <div class="top-in">
+    <div class="brand">Government Schemes<small>सरकारी योजनाएँ · SSC CGL workbook</small></div>
+    <div class="stat" id="topstat"></div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<nav class="nav" aria-label="Sections">
+  <div class="nav-in">
+    <button type="button" id="nav-learn" data-tab="learn"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg><span>Learn</span></button>
+    <button type="button" id="nav-practice" data-tab="practice"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span>Practice</span></button>
+    <button type="button" id="nav-mock" data-tab="mock"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6M12 2v3"/></svg><span>Mock test</span></button>
+    <button type="button" id="nav-revise" data-tab="revise"><svg viewBox="0 0 24 24"><path d="M12 3 2 8l10 5 10-5z"/><path d="m2 13 10 5 10-5"/></svg><span>Revise</span></button>
+  </div>
+</nav>
+
+<script>
+"use strict";
+const LESSONS = [
+{ id:"L1", title:"How to study schemes", hi:"योजनाएँ कैसे पढ़ें", blocks:[
+ {k:"p", h:"Every CGL shift asks 1–3 scheme questions. They come in only a few shapes: <b>ministry</b>, <b>launch year / date</b>, <b>launch place</b>, <b>objective</b>, <b>beneficiaries & eligibility</b>, <b>amount</b> (loan, pension, subsidy), <b>outlay</b>, <b>full form</b>, and <b>which one is NOT a feature</b>. Each lesson here is built around those shapes."},
+ {k:"table", title:"Two kinds of central schemes", head:["Type","Money","Examples"], rows:[["Central Sector (CS)","100% from the Centre; run by central ministries","PM-KISAN, PM SVANidhi, PM-DevINE, VVP-II, PM Vishwakarma, PM-VBRY"],["Centrally Sponsored (CSS)","Centre + State share; states implement","MGNREGA/VB-G RAM G, PMAY, JJM, PM POSHAN, PM SHRI, Samagra Shiksha, Mission Vatsalya, RKVY"]]},
+ {k:"table", title:"CSS sharing pattern (Centre : State)", head:["States / UTs","Share"], rows:[["General states","60 : 40"],["8 North-East + Himalayan states (HP, Uttarakhand) + UT of J&K","90 : 10"],["UTs without legislature (Ladakh, Chandigarh, A&N, Lakshadweep, DNH&DD)","100 : 0"],["UTs with legislature (Delhi, Puducherry, J&K)","J&K 90:10; Delhi & Puducherry 60:40"]]},
+ {k:"trick", h:"<b>6-9-100</b>: sixty (general), ninety (NE & hills), hundred (UTs without an assembly). Only <b>three</b> UTs have a legislature: <b>D</b>elhi, <b>P</b>uducherry, <b>J</b>&K → “<b>DPJ</b>”."},
+ {k:"q", q:"PM-KISAN is funded 100% by the Centre. It is therefore a …", o:["Central Sector scheme","Centrally Sponsored scheme","State scheme","Core of the core scheme"], e:"100% central funding = Central Sector. Shared funding = Centrally Sponsored."},
+ {k:"link", h:"<b>Study schemes as a story, not a list.</b> The second lecture's method: every scheme answers a problem the previous one left behind. <i>No bank account → Jan Dhan → no collateral → MUDRA → SC/ST and women left out → Stand-Up India.</i> <i>Make in India → PLI → ECMS → MPMS → Semiconductor Mission.</i> You will see these chains marked <b>Link</b> in every lesson."},
+ {k:"table", title:"Ministry clues hidden in the name", head:["Word in name","Usual ministry"], rows:[["Kisan, Krishi, Fasal","Agriculture & Farmers Welfare"],["Gramin, Gram, Awas-G, Sadak","Rural Development"],["Urban, Smart City, AMRUT, SVANidhi","Housing & Urban Affairs (MoHUA)"],["Jal, Ganga, Sinchai","Jal Shakti"],["Surya, KUSUM, Hydrogen","New & Renewable Energy (MNRE)"],["Janjati, Adivasi, Dharti Aaba","Tribal Affairs"],["Shakti, Vatsalya, Poshan 2.0, Anganwadi","Women & Child Development"],["Mudra, Jan Dhan, Atal Pension, Stand-Up","Finance (Dept of Financial Services)"]]},
+ {k:"trap", h:"The name can mislead. <b>PM POSHAN</b> (mid-day meal) is <b>Education</b>, not Health or WCD. <b>Stand-Up India</b> is <b>Finance</b>, not Commerce. <b>SHE-Mart / Lakhpati Didi</b> are <b>Rural Development</b>, not WCD. <b>Namo Drone Didi</b> is <b>Agriculture</b>."},
+ {k:"q", q:"Which ministry runs PM POSHAN (mid-day meal)?", o:["Ministry of Education","Ministry of Health & Family Welfare","Ministry of Women & Child Development","Ministry of Consumer Affairs"], e:"Asked in CGL. The food goes to schoolchildren, so Education runs it."}],
+ sum:["Central Sector = 100% Centre; Centrally Sponsored = shared","CSS share: 60:40 general, 90:10 NE/Himalayan/J&K, 100% UTs without legislature","UTs with legislature: Delhi, Puducherry, J&K","Name gives the ministry, except POSHAN (Education), Stand-Up (Finance), Lakhpati Didi (Rural Dev), Drone Didi (Agriculture)","Question shapes: ministry, year, place, objective, eligibility, amount, outlay, full form, NOT-a-feature"]},
+
+{ id:"L2", title:"Farmers I: income, price & insurance", hi:"किसान: आय, MSP, बीमा", blocks:[
+ {k:"facts", title:"PM-KISAN", rows:[["Launched","24 Feb 2019, Gorakhpur (UP); effective retrospectively from 1 Dec 2018"],["Ministry","Agriculture & Farmers Welfare"],["Type","Central Sector (100% Centre), DBT"],["Benefit","₹6,000 a year in 3 equal instalments of ₹2,000"],["Who","All land-holding farmer families (not just small/marginal)"],["Excluded","Income-tax payers, constitutional post holders, doctors/engineers/lawyers, pensioners with ₹10,000+/month"]]},
+ {k:"trap", h:"The lecture says “instalments of ₹20,000”. It is <b>₹2,000</b> × 3 = ₹6,000. Also: launched 2019 but <b>effective from 1 Dec 2018</b> (retrospective)."},
+ {k:"facts", title:"PM Kisan Maandhan Yojana (PM-KMY)", rows:[["Launched","12 Sept 2019, Ranchi"],["Who","Small & marginal farmers with up to 2 hectares, aged 18–40"],["Benefit","Pension ₹3,000/month after 60; spouse gets 50% as family pension"],["Contribution","Farmer pays ₹55–200/month; Centre matches equally. LIC is fund manager"]]},
+ {k:"trick", h:"<b>Maandhan = “maan” (honour) + “dhan” (money) in old age</b>. All three Maandhan-type pensions pay <b>₹3,000 at 60</b> with entry at <b>18–40</b>: PM-KMY (farmers), PM-SYM (unorganised workers)."},
+ {k:"facts", title:"PM Fasal Bima Yojana (PMFBY)", rows:[["Launched","18 Feb 2016 (Sehore, MP); from Kharif 2016"],["Motto","One Nation, One Scheme, One Premium"],["Farmer premium","Kharif 2% · Rabi 1.5% · Commercial/horticulture 5%"],["Covers","Sowing to post-harvest (14 days in field): drought, flood, pests, disease, hailstorm"],["Report loss","Within 72 hours"],["Enrolment","Voluntary for all farmers since Kharif 2020"],["Tech","Drones, satellite imagery, smartphones for claims (YES-TECH)"]]},
+ {k:"trick", h:"Premium falls with the seasons' letters: <b>K</b>harif <b>2</b>, <b>R</b>abi <b>1.5</b>, <b>C</b>ash crops <b>5</b>. Remember “2 – 1½ – 5”."},
+ {k:"q", q:"Under PMFBY, what premium does a farmer pay for a rabi crop?", o:["1.5%","2%","5%","Nil"], e:"Kharif 2%, rabi 1.5%, annual commercial/horticulture 5%."},
+ {k:"facts", title:"MSP basics (lecture link)", rows:[["Recommends","CACP – Commission for Agricultural Costs and Prices (1965)"],["Approves","Cabinet Committee on Economic Affairs (CCEA)"],["Crops","22 mandated crops"],["Sugarcane","No MSP; gets FRP (Fair & Remunerative Price)"]]},
+ {k:"facts", title:"PM-AASHA (Annadata Aay Sanrakshan Abhiyan)", rows:[["Launched","2018"],["Aim","Make sure farmers actually get MSP"],["Components","Price Support Scheme (PSS) · Price Deficiency Payment Scheme (PDPS) · Price Stabilisation Fund (PSF) · Market Intervention Scheme (MIS). PSF & MIS merged into it in 2024"],["Nature","Umbrella scheme, Agriculture ministry"],["Update","Continued to 2025-26 (₹35,000 crore); 100% procurement of tur, urad, masoor for 4 years"]]},
+ {k:"link", h:"<b>MSP → AASHA → Pulses mission.</b> MSP is only a promise; AASHA makes the government buy. India still imports tur, urad and masoor, so the 2025 <b>Mission for Aatmanirbharta in Pulses</b> promises to buy 100% of them for four years."},
+ {k:"facts", title:"PM Dhan-Dhaanya Krishi Yojana", rows:[["Announced","Budget 2025-26"],["Approved","16 July 2025"],["Launched","11 Oct 2025 (IARI, New Delhi) with the Pulses Mission"],["Coverage","100 low-productivity districts (at least 1 per state)"],["How","Converges 36 existing schemes of 11 departments"],["Outlay","₹24,000 crore a year for 6 years"],["Farmers","≈1.7 crore"],["Model","Aspirational Districts Programme"]]},
+ {k:"trap", h:"The lecture says ₹26,000 crore a year. The Cabinet figure is <b>₹24,000 crore/year</b>. Also note two dates: <b>approved 16 July 2025</b>, <b>launched 11 Oct 2025</b>."},
+ {k:"facts", title:"Mission for Aatmanirbharta in Pulses", rows:[["Launched","11 Oct 2025"],["Outlay","₹11,440 crore, 2025-26 to 2030-31"],["Target","350 lakh tonnes by 2030-31 (from 242 LT in 2023-24)"],["Focus","Tur (arhar), urad, masoor: 100% procurement by NAFED & NCCF for 4 years"],["Farmers","≈2 crore"]]},
+ {k:"table", title:"Market & credit for farmers", head:["Scheme","Key facts"], rows:[["e-NAM","14 April 2016 (Ambedkar Jayanti); online pan-India mandi, One Nation One Market; SFAC implements; 1,400+ mandis"],["Agriculture Infrastructure Fund","July 2020; ₹1 lakh crore of loans; 3% interest subvention on loans up to ₹2 crore; post-harvest infra"],["e-Kisan Upaj Nidhi","Loans against produce kept in registered warehouses; low security deposit, ~7% interest"],["Kisan Credit Card","1998 (NABARD); modified interest subvention; limit raised to ₹5 lakh (Budget 2025-26)"]]},
+ {k:"q", q:"e-NAM was launched on which symbolic day?", o:["14 April 2016 – Ambedkar Jayanti","2 October 2016 – Gandhi Jayanti","23 December 2016 – Kisan Diwas","1 May 2016 – Labour Day"], e:"14 April 2016."}],
+ sum:["PM-KISAN: 24 Feb 2019 Gorakhpur, effective 1 Dec 2018; ₹6,000 = 3 × ₹2,000; Central Sector","PM-KMY: 12 Sept 2019 Ranchi; ≤2 ha; 18–40; ₹3,000 pension","PMFBY: 2016; 2% kharif, 1.5% rabi, 5% commercial; report in 72 h","MSP: CACP recommends, CCEA approves; sugarcane FRP","PM-AASHA 2018: PSS, PDPS, PSF, MIS","Dhan-Dhaanya: 100 districts, 36 schemes, 11 depts, ₹24,000 cr/yr; launched 11 Oct 2025","Pulses mission: ₹11,440 cr, 350 LT by 2030-31; tur-urad-masoor","e-NAM 14 Apr 2016; AIF ₹1 lakh crore 2020"]},
+
+{ id:"L3", title:"Farmers II: water, energy, inputs, fish", hi:"सिंचाई, सौर, खाद, मत्स्य", blocks:[
+ {k:"facts", title:"PM Krishi Sinchayee Yojana (PMKSY)", rows:[["Launched","1 July 2015"],["Lead ministry","Jal Shakti (with Rural Development and Agriculture)"],["Slogans","“Har Khet Ko Pani” · “Per Drop More Crop”"],["Components","Accelerated Irrigation Benefit Programme (AIBP) · Har Khet Ko Pani · Watershed Development · Per Drop More Crop (micro-irrigation: drip, sprinkler)"]]},
+ {k:"facts", title:"PM-KUSUM", rows:[["Full form","PM Kisan Urja Suraksha evam Utthaan Mahabhiyan"],["Launched","2019"],["Ministry","New & Renewable Energy (MNRE)"],["Aim","De-dieselise farming; energy + water security; extra income by selling solar power"],["Component A","Small solar plants up to 2 MW on barren land (10,000 MW)"],["Component B","Stand-alone solar pumps"],["Component C","Solarise existing grid-connected pumps"],["Funding (B & C)","30% Centre + 30% State + 30% bank loan + 10% farmer"]]},
+ {k:"trick", h:"<b>KUSUM = 30-30-30-10</b>. Three 30s from Centre, State, Bank; the farmer puts only 10."},
+ {k:"q", q:"The main objective of PM-KUSUM is to …", o:["Install solar pumps and grid-connected solar plants in rural areas","Give crop insurance","Build rural roads","Provide free fertiliser"], e:"Exam-asked. Solar pumps + small solar plants; de-dieselise agriculture."},
+ {k:"table", title:"RKVY family", head:["Year","Stage"], rows:[["2007-08","Rashtriya Krishi Vikas Yojana launched (states plan projects as per local agro-climate)"],["2017-18","Renamed RKVY-RAFTAAR"],["2024","PM-RKVY: cafeteria of schemes; Krishonnati Yojana runs alongside"]]},
+ {k:"facts", title:"National Mission on Natural Farming (NMNF)", rows:[["Approved","25 Nov 2024; standalone CSS"],["Outlay","₹2,481 crore (to 2025-26)"],["Target","1 crore farmers, 7.5 lakh ha, 15,000 clusters, 10,000 Bio-input Resource Centres"],["Idea","Zero Budget Natural Farming (Subhash Palekar): use only on-farm inputs"],["4 wheels","Jeevamrutha (microbial culture) · Beejamrutha (seed treatment) · Acchadana (mulching) · Whapasa (soil aeration/moisture)"]]},
+ {k:"trap", h:"The lecture calls the pillars “Beej-mitra, Jeev-mitra”. The standard names are <b>Beejamrutha</b> and <b>Jeevamrutha</b>. Organic farming allows bought organic manure; natural farming uses nothing from outside the farm."},
+ {k:"table", title:"Fertiliser schemes", head:["Scheme","Key facts"], rows:[["Nutrient Based Subsidy (NBS)","1 April 2010; Dept of Fertilizers (Chemicals & Fertilizers); fixed per-kg subsidy on N, P, K, S of P&K fertilisers; urea is NOT under NBS; extra subsidy for zinc/boron-fortified"],["PM-PRANAM","2023; PM Programme for Restoration, Awareness, Nourishment & Amelioration of Mother Earth; states that cut chemical fertiliser get 50% of the subsidy saved (70% for assets, 30% for farmers)"],["Soil Health Card","19 Feb 2015, Suratgarh (Rajasthan); card every 2 years"],["Nano urea","IFFCO, world's first (2021)"]]},
+ {k:"trap", h:"A PYQ matched “PM-PRANAM – fertiliser use” as correct and “UDAN – farming” as wrong. PRANAM is about <b>cutting chemical fertiliser</b>, run by <b>Chemicals & Fertilizers</b>."},
+ {k:"facts", title:"Namo Drone Didi", rows:[["Approved","29 Nov 2023"],["Nodal","Agriculture & Farmers Welfare (with DAY-NRLM)"],["Target","15,000 women SHGs get drones to rent out for spraying"],["Support","80% of drone cost, up to ₹8 lakh"],["Outlay","₹1,261 crore, 2024-25 to 2025-26"]]},
+ {k:"trap", h:"The lecture reads the outlay as “₹10,261 crore”. It is <b>₹1,261 crore</b>. The nodal ministry is <b>Agriculture</b>, not Rural Development or Civil Aviation."},
+ {k:"table", title:"More farm schemes", head:["Scheme","Key facts"], rows:[["SMAM","Sub-Mission on Agricultural Mechanisation (2014-15); 50–80% subsidy for small/marginal, SC/ST, women farmers"],["MIDH","Mission for Integrated Development of Horticulture (2014-15)"],["PM Matsya Sampada Yojana","10 Sept 2020; ₹20,050 crore; Dept of Fisheries (Fisheries, Animal Husbandry & Dairying); fishers, fish farmers, SHGs, FFPOs"],["Bharat VISTAAR","Budget 2026-27: AI advisory in farmers' own language through “Bharati” voice assistant"],["Agristack / Farmer ID","Unique digital ID for each farmer linked to land records"]]},
+ {k:"q", q:"Which scheme gives women SHGs drones to rent out to farmers?", o:["Namo Drone Didi","Drone Shakti","Lakhpati Didi","Kisan Drone Mission"], e:"15,000 SHGs, 80% subsidy up to ₹8 lakh."}],
+ sum:["PMKSY 2015: Har Khet Ko Pani, Per Drop More Crop; lead Jal Shakti","PM-KUSUM 2019 MNRE: A 2 MW plants, B standalone pumps, C solarise pumps; 30-30-30-10","RKVY 2007-08 → RAFTAAR 2017-18 → PM-RKVY 2024","NMNF 2024 ₹2,481 cr; Jeevamrutha, Beejamrutha, Acchadana, Whapasa","NBS 2010 (not urea); PM-PRANAM 2023 cut chemical fertiliser","Namo Drone Didi: 15,000 SHGs, ₹1,261 cr, Agriculture","PMMSY 2020 ₹20,050 cr, Fisheries"]},
+
+{ id:"L4", title:"Make in India chain", hi:"मेक इन इंडिया से सेमीकंडक्टर तक", blocks:[
+ {k:"link", h:"<b>The story (second lecture).</b> India was a huge market but made little → money and jobs went abroad. <b>Make in India</b> (2014) invited factories. Firms still hesitated → <b>PLI</b> (2020) paid them for extra output. Phones were assembled but parts were imported → <b>ECMS</b> (2025). Next, whole phones and Indian brands → <b>MPMS</b> (2026). Every device still needs a chip, the “brain” → <b>ISM 2.0</b> (2026). Then chemicals (<b>BHAVYA Rasayan</b>) and medicines (<b>Biopharma SHAKTI</b>)."},
+ {k:"facts", title:"Make in India", rows:[["Launched","25 Sept 2014"],["Ministry","Commerce & Industry (DPIIT)"],["Logo","A lion made of gears (cogs)"],["Focus","Manufacturing: investment, innovation, skills, infrastructure"],["Nature","Umbrella initiative, not a subsidy scheme"]]},
+ {k:"facts", title:"Production Linked Incentive (PLI)", rows:[["Started","2020 (first for mobile phones)"],["Sectors","14"],["Outlay","≈₹1.97 lakh crore"],["Coordinated by","DPIIT"],["How it pays","Cash incentive on incremental sales over a base year"],["Aim","Boost domestic manufacturing, attract investment, cut imports, raise exports"]]},
+ {k:"trick", h:"<b>Make in India says “make here”; PLI says “make more and get paid”.</b> PLI is not a loan: nothing is repaid."},
+ {k:"q", q:"PLI incentives are calculated on …", o:["Incremental sales over a base year","Total loans taken","Number of workers hired","Exports only to the USA"], e:"Extra sales above the base year earn a percentage back."},
+ {k:"table", title:"The electronics ladder", head:["Scheme","Facts"], rows:[["ECMS – Electronics Component Manufacturing Scheme","Approved 28 March 2025; MeitY; ₹22,919 crore for 6 years (FY26–FY31); camera & display modules, PCBs, copper-clad laminates; raised to ₹40,000 crore in Budget 2026-27"],["MPMS – Mobile Phone Manufacturing Scheme","Approved 15 July 2026; ₹62,500 crore, FY27–FY31; 2.25–5% on eligible sales (differentiated), +1.5% for local components, +3% for design/R&D; ≈60,000 jobs"],["ISM 1.0 – India Semiconductor Mission","Dec 2021; ₹76,000 crore; Tata–PSMC fab Dholera, Micron ATMP Sanand"],["ISM 2.0","Approved July 2026; ₹1,27,500 crore (₹1.275 lakh crore); design, fabs, display fabs, ATMP/OSAT, equipment & materials, talent"]]},
+ {k:"trap", h:"The lecture says ECMS rose to “₹400 crore”. It is <b>₹40,000 crore</b>. ECMS = <b>parts</b> inside the phone; MPMS = the <b>whole phone</b> and Indian brands."},
+ {k:"q", q:"Which scheme correctly separates ECMS from MPMS?", o:["ECMS: components; MPMS: mobile phones","Both are farm schemes","MPMS builds airports","ECMS opens pension accounts"], e:"Asked in the lecture's PYQ set."},
+ {k:"facts", title:"BHAVYA Rasayan", rows:[["Full form","Bharat Audyogik Vikas Yojana – Rasayan"],["Approved","24 July 2026"],["Outlay","₹3,030 crore, FY27–FY31"],["Plan","3 dedicated chemical parks (≥8 sq km each), chosen by challenge route"],["Money","Centre up to ₹1,000 crore per park; each state at least ₹500 crore"],["Why","Shared effluent treatment, water, steam, corrosion-proof pipelines, warehousing and waste disposal cost too much for single units"]]},
+ {k:"facts", title:"Biopharma SHAKTI", rows:[["Announced","Budget 2026-27"],["Full form","Strategy for Healthcare Advancement through Knowledge, Technology and Innovation"],["Outlay","₹10,000 crore over 5 years"],["Ministry","Chemicals & Fertilizers (Dept of Pharmaceuticals)"],["Aim","Domestic R&D, clinical trials and manufacture of biologics & biosimilars"],["Institutes","3 new NIPERs + upgrade existing 7 (→ 10)"]]},
+ {k:"trick", h:"<b>Generic</b> = copy of a chemical drug. <b>Biologic</b> = made from living cells. <b>Biosimilar</b> = near copy of a biologic. India is the “pharmacy of the world” for generics; SHAKTI pushes it into biologics."},
+ {k:"table", title:"Textiles & MSME energy", head:["Scheme","Facts"], rows:[["PM MITRA","PM Mega Integrated Textile Region & Apparel parks; Budget 2021-22; ₹4,445 crore; 7 parks; 5F: Farm→Fibre→Factory→Fashion→Foreign; PPP via SPV; competitiveness support up to ₹300 crore/park"],["PM MITRA sites","Virudhunagar (TN), Warangal (Telangana), Navsari (Gujarat), Kalaburagi (Karnataka), Dhar (MP), Lucknow (UP), Amravati (Maharashtra)"],["SAMARTH","20 Dec 2017; Ministry of Textiles; skilling for the textile sector (entry 21–45 per lecture)"],["ADEETIE","Assistance in Deploying Energy Efficient Technologies in Industries & Establishments; July 2025; Ministry of Power; run by BEE; ₹1,000 crore; MSMEs in 14 sectors; interest subvention 5% (micro/small), 3% (medium)"]]},
+ {k:"trick", h:"PM MITRA parks: “<b>Viru War Nav Kal Dhar Luck Amra</b>” → Virudhunagar, Warangal, Navsari, Kalaburagi, Dhar, Lucknow, Amravati. Seven states: TN, Telangana, Gujarat, Karnataka, MP, UP, Maharashtra."}],
+ sum:["Make in India 25 Sept 2014, DPIIT, lion of cogs","PLI 2020, 14 sectors, ≈₹1.97 lakh cr, paid on incremental sales","ECMS Mar 2025 ₹22,919 cr → ₹40,000 cr (Budget 2026-27); components","MPMS 15 July 2026 ₹62,500 cr; 2.25–5%; whole phones","ISM 1.0 ₹76,000 cr (2021); ISM 2.0 ₹1.275 lakh cr (July 2026)","BHAVYA Rasayan 24 July 2026: 3 parks, ₹1,000 cr each, state ≥₹500 cr","Biopharma SHAKTI ₹10,000 cr/5 yrs; 3 new NIPERs","PM MITRA 7 parks; ADEETIE BEE ₹1,000 cr"]},
+
+{ id:"L5", title:"Banking, credit & enterprise", hi:"जनधन से मुद्रा तक", blocks:[
+ {k:"link", h:"<b>Account → loan → special groups → startups.</b> No account, so no DBT: <b>Jan Dhan</b> (2014). No collateral, so no loan: <b>MUDRA</b> (2015). SC/ST and women still left out: <b>Stand-Up India</b> (2016). Innovation: <b>Startup India</b> (2016). Street vendors after COVID: <b>SVANidhi</b> (2020). Traditional artisans: <b>Vishwakarma</b> (2023)."},
+ {k:"facts", title:"PM Jan Dhan Yojana (PMJDY)", rows:[["Launched","28 Aug 2014 (announced 15 Aug 2014)"],["Ministry","Finance – Dept of Financial Services"],["Goal","Financial inclusion: a basic account for every household"],["Features","Zero balance; RuPay card with ₹2 lakh accident cover; overdraft up to ₹10,000; DBT backbone"],["Scale","≈55 crore accounts by Feb 2025 (lecture: 58 crore by 2026); over half held by women"]]},
+ {k:"facts", title:"PM MUDRA Yojana", rows:[["Launched","8 April 2015"],["MUDRA","Micro Units Development & Refinance Agency (a SIDBI subsidiary; refinances lenders)"],["Motto","Fund the unfunded"],["For","Non-corporate, non-farm micro/small units (tailor, parlour, repair shop, papad unit…); allied activities like dairy/poultry allowed"],["Collateral","None"],["Lenders","Banks, NBFCs, MFIs (loans carry interest)"]]},
+ {k:"table", title:"MUDRA loan categories", head:["Category","Loan"], numcol:1, rows:[["Shishu","Up to ₹50,000"],["Kishore","₹50,000 – ₹5 lakh"],["Tarun","₹5 lakh – ₹10 lakh"],["Tarun Plus (Budget 2024-25)","₹10 lakh – ₹20 lakh, only for those who repaid a Tarun loan"]]},
+ {k:"trick", h:"Life stages: <b>Shishu → Kishore → Tarun → Tarun Plus</b> = child → teen → youth → youth+. There is <b>no “Yuva”</b> category (PYQ trap)."},
+ {k:"trap", h:"The transcript reads Shishu as “₹500”. It is <b>₹50,000</b>. MUDRA does not lend directly; it refinances banks/MFIs."},
+ {k:"q", q:"Which is NOT a category under PM MUDRA Yojana?", o:["Yuva","Shishu","Kishore","Tarun Plus"], e:"PYQ. The four are Shishu, Kishore, Tarun, Tarun Plus."},
+ {k:"facts", title:"Stand-Up India", rows:[["Launched","5 April 2016"],["Ministry","Finance (DFS); SIDBI runs the portal"],["For","SC/ST and women entrepreneurs, 18+"],["Loan","₹10 lakh – ₹1 crore, composite (term loan + working capital)"],["Condition","Greenfield (first venture); at least 1 SC/ST and 1 woman borrower per bank branch"],["Repay","Within 7 years; moratorium up to 18 months"]]},
+ {k:"trap", h:"Stand-Up India is under <b>Finance</b>, not Commerce. Startup India is under <b>Commerce (DPIIT)</b>. The first lecture slip “₹1 lakh to ₹1 crore” should read <b>₹10 lakh</b>."},
+ {k:"facts", title:"Startup India", rows:[["Launched","16 Jan 2016 (National Startup Day since 2022)"],["Ministry","Commerce & Industry (DPIIT)"],["Startup =","Pvt Ltd / LLP / partnership, under 10 years old, turnover ≤ ₹100 crore in any year"]]},
+ {k:"table", title:"More credit schemes", head:["Scheme","Key facts"], rows:[["PMEGP","2008-09; merged REGP + PM Rozgar Yojana; Ministry of MSME, run nationally by KVIC; new units only; 18+; project up to ₹50 lakh (manufacturing) / ₹20 lakh (service); margin subsidy 15–35% (higher for women, SC/ST, OBC, minorities, ex-servicemen, PwD)"],["PM SVANidhi","1 June 2020; MoHUA + DFS; Central Sector; collateral-free loans to street vendors: ₹15,000 → ₹25,000 → ₹50,000 (enhanced 2025); 7% interest subsidy; extended to 31 March 2030"],["PM Vishwakarma","17 Sept 2023 (Vishwakarma Jayanti); ₹13,000 crore; MSME (with MSDE, DFS); 18 traditional trades; loan ₹3 lakh (₹1 lakh + ₹2 lakh) at 5%; ₹500/day training stipend; ₹15,000 toolkit e-voucher; certificate & ID"],["Jan Samarth","2022; single portal for credit-linked government schemes"],["India Post Payments Bank","1 Sept 2018; Dept of Posts; doorstep banking through postmen; deposit limit ₹2 lakh; cannot give loans"]]},
+ {k:"trap", h:"PMEGP's “₹50 lakh / ₹20 lakh” is the <b>maximum project cost</b>, not the subsidy. IPPB's deposit cap is now <b>₹2 lakh</b> (raised from ₹1 lakh in 2021)."},
+ {k:"trick", h:"Vishwakarma = god of tools, so the scheme gives a <b>toolkit</b> (₹15,000) and is launched on <b>Vishwakarma Jayanti, 17 Sept</b>. Numbers: <b>18 trades · 3 lakh · 5% · 500/day · 15,000</b>."},
+ {k:"q", q:"Under which scheme do artisans get ₹500 a day during training and a ₹15,000 toolkit voucher?", o:["PM Vishwakarma","PMEGP","PM SVANidhi","Stand-Up India"], e:"PYQ."}],
+ sum:["PMJDY 28 Aug 2014: zero balance, ₹2 lakh accident cover, ₹10,000 OD","MUDRA 8 Apr 2015: Shishu ≤50k, Kishore 50k–5L, Tarun 5–10L, Tarun Plus 10–20L","Stand-Up 5 Apr 2016, Finance: SC/ST & women, ₹10 L–₹1 cr, greenfield, 1+1 per branch","Startup India 16 Jan 2016, DPIIT: <10 yrs, ≤₹100 cr","PMEGP 2008-09, KVIC nodal; SVANidhi 2020 → 2030; Vishwakarma 17 Sept 2023, 18 trades","IPPB 1 Sept 2018, ₹2 lakh cap"]},
+
+{ id:"L6", title:"Pensions, insurance & jobs", hi:"पेंशन, बीमा, रोजगार", blocks:[
+ {k:"table", title:"The Jan Suraksha trio (9 May 2015, Kolkata)", head:["Scheme","Age","Premium","Cover"], rows:[["PM Jeevan Jyoti Bima (PMJJBY)","18–50","₹436 / year","₹2 lakh life (death, any cause)"],["PM Suraksha Bima (PMSBY)","18–70","₹20 / year","₹2 lakh accidental death; ₹1 lakh partial disability"],["Atal Pension Yojana (APY)","18–40","Monthly by age & slab","₹1,000–5,000 pension at 60"]]},
+ {k:"trick", h:"<b>Suraksha = ₹20</b> (cheap, accident only). <b>Jyoti = ₹436</b> (life). Age limits: Jyoti <b>50</b>, Suraksha <b>70</b>, Atal <b>40</b>."},
+ {k:"facts", title:"Atal Pension Yojana", rows:[["Launched","9 May 2015"],["Ministry / regulator","Finance; administered by PFRDA"],["For","Unorganised-sector workers with a savings account, 18–40"],["Pension","Guaranteed ₹1,000 / 2,000 / 3,000 / 4,000 / 5,000 a month from 60, by contribution"],["Excluded","Income-tax payers (from 1 Oct 2022)"]]},
+ {k:"q", q:"Who administers the Atal Pension Yojana?", o:["PFRDA","LIC","EPFO","IRDAI"], e:"Pension Fund Regulatory and Development Authority."},
+ {k:"table", title:"Other pensions", head:["Scheme","Facts"], rows:[["PM Shram Yogi Maandhan (PM-SYM)","2019; Labour & Employment; unorganised workers earning ≤₹15,000/month, 18–40; ₹3,000/month at 60; equal central match"],["NSAP","15 Aug 1995; Rural Development; for BPL: IGNOAPS (old age), IGNWPS (widows), IGNDPS (disabled), National Family Benefit (₹20,000 on death of breadwinner), Annapurna"],["IGNOAPS amounts","₹200/month (60–79 yrs), ₹500/month (80+) from the Centre; states add more"],["NPS Vatsalya","18 Sept 2024; Finance, regulated by PFRDA; parents open an NPS account for a minor (min ₹1,000/yr); becomes normal NPS at 18"],["Unified Pension Scheme (UPS)","In force 1 April 2025 for central employees who opt in: 50% of average basic pay (last 12 months) after 25 years; minimum ₹10,000 after 10 years; employee 10%, government 18.5%"]]},
+ {k:"trap", h:"<b>NPS Vatsalya</b> (Finance, pension for minors) ≠ <b>Mission Vatsalya</b> (WCD, child protection, CSS). Both appeared in the lectures back-to-back to test exactly this."},
+ {k:"facts", title:"PM Viksit Bharat Rozgar Yojana (ELI scheme)", rows:[["Approved","1 July 2025"],["Outlay","₹99,446 crore"],["Target","3.5 crore+ jobs in 2 years"],["Window","Jobs created 1 Aug 2025 – 31 July 2027"],["Ministry","Labour & Employment, through EPFO"],["Part A (first-timers)","One month's EPF wage up to ₹15,000 in 2 instalments"],["Part B (employers)","Up to ₹3,000 per extra worker per month for 2 years (4 years in manufacturing)"]]},
+ {k:"facts", title:"SPREE 2025 (ESIC)", rows:[["Full form","Scheme for Promotion of Registration of Employers and Employees"],["Decided","196th ESIC meeting (2025)"],["Window","1 July – 31 Dec 2025"],["Offer","Unregistered employers join ESIC with no inspection or demand for past dues"],["Ministry","Labour & Employment"]]},
+ {k:"table", title:"Also know", head:["Item","Fact"], rows:[["e-Shram portal","26 Aug 2021; national database of unorganised workers"],["ESIC","1952 Act; health insurance for workers; own hospitals"],["EPFO","EPF & MP Act 1952"]]},
+ {k:"q", q:"Which scheme gives unregistered employers a one-time chance to join ESIC without penalties for the past?", o:["SPREE 2025","PM-VBRY","e-Shram","PM-SYM"], e:"PYQ-type (lecture set)."}],
+ sum:["9 May 2015: PMJJBY ₹436, 18–50, ₹2 L life · PMSBY ₹20, 18–70, ₹2 L accident · APY 18–40","APY: PFRDA, ₹1,000–5,000 at 60, no income-tax payers","PM-SYM 2019: ≤₹15,000/month income, ₹3,000 pension","NSAP 1995: IGNOAPS ₹200 (60–79), ₹500 (80+)","NPS Vatsalya 2024 (Finance) ≠ Mission Vatsalya (WCD)","UPS from 1 Apr 2025: 50% after 25 yrs, min ₹10,000","PM-VBRY: ₹99,446 cr, 3.5 cr jobs, EPFO","SPREE 2025: ESIC amnesty 1 July–31 Dec 2025"]},
+
+{ id:"L7", title:"Rural jobs, homes & livelihoods", hi:"ग्रामीण विकास", blocks:[
+ {k:"facts", title:"MGNREGA (2005)", rows:[["Act","Sept 2005; in force 2 Feb 2006 (Bandlapalli, Anantapur, AP) in 200 districts"],["Renamed","Mahatma Gandhi NREGA, 2 Oct 2009"],["Guarantee","100 days of unskilled wage work per rural household per year"],["If no work","Unemployment allowance after 15 days"],["Women","At least one-third of beneficiaries"]]},
+ {k:"facts", title:"VB-G RAM G Act, 2025 (replaces MGNREGA)", rows:[["Full name","Viksit Bharat – Guarantee for Rozgar and Ajeevika Mission (Gramin)"],["Passed","December 2025"],["In force","1 July 2026 (MGNREGA ends the same day)"],["Guarantee","125 days per household per year"],["Farm-season pause","States may notify up to 60 days a year of no works during peak sowing/harvest"],["Wages","Weekly, at most 15 days after muster roll closes; 0.05%/day compensation if late"],["Unemployment allowance","¼ of wage for first 30 days, ½ after that"],["2026-27","₹95,692 crore central allocation; admin spend up from 6% to 9%"],["Ministry","Rural Development"]]},
+ {k:"trick", h:"<b>100 → 125</b> days, <b>2006 → 2026</b>. Twenty years apart, and 25 more days."},
+ {k:"trap", h:"One lecture says the new law began on 1 July 2025. It was <b>passed in Dec 2025</b> and came into force on <b>1 July 2026</b>."},
+ {k:"q", q:"How many days of wage employment does the VB-G RAM G Act guarantee?", o:["125","100","150","90"], e:"Up from 100 under MGNREGA; in force from 1 July 2026."},
+ {k:"facts", title:"DAY-NRLM", rows:[["Launched","June 2011 as Aajeevika (approved 2010); renamed Deendayal Antyodaya Yojana-NRLM"],["Ministry","Rural Development"],["Idea","Organise poor rural women into SHGs; credit, skills, markets"],["Scale","≈10 crore women in ≈91 lakh SHGs (2025)"],["Urban twin","DAY-NULM (Housing & Urban Affairs)"]]},
+ {k:"table", title:"Built on the SHG network", head:["Scheme","Facts"], rows:[["Lakhpati Didi","Announced 15 Aug 2023; SHG woman earning ₹1 lakh+/year; target 3 crore raised to 6 crore (2026); ≈3.5 crore reached by Sept 2026"],["SHE-Mart","Budget 2026-27; community-owned retail outlets (physical + online) for SHG products; Rural Development"],["DDU-GKY","25 Sept 2014; placement-linked skilling for poor rural youth 15–35 (up to 45 for SC/ST/women/PwD); part of NRLM"],["Namo Drone Didi","Drones to SHGs (Agriculture) – see Lesson 3"],["Bima Sakhi","9 Dec 2024, Panipat; LIC; women 18–70, class 10 pass, become insurance agents with a 3-year stipend"]]},
+ {k:"trap", h:"Lakhpati Didi and SHE-Mart are <b>Rural Development</b> schemes, not WCD. PYQ-style option lists put WCD first to catch you."},
+ {k:"table", title:"Roads, houses, land", head:["Scheme","Facts"], rows:[["PMGSY","25 Dec 2000 (Vajpayee's birthday); all-weather roads to unconnected habitations (500+ in plains, 250+ in hills/NE); PMGSY-IV 2024-25 to 2028-29"],["PMAY-Gramin","20 Nov 2016, Agra (replaced Indira Awaas Yojana, 1985); ₹1.20 lakh (plains) / ₹1.30 lakh (hilly/NE); beneficiaries from SECC 2011 + Awaas+ survey; extended to 2028-29"],["SVAMITVA","24 April 2020 (National Panchayati Raj Day); Panchayati Raj; drone mapping of village houses → property cards"]]},
+ {k:"trick", h:"<b>SVAMITVA</b> = Survey of Villages And Mapping with Improvised Technology in Village Areas. Ownership = “swamitva”. Drones + property card."},
+ {k:"table", title:"Vibrant Villages", head:["Phase","Facts"], rows:[["VVP-I (2023)","Home Affairs; CSS; ₹4,800 crore (2022-23 to 2025-26); northern border with China: Arunachal, Sikkim, Uttarakhand, HP, Ladakh; 662 priority villages in 46 blocks"],["VVP-II (April 2025)","Central Sector; ₹6,839 crore till 2028-29; villages on other international land borders in 17 states/UTs"]]},
+ {k:"trap", h:"VVP-I is <b>centrally sponsored</b>; VVP-II is <b>central sector</b>. The lecture stresses this switch."},
+ {k:"q", q:"SVAMITVA scheme was launched on …", o:["National Panchayati Raj Day, 24 April 2020","Gandhi Jayanti 2020","Independence Day 2020","Republic Day 2021"], e:"Ministry of Panchayati Raj; drone-based property cards."}],
+ sum:["MGNREGA: Act 2005, in force 2 Feb 2006, 100 days","VB-G RAM G Act 2025: in force 1 July 2026, 125 days, 60-day farm pause, weekly wages","DAY-NRLM 2011 (renamed 2015-16): SHGs, Rural Dev","Lakhpati Didi ₹1 lakh+/yr; target 6 crore (2026)","DDU-GKY 2014, 15–35","PMGSY 25 Dec 2000 · PMAY-G 20 Nov 2016 Agra · SVAMITVA 24 Apr 2020","VVP-I CSS (China border), VVP-II Central Sector ₹6,839 cr"]},
+
+{ id:"L8", title:"Cities, transport & logistics", hi:"शहर, परिवहन, कनेक्टिविटी", blocks:[
+ {k:"p", h:"<b>25 June 2015</b> is the big urban date: AMRUT, Smart Cities Mission and PMAY-Urban were all launched together."},
+ {k:"table", title:"The three urban missions of 25 June 2015", head:["Mission","Facts"], rows:[["PMAY-Urban","Houses for the urban poor. PMAY-U 2.0 approved Aug 2024: 1 crore houses, ₹2.30 lakh crore central aid, 2024–29; EWS ≤₹3 L, LIG ₹3–6 L, MIG ₹6–9 L income; verticals BLC, AHP, ARH, ISS"],["AMRUT","Atal Mission for Rejuvenation & Urban Transformation; 500 cities: tap water, sewerage, drainage, green spaces, non-motorised transport. AMRUT 2.0: 1 Oct 2021 to 2025-26, all towns, water-secure cities"],["Smart Cities Mission","100 cities; formally ended 31 March 2025"]]},
+ {k:"trap", h:"AMRUT = <b>urban</b> water and sewerage (MoHUA). <b>Jal Jeevan Mission</b> = <b>rural</b> tap water (Jal Shakti). Don't swap them."},
+ {k:"q", q:"Under PMAY-U 2.0, a family earning ₹7 lakh a year falls in which group?", o:["MIG","LIG","EWS","Not eligible"], e:"EWS up to ₹3 L, LIG ₹3–6 L, MIG ₹6–9 L."},
+ {k:"facts", title:"Swachh Bharat Mission", rows:[["Launched","2 Oct 2014 (Gandhi Jayanti)"],["Parts","SBM-Gramin (Jal Shakti) and SBM-Urban (MoHUA)"],["Phase II","SBM-G: ODF Plus · SBM-U 2.0 (1 Oct 2021): garbage-free cities"]]},
+ {k:"table", title:"Clean transport", head:["Scheme","Facts"], rows:[["PM e-Bus Sewa","Approved Aug 2023; 10,000 e-buses in 169 cities; PPP; MoHUA. Payment Security Mechanism (2024) under Heavy Industries"],["PM E-DRIVE","PM Electric Drive Revolution in Innovative Vehicle Enhancement; Heavy Industries; notified Sept 2024; ₹10,900 crore; 1 Oct 2024 – 31 Mar 2026, extended to 31 Mar 2028; e-2W, e-3W, e-ambulances, e-trucks, e-buses, chargers; replaced FAME-II"],["Vehicle Scrappage Policy","Launched 13 Aug 2021 at an investor summit in Gujarat; Road Transport & Highways; fitness test after 15 yrs (commercial) and 20 yrs (private); incentives on new vehicle"]]},
+ {k:"facts", title:"UDAN (Ude Desh ka Aam Nagrik)", rows:[["Launched","Oct 2016 (21 Oct = UDAN Diwas); Civil Aviation"],["First flight","27 April 2017, Shimla (Jubbarhatti) – Delhi"],["How","Viability Gap Funding to airlines; capped fares on some seats"],["Modified UDAN","Approved 25 March 2026; ₹28,840 crore, FY2026-27 to 2035-36; 100 airports from unserved airstrips + 200 helipads (hilly, NE, island, aspirational districts)"]]},
+ {k:"trick", h:"<b>UDAN first flight goes up the hills</b>: Shimla → Delhi, 27 April 2017. Modified UDAN: “<b>100 airports, 200 helipads, 10 years</b>”."},
+ {k:"table", title:"Infrastructure family", head:["Programme","Facts"], rows:[["PM Gati Shakti","13 Oct 2021; National Master Plan for multimodal connectivity; ₹100 lakh crore; GIS platform (BISAG-N); nodal DPIIT (Commerce); 16 ministries; integrates Bharatmala, Sagarmala, UDAN, railways, waterways"],["Bharatmala Pariyojana","2017; Road Transport & Highways; Phase I ≈34,800 km of highways"],["Sagarmala","2015; Ports, Shipping & Waterways; port-led development"],["Parvatmala","2022; ropeways in hilly areas"],["PM-DevINE","Budget 2022-23; ₹6,600 crore (2022-23 to 2025-26); 100% central; Development of North Eastern Region ministry"]]},
+ {k:"trap", h:"The lecture says Bharatmala Phase I is “₹34,800 crore”. It is <b>34,800 km</b>. <b>Bharat</b>mala = roads (<b>bhoomi</b>); <b>Sagar</b>mala = ports (<b>sea</b>); <b>Parvat</b>mala = ropeways (<b>mountains</b>)."},
+ {k:"q", q:"Who is the nodal department for PM Gati Shakti planning?", o:["DPIIT (Ministry of Commerce & Industry)","NITI Aayog","Ministry of Road Transport","Ministry of Railways"], e:"PYQ (lecture set)."}],
+ sum:["25 June 2015: PMAY-U, AMRUT (500 cities), Smart Cities (100, ended 31 Mar 2025)","PMAY-U 2.0: 1 crore houses; EWS ≤3 L, LIG 3–6 L, MIG 6–9 L","SBM 2 Oct 2014; SBM-U 2.0 1 Oct 2021","PM e-Bus Sewa 10,000 buses 169 cities; PM E-DRIVE ₹10,900 cr to Mar 2028","Scrappage 2021: 15 yrs commercial, 20 yrs private","UDAN 2016; first flight Shimla–Delhi 27 Apr 2017; Modified UDAN ₹28,840 cr","Gati Shakti 13 Oct 2021 ₹100 lakh cr, DPIIT; Bharatmala 34,800 km; Sagarmala ports"]},
+
+{ id:"L9", title:"Health", hi:"स्वास्थ्य योजनाएँ", blocks:[
+ {k:"facts", title:"Ayushman Bharat (2018)", rows:[["Pillar 1","Ayushman Arogya Mandir (earlier Health & Wellness Centres): first opened 14 April 2018, Bijapur (Chhattisgarh)"],["Pillar 2","PM Jan Arogya Yojana (PM-JAY): launched 23 Sept 2018, Ranchi"],["PM-JAY cover","₹5 lakh per family per year, secondary & tertiary care, cashless"],["Beneficiaries","From SECC 2011 (+ later additions); runs through National Health Authority"],["Vay Vandana (Oct 2024)","Every citizen 70+ regardless of income; extra ₹5 lakh family top-up"]]},
+ {k:"trick", h:"<b>Ayushman: “5 lakh, 70 plus, Ranchi”</b>. PM-KMY (farmer pension) was also launched in Ranchi (2019): Ranchi = care for the old and the poor."},
+ {k:"q", q:"The main aim of Ayushman Bharat PM-JAY is …", o:["Health insurance for poor families","Crop insurance","Housing for all","Pension for the elderly"], e:"PYQ."},
+ {k:"table", title:"Missions", head:["Scheme","Facts"], rows:[["National Health Mission","2013 = NRHM (12 April 2005) + NUHM (2013); aims: lower MMR, IMR (target 25/1000), TFR; ASHA workers"],["Janani Suraksha Yojana","12 April 2005; cash for institutional delivery"],["Janani Shishu Suraksha Karyakram","1 June 2011; free delivery (normal and C-section), drugs, diagnostics, diet, blood and transport in public facilities; sick infants up to 1 year"],["PM-ABHIM","Announced Budget 2021-22, launched 25 Oct 2021 (Varanasi); ₹64,180 crore, 2021-22 to 2025-26; critical-care blocks, integrated public health labs"],["Mission Indradhanush","25 Dec 2014; vaccinate left-out children under 2 and pregnant women; originally 7 diseases"],["NTEP","Renamed from RNTCP in 2020; End TB target 2025 (SDG 2030); Ni-kshay Poshan ₹1,000/month to patients"],["NP-NCD","2023, renamed from NPCDCS; screens people 30+ for diabetes, hypertension, cancers"],["ABDM","27 Sept 2021; 14-digit ABHA health ID"],["PM Bhartiya Janaushadhi Pariyojana","Cheap generic medicines; Jan Aushadhi Diwas 7 March"]]},
+ {k:"trick", h:"<b>Indradhanush = 7 colours = 7 diseases</b>: diphtheria, whooping cough (pertussis), tetanus, polio, TB, measles, hepatitis B."},
+ {k:"trap", h:"JSSK gives <b>services</b> free (incl. C-section); <b>JSY</b> gives <b>cash</b> for delivering in a hospital. Both run under NHM."},
+ {k:"q", q:"What is the key benefit under Janani Shishu Suraksha Karyakram?", o:["Free delivery, including C-section, in public health facilities","₹6,000 cash for every birth","Free baby food for 5 years","Private hospital insurance"], e:"PYQ."},
+ {k:"facts", title:"HPV vaccination", rows:[["Who","Girls aged 9–14"],["Why","Prevents cervical cancer (≈97% effective per lecture)"]]}],
+ sum:["Ayushman Arogya Mandir 14 Apr 2018 Bijapur; PM-JAY 23 Sept 2018 Ranchi, ₹5 lakh","Vay Vandana: all 70+, no income limit","NHM 2013 = NRHM 2005 + NUHM 2013","JSY 2005 cash; JSSK 2011 free services incl. C-section, infants to 1 yr","PM-ABHIM ₹64,180 cr 2021","Indradhanush 25 Dec 2014, 7 diseases","NTEP 2020, End TB 2025; NP-NCD 30+"]},
+
+{ id:"L10", title:"Women & children", hi:"महिला एवं बाल", blocks:[
+ {k:"facts", title:"Beti Bachao Beti Padhao", rows:[["Launched","22 Jan 2015, Panipat (Haryana)"],["Ministries","WCD with Health and Education"],["Why","Falling child sex ratio: 927 (2001) → 918 (2011 Census)"],["Now","Part of Mission Shakti (Sambal); covers all districts"]]},
+ {k:"facts", title:"Sukanya Samriddhi Yojana (same day, 22 Jan 2015)", rows:[["Account","For a girl under 10"],["Deposit","₹250 to ₹1.5 lakh a year, for 15 years"],["Matures","21 years from opening; 50% can be withdrawn at 18 for education"],["Interest","8.2% (among the highest small savings rates); tax-free (EEE, 80C)"]]},
+ {k:"trap", h:"The lecture says you deposit until the girl is 18. Deposits are for <b>15 years</b>; the account <b>matures at 21 years</b> from opening."},
+ {k:"table", title:"Mission Shakti (2021-22) – two sub-schemes", head:["Sambal (safety)","Samarthya (empowerment)"], rows:[["One Stop Centres","Shakti Sadan (shelter)"],["Women Helpline 181","Sakhi Niwas (working women's hostels)"],["Beti Bachao Beti Padhao","Palna (crèches)"],["Nari Adalat","PM Matru Vandana Yojana"],["—","Sankalp: Hub for Empowerment of Women"]]},
+ {k:"trick", h:"<b>Sambal = support/safety</b> (protect her), <b>Samarthya = capability</b> (lift her up). Sakhi Niwas and PMMVY sit in <b>Samarthya</b>."},
+ {k:"q", q:"Sakhi Niwas (working women's hostels) comes under …", o:["Mission Shakti","Mission Vatsalya","Poshan 2.0","DAY-NRLM"], e:"PYQ: Samarthya sub-scheme of Mission Shakti."},
+ {k:"table", title:"Mothers & children", head:["Scheme","Facts"], rows:[["PM Matru Vandana Yojana","2017; ₹5,000 for first child (2 instalments); ₹6,000 for a second child if a girl"],["Saksham Anganwadi & Poshan 2.0","2021-22; WCD; nutrition for children 0–6, pregnant and lactating women. Merged ICDS (1975), POSHAN Abhiyaan (8 March 2018, Jhunjhunu), scheme for adolescent girls. Poshan Maah: September"],["Mission Vatsalya","2021-22 (was ICPS, 2009); WCD; child protection; CSS 60:40 / 90:10 / 100% UTs without legislature"],["PM Ujjwala Yojana","1 May 2016, Ballia (UP); Petroleum & Natural Gas; LPG connection in an adult woman's name for poor households; ₹1,600 support (14.2 kg) / ₹1,150 (5 kg); ₹300 subsidy per refill (12/yr); PMUY 2.0 10 Aug 2021, Mahoba; 10.33 crore connections (1 July 2025); slogan “Swachh Indhan, Behtar Jeevan”"],["Mahila Samman Savings Certificate","Budget 2023-24; 7.5%; up to ₹2 lakh for 2 years; open April 2023 – March 2025"],["NAVYA","2025; girls 16–18 with class 10; 27 aspirational districts in 9 states; non-traditional job skills; MSDE with WCD"]]},
+ {k:"trap", h:"MSSC interest is <b>7.5%</b>, not 7%. Ujjwala connections are only in a <b>woman's</b> name."},
+ {k:"trick", h:"Ujjwala: “<b>May Day in Ballia</b>” – 1 May 2016. PMUY 2.0 – <b>M</b>ahoba, <b>A</b>ugust 2021."},
+ {k:"q", q:"LPG is mostly a mixture of which two gases, with ethyl mercaptan added for smell?", o:["Propane and butane","Methane and ethane","Butane and methane","Propane and hydrogen"], e:"Both are odourless; mercaptan gives the warning smell (asked in the Ujjwala section of the lecture)."}],
+ sum:["BBBP & SSY: 22 Jan 2015, Panipat; CSR 918 (2011)","SSY: girl <10, ₹250–1.5 L/yr, 15 yrs deposit, matures 21 yrs, 8.2%","Mission Shakti: Sambal (OSC, 181, BBBP, Nari Adalat) + Samarthya (Shakti Sadan, Sakhi Niwas, Palna, PMMVY)","PMMVY ₹5,000; ₹6,000 second girl","Poshan 2.0 (WCD) ≠ PM POSHAN (Education)","Ujjwala 1 May 2016 Ballia; 2.0 Mahoba 2021; ₹1,600; women only","MSSC 7.5%, ₹2 L, 2 yrs"]},
+
+{ id:"L11", title:"Education, skills & youth", hi:"शिक्षा, कौशल, युवा", blocks:[
+ {k:"table", title:"School education (Ministry of Education)", head:["Scheme","Facts"], rows:[["Samagra Shiksha","2018; pre-school to class 12; merged SSA (2001), RMSA (2009) and Teacher Education"],["PM POSHAN","Sept 2021; replaced Mid-Day Meal (national from 15 Aug 1995; Tamil Nadu pioneered); Bal Vatika + classes 1–8; 2021-22 to 2025-26"],["PM POSHAN norms","Primary: 450 kcal + 12 g protein · Upper primary: 700 kcal + 20 g protein. Extras: Tithi Bhojan, school nutrition gardens"],["PM SHRI","PM Schools for Rising India; approved Sept 2022; 14,500+ model NEP-2020 schools; ₹27,360 crore"]]},
+ {k:"trick", h:"<b>POSHAN numbers: 450/12 and 700/20.</b> Smaller child, smaller plate."},
+ {k:"table", title:"Higher education & research", head:["Scheme","Facts"], rows:[["PM-USHA","2023; third phase of RUSA; improve state universities, implement NEP 2020; 2023-24 to 2025-26"],["One Nation One Subscription","Approved 25 Nov 2024; live 1 Jan 2025; ₹6,000 crore for 2025–27; 13,000+ journals for 6,300+ government institutions; run by INFLIBNET (under UGC)"],["PM Vidyalaxmi","Approved Nov 2024; collateral- and guarantor-free loans for students in ≈860 top NIRF institutions; 75% credit guarantee up to ₹7.5 lakh; 3% interest subvention on loans up to ₹10 lakh if family income ≤₹8 lakh"],["PM YASASVI","2021-22; Social Justice; scholarships for OBC, EBC and DNT students; 5 verticals: pre-matric, post-matric, top-class school, top-class college, hostels"],["INSPIRE-MANAK","DST with National Innovation Foundation; students of classes 6–10 (age 10–15); ₹10,000 for selected ideas. MANAK = Million Minds Augmenting National Aspirations and Knowledge"],["Deen Dayal SPARSH","Dept of Posts (Communications); scholarship for classes 6–9 who collect stamps (philately)"]]},
+ {k:"trap", h:"The lecture says PM Vidyalaxmi covers “86 institutions”. It is about <b>860</b> quality higher education institutions."},
+ {k:"q", q:"Which agency implements One Nation One Subscription?", o:["INFLIBNET centre under UGC","NTA","AICTE","NCERT"], e:"PYQ-type."},
+ {k:"table", title:"Skills & youth", head:["Scheme","Facts"], rows:[["Skill India Mission","15 July 2015 (World Youth Skills Day); MSDE"],["PMKVY","2015; free short-term skill training + certificate; PMKVY 4.0 from 2023"],["PM-SETU","PM Skilling & Employability Transformation through Upgraded ITIs; approved May 2025, launched 4 Oct 2025; ₹60,000 crore; 1,000 ITIs (hub & spoke); 5 NSTIs: Bhubaneswar, Chennai, Hyderabad, Kanpur, Ludhiana"],["PM Internship Scheme","Budget 2024-25; Corporate Affairs; 1 crore youth in 5 years at top 500 companies; 12 months; ₹5,000/month (₹4,500 govt + ₹500 company CSR) + ₹6,000 one-time"],["PM YUVA","Mentorship for writers under 30; ₹50,000/month for 6 months (= ₹3 lakh); NBT publishes; 10% lifetime royalty; Ministry of Education"]]},
+ {k:"table", title:"PM YUVA editions", head:["Edition","Theme","Authors"], rows:[["1.0 (2021)","National Movement of India","75"],["2.0 (2023)","Democracy","41"],["3.0 (2025)","Contribution of Indian diaspora; Indian Knowledge System; Makers of Modern India","43 (19 women)"]]},
+ {k:"trick", h:"PM YUVA authors: <b>75 → 41 → 43</b>. 75 for Azadi ka Amrit Mahotsav. A 1.0 winner cannot apply again."},
+ {k:"q", q:"PM Internship Scheme aims to give internships to how many youth in 5 years?", o:["1 crore","10 lakh","50 lakh","5 crore"], e:"PYQ (lecture set)."},
+ {k:"facts", title:"Gyan Bharatam Mission", rows:[["Announced","Budget 2025-26"],["Ministry","Culture"],["Aim","Survey, document, conserve and digitise India's 1 crore+ manuscripts"]]},
+ {k:"q", q:"The main objective of Gyan Bharatam Mission is to …", o:["Survey, document and conserve India's manuscript heritage","Open digital classrooms","Train teachers","Build libraries in villages"], e:"Asked in CGL Mains 2025 and CHSL."}],
+ sum:["Samagra Shiksha 2018; PM POSHAN 2021 (Education) 450/12, 700/20","PM SHRI 14,500 schools ₹27,360 cr","ONOS ₹6,000 cr, INFLIBNET; PM Vidyalaxmi ≈860 institutions, 3% subvention","PM YASASVI OBC/EBC/DNT, 5 verticals","Skill India 15 July 2015; PM-SETU ₹60,000 cr 1,000 ITIs","PM Internship: 1 crore, 500 cos, ₹5,000 + ₹6,000","PM YUVA 75/41/43; Gyan Bharatam manuscripts (Culture)"]},
+
+{ id:"L12", title:"Energy, environment, science & digital", hi:"ऊर्जा, पर्यावरण, विज्ञान", blocks:[
+ {k:"facts", title:"PM Surya Ghar Muft Bijli Yojana", rows:[["Launched","13 Feb 2024 (Cabinet approval 29 Feb 2024)"],["Ministry","MNRE"],["Outlay","₹75,021 crore"],["Target","1 crore households with rooftop solar"],["Benefit","Up to 300 units free electricity a month"],["Subsidy (CFA)","₹30,000/kW for first 2 kW + ₹18,000 for the 3rd kW → max ₹78,000"]]},
+ {k:"trap", h:"The transcript says “₹300 per kW”. It is <b>₹30,000 per kW</b> for the first 2 kW. Cap = 30 + 30 + 18 = <b>₹78,000</b>."},
+ {k:"q", q:"What is the maximum rooftop solar subsidy under PM Surya Ghar for a 3 kW system?", o:["₹78,000","₹60,000","₹90,000","₹30,000"], e:"₹30,000 + ₹30,000 + ₹18,000."},
+ {k:"facts", title:"National Green Hydrogen Mission", rows:[["Approved","4 Jan 2023"],["Outlay","₹19,744 crore (SIGHT programme ₹17,490 crore)"],["Target","5 million tonnes a year by 2030"],["Ministry","MNRE"]]},
+ {k:"table", title:"Hydrogen colours", head:["Colour","Made from"], rows:[["Green","Electrolysis of water using renewable power – cleanest"],["Blue","Natural gas; CO₂ captured and stored (CCS)"],["Grey","Natural gas; CO₂ released"],["Brown / Black","Lignite / bituminous coal – dirtiest"],["Pink","Electrolysis using nuclear power"],["Turquoise","Methane pyrolysis (solid carbon)"]]},
+ {k:"table", title:"Water & rivers", head:["Scheme","Facts"], rows:[["Namami Gange","June 2014; ₹20,000 crore; Jal Shakti; NMCG; “Nirmal” (clean) and “Aviral” (continuous flow) Ganga"],["Jal Jeevan Mission","15 Aug 2019; Jal Shakti; functional household tap connection (55 litres/person/day) to every rural home; Har Ghar Jal; deadline 2024 extended to 2028; ≈80% homes covered; Goa first Har Ghar Jal state"],["Atal Bhujal Yojana","25 Dec 2019; groundwater management in 7 states"]]},
+ {k:"q", q:"Which was the first state certified ‘Har Ghar Jal’?", o:["Goa","Telangana","Gujarat","Haryana"], e:"Under Jal Jeevan Mission."},
+ {k:"table", title:"Earth & ocean science (Earth Sciences ministry)", head:["Scheme","Facts"], rows:[["Deep Ocean Mission","Approved June 2021; ₹4,077 crore; Samudrayaan: MATSYA-6000 submersible takes 3 people to 6,000 m; titanium-alloy sphere; built by NIOT Chennai; hunt for polymetallic nodules"],["PRITHVI","2024 (for 2021-26); ₹4,797 crore; merges 5 sub-schemes: ACROSS (atmosphere/climate), O-SMART (ocean), PACER (polar), SAGE (seismology/geoscience), REACHOUT (research & outreach)"]]},
+ {k:"trap", h:"<b>NIOT</b> (Ocean <b>Technology</b>) is in <b>Chennai</b>; <b>NIO</b> (Ocean<b>ography</b>) is in <b>Goa</b>. PRITHVI was approved in 2024 though it runs from 2021."},
+ {k:"table", title:"Environment", head:["Scheme","Facts"], rows:[["MISHTI","Mangrove Initiative for Shoreline Habitats & Tangible Incomes; 5 June 2023; 540 sq km of mangroves in 9 coastal states & 4 UTs over 5 years; MGNREGA + CAMPA funds; Environment ministry; no commercial leasing"],["Amrit Dharohar","5 June 2023; conserve Ramsar wetlands: species, nature tourism, livelihoods, wetland carbon"],["CCUS push","Budget 2026-27: ₹20,000 crore for carbon capture, utilisation & storage"],["ADEETIE","Energy efficiency for MSMEs (Lesson 4)"]]},
+ {k:"table", title:"Digital India (1 July 2015, MeitY)", head:["Platform","Facts"], rows:[["UMANG","2017; Unified Mobile Application for New-age Governance; NeGD; central + state + local services in one app"],["DigiLocker","2015; cloud locker for documents"],["BHASHINI","2022; BHASHa INterface for India; AI translation in 22 languages"],["GeM","9 Aug 2016; government e-marketplace"],["e-SAKSHI (MPLADS)","New fund-flow portal from 1 April 2023; ₹5 crore per MP per year; MoSPI"]]},
+ {k:"q", q:"Which app gives one platform for central, state and local government services?", o:["UMANG","DigiLocker","BHIM","Aarogya Setu"], e:"PYQ."}],
+ sum:["Surya Ghar: 13 Feb 2024, ₹75,021 cr, 1 crore homes, 300 units, max CFA ₹78,000","Green H₂ 2023: ₹19,744 cr, 5 MMT by 2030","Namami Gange 2014 ₹20,000 cr; JJM 2019 → 2028, Goa first","Deep Ocean ₹4,077 cr; MATSYA-6000, 3 people, 6,000 m, NIOT Chennai","PRITHVI: ACROSS, O-SMART, PACER, SAGE, REACHOUT","MISHTI 540 sq km; Amrit Dharohar wetlands","Digital India 1 July 2015; UMANG 2017; BHASHINI 2022; e-SAKSHI ₹5 cr/MP"]},
+
+{ id:"L13", title:"Tribal, SC & food security", hi:"जनजाति, अनुसूचित जाति, खाद्य", blocks:[
+ {k:"facts", title:"PM JANMAN", rows:[["Full form","PM Janjati Adivasi Nyaya Maha Abhiyan"],["Launched","15 Nov 2023 (Janjatiya Gaurav Divas), Khunti, Jharkhand"],["For","75 PVTGs (Particularly Vulnerable Tribal Groups) in 18 states + A&N Islands"],["Outlay","≈₹24,000 crore (2023-24 to 2025-26)"],["Delivers","Houses, roads, telecom, water, health, education via 9 ministries"],["Ministry","Tribal Affairs"]]},
+ {k:"facts", title:"Dharti Aaba Janjatiya Gram Utkarsh Abhiyan", rows:[["Launched","2 Oct 2024 (Hazaribagh)"],["Outlay","₹79,156 crore, 5 years"],["Coverage","≈63,843 tribal-majority villages; 5 crore+ tribal people"],["Village rule","Population 500+ with ≥50% ST, or aspirational-district villages with 50+ STs"],["Ministry","Tribal Affairs (17 ministries converge)"]]},
+ {k:"trick", h:"<b>Dharti Aaba = Birsa Munda</b>. Both tribal missions are tied to Jharkhand: JANMAN in <b>Khunti</b> (Birsa's birthplace region) on his birthday, Dharti Aaba in <b>Hazaribagh</b>."},
+ {k:"q", q:"How many PVTGs does PM JANMAN target?", o:["75","705","18","50"], e:"75 PVTGs in 18 states and one UT."},
+ {k:"table", title:"Scheduled Castes & backward classes", head:["Scheme","Facts"], rows:[["PM-AJAY","PM Anusuchit Jaati Abhyuday Yojana; 2021-22; Social Justice; merged Adarsh Gram Yojana, SCA to SC Sub-Plan, Babu Jagjivan Ram Chhatrawas; jobs & villages for SCs"],["PM YASASVI","OBC/EBC/DNT scholarships (Lesson 11)"],["Eklavya Model Residential Schools","Tribal Affairs; TALASH (2025) talent & life-skills programme for EMRS students"]]},
+ {k:"table", title:"Food security", head:["Scheme","Facts"], rows:[["NFSA 2013","5 kg grain per person per month (priority households); 35 kg per family (Antyodaya)"],["PMGKAY","April 2020 as COVID relief; Consumer Affairs, Food & PD; from 1 Jan 2024 free grain to ≈81 crore people for 5 years"],["Fortified rice","Iron, folic acid, vitamin B12; supply extended to Dec 2028"]]},
+ {k:"q", q:"Which ministry runs PM Garib Kalyan Anna Yojana?", o:["Consumer Affairs, Food & Public Distribution","Agriculture","Rural Development","Finance"], e:"Department of Food & Public Distribution."}],
+ sum:["PM JANMAN 15 Nov 2023 Khunti: 75 PVTGs, 18 states + A&N","Dharti Aaba 2 Oct 2024 Hazaribagh: ₹79,156 cr, 63,843 villages","PM-AJAY 2021-22 for SCs (Social Justice)","NFSA 5 kg/person; AAY 35 kg/family","PMGKAY: free grain to 81 crore from 1 Jan 2024 for 5 yrs","Fortified rice to Dec 2028"]},
+
+{ id:"L14", title:"State schemes", hi:"राज्यों की योजनाएँ", blocks:[
+ {k:"p", h:"State schemes appear in CGL as “which state launched …”. The trick is to tie each name to the state's language, deity or leader."},
+ {k:"table", title:"Monthly cash for women", head:["Scheme","State","Amount & eligibility"], rows:[["Mukhyamantri Majhi Ladki Bahin","Maharashtra","₹1,500/month; 21–65; family income < ₹2.5 L"],["Ladli Behna","Madhya Pradesh","₹1,500/month (started 2023 at ₹1,000)"],["Subhadra","Odisha","₹50,000 over 5 years: ₹10,000/yr in 2 × ₹5,000 (Rakhi & Women's Day); 21–60; 1 crore women; launched Sept 2024"],["Gruha Lakshmi","Karnataka","₹2,000/month to woman head of family"],["Maiyan Samman","Jharkhand","₹2,500/month; 18–50"],["Indira Gandhi Pyari Behna Sukh Samman Nidhi","Himachal Pradesh","₹1,500/month; 18–60"],["Lakshmir Bhandar","West Bengal","₹1,000 (general) / ₹1,200 (SC/ST) a month"],["Mahtari Vandan","Chhattisgarh","₹1,000/month"],["Orunodoi 3.0","Assam","₹1,250/month"],["Kalaignar Magalir Urimai Thogai","Tamil Nadu","₹1,000/month to 1 crore+ women"],["Mukhyamantri Mahila Rozgar Yojana","Bihar","₹10,000 first instalment to 75 lakh women (₹7,500 crore, 2025); later up to ₹2 lakh for business"]]},
+ {k:"trick", h:"<b>Subhadra</b> is Lord Jagannath's sister → <b>Odisha</b> (Puri). <b>Majhi</b> is Marathi (“my”) → Maharashtra. <b>Orunodoi</b> (sunrise) is Assamese. <b>Kalaignar</b> = Karunanidhi → Tamil Nadu. <b>Maiyan</b> is Jharkhandi. <b>Lakshmir</b> is Bengali."},
+ {k:"q", q:"Subhadra Yojana pays how much, over how long?", o:["₹50,000 over 5 years","₹1,500 a month for life","₹10,000 once","₹1 lakh over 2 years"], e:"PYQ. ₹10,000 a year in two ₹5,000 instalments."},
+ {k:"table", title:"Girls, students, farmers", head:["Scheme","State","Facts"], rows:[["Lado Protsahan","Rajasthan","₹1.5 lakh savings bond for a girl in 7 stages, birth to graduation (2024)"],["Kanya Sumangala","Uttar Pradesh","₹25,000 in 6 stages (earlier ₹15,000)"],["Namo Saraswati Vigyan Sadhana","Gujarat","₹25,000 to students who take science in classes 11–12"],["Thalliki Vandanam","Andhra Pradesh","₹15,000 a year to mothers who send children to school (replaced Amma Vodi)"],["Rythu Bandhu","Telangana","Investment support per acre per season (now Rythu Bharosa)"],["CM Kisan Samman Nidhi","Rajasthan","₹3,000 on top of PM-KISAN → ₹9,000 a year"],["Gopal Credit Card","Rajasthan","Interest-free loan up to ₹1 lakh for dairy farmers"],["Mukhyamantri Ayushman Arogya","Rajasthan","Cashless health cover up to ₹25 lakh (successor of Chiranjeevi)"],["Mukhyamantri Vriddhavastha Samman Bhatta","Haryana","Old-age pension ₹3,200/month"]]},
+ {k:"table", title:"Services & other", head:["Scheme","State","Facts"], rows:[["Mukhyamantri Mitan","Chhattisgarh","Doorstep delivery of 100 govt services/certificates"],["Mo Ghar","Odisha","Loans/subsidy to turn kachcha houses pucca"],["Mahalakshmi","Telangana","Free bus travel for women + LPG at ₹500"],["HAPPY","Haryana","Haryana Antyodaya Parivar Parivahan Yojana: 1,000 km free bus travel a year for families earning < ₹1 lakh"],["Farishtey","Punjab","Free treatment for road-accident victims; ₹2,000 to the helper"],["CM Yuva Udyami Vikas Abhiyan","Uttar Pradesh","Interest-free loans up to ₹5 lakh; 10 lakh micro units"]]},
+ {k:"q", q:"‘Farishtey’, which rewards people who take road-accident victims to hospital, is a scheme of …", o:["Punjab","Haryana","Delhi","Himachal Pradesh"], e:"₹2,000 to the good Samaritan; free treatment."}],
+ sum:["Ladki Bahin MH ₹1,500 · Ladli Behna MP ₹1,500 · Gruha Lakshmi KA ₹2,000 · Maiyan Samman JH ₹2,500","Subhadra Odisha ₹50,000 / 5 yrs (Rakhi + Women's Day)","Lakshmir Bhandar WB · Mahtari Vandan CG · Orunodoi Assam · Magalir Urimai TN","Lado Protsahan RJ ₹1.5 L · Kanya Sumangala UP ₹25,000","Thalliki Vandanam AP ₹15,000 · Namo Saraswati GJ ₹25,000","HAPPY Haryana 1,000 km · Farishtey Punjab · Mitan CG"]},
+
+{ id:"L15", title:"2025–26 roundup & full forms", hi:"नवीनतम अपडेट", blocks:[
+ {k:"tl", title:"What changed recently (to Sept 2026)", rows:[["Jul 2025","PM-VBRY (ELI) approved ₹99,446 cr; Dhan-Dhaanya approved; ADEETIE launched"],["Oct 2025","Dhan-Dhaanya & Pulses mission launched (11 Oct); PM-SETU launched (4 Oct)"],["Dec 2025","VB-G RAM G Act passed"],["Feb 2026","Budget 2026-27: Biopharma SHAKTI, SHE-Mart, Bharat VISTAAR, CCUS ₹20,000 cr, ECMS raised to ₹40,000 cr"],["Mar 2026","Modified UDAN approved: ₹28,840 cr, 100 airports + 200 helipads"],["1 Jul 2026","VB-G RAM G in force; MGNREGA ends"],["15 Jul 2026","MPMS ₹62,500 cr approved"],["Jul 2026","ISM 2.0 ₹1.275 lakh cr approved"],["24 Jul 2026","BHAVYA Rasayan ₹3,030 cr approved"],["2026","Lakhpati Didi target doubled to 6 crore"]]},
+ {k:"table", title:"Extended deadlines", head:["Scheme","Now runs till"], rows:[["PM SVANidhi","31 March 2030"],["PM E-DRIVE","31 March 2028"],["Jal Jeevan Mission","2028"],["PMGKAY free grain","Dec 2028"],["Fortified rice","Dec 2028"],["PMAY-G","2028-29"]]},
+ {k:"table", title:"Launch places (a favourite question)", head:["Place","Scheme"], rows:[["Gorakhpur","PM-KISAN (2019)"],["Ranchi","PM-JAY (2018), PM-KMY (2019)"],["Panipat","BBBP & SSY (2015), Bima Sakhi (2024)"],["Ballia","Ujjwala (2016)"],["Mahoba","Ujjwala 2.0 (2021)"],["Agra","PMAY-G (2016)"],["Kolkata","APY, PMJJBY, PMSBY (2015)"],["Sehore","PMFBY (2016)"],["Suratgarh","Soil Health Card (2015)"],["Khunti","PM JANMAN (2023)"],["Hazaribagh","Dharti Aaba (2024)"],["Jhunjhunu","POSHAN Abhiyaan (2018)"],["Bijapur (CG)","First Health & Wellness Centre (2018), Van Dhan (2018)"],["Shimla–Delhi","First UDAN flight (2017)"]]},
+ {k:"trick", h:"<b>Panipat</b> hosted battles and now schemes for daughters: BBBP, SSY and Bima Sakhi. <b>Ranchi</b> = health & pension (PM-JAY, PM-KMY)."},
+ {k:"table", title:"Also asked (not in the lectures)", head:["Scheme","Year · Facts"], rows:[["Kisan Credit Card","1998"],["Rashtriya Gokul Mission","2014; indigenous cattle"],["UJALA","5 Jan 2015; LED bulbs"],["Saubhagya","Sept 2017; household electricity"],["Atal Innovation Mission","2016; NITI Aayog; Atal Tinkering Labs"],["Operation Greens","2018; TOP: tomato, onion, potato"],["Van Dhan Yojana","14 April 2018; tribal forest produce"],["GOBARdhan","2018; cattle dung to biogas"],["Mission Karmayogi","2 Sept 2020; civil service capacity building; iGOT portal"],["PM-WANI","Dec 2020; public Wi-Fi"],["Agnipath","14 June 2022; 4-year military service"],["National Quantum Mission","2023; ₹6,003 crore"],["IndiaAI Mission","March 2024; ₹10,372 crore"],["National Critical Mineral Mission","Jan 2025; ₹16,300 crore"],["PRASHAD / Swadesh Darshan","2014-15; Tourism: pilgrimage sites / theme circuits"]]},
+ {k:"q", q:"Mission Karmayogi, whose courses run on the iGOT portal, is meant for …", o:["Capacity building of civil servants","Skilling farmers","School teachers only","Armed forces recruitment"], e:"New central employees complete iGOT courses during probation."}],
+ sum:["VB-G RAM G from 1 July 2026 (125 days)","MPMS ₹62,500 cr · ISM 2.0 ₹1.275 lakh cr · BHAVYA ₹3,030 cr (July 2026)","Modified UDAN ₹28,840 cr (Mar 2026)","Budget 2026-27: Biopharma SHAKTI ₹10,000 cr, SHE-Mart, Bharat VISTAAR, CCUS ₹20,000 cr","Places: Gorakhpur KISAN, Ranchi JAY/KMY, Panipat BBBP, Ballia Ujjwala, Khunti JANMAN"]}
+];
+
+
+const QB = [
+/* L1 basics */
+["L1","A scheme fully funded by the Union government is called a",["Central Sector scheme","Centrally Sponsored scheme","Core scheme","State Plan scheme"],"Centrally Sponsored schemes share cost with states."],
+["L1","For general category states, the usual Centre:State sharing in centrally sponsored schemes is",["60:40","90:10","50:50","75:25"],"90:10 applies to NE and Himalayan states."],
+["L1","For North-Eastern and Himalayan states, most CSS are shared in the ratio",["90:10","60:40","80:20","100:0"],"J&K UT also gets 90:10."],
+["L1","Which of these Union Territories has a legislature?",["Puducherry","Ladakh","Chandigarh","Lakshadweep"],"Only Delhi, Puducherry and J&K have legislatures."],
+["L1","UTs without legislature get what share of CSS funds from the Centre?",["100%","90%","60%","75%"],"The Centre funds them fully."],
+["L1","PM POSHAN is implemented by the",["Ministry of Education","Ministry of Health & Family Welfare","Ministry of Women & Child Development","Ministry of Rural Development"],"Mid-day meal in schools.","p"],
+["L1","Stand-Up India is a scheme of the",["Ministry of Finance","Ministry of Commerce & Industry","Ministry of MSME","NITI Aayog"],"Department of Financial Services; Startup India is DPIIT."],
+["L1","Which of these is a Central Sector scheme?",["PM-KISAN","PM Awas Yojana-Gramin","Jal Jeevan Mission","Samagra Shiksha"],"The other three are centrally sponsored."],
+["L1","Which of these is a Centrally Sponsored scheme?",["Jal Jeevan Mission","PM SVANidhi","PM-KISAN","PM Vishwakarma"],"States share JJM cost and implement it."],
+["L1","Lakhpati Didi initiative is run by the",["Ministry of Rural Development","Ministry of Women & Child Development","Ministry of Finance","Ministry of MSME"],"Built on DAY-NRLM self-help groups."],
+/* L2 */
+["L2","PM-KISAN was formally launched at",["Gorakhpur","Varanasi","Ranchi","Lucknow"],"24 Feb 2019.","p"],
+["L2","PM-KISAN benefits are effective from",["1 December 2018","24 February 2019","1 April 2019","15 August 2018"],"It was applied retrospectively."],
+["L2","Annual benefit under PM-KISAN is",["₹6,000","₹12,000","₹2,000","₹10,000"],"Three instalments of ₹2,000.","p"],
+["L2","PM-KISAN money is paid in",["3 equal instalments","2 equal instalments","12 monthly instalments","One lump sum"],"₹2,000 every four months."],
+["L2","PM-KISAN covers",["All land-holding farmer families (with exclusions)","Only farmers with less than 2 ha","Only tenant farmers","Only farm labourers"],"The 2 ha limit was removed in 2019."],
+["L2","Which of these is excluded from PM-KISAN?",["An income-tax payer","A small farmer","A woman farmer","A marginal farmer"],"Also excluded: constitutional post holders, professionals, pensioners ₹10,000+."],
+["L2","PM Kisan Maandhan Yojana gives a monthly pension of",["₹3,000","₹1,000","₹5,000","₹2,000"],"After age 60.","p"],
+["L2","Who are the main beneficiaries of PM Kisan Maandhan Yojana?",["Small and marginal farmers with up to 2 ha","All farmers above 60","Landless labourers","Large farmers"],"Entry age 18–40.","p"],
+["L2","PM Kisan Maandhan Yojana was launched in",["Ranchi, 2019","Gorakhpur, 2019","Delhi, 2018","Patna, 2020"],"12 September 2019."],
+["L2","Under PMFBY, the farmer's premium for kharif crops is",["2%","1.5%","5%","3%"],"Rabi 1.5%, commercial/horticulture 5%.","p"],
+["L2","Under PMFBY, the premium for annual commercial and horticulture crops is",["5%","2%","1.5%","10%"],"Highest of the three."],
+["L2","PMFBY was launched in",["2016","2014","2018","2019"],"Kharif 2016 onwards; replaced NAIS and MNAIS."],
+["L2","Consider: 1. PMFBY covers losses from non-preventable natural risks. 2. Enrolment is mandatory for all farmers. Which is correct?",["Only 1","Only 2","Both","Neither"],"Enrolment has been voluntary since 2020.","p"],
+["L2","Under PMFBY, crop loss should be reported within",["72 hours","7 days","24 hours","15 days"],"For localised calamities."],
+["L2","Who recommends Minimum Support Prices?",["CACP","NITI Aayog","FCI","NABARD"],"Commission for Agricultural Costs and Prices, 1965."],
+["L2","Instead of MSP, sugarcane growers get",["FRP","MIS","PDPS","CIP"],"Fair and Remunerative Price."],
+["L2","MSP is currently announced for how many mandated crops?",["22","14","25","7"],"Plus FRP for sugarcane."],
+["L2","PM-AASHA was launched to",["Ensure farmers get MSP for their produce","Insure crops","Provide farm loans","Build warehouses"],"Umbrella scheme, 2018."],
+["L2","Which is NOT a component of PM-AASHA?",["Kisan Credit Card","Price Support Scheme","Price Deficiency Payment Scheme","Price Stabilisation Fund"],"MIS is the fourth component."],
+["L2","PM Dhan-Dhaanya Krishi Yojana covers how many districts?",["100","112","75","150"],"Low-productivity districts, at least one per state.","p"],
+["L2","PM Dhan-Dhaanya Krishi Yojana converges how many existing schemes?",["36","11","100","24"],"From 11 departments."],
+["L2","PM Dhan-Dhaanya Krishi Yojana aims to benefit about",["1.7 crore farmers","11 crore farmers","50 lakh farmers","5 crore farmers"],"Asked as ‘how many farmers’.","p"],
+["L2","The annual outlay of PM Dhan-Dhaanya Krishi Yojana is",["₹24,000 crore","₹6,000 crore","₹1 lakh crore","₹11,440 crore"],"For six years."],
+["L2","PM Dhan-Dhaanya Krishi Yojana is modelled on",["Aspirational Districts Programme","Smart Cities Mission","MGNREGA","PM Gati Shakti"],"District-level convergence."],
+["L2","The Mission for Aatmanirbharta in Pulses targets production of",["350 lakh tonnes by 2030-31","242 lakh tonnes by 2026","500 lakh tonnes by 2030","100 lakh tonnes by 2028"],"From 242 LT in 2023-24."],
+["L2","Under the pulses mission, 100% procurement is promised for",["Tur, urad and masoor","Moong, chana and rajma","Wheat and rice","Soybean and groundnut"],"For four years, by NAFED and NCCF."],
+["L2","e-NAM was launched on",["14 April 2016","2 October 2016","1 July 2015","26 January 2017"],"Ambedkar Jayanti; ‘One Nation One Market’.","p"],
+["L2","e-NAM primarily aims at",["A unified national online market for farm produce","Crop insurance","Credit to farmers","Irrigation"],"PYQ.","p"],
+["L2","The Agriculture Infrastructure Fund provides financing of",["₹1 lakh crore","₹10,000 crore","₹50,000 crore","₹2 lakh crore"],"Launched July 2020 with 3% interest subvention."],
+/* L3 */
+["L3","‘Har Khet Ko Pani’ and ‘Per Drop More Crop’ are slogans of",["PM Krishi Sinchayee Yojana","PM-KUSUM","Jal Jeevan Mission","Atal Bhujal Yojana"],"PMKSY, 1 July 2015.","p"],
+["L3","The lead ministry for PMKSY is",["Jal Shakti","Agriculture","Rural Development","Environment"],"Agriculture runs the Per Drop More Crop part."],
+["L3","PM-KUSUM is administered by the",["Ministry of New & Renewable Energy","Ministry of Power","Ministry of Agriculture","Ministry of Jal Shakti"],"MNRE.","p"],
+["L3","The full form of PM-KUSUM is",["PM Kisan Urja Suraksha evam Utthaan Mahabhiyan","PM Krishi Urja Sinchai Maha Yojana","PM Kisan Unnat Solar Mission","PM Krishi Utpadan Sahayata Mission"],"Full forms are asked.","p"],
+["L3","Under Component A of PM-KUSUM, farmers can set up solar plants of up to",["2 MW","10 MW","500 kW","5 MW"],"On barren or fallow land."],
+["L3","Under PM-KUSUM stand-alone pumps, a farmer pays about",["10% of the cost","30% of the cost","50% of the cost","Nothing"],"30% Centre + 30% State + 30% loan."],
+["L3","Rashtriya Krishi Vikas Yojana was launched in",["2007-08","2017-18","2014-15","2024-25"],"Renamed RKVY-RAFTAAR in 2017-18.","p"],
+["L3","Which scheme lets states plan agriculture projects as per local agro-climatic conditions and promotes crop diversification through cluster planning?",["RKVY","PMFBY","PM-KISAN","e-NAM"],"PYQ.","p"],
+["L3","The National Mission on Natural Farming has an outlay of",["₹2,481 crore","₹24,000 crore","₹11,440 crore","₹1,261 crore"],"Approved Nov 2024."],
+["L3","Which is NOT one of the four wheels of Zero Budget Natural Farming?",["Urea spray","Jeevamrutha","Beejamrutha","Acchadana (mulching)"],"The fourth is Whapasa."],
+["L3","Mulching in natural farming mainly helps to",["Conserve soil moisture and suppress weeds","Add nitrogen chemically","Kill pests with chemicals","Increase salinity"],"Organic cover on the soil."],
+["L3","Nutrient Based Subsidy (NBS) scheme does NOT cover",["Urea","Phosphatic fertilisers","Potassic fertilisers","Sulphur-containing complex fertilisers"],"Urea has its own fixed-price subsidy.","p"],
+["L3","NBS was introduced in",["2010","2015","2005","2020"],"1 April 2010, Department of Fertilizers.","p"],
+["L3","PM-PRANAM encourages states to",["Reduce use of chemical fertilisers","Increase urea imports","Build fertiliser plants","Subsidise pesticides"],"States keep 50% of the subsidy saved.","p"],
+["L3","Which pair is correctly matched?",["PM-PRANAM – fertiliser use","UDAN – farming","ECMS – pensions","SVAMITVA – aviation"],"PYQ.","p"],
+["L3","Under PM-PRANAM, what share of the grant goes to asset creation?",["70%","50%","30%","100%"],"The remaining 30% rewards farmers and groups."],
+["L3","Soil Health Card scheme was launched at",["Suratgarh, Rajasthan","Sehore, MP","Ballia, UP","Panipat, Haryana"],"19 February 2015."],
+["L3","The nodal ministry for Namo Drone Didi is",["Agriculture & Farmers Welfare","Rural Development","Civil Aviation","Women & Child Development"],"With DAY-NRLM support.","p"],
+["L3","Namo Drone Didi aims to give drones to how many women SHGs?",["15,000","1,500","1 lakh","50,000"],"PYQ-type number."],
+["L3","Under Namo Drone Didi, central assistance covers",["80% of drone cost up to ₹8 lakh","100% of cost","50% up to ₹5 lakh","₹1 lakh flat"],"The rest can be an AIF loan."],
+["L3","The SMAM scheme is related to",["Farm mechanisation","Soil testing","Organic manure","Fisheries"],"Sub-Mission on Agricultural Mechanisation."],
+["L3","PM Matsya Sampada Yojana is implemented by",["Department of Fisheries","Ministry of Agriculture","Ministry of Jal Shakti","Ministry of Food Processing"],"Ministry of Fisheries, Animal Husbandry & Dairying, 2020."],
+["L3","PM Matsya Sampada Yojana was launched with an investment of",["₹20,050 crore","₹2,050 crore","₹50,000 crore","₹5,000 crore"],"Launched 10 Sept 2020."],
+["L3","Bharat VISTAAR (Budget 2026-27) gives farmers",["AI-based advisory in their language","Free tractors","Crop insurance","Cash transfers"],"Through the ‘Bharati’ voice assistant."],
+/* L4 */
+["L4","Make in India was launched on",["25 September 2014","15 August 2014","1 July 2015","26 January 2015"],"Lion made of cogs is the logo.","p"],
+["L4","Make in India is primarily associated with",["Manufacturing","Old-age pension","Crop insurance","Food subsidy"],"PYQ.","p"],
+["L4","The logo of Make in India is",["A lion made of gears","A spinning wheel","A tiger","A lotus"],"Symbol of strength and manufacturing."],
+["L4","Which department coordinates the PLI scheme?",["DPIIT","Department of Expenditure","NITI Aayog","MeitY"],"Commerce & Industry.","p"],
+["L4","PLI schemes were announced for how many sectors?",["14","10","22","27"],"PYQ.","p"],
+["L4","The primary goal of the PLI scheme is to",["Boost domestic manufacturing and attract investment","Give loans to startups","Provide farm subsidies","Build highways"],"PYQ.","p"],
+["L4","PLI incentives are paid on",["Incremental sales over a base year","Total capital invested","Land area used","Number of patents"],"Not a loan."],
+["L4","The total PLI outlay across sectors is about",["₹1.97 lakh crore","₹19,744 crore","₹76,000 crore","₹10 lakh crore"],"Across 14 sectors."],
+["L4","ECMS (2025) mainly supports manufacture of",["Electronic components and sub-assemblies","Complete cars","Textiles","Pharmaceuticals"],"Camera modules, display modules, PCBs.","p"],
+["L4","Which correctly distinguishes ECMS and MPMS?",["ECMS: components; MPMS: mobile phones","Both are farm schemes","MPMS builds airports","ECMS opens pension accounts"],"Lecture PYQ."],
+["L4","In Budget 2026-27 the ECMS outlay was raised to",["₹40,000 crore","₹400 crore","₹22,919 crore","₹62,500 crore"],"From ₹22,919 crore."],
+["L4","ECMS is run by the",["Ministry of Electronics & IT","Ministry of Commerce","Ministry of Heavy Industries","Ministry of Science & Technology"],"MeitY."],
+["L4","The Mobile Phone Manufacturing Scheme approved in July 2026 has an outlay of",["₹62,500 crore","₹1.275 lakh crore","₹40,000 crore","₹22,919 crore"],"FY 2026-27 to 2030-31."],
+["L4","Under MPMS, the sales-linked incentive ranges from",["2.25% to 5%","10% to 12%","1% to 2%","20% to 25%"],"Plus extra for local components and R&D."],
+["L4","The approved outlay of India Semiconductor Mission 2.0 is",["₹1,27,500 crore","₹76,000 crore","₹62,500 crore","₹10,000 crore"],"July 2026.","p"],
+["L4","ISM 1.0 (2021) had an outlay of",["₹76,000 crore","₹1.27 lakh crore","₹40,000 crore","₹20,000 crore"],"Tata–PSMC fab at Dholera."],
+["L4","BHAVYA Rasayan will develop how many dedicated chemical parks?",["3","7","10","5"],"PYQ-type.","p"],
+["L4","BHAVYA in BHAVYA Rasayan stands for",["Bharat Audyogik Vikas Yojana","Bharat Vyapar Yojana","Bhartiya Audyogik Vikas Abhiyan","Bharat Avsanrachna Yojana"],"Full forms are asked."],
+["L4","Under BHAVYA Rasayan, the Centre gives up to how much per park?",["₹1,000 crore","₹500 crore","₹300 crore","₹3,030 crore"],"States must add at least ₹500 crore."],
+["L4","Parks under BHAVYA Rasayan are selected through",["A challenge route among states","Lottery","Only BJP-ruled states","NITI Aayog ranking of cities"],"States compete with land and money."],
+["L4","The primary objective of Biopharma SHAKTI is to",["Build domestic capacity in biologics and biosimilars","Give collateral-free loans","Raise farm exports","Build rural roads"],"Lecture PYQ."],
+["L4","Biopharma SHAKTI has an outlay of",["₹10,000 crore over 5 years","₹1,000 crore","₹62,500 crore","₹76,000 crore"],"Budget 2026-27."],
+["L4","Under Biopharma SHAKTI, how many new NIPERs will be opened?",["3","7","10","5"],"7 existing + 3 new = 10."],
+["L4","PM MITRA parks relate to",["Textiles and apparel","Mobile phones","Chemicals","Semiconductors"],"PM Mega Integrated Textile Region & Apparel.","p"],
+["L4","How many PM MITRA parks have been approved?",["7","3","10","14"],"PYQ-type.","p"],
+["L4","Which of these is NOT a PM MITRA park location?",["Kanpur","Virudhunagar","Warangal","Navsari"],"The seven: Virudhunagar, Warangal, Navsari, Kalaburagi, Dhar, Lucknow, Amravati."],
+["L4","Which scheme–ministry pair is correctly matched?",["SAMARTH – Ministry of Textiles","PM MITRA – Ministry of MSME","ECMS – Ministry of Finance","UDAN – Ministry of Tourism"],"PYQ.","p"],
+["L4","The ‘5F’ vision behind PM MITRA is",["Farm to Fibre to Factory to Fashion to Foreign","Food to Fuel to Finance to Farm to Future","Fibre to Finance to Freedom to Fame to Future","Farm to Food to Factory to Freight to Foreign"],"Covers the full textile value chain."],
+["L4","ADEETIE scheme is implemented by",["Bureau of Energy Efficiency","SIDBI","NITI Aayog","KVIC"],"Ministry of Power, July 2025."],
+["L4","ADEETIE mainly helps MSMEs to",["Adopt energy-efficient technologies","Get export credit","Hire apprentices","Buy land"],"₹1,000 crore; 14 sectors."],
+/* L5 */
+["L5","PM Jan Dhan Yojana was launched on",["28 August 2014","15 August 2014","25 September 2014","2 October 2014"],"Announced on 15 Aug 2014.","p"],
+["L5","PMJDY is India's national mission for",["Financial inclusion","Housing","Skill development","Digital literacy"],"PYQ.","p"],
+["L5","The overdraft facility under PMJDY is up to",["₹10,000","₹5,000","₹50,000","₹1 lakh"],"Raised from ₹5,000 in 2018."],
+["L5","Accident cover on RuPay cards for new PMJDY accounts is",["₹2 lakh","₹1 lakh","₹5 lakh","₹30,000"],"For accounts opened after 28 Aug 2018."],
+["L5","PM MUDRA Yojana was launched on",["8 April 2015","5 April 2016","28 August 2014","16 January 2016"],"MUDRA is a SIDBI subsidiary."],
+["L5","The loan limit for the Shishu category of MUDRA is",["Up to ₹50,000","Up to ₹5 lakh","Up to ₹10 lakh","Up to ₹20,000"],"Kishore: ₹50,000–₹5 lakh."],
+["L5","Tarun Plus under MUDRA covers loans of",["₹10–20 lakh","₹5–10 lakh","₹20–50 lakh","₹1–5 lakh"],"Only for past Tarun borrowers who repaid."],
+["L5","As of Oct 2024, which is NOT a category under PM MUDRA Yojana?",["Yuva","Shishu","Kishore","Tarun Plus"],"PYQ.","p"],
+["L5","MUDRA loans are meant for",["Non-corporate, non-farm small businesses","Large corporates","Crop loans","Home loans"],"No collateral."],
+["L5","Stand-Up India was launched on",["5 April 2016","8 April 2015","16 January 2016","1 May 2016"],"Ministry of Finance."],
+["L5","Stand-Up India was launched to promote entrepreneurship among",["SC/ST and women","Minorities only","Ex-servicemen","Farmers"],"PYQ.","p"],
+["L5","Loan size under Stand-Up India is",["₹10 lakh to ₹1 crore","₹1 lakh to ₹10 lakh","₹50,000 to ₹5 lakh","₹1 crore to ₹5 crore"],"Composite loan for greenfield units."],
+["L5","Under Stand-Up India, each bank branch must lend to at least",["One SC/ST and one woman borrower","Ten women","Five SC/ST borrowers","One minority borrower"],"Mandatory target."],
+["L5","A ‘greenfield’ enterprise means",["A first-time venture in that activity","A farm-based business","An eco-friendly business","A government company"],"Asked in Stand-Up India context."],
+["L5","To be a recognised startup, annual turnover must not exceed",["₹100 crore","₹25 crore","₹50 crore","₹500 crore"],"And the entity must be under 10 years old."],
+["L5","Startup India is under",["DPIIT, Ministry of Commerce & Industry","Ministry of Finance","NITI Aayog","MSME"],"Launched 16 Jan 2016."],
+["L5","PMEGP is implemented at the national level by",["KVIC","SIDBI","NABARD","NSIC"],"Ministry of MSME is the parent."],
+["L5","PMEGP was formed by merging",["REGP and PM Rozgar Yojana","SGSY and IAY","PMKVY and DDU-GKY","NREGA and SGRY"],"2008-09."],
+["L5","Under PMEGP, maximum project cost for a service unit is",["₹20 lakh","₹50 lakh","₹10 lakh","₹1 crore"],"₹50 lakh for manufacturing."],
+["L5","PM SVANidhi gives loans to",["Street vendors","Artisans","SC/ST entrepreneurs","Farmers"],"Launched 1 June 2020."],
+["L5","After the 2025 restructuring, the first PM SVANidhi loan is",["₹15,000","₹10,000","₹20,000","₹50,000"],"Then ₹25,000, then ₹50,000."],
+["L5","PM SVANidhi has been extended till",["31 March 2030","31 March 2026","2028","2035"],"Restructured in 2025."],
+["L5","PM SVANidhi is a",["Central Sector scheme under MoHUA","Centrally Sponsored scheme under MSME","State scheme","Scheme of NABARD"],"The lecture corrected this itself."],
+["L5","PM Vishwakarma was launched on",["17 September 2023","15 August 2023","2 October 2023","25 December 2023"],"Vishwakarma Jayanti.","p"],
+["L5","How many trades are covered under PM Vishwakarma?",["18","14","21","12"],"Carpenter, blacksmith, potter, barber, tailor, goldsmith, boatmaker, etc.","p"],
+["L5","Under PM Vishwakarma, collateral-free loans up to ₹3 lakh are given at",["5% interest","7% interest","3% interest","0% interest"],"In two tranches of ₹1 lakh and ₹2 lakh."],
+["L5","Under PM Vishwakarma, the toolkit incentive is",["₹15,000 e-voucher","₹5,000 cash","₹50,000 loan","₹25,000 grant"],"Plus ₹500/day during training."],
+["L5","The nodal ministry for PM Vishwakarma is",["MSME","Skill Development","Textiles","Rural Development"],"MSDE and DFS co-implement."],
+["L5","India Post Payments Bank was launched in",["2018","2015","2020","2014"],"1 September 2018."],
+["L5","Which scheme supports financial services through postmen at the doorstep?",["India Post Payments Bank","Jan Dhan","MUDRA","Jan Samarth"],"PYQ.","p"],
+["L5","The current deposit limit per customer in a payments bank is",["₹2 lakh","₹1 lakh","₹5 lakh","₹50,000"],"Raised from ₹1 lakh in 2021."],
+/* L6 */
+["L6","Atal Pension Yojana was launched on",["9 May 2015","28 August 2014","1 April 2016","15 August 2015"],"With PMJJBY and PMSBY, Kolkata."],
+["L6","Entry age for Atal Pension Yojana is",["18–40 years","18–60 years","21–45 years","25–50 years"],"Pension begins at 60."],
+["L6","Which government scheme aims to provide social security to workers in the unorganised sector?",["Atal Pension Yojana","PM-JAY","PMKVY","MUDRA"],"PYQ.","p"],
+["L6","APY gives a guaranteed monthly pension in the range",["₹1,000–5,000","₹500–2,000","₹3,000–10,000","₹5,000–10,000"],"Depends on contribution."],
+["L6","Who is NOT eligible to join APY after October 2022?",["Income-tax payers","Farmers","Women","Self-employed"],"Rule change from 1 Oct 2022."],
+["L6","PMSBY provides accidental death cover of",["₹2 lakh at ₹20 a year","₹2 lakh at ₹436 a year","₹5 lakh at ₹20 a year","₹1 lakh at ₹12 a year"],"Age 18–70."],
+["L6","PMJJBY provides life cover of",["₹2 lakh for ₹436 a year","₹2 lakh for ₹20 a year","₹5 lakh for ₹436 a year","₹1 lakh for ₹330 a year"],"Age 18–50."],
+["L6","The upper age limit to enrol in PMSBY is",["70","50","40","60"],"PMJJBY is 50."],
+["L6","PM Shram Yogi Maandhan is for unorganised workers earning up to",["₹15,000 a month","₹10,000 a month","₹25,000 a month","₹5,000 a month"],"₹3,000 pension at 60."],
+["L6","The National Social Assistance Programme was launched in",["1995","2005","2014","1985"],"15 August 1995, Rural Development."],
+["L6","Under IGNOAPS, central pension for people aged 80+ is",["₹500 a month","₹200 a month","₹1,000 a month","₹300 a month"],"₹200 for 60–79."],
+["L6","Which scheme gives financial support to BPL senior citizens who have lost their means of support?",["Indira Gandhi National Old Age Pension Scheme","APY","PM-SYM","NPS Vatsalya"],"PYQ.","p"],
+["L6","The National Family Benefit Scheme gives, on death of the breadwinner,",["₹20,000 lump sum","₹2 lakh insurance","₹500 a month","A house"],"Part of NSAP."],
+["L6","NPS Vatsalya is regulated and administered by",["PFRDA","SEBI","LIC","EPFO"],"PYQ.","p"],
+["L6","NPS Vatsalya is meant for",["Minors (opened by parents)","Senior citizens","Farmers","Women SHGs"],"Converts to normal NPS at 18."],
+["L6","NPS Vatsalya was launched in",["2024","2021","2015","2019"],"18 September 2024."],
+["L6","Mission Vatsalya is related to",["Child protection services","Pension for children","Girls' savings accounts","Mid-day meals"],"WCD; earlier ICPS."],
+["L6","Under the Unified Pension Scheme, a central employee with 25 years' service gets",["50% of average basic pay of last 12 months","100% of last pay","₹10,000 fixed","30% of last pay"],"Minimum ₹10,000 after 10 years."],
+["L6","Unified Pension Scheme came into effect from",["1 April 2025","1 January 2024","1 April 2026","1 October 2025"],"Optional for NPS employees."],
+["L6","PM Viksit Bharat Rozgar Yojana is implemented through",["EPFO","ESIC","NSDC","PFRDA"],"Ministry of Labour & Employment."],
+["L6","PM-VBRY aims to create how many jobs?",["3.5 crore","1 crore","35 lakh","10 crore"],"Outlay ₹99,446 crore.","p"],
+["L6","Under PM-VBRY, a first-time employee can get up to",["₹15,000","₹3,000","₹6,000","₹50,000"],"In two instalments."],
+["L6","SPREE 2025 is an initiative of",["ESIC","EPFO","PFRDA","SEBI"],"PYQ.","p"],
+["L6","The e-Shram portal is a database of",["Unorganised workers","Startups","Farmers' land","Street vendors only"],"Launched 26 Aug 2021."],
+/* L7 */
+["L7","MGNREGA came into force on",["2 February 2006","2 October 2005","1 April 2008","15 August 2006"],"In 200 districts."],
+["L7","MGNREGA guaranteed how many days of work?",["100","125","150","90"],"Per rural household per year.","p"],
+["L7","Which scheme aims to provide a social safety net by guaranteeing wage employment to rural households?",["MGNREGA","PMKVY","DDU-GKY","PM-SYM"],"PYQ.","p"],
+["L7","The VB-G RAM G Act came into force on",["1 July 2026","1 July 2025","18 December 2025","1 April 2026"],"MGNREGA ended the same day."],
+["L7","‘G RAM G’ in VB-G RAM G stands for",["Guarantee for Rozgar and Ajeevika Mission (Gramin)","Gramin Rozgar Adhikar Mission Guarantee","Government Rural Assistance Mission","Gram Rozgar Aajeevika Mahabhiyan"],"Viksit Bharat–Guarantee for Rozgar and Ajeevika Mission (Gramin)."],
+["L7","Under the VB-G RAM G Act, states may pause works during peak farm season for up to",["60 days","30 days","90 days","15 days"],"The 125-day guarantee continues."],
+["L7","Under VB-G RAM G, wages must be paid",["Weekly or within 15 days","Monthly","Within 60 days","Every 6 months"],"Late payment earns 0.05% a day."],
+["L7","MGNREGA was renamed after Mahatma Gandhi in",["2009","2006","2014","2012"],"On 2 October 2009."],
+["L7","DAY-NRLM mainly works through",["Women's self-help groups","Panchayats","Cooperative banks","NGOs only"],"Began as Aajeevika in 2011."],
+["L7","A ‘Lakhpati Didi’ is an SHG member who earns at least",["₹1 lakh a year","₹1 lakh a month","₹10 lakh a year","₹50,000 a year"],"Sustained annual income."],
+["L7","The Lakhpati Didi target was raised in 2026 to",["6 crore","3 crore","10 crore","1 crore"],"≈3.5 crore reached by Sept 2026."],
+["L7","SHE-Mart (Budget 2026-27) is meant for",["Community-owned retail outlets for SHG women","Women's hostels","Loans to women startups","Online coaching"],"Rural Development."],
+["L7","DDU-GKY trains poor rural youth in the age group",["15–35","18–40","14–21","21–45"],"Up to 45 for SC/ST, women, PwD."],
+["L7","DDU-GKY is part of",["DAY-NRLM","PMKVY","Skill India only","MGNREGA"],"Placement-linked skilling."],
+["L7","PMGSY was launched on",["25 December 2000","2 October 2000","15 August 2001","26 January 2000"],"Vajpayee's birthday."],
+["L7","PMGSY provides",["All-weather roads to unconnected rural habitations","Highways between states","Railway lines","Urban flyovers"],"500+ population in plains, 250+ in hills."],
+["L7","PMAY-Gramin was launched at",["Agra","Ballia","Varanasi","Panipat"],"20 November 2016."],
+["L7","PMAY-G replaced",["Indira Awaas Yojana","Rajiv Awas Yojana","JNNURM","Ashraya"],"IAY dated from 1985."],
+["L7","PMAY-G identifies beneficiaries using",["SECC 2011 and Awaas+ survey","Census 2001","Income tax data","Ration cards only"],"Lecture fact."],
+["L7","SVAMITVA scheme is run by the",["Ministry of Panchayati Raj","Ministry of Rural Development","Survey of India alone","Ministry of Home Affairs"],"PYQ.","p"],
+["L7","SVAMITVA provides",["Property cards using drone mapping of village houses","Crop insurance","Solar pumps","Rural roads"],"PYQ.","p"],
+["L7","Consider: A – SVAMITVA provides property cards using drones. R – It covers rural and urban areas. Choose:",["A is true, R is false","Both true, R explains A","Both false","A false, R true"],"Only rural areas.","p"],
+["L7","Vibrant Villages Programme-I focuses on villages along the border with",["China","Pakistan","Bangladesh","Nepal"],"Northern border."],
+["L7","VVP-II is a",["Central Sector scheme","Centrally Sponsored scheme","State scheme","PPP scheme"],"VVP-I was centrally sponsored."],
+["L7","The nodal ministry for the Vibrant Villages Programme is",["Home Affairs","Defence","Rural Development","DoNER"],"Border area development."],
+["L7","The outlay of VVP-II is",["₹6,839 crore","₹4,800 crore","₹6,600 crore","₹2,481 crore"],"Till 2028-29."],
+/* L8 */
+["L8","AMRUT, Smart Cities Mission and PMAY-U were all launched on",["25 June 2015","2 October 2014","1 July 2015","15 August 2015"],"Big urban day."],
+["L8","Which initiative focuses on water supply, sewerage and urban transport in cities?",["AMRUT","Jal Jeevan Mission","PMGSY","PMKSY"],"PYQ.","p"],
+["L8","AMRUT originally covered how many cities?",["500","100","4,000","1,000"],"AMRUT 2.0 covers all towns."],
+["L8","AMRUT 2.0 was launched on",["1 October 2021","25 June 2015","1 April 2022","15 August 2021"],"Together with SBM-U 2.0."],
+["L8","Jal Jeevan Mission differs from AMRUT because JJM",["Gives tap water to rural households","Covers only cities","Builds sewers","Is run by MoHUA"],"AMRUT = urban."],
+["L8","The Smart Cities Mission targeted",["100 cities","500 cities","50 cities","200 cities"],"Ended 31 March 2025."],
+["L8","PMAY-U 2.0 aims to build",["1 crore urban houses","2 crore rural houses","50 lakh houses","3 crore houses"],"2024–29."],
+["L8","PMAY 2.0 (Aug 2024) aims to provide housing subsidy to",["Urban poor and middle class (EWS, LIG, MIG)","Rural BPL only","Government employees","Senior citizens"],"PYQ.","p"],
+["L8","Under PMAY-U 2.0, the MIG income band is",["₹6–9 lakh","₹3–6 lakh","₹9–18 lakh","Up to ₹3 lakh"],"EWS ≤₹3 L, LIG ₹3–6 L."],
+["L8","Swachh Bharat Mission was launched on",["2 October 2014","25 June 2015","15 August 2014","26 January 2015"],"Gandhi Jayanti."],
+["L8","SBM-Urban 2.0 aims at",["Garbage-free cities","Open defecation free villages","Smart meters","Metro rail"],"Launched 1 Oct 2021."],
+["L8","PM e-Bus Sewa plans to deploy",["10,000 e-buses","1,000 e-buses","50,000 e-buses","5,000 e-buses"],"In 169 cities, PPP mode."],
+["L8","PM E-DRIVE has an outlay of",["₹10,900 crore","₹10,000 crore","₹57,613 crore","₹19,744 crore"],"Extended to 31 March 2028."],
+["L8","PM E-DRIVE is run by the",["Ministry of Heavy Industries","MNRE","MoHUA","Ministry of Road Transport"],"Replaced FAME-II."],
+["L8","Under the vehicle scrappage policy, commercial vehicles need a fitness test after",["15 years","20 years","10 years","25 years"],"Private vehicles: 20 years.","p"],
+["L8","Which scheme aims to phase out unfit and polluting vehicles?",["Voluntary Vehicle Fleet Modernisation Programme","PM E-DRIVE","FAME-II","Bharatmala"],"PYQ.","p"],
+["L8","UDAN stands for",["Ude Desh ka Aam Nagrik","Unified Domestic Air Network","Udyog Desh Aviation Network","Ude Desh Ab Nirantar"],"Civil Aviation, 2016."],
+["L8","The first UDAN flight flew on",["Shimla–Delhi","Delhi–Agra","Mumbai–Nanded","Kadapa–Hyderabad"],"27 April 2017.","p"],
+["L8","Consider: A – UDAN improves regional air connectivity. R – It gives viability gap funding to airlines. Choose:",["Both true, R explains A","Both true, R does not explain A","A true, R false","A false, R true"],"PYQ.","p"],
+["L8","Modified UDAN (March 2026) has an outlay of",["₹28,840 crore","₹6,600 crore","₹10,900 crore","₹62,500 crore"],"FY 2026-27 to 2035-36."],
+["L8","Modified UDAN plans to develop",["100 airports and 200 helipads","200 airports and 100 helipads","50 airports and 50 heliports","1,000 airstrips"],"Over 10 years."],
+["L8","PM Gati Shakti was launched on",["13 October 2021","25 September 2014","15 August 2021","1 July 2022"],"National Master Plan."],
+["L8","Under PM Gati Shakti, who is responsible for nodal planning?",["DPIIT","NITI Aayog","MoRTH","Railway Board"],"PYQ.","p"],
+["L8","The investment linked to PM Gati Shakti is",["₹100 lakh crore","₹10 lakh crore","₹1 lakh crore","₹50 lakh crore"],"Lecture fact."],
+["L8","Bharatmala Pariyojana is about",["Highways","Ports","Ropeways","Railways"],"Phase I ≈34,800 km."],
+["L8","Sagarmala is a programme for",["Port-led development","Coastal fishing","Naval bases","Island tourism"],"Ministry of Ports, Shipping & Waterways, 2015."],
+["L8","Parvatmala is associated with",["Ropeways","Hill roads","Tunnels","Himalayan railways"],"National Ropeways Development Programme, 2022."],
+["L8","PM-DevINE is administered by the",["Ministry of Development of North Eastern Region","Home Ministry","NITI Aayog","Ministry of Tribal Affairs"],"₹6,600 crore."],
+["L8","PM-DevINE was announced in the Budget of",["2022-23","2021-22","2024-25","2019-20"],"For 2022-23 to 2025-26."],
+/* L9 */
+["L9","The aim of Ayushman Bharat PM-JAY is",["Health insurance for the poor","Crop insurance","Housing for all","Pension for elderly"],"PYQ.","p"],
+["L9","PM-JAY provides health cover of",["₹5 lakh per family per year","₹5 lakh per person per year","₹2 lakh per family","₹10 lakh per family"],"Cashless, secondary and tertiary."],
+["L9","PM-JAY was launched at",["Ranchi","Gorakhpur","Bijapur","Varanasi"],"23 September 2018."],
+["L9","The first Health & Wellness Centre under Ayushman Bharat opened at",["Bijapur, Chhattisgarh","Ranchi","Jhunjhunu","Khunti"],"14 April 2018."],
+["L9","Ayushman Vay Vandana covers",["All citizens aged 70+ regardless of income","BPL people above 60","Pregnant women","Government pensioners only"],"Oct 2024."],
+["L9","PM-JAY beneficiaries were originally identified using",["SECC 2011","Census 2011","Aadhaar","Ration card data 2020"],"Socio-Economic Caste Census."],
+["L9","National Health Mission was formed in 2013 by combining NRHM with",["NUHM","JSY","NACP","RSBY"],"NRHM started 2005."],
+["L9","A key objective of the National Health Mission is",["Reducing child mortality","Industrial growth","Space exploration","Wildlife protection"],"PYQ.","p"],
+["L9","What is the key benefit under Janani Shishu Suraksha Karyakram?",["Free delivery including C-section in public facilities","₹5,000 cash per delivery","Private hospital insurance","Free baby food"],"PYQ.","p"],
+["L9","JSSK covers sick infants up to",["1 year of age","30 days","5 years","6 months"],"Extended from 30 days in 2014."],
+["L9","Janani Suraksha Yojana gives",["Cash for institutional delivery","Free LPG","Nutrition kits","Pension to mothers"],"2005 under NRHM."],
+["L9","PM-ABHIM has an outlay of",["₹64,180 crore","₹6,418 crore","₹75,021 crore","₹1 lakh crore"],"2021-22 to 2025-26."],
+["L9","Mission Indradhanush was launched on",["25 December 2014","22 January 2015","2 October 2014","1 July 2015"],"Immunisation drive."],
+["L9","Mission Indradhanush originally targeted how many vaccine-preventable diseases?",["7","12","5","10"],"Seven colours."],
+["L9","Mission Indradhanush focuses on",["Children under 2 and pregnant women left out of immunisation","Elderly people","Adolescent girls only","Migrant workers"],"Lecture fact."],
+["L9","The RNTCP was renamed the National TB Elimination Programme in",["2020","2017","2025","2012"],"Target: end TB by 2025."],
+["L9","India's national target year to end TB was",["2025","2030","2035","2028"],"Five years ahead of the SDG 2030."],
+["L9","NP-NCD mainly screens people aged",["30 and above","18 and above","60 and above","Children"],"Renamed from NPCDCS in 2023."],
+["L9","The ABHA health ID under ABDM has",["14 digits","12 digits","16 digits","10 digits"],"Ayushman Bharat Health Account."],
+["L9","HPV vaccination is aimed at preventing",["Cervical cancer","Tuberculosis","Polio","Hepatitis B"],"Girls aged 9–14."],
+/* L10 */
+["L10","Beti Bachao Beti Padhao was launched at",["Panipat","Rohtak","Jhunjhunu","Ballia"],"22 January 2015."],
+["L10","The main focus of Beti Bachao Beti Padhao is",["Survival and education of the girl child","Women's pensions","Maternity cash","Women's hostels"],"PYQ.","p"],
+["L10","BBBP is jointly run by WCD with",["Health and Education","Rural Development and Finance","Home Affairs and Law","Labour and Skill"],"Three ministries."],
+["L10","The child sex ratio in Census 2011 was",["918","927","943","940"],"927 in 2001; 943 is the overall sex ratio."],
+["L10","A Sukanya Samriddhi account can be opened for a girl below",["10 years","5 years","14 years","18 years"],"Launched with BBBP."],
+["L10","The maximum yearly deposit in Sukanya Samriddhi is",["₹1.5 lakh","₹2 lakh","₹50,000","₹5 lakh"],"Minimum ₹250."],
+["L10","A Sukanya Samriddhi account matures after",["21 years from opening","18 years","15 years","25 years"],"Deposits are made for 15 years."],
+["L10","Mission Shakti has two sub-schemes:",["Sambal and Samarthya","Sambal and Poshan","Samarthya and Vatsalya","Sakhi and Sankalp"],"Safety and empowerment."],
+["L10","One Stop Centres and the Women Helpline come under",["Sambal","Samarthya","Poshan 2.0","Mission Vatsalya"],"Safety vertical."],
+["L10","Sakhi Niwas Scheme seen in the news is related to",["Mission Shakti","Mission Vatsalya","Poshan 2.0","DAY-NRLM"],"PYQ.","p"],
+["L10","Sakhi Niwas provides",["Hostels for working women","Shelters for old people","Child-care crèches","Ration shops for women"],"Samarthya sub-scheme."],
+["L10","Palna scheme provides",["Crèches","Hostels","Loans","Scholarships"],"Under Samarthya."],
+["L10","PM Matru Vandana Yojana gives how much for the first child?",["₹5,000","₹6,000","₹1,600","₹10,000"],"₹6,000 for a second child if a girl."],
+["L10","The central objective of Saksham Anganwadi and Poshan 2.0 is",["Early childhood care and nutrition delivery","Housing","Adult literacy","Old-age pension"],"PYQ.","p"],
+["L10","Saksham Anganwadi and Poshan 2.0 is run by",["Ministry of Women & Child Development","Ministry of Education","Ministry of Health","NITI Aayog"],"Unlike PM POSHAN (Education)."],
+["L10","POSHAN Abhiyaan was launched at",["Jhunjhunu","Panipat","Ballia","Agra"],"8 March 2018."],
+["L10","Poshan Maah is observed in",["September","March","January","November"],"Nutrition month."],
+["L10","Which scheme aims to provide clean cooking fuel (LPG) to women below the poverty line?",["PM Ujjwala Yojana","PM Surya Ghar","PM-KUSUM","Saubhagya"],"PYQ.","p"],
+["L10","PM Ujjwala Yojana was launched on",["1 May 2016 at Ballia","1 May 2016 at Mahoba","10 August 2021 at Ballia","2 October 2016 at Agra"],"PMUY 2.0 was Mahoba, 2021."],
+["L10","Ujjwala Yojana is under the",["Ministry of Petroleum & Natural Gas","Ministry of Women & Child Development","Ministry of Rural Development","Ministry of Consumer Affairs"],"MoPNG."],
+["L10","Financial support per new Ujjwala connection (14.2 kg) is",["₹1,600","₹1,150","₹300","₹5,000"],"₹1,150 for 5 kg."],
+["L10","As of 1 July 2025, Ujjwala connections numbered about",["10.33 crore","5 crore","8 crore","25 crore"],"Lecture fact."],
+["L10","LPG is mainly a mixture of",["Propane and butane","Methane and ethane","Butane and hydrogen","Methane and propane"],"Ethyl mercaptan is added for smell."],
+["L10","Mahila Samman Savings Certificate paid interest of",["7.5%","7%","8.2%","6.5%"],"Up to ₹2 lakh for 2 years."],
+["L10","Bima Sakhi Yojana is linked to",["LIC","SBI","Post Office","NABARD"],"Launched at Panipat, Dec 2024."],
+["L10","NAVYA trains",["Adolescent girls aged 16–18 in non-traditional trades","Widows in farming","Women pilots","Anganwadi workers"],"27 districts, 9 states."],
+/* L11 */
+["L11","Samagra Shiksha subsumed",["SSA, RMSA and Teacher Education","SSA and Mid-Day Meal","RUSA and RMSA","PMKVY and SSA"],"2018; pre-school to class 12."],
+["L11","The mid-day meal scheme was first launched nationally in",["1995","2001","2005","1985"],"15 August 1995; Tamil Nadu pioneered."],
+["L11","Under PM POSHAN, a primary-level child should get",["450 kcal and 12 g protein","700 kcal and 20 g protein","300 kcal and 8 g protein","500 kcal and 15 g protein"],"Upper primary: 700 kcal, 20 g."],
+["L11","PM POSHAN covers",["Bal Vatika and classes 1–8","Classes 1–12","Classes 6–10","Only primary classes"],"In government and aided schools."],
+["L11","PM SHRI aims to upgrade about",["14,500 schools","1,000 schools","50,000 schools","5,000 schools"],"Model NEP-2020 schools."],
+["L11","PM-USHA is a restructured form of",["RUSA","SSA","RMSA","NMEICT"],"Third phase, 2023."],
+["L11","One Nation One Subscription gives access to",["International scholarly journals","OTT platforms","Newspapers","Mobile data"],"13,000+ journals."],
+["L11","The outlay of One Nation One Subscription for 2025–27 is",["₹6,000 crore","₹600 crore","₹60,000 crore","₹2,000 crore"],"Lecture fact."],
+["L11","PM Vidyalaxmi gives interest subvention of",["3% on loans up to ₹10 lakh","5% on all loans","7% on loans up to ₹7.5 lakh","1% on any loan"],"For family income up to ₹8 lakh."],
+["L11","PM Vidyalaxmi covers students admitted to",["About 860 top institutions","Only IITs","All colleges","Only foreign universities"],"Based on NIRF ranking."],
+["L11","There are how many sub-schemes (verticals) under PM YASASVI?",["5","3","7","9"],"PYQ.","p"],
+["L11","PM YASASVI supports students from",["OBC, EBC and DNT communities","SC and ST only","Minorities only","Girls only"],"Ministry of Social Justice."],
+["L11","Which platform is used to submit ideas under INSPIRE-MANAK?",["E-MIAS portal (INSPIRE awards portal)","DigiLocker","UMANG","SWAYAM"],"PYQ-type: submitted online through the INSPIRE awards portal.","p"],
+["L11","INSPIRE-MANAK is for students of",["Classes 6 to 10","Classes 11 and 12","Undergraduates","PhD scholars"],"Age 10–15."],
+["L11","Which ministry launched Deen Dayal SPARSH Yojana?",["Ministry of Communications","Ministry of Culture","Ministry of Education","Ministry of Tourism"],"Department of Posts.","p"],
+["L11","Deen Dayal SPARSH is a scholarship linked to",["Philately (stamp collecting)","Coin collecting","Sports","Music"],"Classes 6–9."],
+["L11","Collecting coins as a hobby is called",["Numismatics","Philately","Calligraphy","Cartography"],"Stamp collecting is philately."],
+["L11","Skill India Mission was launched on",["15 July 2015","25 September 2014","1 July 2015","2 October 2016"],"World Youth Skills Day."],
+["L11","PM-SETU upgrades",["1,000 government ITIs","500 polytechnics","100 IITs","10,000 schools"],"₹60,000 crore."],
+["L11","Which is NOT among the 5 NSTIs upgraded under PM-SETU?",["Patna","Kanpur","Ludhiana","Hyderabad"],"The five: Bhubaneswar, Chennai, Hyderabad, Kanpur, Ludhiana."],
+["L11","The PM Internship Scheme targets",["1 crore youth in 5 years","10 lakh youth in 1 year","50 lakh youth in 3 years","5 crore youth in 10 years"],"PYQ.","p"],
+["L11","Monthly assistance under the PM Internship Scheme is",["₹5,000","₹15,000","₹6,000","₹3,000"],"₹4,500 from government + ₹500 from the company."],
+["L11","The PM Internship Scheme is run by the",["Ministry of Corporate Affairs","Ministry of Labour","MSDE","Ministry of Education"],"Top 500 companies."],
+["L11","PM YUVA 3.0 (March 2025) is related to",["Mentoring young authors","Sports training","Startup funding","Internships"],"PYQ.","p"],
+["L11","How many authors were selected under PM YUVA 3.0?",["43","75","41","50"],"19 women and 24 men."],
+["L11","The theme of PM YUVA 2.0 was",["Democracy","National Movement","Indian Knowledge System","Digital India"],"41 authors."],
+["L11","Under PM YUVA, a selected author gets",["₹50,000 a month for 6 months","₹5,000 a month for a year","₹3 lakh a month","₹1 lakh once"],"₹3 lakh total; published by NBT."],
+["L11","The main objective of Gyan Bharatam Mission is to",["Survey, document and conserve India's manuscripts","Digitise school textbooks","Train teachers","Build libraries"],"PYQ (CGL Mains 2025).","p"],
+/* L12 */
+["L12","PM Surya Ghar Muft Bijli Yojana gives households up to",["300 units of free electricity a month","100 units a month","200 units a month","500 units a month"],"Rooftop solar.","p"],
+["L12","PM Surya Ghar targets",["1 crore households","10 lakh households","5 crore households","2 crore households"],"Outlay ₹75,021 crore."],
+["L12","The maximum central subsidy for a 3 kW rooftop under PM Surya Ghar is",["₹78,000","₹60,000","₹30,000","₹90,000"],"30,000 + 30,000 + 18,000."],
+["L12","PM Surya Ghar is under the",["Ministry of New & Renewable Energy","Ministry of Power","MoHUA","Ministry of Rural Development"],"MNRE."],
+["L12","National Green Hydrogen Mission targets production of",["5 million tonnes a year by 2030","10 MMT by 2047","1 MMT by 2025","50 MMT by 2030"],"Asked in CGL Tier 1.","p"],
+["L12","The outlay of the National Green Hydrogen Mission is",["₹19,744 crore","₹17,490 crore","₹75,021 crore","₹20,000 crore"],"SIGHT gets ₹17,490 crore of it."],
+["L12","Green hydrogen is produced by",["Electrolysis of water using renewable energy","Steam reforming of natural gas","Gasification of coal","Nuclear fusion"],"No fossil fuel emissions."],
+["L12","Hydrogen made from natural gas with the CO₂ captured and stored is called",["Blue hydrogen","Green hydrogen","Grey hydrogen","Brown hydrogen"],"Grey = CO₂ released."],
+["L12","Brown hydrogen is produced from",["Lignite","Natural gas","Water","Biomass"],"Black from bituminous coal."],
+["L12","Namami Gange was approved in",["June 2014","June 2019","2008","2016"],"₹20,000 crore."],
+["L12","‘Aviral’ in the Namami Gange context means",["Continuous flow","Clean","Deep","Wide"],"‘Nirmal’ means clean."],
+["L12","Jal Jeevan Mission aims to provide",["A functional household tap connection to every rural home","Irrigation to every farm","Sewers in cities","Drinking water in schools only"],"Launched 15 Aug 2019."],
+["L12","Jal Jeevan Mission's deadline was extended to",["2028","2024","2030","2026"],"Budget 2025-26."],
+["L12","The first state to become ‘Har Ghar Jal’ certified was",["Goa","Telangana","Haryana","Gujarat"],"Under JJM."],
+["L12","The Deep Ocean Mission is under the",["Ministry of Earth Sciences","Ministry of Science & Technology","DRDO","ISRO"],"Approved June 2021.","p"],
+["L12","MATSYA-6000 is designed to carry how many people?",["3","1","5","2"],"To 6,000 m depth."],
+["L12","MATSYA-6000 is being built by",["NIOT, Chennai","NIO, Goa","ISRO, Bengaluru","DRDO, Hyderabad"],"National Institute of Ocean Technology."],
+["L12","Samudrayaan is linked to",["Deep Ocean Mission","Gaganyaan","Sagarmala","Chandrayaan"],"India's first manned deep-sea mission."],
+["L12","Which is NOT a sub-scheme of PRITHVI?",["SAMUDRA","ACROSS","PACER","SAGE"],"The five: ACROSS, O-SMART, PACER, SAGE, REACHOUT."],
+["L12","MISHTI is related to",["Mangroves","Millets","Sweets exports","Mountains"],"Mangrove Initiative for Shoreline Habitats & Tangible Incomes.","p"],
+["L12","Consider: 1. MISHTI aims at mangrove plantation. 2. It was announced in Budget 2023-24. 3. It allows commercial leasing of mangrove forests. Which are correct?",["1 and 2 only","1, 2 and 3","2 and 3 only","1 only"],"PYQ. Leasing would defeat the purpose.","p"],
+["L12","MISHTI aims to cover about",["540 sq km of mangroves","5,400 sq km","54 sq km","1,000 sq km"],"In 9 states and 4 UTs."],
+["L12","Amrit Dharohar focuses on",["Ramsar wetland sites","Heritage buildings","Old manuscripts","River linking"],"Launched 5 June 2023."],
+["L12","Digital India was launched on",["1 July 2015","25 June 2015","15 August 2015","2 October 2014"],"MeitY."],
+["L12","UMANG stands for",["Unified Mobile Application for New-age Governance","Universal Mobile Access for National Governance","Unified Mission for Advanced Next-gen Governance","Union Mobile App for National Grievances"],"PYQ.","p"],
+["L12","Which initiative gives a single platform for citizens to access many government services online?",["UMANG","DigiLocker","BHIM","GeM"],"PYQ.","p"],
+["L12","BHASHINI is",["An AI-based language translation platform","A payments app","A digital library","A school portal"],"22 Indian languages, 2022."],
+["L12","What was the purpose of the two-day training on the e-SAKSHI portal in June 2024?",["Train officials on the revised MPLADS fund-flow procedure","Train teachers in digital skills","Register farmers","Launch a health app"],"PYQ.","p"],
+["L12","Annual MPLADS entitlement per MP is",["₹5 crore","₹2 crore","₹10 crore","₹1 crore"],"MoSPI."],
+/* L13 */
+["L13","PM JANMAN was launched on",["15 November 2023","2 October 2024","26 January 2023","15 August 2023"],"Janjatiya Gaurav Divas."],
+["L13","PM JANMAN targets how many PVTGs?",["75","705","18","100"],"In 18 states and A&N Islands."],
+["L13","PVTG stands for",["Particularly Vulnerable Tribal Groups","Primitive Village Tribal Groups","Protected Vulnerable Tribal Groups","Poor Village Tribal Groups"],"A sub-category of STs."],
+["L13","PM JANMAN was launched at",["Khunti, Jharkhand","Hazaribagh, Jharkhand","Bastar, Chhattisgarh","Dantewada"],"Birsa Munda's region."],
+["L13","Dharti Aaba Janjatiya Gram Utkarsh Abhiyan has an outlay of",["₹79,156 crore","₹24,104 crore","₹6,839 crore","₹10,000 crore"],"Five years."],
+["L13","Dharti Aaba is a title of",["Birsa Munda","Tantya Bhil","Sidhu Murmu","Alluri Sitarama Raju"],"‘Father of the Earth’."],
+["L13","Dharti Aaba abhiyan covers about",["63,843 villages","6,000 villages","1 lakh villages","663 villages"],"5 crore+ tribal people."],
+["L13","PM-AJAY is meant for",["Scheduled Castes","Scheduled Tribes","OBCs","Minorities"],"PM Anusuchit Jaati Abhyuday Yojana."],
+["L13","PM-AJAY is run by the Ministry of",["Social Justice & Empowerment","Tribal Affairs","Minority Affairs","Rural Development"],"Since 2021-22."],
+["L13","Under NFSA, priority households get",["5 kg grain per person per month","35 kg per person","10 kg per family","2 kg per person"],"Antyodaya families get 35 kg."],
+["L13","PM Garib Kalyan Anna Yojana was launched in",["2020","2016","2013","2023"],"COVID relief; now free grain to ≈81 crore."],
+["L13","Free grain under PMGKAY has been extended for 5 years from",["1 January 2024","1 April 2020","1 January 2023","1 July 2025"],"Till Dec 2028."],
+["L13","Fortified rice adds",["Iron, folic acid and vitamin B12","Calcium only","Vitamin C and D","Protein powder"],"Supply extended to Dec 2028."],
+["L13","Janjatiya Gaurav Divas is observed on",["15 November","2 October","9 August","26 November"],"Birsa Munda's birth anniversary."],
+/* L14 */
+["L14","The primary objective of Subhadra Yojana of Odisha is",["₹50,000 over 5 years to women","Free bus travel","Housing loans","Crop insurance"],"PYQ.","p"],
+["L14","Under Subhadra Yojana, over what period do beneficiaries receive ₹50,000?",["5 years","1 year","10 years","2 years"],"PYQ.","p"],
+["L14","Subhadra Yojana instalments are paid on",["Raksha Bandhan and International Women's Day","Diwali and Holi","Independence Day and Republic Day","Rath Yatra and Durga Puja"],"₹5,000 each."],
+["L14","Majhi Ladki Bahin Yojana belongs to",["Maharashtra","Madhya Pradesh","Rajasthan","Gujarat"],"₹1,500 a month."],
+["L14","Gruha Lakshmi, giving ₹2,000 a month to the woman head of family, is from",["Karnataka","Telangana","Kerala","Andhra Pradesh"],"Lecture fact."],
+["L14","Maiyan Samman Yojana, paying ₹2,500 a month, is from",["Jharkhand","Bihar","Odisha","Chhattisgarh"],"Women 18–50."],
+["L14","Lakshmir Bhandar is a scheme of",["West Bengal","Assam","Odisha","Tripura"],"₹1,000 general / ₹1,200 SC/ST."],
+["L14","Mahtari Vandan Yojana is from",["Chhattisgarh","Madhya Pradesh","Uttarakhand","Jharkhand"],"₹1,000 a month."],
+["L14","Orunodoi is a women's cash scheme of",["Assam","Meghalaya","Manipur","Mizoram"],"₹1,250 a month."],
+["L14","Kalaignar Magalir Urimai Thogai is from",["Tamil Nadu","Kerala","Puducherry","Karnataka"],"₹1,000 a month."],
+["L14","Indira Gandhi Pyari Behna Sukh Samman Nidhi belongs to",["Himachal Pradesh","Punjab","Karnataka","Telangana"],"₹1,500 a month, 18–60."],
+["L14","Mukhyamantri Mahila Rozgar Yojana giving ₹10,000 to women is from",["Bihar","Uttar Pradesh","Jharkhand","Madhya Pradesh"],"75 lakh women in 2025."],
+["L14","Lado Protsahan Yojana is from",["Rajasthan","Haryana","Punjab","Gujarat"],"₹1.5 lakh in 7 stages."],
+["L14","Under UP's Kanya Sumangala Yojana a girl receives",["₹25,000 in 6 stages","₹1.5 lakh in 7 stages","₹50,000 over 5 years","₹15,000 once"],"Earlier ₹15,000."],
+["L14","Namo Saraswati Vigyan Sadhana Yojana supports",["Science students of classes 11–12 in Gujarat","Girls in Rajasthan","Farmers in Gujarat","Teachers in UP"],"₹25,000."],
+["L14","Thalliki Vandanam is a scheme of",["Andhra Pradesh","Telangana","Tamil Nadu","Karnataka"],"₹15,000 a year to mothers."],
+["L14","Rythu Bandhu is a farmer investment scheme of",["Telangana","Andhra Pradesh","Odisha","Maharashtra"],"Now Rythu Bharosa."],
+["L14","Rajasthan's CM Kisan Samman Nidhi adds how much to PM-KISAN?",["₹3,000","₹6,000","₹2,000","₹12,000"],"Total ₹9,000 a year."],
+["L14","Gopal Credit Card scheme giving interest-free loans to dairy farmers is from",["Rajasthan","Gujarat","Haryana","Punjab"],"Up to ₹1 lakh."],
+["L14","HAPPY scheme giving free bus travel is from",["Haryana","Himachal Pradesh","Punjab","Uttar Pradesh"],"Haryana Antyodaya Parivar Parivahan Yojana."],
+["L14","Mukhyamantri Mitan Yojana provides",["Doorstep delivery of government services","Free bus rides","Farm loans","School meals"],"Chhattisgarh."],
+["L14","Mahalakshmi scheme of Telangana gives women",["Free bus travel and LPG at ₹500","₹2,000 a month","Free smartphones","Scholarships"],"Lecture fact."],
+["L14","Mo Ghar is a housing scheme of",["Odisha","Assam","Goa","Kerala"],"Kachcha to pucca houses."],
+["L14","Haryana's old-age pension (Vriddhavastha Samman Bhatta) is",["₹3,200 a month","₹1,500 a month","₹500 a month","₹2,500 a month"],"Lecture fact."],
+/* L15 */
+["L15","Which three schemes did the Union Cabinet approve in July 2026?",["MPMS, ISM 2.0 and BHAVYA Rasayan","PMFBY, PM-KISAN and APY","UDAN, SVAMITVA and AMRUT","Ujjwala, BBBP and SSY"],"Electronics, chips and chemical parks."],
+["L15","Which scheme was launched at Ballia?",["PM Ujjwala Yojana","PM-KISAN","PMAY-G","BBBP"],"1 May 2016."],
+["L15","Which pair is wrongly matched?",["PMAY-G – Gorakhpur","PM-KISAN – Gorakhpur","PM-JAY – Ranchi","BBBP – Panipat"],"PMAY-G was launched at Agra."],
+["L15","PM JANMAN and Dharti Aaba were launched in which state?",["Jharkhand","Odisha","Chhattisgarh","Madhya Pradesh"],"Khunti and Hazaribagh."],
+["L15","Which scheme has been extended to 31 March 2030?",["PM SVANidhi","PM E-DRIVE","Jal Jeevan Mission","PMGKAY"],"E-DRIVE to 2028; JJM to 2028."],
+["L15","Mission Karmayogi (2020) relates to",["Capacity building of civil servants","Rural employment","Yoga promotion","Skilling of farmers"],"iGOT Karmayogi platform."],
+["L15","UJALA scheme distributes",["LED bulbs","LPG cylinders","Solar pumps","Water filters"],"5 January 2015."],
+["L15","Saubhagya scheme aimed at",["Household electrification","Women's savings","Girls' education","Crop insurance"],"September 2017."],
+["L15","Operation Greens covers",["Tomato, onion, potato","Tea, coffee, rubber","Wheat, rice, maize","Mango, banana, grapes"],"TOP crops, 2018."],
+["L15","Atal Innovation Mission is set up under",["NITI Aayog","DST","MeitY","Ministry of Education"],"Atal Tinkering Labs in schools."],
+["L15","Agnipath scheme relates to",["Short-term recruitment into the armed forces","Fire safety","Rural roads","Metro rail"],"14 June 2022; four-year tenure."],
+["L15","The National Critical Mineral Mission (Jan 2025) has an outlay of",["₹16,300 crore","₹6,003 crore","₹10,372 crore","₹1,000 crore"],"NQM ₹6,003 cr; IndiaAI ₹10,372 cr."],
+["L15","IndiaAI Mission was approved in",["March 2024","January 2023","July 2025","October 2021"],"₹10,372 crore."],
+["L15","Van Dhan Yojana is linked to",["Tribal forest produce","Afforestation drives","Sale of timber","Wildlife tourism"],"Launched 14 April 2018, Bijapur."],
+["L15","PRASHAD scheme relates to",["Development of pilgrimage sites","Food distribution in temples","Nutrition for pregnant women","Distribution of seeds"],"Ministry of Tourism."]
+];
+
+
+/* ============================================================
+   REVISE DATA
+   ============================================================ */
+// [scheme, year, ministry, key fact, type]  type: CS | CSS | ST | OT
+const ORGS = [
+ ["PM-KISAN","2019","Agriculture","₹6,000/yr in 3 × ₹2,000; Gorakhpur","CS"],
+ ["PM-KMY","2019","Agriculture","₹3,000 pension; ≤2 ha; 18–40; Ranchi","CS"],
+ ["PMFBY","2016","Agriculture","2% kharif · 1.5% rabi · 5% commercial","CSS"],
+ ["PM-AASHA","2018","Agriculture","MSP assurance: PSS, PDPS, PSF, MIS","CS"],
+ ["PM Dhan-Dhaanya","2025","Agriculture","100 districts, 36 schemes, ₹24,000 cr/yr","CS"],
+ ["Pulses Mission","2025","Agriculture","₹11,440 cr; 350 LT by 2030-31","CSS"],
+ ["e-NAM","2016","Agriculture","Online mandi, 14 April 2016","CS"],
+ ["AIF","2020","Agriculture","₹1 lakh cr financing, 3% subvention","CS"],
+ ["PMKSY","2015","Jal Shakti (lead)","Har Khet Ko Pani; Per Drop More Crop","CSS"],
+ ["PM-KUSUM","2019","MNRE","Solar pumps; 30-30-30-10","CS"],
+ ["RKVY","2007-08","Agriculture","RAFTAAR 2017-18; PM-RKVY 2024","CSS"],
+ ["NMNF","2024","Agriculture","Natural farming ₹2,481 cr","CSS"],
+ ["NBS","2010","Chemicals & Fertilizers","P&K subsidy; not urea","OT"],
+ ["PM-PRANAM","2023","Chemicals & Fertilizers","Cut chemical fertiliser; 50% saving to states","OT"],
+ ["Namo Drone Didi","2023","Agriculture","15,000 SHGs; ₹1,261 cr; 80% up to ₹8 L","CS"],
+ ["PMMSY","2020","Fisheries","₹20,050 cr","CSS"],
+ ["Make in India","2014","Commerce (DPIIT)","25 Sept 2014; lion of cogs","OT"],
+ ["PLI","2020","DPIIT (coord.)","14 sectors; ≈₹1.97 lakh cr","CS"],
+ ["ECMS","2025","MeitY","Components; ₹22,919 → ₹40,000 cr","CS"],
+ ["MPMS","2026","MeitY","₹62,500 cr; 2.25–5% on sales","CS"],
+ ["ISM 2.0","2026","MeitY","₹1.275 lakh cr; ISM 1.0 ₹76,000 cr","CS"],
+ ["BHAVYA Rasayan","2026","Chemicals & Petrochemicals","3 parks; ₹3,030 cr","CS"],
+ ["Biopharma SHAKTI","2026","Pharmaceuticals","₹10,000 cr/5 yrs; 3 new NIPERs","CS"],
+ ["PM MITRA","2021","Textiles","7 textile parks; 5F","CS"],
+ ["SAMARTH","2017","Textiles","Textile skilling","CS"],
+ ["ADEETIE","2025","Power (BEE)","MSME energy efficiency ₹1,000 cr","CS"],
+ ["PMJDY","2014","Finance (DFS)","Zero balance; ₹10,000 OD; ₹2 L cover","OT"],
+ ["MUDRA","2015","Finance (DFS)","Shishu ≤50k · Kishore ≤5L · Tarun ≤10L · Tarun+ ≤20L","OT"],
+ ["Stand-Up India","2016","Finance (DFS)","SC/ST & women; ₹10 L–₹1 cr","OT"],
+ ["Startup India","2016","Commerce (DPIIT)","<10 yrs; turnover ≤₹100 cr","OT"],
+ ["PMEGP","2008-09","MSME (KVIC)","Project ≤₹50 L / ₹20 L; 15–35% subsidy","CS"],
+ ["PM SVANidhi","2020","MoHUA + DFS","Street vendors ₹15k/25k/50k; till 2030","CS"],
+ ["PM Vishwakarma","2023","MSME","18 trades; ₹3 L at 5%; ₹15,000 toolkit","CS"],
+ ["IPPB","2018","Posts","Doorstep banking; ₹2 L deposit cap","OT"],
+ ["APY","2015","Finance / PFRDA","18–40; ₹1,000–5,000 pension","CS"],
+ ["PMJJBY","2015","Finance","₹436 → ₹2 L life; 18–50","CS"],
+ ["PMSBY","2015","Finance","₹20 → ₹2 L accident; 18–70","CS"],
+ ["PM-SYM","2019","Labour","≤₹15,000 income; ₹3,000 pension","CS"],
+ ["NSAP / IGNOAPS","1995","Rural Development","₹200 (60–79), ₹500 (80+)","CSS"],
+ ["NPS Vatsalya","2024","Finance / PFRDA","NPS for minors","OT"],
+ ["UPS","2025","Finance (DoE)","50% after 25 yrs; min ₹10,000","OT"],
+ ["PM-VBRY (ELI)","2025","Labour (EPFO)","₹99,446 cr; 3.5 cr jobs","CS"],
+ ["SPREE 2025","2025","Labour (ESIC)","ESIC registration amnesty","OT"],
+ ["MGNREGA","2005/06","Rural Development","100 days; ended 30 June 2026","CSS"],
+ ["VB-G RAM G","2025/26","Rural Development","125 days from 1 July 2026","CSS"],
+ ["DAY-NRLM","2011","Rural Development","SHGs; Aajeevika","CSS"],
+ ["Lakhpati Didi","2023","Rural Development","₹1 L+/yr; target 6 crore","OT"],
+ ["DDU-GKY","2014","Rural Development","Skilling 15–35","CSS"],
+ ["PMGSY","2000","Rural Development","All-weather roads; 25 Dec","CSS"],
+ ["PMAY-G","2016","Rural Development","Agra; ₹1.2 L / ₹1.3 L","CSS"],
+ ["SVAMITVA","2020","Panchayati Raj","Drone property cards; 24 April","CS"],
+ ["VVP-I","2023","Home Affairs","China border; 662 villages","CSS"],
+ ["VVP-II","2025","Home Affairs","₹6,839 cr; other borders","CS"],
+ ["PMAY-U 2.0","2024","MoHUA","1 crore houses; EWS/LIG/MIG","CSS"],
+ ["AMRUT","2015","MoHUA","500 cities water & sewerage; 2.0 in 2021","CSS"],
+ ["Smart Cities","2015","MoHUA","100 cities; ended Mar 2025","CSS"],
+ ["SBM","2014","Jal Shakti / MoHUA","2 Oct 2014","CSS"],
+ ["PM e-Bus Sewa","2023","MoHUA","10,000 buses, 169 cities","CSS"],
+ ["PM E-DRIVE","2024","Heavy Industries","₹10,900 cr; till Mar 2028","CS"],
+ ["Vehicle Scrappage","2021","Road Transport","15 yrs commercial, 20 private","OT"],
+ ["UDAN","2016","Civil Aviation","First flight Shimla–Delhi 2017; Modified ₹28,840 cr","CS"],
+ ["PM Gati Shakti","2021","DPIIT (nodal)","₹100 lakh cr master plan","OT"],
+ ["Bharatmala","2017","Road Transport","Phase I 34,800 km","CS"],
+ ["Sagarmala","2015","Ports & Shipping","Port-led development","CS"],
+ ["PM-DevINE","2022","DoNER","₹6,600 cr; 100% central","CS"],
+ ["PM-JAY","2018","Health","₹5 L/family; Ranchi; Vay Vandana 70+","CSS"],
+ ["NHM","2013","Health","NRHM 2005 + NUHM 2013","CSS"],
+ ["JSSK","2011","Health","Free delivery incl. C-section","CSS"],
+ ["PM-ABHIM","2021","Health","₹64,180 cr","CSS"],
+ ["Mission Indradhanush","2014","Health","7 diseases; 25 Dec 2014","CSS"],
+ ["NTEP","2020","Health","End TB 2025","CSS"],
+ ["BBBP","2015","WCD","Panipat, 22 Jan 2015","CSS"],
+ ["Sukanya Samriddhi","2015","Finance","Girl <10; 8.2%; matures 21 yrs","OT"],
+ ["Mission Shakti","2021-22","WCD","Sambal + Samarthya","CSS"],
+ ["PMMVY","2017","WCD","₹5,000; ₹6,000 second girl","CSS"],
+ ["Poshan 2.0","2021-22","WCD","Anganwadi nutrition 0–6","CSS"],
+ ["Mission Vatsalya","2021-22","WCD","Child protection (was ICPS)","CSS"],
+ ["PMUY","2016","Petroleum","Ballia; 2.0 Mahoba 2021; ₹1,600","CS"],
+ ["MSSC","2023","Finance","7.5%, ₹2 L, 2 yrs","OT"],
+ ["Samagra Shiksha","2018","Education","SSA + RMSA + TE","CSS"],
+ ["PM POSHAN","2021","Education","450/12 · 700/20","CSS"],
+ ["PM SHRI","2022","Education","14,500 schools; ₹27,360 cr","CSS"],
+ ["PM-USHA","2023","Education","RUSA phase 3","CSS"],
+ ["ONOS","2024-25","Education","₹6,000 cr; INFLIBNET","CS"],
+ ["PM Vidyalaxmi","2024","Education","860 QHEIs; 3% subvention","CS"],
+ ["PM YASASVI","2021","Social Justice","OBC/EBC/DNT; 5 verticals","CSS"],
+ ["INSPIRE-MANAK","2008+","Science & Tech","Classes 6–10; ₹10,000","CS"],
+ ["Deen Dayal SPARSH","2017","Posts","Philately scholarship 6–9","CS"],
+ ["PMKVY","2015","MSDE","Short-term skilling","CS"],
+ ["PM-SETU","2025","MSDE","₹60,000 cr; 1,000 ITIs","CSS"],
+ ["PM Internship","2024","Corporate Affairs","1 crore youth; ₹5,000/month","CS"],
+ ["PM YUVA 3.0","2025","Education","43 authors; ₹50,000 × 6","CS"],
+ ["Gyan Bharatam","2025","Culture","1 crore+ manuscripts","CS"],
+ ["PM Surya Ghar","2024","MNRE","1 crore homes; 300 units; ₹78,000 max","CS"],
+ ["Green Hydrogen Mission","2023","MNRE","₹19,744 cr; 5 MMT by 2030","CS"],
+ ["Namami Gange","2014","Jal Shakti","₹20,000 cr","CS"],
+ ["Jal Jeevan Mission","2019","Jal Shakti","Rural tap water; to 2028","CSS"],
+ ["Deep Ocean Mission","2021","Earth Sciences","₹4,077 cr; MATSYA-6000","CS"],
+ ["PRITHVI","2024","Earth Sciences","5 sub-schemes; ₹4,797 cr","CS"],
+ ["MISHTI","2023","Environment","540 sq km mangroves","OT"],
+ ["Amrit Dharohar","2023","Environment","Ramsar wetlands","OT"],
+ ["Digital India","2015","MeitY","1 July 2015; UMANG, DigiLocker, BHASHINI","OT"],
+ ["PM JANMAN","2023","Tribal Affairs","75 PVTGs; Khunti","CSS"],
+ ["Dharti Aaba","2024","Tribal Affairs","₹79,156 cr; 63,843 villages","CSS"],
+ ["PM-AJAY","2021-22","Social Justice","Scheduled Castes","CSS"],
+ ["PMGKAY","2020","Food & PD","Free grain to 81 crore till 2028","CS"],
+ ["Subhadra","2024","Odisha","₹50,000 over 5 yrs","ST"],
+ ["Majhi Ladki Bahin","2024","Maharashtra","₹1,500/month","ST"],
+ ["Ladli Behna","2023","Madhya Pradesh","₹1,500/month","ST"],
+ ["Gruha Lakshmi","2023","Karnataka","₹2,000/month","ST"],
+ ["Maiyan Samman","2024","Jharkhand","₹2,500/month","ST"],
+ ["Lakshmir Bhandar","2021","West Bengal","₹1,000 / ₹1,200","ST"],
+ ["Mahtari Vandan","2024","Chhattisgarh","₹1,000/month","ST"],
+ ["Orunodoi 3.0","2025","Assam","₹1,250/month","ST"],
+ ["Lado Protsahan","2024","Rajasthan","₹1.5 L in 7 stages","ST"],
+ ["Kanya Sumangala","2019","Uttar Pradesh","₹25,000 in 6 stages","ST"],
+ ["Thalliki Vandanam","2025","Andhra Pradesh","₹15,000/yr to mothers","ST"],
+ ["HAPPY","2023","Haryana","1,000 km free bus","ST"],
+ ["Farishtey","2024","Punjab","Road-accident good Samaritan ₹2,000","ST"]
+];
+const TILES = [["₹6,000","PM-KISAN a year"],["₹3,000","PM-KMY & PM-SYM pension"],["₹5 lakh","PM-JAY family cover"],["125 days","VB-G RAM G (from 1 Jul 2026)"],["300 units","Free power, Surya Ghar"],["₹78,000","Max rooftop subsidy"],["18","PM Vishwakarma trades"],["14","PLI sectors"],["7","PM MITRA parks"],["3","BHAVYA chemical parks"],["100","Dhan-Dhaanya districts"],["75","PVTGs in PM JANMAN"],["1 crore","PM Internship youth / PMAY-U 2.0 houses"],["15,000","Namo Drone Didi SHGs"]];
+const PAIRS = [["PM POSHAN (mid-day meal)","Education"],["Saksham Anganwadi & Poshan 2.0","Women & Child Development"],["Stand-Up India","Finance (not Commerce)"],["Startup India","Commerce (DPIIT)"],["Lakhpati Didi, SHE-Mart","Rural Development"],["Namo Drone Didi","Agriculture"],["NPS Vatsalya","Finance / PFRDA"],["Mission Vatsalya","WCD (child protection)"],["AMRUT","Urban water (MoHUA)"],["Jal Jeevan Mission","Rural tap water (Jal Shakti)"],["ECMS","Components"],["MPMS","Whole mobile phones"],["JSY","Cash for hospital delivery"],["JSSK","Free services incl. C-section"],["VVP-I","Centrally sponsored"],["VVP-II","Central sector"],["PM Gati Shakti nodal","DPIIT"],["Deep Ocean submersible builder","NIOT Chennai (not NIO Goa)"]];
+const FULLFORMS = [["PM-KUSUM","PM Kisan Urja Suraksha evam Utthaan Mahabhiyan"],["PM-AASHA","PM Annadata Aay Sanrakshan Abhiyan"],["PM-PRANAM","PM Programme for Restoration, Awareness, Nourishment & Amelioration of Mother Earth"],["MUDRA","Micro Units Development & Refinance Agency"],["UDAN","Ude Desh ka Aam Nagrik"],["AMRUT","Atal Mission for Rejuvenation & Urban Transformation"],["SVAMITVA","Survey of Villages And Mapping with Improvised Technology in Village Areas"],["UMANG","Unified Mobile Application for New-age Governance"],["BHASHINI","BHASHa INterface for India"],["PM JANMAN","PM Janjati Adivasi Nyaya Maha Abhiyan"],["PM-AJAY","PM Anusuchit Jaati Abhyuday Yojana"],["PM MITRA","PM Mega Integrated Textile Region & Apparel"],["PM E-DRIVE","PM Electric Drive Revolution in Innovative Vehicle Enhancement"],["PM-DevINE","PM Development Initiative for North East Region"],["PM-SETU","PM Skilling & Employability Transformation through Upgraded ITIs"],["PM SHRI","PM Schools for Rising India"],["PM-USHA","PM Uchchatar Shiksha Abhiyan"],["PM YASASVI","PM Young Achievers Scholarship Award Scheme for Vibrant India"],["PM YUVA","Young, Upcoming and Versatile Authors"],["PM-ABHIM","PM Ayushman Bharat Health Infrastructure Mission"],["PM-JAY","PM Jan Arogya Yojana"],["BHAVYA","Bharat Audyogik Vikas Yojana"],["SHAKTI (Biopharma)","Strategy for Healthcare Advancement through Knowledge, Technology and Innovation"],["ADEETIE","Assistance in Deploying Energy Efficient Technologies in Industries & Establishments"],["MISHTI","Mangrove Initiative for Shoreline Habitats & Tangible Incomes"],["MANAK","Million Minds Augmenting National Aspirations and Knowledge"],["SPARSH","Scholarship for Promotion of Aptitude & Research in Stamps as a Hobby"],["SPREE","Scheme for Promotion of Registration of Employers and Employees"],["VB-G RAM G","Viksit Bharat – Guarantee for Rozgar and Ajeevika Mission (Gramin)"],["HAPPY","Haryana Antyodaya Parivar Parivahan Yojana"],["ECMS","Electronics Component Manufacturing Scheme"],["MPMS","Mobile Phone Manufacturing Scheme"],["e-NAM","National Agriculture Market (electronic)"],["PMEGP","PM Employment Generation Programme"],["DDU-GKY","Deen Dayal Upadhyaya Grameen Kaushalya Yojana"],["DAY-NRLM","Deendayal Antyodaya Yojana – National Rural Livelihoods Mission"],["PRASHAD","Pilgrimage Rejuvenation and Spiritual, Heritage Augmentation Drive"]];
+
+/* app strings */
+const APP = { key:"govt_schemes_workbook_v1", brand:"Government Schemes", sub:"सरकारी योजनाएँ · SSC CGL workbook",
+  eyebrow:"Central · Centrally sponsored · State · 2025–26 updates",
+  intro:"15 short lessons from your four lectures, linked as stories (Make in India → PLI → ECMS → MPMS → chips; Jan Dhan → MUDRA → Stand-Up), with tricks, lecture slips corrected in red boxes, quick checks inside each lesson and updates to September 2026." };
+
+
+/* ============================================================
+   HELPERS & STATE
+   ============================================================ */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const hash = s => { let h = 5381; for (let i=0;i<s.length;i++) h = ((h<<5)+h + s.charCodeAt(i))|0; return "q"+(h>>>0).toString(36); };
+const shuffle = a => { const b=a.slice(); for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]];} return b; };
+const L = id => LESSONS.find(l => l.id === id);
+const LNUM = id => LESSONS.findIndex(l => l.id === id) + 1;
+
+const QS = QB.map(r => {
+  const fixed = !!r[6];
+  return { t:r[0], q:r[1], o:r[2], e:r[3], p:(r[4]||"").includes("p"), a: fixed ? (r[5]||0) : 0, fixed, id:hash(r[1]) };
+});
+const byLesson = id => QS.filter(q => q.t === id);
+// order of options to show: array of original indexes
+const makePerm = q => q.fixed ? q.o.map((_,i)=>i) : shuffle(q.o.map((_,i)=>i));
+
+const KEY = APP.key;
+let S = { ans:{}, bm:{}, les:{}, mocks:[] };
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch(e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
+const record = (q, ok) => { S.ans[q.id] = ok ? 1 : 0; save(); renderTop(); };
+
+function renderTop(){
+  const ids = Object.keys(S.ans).filter(k => QS.some(q => q.id === k));
+  const right = ids.filter(k => S.ans[k] === 1).length;
+  const pct = ids.length ? Math.round(right*100/ids.length) : 0;
+  $("#topstat").innerHTML = `<b>${ids.length}</b>/${QS.length} tried<br><b>${pct}%</b> right now`;
+}
+
+/* ============================================================
+   ROUTING
+   ============================================================ */
+let TAB = "learn";
+let timerId = null;
+function go(tab){
+  TAB = tab;
+  document.querySelectorAll(".nav button").forEach(b => b.setAttribute("aria-current", b.dataset.tab===tab ? "page" : "false"));
+  if (tab === "learn") renderLearn();
+  if (tab === "practice") renderPractice();
+  if (tab === "mock") renderMock();
+  if (tab === "revise") renderRevise();
+  window.scrollTo(0,0);
+  try { history.replaceState(null, "", "#"+tab); } catch(e) {}
+}
+document.querySelectorAll(".nav button").forEach(b => b.addEventListener("click", () => {
+  if (TAB === "mock" && M && M.running && b.dataset.tab !== "mock") { go("mock"); showMockLeave(b.dataset.tab); return; }
+  go(b.dataset.tab);
+}));
+
+/* ============================================================
+   LEARN
+   ============================================================ */
+function renderLearn(){
+  const done = LESSONS.filter(l => S.les[l.id] && S.les[l.id].done).length;
+  const nextIdx = LESSONS.findIndex(l => !(S.les[l.id] && S.les[l.id].done));
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="hero">
+      <span class="eyebrow">${APP.eyebrow}</span>
+      <h1>Learn it, test it, revise it</h1>
+      <p>${APP.intro} ${QS.length} exam-style questions in all.</p>
+      <div class="meter" aria-label="Lessons done"><i style="width:${done/LESSONS.length*100}%"></i></div>
+      <div class="row between"><span class="muted num" style="font-size:13px">${done}/${LESSONS.length} lessons done</span>
+      ${nextIdx>=0 ? `<button class="btn pri sm" type="button" data-open="${LESSONS[nextIdx].id}">${done? "Continue" : "Start"}: Lesson ${nextIdx+1}</button>` : `<span class="muted" style="font-size:13px">All lessons done. Try a mock test.</span>`}</div>
+    </div>
+    <div class="lessons">${LESSONS.map((l,i) => {
+      const st = S.les[l.id] || {}; const n = byLesson(l.id).length;
+      return `<button type="button" class="les ${st.done?"done":""} ${i===nextIdx?"next":""}" data-open="${l.id}">
+        <span class="no">${st.done ? "✓" : i+1}</span>
+        <span class="t"><b>${esc(l.title)}</b><span>${l.hi} · ${n} questions</span></span>
+        <span class="sc">${st.best!=null ? `best<br>${st.best}/${n}` : ""}</span></button>`;}).join("")}
+    </div>
+    <p class="foot">Current affairs are updated to September 2026. Where the lecture got a fact wrong, the lesson flags it in a red “Trap” box.</p>
+  </section>`;
+  $("#app").querySelectorAll("[data-open]").forEach(b => b.addEventListener("click", () => openLesson(b.dataset.open, "learn")));
+}
+
+function blockHTML(b){
+  if (b.k==="p") return `<div class="plain"><p>${b.h}</p></div>`;
+  if (b.k==="trick") return `<div class="trick"><span class="lab">Trick</span>${b.h}</div>`;
+  if (b.k==="link") return `<div class="link"><span class="lab">Link · connect the schemes</span>${b.h}</div>`;
+  if (b.k==="q") { const perm = shuffle(b.o.map((_,i)=>i)); return `<div class="icheck" data-ic><span class="lab">Quick check</span><p class="qt">${esc(b.q)}</p><div class="opts">${perm.map((oi,k)=>`<button type="button" class="opt" data-ioi="${oi}"><span class="k">${"ABCD"[k]}</span><span>${esc(b.o[oi])}</span></button>`).join("")}</div><div class="exp" hidden><b class="okl"></b> ${esc(b.e)}</div></div>`; }
+  if (b.k==="trap") return `<div class="trap"><span class="lab">Trap · correction</span>${b.h}</div>`;
+  if (b.k==="facts") return `<div class="block"><h3>${b.title}</h3><dl class="facts">${b.rows.map(r=>`<div><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join("")}</dl></div>`;
+  if (b.k==="tl") return `<div class="block"><h3>${b.title}</h3><ul class="tl">${b.rows.map(r=>`<li><span class="y">${r[0]}</span><span>${r[1]}</span></li>`).join("")}</ul></div>`;
+  if (b.k==="table") {
+    const isNum = (ci) => b.numcol==="all" ? ci>0 : (b.numcol===1 && ci===1) || (typeof b.numcol==="string" && b.numcol.includes(String(ci)));
+    return `<div class="block"><h3>${b.title}</h3><div class="tbl"><table><thead><tr>${b.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${b.rows.map(r=>`<tr>${r.map((c,ci)=>`<td class="${isNum(ci)?"n":""}">${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+  }
+  if (b.k==="fig") return `<div class="block"><h3>${b.title}</h3><figure class="fig">${b.svg}<figcaption>${b.cap}</figcaption></figure></div>`;
+  if (b.k==="pyr") return `<div class="block"><h3>${b.title}</h3><div class="pyr">${b.items.map(it=>`<div>${PYR(it.rows)}<b>${it.name}</b><span class="muted">${it.note}</span></div>`).join("")}</div><p class="muted" style="font-size:13px;margin-top:8px"><span style="color:var(--blue)">■</span> males · <span style="color:var(--accent)">■</span> females · top = old, base = young</p></div>`;
+  return "";
+}
+
+let LQ = null;
+function openLesson(id, step){
+  const l = L(id), i = LNUM(id);
+  if (step === "quiz") { LQ = { id, list: shuffle(byLesson(id)).map(q => ({q, perm:makePerm(q)})), i:0, score:0, picked:null }; }
+  const head = `<div class="lhead"><button class="back" type="button" id="lback">‹ Lessons</button></div>
+    <span class="eyebrow">Lesson ${i} of ${LESSONS.length} · ${l.hi}</span><h1>${esc(l.title)}</h1>
+    <div class="steps" role="tablist">
+      <button type="button" data-step="learn" aria-current="${step==="learn"?"step":"false"}">1 · Learn</button>
+      <button type="button" data-step="quiz" aria-current="${step==="quiz"?"step":"false"}">2 · Quiz</button>
+      <button type="button" data-step="sum" aria-current="${step==="sum"?"step":"false"}">3 · Summary</button>
+    </div>`;
+  let body = "";
+  if (step === "learn") {
+    body = `<div class="stack">${l.blocks.map(blockHTML).join("")}
+      <div class="row end"><button class="btn pri" type="button" id="toquiz">Take the lesson quiz · ${byLesson(id).length} questions</button></div></div>`;
+  } else if (step === "quiz") {
+    body = `<div id="lq"></div>`;
+  } else {
+    const nxt = LESSONS[i];
+    body = `<div class="stack"><div class="block"><h3>Remember these</h3><ul class="sum">${l.sum.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>
+      <div class="row between"><button class="btn" type="button" id="relearn">Read again</button>
+      ${nxt ? `<button class="btn pri" type="button" id="nextles">Next: ${esc(nxt.title)}</button>` : `<button class="btn pri" type="button" id="tomock">Take a mock test</button>`}</div></div>`;
+    S.les[id] = Object.assign(S.les[id]||{}, {done:1}); save();
+  }
+  $("#app").innerHTML = `<section class="view stack">${head}${body}</section>`;
+  $("#lback").onclick = () => renderLearn();
+  $("#app").querySelectorAll("[data-step]").forEach(b => b.onclick = () => openLesson(id, b.dataset.step));
+  if (step==="learn") { $("#toquiz").onclick = () => openLesson(id,"quiz");
+    const ics = l.blocks.filter(b=>b.k==="q");
+    $("#app").querySelectorAll("[data-ic]").forEach((box,n) => { const b = ics[n];
+      box.querySelectorAll("[data-ioi]").forEach(btn => btn.onclick = () => {
+        if (box.dataset.done) return; box.dataset.done = 1; const pick = +btn.dataset.ioi;
+        box.querySelectorAll("[data-ioi]").forEach(x => { const oi=+x.dataset.ioi; x.disabled = true; if (oi===0) x.classList.add("ok"); else if (oi===pick) x.classList.add("no"); });
+        const ex = box.querySelector(".exp"); ex.hidden = false; const lab = ex.querySelector("b");
+        if (pick===0) { lab.textContent = "Correct."; } else { lab.className = "nol"; lab.textContent = "Answer: " + b.o[0] + "."; }
+      }); }); }
+  if (step==="quiz") renderLQ();
+  if (step==="sum") {
+    $("#relearn").onclick = () => openLesson(id,"learn");
+    const n = $("#nextles"); if (n) n.onclick = () => openLesson(LESSONS[i].id,"learn");
+    const m = $("#tomock"); if (m) m.onclick = () => go("mock");
+  }
+  window.scrollTo(0,0);
+}
+
+function optsHTML(q, perm, state){
+  // state: {picked: originalIndex|null, reveal: bool, sel: originalIndex|null}
+  return perm.map((oi, k) => {
+    let cls = "opt";
+    if (state.reveal) { if (oi === q.a) cls += " ok"; else if (oi === state.picked) cls += " no"; }
+    else if (state.sel === oi) cls += " sel";
+    return `<button type="button" class="${cls}" data-oi="${oi}" ${state.reveal?"disabled":""}><span class="k">${"ABCD"[k]}</span><span>${esc(q.o[oi])}</span></button>`;
+  }).join("");
+}
+function expHTML(q, picked){
+  const ok = picked === q.a;
+  return `<div class="exp">${ok ? `<b class="okl">Correct.</b>` : `<b class="nol">Answer: ${esc(q.o[q.a])}.</b>`} ${esc(q.e)}</div>`;
+}
+function metaHTML(q, no){
+  return `<div class="qmeta"><span class="qno">${no}</span><span class="tag">L${LNUM(q.t)} · ${esc(L(q.t).title)}</span>${q.p?`<span class="tag pyq">Exam-asked</span>`:""}
+  <button type="button" class="bm" data-bm="${q.id}" aria-pressed="${S.bm[q.id]?"true":"false"}" aria-label="Bookmark">${S.bm[q.id]?"★":"☆"}</button></div>`;
+}
+
+function renderLQ(){
+  const box = $("#lq");
+  if (LQ.i >= LQ.list.length) {
+    const n = LQ.list.length, l = L(LQ.id);
+    const st = S.les[LQ.id] || {}; st.best = Math.max(st.best||0, LQ.score); S.les[LQ.id] = st; save();
+    box.innerHTML = `<div class="stack"><div class="block stack"><span class="eyebrow">Quiz done</span>
+      <div class="scorebig"><span class="num">${LQ.score}</span><span class="muted">/ ${n} correct</span></div>
+      <p class="muted">${LQ.score===n ? "Full marks." : LQ.score >= n*0.8 ? "Strong. Review the ones you missed in Practice → Mistakes." : "Read the lesson once more, then retry. Missed questions are saved under Practice → Mistakes."}</p></div>
+      <div class="row between"><button class="btn" type="button" id="retry">Retry quiz</button><button class="btn pri" type="button" id="tosum">See summary</button></div></div>`;
+    $("#retry").onclick = () => openLesson(LQ.id,"quiz");
+    $("#tosum").onclick = () => openLesson(LQ.id,"sum");
+    return;
+  }
+  const it = LQ.list[LQ.i], q = it.q;
+  const reveal = LQ.picked !== null;
+  box.innerHTML = `<div class="stack"><div class="meter"><i style="width:${LQ.i/LQ.list.length*100}%"></i></div>
+    <article class="qcard">${metaHTML(q, `Q${LQ.i+1}/${LQ.list.length}`)}
+    <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {picked:LQ.picked, reveal})}</div>
+    ${reveal ? expHTML(q, LQ.picked) : ""}</article>
+    ${reveal ? `<div class="row end"><button class="btn pri" type="button" id="lqnext">${LQ.i+1 < LQ.list.length ? "Next question" : "Finish"}</button></div>` : `<p class="muted" style="font-size:13px">Score so far: <span class="num">${LQ.score}</span></p>`}</div>`;
+  box.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    if (LQ.picked !== null) return;
+    LQ.picked = +b.dataset.oi; const ok = LQ.picked === q.a; if (ok) LQ.score++; record(q, ok); renderLQ();
+  });
+  bindBM(box);
+  const nx = $("#lqnext"); if (nx) nx.onclick = () => { LQ.i++; LQ.picked = null; renderLQ(); window.scrollTo(0,0); };
+}
+
+function bindBM(root){
+  root.querySelectorAll("[data-bm]").forEach(b => b.onclick = (ev) => {
+    ev.stopPropagation();
+    const id = b.dataset.bm; if (S.bm[id]) delete S.bm[id]; else S.bm[id] = 1; save();
+    b.setAttribute("aria-pressed", S.bm[id] ? "true":"false"); b.textContent = S.bm[id] ? "★" : "☆";
+  });
+}
+
+/* ============================================================
+   PRACTICE
+   ============================================================ */
+let PF = "all", PSHOW = 20, PORDER = null, PPERM = {}, PPICK = {};
+function practiceList(){
+  let list = QS;
+  if (PF === "pyq") list = QS.filter(q => q.p);
+  else if (PF === "wrong") list = QS.filter(q => S.ans[q.id] === 0);
+  else if (PF === "new") list = QS.filter(q => S.ans[q.id] === undefined);
+  else if (PF === "bm") list = QS.filter(q => S.bm[q.id]);
+  else if (PF !== "all") list = QS.filter(q => q.t === PF);
+  if (PORDER) { const pos = new Map(PORDER.map((id,i)=>[id,i])); list = list.slice().sort((a,b)=>(pos.get(a.id)??0)-(pos.get(b.id)??0)); }
+  return list;
+}
+function renderPractice(){
+  const wrongN = QS.filter(q => S.ans[q.id] === 0).length, bmN = QS.filter(q=>S.bm[q.id]).length, pyqN = QS.filter(q=>q.p).length;
+  const chips = [["all",`All ${QS.length}`],["new","Not tried"],["wrong",`Mistakes ${wrongN}`],["pyq",`Exam-asked ${pyqN}`],["bm",`Starred ${bmN}`]].concat(LESSONS.map((l,i)=>[l.id,`L${i+1} ${l.title}`]));
+  const list = practiceList();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Question bank</span><h1>Practice</h1>
+    <p class="muted">Tap an option to check it. Wrong answers go to <b>Mistakes</b> until you get them right.</p></div>
+    <div class="chips" role="group" aria-label="Filter">${chips.map(c=>`<button type="button" class="chip" data-f="${c[0]}" aria-pressed="${PF===c[0]}">${esc(c[1])}</button>`).join("")}</div>
+    <div class="row between"><span class="muted num" style="font-size:13px">${list.length} questions</span>
+      <div class="row"><button class="btn sm ghost" type="button" id="pshuf">${PORDER?"In order":"Shuffle"}</button></div></div>
+    <div class="stack" id="plist"></div>
+  </section>`;
+  $("#app").querySelectorAll("[data-f]").forEach(b => b.onclick = () => { PF = b.dataset.f; PSHOW = 20; PPICK = {}; renderPractice(); });
+  $("#pshuf").onclick = () => { PORDER = PORDER ? null : shuffle(QS.map(q=>q.id)); PSHOW = 20; renderPractice(); };
+  const chipOn = $(`.chip[aria-pressed="true"]`); if (chipOn) chipOn.scrollIntoView({block:"nearest", inline:"center"});
+  drawPList();
+}
+function pCard(q, idx){
+  if (!PPERM[q.id]) PPERM[q.id] = makePerm(q);
+  const picked = PPICK[q.id]; const reveal = picked !== undefined;
+  return `<article class="qcard" data-q="${q.id}">${metaHTML(q, "Q"+(idx+1))}<p class="qt">${esc(q.q)}</p>
+    <div class="opts">${optsHTML(q, PPERM[q.id], {picked: reveal?picked:null, reveal})}</div>${reveal?expHTML(q,picked):""}</article>`;
+}
+function drawPList(){
+  const list = practiceList(), box = $("#plist");
+  if (!list.length) { box.innerHTML = `<p class="empty">${PF==="wrong"?"No mistakes saved. Answer some questions first, or you've cleared them all.":PF==="bm"?"Nothing starred yet. Tap ☆ on any question.":"Nothing here."}</p>`; return; }
+  box.innerHTML = list.slice(0, PSHOW).map((q,i)=>pCard(q,i)).join("") + (list.length > PSHOW ? `<button class="btn" type="button" id="pmore">Show 20 more (${list.length-PSHOW} left)</button>` : "");
+  bindP(box);
+  const more = $("#pmore"); if (more) more.onclick = () => { PSHOW += 20; drawPList(); };
+}
+function bindP(box){ box.querySelectorAll(".qcard").forEach(bindCard); }
+function bindCard(card){
+  card.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    const q = QS.find(x => x.id === card.dataset.q); if (PPICK[q.id] !== undefined) return;
+    PPICK[q.id] = +b.dataset.oi; record(q, PPICK[q.id] === q.a);
+    const idx = +card.querySelector(".qno").textContent.slice(1) - 1;
+    const tmp = document.createElement("div"); tmp.innerHTML = pCard(q, idx); const nc = tmp.firstElementChild;
+    card.replaceWith(nc); bindCard(nc);
+  });
+  bindBM(card);
+}
+
+/* ============================================================
+   MOCK TEST
+   ============================================================ */
+let M = null, MCFG = {n:25, scope:"all", neg:1}, LEAVE_TO = null;
+function renderMock(){
+  if (M && M.running) return drawMockRun();
+  if (M && M.done) return drawMockResult();
+  const hist = (S.mocks||[]).slice(-6).reverse();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Timed, SSC pattern</span><h1>Mock test</h1>
+    <p class="muted">+2 for a right answer, −0.5 for a wrong one, 36 seconds per question (CGL Tier-1 pace). Answers show only after you submit.</p></div>
+    <div class="block stack">
+      <fieldset><legend>Questions</legend><div class="radios">${[10,25,50,100].map(n=>`<label><input type="radio" name="mn" id="mn${n}" value="${n}" ${MCFG.n===n?"checked":""}><span>${n} · ${Math.round(n*36/60)} min</span></label>`).join("")}</div></fieldset>
+      <fieldset><legend>From</legend><select id="mscope" aria-label="Lessons to draw from"><option value="all">All lessons</option><option value="pyq">Exam-asked only</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}" ${MCFG.scope===l.id?"selected":""}>L${i+1} · ${esc(l.title)}</option>`).join("")}</select></fieldset>
+      <label class="row" style="gap:8px;font-weight:600"><input type="checkbox" id="mneg" ${MCFG.neg?"checked":""}> Negative marking (−0.5)</label>
+      <div id="merr" class="muted" style="font-size:14px"></div>
+      <div class="row end"><button class="btn pri" type="button" id="mstart">Start test</button></div>
+    </div>
+    ${hist.length ? `<div class="block"><h3>Recent attempts</h3><div class="hist">${hist.map(h=>`<div><span>${esc(h.d)} · ${h.n} Q</span><span class="num">${h.score}/${h.max} · ${h.acc}%</span></div>`).join("")}</div></div>` : ""}
+  </section>`;
+  $("#mscope").value = MCFG.scope;
+  $("#mstart").onclick = () => {
+    MCFG.n = +(document.querySelector('input[name="mn"]:checked')||{value:25}).value;
+    MCFG.scope = $("#mscope").value; MCFG.neg = $("#mneg").checked ? 1 : 0;
+    let pool = MCFG.scope==="all" ? QS : MCFG.scope==="pyq" ? QS.filter(q=>q.p) : MCFG.scope==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===MCFG.scope);
+    if (!pool.length) { $("#merr").textContent = "No questions in that set yet. Pick another source."; return; }
+    const qs = shuffle(pool).slice(0, MCFG.n);
+    M = { running:true, list: qs.map(q=>({q, perm:makePerm(q)})), ans: qs.map(()=>null), mark: qs.map(()=>false), i:0, neg:MCFG.neg, secs: qs.length*36, start: Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000;
+    startTimer(); drawMockRun();
+  };
+}
+function startTimer(){
+  clearInterval(timerId);
+  timerId = setInterval(() => {
+    if (!M || !M.running) { clearInterval(timerId); return; }
+    const left = Math.max(0, Math.round((M.end - Date.now())/1000));
+    const el = $("#mtime"); if (el) { el.textContent = fmt(left); el.classList.toggle("low", left <= 60); }
+    if (left <= 0) submitMock();
+  }, 1000);
+}
+const fmt = s => `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+function drawMockRun(){
+  const it = M.list[M.i], q = it.q, left = Math.max(0, Math.round((M.end-Date.now())/1000));
+  const answered = M.ans.filter(a=>a!==null).length;
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="mbar"><span class="timer num ${left<=60?"low":""}" id="mtime">${fmt(left)}</span>
+      <span class="muted num" style="font-size:13px;flex:1">Q ${M.i+1}/${M.list.length} · ${answered} answered</span>
+      <button class="btn sm" type="button" id="mpal">${M.showPal?"Hide":"All Qs"}</button></div>
+    ${LEAVE_TO ? `<div class="confirm"><b>Leave the test?</b><span>Your answers so far will be scored now.</span><div class="row"><button class="btn sm pri" type="button" id="lvy">Submit and leave</button><button class="btn sm" type="button" id="lvn">Stay</button></div></div>` : ""}
+    ${M.showPal ? `<div class="block"><div class="pal">${M.list.map((_,k)=>`<button type="button" data-j="${k}" class="${M.ans[k]!==null?"a":""} ${M.mark[k]?"m":""} ${k===M.i?"cur":""}" aria-label="Question ${k+1}">${k+1}</button>`).join("")}</div>
+      <p class="muted" style="font-size:12px;margin-top:8px">Filled = answered · orange line = marked for review</p></div>` : ""}
+    <article class="qcard"><div class="qmeta"><span class="qno">Q${M.i+1}</span><span class="tag">L${LNUM(q.t)}</span>${M.mark[M.i]?`<span class="tag pyq">Marked</span>`:""}</div>
+      <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {sel:M.ans[M.i], reveal:false})}</div></article>
+    <div class="row between"><button class="btn" type="button" id="mprev" ${M.i===0?"disabled":""}>‹ Prev</button>
+      <button class="btn ghost" type="button" id="mmark">${M.mark[M.i]?"Unmark":"Mark"}</button>
+      <button class="btn ghost" type="button" id="mclr" ${M.ans[M.i]===null?"disabled":""}>Clear</button>
+      <button class="btn ${M.i<M.list.length-1?"pri":""}" type="button" id="mnext" ${M.i===M.list.length-1?"disabled":""}>Next ›</button></div>
+    ${M.confirm ? `<div class="confirm"><b>Submit the test?</b><span>${M.list.length-answered} unanswered${M.mark.filter(Boolean).length?`, ${M.mark.filter(Boolean).length} marked for review`:""}.</span><div class="row"><button class="btn sm pri" type="button" id="msubY">Submit</button><button class="btn sm" type="button" id="msubN">Keep going</button></div></div>`
+      : `<button class="btn pri" type="button" id="msub">Submit test</button>`}
+  </section>`;
+  $("#app").querySelectorAll(".opt").forEach(b => b.onclick = () => { M.ans[M.i] = +b.dataset.oi; drawMockRun(); });
+  $("#mprev").onclick = () => { if (M.i>0){M.i--; drawMockRun();} };
+  $("#mnext").onclick = () => { if (M.i<M.list.length-1){M.i++; drawMockRun(); window.scrollTo(0,0);} };
+  $("#mmark").onclick = () => { M.mark[M.i] = !M.mark[M.i]; drawMockRun(); };
+  $("#mclr").onclick = () => { M.ans[M.i] = null; drawMockRun(); };
+  $("#mpal").onclick = () => { M.showPal = !M.showPal; drawMockRun(); };
+  $("#app").querySelectorAll("[data-j]").forEach(b => b.onclick = () => { M.i = +b.dataset.j; drawMockRun(); });
+  const s = $("#msub"); if (s) s.onclick = () => { M.confirm = true; drawMockRun(); };
+  const y = $("#msubY"); if (y) y.onclick = submitMock;
+  const n = $("#msubN"); if (n) n.onclick = () => { M.confirm = false; drawMockRun(); };
+  const lvy = $("#lvy"); if (lvy) lvy.onclick = () => { const t = LEAVE_TO; LEAVE_TO = null; submitMock(); go(t); };
+  const lvn = $("#lvn"); if (lvn) lvn.onclick = () => { LEAVE_TO = null; drawMockRun(); };
+}
+function showMockLeave(tab){ LEAVE_TO = tab; drawMockRun(); }
+function submitMock(){
+  if (!M || !M.running) return;
+  clearInterval(timerId);
+  M.running = false; M.done = true; M.confirm = false;
+  let c=0,w=0,sk=0; const per = {};
+  M.list.forEach((it,k) => {
+    const a = M.ans[k]; const t = it.q.t; per[t] = per[t] || {c:0,n:0}; per[t].n++;
+    if (a===null) sk++; else if (a===it.q.a) { c++; per[t].c++; S.ans[it.q.id]=1; } else { w++; S.ans[it.q.id]=0; }
+  });
+  const max = M.list.length*2, score = +(c*2 - (M.neg? w*0.5 : 0)).toFixed(1);
+  const used = Math.min(M.secs, Math.round((Date.now()-M.start)/1000));
+  M.res = {c,w,sk,score,max,used,per, acc: (c+w) ? Math.round(c*100/(c+w)) : 0};
+  const d = new Date(); const ds = d.toLocaleDateString("en-IN",{day:"numeric",month:"short"})+" "+d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
+  S.mocks = (S.mocks||[]).concat([{d:ds, n:M.list.length, score, max, acc:M.res.acc}]).slice(-20); save(); renderTop();
+  M.filter = "wrong";
+  if (TAB==="mock") drawMockResult();
+}
+function drawMockResult(){
+  const r = M.res;
+  const per = Object.keys(r.per).sort((a,b)=>LNUM(a)-LNUM(b)).map(t => `<div><span>L${LNUM(t)} · ${esc(L(t).title)}</span><span class="num">${r.per[t].c}/${r.per[t].n}</span></div>`).join("");
+  const rows = M.list.map((it,k)=>({it,k})).filter(({it,k}) => M.filter==="all" ? true : M.filter==="wrong" ? (M.ans[k]!==null && M.ans[k]!==it.q.a) : M.ans[k]===null);
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Result</span>
+    <div class="scorebig"><span class="num">${r.score}</span><span class="muted">/ ${r.max} marks</span></div></div>
+    <div class="kpis"><div class="kpi g"><span class="num">${r.c}</span><span>right</span></div><div class="kpi b"><span class="num">${r.w}</span><span>wrong</span></div><div class="kpi"><span class="num">${r.sk}</span><span>skipped</span></div><div class="kpi"><span class="num">${r.acc}%</span><span>accuracy</span></div></div>
+    <p class="muted num" style="font-size:13px">Time used ${fmt(r.used)} of ${fmt(M.secs)}</p>
+    <div class="block"><h3>By lesson</h3><div class="hist">${per}</div></div>
+    <div class="row between"><button class="btn" type="button" id="mnew">New test</button><button class="btn pri" type="button" id="mretry">Retake same questions</button></div>
+    <h2>Review</h2>
+    <div class="chips">${[["wrong",`Wrong ${r.w}`],["skip",`Skipped ${r.sk}`],["all",`All ${M.list.length}`]].map(c=>`<button class="chip" type="button" data-rf="${c[0]}" aria-pressed="${M.filter===c[0]}">${c[1]}</button>`).join("")}</div>
+    <div class="stack">${rows.length ? rows.map(({it,k}) => `<article class="qcard">${metaHTML(it.q, "Q"+(k+1))}<p class="qt">${esc(it.q.q)}</p><div class="opts">${optsHTML(it.q, it.perm, {picked:M.ans[k], reveal:true})}</div>${M.ans[k]===null?`<div class="exp"><b class="nol">Skipped. Answer: ${esc(it.q.o[it.q.a])}.</b> ${esc(it.q.e)}</div>`:expHTML(it.q, M.ans[k])}</article>`).join("") : `<p class="empty">Nothing in this list.</p>`}</div>
+  </section>`;
+  bindBM($("#app"));
+  $("#app").querySelectorAll("[data-rf]").forEach(b => b.onclick = () => { M.filter = b.dataset.rf; drawMockResult(); });
+  $("#mnew").onclick = () => { M = null; renderMock(); };
+  $("#mretry").onclick = () => {
+    const list = M.list.map(it=>({q:it.q, perm:makePerm(it.q)}));
+    M = { running:true, list, ans:list.map(()=>null), mark:list.map(()=>false), i:0, neg:MCFG.neg, secs:list.length*36, start:Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000; startTimer(); drawMockRun();
+  };
+}
+
+/* ============================================================
+   REVISE
+   ============================================================ */
+let RV = "where", FC = null, FCSCOPE = "all";
+function renderRevise(){
+  const tabs = [["where","Scheme finder"],["nums","Numbers"],["ff","Full forms"],["links","Links"],["tricks","Tricks"],["traps","Traps"],["flash","Flashcards"]];
+  if (!tabs.some(t=>t[0]===RV)) RV = "where";
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Last-day revision</span><h1>Revise</h1></div>
+    <div class="seg" role="tablist">${tabs.map(t=>`<button type="button" role="tab" data-rv="${t[0]}" aria-selected="${RV===t[0]}">${t[1]}</button>`).join("")}</div>
+    <div id="rv" class="stack"></div></section>`;
+  $("#app").querySelectorAll("[data-rv]").forEach(b => b.onclick = () => { RV = b.dataset.rv; renderRevise(); });
+  const box = $("#rv");
+  if (RV === "where") {
+    const CATN = {CS:"Central Sector",CSS:"Centrally Sponsored",ST:"State",OT:"Other / fund / policy"};
+    box.innerHTML = `<input class="search" id="rks" type="search" placeholder="Search a scheme, ministry, year or amount (e.g. MNRE, 2016, ₹3,000)" aria-label="Search schemes">
+      <div class="chips" role="group" aria-label="Scheme type">${[["all","All"],["CS","Central Sector"],["CSS","Centrally Sponsored"],["ST","State"],["OT","Other"]].map(c=>`<button type="button" class="chip" data-is="${c[0]}" aria-pressed="${ISF===c[0]}">${c[1]}</button>`).join("")}</div>
+      <div class="block"><div class="tbl"><table><thead><tr><th>Scheme</th><th>Year</th><th>Ministry / State</th><th>Key fact</th></tr></thead><tbody id="orgb"></tbody></table></div>
+      <p class="muted" style="font-size:13px;margin-top:8px">Tags: <span class="cat CS">CS</span> Central Sector · <span class="cat CSS">CSS</span> Centrally Sponsored · <span class="cat ST">State</span></p></div>`;
+    const draw = () => {
+      const q = $("#rks").value.trim().toLowerCase();
+      const rows = ORGS.filter(r => (!q || r.join(" ").toLowerCase().includes(q)) && (ISF==="all" || r[4]===ISF));
+      $("#orgb").innerHTML = rows.length ? rows.map(r=>`<tr><td><b>${esc(r[0])}</b><br><span class="cat ${r[4]}" title="${CATN[r[4]]}">${r[4]==="ST"?"State":r[4]==="OT"?"Other":r[4]}</span></td><td class="n">${esc(r[1])}</td><td>${esc(r[2])}</td><td>${esc(r[3])}</td></tr>`).join("") : `<tr><td colspan="4" class="muted">No match.</td></tr>`;
+    };
+    $("#rks").oninput = draw;
+    box.querySelectorAll("[data-is]").forEach(b => b.onclick = () => { ISF = b.dataset.is; box.querySelectorAll("[data-is]").forEach(x=>x.setAttribute("aria-pressed", x.dataset.is===ISF)); draw(); });
+    draw();
+  }
+  if (RV === "ff") {
+    box.innerHTML = `<input class="search" id="ffs" type="search" placeholder="Search a short form" aria-label="Search full forms"><div class="block"><dl class="rk" id="ffl"></dl></div>`;
+    const draw = () => { const q=$("#ffs").value.trim().toLowerCase(); const r=FULLFORMS.filter(f=>!q||f.join(" ").toLowerCase().includes(q));
+      $("#ffl").innerHTML = r.length ? r.map(f=>`<div><dt><b style="color:var(--ink)">${esc(f[0])}</b></dt><dd>${esc(f[1])}</dd></div>`).join("") : `<p class="muted">No match.</p>`; };
+    $("#ffs").oninput = draw; draw();
+  }
+  if (RV === "links") {
+    const items = LESSONS.flatMap((l,i) => l.blocks.filter(b=>b.k==="link").map(b=>({l:i+1, t:l.title, h:b.h})));
+    box.innerHTML = items.map(x => `<div class="link"><span class="lab">L${x.l} · ${esc(x.t)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "nums") {
+    box.innerHTML = `<div class="tiles">${TILES.map(t=>`<div class="tile"><span class="num">${t[0]}</span><span>${t[1]}</span></div>`).join("")}</div>
+    <div class="block"><h3>Confusing pairs (ministry & meaning)</h3><dl class="rk">${PAIRS.map(p=>`<div><dt>${esc(p[0])}</dt><dd>${esc(p[1])}</dd></div>`).join("")}</dl></div>`;
+  }
+  if (RV === "tricks" || RV === "traps") {
+    const kind = RV==="tricks" ? "trick" : "trap";
+    const items = LESSONS.flatMap((l,i) => l.blocks.filter(b=>b.k===kind).map(b=>({l:i+1, t:l.title, h:b.h})));
+    box.innerHTML = items.map(x => `<div class="${kind}"><span class="lab">L${x.l} · ${esc(x.t)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "flash") drawFlash(box);
+}
+let ISF = "all";
+function drawFlash(box){
+  if (!FC) { const pool = FCSCOPE==="all" ? QS : FCSCOPE==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===FCSCOPE); FC = {list: shuffle(pool), i:0, flip:false, known:0}; }
+  const sel = `<select id="fcs" aria-label="Flashcard set"><option value="all">All questions</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}">L${i+1} · ${esc(l.title)}</option>`).join("")}</select>`;
+  if (!FC.list.length || FC.i >= FC.list.length) {
+    box.innerHTML = `<div class="row">${sel}</div><div class="block stack"><h3>${FC.list.length ? "Deck finished" : "No cards in this set"}</h3>${FC.list.length?`<p class="muted">You knew ${FC.known} of ${FC.list.length} on first look.</p>`:""}<div class="row"><button class="btn pri" type="button" id="fcr">Shuffle and restart</button></div></div>`;
+    $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+    $("#fcr").onclick = () => { FC = null; drawFlash(box); }; return;
+  }
+  const q = FC.list[FC.i];
+  box.innerHTML = `<div class="row between">${sel}<span class="muted num" style="font-size:13px">${FC.i+1}/${FC.list.length}</span></div>
+    <button type="button" class="flash" id="fcard" aria-label="Flip card">
+      <span class="side">${FC.flip?"Answer":"Question · tap to flip"}</span>
+      <span class="front">${esc(q.q)}</span>
+      ${FC.flip ? `<span class="ans">${esc(q.o[q.a])}</span><span class="muted">${esc(q.e)}</span>` : ""}
+    </button>
+    <div class="row between"><button class="btn" type="button" id="fca" ${FC.flip?"":"disabled"}>Again later</button><button class="btn pri" type="button" id="fck" ${FC.flip?"":"disabled"}>Got it</button></div>`;
+  $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+  $("#fcard").onclick = () => { FC.flip = !FC.flip; drawFlash(box); };
+  $("#fca").onclick = () => { FC.list.push(q); FC.list.splice(FC.i,1); FC.flip=false; drawFlash(box); };
+  $("#fck").onclick = () => { FC.known++; FC.i++; FC.flip=false; drawFlash(box); };
+}
+
+/* boot */
+renderTop();
+const start = (location.hash||"").replace("#","");
+go(["learn","practice","mock","revise"].includes(start) ? start : "learn");
+</script>
+
+</body></html>
