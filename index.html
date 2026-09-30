@@ -362,6 +362,14 @@
   .hub-meta{ display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:auto; padding-top:10px; border-top:1px dashed var(--rule); font-size:12.5px; color:var(--ink-faint); }
   .hub-meta b{ color:var(--hub-c, var(--teal)); font-weight:700; }
   .hub-card.here{ cursor:default; }
+  .hub-jump{ display:flex; flex-wrap:wrap; gap:8px; margin:0 0 6px; }
+  .hub-jump button{ border:1px solid var(--rule); background:var(--card); color:var(--ink); border-radius:999px; padding:7px 14px; font:inherit; font-size:13.5px; font-weight:600; cursor:pointer; }
+  .hub-jump button small{ color:var(--ink-faint); font-weight:700; margin-left:2px; }
+  .hub-jump button:hover{ border-color:var(--ink-faint); }
+  .hub-sub{ margin-top:18px; scroll-margin-top:14px; }
+  .hub-sub-h{ display:flex; align-items:baseline; gap:10px; margin:0 0 10px; padding-bottom:6px; border-bottom:1px dashed var(--rule); }
+  .hub-sub-h h3{ margin:0; font-family:var(--font-display); font-weight:var(--h-weight); font-size:18px; color:var(--ink); }
+  .hub-sub-h span{ font-size:12.5px; color:var(--ink-faint); }
   .hub-ring{ position:relative; width:50px; height:50px; flex-shrink:0; }
   .hub-ring span{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:11.5px; font-weight:700; color:var(--ink); font-variant-numeric:tabular-nums; }
   .hub-stats{ display:flex; gap:14px; flex-wrap:wrap; font-size:13px; color:var(--ink-soft); }
@@ -422,6 +430,8 @@
   .dq-tog{ border:1px solid var(--rule); background:var(--paper); color:var(--ink-soft); border-radius:999px; padding:6px 12px; font:inherit; font-size:13.5px; font-weight:600; cursor:pointer; }
   .dq-tog.on{ border-color:var(--teal); background:color-mix(in srgb, var(--teal) 14%, var(--card)); color:var(--ink); }
   .dq-tog.on::before{ content:'✓ '; color:var(--teal); }
+  .dq-gsub{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; width:100%; }
+  .dq-gsub > span{ font-size:11.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-faint); width:100%; margin-top:4px; }
   .dq-h3{ font-family:var(--font-display); font-weight:var(--h-weight); font-size:20px; margin:22px 0 10px; color:var(--ink); }
   .dq-hist{ display:grid; gap:8px; max-width:640px; }
   .dq-hist div{ display:flex; justify-content:space-between; gap:12px; background:var(--card); border:1px solid var(--rule); border-radius:12px; padding:10px 14px; font-size:14px; color:var(--ink-soft); }
@@ -886,7 +896,7 @@
     </button>
     <div class="navmenu" id="subjectsMenu">
       <button class="subj-item" data-go="vocab"><b>शब्दRegister <span class="here">you are here</span></b><span>Vocabulary · words, idioms, spellings, roots, quizzes</span></button>
-      <button class="subj-item" data-go="hub"><b>पाठShala</b><span>All subjects · Grammar, Polity, Schemes, Census, Reports, Sports, Festivals…</span></button>
+      <button class="subj-item" data-go="hub"><b>पाठShala</b><span>All subjects · English + GS by subject: Polity, Economy, Geography, Culture, Static GK…</span></button>
     </div>
     </div>
 
@@ -1423,7 +1433,9 @@
     intlorgs: { title: 'International Organisations', file: 'study-intl-orgs.html',    key: 'intl_orgs_workbook_v1' },
     reports:  { title: 'Reports & Indices',            file: 'study-reports-indices.html', key: 'reports_indices_workbook_v1' },
     sports:   { title: 'Sports',                       file: 'study-sports.html',       key: 'sports_workbook_v1' },
-    festivals:{ title: 'Festivals of India',           file: 'study-festivals.html',    key: 'festivals_workbook_v1' }
+    festivals:{ title: 'Festivals of India',           file: 'study-festivals.html',    key: 'festivals_workbook_v1' },
+    iprplans: { title: 'IPR & Five Year Plans',        file: 'study-ipr-plans.html',    key: 'economy_ipr_plans_v1' },
+    folkdances:{ title: 'Folk Dances of India',        file: 'study-folk-dances.html',  key: 'folk_dances_workbook_v1' }
   };
   STUDY.grammar.subj = 'english'; STUDY.grammar.ico = '✍️'; STUDY.grammar.hi = 'व्याकरण · error spotting'; STUDY.grammar.desc = '100 rules with logic, tricks and examples; unit tests after every 10 rules; revise and mistakes lists.'; STUDY.grammar.meta = '100 rules · unit tests'; STUDY.grammar.color = '#C8402F';
   STUDY.bns.subj = 'gs'; STUDY.bns.ico = '⚖️'; STUDY.bns.hi = 'नए आपराधिक क़ानून · Polity'; STUDY.bns.desc = 'The three new criminal laws — what replaced what, key offences, police & court procedure, evidence.'; STUDY.bns.meta = '12 lessons · mock test'; STUDY.bns.color = '#3D5CF0';
@@ -1433,6 +1445,17 @@
   STUDY.reports.subj = 'gs'; STUDY.reports.ico = '📈'; STUDY.reports.hi = 'रिपोर्ट और सूचकांक'; STUDY.reports.desc = 'Global and national reports & indices — who publishes them, what rank 1 means, India’s latest positions.'; STUDY.reports.meta = '14 lessons · 294 questions'; STUDY.reports.color = '#6A4C93';
   STUDY.sports.subj = 'gs'; STUDY.sports.ico = '🏏'; STUDY.sports.hi = 'खेल'; STUDY.sports.desc = 'Players per side, field and ball dimensions, terms, trophies, firsts and 2025–26 results — with a one-page dimension sheet.'; STUDY.sports.meta = '15 lessons · 349 questions'; STUDY.sports.color = '#1F7A5A';
   STUDY.festivals.subj = 'gs'; STUDY.festivals.ico = '🪔'; STUDY.festivals.hi = 'भारत के त्योहार'; STUDY.festivals.desc = 'About 140 festivals state by state — tribe, deity, harvest and new-year links, with name-ending tricks.'; STUDY.festivals.meta = '16 lessons · 415 questions'; STUDY.festivals.color = '#C2571A';
+  STUDY.iprplans.subj = 'gs'; STUDY.iprplans.ico = '🏭'; STUDY.iprplans.hi = 'औद्योगिक नीति · पंचवर्षीय योजनाएँ'; STUDY.iprplans.desc = 'Industrial Policy Resolutions (1948, 1956, 1991 …) and the Five Year Plans — aims, models, highlights and NITI Aayog.'; STUDY.iprplans.meta = '12 lessons · 252 questions'; STUDY.iprplans.color = '#8C5A2B';
+  STUDY.folkdances.subj = 'gs'; STUDY.folkdances.ico = '💃'; STUDY.folkdances.hi = 'भारत के लोक नृत्य'; STUDY.folkdances.desc = 'Folk and tribal dances state by state — who performs them, when, and the tricks to tell look-alikes apart.'; STUDY.folkdances.meta = '16 lessons · 444 questions'; STUDY.folkdances.color = '#B0306A';
+  // General Studies is split by subject in पाठShala
+  var GS_SUBJECTS = [
+    ['history', 'History', 'इतिहास'], ['culture', 'Art & Culture', 'कला एवं संस्कृति'], ['polity', 'Polity', 'राजव्यवस्था'],
+    ['geography', 'Geography', 'भूगोल'], ['economy', 'Economy', 'अर्थव्यवस्था'], ['science', 'Science', 'विज्ञान'],
+    ['staticgk', 'Static GK', 'स्थैतिक सामान्य ज्ञान'], ['current', 'Current Affairs', 'समसामयिकी']
+  ];
+  STUDY.bns.gsub = 'polity'; STUDY.schemes.gsub = 'economy'; STUDY.iprplans.gsub = 'economy'; STUDY.census.gsub = 'geography';
+  STUDY.festivals.gsub = 'culture'; STUDY.folkdances.gsub = 'culture'; STUDY.sports.gsub = 'staticgk'; STUDY.intlorgs.gsub = 'staticgk';
+  STUDY.reports.gsub = 'current';
   var studyOpen = null, studyWatch = null, studyPushTimer = null, studyLast = null, hubOpen = false;
   function agoText(ms){
     if(!ms) return 'Not started yet';
@@ -1471,11 +1494,23 @@
       '<div class="hub-hero"><div class="eyebrow">SSC CGL · all subjects</div><h1>पाठ<span>Shala</span></h1><p>Every mini course in one place. Pick one to study — your progress saves to your account and works offline.</p></div>' +
       hubPracticeSection() +
       '<section class="hub-sec"><div class="hub-sec-h"><h2>English</h2><span>अंग्रेज़ी</span></div><div class="hub-grid">' + vocabCard + ids.filter(function(id){ return STUDY[id].subj === 'english'; }).map(hubCard).join('') + '</div></section>' +
-      '<section class="hub-sec"><div class="hub-sec-h"><h2>General Studies</h2><span>सामान्य अध्ययन</span></div><div class="hub-grid">' + ids.filter(function(id){ return STUDY[id].subj === 'gs'; }).map(hubCard).join('') + '</div></section>';
+      '<section class="hub-sec"><div class="hub-sec-h"><h2>General Studies</h2><span>सामान्य अध्ययन · ' + gsIds().length + ' mini apps</span></div>' +
+        '<div class="hub-jump">' + GS_SUBJECTS.filter(function(g){ return gsIds().some(function(id){ return STUDY[id].gsub === g[0]; }); }).map(function(g){
+          var n = gsIds().filter(function(id){ return STUDY[id].gsub === g[0]; }).length;
+          return '<button data-hub-jump="' + g[0] + '">' + g[1] + ' <small>' + n + '</small></button>';
+        }).join('') + '</div>' +
+        GS_SUBJECTS.concat([['other', 'More', 'अन्य']]).map(function(g){
+          var list = gsIds().filter(function(id){ return (STUDY[id].gsub || 'other') === g[0]; });
+          if(!list.length) return '';
+          return '<div class="hub-sub" id="hubsub-' + g[0] + '"><div class="hub-sub-h"><h3>' + g[1] + '</h3><span>' + g[2] + '</span></div><div class="hub-grid">' + list.map(hubCard).join('') + '</div></div>';
+        }).join('') +
+      '</section>';
   }
   document.getElementById('hubBody').addEventListener('click', function(ev){
     var c = ev.target.closest('[data-open-study]');
     if(c){ openStudy(c.dataset.openStudy, false); return; }
+    var jump = ev.target.closest('[data-hub-jump]');
+    if(jump){ var t = document.getElementById('hubsub-' + jump.dataset.hubJump); if(t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
     var act = ev.target.closest('[data-hub-act]');
     if(act){ if(act.dataset.hubAct === 'mistakes') openMistakes(); else openMock(); return; }
     if(ev.target.closest('[data-hub-close]')) closeHub(false);
@@ -1623,6 +1658,8 @@
   STUDY.reports.lessons = 14; STUDY.reports.unit = 'lessons';
   STUDY.sports.lessons = 15; STUDY.sports.unit = 'lessons';
   STUDY.festivals.lessons = 16; STUDY.festivals.unit = 'lessons';
+  STUDY.iprplans.lessons = 12; STUDY.iprplans.unit = 'lessons';
+  STUDY.folkdances.lessons = 16; STUDY.folkdances.unit = 'lessons';
   function gsIds(){ return Object.keys(STUDY).filter(function(id){ return STUDY[id].subj === 'gs'; }); }
   var STUDY_EXTRA = { mocks: { key: 'shabdMockHistory', title: 'Mixed mock history' } };
   function studyMod(id){ return STUDY[id] || STUDY_EXTRA[id]; }
@@ -1709,7 +1746,7 @@
 
   // ---- the practice / mock screen ----
   var drill = null, drillOpen = false, drillTimer = null;
-  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals' };
+  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances' };
   function openDrill(title){
     closeAllMenus();
     drillOpen = true;
@@ -1838,7 +1875,7 @@
     drillBody('<div class="dq-hero"><div class="eyebrow">English + General Studies · SSC pattern</div><h1>Mixed mock test</h1><p>Questions from your vocab register and every mini app, timed like Tier 1 (36 seconds a question), marked +2 / −0.5. Wrong answers go to your Mistakes book.</p></div>' +
       '<div class="dq-setup">' +
         '<div class="dq-box"><h3>English</h3>' + seg('en', [0, 10, 25]) + '<div class="dq-tags">' + tog('vocab', 'Vocabulary (' + words.length + ' words)') + tog('grammar', 'Grammar 100') + '</div></div>' +
-        '<div class="dq-box"><h3>General Studies</h3>' + seg('gs', [0, 10, 25]) + '<div class="dq-tags">' + gsIds().map(gsTog).join('') + '</div></div>' +
+        '<div class="dq-box"><h3>General Studies</h3>' + seg('gs', [0, 10, 25]) + '<div class="dq-tags">' + GS_SUBJECTS.map(function(g){ var l = gsIds().filter(function(id){ return STUDY[id].gsub === g[0]; }); return l.length ? '<div class="dq-gsub"><span>' + g[1] + '</span>' + l.map(gsTog).join('') + '</div>' : ''; }).join('') + gsIds().filter(function(id){ return !STUDY[id].gsub; }).map(gsTog).join('') + '</div></div>' +
         '<div class="dq-box"><h3>Marking</h3><div class="dq-tags">' + tog('neg', 'Negative marking −0.5') + '</div><p class="help" style="margin:10px 0 0;">' + n + ' questions · ' + mins + ' minutes · maximum ' + (n * 2) + ' marks</p></div>' +
       '</div>' +
       '<div class="dq-actions"><button class="btn teal" id="mkStart"' + (n ? '' : ' disabled') + '>Start test ›</button></div>' +

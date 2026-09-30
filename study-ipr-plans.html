@@ -1,0 +1,1330 @@
+<!doctype html><html><head><meta charset=utf8>
+<script>
+/* शब्दRegister bridge: follows the app's look (Paper / Indigo) and Light / Dark / Auto choice. */
+(function(){
+  var root = document.documentElement;
+  function theme(t){ if(t === 'dark' || t === 'light') root.setAttribute('data-theme', t); else root.removeAttribute('data-theme'); }
+  function skin(s){ if(s === 'paper' || s === 'indigo') root.setAttribute('data-skin', s); }
+  try{
+    var q = new URLSearchParams(location.search);
+    theme(q.get('theme'));
+    skin(q.get('skin') || (q.get('embed') ? 'paper' : ''));
+    if(q.get('embed')) root.classList.add('in-shabd');
+  }catch(e){}
+  window.addEventListener('message', function(e){
+    if(e.origin !== location.origin || !e.data || e.data.type !== 'shabd-theme') return;
+    theme(e.data.theme);
+    if(e.data.skin) skin(e.data.skin);
+  });
+})();
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap">
+<meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>IPR & Five Year Plans</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<style>
+/* Layout: Industrial Policy & Plans — follows the शब्दRegister Paper / Indigo look; one column + bottom tabs on phones, sidebar on PC. */
+:root{
+  --paper:#f6f3ea; --sheet:#fffdf7; --sunk:#ebe6d8;
+  --ink:#1d2a22; --ink2:#56625a; --rule:#dcd5c3;
+  --blue:#1f5c3d; --on-blue:#ffffff; --blue-bg:#dcebdf;
+  --accent:#b4530f; --accent-bg:#fbe7d3;
+  --good:#1b7547; --good-bg:#dff1e6; --bad:#b0271f; --bad-bg:#f8e1de;
+  --warn-bg:#fff2d2;
+  --f-display:"Fraunces", "Tiro Devanagari Hindi", Georgia, serif;
+  --f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-num:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r:10px; --nav-h:64px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#111612; --sheet:#1a211c; --sunk:#222b25;
+  --ink:#e8eee9; --ink2:#a3b0a7; --rule:#2f3a33;
+  --blue:#86cfa2; --on-blue:#111612; --blue-bg:#1d3a29;
+  --accent:#f3a764; --accent-bg:#3b2614;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#111612; --sheet:#1a211c; --sunk:#222b25;
+  --ink:#e8eee9; --ink2:#a3b0a7; --rule:#2f3a33;
+  --blue:#86cfa2; --on-blue:#111612; --blue-bg:#1d3a29;
+  --accent:#f3a764; --accent-bg:#3b2614;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
+.wrap{max-width:640px;margin:0 auto;padding-inline:16px;padding-block:0 calc(var(--nav-h) + 28px + env(safe-area-inset-bottom,0px))}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);border-bottom:1px solid var(--rule)}
+.top-in{max-width:640px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px}
+.brand{font-family:var(--f-display);font-weight:800;font-size:17px;line-height:1.2;flex:1;min-width:0}
+.brand small{display:block;font-family:var(--f-body);font-weight:500;font-size:12px;color:var(--ink2);letter-spacing:.02em}
+.stat{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right;white-space:nowrap}
+.stat b{color:var(--ink);font-weight:600}
+
+/* bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--sheet);border-top:1px solid var(--rule);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);height:var(--nav-h)}
+.nav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer}
+.nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav button[aria-current="page"]{color:var(--blue)}
+.nav button[aria-current="page"] span{border-bottom:2px solid var(--blue)}
+
+/* type */
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.25;margin:0}
+h1{font-size:24px;font-weight:800}
+h2{font-size:19px;font-weight:800}
+h3{font-size:16px;font-weight:700}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--ink2)}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+p{margin:0}
+.stack{display:flex;flex-direction:column;gap:14px}
+.view{padding-top:18px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--rule);background:var(--sheet);font-weight:600;cursor:pointer;text-decoration:none}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:var(--on-blue)}
+.btn.ghost{background:transparent}
+.btn.sm{min-height:36px;padding:0 14px;font-size:14px}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.end{justify-content:flex-end}
+.row.between{justify-content:space-between}
+
+/* hero */
+.hero{display:grid;gap:10px;padding:4px 0 6px}
+.hero p{color:var(--ink2)}
+.meter{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--blue);border-radius:99px}
+
+/* lesson list */
+.lessons{display:flex;flex-direction:column;border-top:1px solid var(--rule)}
+.les{display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;padding:14px 2px;border-bottom:1px solid var(--rule);background:none;border-left:0;border-right:0;border-top:0;text-align:left;cursor:pointer;width:100%}
+.les .no{font-family:var(--f-num);font-weight:600;font-size:15px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--rule);color:var(--ink2)}
+.les.done .no{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.les .t{min-width:0}
+.les .t b{display:block;font-weight:700;font-size:16px;line-height:1.3}
+.les .t span{font-size:13px;color:var(--ink2)}
+.les .sc{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right}
+.les.next .no{border-color:var(--blue);color:var(--blue)}
+
+/* lesson reader */
+.lhead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.back{background:none;border:0;padding:8px 8px 8px 0;cursor:pointer;color:var(--blue);font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0 4px}
+.steps button{border:1px solid var(--rule);background:var(--sheet);border-radius:8px;padding:8px 4px;font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer}
+.steps button[aria-current="step"]{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.block{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;min-width:0}
+.block h3{margin-bottom:8px}
+.block p + p{margin-top:8px}
+.plain{padding:0 2px}
+.facts{display:grid;gap:0}
+.facts div{display:grid;grid-template-columns:minmax(0,42%) minmax(0,1fr);gap:10px;padding:7px 0;border-top:1px dashed var(--rule)}
+.facts div:first-child{border-top:0}
+.facts dt{font-size:14px;color:var(--ink2);margin:0}
+.facts dd{margin:0;font-weight:600;min-width:0}
+.tl{display:grid;gap:0;margin:0;padding:0;list-style:none}
+.tl li{display:grid;grid-template-columns:92px 1fr;gap:10px;padding:8px 0;border-top:1px dashed var(--rule)}
+.tl li:first-child{border-top:0}
+.tl .y{font-family:var(--f-num);font-weight:600;font-size:13px;color:var(--accent);padding-top:2px}
+.trick,.trap{border-radius:var(--r);padding:12px 14px 12px 14px;border:1px solid var(--rule)}
+.trick{background:var(--accent-bg);border-color:transparent}
+.trap{background:var(--bad-bg);border-color:transparent}
+.trick .lab,.trap .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.trick .lab{color:var(--accent)}
+.trap .lab{color:var(--bad)}
+.tbl{overflow-x:auto;margin:0 -2px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);font-weight:700}
+td.n{font-family:var(--f-num);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fig{margin:0}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-size:13px;color:var(--ink2);margin-top:6px}
+.pyr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pyr div{text-align:center;font-size:13px}
+.pyr b{display:block;font-size:14px}
+.pm{fill:var(--blue)} .pf{fill:var(--accent)}
+.sum{margin:0;padding-left:20px;display:grid;gap:6px}
+
+/* questions */
+.qcard{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px;min-width:0}
+.qmeta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}
+.qno{font-family:var(--f-num);font-weight:600;color:var(--ink2)}
+.tag{background:var(--sunk);color:var(--ink2);border-radius:99px;padding:1px 9px;font-weight:600}
+.tag.pyq{background:var(--accent-bg);color:var(--accent)}
+.bm{margin-left:auto;background:none;border:0;cursor:pointer;color:var(--ink2);font-size:20px;line-height:1;padding:4px}
+.bm[aria-pressed="true"]{color:var(--accent)}
+.qt{font-weight:600;font-size:16px}
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:start;text-align:left;width:100%;border:1.5px solid var(--rule);background:var(--paper);border-radius:9px;padding:10px 12px;cursor:pointer;min-height:44px}
+.opt .k{font-family:var(--f-num);font-weight:600;color:var(--ink2);font-size:14px;padding-top:1px}
+.opt.sel{border-color:var(--blue);background:var(--blue-bg)}
+.opt.ok{border-color:var(--good);background:var(--good-bg)}
+.opt.no{border-color:var(--bad);background:var(--bad-bg)}
+.opt.ok .k{color:var(--good)} .opt.no .k{color:var(--bad)}
+.opt:disabled{cursor:default;color:inherit}
+.exp{font-size:15px;border-left:3px solid var(--blue);padding:4px 0 4px 12px;color:var(--ink)}
+.exp b.okl{color:var(--good)} .exp b.nol{color:var(--bad)}
+
+/* chips */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 13px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.seg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--rule)}
+.seg::-webkit-scrollbar{display:none}
+.seg button{flex:none;background:none;border:0;border-bottom:2px solid transparent;padding:10px 8px;font-weight:600;color:var(--ink2);cursor:pointer}
+.seg button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+
+/* score panel */
+.scorebig{display:flex;align-items:baseline;gap:8px}
+.scorebig .num{font-size:44px;font-weight:600;line-height:1;color:var(--blue)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.kpi{background:var(--sunk);border-radius:8px;padding:8px;text-align:center}
+.kpi .num{display:block;font-size:20px;font-weight:600}
+.kpi span{font-size:12px;color:var(--ink2)}
+.kpi.g .num{color:var(--good)} .kpi.b .num{color:var(--bad)}
+
+/* mock */
+.mbar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 57px);z-index:10;background:var(--paper);padding:10px 0;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--rule)}
+.timer{font-family:var(--f-num);font-weight:600;font-size:18px;padding:4px 10px;border-radius:8px;background:var(--sunk)}
+.timer.low{background:var(--bad-bg);color:var(--bad)}
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px}
+.pal button{height:40px;border-radius:8px;border:1px solid var(--rule);background:var(--sheet);font-family:var(--f-num);font-weight:600;font-size:13px;cursor:pointer}
+.pal button.a{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.pal button.m{box-shadow:inset 0 -4px 0 var(--accent)}
+.pal button.cur{outline:2px solid var(--ink);outline-offset:1px}
+.pal button.ok{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.pal button.no{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.confirm{background:var(--warn-bg);border-radius:var(--r);padding:12px 14px;display:grid;gap:10px}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}
+legend{font-weight:700;margin-bottom:6px;padding:0}
+.radios{display:flex;gap:8px;flex-wrap:wrap}
+.radios label{border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 14px;font-weight:600;cursor:pointer;font-size:14px}
+.radios input{position:absolute;opacity:0;pointer-events:none}
+.radios input:checked + span{color:var(--blue)}
+.radios label:has(input:checked){border-color:var(--blue);background:var(--blue-bg)}
+.radios label:has(input:focus-visible){outline:2px solid var(--blue);outline-offset:2px}
+select{font:inherit;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:8px;padding:8px 10px;max-width:100%}
+.hist{display:grid;gap:0}
+.hist div{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:14px}
+
+/* revise */
+.search{width:100%;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:10px;padding:10px 12px;font:inherit}
+.rk{display:grid;gap:0}
+.rk div{display:grid;grid-template-columns:minmax(0,48%) 1fr;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:15px}
+.rk div:first-child{border-top:0}
+.rk dt{font-size:13px;color:var(--ink2);margin:0}
+.rk dt.up{color:var(--good)} .rk dt.dn{color:var(--bad)}
+.rk dd{margin:0;font-weight:600;min-width:0}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px}
+.tile .num{display:block;font-size:24px;font-weight:600;color:var(--accent);line-height:1.2}
+.tile span{font-size:13px;color:var(--ink2)}
+.gbar{display:grid;grid-template-columns:78px 1fr 52px;gap:8px;align-items:center;font-size:13px;padding:3px 0}
+.gbar .tr{height:12px;background:var(--sunk);border-radius:3px;position:relative;overflow:hidden}
+.gbar .tr i{position:absolute;left:0;top:0;bottom:0;background:var(--blue);border-radius:3px}
+.gbar .tr i.neg{background:var(--bad)}
+.gbar .v{font-family:var(--f-num);text-align:right}
+.flash{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;min-height:240px;padding:20px 18px;display:grid;align-content:center;gap:12px;cursor:pointer;text-align:left;width:100%}
+.flash .side{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.flash .front{font-size:18px;font-weight:600}
+.flash .ans{font-size:20px;font-weight:700;color:var(--good)}
+.empty{padding:24px 4px;color:var(--ink2);text-align:center}
+.foot{font-size:13px;color:var(--ink2);padding-top:10px}
+@media (prefers-reduced-motion: no-preference){ .opt,.chip,.btn{transition:background-color .15s, border-color .15s} }
+.link{background:var(--blue-bg);border-radius:var(--r);padding:12px 14px}
+.link .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;color:var(--blue)}
+.icheck{background:var(--sheet);border:1.5px dashed var(--blue);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px}
+.icheck .lab{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue)}
+.cat{font-size:12px;font-weight:700;border-radius:99px;padding:1px 8px;white-space:nowrap}
+.cat.CS{background:var(--blue-bg);color:var(--blue)} .cat.CSS{background:var(--accent-bg);color:var(--accent)} .cat.ST{background:var(--sunk);color:var(--ink)} .cat.OT{background:var(--sunk);color:var(--ink2)}
+
+/* ---- workbook additions ---- */
+table.cover td:nth-child(4){min-width:180px}
+.plist .dl{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.plist .dl em{font-style:normal;font-weight:700;color:var(--blue);text-align:right}
+.ladder{list-style:none;margin:0;padding:0;display:grid;gap:0;border-top:1px solid var(--rule)}
+.ladder li{display:grid;grid-template-columns:62px 1fr auto;gap:12px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--rule)}
+.ladder .rk-n{font-size:22px;font-weight:600;color:var(--blue);text-align:right}
+.ladder .rk-t{min-width:0}
+.ladder .rk-t b{display:block;line-height:1.3}
+.ladder .rk-t span{font-size:13px;color:var(--ink2)}
+.ladder .rk-d{font-weight:700;font-size:14px;white-space:nowrap}
+.ladder li.up .rk-d{color:var(--good)} .ladder li.dn .rk-d{color:var(--bad)}
+.ladder small{font-weight:600;color:var(--ink2)}
+table.cover td{min-width:90px}
+.peek{border:1.5px dashed var(--blue);background:var(--blue-bg);color:var(--blue);border-radius:8px;padding:6px 10px;font-weight:600;cursor:pointer;min-height:36px;width:100%}
+.pubs{display:grid;gap:12px}
+.plist{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.plist li{padding:7px 0;border-top:1px dashed var(--rule);display:grid;gap:1px}
+.plist li:first-child{border-top:0}
+.plist li span{font-size:13px;color:var(--ink2)}
+.seg{scroll-snap-type:x proximity}
+@media (max-width: 700px){
+  table.cover thead{display:none}
+  table.cover tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 10px;padding:10px 0;border-bottom:1px solid var(--rule)}
+  table.cover td{border:0;padding:0;min-width:0;font-size:14px}
+  table.cover td:first-child{grid-column:1/-1;font-size:15px}
+  table.cover td:nth-child(4){grid-column:1/-1;min-width:0}
+  table.cover td[data-l]::before{content:attr(data-l);display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-bottom:2px}
+}
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">IPR &amp; Five Year Plans<small>औद्योगिक नीति · पंचवर्षीय योजनाएँ · SSC CGL workbook</small></div>
+    <div class="stat" id="topstat"></div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<nav class="nav" aria-label="Sections">
+  <div class="nav-in">
+    <button type="button" id="nav-learn" data-tab="learn"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg><span>Learn</span></button>
+    <button type="button" id="nav-practice" data-tab="practice"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span>Practice</span></button>
+    <button type="button" id="nav-mock" data-tab="mock"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6M12 2v3"/></svg><span>Mock test</span></button>
+    <button type="button" id="nav-revise" data-tab="revise"><svg viewBox="0 0 24 24"><path d="M12 3 2 8l10 5 10-5z"/><path d="m2 13 10 5 10-5"/></svg><span>Revise</span></button>
+  </div>
+</nav>
+
+<script>
+"use strict";
+const LESSONS = [
+{ id:"L1", title:"How these questions are asked · economic systems", hi:"प्रश्न कैसे आते हैं · अर्थव्यवस्था के प्रकार", blocks:[
+ {k:"p", h:"Industrial Policy Resolutions (IPR) and Five Year Plans are among the least-taught but most-asked economy topics. The 2025 papers (CGL, CHSL, Steno, Selection Post, NTPC) asked them in five shapes: <b>(1) which year / which policy</b>, <b>(2) key feature</b>, <b>(3) 'not associated with'</b> (exclusion), <b>(4) assertion–reason</b>, and <b>(5) matching</b> (4 items vs 5 options). The lecture's rule: <b>learn it as one story</b> — government-controlled (1948) → tighter (1956) → small units (1977) → efficiency (1980) → open up (1991)."},
+ {k:"table", title:"Three economic systems", head:["System","Who decides what to produce","Example"], rows:[["<b>Socialist</b> (समाजवादी)","Government decides everything; aim is equal distribution","India before 1991 (mostly PSUs), USSR"],["<b>Capitalist</b> (पूंजीवादी)","Market/profit decides; state stays out of business","USA, France"],["<b>Mixed</b> (मिश्रित)","Both sectors; government mostly <b>regulates</b> the market (IRDAI for insurance, SEBI for shares)","India — declared by IPR 1948"]]},
+ {k:"trick", h:"<b>Mixed economy test:</b> private companies run the business, the government writes the rules. Insurance: LIC + ICICI + Bajaj, all regulated by <b>IRDAI</b>. Shares: PSU and private companies, all regulated by <b>SEBI</b>. Public-sector decisions are taken by government; private-sector decisions by individuals — both statements true."},
+ {k:"facts", title:"Invisible hand", rows:[["Given by","<b>Adam Smith</b> — 'Father of Economics'"],["Book","<i>An Inquiry into the Nature and Causes of the Wealth of Nations</i> (1776)"],["Idea","Each person working for own profit unknowingly benefits society — the baker buys flour → mill workers and farmers earn too"]]},
+ {k:"facts", title:"PSU vocabulary", rows:[["PSU / PSE","Any government company: government owns <b>51% or more</b> of shares"],["CPSE","Central Public Sector Enterprise — central government stake ≥ 51%"],["SPSE","State Public Sector Enterprise — state government stake ≥ 51%"],["Navratna / Miniratna","Scheme of 1997"],["Maharatna","Scheme of 2009 (the biggest CPSEs)"]]},
+ {k:"trick", h:"<b>Three solving rules from the lecture.</b> (1) <b>Never use 'mutual friend' logic</b> — A links to B, B to C, so A to C? Economics options are built to trap that. Pick only a direct link you have read. (2) <b>Extreme words</b> — <i>all, entirely, only, complete</i> — are usually false (\"reserved list was eliminated <b>entirely</b>\" ✗). (3) If the question asks a <b>negative consequence</b>, drop every positive-sounding option first."},
+ {k:"q", q:"Which body regulates the insurance market in India's mixed economy?", o:["IRDAI","SEBI","RBI","NABARD"], e:"Insurance Regulatory and Development Authority of India."},
+ {k:"q", q:"The concept of the 'invisible hand' is associated with…", o:["Adam Smith","Karl Marx","J.M. Keynes","Alfred Marshall"], e:"Adam Smith, The Wealth of Nations (1776)."},
+ {k:"link", h:"<b>Why study IPRs with Five Year Plans?</b> They move together: IPR 1956 ↔ 2nd Plan (Mahalanobis, heavy industry); 1977 statement ↔ Janata rolling plan; 1991 NIP ↔ 8th Plan (first after LPG)."}
+], sum:["Socialist = government decides; capitalist = market decides; mixed = both, government regulates.","India became a mixed economy through IPR 1948.","Invisible hand = Adam Smith, Wealth of Nations 1776.","PSU = government stake ≥ 51% (CPSE central, SPSE state).","No 'mutual friend' logic; extreme words usually false."]},
+
+{ id:"L2", title:"Roots of planning · Planning Commission → NITI Aayog", hi:"योजना की शुरुआत · योजना आयोग से नीति आयोग", blocks:[
+ {k:"tl", title:"Plans before the Five Year Plans", rows:[["1934","<b>M. Visvesvaraya</b> — <i>Planned Economy for India</i> (first blueprint)"],["1938","<b>National Planning Committee</b> — set up by Congress president <b>Subhas Chandra Bose</b>; chaired by <b>Jawaharlal Nehru</b>"],["1944","<b>Bombay Plan</b> — 8 industrialists (J.R.D. Tata, G.D. Birla and others)"],["1944","<b>Gandhian Plan</b> — Shriman Narayan Agarwal"],["1945","<b>People's Plan</b> — M.N. Roy"],["1950","<b>Sarvodaya Plan</b> — Jayaprakash Narayan (founder of Congress Socialist Party)"]]},
+ {k:"trick", h:"<b>Order trick — “Bose Bombay गया, Gandhi-People के साथ सर्वोदय लाया”</b>: NPC 1938 → Bombay 1944 → Gandhian 1944 → People's 1945 → Sarvodaya 1950. JP = Sarvodaya (JP later led 'Sampoorna Kranti' too)."},
+ {k:"facts", title:"Planning Commission (योजना आयोग)", rows:[["Set up","<b>15 March 1950</b>, by a cabinet (executive) resolution"],["Nature","<b>Non-constitutional and non-statutory</b> — not in the Constitution, not made by an Act"],["Chairman","Prime Minister (first: Nehru)"],["First Deputy Chairman","<b>Gulzarilal Nanda</b>"],["Last Deputy Chairman","Montek Singh Ahluwalia"],["Idea borrowed from","<b>USSR</b> (Soviet five-year plans)"],["Ran","1950 – 2014 (about 65 years)"]]},
+ {k:"facts", title:"National Development Council (NDC)", rows:[["Set up","<b>6 August 1952</b>"],["Chairman","Prime Minister"],["Role","Final approval of Five Year Plans (Planning Commission drafts, NDC approves)"],["Now","Effectively replaced by NITI Aayog's Governing Council"]]},
+ {k:"facts", title:"NITI Aayog (नीति आयोग)", rows:[["Full form","<b>National Institution for Transforming India</b>"],["Set up","<b>1 January 2015</b>, replacing the Planning Commission"],["Chairperson","Prime Minister"],["First Vice-Chairperson","<b>Arvind Panagariya</b>"],["Vice-Chairperson now","<b>Ashok Kumar Lahiri</b> (notified 24 April 2026; succeeded Suman Bery)"],["First CEO","Sindhushree Khullar"],["CEO now","<b>Anurag Jain</b> (appointed 18 August 2026; succeeded B.V.R. Subrahmanyam)"],["Role","Government's <b>think tank</b>; promotes <b>cooperative federalism</b>"]]},
+ {k:"trap", h:"<b>The lectures are out of date on NITI officials.</b> They say Suman Bery (VC) and B.V.R. Subrahmanyam (CEO). Since 2026 it is <b>Ashok Kumar Lahiri</b> (VC, April 2026) and <b>Anurag Jain</b> (CEO, August 2026). A 2026–27 paper will use the new names."},
+ {k:"trap", h:"<b>Cooperative federalism, not 'cooperative socialism'.</b> A 2025 statement said NITI 'brings cooperative socialism among states' — false. Also: NITI's full form is 'National <b>Institution</b> for Transforming India' — the lecture's 'Institute' is a common slip; options may test exactly this."},
+ {k:"q", q:"The Planning Commission of India was set up on…", o:["15 March 1950","26 January 1950","1 January 2015","6 August 1952"], e:"By executive resolution; NDC came on 6 August 1952."},
+ {k:"q", q:"Who was the first Vice-Chairperson of NITI Aayog?", o:["Arvind Panagariya","Rajiv Kumar","Suman Bery","Montek Singh Ahluwalia"], e:"Panagariya (2015–17), then Rajiv Kumar, Suman Bery, and Ashok Lahiri (2026)."},
+ {k:"link", h:"<b>USSR → India → China.</b> India borrowed five-year planning from the USSR; China still plans in five-year blocks (its 15th plan covers 2026–30). India stopped after the 12th Plan (2012–17); NITI moved to a 15-year vision, 7-year strategy and 3-year action agenda."}
+], sum:["NPC 1938 (Bose set up, Nehru chair) → Bombay 1944 → Gandhian 1944 → People's 1945 (M.N. Roy) → Sarvodaya 1950 (JP).","Planning Commission 15 Mar 1950, non-constitutional, non-statutory; first Deputy Chairman G.L. Nanda.","NDC 6 Aug 1952 approves plans.","NITI Aayog 1 Jan 2015; first VC Panagariya; now VC Ashok Lahiri, CEO Anurag Jain; cooperative federalism."]},
+
+{ id:"L3", title:"IPR 1948 — the first industrial policy", hi:"औद्योगिक नीति प्रस्ताव 1948", blocks:[
+ {k:"facts", title:"Key facts", rows:[["Date","<b>6 April 1948</b> — first industrial policy of independent India"],["Presented by","<b>Dr. Syama Prasad Mookerjee</b>, first Industry (& Supply) Minister"],["Where","Constituent Assembly (Legislative) — no Lok Sabha yet"],["Main aim","<b>Promote the public sector</b>; declared India a <b>mixed economy</b>"],["Categories","<b>Four</b>"]]},
+ {k:"trick", h:"<b>Mookerjee → मुखड़ा</b>: he gave India's industry its first face (मुखड़ा). Patel = first Home Minister; Mahalanobis was never a minister — he was a planner."},
+ {k:"table", title:"The four categories — remember S·B·I·O", head:["","Category","Count","What it meant"], rows:[["<b>S</b>","Strategic — exclusive <b>Central</b> monopoly","<b>3</b>","Arms & ammunition, atomic energy, railway transport"],["<b>B</b>","Basic — new units only by the State","<b>6</b>","Coal, iron & steel, aircraft, shipbuilding, telephone/telegraph/wireless equipment, mineral oils. Existing private units could continue (reviewed after 10 years) but could not expand freely"],["<b>I</b>","Important — regulated by government","<b>18</b>","Private allowed but centrally regulated: sugar, cement, heavy chemicals, cotton & woollen textiles, etc."],["<b>O</b>","Others","rest","Open to private enterprise, individuals, cooperatives"]]},
+ {k:"trick", h:"<b>“SBI-O” and 3 × 6 = 18.</b> Strategic 3, Basic 6, Important 18 (3 × 6), then Others. Read it like the bank: <b>SBI</b> + O."},
+ {k:"trap", h:"<b>The lecture first said 'six' strategic, then corrected itself to three.</b> Strategic = 3 (arms & ammunition, atomic energy, railways). The six are the <b>basic</b> industries."},
+ {k:"trap", h:"<b>Nehru was Prime Minister from 15 August 1947</b>, not from 1952. What began in 1952 was the <b>first elected Lok Sabha</b>. Until then the Constituent Assembly also worked as the provisional Parliament — which is why the 1948 resolution was placed there."},
+ {k:"q", q:"Who presented the Industrial Policy Resolution of 1948 in the Constituent Assembly?", o:["Syama Prasad Mookerjee","Jawaharlal Nehru","Sardar Vallabhbhai Patel","P.C. Mahalanobis"], e:"He was India's first Industry and Supply Minister."},
+ {k:"q", q:"Into how many categories did IPR 1948 divide industries?", o:["Four","Three","Two","Five"], e:"Strategic, Basic, Important, Others (IPR 1956 used three schedules)."},
+ {k:"link", h:"<b>Why so anti-private?</b> Memories of the East India Company (a trader that became ruler), socialist ideals (DPSP Art. 39(b)–(c): prevent concentration of wealth) and the wish to protect small artisans. The lecture's image: the government behaved like an <b>over-caring parent</b> until 1990."}
+], sum:["IPR 1948: 6 April 1948, S.P. Mookerjee, Constituent Assembly.","Four categories SBI-O: Strategic 3 (central monopoly), Basic 6 (new units by State), Important 18 (regulated), Others.","Made India a mixed economy; main aim = promote public sector."]},
+
+{ id:"L4", title:"IPR 1956 — the Economic Constitution", hi:"औद्योगिक नीति प्रस्ताव 1956 · आर्थिक संविधान", blocks:[
+ {k:"facts", title:"Key facts", rows:[["Date","<b>30 April 1956</b>"],["Nickname","<b>Economic Constitution of India</b>"],["Linked plan","<b>2nd Five Year Plan</b> (1956–61, Mahalanobis model)"],["Central theme","<b>State control of the 'commanding heights'</b> — public sector to lead heavy and basic industry"],["Classification","<b>Three schedules</b> — A, B, C"],["Also said","Support small & cottage industries; reduce regional disparities; fair treatment of labour"]]},
+ {k:"table", title:"Schedules A · B · C", head:["Schedule","Count","Rule"], rows:[["<b>A</b>","<b>17</b>","Exclusive responsibility of the State (the old 3 strategic grew to 17)"],["<b>B</b>","<b>12</b>","Progressively State-owned; private sector may supplement (the old 6 basic doubled to 12)"],["<b>C</b>","rest","Left to private initiative, under licensing (old 18 + Others merged)"]]},
+ {k:"trick", h:"<b>“17-12-बाकी”</b> and the growth story: 3 → <b>17</b>, 6 → <b>12</b> (doubled), 18 + others → <b>C</b>. Two schedules for government, one for private — the state holds the steering wheel."},
+ {k:"trick", h:"<b>Decode the economics English.</b> 'State control of the commanding heights of the economy' simply means the government took the top seat in every key decision. That is the 1956 answer. 'Import-led growth', 'consumer goods', 'full privatisation' — all traps."},
+ {k:"trap", h:"<b>1956 was the basis of the 2nd Plan, not the 3rd.</b> In the 'NOT associated' PYQ, 'formed the basis of the Third Five Year Plan' was the odd one out. (Note: the 1956 text did mention reducing regional disparities and helping small industry — but in 'key feature' questions the three-schedule classification is the best answer.)"},
+ {k:"facts", title:"Licence Raj (लाइसेंस राज)", rows:[["Meaning","Private firms needed government licences to start, expand, change product or import machines"],["Law","Industries (Development & Regulation) Act, <b>1951</b>"],["Became densest","After IPR <b>1956</b>"],["Effects","Entry barriers, hindered expansion, inefficiency, red-tapism, corruption"],["Ended","Largely by NIP <b>1991</b>"]]},
+ {k:"facts", title:"Freight Equalisation Policy", rows:[["Introduced","<b>1952</b>"],["Abolished","<b>1993</b>"],["Idea","Minerals (coal, iron) cost the same to transport anywhere in India — to balance industrial growth"],["Result","Mineral-rich east (Bihar, Jharkhand, Odisha, Bengal) lost its natural advantage; industry clustered in the west (Gujarat, Maharashtra)"]]},
+ {k:"q", q:"Which statement best describes the central theme of IPR 1956?", o:["State control of the commanding heights of the economy","Import-led growth strategy","Full privatisation of industry","Promotion of consumer goods industries"], e:"Schedules A and B gave the State the lead in basic and heavy industry."},
+ {k:"q", q:"How many industries were in Schedule A of IPR 1956?", o:["17","12","18","3"], e:"17 in A, 12 in B, the rest in C. Asked in NTPC 2026 too."},
+ {k:"link", h:"<b>Why heavy industry?</b> Poverty goes when jobs come; jobs come from industry. The lecture's logic: the government wanted big industry but did not trust Tata/Birla to lead it — so the State took Schedule A and B itself."}
+], sum:["IPR 1956: 30 April 1956, 'Economic Constitution', basis of 2nd Plan.","Three schedules: A 17 (State only), B 12 (State leads, private supplements), C rest.","Commanding heights = State control; Licence Raj densest after 1956.","Freight Equalisation 1952–1993 hurt the mineral-rich east."]},
+
+{ id:"L5", title:"1969–1980: MRTP, FERA, 1977 & 1980 statements", hi:"1969–1980: MRTP, FERA, 1977 और 1980", blocks:[
+ {k:"tl", title:"The control years", rows:[["1969","<b>MRTP Act</b> — Monopolies & Restrictive Trade Practices (in force 1 June 1970); 14 banks nationalised (19 July)"],["1973","<b>FERA</b> — Foreign Exchange Regulation Act (replaced the 1947 Act); Industrial Policy Statement 1973 (joint sector)"],["1977","<b>Industrial Policy Statement</b> — George Fernandes, Janata govt (23 Dec)"],["1978","<b>District Industries Centres</b> begin (1 May 1978)"],["1980","<b>Industrial Policy Statement</b> (23 July); 6 more banks nationalised (15 April)"]]},
+ {k:"facts", title:"MRTP Act 1969", rows:[["Aim","Stop <b>concentration of economic power</b> and monopolies"],["How","Big firms (assets above a limit: ₹20 crore in 1969, ₹100 crore from 1985) needed approval to set up or expand"],["1991","Asset threshold <b>removed</b>"],["Replaced by","<b>Competition Act 2002</b> (CCI set up 2003); MRTP repealed <b>2009</b>"]]},
+ {k:"trap", h:"<b>MRTP threshold was ₹20 crore (later ₹100 crore), not ₹500 crore</b> as one lecture said. And MRTP did not need '75 licences' — that was classroom exaggeration for the paperwork maze."},
+ {k:"facts", title:"FERA → FEMA", rows:[["FERA","<b>1973</b> (in force 1974); tightly controlled foreign exchange; violation = <b>criminal</b> offence"],["FEMA","Foreign Exchange <b>Management</b> Act <b>1999</b> (in force 1 June 2000); violation = <b>civil</b> offence"],["Trick","R = Regulation = Rigid; M = Management = Mild"]]},
+ {k:"trap", h:"<b>FERA is 1973, not 1971.</b> One lecture said 'FERA 1971 became FEMA 1999' — the year is 1973. Also, MRTP (1969) and FERA (1973) were separate Acts; the 1980 statement did not create them."},
+ {k:"facts", title:"Industrial Policy Statement 1977", rows:[["By","<b>George Fernandes</b>, Industry Minister, Janata government"],["Core idea","<b>Decentralisation</b> — take industry to villages and small towns; rural and urban growth together"],["Small units","Priority to small-scale, cottage and <b>tiny units</b> (tiny sector defined); SSI reserved list raised from ~180 to 500+ items"],["New body","<b>District Industries Centre (DIC)</b> — single window per district for loans, raw material, training, marketing"],["Big houses","Restrictions on large business houses tightened"]]},
+ {k:"trap", h:"<b>Decentralisation is not disinvestment.</b> One lecture called 1977's decentralisation 'disinvestment' (selling government shares). Disinvestment began in <b>1991–92</b>. In 1977, decentralisation meant spreading small industries to districts."},
+ {k:"trick", h:"<b>“77 = गांव की ओर”</b>: 1977 took industry to the village — tiny units + DIC. <b>“80 = अच्छा करो”</b>: 1980 tried to make the public sector efficient."},
+ {k:"facts", title:"Industrial Policy Statement 1980", rows:[["Mood","First softening: competition, modernisation, <b>selective liberalisation</b>; automatic capacity expansion allowed"],["Objectives","Optimum use of installed capacity · higher productivity · employment · correct regional imbalance ('nucleus plants') · agro-based industry · promote <b>export-oriented and import-substitution</b> industries · <b>consumer protection</b> against high prices and bad quality · economic federalism"],["Public sector","Revive its <b>efficiency</b>"],["NOT an objective","<b>Permitting maximum FDI</b> — that is 1991"]]},
+ {k:"trap", h:"<b>The 1980 PYQ confused even the teacher.</b> Official objectives include promoting export-oriented industries and consumer protection — so those are NOT the odd ones out. The option that does not fit 1980 is <b>'permitting maximum foreign direct investment'</b>."},
+ {k:"q", q:"District Industries Centres (DICs) were created under which industrial policy?", o:["Industrial Policy Statement 1977","IPR 1956","Industrial Policy Statement 1980","New Industrial Policy 1991"], e:"Announced in 1977, set up from 1 May 1978, as single-window support in each district."},
+ {k:"q", q:"The MRTP Act was replaced by…", o:["Competition Act 2002","FEMA 1999","Companies Act 2013","Consumer Protection Act 1986"], e:"The Competition Commission of India took over; MRTP was repealed in 2009."},
+ {k:"link", h:"<b>US/China vs India on monopoly.</b> The goal — stop wealth piling up with a few — was the same everywhere. The US and China answered with <b>more competitors</b>; India answered by <b>capping the big firms</b>. The lecture's point: capping killed growth; competition would have grown it."}
+], sum:["MRTP 1969 (threshold ₹20 cr → ₹100 cr 1985 → removed 1991) → Competition Act 2002 → repealed 2009.","FERA 1973 (criminal) → FEMA 1999 (civil).","1977: George Fernandes, decentralisation, tiny units, DIC (1978).","1980: efficiency of PSUs, selective liberalisation; max FDI is NOT a 1980 objective."]},
+
+{ id:"L6", title:"New Industrial Policy 1991 & LPG", hi:"नई औद्योगिक नीति 1991 · उदारीकरण-निजीकरण-वैश्वीकरण", blocks:[
+ {k:"facts", title:"Key facts", rows:[["Date","<b>24 July 1991</b> (same day as the Union Budget)"],["Trigger","<b>Balance of payments crisis</b> 1990–91 (reserves for ~2 weeks of imports; gold pledged)"],["Prime Minister","<b>P.V. Narasimha Rao</b> (also held Industry)"],["Finance Minister","<b>Manmohan Singh</b>"],["Pillars","<b>L</b>iberalisation · <b>P</b>rivatisation · <b>G</b>lobalisation"],["Status","Still India's last full industrial policy"]]},
+ {k:"table", title:"What 1991 changed", head:["Area","Change"], rows:[["De-licensing","Compulsory licensing abolished except a short list (18 then; now <b>4</b>: cigars & cigarettes, electronic aerospace & defence equipment, industrial explosives, hazardous chemicals)"],["De-reservation","Public-sector-only list cut from 17 to <b>8</b>"],["FDI","Automatic approval up to <b>51%</b> in <b>34</b> high-priority industries — first time foreigners could hold majority"],["Technology","Automatic approval for foreign technology agreements"],["MRTP","Asset threshold removed; no prior approval for big firms"],["Disinvestment","Sale of part of government's stake in PSUs (from 1991–92)"],["Trade","Tariffs cut, quantitative restrictions and import licensing phased out"]]},
+ {k:"tl", title:"Public-sector reserved list", rows:[["1956","17 (Schedule A)"],["1991","8"],["2001","3 — defence, atomic energy, railway transport"],["Today","2 — <b>atomic energy</b> and <b>railway operations</b>"],["Dec 2025","<b>SHANTI Act</b> lets private firms build and run nuclear power plants; sensitive fuel-cycle work stays with government"]]},
+ {k:"trap", h:"<b>Numbers the lectures got wrong.</b> 1991 reserved <b>8</b> industries (one lecture said 5 'core areas'). FDI up to 51% was in <b>34</b> high-priority industries (one lecture said 47). Also, <b>1991 is the latest industrial policy</b> — the '2002, 2011, 2022 policies' in one lecture were other documents (2011 was the National Manufacturing Policy)."},
+ {k:"trick", h:"<b>“1991 = undo button.”</b> Whatever 1950–1990 did, 1991 reversed: licence → de-licence; reserved → de-reserved; FERA → (FEMA 1999); MRTP → (Competition Act 2002); closed → FDI. <b>L</b> because licences broke firms, <b>P</b> because PSUs were inefficient, <b>G</b> because we needed money and competition."},
+ {k:"trap", h:"<b>Nationalisation is NOT a pillar of 1991.</b> Nationalisation (making companies government-owned) was 1969 and 1980 for banks. Options mixing 'nationalisation' into LPG are wrong."},
+ {k:"q", q:"The New Industrial Policy was announced on…", o:["24 July 1991","15 August 1991","1 April 1992","30 April 1956"], e:"Announced by the Narasimha Rao government during the BoP crisis."},
+ {k:"q", q:"Which is NOT one of the core pillars of the 1991 reforms?", o:["Nationalisation","Liberalisation","Privatisation","Globalisation"], e:"LPG. Nationalisation is the opposite idea (1969, 1980 bank nationalisations)."},
+ {k:"q", q:"Today, which sectors remain reserved for the public sector?", o:["Atomic energy and railway operations","Defence and coal","Mineral oils and mining","Railways and aviation"], e:"Only two remain; defence was opened in 2001."},
+ {k:"link", h:"<b>1991 → 8th Plan.</b> The 8th Plan (1992–97) was the first plan after LPG and moved India to <b>indicative planning</b> — the government points the direction, the market does the running."}
+], sum:["NIP 24 July 1991: BoP crisis; PM Narasimha Rao, FM Manmohan Singh; LPG.","Licensing now only 4 industries; reserved list 17 → 8 → 3 → 2 (atomic energy, railways).","51% FDI automatic in 34 industries; MRTP threshold removed; disinvestment begins.","Nationalisation ≠ LPG."]},
+
+{ id:"L7", title:"Before vs after 1991 — PYQ patterns", hi:"1991 से पहले बनाम बाद · PYQ पैटर्न", blocks:[
+ {k:"table", title:"Two phases in one table", head:["","1947–1990","After 1991"], rows:[["Role of state","Over-caring parent; public sector dominant","Regulator and facilitator"],["Trade strategy","<b>Inward-looking</b>, import substitution, high tariffs","Outward-looking; tariffs cut, QRs removed"],["Private sector","Licence Raj, MRTP, FERA","De-licensed, competition law, FEMA"],["Foreign capital","Very limited","FDI welcomed (51% → up to 100% in many sectors)"],["Result","Protected market → inefficiency, low innovation","Competition → efficiency"]]},
+ {k:"trick", h:"<b>Match the period, then the tone.</b> Any 1947–90 question: answer contains <i>inward-looking, import substitution, protection of domestic industry, entry barriers, inefficiency</i>. Any post-1991 question: <i>reduced tariffs, removed licensing, removed quantitative restrictions, prudential norms</i>."},
+ {k:"facts", title:"Why public sector got the lead (1947–90)", rows:[["Correct reason","A tool to achieve <b>social goals</b>, <b>balanced regional development</b> and control of <b>strategic industries</b>"],["Wrong reasons","'Public sector was inherently more efficient' · 'private sector had enough capital and technology' · 'no demand for industrial goods'"]]},
+ {k:"facts", title:"Banking reforms", rows:[["Bank nationalisation","<b>14 banks</b> on 19 July 1969; <b>6 banks</b> on 15 April 1980"],["Narasimham Committee I","<b>1991</b> — financial system reforms"],["Narasimham Committee II","<b>1998</b> — banking sector reforms; <b>merge and consolidate</b> strong public sector banks"],["Prudential norms","Capital adequacy — <b>CRAR</b> = Capital to Risk-weighted Assets Ratio (Basel norms)"]]},
+ {k:"trap", h:"<b>Assertion–reason on trade reforms.</b> 'Trade reforms removed quantitative restrictions on imports and exports' ✓. 'Trade reforms increased import licensing to support domestic manufacturers' ✗ — increasing licences is the <b>pre-1991</b> habit."},
+ {k:"q", q:"India's trade policy between 1947 and 1990 is best described as…", o:["Inward-looking, emphasising import substitution and protection of domestic industry","Free trade with minimal government role","Export-led growth with low tariffs","Primarily focused on importing luxury goods"], e:"High tariffs and import licensing protected domestic industry."},
+ {k:"q", q:"A major criticism of India's industrial policy during 1950–1990 was…", o:["A protected market leading to inefficiency and lack of innovation","Excessive focus on exports","Excessive competition among domestic firms","Neglect of the public sector"], e:"Protection removed competition, so there was no pressure to improve."},
+ {k:"link", h:"<b>The lecture's parenting analogy.</b> A child never allowed to fall never learns to stand. 1947–90 India held its industry's hand so tightly that it never learned to compete — and 1991 finally let go."}
+], sum:["1947–90: inward-looking, import substitution, protection → inefficiency.","Post-1991: tariffs cut, licensing and QRs removed, prudential norms (CRAR).","Public sector's lead: social goals, balanced regional development, strategic control.","Banks nationalised 1969 (14) and 1980 (6); Narasimham I 1991, II 1998 (merge & consolidate)."]},
+
+{ id:"L8", title:"Plans 1–3 and the Plan Holiday", hi:"पहली से तीसरी योजना · योजना अवकाश", blocks:[
+ {k:"trick", h:"<b>Roti → Makaan → Aatmanirbhar.</b> 1st Plan = रोटी (agriculture); 2nd = मकान-गाड़ी need steel (industry); 3rd = आत्मनिर्भर (self-reliance, first time)."},
+ {k:"table", title:"First three plans", head:["Plan","Years","Model","Focus","Target → Achieved"], rows:[["1st","1951–56","<b>Harrod–Domar</b>","Agriculture, irrigation, power","2.1% → <b>3.6%</b> (success)"],["2nd","1956–61","<b>P.C. Mahalanobis</b>","<b>Rapid industrialisation</b>, heavy & basic industry","4.5% → 4.27%"],["3rd","1961–66","Sukhamoy Chakravarty & John Sandee","<b>Self-reliant, self-generating economy</b>; agriculture + industry","5.6% → 2.4% (<b>failure</b>)"]]},
+ {k:"facts", title:"1st Plan highlights", rows:[["Dams","Bhakra-Nangal (Sutlej), Hirakud (Mahanadi), Damodar Valley, Nagarjuna Sagar (Krishna)"],["Institutions","IIT Kharagpur (1951); UGC (1953)"],["Also","Community Development Programme (1952)"]]},
+ {k:"table", title:"2nd Plan steel plants", head:["Plant","State","Helped by","Trick"], rows:[["<b>Bhilai</b>","Chhattisgarh","<b>USSR</b>","भिलाई = पिलाई रूस के साथ"],["<b>Rourkela</b>","Odisha","<b>West Germany</b>","रावरकेला = केला खाया जर्मनी के साथ"],["<b>Durgapur</b>","West Bengal","<b>UK</b>","दुर्गा पूजा UK वालों के साथ"]]},
+ {k:"facts", title:"P.C. Mahalanobis", rows:[["Known as","Father of Indian Statistics"],["Founded","Indian Statistical Institute, Kolkata (1931); journal <i>Sankhya</i>"],["Birthday","<b>29 June</b> = National Statistics Day"],["Also","Chaired the National Income Committee (1949)"]]},
+ {k:"trap", h:"<b>Harrod and Domar were not both British.</b> Roy Harrod was British; Evsey Domar was American. And the <b>Gadgil formula belongs to the 4th Plan</b> — one lecture put it on the 3rd."},
+ {k:"facts", title:"Why the 3rd Plan failed", rows:[["1962","War with China"],["1965","War with Pakistan"],["1965–67","Severe droughts; also rupee devaluation (1966) and inflation"],["Set up then","IDBI (1964), Food Corporation of India (1965), Agricultural Prices Commission (1965; renamed CACP 1985)"]]},
+ {k:"facts", title:"Plan Holiday", rows:[["Period","<b>1966–69</b> — three <b>annual plans</b> (1966-67, 1967-68, 1968-69)"],["Name","Coined in mockery by the opposition and press"],["Why","Wars, drought, money shortage after the 3rd Plan"],["Big event","Green Revolution (HYV seeds) began in 1966"]]},
+ {k:"q", q:"Which Five Year Plan is known as the Mahalanobis Plan?", o:["Second","First","Third","Fourth"], e:"1956–61, focused on rapid industrialisation."},
+ {k:"q", q:"The Rourkela steel plant was set up with the help of…", o:["West Germany","USSR","United Kingdom","USA"], e:"Bhilai–USSR, Durgapur–UK, Rourkela–West Germany."},
+ {k:"link", h:"<b>IPR 1956 + 2nd Plan = one project.</b> The policy reserved heavy industry for the State; the plan funded it — Bhilai, Rourkela, Durgapur."}
+], sum:["1st 1951–56 Harrod-Domar, agriculture, 2.1→3.6%.","2nd 1956–61 Mahalanobis, rapid industrialisation, steel: Bhilai–USSR, Rourkela–W. Germany, Durgapur–UK.","3rd 1961–66 self-reliance first time; failed (1962, 1965 wars, drought).","Plan Holiday 1966–69: three annual plans."]},
+
+{ id:"L9", title:"Plans 4–7 · Rolling Plan · Annual Plans", hi:"चौथी से सातवीं योजना · रोलिंग प्लान", blocks:[
+ {k:"table", title:"Plans 4 to 7", head:["Plan","Years","Model / drafter","Focus","Target → Achieved"], rows:[["4th","1969–74","Ashok Rudra & Alan Manne; <b>Gadgil formula</b>","<b>Growth with stability</b> and progressive achievement of self-reliance","5.7% → 3.3%"],["5th","1974–78","<b>D.P. Dhar</b>","<b>Removal of poverty (Garibi Hatao)</b> and attainment of self-reliance","4.4% → 4.8%"],["6th","1980–85","—","Poverty removal and employment; raise national income","5.2% → 5.7%"],["7th","1985–90","—","<b>Food, Work, Productivity</b>","5.0% → 6.0%"]]},
+ {k:"facts", title:"4th Plan events", rows:[["1969","14 banks nationalised"],["1973","Drought Prone Areas Programme (DPAP)"],["18 May 1974","<b>Smiling Buddha</b>, India's first nuclear test (Pokhran)"],["Gadgil formula","1969, for sharing central assistance among states"]]},
+ {k:"trap", h:"<b>Smiling Buddha was 1974</b> (the lecture first said 1964). And India's family planning programme began in <b>1952</b>, not the 4th Plan — the 4th Plan only gave it high priority."},
+ {k:"facts", title:"5th Plan", rows:[["Slogan","<b>Garibi Hatao</b> (Indira Gandhi's 1971 election slogan)"],["Schemes","Minimum Needs Programme (1974), 20-Point Programme (1975), Hill Area Development"],["Cut short","Ended in <b>1978</b> (one year early) by the Janata government"]]},
+ {k:"trick", h:"<b>“हम पाँच, पाँचों गरीब”</b> — 5th Plan = Garibi Hatao. <b>“गरीबी धरी की धरी रह गई”</b> — drafted by <b>D.P. Dhar</b>. <b>3rd Reliance, 5th Reliance</b>: 3rd = self-reliant <i>economy</i>; 5th = <i>attainment</i> of self-reliance."},
+ {k:"facts", title:"Rolling Plan", rows:[["Period","<b>1978–80</b>"],["Government","Janata Party (PM Morarji Desai)"],["Concept","<b>Gunnar Myrdal</b> — plan revised every year, rolling forward"],["Ended","Congress returned in 1980 and started the 6th Plan"]]},
+ {k:"facts", title:"6th Plan schemes", rows:[["NABARD","<b>12 July 1982</b>, on the <b>B. Sivaraman</b> Committee's recommendation"],["IRDP","Integrated Rural Development Programme (nationwide 1980)"],["TRYSEM","Training Rural Youth for Self-Employment (1979)"],["NREP / RLEGP","National Rural Employment Programme (1980), Rural Landless Employment Guarantee Programme (1983)"]]},
+ {k:"trick", h:"<b>7th Plan = F-W-P</b>: <b>F</b>ood, <b>W</b>ork, <b>P</b>roductivity. Jawahar Rozgar Yojana came in 1989."},
+ {k:"facts", title:"Annual Plans 1990–92", rows:[["Why","Political instability (V.P. Singh, Chandra Shekhar governments) and the <b>BoP crisis</b>"],["Then","8th Plan started in 1992 after LPG reforms"]]},
+ {k:"trap", h:"<b>Rajiv Gandhi was not PM in 1990–92.</b> One lecture linked the annual plans to his death — but he left office in December 1989 and was killed in May 1991 while in opposition. Also, the 6th Plan was under <b>Indira Gandhi and then Rajiv</b> (from Oct 1984)."},
+ {k:"table", title:"Three breaks in planning", head:["Break","Years","Came after"], rows:[["<b>Plan Holiday</b>","1966–69","3rd Plan"],["<b>Rolling Plan</b>","1978–80","5th Plan"],["<b>Annual Plans</b>","1990–92","7th Plan"]]},
+ {k:"q", q:"The slogan 'Garibi Hatao' is associated with which Five Year Plan?", o:["Fifth","Fourth","Sixth","Seventh"], e:"1974–78, drafted by D.P. Dhar."},
+ {k:"q", q:"The Rolling Plan was in force during…", o:["1978–1980","1966–1969","1990–1992","1974–1979"], e:"Janata government; concept by Gunnar Myrdal."}
+], sum:["4th 1969–74 growth with stability; Gadgil formula; banks 1969; Smiling Buddha 1974.","5th 1974–78 Garibi Hatao, D.P. Dhar; ended early.","Rolling Plan 1978–80 (Myrdal, Janata).","6th 1980–85 poverty & employment, NABARD 1982; 7th 1985–90 Food-Work-Productivity.","Breaks: Plan Holiday 66–69, Rolling 78–80, Annual 90–92."]},
+
+{ id:"L10", title:"Plans 8–12 and the end of planning", hi:"आठवीं से बारहवीं योजना · योजना का अंत", blocks:[
+ {k:"table", title:"Plans 8 to 12", head:["Plan","Years","PM","Focus / slogan","Target → Achieved"], rows:[["8th","1992–97","P.V. Narasimha Rao","<b>Human resource development</b>; first after LPG; indicative planning","5.6% → 6.8%"],["9th","1997–2002","A.B. Vajpayee","<b>Growth with social justice and equality</b>","6.5% → 5.4%"],["10th","2002–07","Vajpayee → Manmohan Singh","8% growth; double per-capita income in 10 years","8.0% → 7.6%"],["11th","2007–12","Manmohan Singh","<b>Towards faster and more inclusive growth</b>","9.0% → ~8%"],["12th","2012–17","Manmohan Singh → Narendra Modi","<b>Faster, more inclusive and sustainable growth</b>","8.0% (last plan)"]]},
+ {k:"trick", h:"<b>11 → 12 just adds a word.</b> 11th = faster + inclusive. 12th = faster + inclusive + <b>sustainable</b>. 9th = social <b>justice</b> + equality (नौ = न्याय)."},
+ {k:"trap", h:"<b>Match-type PYQ trap:</b> 'Faster and more inclusive growth' = <b>11th</b>; 'Faster, more inclusive and sustainable growth' = <b>12th</b>. One lecture's quiz gave the 11th slogan to the 12th — read every word."},
+ {k:"facts", title:"Highlights", rows:[["8th","73rd & 74th Amendments (1992), PM Rozgar Yojana (1993), MPLADS (1993)"],["10th","National Horticulture Mission (2005–06), NREGA (2005), NRHM (2005)"],["11th","RTE in force (2010), NRLM (2011)"],["12th","Planning Commission replaced by NITI Aayog (1 Jan 2015); plan period ended March 2017 — India's last FYP"]]},
+ {k:"facts", title:"Hindu rate of growth", rows:[["Coined by","<b>Prof. Raj Krishna</b> (1978)"],["Meaning","India's slow ~3.5% annual growth during <b>1950–80</b>"],["Idea","Low growth accepted as normal"]]},
+ {k:"trap", h:"<b>The Hindu rate of growth is not about the 10th Plan.</b> One lecture tied it to 2002–07, when growth was near 8%. The term describes the <b>~3.5% growth of 1950–80</b>."},
+ {k:"trick", h:"<b>PM trick — Rahul Gandhi's family tree:</b> Plans 1-2-3 = नाना जी (Nehru); 4-5-6 = दादी जी (Indira); 7 = पापा जी (Rajiv); 8 = Narasimha Rao; 9 = Vajpayee; 10 = Vajpayee + Manmohan; 11 = Manmohan; 12 = Manmohan + Modi."},
+ {k:"trap", h:"<b>Small print on the family trick.</b> The 3rd Plan also saw Lal Bahadur Shastri (1964–66) after Nehru's death, and the 9th was launched in 1997 before Vajpayee's government took over. In exams, the trick's answer is what is expected."},
+ {k:"q", q:"'Growth with social justice and equality' was the objective of which plan?", o:["Ninth","Eighth","Tenth","Eleventh"], e:"1997–2002."},
+ {k:"q", q:"The term 'Hindu rate of growth' was coined by…", o:["Raj Krishna","Amartya Sen","Jagdish Bhagwati","Manmohan Singh"], e:"Raj Krishna, 1978, for India's ~3.5% growth in 1950–80."},
+ {k:"link", h:"<b>From plans to NITI.</b> Planning Commission gave money and targets top-down; NITI Aayog gives advice and ranks states (cooperative & competitive federalism) — no plan funds."}
+], sum:["8th 1992–97 HRD, first after LPG (Rao); 9th growth with social justice & equality (Vajpayee).","10th 8% target, 7.6% achieved; 11th faster & more inclusive; 12th faster, more inclusive & sustainable (last).","Hindu rate of growth: Raj Krishna, ~3.5% in 1950–80."]},
+
+{ id:"L11", title:"National income & sectors basics", hi:"राष्ट्रीय आय और क्षेत्र", blocks:[
+ {k:"facts", title:"Income terms", rows:[["NDP","<b>GDP − depreciation</b>"],["Personal income (PI)","What you earn"],["Disposable income (DI)","<b>PI − personal direct taxes</b> — what you can spend"],["DI splits into","<b>Consumption + Saving</b> (C + S = DI)"],["So","DI + personal taxes = PI"]]},
+ {k:"trick", h:"<b>₹12 lakh package example:</b> ₹1 lakh a month = personal income. 'निर्मला ताई' takes 20% tax → ₹80,000 = disposable income. Of that, ₹30,000 SIP (saving) + ₹50,000 spent (consumption) = ₹80,000."},
+ {k:"table", title:"Three ways to measure GDP", head:["Method","What is added"], rows:[["<b>Income</b>","Rent + interest + wages + profit"],["<b>Output / Value-added</b>","Value added at each stage (farmer ₹5 → mill +₹5 → baker +₹5)"],["<b>Expenditure</b>","<b>C + I + G + (X − M)</b> — consumption, investment, government spending, net exports"]]},
+ {k:"trap", h:"<b>'G' is government expenditure, not subsidy</b>, and 'savings method' is not a GDP method. One lecture read G as 'government subsidy'."},
+ {k:"facts", title:"History of national income estimates", rows:[["First estimate","<b>Dadabhai Naoroji</b>, 1867–68 — per capita ₹20 (<i>Poverty and Un-British Rule in India</i>)"],["First scientific estimate","<b>V.K.R.V. Rao</b> (1931–32)"],["National Income Committee","<b>August 1949</b> — Chairman <b>P.C. Mahalanobis</b>; members <b>D.R. Gadgil</b> and <b>V.K.R.V. Rao</b>"],["CSO","Central Statistical Organisation, set up <b>1951</b>"],["First official series","Published by CSO in <b>1956</b>, base year <b>1948–49</b> ('conventional series')"],["Today","NSO under MoSPI (CSO + NSSO merged 2019); new GDP series base year <b>2022–23</b> released 27 Feb 2026"]]},
+ {k:"trap", h:"<b>MoSPI did not make the first estimate.</b> It was formed in 1999; the 1956 estimate came from the CSO. And for 'members' of the 1949 committee, Mahalanobis is the <b>chairman</b> — members are Gadgil and V.K.R.V. Rao."},
+ {k:"table", title:"Five sectors", head:["Sector","What","Examples"], rows:[["Primary","Taking from nature","Agriculture, mining, fishing, forestry"],["Secondary","Processing / manufacturing (factories)","Metal work, automobiles, textiles, food processing"],["Tertiary","Services — no product","Banking, telecom, transport, hospitality"],["<b>Quaternary</b>","Knowledge-based","Research & development, education, consulting, IT"],["<b>Quinary</b>","Highest-level decision makers","Top government officials, media executives, top scientists, investment bankers"]]},
+ {k:"facts", title:"Other asked facts", rows:[["Highest per-capita NSDP (2023–24)","<b>Sikkim</b> (then Goa, Delhi)"],["Services share","Over 50% of India's GVA"],["SEIS","Service Exports from India Scheme, 2015 (Foreign Trade Policy 2015–20); duty-credit scrips on service exports"],["Aspirational Districts","Launched <b>January 2018</b>; <b>112</b> districts; <b>49</b> KPIs; NITI Aayog monitors"],["Aspirational Blocks","January 2023; 500 blocks"]]},
+ {k:"trap", h:"<b>Delhi is not the answer for per-capita income</b> — its large population pulls the average down. <b>Sikkim</b> tops. Also the Aspirational Districts Programme is <b>2018</b>, not 2017 (a PYQ statement)."},
+ {k:"q", q:"Disposable income equals…", o:["Personal income minus personal direct taxes","GDP minus depreciation","Personal income plus taxes","Consumption minus saving"], e:"DI = PI − personal taxes = consumption + saving."},
+ {k:"q", q:"Who chaired the National Income Committee of 1949?", o:["P.C. Mahalanobis","V.K.R.V. Rao","D.R. Gadgil","Dadabhai Naoroji"], e:"Gadgil and V.K.R.V. Rao were members."},
+ {k:"link", h:"<b>Mahalanobis links three lessons:</b> National Income Committee chair (1949), Indian Statistical Institute, and the 2nd Five Year Plan (1956)."}
+], sum:["NDP = GDP − depreciation; DI = PI − taxes = C + S.","GDP methods: income, output (value-added), expenditure C+I+G+(X−M).","NIC 1949: Mahalanobis (chair), Gadgil, V.K.R.V. Rao; CSO 1951; first series 1956, base 1948–49; new base 2022–23.","Sectors: primary, secondary, tertiary, quaternary (knowledge), quinary (top decisions).","Sikkim tops per-capita NSDP; Aspirational Districts 2018, 112, 49 KPIs."]},
+
+{ id:"L12", title:"Grand revision — one-page story", hi:"संपूर्ण पुनरावृत्ति", blocks:[
+ {k:"tl", title:"The whole story in 16 dates", rows:[["1938","National Planning Committee (Bose set up, Nehru chair)"],["1948","IPR 1948 — 4 categories, mixed economy (Mookerjee)"],["1950","Planning Commission 15 March"],["1951","1st Plan; IDR Act; CSO"],["1952","NDC; Freight Equalisation"],["1956","IPR 1956 — Economic Constitution; 2nd Plan"],["1966–69","Plan Holiday"],["1969","MRTP Act; 14 banks nationalised; 4th Plan"],["1973","FERA"],["1977","Industrial Policy Statement — decentralisation, DIC"],["1978–80","Rolling Plan"],["1980","Industrial Policy Statement; 6 banks nationalised"],["1991","NIP 24 July — LPG"],["2002","Competition Act (MRTP out, repealed 2009)"],["2015","NITI Aayog 1 January"],["2017","12th Plan period ends — last FYP"]]},
+ {k:"trick", h:"<b>One line per policy:</b> 48 = <b>SBI-O</b> (3-6-18); 56 = <b>A-B-C</b> (17-12-rest), commanding heights; 77 = <b>गांव</b> (tiny units, DIC); 80 = <b>अच्छा</b> (PSU efficiency); 91 = <b>undo</b> (LPG)."},
+ {k:"trick", h:"<b>One word per plan:</b> 1 Agriculture · 2 Industry · 3 Self-reliance · 4 Stability · 5 Garibi Hatao · 6 Employment · 7 Food-Work-Productivity · 8 Human resources · 9 Social justice · 10 Doubling income · 11 Inclusive · 12 Sustainable."},
+ {k:"q", q:"Which pairing is correct?", o:["IPR 1956 – Economic Constitution of India","IPR 1948 – Three schedules","NIP 1991 – District Industries Centres","IPS 1977 – LPG reforms"], e:"1948 had four categories; DIC was 1977; LPG was 1991."},
+ {k:"q", q:"Arrange in order: (a) Rolling Plan (b) Plan Holiday (c) Annual Plans 1990–92 (d) NITI Aayog", o:["b, a, c, d","a, b, c, d","b, c, a, d","a, c, b, d"], e:"1966–69, 1978–80, 1990–92, 2015."}
+], sum:["48 SBI-O; 56 A-B-C; 77 village; 80 efficiency; 91 LPG.","Plans: Agri, Industry, Self-reliance, Stability, Garibi Hatao, Employment, FWP, HRD, Social justice, Double income, Inclusive, Sustainable.","Breaks: 66–69, 78–80, 90–92; NITI 2015."]}
+];
+
+const QB = [
+/* L1 */
+["L1","In a socialist economy, what to produce is decided mainly by…",["The government","Market prices","Private firms","Foreign investors"],"Socialism: the state decides production and distribution."],
+["L1","In a capitalist economy, production decisions are driven mainly by…",["Profit and market demand","Government planning","Cooperative societies","Religious bodies"],"Capitalism: what sells more is produced more."],
+["L1","Consider: 1. In a mixed economy the government regulates markets for social welfare. 2. Public sector decisions are taken by government, private sector decisions by individuals. Which is/are correct?",["Both 1 and 2","Only 1","Only 2","Neither 1 nor 2"],"Both are defining features of a mixed economy.","p",0,1],
+["L1","Which country is the standard example of a capitalist economy?",["USA","Cuba","North Korea","Former USSR"],"USA and France are cited as capitalist economies."],
+["L1","India was declared a mixed economy by…",["Industrial Policy Resolution 1948","Industrial Policy Resolution 1956","New Industrial Policy 1991","The 42nd Amendment"],"IPR 1948 kept public and private sectors side by side."],
+["L1","The book 'The Wealth of Nations' was written by…",["Adam Smith","David Ricardo","Karl Marx","J.M. Keynes"],"Published 1776; the invisible hand idea."],
+["L1","The 'invisible hand' suggests that…",["Individuals pursuing self-interest unintentionally benefit society","Government must control all prices","Foreign trade harms growth","Monopolies are efficient"],"The baker working for profit feeds mill workers and farmers too.","p"],
+["L1","Who is called the 'Father of Economics'?",["Adam Smith","Alfred Marshall","Amartya Sen","Kautilya"],"Adam Smith."],
+["L1","A company is a public sector enterprise when government holds at least…",["51% of shares","26% of shares","33% of shares","74% of shares"],"51% or more gives ownership."],
+["L1","The full form of CPSE is…",["Central Public Sector Enterprise","Central Private Sector Enterprise","Commercial Public Service Entity","Central Planning and Statistics Enterprise"],"Central government stake of 51% or more.","p"],
+["L1","The share market in India is regulated by…",["SEBI","IRDAI","RBI","CCI"],"Securities and Exchange Board of India."],
+["L1","The Maharatna scheme for CPSEs was introduced in…",["2009","1997","1991","2015"],"Navratna and Miniratna came in 1997."],
+["L1","In statement questions, an option containing 'entirely' or 'all' is usually…",["False","True","Irrelevant","Always the answer"],"Extreme words usually signal a false statement."],
+["L1","Which DPSP clause reflects the socialist aim of preventing concentration of wealth?",["Article 39(c)","Article 44","Article 48","Article 51"],"Art. 39(b)–(c): distribution of material resources, no concentration of wealth."],
+["L1","In a mixed economy, the government mainly…",["Regulates the market and runs only a few businesses","Owns every industry","Stays completely out of the economy","Bans private firms"],"Rule-maker more than business-runner."],
+/* L2 */
+["L2","The National Planning Committee of 1938 was chaired by…",["Jawaharlal Nehru","Subhas Chandra Bose","M. Visvesvaraya","J.R.D. Tata"],"Set up by Congress president Bose; Nehru chaired it.","p"],
+["L2","The National Planning Committee (1938) was set up under the Congress presidency of…",["Subhas Chandra Bose","Jawaharlal Nehru","Mahatma Gandhi","Rajendra Prasad"],"Haripura/Congress 1938, Bose was president."],
+["L2","The Bombay Plan (1944) was prepared by…",["A group of industrialists","M.N. Roy","Jayaprakash Narayan","The Planning Commission"],"Eight industrialists incl. J.R.D. Tata and G.D. Birla."],
+["L2","The Gandhian Plan (1944) was drafted by…",["Shriman Narayan Agarwal","M.N. Roy","Jayaprakash Narayan","Vinoba Bhave"],"Based on Gandhian ideas of decentralisation."],
+["L2","The People's Plan (1945) was given by…",["M.N. Roy","Jayaprakash Narayan","Nehru","Shriman Narayan Agarwal"],"M.N. Roy, radical humanist."],
+["L2","The Sarvodaya Plan (1950) was formulated by…",["Jayaprakash Narayan","M.N. Roy","Vinoba Bhave","Ram Manohar Lohia"],"JP, founder of the Congress Socialist Party.","p"],
+["L2","Arrange chronologically: 1. People's Plan 2. Sarvodaya Plan 3. National Planning Committee 4. Bombay Plan",["3, 4, 1, 2","4, 3, 1, 2","3, 1, 4, 2","1, 3, 4, 2"],"1938, 1944, 1945, 1950.","",0,1],
+["L2","'Planned Economy for India' (1934) was written by…",["M. Visvesvaraya","Jawaharlal Nehru","Dadabhai Naoroji","P.C. Mahalanobis"],"The first blueprint of planning."],
+["L2","The Planning Commission was set up on…",["15 March 1950","26 January 1950","6 August 1952","1 April 1951"],"By executive resolution.","p"],
+["L2","The Planning Commission was…",["A non-constitutional and non-statutory body","A constitutional body","A statutory body under an Act of 1950","A body under the Finance Commission"],"Created by a cabinet resolution."],
+["L2","The first Deputy Chairman of the Planning Commission was…",["Gulzarilal Nanda","C.D. Deshmukh","V.T. Krishnamachari","Montek Singh Ahluwalia"],"Nehru was Chairman; Nanda the first Deputy Chairman."],
+["L2","The Five Year Plans were inspired by the planning of…",["USSR","USA","UK","Japan"],"Soviet five-year plans.","p"],
+["L2","The National Development Council was set up in…",["1952","1950","1956","1965"],"6 August 1952; approves plans."],
+["L2","The era of Five Year Plans in India began with the establishment of…",["Planning Commission","Finance Commission","NITI Aayog","Parliament"],"Planning Commission, March 1950.","p"],
+["L2","NITI Aayog came into existence on…",["1 January 2015","15 August 2014","26 January 2015","1 April 2015"],"Replaced the Planning Commission.","p"],
+["L2","NITI Aayog stands for…",["National Institution for Transforming India","National Institute for Technical Innovation","National Planning Institute","New Indian Transformation Institute"],"Institution, not Institute.","p"],
+["L2","The first Vice-Chairperson of NITI Aayog was…",["Arvind Panagariya","Rajiv Kumar","Suman Bery","Amitabh Kant"],"2015–17.","p"],
+["L2","Who was appointed Vice-Chairperson of NITI Aayog in April 2026?",["Ashok Kumar Lahiri","Suman Bery","Rajiv Kumar","Arvind Panagariya"],"Notified 24 April 2026; succeeded Suman Bery."],
+["L2","Who became CEO of NITI Aayog in August 2026?",["Anurag Jain","B.V.R. Subrahmanyam","Amitabh Kant","Parameswaran Iyer"],"1989-batch IAS, former MP chief secretary."],
+["L2","The Chairperson of NITI Aayog is…",["The Prime Minister","The President","The Finance Minister","The Vice-President"],"The PM chairs both NITI and the old Planning Commission."],
+["L2","Consider: 1. NITI Aayog was set up in 2015. 2. The PM is its chairperson. 3. It is a think tank. 4. It brings cooperative socialism among states. Which are correct?",["1, 2 and 3","1, 2, 3 and 4","1 and 2 only","2, 3 and 4"],"It promotes cooperative federalism, not socialism.","p",0,1],
+["L2","Which country still plans in five-year blocks today?",["China","India","USA","UK"],"China's 15th plan covers 2026–30."],
+["L2","The last Deputy Chairman of the Planning Commission was…",["Montek Singh Ahluwalia","Pranab Mukherjee","Arvind Panagariya","K.C. Pant"],"Served 2004–2014."],
+["L2","Which body finally approved India's Five Year Plans?",["National Development Council","Planning Commission","Finance Commission","Lok Sabha Speaker"],"Planning Commission drafted, NDC approved."],
+/* L3 */
+["L3","The first Industrial Policy Resolution of independent India was announced in…",["1948","1956","1951","1947"],"6 April 1948.","p"],
+["L3","Who presented the IPR 1948 in the Constituent Assembly?",["Syama Prasad Mookerjee","Jawaharlal Nehru","Vallabhbhai Patel","John Mathai"],"First Industry & Supply Minister.","p"],
+["L3","The main aim of IPR 1948 was to…",["Promote the public sector","Privatise industry","Open foreign trade","Develop rural areas"],"Privatisation and open trade are 1991; rural decentralisation is 1977.","p"],
+["L3","IPR 1948 divided industries into how many categories?",["Four","Three","Two","Five"],"Strategic, Basic, Important, Others.","p"],
+["L3","Which was an exclusive Central monopoly under IPR 1948?",["Railway transport","Sugar","Cement","Cotton textiles"],"Arms & ammunition, atomic energy, railways."],
+["L3","How many industries were in the 'basic' (new units by State) category of IPR 1948?",["Six","Three","Eighteen","Twelve"],"Coal, iron & steel, aircraft, shipbuilding, telecom equipment, mineral oils."],
+["L3","How many industries were placed under government regulation (third category) in IPR 1948?",["18","17","12","6"],"3 × 6 = 18."],
+["L3","Under IPR 1948, 'coal, iron and steel, aircraft and shipbuilding' were in which category?",["New undertakings only by the State","Exclusive Central monopoly","Regulated industries","Open to private sector"],"The six basic industries."],
+["L3","Which type of economic system did IPR 1948 adopt?",["Mixed economy","Pure capitalist","Pure socialist","Barter economy"],"Public and private sectors both allowed.","p"],
+["L3","What happened to existing private units in the 'basic' industries under IPR 1948?",["They could continue, but new units were for the State","They were nationalised immediately","They were closed down","They were exempted from all rules"],"Existing units were allowed (reviewed after 10 years)."],
+["L3","Sugar, cement and heavy chemicals fell in which IPR 1948 category?",["Industries regulated by government","Exclusive Central monopoly","Basic industries","Schedule A"],"The 18 'important' regulated industries."],
+["L3","The first Industry Minister of independent India was…",["Syama Prasad Mookerjee","Vallabhbhai Patel","B.R. Ambedkar","C. Rajagopalachari"],"Industry & Supply."],
+["L3","In the SBI-O trick for IPR 1948, 'O' stands for…",["Others — open to private sector","Ownership by State","Overseas industries","Oil industries"],"Strategic, Basic, Important, Others."],
+["L3","Atomic energy under IPR 1948 was…",["An exclusive Central monopoly","Open to private sector","Regulated but private","A State-list subject"],"One of the three strategic industries."],
+["L3","The 1948 resolution was presented in the Constituent Assembly because…",["The first Lok Sabha had not yet been elected","Parliament had been dissolved","The President was abroad","It was a constitutional amendment"],"The Constituent Assembly doubled as the provisional Parliament until 1952."],
+["L3","Jawaharlal Nehru became Prime Minister on…",["15 August 1947","26 January 1950","17 April 1952","6 April 1948"],"The first elected Lok Sabha came in 1952, but Nehru was PM from 1947."],
+/* L4 */
+["L4","Which industrial policy is called the 'Economic Constitution of India'?",["IPR 1956","IPR 1948","IPS 1977","NIP 1991"],"30 April 1956.","p"],
+["L4","IPR 1956 classified industries into…",["Three schedules","Four categories","Two lists","Five sectors"],"Schedules A, B, C.","p"],
+["L4","How many industries were in Schedule A of IPR 1956?",["17","12","18","8"],"Exclusive responsibility of the State.","p"],
+["L4","How many industries were in Schedule B of IPR 1956?",["12","17","6","18"],"State to lead, private to supplement."],
+["L4","The central theme of IPR 1956 was…",["State control of the commanding heights of the economy","Import-led growth","Full privatisation of industry","Promoting consumer goods"],"Public sector at the top of key industries.","p"],
+["L4","IPR 1956 was closely aligned with which Five Year Plan?",["Second","First","Third","Fourth"],"Mahalanobis plan, 1956–61.","p"],
+["L4","A key feature of IPR 1956 was that it…",["Classified industries into three schedules with the public sector leading strategic and heavy industries","Strongly advocated private-sector dominance in all industry","Promoted a fully open, competitive environment","Mainly emphasised small-scale industry development"],"Steno 2025 PYQ.","p"],
+["L4","Which is NOT associated with IPR 1956?",["It formed the basis of the Third Five Year Plan","It classified industries into three categories","It used licensing to regulate private industry","It gave the State the lead in heavy industry"],"It was the basis of the Second Plan.","p"],
+["L4","Consider: Assertion (A): IPR 1956 classified industries into three schedules. Reason (R): It sought to identify sectors of exclusive State responsibility, sectors of joint effort and sectors left to private enterprise. Choose:",["Both A and R true; R explains A","Both true; R does not explain A","A true, R false","A false, R true"],"R is the purpose of the classification.","p",0,1],
+["L4","Schedule C of IPR 1956 was…",["Left to private initiative","Reserved for the State","Reserved for cooperatives","Reserved for foreign firms"],"Private sector, under licensing."],
+["L4","The Licence Raj became most dense after…",["IPR 1956","NIP 1991","IPS 1980","IPR 1948"],"State control peaked with the 1956 schedules."],
+["L4","The Industries (Development and Regulation) Act was passed in…",["1951","1948","1956","1969"],"Legal base for industrial licensing."],
+["L4","The primary impact of the Licence Raj on industrial growth before 1991 was that it…",["Created entry barriers, hindered expansion and fostered inefficiency","Rapidly raised global competitiveness","Created many competitors in each industry","Encouraged foreign investment"],"Licensing blocked entry and expansion.","p"],
+["L4","A significant unintended negative consequence of the Licence Raj was…",["Barriers to entry that stifled innovation and caused inefficiency","Rapid rise in quality and competitiveness","A highly competitive market with many players","Excess foreign investment"],"Negative consequence asked — drop positive options.","p"],
+["L4","The Freight Equalisation Policy was introduced in…",["1952","1948","1969","1991"],"Abolished in 1993.","p"],
+["L4","The Freight Equalisation Policy was abolished in…",["1993","1991","1985","2000"],"After four decades."],
+["L4","Why did the government introduce the Freight Equalisation Policy?",["To balance industrial growth by equalising transport costs of key minerals across India","To raise railway revenue","To promote imports","To favour eastern states only"],"Its effect was the reverse — the mineral-rich east lost out.","p"],
+["L4","Which region lost most from the Freight Equalisation Policy?",["Mineral-rich eastern states like Bihar, Jharkhand, Odisha","Western states like Gujarat","Southern coastal states","Himalayan states"],"Industry moved west since minerals cost the same everywhere."],
+["L4","The Second Five Year Plan and IPR 1956 together emphasised…",["Heavy and basic industries in the public sector","Agriculture and irrigation","Small-scale industry only","Export-led growth"],"Mahalanobis strategy."],
+["L4","'Commanding heights of the economy' in IPR 1956 refers to…",["Key industries controlled by the State","Mountainous industrial zones","Private monopolies","Foreign-owned firms"],"The State held the top positions in the economy."],
+/* L5 */
+["L5","MRTP stands for…",["Monopolies and Restrictive Trade Practices","Market Regulation and Trade Policy","Monopoly Regulation and Tax Provisions","Modern Restrictive Trade Practices"],"Act of 1969."],
+["L5","The MRTP Act was passed in…",["1969","1973","1956","1980"],"In force from June 1970."],
+["L5","The main aim of the MRTP Act was to…",["Prevent concentration of economic power","Promote foreign investment","Nationalise banks","Regulate foreign exchange"],"Curb monopolies."],
+["L5","The MRTP Act was replaced by…",["Competition Act 2002","FEMA 1999","Companies Act 1956","Consumer Protection Act 1986"],"CCI set up in 2003.","p"],
+["L5","The MRTP Act was finally repealed in…",["2009","2002","1991","2003"],"1 September 2009."],
+["L5","FERA stands for…",["Foreign Exchange Regulation Act","Foreign Exchange Revenue Act","Financial Emergency Regulation Act","Foreign Enterprise Registration Act"],"1973."],
+["L5","FERA was replaced by FEMA in…",["1999","1991","2002","1973"],"FEMA in force from 1 June 2000."],
+["L5","Under FEMA, violations of foreign exchange rules are treated as…",["Civil offences","Criminal offences","Cognisable offences","Not offences at all"],"FERA had made them criminal."],
+["L5","The comprehensive FERA came in…",["1973","1971","1969","1980"],"Replaced the 1947 Act."],
+["L5","The Industrial Policy Statement 1977 was announced by…",["George Fernandes","Charan Singh","Morarji Desai","Madhu Dandavate"],"Industry Minister in the Janata government."],
+["L5","The 1977 Industrial Policy Statement created…",["District Industries Centres","Special Economic Zones","Export Processing Zones","Industrial Finance Corporation"],"To promote small and cottage industries in rural areas.","p"],
+["L5","District Industries Centres started functioning from…",["1 May 1978","23 December 1977","24 July 1991","1 April 1980"],"Single-window support in every district."],
+["L5","The main focus of the 1977 Industrial Policy Statement was…",["Decentralisation and priority to small, cottage and tiny units","Liberalisation and FDI","Nationalisation of banks","Heavy industry in the public sector"],"Rural and urban development together.","p"],
+["L5","'Tiny units' were first given special recognition in…",["Industrial Policy Statement 1977","IPR 1956","IPR 1948","NIP 1991"],"Tiny sector defined for small investment."],
+["L5","Which statement about the 1977 policy is correct?",["It aimed to develop villages and cities together","It began disinvestment of PSUs","It abolished MRTP","It allowed 51% FDI"],"Disinvestment began in 1991–92."],
+["L5","Which was NOT an objective of the Industrial Policy Statement 1980?",["Permitting maximum foreign direct investment","Promoting export-oriented industries","Consumer protection against high prices and poor quality","Higher employment generation"],"Maximum FDI belongs to 1991.","p"],
+["L5","The Industrial Policy Statement 1980 aimed to revive the efficiency of…",["Public sector enterprises","Foreign companies","Cooperative banks","Stock exchanges"],"PSUs were producing little at high cost."],
+["L5","'Nucleus plants' to correct regional imbalance are linked with…",["Industrial Policy Statement 1980","IPR 1948","NIP 1991","IPR 1956"],"Ancillary development in backward districts."],
+["L5","Which policy first spoke of 'selective liberalisation'?",["Industrial Policy Statement 1980","IPR 1956","IPS 1977","IPR 1948"],"A first, cautious step before 1991."],
+["L5","In 1985 the MRTP asset threshold was raised to…",["₹100 crore","₹20 crore","₹500 crore","₹1,000 crore"],"It was ₹20 crore in 1969."],
+["L5","The 'joint sector' concept was introduced by the Industrial Policy Statement of…",["1973","1977","1956","1991"],"Government and private together."],
+["L5","In 1969, how many banks were nationalised?",["14","6","20","8"],"19 July 1969; six more on 15 April 1980."],
+["L5","In 1980, how many more banks were nationalised?",["6","14","8","4"],"15 April 1980."],
+/* L6 */
+["L6","The New Industrial Policy was announced on…",["24 July 1991","15 August 1991","30 April 1956","1 January 1992"],"Rao government.","p"],
+["L6","Which crisis triggered the 1991 reforms?",["Balance of payments crisis","Stock market crash","Drought","Banking collapse"],"Reserves covered only about two weeks of imports."],
+["L6","Who was Prime Minister when the 1991 reforms were introduced?",["P.V. Narasimha Rao","Manmohan Singh","V.P. Singh","Chandra Shekhar"],"Manmohan Singh was Finance Minister.","p"],
+["L6","Who was Finance Minister during the 1991 reforms?",["Manmohan Singh","P. Chidambaram","Yashwant Sinha","Pranab Mukherjee"],"Credited as the architect of LPG."],
+["L6","LPG stands for…",["Liberalisation, Privatisation, Globalisation","Licensing, Planning, Growth","Land, Production, Growth","Liberalisation, Planning, Globalisation"],"The three pillars of 1991."],
+["L6","Which is NOT a core pillar of the 1991 reforms?",["Nationalisation","Liberalisation","Privatisation","Globalisation"],"Nationalisation was 1969/1980.","p"],
+["L6","Liberalisation was started by reducing restrictions on private companies through…",["Industrial Policy 1991","IPR 1956","IPS 1980","IPR 1948"],"Licence Raj largely ended.","p"],
+["L6","Which statement best describes the change in the public sector's role under the 1991 policy?",["Industries reserved for the public sector were reduced to a core of strategic interest","The reserved list was eliminated entirely","PSUs were expanded into all service sectors","PSUs were fully privatised at once"],"'Entirely' and 'all' are extreme — reject.","p"],
+["L6","How did the 1991 policy treat industrial licensing?",["Abolished it for most industries, keeping it for a few critical sectors","Made it compulsory for all industries","Transferred all licensing to states","Extended it to strategic sectors"],"Now only 4 industries need a licence.","p"],
+["L6","How many industries were reserved for the public sector under the 1991 policy?",["8","17","3","2"],"Cut from 17 to 8."],
+["L6","Which industry still requires a compulsory industrial licence?",["Industrial explosives","Cement","Steel","Automobiles"],"Also tobacco cigars/cigarettes, electronic aerospace & defence equipment, hazardous chemicals."],
+["L6","How many industries require compulsory licensing today (DPIIT list)?",["4","8","18","2"],"Cigars & cigarettes, electronic aerospace & defence, industrial explosives, hazardous chemicals."],
+["L6","Under the 1991 policy, automatic approval for foreign equity was allowed up to…",["51% in 34 high-priority industries","26% in all industries","100% in all industries","74% in 47 industries"],"First time majority foreign stake allowed."],
+["L6","The 1991 policy amended the MRTP Act to…",["Remove the asset threshold limit for big firms","Double the threshold","Bring PSUs under MRTP","Add FDI controls"],"No prior approval needed for size."],
+["L6","Disinvestment of PSUs means…",["Government selling part of its stake in public enterprises","Nationalising private firms","Closing loss-making firms","Raising taxes on PSUs"],"Began in 1991–92."],
+["L6","Which key 1991 reform addressed the inefficiency of public sector enterprises?",["Disinvestment / privatisation of PSUs","Nationalisation of PSUs","Complex industrial licensing","Higher import tariffs"],"Opening PSUs to private ownership and competition.","p"],
+["L6","Which two sectors remain reserved exclusively for the public sector today?",["Atomic energy and railway operations","Defence and coal","Mining and mineral oils","Aviation and shipping"],"Defence opened in 2001."],
+["L6","The SHANTI Act (December 2025) opened which sector to private participation?",["Nuclear power","Railway operations","Coal mining","Space launches"],"Private firms may build and run nuclear power plants."],
+["L6","How did India's trade reforms after 1991 affect imports of capital goods?",["Reduced tariffs and removed licensing","Raised tariffs to protect industry","Linked capital imports only to foreign firms","Banned capital goods imports"],"Machines became easier to import.","p"],
+["L6","Globalisation means…",["Integrating the domestic economy with the world economy","Nationalising foreign firms","Stopping exports","Only state-to-state trade"],"Foreign firms, trade and capital flow in."],
+["L6","In which year were major economic reforms introduced in India?",["1991","1985","1995","2000"],"LPG reforms.","p"],
+["L6","Which is the latest full industrial policy of India?",["NIP 1991","Industrial Policy 2022","National Manufacturing Policy 2011","IPS 1980"],"No full industrial policy has replaced 1991."],
+["L6","The first five-year plan launched after the 1991 reforms was the…",["Eighth","Seventh","Ninth","Sixth"],"1992–97."],
+["L6","Which statement about FDI after 1991 is correct?",["For the first time, foreign companies could hold a majority stake in many industries","FDI was banned","FDI was limited to 10%","FDI was allowed only in agriculture"],"51% automatic approval in priority industries."],
+/* L7 */
+["L7","Indian trade policy during 1947–1990 was characterised by…",["An inward-looking strategy emphasising import substitution and protection of domestic industry","Free trade with minimal government","Export-led growth","Import of luxury goods"],"PYQ.","p"],
+["L7","A common characteristic of Indian trade policy in 1947–1990 was…",["Import substitution","Promotion of imports","Import of luxury goods","Zero tariffs"],"Make at home instead of importing.","p"],
+["L7","The key rationale for the public sector's dominant role in 1947–1990 was that it was seen as a tool for…",["Social goals, balanced regional development and control of strategic industries","Being inherently more efficient than private firms","Using the private sector's surplus capital","Meeting weak demand for industrial goods"],"PYQ on rationale.","p"],
+["L7","A major criticism of India's industrial policy during 1950–1990 was…",["Creation of a protected market leading to inefficiency and lack of innovation","Too much focus on exports","Excessive domestic competition","Neglect of the public sector"],"PYQ.","p"],
+["L7","Consider: 1. Trade reforms removed quantitative restrictions on imports and exports. 2. Trade reforms increased import licensing to support domestic manufacturers. Which is correct?",["Only 1","Only 2","Both","Neither"],"Increasing licensing is the pre-1991 habit.","p",0,1],
+["L7","Which policy reform targeted competitiveness and efficiency of the banking system after 1991?",["Introduction of prudential norms and CRAR","Nationalisation of all banks","Full deregulation of cooperative banks","Limiting foreign entry into retail banking"],"Basel-linked capital adequacy.","p"],
+["L7","CRAR stands for…",["Capital to Risk-weighted Assets Ratio","Cash Reserve and Asset Ratio","Credit Risk Assessment Rate","Capital Reserve Adequacy Rate"],"Linked to Basel norms."],
+["L7","The Narasimham Committee recommended for public sector banks…",["Merger and consolidation","Increasing government ownership","Reducing lending","Privatising all banks"],"PYQ.","p"],
+["L7","The first Narasimham Committee (on the financial system) was set up in…",["1991","1998","1985","2004"],"The second, on banking sector reforms, was in 1998."],
+["L7","Before 1991, India protected domestic industry mainly through…",["High import tariffs and licensing","Low taxes on imports","Free trade agreements","Currency board"],"To shield firms from cheap foreign goods."],
+["L7","Which pair is correct?",["Before 1991 – import substitution; after 1991 – tariff reduction","Before 1991 – free trade; after 1991 – protection","Before 1991 – FDI welcome; after 1991 – FDI banned","Before 1991 – no licensing; after 1991 – heavy licensing"],"Period tone test."],
+["L7","The word 'inward-looking' in trade policy means…",["Relying on domestic production and limiting imports","Promoting exports aggressively","Welcoming foreign firms","Joining trade blocs"],"Look inside: make it ourselves."],
+["L7","Why did Indian industry lack innovation before 1991?",["Protection removed competitive pressure","Too many foreign competitors","Too little government support","Excessive exports"],"No competitor, no need to improve."],
+["L7","Which option would be a 'negative consequence' of the Licence Raj?",["Stifled innovation and inefficiency","Global competitiveness","Many competing firms","Faster expansion"],"Pick the negative-sounding option."],
+["L7","The period 1948–1990 can be summed up as the government acting like…",["An over-caring parent protecting domestic industry","A neutral referee","A foreign investor","A free-market promoter"],"The lecture's analogy."],
+/* L8 */
+["L8","The First Five Year Plan covered…",["1951–1956","1950–1955","1952–1957","1947–1952"],"1 April 1951 to 31 March 1956."],
+["L8","The First Five Year Plan was based on the…",["Harrod–Domar model","Mahalanobis model","Gadgil formula","Rudra–Manne model"],"PYQ.","p"],
+["L8","The main focus of the First Five Year Plan was…",["Agriculture and irrigation","Heavy industry","Self-reliance","Poverty removal"],"Roti first."],
+["L8","The First Plan's target and achieved growth were…",["2.1% and 3.6%","4.5% and 4.3%","5.6% and 2.4%","5% and 6%"],"A success."],
+["L8","The Second Five Year Plan is also called the…",["Mahalanobis Plan","Gadgil Plan","Nehru Plan","Harrod–Domar Plan"],"PYQ.","p"],
+["L8","The major objective of the Second Five Year Plan was…",["Rapid industrialisation","Poverty eradication","Self-reliance","Employment generation"],"PYQ.","p"],
+["L8","The Second Five Year Plan gave main emphasis to…",["Industry","Agriculture","Transport","Trade"],"Heavy and basic industry.","p"],
+["L8","Bhilai steel plant was set up with the help of…",["USSR","UK","West Germany","USA"],"Chhattisgarh.","p"],
+["L8","Durgapur steel plant was set up with the help of…",["United Kingdom","USSR","West Germany","Japan"],"West Bengal.","p"],
+["L8","Rourkela steel plant is located in…",["Odisha","Chhattisgarh","West Bengal","Jharkhand"],"Built with West German help."],
+["L8","National Statistics Day, 29 June, marks the birth anniversary of…",["P.C. Mahalanobis","V.K.R.V. Rao","D.R. Gadgil","C.R. Rao"],"Father of Indian statistics."],
+["L8","The Indian Statistical Institute was founded by…",["P.C. Mahalanobis","V.K.R.V. Rao","Raj Krishna","D.R. Gadgil"],"Kolkata, 1931; journal Sankhya."],
+["L8","In which plan was 'self-reliance' first made an objective?",["Third","Second","Fourth","Fifth"],"'Self-reliant and self-generating economy'.","p"],
+["L8","The Third Five Year Plan was based on the model of…",["Sukhamoy Chakravarty and John Sandee","Harrod and Domar","D.P. Dhar","Ashok Rudra and Alan Manne"],"The Gadgil formula belongs to the 4th Plan."],
+["L8","Which was NOT a reason for the failure of the Third Plan?",["The Emergency of 1975","War with China in 1962","War with Pakistan in 1965","Severe drought of 1965–66"],"The Emergency came during the 5th Plan."],
+["L8","The Third Plan's target and actual growth were about…",["5.6% and 2.4%","2.1% and 3.6%","4.4% and 4.8%","5% and 6%"],"A failure."],
+["L8","The period 1966–69 is known as…",["Plan Holiday","Rolling Plan","Annual Plans of 1990s","Emergency period"],"Three annual plans.","p"],
+["L8","The term 'Plan Holiday' was coined by…",["The opposition and the press, mockingly","The Planning Commission","The World Bank","The President"],"The government called them annual plans."],
+["L8","Food Corporation of India was set up in…",["1965","1951","1969","1982"],"During the 3rd Plan."],
+["L8","The Bhakra-Nangal dam, built in the First Plan period, is on the river…",["Sutlej","Mahanadi","Krishna","Damodar"],"Hirakud is on the Mahanadi."],
+["L8","Which institution was set up during the First Five Year Plan?",["IIT Kharagpur","NABARD","NITI Aayog","SEBI"],"1951."],
+["L8","Roy Harrod and Evsey Domar were economists from…",["UK and USA respectively","Both UK","Both USA","USSR and UK"],"Harrod British, Domar American."],
+["L8","The first Five Year Plan was implemented under Prime Minister…",["Jawaharlal Nehru","Indira Gandhi","Lal Bahadur Shastri","Rajiv Gandhi"],"PYQ.","p"],
+/* L9 */
+["L9","The Fourth Five Year Plan covered…",["1969–1974","1966–1971","1974–1979","1970–1975"],"After the Plan Holiday."],
+["L9","'Growth with stability and progressive achievement of self-reliance' was the objective of…",["Fourth Plan","Third Plan","Fifth Plan","Sixth Plan"],"CPO 2022 PYQ.","p"],
+["L9","The Gadgil formula is associated with which Five Year Plan?",["Fourth","Third","Fifth","Sixth"],"1969, for central assistance to states.","p"],
+["L9","The Fourth Plan model is credited to…",["Ashok Rudra and Alan Manne","P.C. Mahalanobis","D.P. Dhar","Harrod and Domar"],"If absent from options, pick Gadgil."],
+["L9","India's first nuclear test 'Smiling Buddha' took place in…",["1974","1964","1998","1971"],"18 May 1974, Pokhran, during the 4th Plan."],
+["L9","The Drought Prone Areas Programme was launched in…",["1973","1980","1952","1989"],"4th Plan period."],
+["L9","The slogan 'Garibi Hatao' is linked to which Five Year Plan?",["Fifth","Fourth","Sixth","Seventh"],"PYQ.","p"],
+["L9","The Fifth Five Year Plan was prepared by…",["D.P. Dhar","P.C. Mahalanobis","Jawaharlal Nehru","Manmohan Singh"],"PYQ.","p"],
+["L9","Which plan focused on poverty removal, employment and agricultural production, among other aims?",["Fifth","Fourth","Third","Second"],"CGL 2022 PYQ.","p"],
+["L9","The Fifth Five Year Plan was terminated in…",["1978","1979","1977","1980"],"One year early, by the Janata government."],
+["L9","The Minimum Needs Programme was launched in the…",["Fifth Plan","Third Plan","Seventh Plan","Tenth Plan"],"1974."],
+["L9","The 20-Point Programme was launched in…",["1975","1982","1969","1991"],"During the 5th Plan."],
+["L9","The period of the Rolling Plan was…",["1978–1980","1966–1969","1990–1992","1985–1987"],"CGL 2022 PYQ.","p"],
+["L9","The Rolling Plan concept was given by…",["Gunnar Myrdal","Raj Krishna","D.P. Dhar","Amartya Sen"],"Adopted by the Janata government."],
+["L9","The Rolling Plan was introduced by the government of…",["Morarji Desai","Indira Gandhi","Rajiv Gandhi","Charan Singh"],"Janata Party."],
+["L9","The main objective of the Sixth Five Year Plan was…",["Poverty eradication and employment generation","Self-reliance","Heavy industry","Small-scale industry"],"Continues Garibi Hatao.","p"],
+["L9","NABARD was established on…",["12 July 1982","1 April 1935","19 July 1969","12 July 1992"],"On B. Sivaraman Committee's advice."],
+["L9","NABARD was set up on the recommendation of…",["B. Sivaraman Committee","Narasimham Committee","Rangarajan Committee","Gadgil Committee"],"CRAFICARD."],
+["L9","TRYSEM stands for…",["Training Rural Youth for Self-Employment","Training Rural Youth for Service and Education Mission","Technical Rural Youth Self-Employment Mission","Training of Rural Youth in Small Enterprises Management"],"1979."],
+["L9","The Seventh Plan emphasised…",["Food, work and productivity","Garibi Hatao","Growth with stability","Human resource development"],"F-W-P."],
+["L9","The Seventh Five Year Plan was implemented under Prime Minister…",["Rajiv Gandhi","Indira Gandhi","V.P. Singh","Narasimha Rao"],"1985–90."],
+["L9","Annual Plans were run during 1990–92 mainly because of…",["Political instability and the balance of payments crisis","A war with China","A plan holiday demand","The Emergency"],"V.P. Singh and Chandra Shekhar governments."],
+["L9","Which is the correct combination? (Plans – PM)",["1st, 2nd, 3rd – Nehru; 4th, 5th, 6th – Indira Gandhi","6th – Rajiv Gandhi; 7th – Indira Gandhi","5th – Morarji Desai; 6th – Charan Singh","4th – Nehru; 5th – Shastri"],"CGL PYQ combination.","p"],
+["L9","Which order of planning breaks is correct?",["Plan Holiday → Rolling Plan → Annual Plans","Rolling Plan → Plan Holiday → Annual Plans","Annual Plans → Plan Holiday → Rolling Plan","Plan Holiday → Annual Plans → Rolling Plan"],"1966–69, 1978–80, 1990–92.","",0,1],
+["L9","The 14 major banks were nationalised during which plan?",["Fourth","Third","Fifth","Sixth"],"19 July 1969."],
+["L9","The Integrated Rural Development Programme was extended across India in…",["1980","1969","1991","1999"],"6th Plan."],
+/* L10 */
+["L10","Economic liberalisation was first given importance in which plan?",["Eighth","Sixth","Seventh","Ninth"],"1992–97.","p"],
+["L10","The Eighth Five Year Plan covered…",["1992–1997","1990–1995","1991–1996","1993–1998"],"Two annual plans came before it."],
+["L10","The main focus of the Eighth Plan was…",["Human resource development","Growth with social justice","Garibi Hatao","Food, work and productivity"],"First plan after LPG."],
+["L10","Who was Prime Minister during the Eighth Five Year Plan?",["P.V. Narasimha Rao","Rajiv Gandhi","A.B. Vajpayee","Manmohan Singh"],"PYQ.","p"],
+["L10","'Indicative planning' was adopted from the…",["Eighth Plan","Fifth Plan","Second Plan","Twelfth Plan"],"Government guides, market runs."],
+["L10","'Growth with social justice and equality' was the aim of the…",["Ninth Plan","Eighth Plan","Tenth Plan","Eleventh Plan"],"1997–2002."],
+["L10","Which plan was implemented during Atal Bihari Vajpayee's tenure?",["Ninth","Seventh","Eighth","Sixth"],"PYQ.","p"],
+["L10","The Tenth Plan targeted an annual growth rate of…",["8%","9%","6.5%","5.6%"],"Achieved about 7.6%."],
+["L10","The National Horticulture Mission was launched during the…",["Tenth Plan","Eighth Plan","Sixth Plan","Twelfth Plan"],"2005–06."],
+["L10","'Towards faster and more inclusive growth' was the theme of the…",["Eleventh Plan","Twelfth Plan","Tenth Plan","Ninth Plan"],"2007–12."],
+["L10","The objective of the Twelfth Plan was…",["Faster, more inclusive and sustainable growth","Faster and more inclusive growth","Growth with social justice","Human resource development"],"Adds 'sustainable'.","p"],
+["L10","The last Five Year Plan of India was the…",["Twelfth","Eleventh","Thirteenth","Tenth"],"2012–17."],
+["L10","Match: A. 2nd Plan B. 5th Plan C. 9th Plan D. 11th Plan with 1. Growth with social justice and equality 2. Faster and more inclusive growth 3. Removal of poverty 4. Industrialisation",["A-4, B-3, C-1, D-2","A-3, B-4, C-2, D-1","A-4, B-1, C-3, D-2","A-2, B-3, C-1, D-4"],"Start from what you know best (2nd and 5th).","p",0,1],
+["L10","The term 'Hindu rate of growth' was coined by…",["Raj Krishna","Amartya Sen","K.N. Raj","Jagdish Bhagwati"],"1978."],
+["L10","'Hindu rate of growth' refers to India's growth of about…",["3.5% during 1950–80","8% during 2002–07","6% during 1985–90","1% during British rule"],"Slow growth accepted as normal."],
+["L10","Which Prime Ministers served during the Twelfth Plan period?",["Manmohan Singh and Narendra Modi","Vajpayee and Manmohan Singh","Narasimha Rao and Vajpayee","Only Narendra Modi"],"2012–14 and 2014–17."],
+["L10","Which Prime Ministers served during the Tenth Plan period?",["A.B. Vajpayee and Manmohan Singh","Manmohan Singh only","Narasimha Rao and Vajpayee","Deve Gowda and Gujral"],"2002–04 and 2004–07."],
+["L10","The Planning Commission was replaced by NITI Aayog during which plan period?",["Twelfth","Eleventh","Tenth","Thirteenth"],"1 January 2015."],
+["L10","MGNREGA (NREGA 2005) came during the…",["Tenth Plan","Ninth Plan","Eighth Plan","Eleventh Plan"],"2005."],
+["L10","The Ninth Plan's achieved growth (about 5.4%) was…",["Below its 6.5% target","Above its target","Equal to target","Not measured"],"It fell short."],
+["L10","The Eighth Plan's achieved growth was about…",["6.8% against a 5.6% target","3.6% against 2.1%","2.4% against 5.6%","7.6% against 8%"],"A success after the reforms."],
+["L10","The 73rd and 74th Constitutional Amendments came during the…",["Eighth Plan","Seventh Plan","Ninth Plan","Sixth Plan"],"1992."],
+["L10","In the PM trick, Plans 4–5–6 map to…",["Indira Gandhi","Jawaharlal Nehru","Rajiv Gandhi","Morarji Desai"],"दादी जी."],
+/* L11 */
+["L11","Net Domestic Product (NDP) equals…",["GDP minus depreciation","GDP plus depreciation","GNP minus taxes","GDP minus net factor income"],"PYQ.","p"],
+["L11","Disposable income equals…",["Personal income minus personal taxes","Personal income plus taxes","GDP minus depreciation","Consumption minus saving"],"What you can spend."],
+["L11","Consider: 1. Consumption + saving = disposable income. 2. Disposable income + personal taxes = personal income. Which is correct?",["Both 1 and 2","Only 1","Only 2","Neither"],"Both are identities.","p",0,1],
+["L11","Which is NOT a method of measuring GDP in India?",["Savings method","Income method","Output method","Expenditure method"],"Three methods: income, output, expenditure.","p"],
+["L11","In GDP = C + I + G + (X − M), 'G' stands for…",["Government expenditure","Government subsidy","Gross savings","Gold reserves"],"Expenditure method."],
+["L11","The income method adds…",["Rent, interest, wages and profit","Consumption and investment","Exports and imports","Value added at each stage"],"Factor incomes."],
+["L11","The value-added method is also called the…",["Output method","Income method","Expenditure method","Savings method"],"Sum of value added at each stage."],
+["L11","The National Income Committee was set up in…",["1949","1951","1956","1947"],"August 1949."],
+["L11","The chairman of the National Income Committee (1949) was…",["P.C. Mahalanobis","V.K.R.V. Rao","D.R. Gadgil","Dadabhai Naoroji"],"PYQ.","p"],
+["L11","Who were members of the National Income Committee (1949)?",["D.R. Gadgil and V.K.R.V. Rao","P.C. Mahalanobis and D.R. Gadgil","Dadabhai Naoroji and V.K.R.V. Rao","Raj Krishna and K.N. Raj"],"Mahalanobis was chairman, not member.","p"],
+["L11","The Central Statistical Organisation was set up in…",["1951","1949","1956","1999"],"On the National Income Committee's advice."],
+["L11","The first official estimates of national income were published by the CSO in…",["1956","1949","1951","1948"],"Base year 1948–49.","p"],
+["L11","The base year of the first official national income series was…",["1948–49","1950–51","1947–48","1956–57"],"'Conventional series'."],
+["L11","Who first estimated India's national income?",["Dadabhai Naoroji","V.K.R.V. Rao","P.C. Mahalanobis","R.C. Dutt"],"1867–68; per capita ₹20."],
+["L11","Who made the first scientific estimate of India's national income?",["V.K.R.V. Rao","Dadabhai Naoroji","P.C. Mahalanobis","Findlay Shirras"],"1931–32."],
+["L11","The new GDP series released in February 2026 uses base year…",["2022–23","2011–12","2017–18","2020–21"],"Released 27 February 2026."],
+["L11","Which state/UT topped per-capita NSDP in 2023–24?",["Sikkim","Delhi","Goa","Maharashtra"],"Delhi's big population lowers its per-capita figure.","p"],
+["L11","Research & development, education and consulting belong to the…",["Quaternary sector","Tertiary sector","Secondary sector","Quinary sector"],"Knowledge-based work.","p"],
+["L11","Top government officials and media executives belong to the…",["Quinary sector","Quaternary sector","Tertiary sector","Primary sector"],"Highest-level decision makers.","p"],
+["L11","Fishing and mining belong to the…",["Primary sector","Secondary sector","Tertiary sector","Quaternary sector"],"Taking directly from nature."],
+["L11","Food processing belongs to the…",["Secondary sector","Primary sector","Tertiary sector","Quinary sector"],"Processing = factory work."],
+["L11","Transport and hospitality are sub-sectors of the…",["Services (tertiary) sector","Primary sector","Secondary sector","Quinary sector"],"No goods produced."],
+["L11","The Service Exports from India Scheme (SEIS) was introduced in…",["2015","2009","2020","1991"],"Foreign Trade Policy 2015–20.","p"],
+["L11","The Aspirational Districts Programme was launched in…",["January 2018","January 2017","April 2015","January 2023"],"The 2017 statement is false.","p"],
+["L11","How many districts are covered by the Aspirational Districts Programme?",["112","115","100","500"],"49 KPIs, monitored by NITI Aayog.","p"],
+["L11","How many key performance indicators track Aspirational Districts?",["49","112","5","25"],"Across five themes."],
+["L11","The Aspirational Blocks Programme (2023) covers…",["500 blocks","112 blocks","1,000 blocks","250 blocks"],"January 2023."],
+["L11","Per-capita income is calculated as…",["National income ÷ population","National income × population","GDP − depreciation","GDP ÷ area"],"Why Delhi is not top."],
+/* L12 */
+["L12","Which pairing is correct?",["IPR 1948 – four categories","IPR 1956 – four categories","NIP 1991 – three schedules","IPS 1977 – LPG"],"1948 four, 1956 three schedules."],
+["L12","Which pair is mismatched?",["IPS 1980 – District Industries Centres","IPR 1956 – Economic Constitution","NIP 1991 – LPG","IPR 1948 – mixed economy"],"DIC is 1977."],
+["L12","Arrange chronologically: 1. MRTP Act 2. FERA 3. FEMA 4. Competition Act",["1, 2, 3, 4","2, 1, 3, 4","1, 3, 2, 4","2, 1, 4, 3"],"1969, 1973, 1999, 2002.","",0,1],
+["L12","Arrange chronologically: 1. NITI Aayog 2. NDC 3. Planning Commission 4. National Planning Committee",["4, 3, 2, 1","3, 4, 2, 1","4, 2, 3, 1","3, 2, 4, 1"],"1938, 1950, 1952, 2015.","",0,1],
+["L12","The Planning Commission functioned for about…",["65 years","50 years","70 years","45 years"],"1950–2014."],
+["L12","Which plan was cut short by a change of government?",["Fifth","Third","Seventh","Tenth"],"Ended 1978."],
+["L12","Which plan was a clear failure due to wars and drought?",["Third","First","Seventh","Eighth"],"Target 5.6%, achieved about 2.4%."],
+["L12","Which pairing of plan and theme is correct?",["Seventh – Food, work, productivity","Fourth – Garibi Hatao","Ninth – Rapid industrialisation","Twelfth – Human resource development"],"Fourth = stability; 9th = social justice."],
+["L12","Which pair of IPR numbers is correct?",["1948: 3 strategic, 6 basic, 18 regulated","1948: 17, 12, rest","1956: 3, 6, 18","1956: 8 reserved"],"1956: 17, 12, rest; 1991: 8 reserved."],
+["L12","Which person is linked to both the 2nd Plan and the National Income Committee?",["P.C. Mahalanobis","D.R. Gadgil","V.K.R.V. Rao","D.P. Dhar"],"Chair of NIC; architect of 2nd Plan."],
+["L12","D.R. Gadgil is linked to…",["The Gadgil formula (4th Plan) and the National Income Committee","The 2nd Plan model","The 5th Plan draft","The Rolling Plan"],"Member of NIC 1949; formula 1969."],
+["L12","Which event did NOT happen in 1969?",["FERA was enacted","MRTP Act was passed","14 banks were nationalised","The Fourth Plan began"],"FERA was 1973."],
+["L12","Which event did NOT happen in 1991?",["Competition Act was passed","New Industrial Policy","Narasimham Committee I","LPG reforms"],"Competition Act 2002."],
+["L12","Which Prime Minister is linked to both the Rolling Plan and the 1977 industrial policy?",["Morarji Desai","Indira Gandhi","Charan Singh","Rajiv Gandhi"],"Janata government, 1977–79."],
+["L12","The 'Economic Constitution' and the 'Mahalanobis Plan' both belong to the year…",["1956","1948","1951","1961"],"IPR 1956 and the 2nd Plan start."]
+];
+
+/* Plan finder: [plan, years, model/drafter, PM, focus, target, achieved, key events, lesson] */
+const PLANS = [
+ ["1st","1951–56","Harrod–Domar","Nehru","Agriculture, irrigation","2.1%","3.6%","Bhakra-Nangal, Hirakud; IIT Kharagpur; CDP 1952","L8"],
+ ["2nd","1956–61","P.C. Mahalanobis","Nehru","Rapid industrialisation (heavy industry)","4.5%","4.27%","Bhilai (USSR), Rourkela (W. Germany), Durgapur (UK); IPR 1956","L8"],
+ ["3rd","1961–66","Chakravarty & Sandee","Nehru (then Shastri)","Self-reliant, self-generating economy (first time)","5.6%","2.4%","Failed: 1962 & 1965 wars, drought; FCI, APC 1965","L8"],
+ ["Plan Holiday","1966–69","—","Indira Gandhi","Three annual plans","—","—","Green Revolution begins 1966","L8"],
+ ["4th","1969–74","Rudra–Manne; Gadgil formula","Indira Gandhi","Growth with stability, progressive self-reliance","5.7%","3.3%","14 banks 1969; DPAP 1973; Smiling Buddha 1974","L9"],
+ ["5th","1974–78","D.P. Dhar","Indira Gandhi","Garibi Hatao + attainment of self-reliance","4.4%","4.8%","MNP 1974; 20-Point 1975; ended early 1978","L9"],
+ ["Rolling Plan","1978–80","Gunnar Myrdal (concept)","Morarji Desai","Plan revised every year","—","—","Janata government","L9"],
+ ["6th","1980–85","—","Indira Gandhi → Rajiv","Poverty removal & employment","5.2%","5.7%","NABARD 1982; IRDP; TRYSEM; NREP; RLEGP","L9"],
+ ["7th","1985–90","—","Rajiv Gandhi","Food, Work, Productivity","5.0%","6.0%","Jawahar Rozgar Yojana 1989","L9"],
+ ["Annual Plans","1990–92","—","V.P. Singh, Chandra Shekhar","Instability + BoP crisis","—","—","NIP 24 July 1991","L9"],
+ ["8th","1992–97","Indicative planning","P.V. Narasimha Rao","Human resource development; first after LPG","5.6%","6.8%","73rd/74th Amendments; PMRY; MPLADS","L10"],
+ ["9th","1997–2002","—","A.B. Vajpayee","Growth with social justice and equality","6.5%","5.4%","Fell short of target","L10"],
+ ["10th","2002–07","—","Vajpayee → Manmohan","8% growth; double per-capita income","8.0%","7.6%","NHM (horticulture), NREGA, NRHM 2005","L10"],
+ ["11th","2007–12","—","Manmohan Singh","Faster and more inclusive growth","9.0%","~8%","RTE 2010; NRLM 2011","L10"],
+ ["12th","2012–17","—","Manmohan → Modi","Faster, more inclusive and sustainable growth","8.0%","—","NITI Aayog 2015; last FYP","L10"]
+];
+
+/* Policy finder: [policy, year, by / govt, key features, lesson] */
+const POLICIES = [
+ ["IPR 1948","6 Apr 1948","S.P. Mookerjee (Constituent Assembly)","4 categories SBI-O: strategic 3, basic 6, regulated 18, others; mixed economy; promote public sector","L3"],
+ ["IDR Act","1951","Parliament","Legal base of industrial licensing","L4"],
+ ["Freight Equalisation","1952–1993","Central govt","Same transport cost for minerals everywhere; hurt the east","L4"],
+ ["IPR 1956","30 Apr 1956","Nehru govt","Economic Constitution; Schedules A 17, B 12, C rest; commanding heights; 2nd Plan","L4"],
+ ["MRTP Act","1969","Indira govt","Curb monopolies; threshold ₹20 cr (₹100 cr 1985); replaced by Competition Act 2002; repealed 2009","L5"],
+ ["IPS 1973","1973","Indira govt","Joint sector; large houses defined","L5"],
+ ["FERA","1973","Indira govt","Strict forex control, criminal law; → FEMA 1999 (civil)","L5"],
+ ["IPS 1977","23 Dec 1977","George Fernandes (Janata)","Decentralisation; tiny units; SSI reservation expanded; DIC (1 May 1978)","L5"],
+ ["IPS 1980","23 Jul 1980","Indira govt","PSU efficiency; selective liberalisation; export & import-substitution industries; consumer protection; nucleus plants","L5"],
+ ["NIP 1991","24 Jul 1991","Rao / Manmohan Singh","LPG; de-licensing (now 4 industries); reserved list 17→8; 51% FDI in 34 industries; MRTP threshold removed; disinvestment","L6"],
+ ["FEMA","1999 (in force 2000)","Vajpayee govt","Replaced FERA; civil offences","L5"],
+ ["Competition Act","2002","Vajpayee govt","Replaced MRTP; CCI set up 2003","L5"],
+ ["SHANTI Act","Dec 2025","Modi govt","Private firms may build and run nuclear power plants","L6"]
+];
+
+const TIMELINE = [["1867–68","Naoroji's first national income estimate (₹20 per head)"],["1934","Visvesvaraya: Planned Economy for India"],["1938","National Planning Committee (Bose; chair Nehru)"],["1944","Bombay Plan; Gandhian Plan"],["1945","People's Plan (M.N. Roy)"],["6 Apr 1948","IPR 1948"],["Aug 1949","National Income Committee (Mahalanobis)"],["1950","Sarvodaya Plan (JP)"],["15 Mar 1950","Planning Commission"],["1951","1st Plan; IDR Act; CSO"],["6 Aug 1952","NDC; Freight Equalisation"],["1956","IPR 1956 (30 Apr); 2nd Plan; first official NI estimate"],["1966–69","Plan Holiday"],["1969","MRTP Act; 14 banks nationalised; 4th Plan; Gadgil formula"],["1973","FERA; IPS 1973 (joint sector)"],["1974","5th Plan; Smiling Buddha"],["1977","IPS 1977 (George Fernandes)"],["1 May 1978","District Industries Centres"],["1978–80","Rolling Plan"],["1980","IPS 1980; 6 banks nationalised; 6th Plan"],["12 Jul 1982","NABARD"],["1990–92","Annual Plans"],["24 Jul 1991","New Industrial Policy (LPG)"],["1992","8th Plan"],["1993","Freight Equalisation abolished"],["1999","FEMA"],["2002","Competition Act"],["2009","MRTP repealed"],["1 Jan 2015","NITI Aayog"],["2017","12th Plan ends"],["2018","Aspirational Districts (112)"],["Dec 2025","SHANTI Act (nuclear)"],["27 Feb 2026","New GDP series, base 2022–23"],["Apr / Aug 2026","NITI: VC Ashok Lahiri; CEO Anurag Jain"]];
+
+const FULLF = [["NITI","National Institution for Transforming India"],["NDC","National Development Council"],["IPR","Industrial Policy Resolution"],["IPS","Industrial Policy Statement"],["NIP","New Industrial Policy"],["LPG","Liberalisation, Privatisation, Globalisation"],["MRTP","Monopolies and Restrictive Trade Practices"],["FERA","Foreign Exchange Regulation Act"],["FEMA","Foreign Exchange Management Act"],["CCI","Competition Commission of India"],["IDR Act","Industries (Development and Regulation) Act"],["DIC","District Industries Centre"],["PSU / PSE","Public Sector Undertaking / Enterprise"],["CPSE","Central Public Sector Enterprise"],["SPSE","State Public Sector Enterprise"],["FDI","Foreign Direct Investment"],["BoP","Balance of Payments"],["CRAR","Capital to Risk-weighted Assets Ratio"],["NABARD","National Bank for Agriculture and Rural Development"],["IRDP","Integrated Rural Development Programme"],["TRYSEM","Training Rural Youth for Self-Employment"],["NREP","National Rural Employment Programme"],["RLEGP","Rural Landless Employment Guarantee Programme"],["DPAP","Drought Prone Areas Programme"],["MNP","Minimum Needs Programme"],["FCI","Food Corporation of India"],["CACP","Commission for Agricultural Costs and Prices"],["IDBI","Industrial Development Bank of India"],["CSO","Central Statistical Organisation"],["NSO","National Statistical Office"],["MoSPI","Ministry of Statistics and Programme Implementation"],["GDP / NDP","Gross / Net Domestic Product"],["NSDP","Net State Domestic Product"],["SEIS","Service Exports from India Scheme"],["IRDAI","Insurance Regulatory and Development Authority of India"],["SEBI","Securities and Exchange Board of India"],["SHANTI","Sustainable Harnessing and Advancement of Nuclear Energy for Transforming India"]];
+
+const TILES = [["4","categories — IPR 1948"],["3·6·18","strategic · basic · regulated (1948)"],["3","schedules — IPR 1956"],["17","Schedule A (1956)"],["12","Schedule B (1956)"],["8","reserved for public sector (1991)"],["2","reserved today — atomic energy, railways"],["4","industries needing a licence today"],["51%","FDI automatic (1991)"],["34","high-priority industries (1991)"],["14 / 6","banks nationalised 1969 / 1980"],["₹20 cr","MRTP threshold 1969 (₹100 cr 1985)"],["12","Five Year Plans"],["3","planning breaks"],["112","Aspirational Districts"],["49","KPIs for Aspirational Districts"],["₹20","Naoroji's per-capita income"],["1948–49","first base year"],["2022–23","GDP base year now"],["29 June","National Statistics Day"]];
+
+const PAIRS = [["IPR 1948 vs IPR 1956","4 categories (SBI-O) vs 3 schedules (A-B-C)"],["Strategic (1948) vs Schedule A (1956)","3 industries vs 17 industries"],["IPS 1977 vs IPS 1980","Village & tiny units, DIC vs PSU efficiency, selective liberalisation"],["Decentralisation vs Disinvestment","Spreading industry to districts (1977) vs selling government stake (1991–92)"],["FERA vs FEMA","1973, Regulation, criminal vs 1999, Management, civil"],["MRTP vs Competition Act","1969, curb size vs 2002, curb anti-competitive conduct"],["Nationalisation vs Privatisation","Private → government (1969, 1980) vs government → private (1991)"],["3rd Plan vs 5th Plan","Self-reliant economy (first) vs attainment of self-reliance"],["Plan Holiday vs Rolling Plan","1966–69 after wars vs 1978–80 Janata (Myrdal)"],["Rolling Plan vs Annual Plans","1978–80 vs 1990–92"],["11th vs 12th Plan","Faster & inclusive vs faster, inclusive & sustainable"],["Harrod vs Domar","British vs American"],["Gadgil formula vs Mahalanobis model","4th Plan, state assistance vs 2nd Plan, heavy industry"],["Mahalanobis vs Gadgil & Rao","NIC chairman vs NIC members"],["Naoroji vs V.K.R.V. Rao","First estimate vs first scientific estimate"],["Quaternary vs Quinary","Knowledge work vs top decision-makers"],["Cooperative federalism vs socialism","NITI promotes federalism — 'socialism' is the trap"],["Planning Commission vs NITI Aayog","1950, allocates funds vs 2015, think tank"],["Bhilai vs Rourkela vs Durgapur","USSR vs West Germany vs UK"],["Institute vs Institution","NITI = National Institution for Transforming India"]];
+
+const APP = { key:"economy_ipr_plans_v1", brand:"Industrial Policy & Plans", sub:"औद्योगिक नीति · पंचवर्षीय योजनाएँ · SSC CGL workbook",
+  eyebrow:"IPR 1948 → 1991 · Five Year Plans · 2025 PYQs",
+  intro:"12 short lessons from your five economy lectures: every Industrial Policy from 1948 to 1991, all twelve Five Year Plans, NITI Aayog and national-income basics, with the lecture tricks (SBI-O, 17-12-बाकी, नाना-दादी-पापा, हम पाँच पाँचों गरीब), the Steno, CGL and NTPC questions, and lecture slips corrected in red Trap boxes. Checked to October 2026, including NITI Aayog's new Vice-Chairperson and CEO." };
+
+
+/* ============================================================
+   HELPERS & STATE
+   ============================================================ */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const hash = s => { let h = 5381; for (let i=0;i<s.length;i++) h = ((h<<5)+h + s.charCodeAt(i))|0; return "q"+(h>>>0).toString(36); };
+const shuffle = a => { const b=a.slice(); for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]];} return b; };
+const L = id => LESSONS.find(l => l.id === id);
+const LNUM = id => LESSONS.findIndex(l => l.id === id) + 1;
+
+const QS = QB.map(r => {
+  const fixed = !!r[6];
+  return { t:r[0], q:r[1], o:r[2], e:r[3], p:(r[4]||"").includes("p"), a: fixed ? (r[5]||0) : 0, fixed, id:hash(r[1]) };
+});
+const byLesson = id => QS.filter(q => q.t === id);
+// order of options to show: array of original indexes
+const makePerm = q => q.fixed ? q.o.map((_,i)=>i) : shuffle(q.o.map((_,i)=>i));
+
+const KEY = APP.key;
+let S = { ans:{}, bm:{}, les:{}, mocks:[] };
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch(e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
+const record = (q, ok) => { S.ans[q.id] = ok ? 1 : 0; save(); renderTop(); };
+
+function renderTop(){
+  const ids = Object.keys(S.ans).filter(k => QS.some(q => q.id === k));
+  const right = ids.filter(k => S.ans[k] === 1).length;
+  const pct = ids.length ? Math.round(right*100/ids.length) : 0;
+  $("#topstat").innerHTML = `<b>${ids.length}</b>/${QS.length} tried<br><b>${pct}%</b> right now`;
+}
+
+/* ============================================================
+   ROUTING
+   ============================================================ */
+let TAB = "learn";
+let timerId = null;
+function go(tab){
+  TAB = tab;
+  document.querySelectorAll(".nav button").forEach(b => b.setAttribute("aria-current", b.dataset.tab===tab ? "page" : "false"));
+  if (tab === "learn") renderLearn();
+  if (tab === "practice") renderPractice();
+  if (tab === "mock") renderMock();
+  if (tab === "revise") renderRevise();
+  window.scrollTo(0,0);
+  try { history.replaceState(null, "", "#"+tab); } catch(e) {}
+}
+document.querySelectorAll(".nav button").forEach(b => b.addEventListener("click", () => {
+  if (TAB === "mock" && M && M.running && b.dataset.tab !== "mock") { go("mock"); showMockLeave(b.dataset.tab); return; }
+  go(b.dataset.tab);
+}));
+
+/* ============================================================
+   LEARN
+   ============================================================ */
+function renderLearn(){
+  const done = LESSONS.filter(l => S.les[l.id] && S.les[l.id].done).length;
+  const nextIdx = LESSONS.findIndex(l => !(S.les[l.id] && S.les[l.id].done));
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="hero">
+      <span class="eyebrow">${APP.eyebrow}</span>
+      <h1>Learn it, test it, revise it</h1>
+      <p>${APP.intro} ${QS.length} exam-style questions in all.</p>
+      <div class="meter" aria-label="Lessons done"><i style="width:${done/LESSONS.length*100}%"></i></div>
+      <div class="row between"><span class="muted num" style="font-size:13px">${done}/${LESSONS.length} lessons done</span>
+      ${nextIdx>=0 ? `<button class="btn pri sm" type="button" data-open="${LESSONS[nextIdx].id}">${done? "Continue" : "Start"}: Lesson ${nextIdx+1}</button>` : `<span class="muted" style="font-size:13px">All lessons done. Try a mock test.</span>`}</div>
+    </div>
+    <div class="lessons">${LESSONS.map((l,i) => {
+      const st = S.les[l.id] || {}; const n = byLesson(l.id).length;
+      return `<button type="button" class="les ${st.done?"done":""} ${i===nextIdx?"next":""}" data-open="${l.id}">
+        <span class="no">${st.done ? "✓" : i+1}</span>
+        <span class="t"><b>${esc(l.title)}</b><span>${l.hi} · ${n} questions</span></span>
+        <span class="sc">${st.best!=null ? `best<br>${st.best}/${n}` : ""}</span></button>`;}).join("")}
+    </div>
+    <p class="foot">Facts are checked to September 2026. Where a lecture got a fact wrong, the lesson flags it in a red “Trap” box. Revise → Plan table and Policy table are the fastest last-week tools.</p>
+  </section>`;
+  $("#app").querySelectorAll("[data-open]").forEach(b => b.addEventListener("click", () => openLesson(b.dataset.open, "learn")));
+}
+
+function blockHTML(b){
+  if (b.k==="p") return `<div class="plain"><p>${b.h}</p></div>`;
+  if (b.k==="trick") return `<div class="trick"><span class="lab">Trick</span>${b.h}</div>`;
+  if (b.k==="link") return `<div class="link"><span class="lab">Link · connect the dots</span>${b.h}</div>`;
+  if (b.k==="q") { const perm = shuffle(b.o.map((_,i)=>i)); return `<div class="icheck" data-ic><span class="lab">Quick check</span><p class="qt">${esc(b.q)}</p><div class="opts">${perm.map((oi,k)=>`<button type="button" class="opt" data-ioi="${oi}"><span class="k">${"ABCD"[k]}</span><span>${esc(b.o[oi])}</span></button>`).join("")}</div><div class="exp" hidden><b class="okl"></b> ${esc(b.e)}</div></div>`; }
+  if (b.k==="trap") return `<div class="trap"><span class="lab">Trap · correction</span>${b.h}</div>`;
+  if (b.k==="facts") return `<div class="block"><h3>${b.title}</h3><dl class="facts">${b.rows.map(r=>`<div><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join("")}</dl></div>`;
+  if (b.k==="tl") return `<div class="block"><h3>${b.title}</h3><ul class="tl">${b.rows.map(r=>`<li><span class="y">${r[0]}</span><span>${r[1]}</span></li>`).join("")}</ul></div>`;
+  if (b.k==="table") {
+    const isNum = (ci) => b.numcol==="all" ? ci>0 : (b.numcol===1 && ci===1) || (typeof b.numcol==="string" && b.numcol.includes(String(ci)));
+    return `<div class="block"><h3>${b.title}</h3><div class="tbl"><table><thead><tr>${b.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${b.rows.map(r=>`<tr>${r.map((c,ci)=>`<td class="${isNum(ci)?"n":""}">${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+  }
+  if (b.k==="fig") return `<div class="block"><h3>${b.title}</h3><figure class="fig">${b.svg}<figcaption>${b.cap}</figcaption></figure></div>`;
+  if (b.k==="pyr") return `<div class="block"><h3>${b.title}</h3><div class="pyr">${b.items.map(it=>`<div>${PYR(it.rows)}<b>${it.name}</b><span class="muted">${it.note}</span></div>`).join("")}</div><p class="muted" style="font-size:13px;margin-top:8px"><span style="color:var(--blue)">■</span> males · <span style="color:var(--accent)">■</span> females · top = old, base = young</p></div>`;
+  return "";
+}
+
+let LQ = null;
+function openLesson(id, step){
+  const l = L(id), i = LNUM(id);
+  if (step === "quiz") { LQ = { id, list: shuffle(byLesson(id)).map(q => ({q, perm:makePerm(q)})), i:0, score:0, picked:null }; }
+  const head = `<div class="lhead"><button class="back" type="button" id="lback">‹ Lessons</button></div>
+    <span class="eyebrow">Lesson ${i} of ${LESSONS.length} · ${l.hi}</span><h1>${esc(l.title)}</h1>
+    <div class="steps" role="tablist">
+      <button type="button" data-step="learn" aria-current="${step==="learn"?"step":"false"}">1 · Learn</button>
+      <button type="button" data-step="quiz" aria-current="${step==="quiz"?"step":"false"}">2 · Quiz</button>
+      <button type="button" data-step="sum" aria-current="${step==="sum"?"step":"false"}">3 · Summary</button>
+    </div>`;
+  let body = "";
+  if (step === "learn") {
+    body = `<div class="stack">${l.blocks.map(blockHTML).join("")}
+      <div class="row end"><button class="btn pri" type="button" id="toquiz">Take the lesson quiz · ${byLesson(id).length} questions</button></div></div>`;
+  } else if (step === "quiz") {
+    body = `<div id="lq"></div>`;
+  } else {
+    const nxt = LESSONS[i];
+    body = `<div class="stack"><div class="block"><h3>Remember these</h3><ul class="sum">${l.sum.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>
+      <div class="row between"><button class="btn" type="button" id="relearn">Read again</button>
+      ${nxt ? `<button class="btn pri" type="button" id="nextles">Next: ${esc(nxt.title)}</button>` : `<button class="btn pri" type="button" id="tomock">Take a mock test</button>`}</div></div>`;
+    S.les[id] = Object.assign(S.les[id]||{}, {done:1}); save();
+  }
+  $("#app").innerHTML = `<section class="view stack">${head}${body}</section>`;
+  $("#lback").onclick = () => renderLearn();
+  $("#app").querySelectorAll("[data-step]").forEach(b => b.onclick = () => openLesson(id, b.dataset.step));
+  if (step==="learn") { $("#toquiz").onclick = () => openLesson(id,"quiz");
+    const ics = l.blocks.filter(b=>b.k==="q");
+    $("#app").querySelectorAll("[data-ic]").forEach((box,n) => { const b = ics[n];
+      box.querySelectorAll("[data-ioi]").forEach(btn => btn.onclick = () => {
+        if (box.dataset.done) return; box.dataset.done = 1; const pick = +btn.dataset.ioi;
+        box.querySelectorAll("[data-ioi]").forEach(x => { const oi=+x.dataset.ioi; x.disabled = true; if (oi===0) x.classList.add("ok"); else if (oi===pick) x.classList.add("no"); });
+        const ex = box.querySelector(".exp"); ex.hidden = false; const lab = ex.querySelector("b");
+        if (pick===0) { lab.textContent = "Correct."; } else { lab.className = "nol"; lab.textContent = "Answer: " + b.o[0] + "."; }
+      }); }); }
+  if (step==="quiz") renderLQ();
+  if (step==="sum") {
+    $("#relearn").onclick = () => openLesson(id,"learn");
+    const n = $("#nextles"); if (n) n.onclick = () => openLesson(LESSONS[i].id,"learn");
+    const m = $("#tomock"); if (m) m.onclick = () => go("mock");
+  }
+  window.scrollTo(0,0);
+}
+
+function optsHTML(q, perm, state){
+  // state: {picked: originalIndex|null, reveal: bool, sel: originalIndex|null}
+  return perm.map((oi, k) => {
+    let cls = "opt";
+    if (state.reveal) { if (oi === q.a) cls += " ok"; else if (oi === state.picked) cls += " no"; }
+    else if (state.sel === oi) cls += " sel";
+    return `<button type="button" class="${cls}" data-oi="${oi}" ${state.reveal?"disabled":""}><span class="k">${"ABCD"[k]}</span><span>${esc(q.o[oi])}</span></button>`;
+  }).join("");
+}
+function expHTML(q, picked){
+  const ok = picked === q.a;
+  return `<div class="exp">${ok ? `<b class="okl">Correct.</b>` : `<b class="nol">Answer: ${esc(q.o[q.a])}.</b>`} ${esc(q.e)}</div>`;
+}
+function metaHTML(q, no){
+  return `<div class="qmeta"><span class="qno">${no}</span><span class="tag">L${LNUM(q.t)} · ${esc(L(q.t).title)}</span>${q.p?`<span class="tag pyq">Exam-asked</span>`:""}
+  <button type="button" class="bm" data-bm="${q.id}" aria-pressed="${S.bm[q.id]?"true":"false"}" aria-label="Bookmark">${S.bm[q.id]?"★":"☆"}</button></div>`;
+}
+
+function renderLQ(){
+  const box = $("#lq");
+  if (LQ.i >= LQ.list.length) {
+    const n = LQ.list.length, l = L(LQ.id);
+    const st = S.les[LQ.id] || {}; st.best = Math.max(st.best||0, LQ.score); S.les[LQ.id] = st; save();
+    box.innerHTML = `<div class="stack"><div class="block stack"><span class="eyebrow">Quiz done</span>
+      <div class="scorebig"><span class="num">${LQ.score}</span><span class="muted">/ ${n} correct</span></div>
+      <p class="muted">${LQ.score===n ? "Full marks." : LQ.score >= n*0.8 ? "Strong. Review the ones you missed in Practice → Mistakes." : "Read the lesson once more, then retry. Missed questions are saved under Practice → Mistakes."}</p></div>
+      <div class="row between"><button class="btn" type="button" id="retry">Retry quiz</button><button class="btn pri" type="button" id="tosum">See summary</button></div></div>`;
+    $("#retry").onclick = () => openLesson(LQ.id,"quiz");
+    $("#tosum").onclick = () => openLesson(LQ.id,"sum");
+    return;
+  }
+  const it = LQ.list[LQ.i], q = it.q;
+  const reveal = LQ.picked !== null;
+  box.innerHTML = `<div class="stack"><div class="meter"><i style="width:${LQ.i/LQ.list.length*100}%"></i></div>
+    <article class="qcard">${metaHTML(q, `Q${LQ.i+1}/${LQ.list.length}`)}
+    <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {picked:LQ.picked, reveal})}</div>
+    ${reveal ? expHTML(q, LQ.picked) : ""}</article>
+    ${reveal ? `<div class="row end"><button class="btn pri" type="button" id="lqnext">${LQ.i+1 < LQ.list.length ? "Next question" : "Finish"}</button></div>` : `<p class="muted" style="font-size:13px">Score so far: <span class="num">${LQ.score}</span></p>`}</div>`;
+  box.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    if (LQ.picked !== null) return;
+    LQ.picked = +b.dataset.oi; const ok = LQ.picked === q.a; if (ok) LQ.score++; record(q, ok); renderLQ();
+  });
+  bindBM(box);
+  const nx = $("#lqnext"); if (nx) nx.onclick = () => { LQ.i++; LQ.picked = null; renderLQ(); window.scrollTo(0,0); };
+}
+
+function bindBM(root){
+  root.querySelectorAll("[data-bm]").forEach(b => b.onclick = (ev) => {
+    ev.stopPropagation();
+    const id = b.dataset.bm; if (S.bm[id]) delete S.bm[id]; else S.bm[id] = 1; save();
+    b.setAttribute("aria-pressed", S.bm[id] ? "true":"false"); b.textContent = S.bm[id] ? "★" : "☆";
+  });
+}
+
+/* ============================================================
+   PRACTICE
+   ============================================================ */
+let PF = "all", PSHOW = 20, PORDER = null, PPERM = {}, PPICK = {};
+function practiceList(){
+  let list = QS;
+  if (PF === "pyq") list = QS.filter(q => q.p);
+  else if (PF === "wrong") list = QS.filter(q => S.ans[q.id] === 0);
+  else if (PF === "new") list = QS.filter(q => S.ans[q.id] === undefined);
+  else if (PF === "bm") list = QS.filter(q => S.bm[q.id]);
+  else if (PF !== "all") list = QS.filter(q => q.t === PF);
+  if (PORDER) { const pos = new Map(PORDER.map((id,i)=>[id,i])); list = list.slice().sort((a,b)=>(pos.get(a.id)??0)-(pos.get(b.id)??0)); }
+  return list;
+}
+function renderPractice(){
+  const wrongN = QS.filter(q => S.ans[q.id] === 0).length, bmN = QS.filter(q=>S.bm[q.id]).length, pyqN = QS.filter(q=>q.p).length;
+  const chips = [["all",`All ${QS.length}`],["new","Not tried"],["wrong",`Mistakes ${wrongN}`],["pyq",`Exam-asked ${pyqN}`],["bm",`Starred ${bmN}`]].concat(LESSONS.map((l,i)=>[l.id,`L${i+1} ${l.title}`]));
+  const list = practiceList();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Question bank</span><h1>Practice</h1>
+    <p class="muted">Tap an option to check it. Wrong answers go to <b>Mistakes</b> until you get them right.</p></div>
+    <div class="chips" role="group" aria-label="Filter">${chips.map(c=>`<button type="button" class="chip" data-f="${c[0]}" aria-pressed="${PF===c[0]}">${esc(c[1])}</button>`).join("")}</div>
+    <div class="row between"><span class="muted num" style="font-size:13px">${list.length} questions</span>
+      <div class="row"><button class="btn sm ghost" type="button" id="pshuf">${PORDER?"In order":"Shuffle"}</button></div></div>
+    <div class="stack" id="plist"></div>
+  </section>`;
+  $("#app").querySelectorAll("[data-f]").forEach(b => b.onclick = () => { PF = b.dataset.f; PSHOW = 20; PPICK = {}; renderPractice(); });
+  $("#pshuf").onclick = () => { PORDER = PORDER ? null : shuffle(QS.map(q=>q.id)); PSHOW = 20; renderPractice(); };
+  const chipOn = $(`.chip[aria-pressed="true"]`); if (chipOn) chipOn.scrollIntoView({block:"nearest", inline:"center"});
+  drawPList();
+}
+function pCard(q, idx){
+  if (!PPERM[q.id]) PPERM[q.id] = makePerm(q);
+  const picked = PPICK[q.id]; const reveal = picked !== undefined;
+  return `<article class="qcard" data-q="${q.id}">${metaHTML(q, "Q"+(idx+1))}<p class="qt">${esc(q.q)}</p>
+    <div class="opts">${optsHTML(q, PPERM[q.id], {picked: reveal?picked:null, reveal})}</div>${reveal?expHTML(q,picked):""}</article>`;
+}
+function drawPList(){
+  const list = practiceList(), box = $("#plist");
+  if (!list.length) { box.innerHTML = `<p class="empty">${PF==="wrong"?"No mistakes saved. Answer some questions first, or you've cleared them all.":PF==="bm"?"Nothing starred yet. Tap ☆ on any question.":"Nothing here."}</p>`; return; }
+  box.innerHTML = list.slice(0, PSHOW).map((q,i)=>pCard(q,i)).join("") + (list.length > PSHOW ? `<button class="btn" type="button" id="pmore">Show 20 more (${list.length-PSHOW} left)</button>` : "");
+  bindP(box);
+  const more = $("#pmore"); if (more) more.onclick = () => { PSHOW += 20; drawPList(); };
+}
+function bindP(box){ box.querySelectorAll(".qcard").forEach(bindCard); }
+function bindCard(card){
+  card.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    const q = QS.find(x => x.id === card.dataset.q); if (PPICK[q.id] !== undefined) return;
+    PPICK[q.id] = +b.dataset.oi; record(q, PPICK[q.id] === q.a);
+    const idx = +card.querySelector(".qno").textContent.slice(1) - 1;
+    const tmp = document.createElement("div"); tmp.innerHTML = pCard(q, idx); const nc = tmp.firstElementChild;
+    card.replaceWith(nc); bindCard(nc);
+  });
+  bindBM(card);
+}
+
+/* ============================================================
+   MOCK TEST
+   ============================================================ */
+let M = null, MCFG = {n:25, scope:"all", neg:1}, LEAVE_TO = null;
+function renderMock(){
+  if (M && M.running) return drawMockRun();
+  if (M && M.done) return drawMockResult();
+  const hist = (S.mocks||[]).slice(-6).reverse();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Timed, SSC pattern</span><h1>Mock test</h1>
+    <p class="muted">+2 for a right answer, −0.5 for a wrong one, 36 seconds per question (CGL Tier-1 pace). Answers show only after you submit.</p></div>
+    <div class="block stack">
+      <fieldset><legend>Questions</legend><div class="radios">${[10,25,50,100].map(n=>`<label><input type="radio" name="mn" id="mn${n}" value="${n}" ${MCFG.n===n?"checked":""}><span>${n} · ${Math.round(n*36/60)} min</span></label>`).join("")}</div></fieldset>
+      <fieldset><legend>From</legend><select id="mscope" aria-label="Lessons to draw from"><option value="all">All lessons</option><option value="pyq">Exam-asked only</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}" ${MCFG.scope===l.id?"selected":""}>L${i+1} · ${esc(l.title)}</option>`).join("")}</select></fieldset>
+      <label class="row" style="gap:8px;font-weight:600"><input type="checkbox" id="mneg" ${MCFG.neg?"checked":""}> Negative marking (−0.5)</label>
+      <div id="merr" class="muted" style="font-size:14px"></div>
+      <div class="row end"><button class="btn pri" type="button" id="mstart">Start test</button></div>
+    </div>
+    ${hist.length ? `<div class="block"><h3>Recent attempts</h3><div class="hist">${hist.map(h=>`<div><span>${esc(h.d)} · ${h.n} Q</span><span class="num">${h.score}/${h.max} · ${h.acc}%</span></div>`).join("")}</div></div>` : ""}
+  </section>`;
+  $("#mscope").value = MCFG.scope;
+  $("#mstart").onclick = () => {
+    MCFG.n = +(document.querySelector('input[name="mn"]:checked')||{value:25}).value;
+    MCFG.scope = $("#mscope").value; MCFG.neg = $("#mneg").checked ? 1 : 0;
+    let pool = MCFG.scope==="all" ? QS : MCFG.scope==="pyq" ? QS.filter(q=>q.p) : MCFG.scope==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===MCFG.scope);
+    if (!pool.length) { $("#merr").textContent = "No questions in that set yet. Pick another source."; return; }
+    const qs = shuffle(pool).slice(0, MCFG.n);
+    M = { running:true, list: qs.map(q=>({q, perm:makePerm(q)})), ans: qs.map(()=>null), mark: qs.map(()=>false), i:0, neg:MCFG.neg, secs: qs.length*36, start: Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000;
+    startTimer(); drawMockRun();
+  };
+}
+function startTimer(){
+  clearInterval(timerId);
+  timerId = setInterval(() => {
+    if (!M || !M.running) { clearInterval(timerId); return; }
+    const left = Math.max(0, Math.round((M.end - Date.now())/1000));
+    const el = $("#mtime"); if (el) { el.textContent = fmt(left); el.classList.toggle("low", left <= 60); }
+    if (left <= 0) submitMock();
+  }, 1000);
+}
+const fmt = s => `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+function drawMockRun(){
+  const it = M.list[M.i], q = it.q, left = Math.max(0, Math.round((M.end-Date.now())/1000));
+  const answered = M.ans.filter(a=>a!==null).length;
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="mbar"><span class="timer num ${left<=60?"low":""}" id="mtime">${fmt(left)}</span>
+      <span class="muted num" style="font-size:13px;flex:1">Q ${M.i+1}/${M.list.length} · ${answered} answered</span>
+      <button class="btn sm" type="button" id="mpal">${M.showPal?"Hide":"All Qs"}</button></div>
+    ${LEAVE_TO ? `<div class="confirm"><b>Leave the test?</b><span>Your answers so far will be scored now.</span><div class="row"><button class="btn sm pri" type="button" id="lvy">Submit and leave</button><button class="btn sm" type="button" id="lvn">Stay</button></div></div>` : ""}
+    ${M.showPal ? `<div class="block"><div class="pal">${M.list.map((_,k)=>`<button type="button" data-j="${k}" class="${M.ans[k]!==null?"a":""} ${M.mark[k]?"m":""} ${k===M.i?"cur":""}" aria-label="Question ${k+1}">${k+1}</button>`).join("")}</div>
+      <p class="muted" style="font-size:12px;margin-top:8px">Filled = answered · orange line = marked for review</p></div>` : ""}
+    <article class="qcard"><div class="qmeta"><span class="qno">Q${M.i+1}</span><span class="tag">L${LNUM(q.t)}</span>${M.mark[M.i]?`<span class="tag pyq">Marked</span>`:""}</div>
+      <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {sel:M.ans[M.i], reveal:false})}</div></article>
+    <div class="row between"><button class="btn" type="button" id="mprev" ${M.i===0?"disabled":""}>‹ Prev</button>
+      <button class="btn ghost" type="button" id="mmark">${M.mark[M.i]?"Unmark":"Mark"}</button>
+      <button class="btn ghost" type="button" id="mclr" ${M.ans[M.i]===null?"disabled":""}>Clear</button>
+      <button class="btn ${M.i<M.list.length-1?"pri":""}" type="button" id="mnext" ${M.i===M.list.length-1?"disabled":""}>Next ›</button></div>
+    ${M.confirm ? `<div class="confirm"><b>Submit the test?</b><span>${M.list.length-answered} unanswered${M.mark.filter(Boolean).length?`, ${M.mark.filter(Boolean).length} marked for review`:""}.</span><div class="row"><button class="btn sm pri" type="button" id="msubY">Submit</button><button class="btn sm" type="button" id="msubN">Keep going</button></div></div>`
+      : `<button class="btn pri" type="button" id="msub">Submit test</button>`}
+  </section>`;
+  $("#app").querySelectorAll(".opt").forEach(b => b.onclick = () => { M.ans[M.i] = +b.dataset.oi; drawMockRun(); });
+  $("#mprev").onclick = () => { if (M.i>0){M.i--; drawMockRun();} };
+  $("#mnext").onclick = () => { if (M.i<M.list.length-1){M.i++; drawMockRun(); window.scrollTo(0,0);} };
+  $("#mmark").onclick = () => { M.mark[M.i] = !M.mark[M.i]; drawMockRun(); };
+  $("#mclr").onclick = () => { M.ans[M.i] = null; drawMockRun(); };
+  $("#mpal").onclick = () => { M.showPal = !M.showPal; drawMockRun(); };
+  $("#app").querySelectorAll("[data-j]").forEach(b => b.onclick = () => { M.i = +b.dataset.j; drawMockRun(); });
+  const s = $("#msub"); if (s) s.onclick = () => { M.confirm = true; drawMockRun(); };
+  const y = $("#msubY"); if (y) y.onclick = submitMock;
+  const n = $("#msubN"); if (n) n.onclick = () => { M.confirm = false; drawMockRun(); };
+  const lvy = $("#lvy"); if (lvy) lvy.onclick = () => { const t = LEAVE_TO; LEAVE_TO = null; submitMock(); go(t); };
+  const lvn = $("#lvn"); if (lvn) lvn.onclick = () => { LEAVE_TO = null; drawMockRun(); };
+}
+function showMockLeave(tab){ LEAVE_TO = tab; drawMockRun(); }
+function submitMock(){
+  if (!M || !M.running) return;
+  clearInterval(timerId);
+  M.running = false; M.done = true; M.confirm = false;
+  let c=0,w=0,sk=0; const per = {};
+  M.list.forEach((it,k) => {
+    const a = M.ans[k]; const t = it.q.t; per[t] = per[t] || {c:0,n:0}; per[t].n++;
+    if (a===null) sk++; else if (a===it.q.a) { c++; per[t].c++; S.ans[it.q.id]=1; } else { w++; S.ans[it.q.id]=0; }
+  });
+  const max = M.list.length*2, score = +(c*2 - (M.neg? w*0.5 : 0)).toFixed(1);
+  const used = Math.min(M.secs, Math.round((Date.now()-M.start)/1000));
+  M.res = {c,w,sk,score,max,used,per, acc: (c+w) ? Math.round(c*100/(c+w)) : 0};
+  const d = new Date(); const ds = d.toLocaleDateString("en-IN",{day:"numeric",month:"short"})+" "+d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
+  S.mocks = (S.mocks||[]).concat([{d:ds, n:M.list.length, score, max, acc:M.res.acc}]).slice(-20); save(); renderTop();
+  M.filter = "wrong";
+  if (TAB==="mock") drawMockResult();
+}
+function drawMockResult(){
+  const r = M.res;
+  const per = Object.keys(r.per).sort((a,b)=>LNUM(a)-LNUM(b)).map(t => `<div><span>L${LNUM(t)} · ${esc(L(t).title)}</span><span class="num">${r.per[t].c}/${r.per[t].n}</span></div>`).join("");
+  const rows = M.list.map((it,k)=>({it,k})).filter(({it,k}) => M.filter==="all" ? true : M.filter==="wrong" ? (M.ans[k]!==null && M.ans[k]!==it.q.a) : M.ans[k]===null);
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Result</span>
+    <div class="scorebig"><span class="num">${r.score}</span><span class="muted">/ ${r.max} marks</span></div></div>
+    <div class="kpis"><div class="kpi g"><span class="num">${r.c}</span><span>right</span></div><div class="kpi b"><span class="num">${r.w}</span><span>wrong</span></div><div class="kpi"><span class="num">${r.sk}</span><span>skipped</span></div><div class="kpi"><span class="num">${r.acc}%</span><span>accuracy</span></div></div>
+    <p class="muted num" style="font-size:13px">Time used ${fmt(r.used)} of ${fmt(M.secs)}</p>
+    <div class="block"><h3>By lesson</h3><div class="hist">${per}</div></div>
+    <div class="row between"><button class="btn" type="button" id="mnew">New test</button><button class="btn pri" type="button" id="mretry">Retake same questions</button></div>
+    <h2>Review</h2>
+    <div class="chips">${[["wrong",`Wrong ${r.w}`],["skip",`Skipped ${r.sk}`],["all",`All ${M.list.length}`]].map(c=>`<button class="chip" type="button" data-rf="${c[0]}" aria-pressed="${M.filter===c[0]}">${c[1]}</button>`).join("")}</div>
+    <div class="stack">${rows.length ? rows.map(({it,k}) => `<article class="qcard">${metaHTML(it.q, "Q"+(k+1))}<p class="qt">${esc(it.q.q)}</p><div class="opts">${optsHTML(it.q, it.perm, {picked:M.ans[k], reveal:true})}</div>${M.ans[k]===null?`<div class="exp"><b class="nol">Skipped. Answer: ${esc(it.q.o[it.q.a])}.</b> ${esc(it.q.e)}</div>`:expHTML(it.q, M.ans[k])}</article>`).join("") : `<p class="empty">Nothing in this list.</p>`}</div>
+  </section>`;
+  bindBM($("#app"));
+  $("#app").querySelectorAll("[data-rf]").forEach(b => b.onclick = () => { M.filter = b.dataset.rf; drawMockResult(); });
+  $("#mnew").onclick = () => { M = null; renderMock(); };
+  $("#mretry").onclick = () => {
+    const list = M.list.map(it=>({q:it.q, perm:makePerm(it.q)}));
+    M = { running:true, list, ans:list.map(()=>null), mark:list.map(()=>false), i:0, neg:MCFG.neg, secs:list.length*36, start:Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000; startTimer(); drawMockRun();
+  };
+}
+
+/* ============================================================
+   REVISE
+   ============================================================ */
+let RV = "plans", FC = null, FCSCOPE = "all", HIDE = {model:1, pm:0, focus:1, ta:0}, CREV = {}, CORDER = null, PHIDE = {yr:0, feat:1}, PREV = {};
+function renderRevise(){
+  const tabs = [["plans","Plan table"],["policies","Policy table"],["timeline","Timeline"],["finder","Search all"],["ff","Full forms"],["nums","Numbers & pairs"],["links","Links"],["tricks","Tricks"],["traps","Traps"],["flash","Flashcards"]];
+  if (!tabs.some(t=>t[0]===RV)) RV = "plans";
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Last-day revision</span><h1>Revise</h1></div>
+    <div class="seg" role="tablist">${tabs.map(t=>`<button type="button" role="tab" data-rv="${t[0]}" aria-selected="${RV===t[0]}">${t[1]}</button>`).join("")}</div>
+    <div id="rv" class="stack"></div></section>`;
+  $("#app").querySelectorAll("[data-rv]").forEach(b => b.onclick = () => { RV = b.dataset.rv; renderRevise(); });
+  const on = $(`.seg [aria-selected="true"]`); if (on) on.scrollIntoView({block:"nearest", inline:"center"});
+  const box = $("#rv");
+  if (RV === "plans") {
+    const order = CORDER || PLANS.map((_,i)=>i);
+    const LBL = {model:"Model", pm:"PM", focus:"Focus", ta:"Target → achieved"};
+    const cell = (k, col, v) => (HIDE[col] && !CREV[k+col] && v!=="—") ? `<td data-l="${LBL[col]}"><button type="button" class="peek" data-peek="${k+col}" aria-label="Show ${LBL[col]}">tap</button></td>` : `<td data-l="${LBL[col]}">${esc(v)}</td>`;
+    box.innerHTML = `<p class="muted">Cover drill for all 12 plans and the 3 breaks. Hide a column, say it aloud, tap to check.</p>
+      <div class="chips" role="group" aria-label="Hide columns">${[["model","Hide model"],["pm","Hide PM"],["focus","Hide focus"],["ta","Hide growth"]].map(c=>`<button type="button" class="chip" data-hide="${c[0]}" aria-pressed="${!!HIDE[c[0]]}">${c[1]}</button>`).join("")}
+      <button type="button" class="chip" id="cshuf">${CORDER?"In order":"Shuffle rows"}</button><button type="button" class="chip" id="creset">Cover all again</button></div>
+      <div class="block"><div class="tbl"><table class="cover"><thead><tr><th>Plan</th><th>Years</th><th>Model</th><th>PM</th><th>Focus</th><th>Target → achieved</th></tr></thead><tbody>${order.map(k=>{ const p = PLANS[k];
+        const ta = p[5]==="—" ? "—" : `${p[5]} → ${p[6]}`;
+        return `<tr><td><b>${esc(p[0])}</b></td><td class="num" data-l="Years">${esc(p[1])}</td>${cell(k,"model",p[2])}${cell(k,"pm",p[3])}${cell(k,"focus",p[4])}${cell(k,"ta",ta)}</tr>`; }).join("")}</tbody></table></div></div>
+      <div class="block"><h3>Key events by plan</h3><dl class="rk">${PLANS.map(p=>`<div><dt>${esc(p[0])} · ${esc(p[1])}</dt><dd>${esc(p[7])}</dd></div>`).join("")}</dl></div>`;
+    box.querySelectorAll("[data-hide]").forEach(b => b.onclick = () => { const c=b.dataset.hide; HIDE[c] = HIDE[c]?0:1; renderRevise(); });
+    box.querySelectorAll("[data-peek]").forEach(b => b.onclick = () => { CREV[b.dataset.peek] = 1; renderRevise(); });
+    $("#cshuf").onclick = () => { CORDER = CORDER ? null : shuffle(PLANS.map((_,i)=>i)); renderRevise(); };
+    $("#creset").onclick = () => { CREV = {}; renderRevise(); };
+  }
+  if (RV === "policies") {
+    const cell = (k, col, v, l) => (PHIDE[col] && !PREV[k+col]) ? `<td data-l="${l}"><button type="button" class="peek" data-ppeek="${k+col}" aria-label="Show ${l}">tap</button></td>` : `<td data-l="${l}">${esc(v)}</td>`;
+    box.innerHTML = `<p class="muted">Every policy and Act in order. Hide the features and recall them from the name.</p>
+      <div class="chips" role="group" aria-label="Hide columns">${[["yr","Hide year"],["feat","Hide features"]].map(c=>`<button type="button" class="chip" data-phide="${c[0]}" aria-pressed="${!!PHIDE[c[0]]}">${c[1]}</button>`).join("")}<button type="button" class="chip" id="preset">Cover all again</button></div>
+      <div class="block"><div class="tbl"><table class="cover"><thead><tr><th>Policy</th><th>Year</th><th>By</th><th>Key features</th></tr></thead><tbody>${POLICIES.map((p,k)=>`<tr><td><b>${esc(p[0])}</b><br><span class="muted" style="font-size:12px">L${LNUM(p[4])}</span></td>${cell(k,"yr",p[1],"Year")}<td data-l="By">${esc(p[2])}</td>${cell(k,"feat",p[3],"Features")}</tr>`).join("")}</tbody></table></div></div>`;
+    box.querySelectorAll("[data-phide]").forEach(b => b.onclick = () => { const c=b.dataset.phide; PHIDE[c] = PHIDE[c]?0:1; renderRevise(); });
+    box.querySelectorAll("[data-ppeek]").forEach(b => b.onclick = () => { PREV[b.dataset.ppeek] = 1; renderRevise(); });
+    $("#preset").onclick = () => { PREV = {}; renderRevise(); };
+  }
+  if (RV === "timeline") {
+    box.innerHTML = `<p class="muted">The whole story in order — for 'arrange chronologically' questions.</p><div class="block"><ul class="tl">${TIMELINE.map(r=>`<li><span class="y">${esc(r[0])}</span><span>${esc(r[1])}</span></li>`).join("")}</ul></div>`;
+  }
+  if (RV === "finder") {
+    box.innerHTML = `<input class="search" id="fs" type="search" placeholder="Search a plan, policy, year or clue (e.g. Gadgil, 1977, steel)" aria-label="Search plans and policies">
+      <div class="block"><div class="tbl"><table><thead><tr><th>Item</th><th>When</th><th>Who</th><th>Details</th></tr></thead><tbody id="fb"></tbody></table></div></div>`;
+    const ALL = PLANS.map(p=>[p[0]+" Plan", p[1], p[3]+" · "+p[2], p[4]+"; "+p[7], p[8]]).concat(POLICIES.map(p=>[p[0], p[1], p[2], p[3], p[4]]));
+    const draw = () => {
+      const q = $("#fs").value.trim().toLowerCase();
+      const rows = ALL.filter(f => !q || f.join(" ").toLowerCase().includes(q));
+      $("#fb").innerHTML = rows.length ? rows.map(f=>`<tr><td><b>${esc(f[0])}</b><br><span class="muted" style="font-size:12px">L${LNUM(f[4])}</span></td><td class="num">${esc(f[1])}</td><td>${esc(f[2])}</td><td>${esc(f[3])}</td></tr>`).join("") : `<tr><td colspan="4" class="muted">No match.</td></tr>`;
+    };
+    $("#fs").oninput = draw; draw();
+  }
+  if (RV === "ff") {
+    box.innerHTML = `<p class="muted">Full forms asked in this topic. Cover the right side and recall.</p><input class="search" id="ts" type="search" placeholder="Search a short form" aria-label="Search full forms"><div class="block"><dl class="rk" id="tl"></dl></div>`;
+    const draw = () => { const q=$("#ts").value.trim().toLowerCase(); const r=FULLF.filter(t=>!q||t.join(" ").toLowerCase().includes(q));
+      $("#tl").innerHTML = r.length ? r.map(t=>`<div><dt><b style="color:var(--ink)">${esc(t[0])}</b></dt><dd>${esc(t[1])}</dd></div>`).join("") : `<p class="muted">No match.</p>`; };
+    $("#ts").oninput = draw; draw();
+  }
+  if (RV === "links") {
+    const items = LESSONS.flatMap((l,i) => l.blocks.filter(b=>b.k==="link").map(b=>({l:i+1, t:l.title, h:b.h})));
+    box.innerHTML = items.map(x => `<div class="link"><span class="lab">L${x.l} · ${esc(x.t)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "nums") {
+    box.innerHTML = `<div class="tiles">${TILES.map(t=>`<div class="tile"><span class="num">${t[0]}</span><span>${t[1]}</span></div>`).join("")}</div>
+    <div class="block"><h3>Confusing pairs</h3><dl class="rk">${PAIRS.map(p=>`<div><dt>${esc(p[0])}</dt><dd>${esc(p[1])}</dd></div>`).join("")}</dl></div>`;
+  }
+  if (RV === "tricks" || RV === "traps") {
+    const kind = RV==="tricks" ? "trick" : "trap";
+    const items = LESSONS.flatMap((l,i) => l.blocks.filter(b=>b.k===kind).map(b=>({l:i+1, t:l.title, h:b.h})));
+    box.innerHTML = items.map(x => `<div class="${kind}"><span class="lab">L${x.l} · ${esc(x.t)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "flash") drawFlash(box);
+}
+function drawFlash(box){
+  if (!FC) { const pool = FCSCOPE==="all" ? QS : FCSCOPE==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===FCSCOPE); FC = {list: shuffle(pool), i:0, flip:false, known:0}; }
+  const sel = `<select id="fcs" aria-label="Flashcard set"><option value="all">All questions</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}">L${i+1} · ${esc(l.title)}</option>`).join("")}</select>`;
+  if (!FC.list.length || FC.i >= FC.list.length) {
+    box.innerHTML = `<div class="row">${sel}</div><div class="block stack"><h3>${FC.list.length ? "Deck finished" : "No cards in this set"}</h3>${FC.list.length?`<p class="muted">You knew ${FC.known} of ${FC.list.length} on first look.</p>`:""}<div class="row"><button class="btn pri" type="button" id="fcr">Shuffle and restart</button></div></div>`;
+    $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+    $("#fcr").onclick = () => { FC = null; drawFlash(box); }; return;
+  }
+  const q = FC.list[FC.i];
+  box.innerHTML = `<div class="row between">${sel}<span class="muted num" style="font-size:13px">${FC.i+1}/${FC.list.length}</span></div>
+    <button type="button" class="flash" id="fcard" aria-label="Flip card">
+      <span class="side">${FC.flip?"Answer":"Question · tap to flip"}</span>
+      <span class="front">${esc(q.q)}</span>
+      ${FC.flip ? `<span class="ans">${esc(q.o[q.a])}</span><span class="muted">${esc(q.e)}</span>` : ""}
+    </button>
+    <div class="row between"><button class="btn" type="button" id="fca" ${FC.flip?"":"disabled"}>Again later</button><button class="btn pri" type="button" id="fck" ${FC.flip?"":"disabled"}>Got it</button></div>`;
+  $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+  $("#fcard").onclick = () => { FC.flip = !FC.flip; drawFlash(box); };
+  $("#fca").onclick = () => { FC.list.push(q); FC.list.splice(FC.i,1); FC.flip=false; drawFlash(box); };
+  $("#fck").onclick = () => { FC.known++; FC.i++; FC.flip=false; drawFlash(box); };
+}
+
+/* boot */
+renderTop();
+const start = (location.hash||"").replace("#","");
+go(["learn","practice","mock","revise"].includes(start) ? start : "learn");
+</script>
+
+
+<style id="shabd-skin">
+/* ===== शब्दRegister skin: app colours + fonts (only when opened from the app) ===== */
+:root[data-skin="paper"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(150,128,90,.10) 31px, rgba(150,128,90,.10) 32px);--app-psize:auto;--app-card:#FFFCF6;--app-rule:#DCCFB2;--app-pri:#2F6F63;--app-ink:#221E17;--app-soft:#5E5547;--app-faint:#857B6A;--app-bg:#F3EEE3;--app-deep:#E9E1CF;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#F3EEE3;--sheet:#FFFCF6;--sunk:#E9E1CF;--ink:#221E17;--ink2:#5E5547;--rule:#DCCFB2;--blue:#2F6F63;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--accent:#A87E1F;--accent-bg:color-mix(in srgb, #A87E1F 16%, #FFFCF6);--good:#2F6F63;--good-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--bad:#8C2F39;--bad-bg:color-mix(in srgb, #8C2F39 14%, #FFFCF6);--warn-bg:color-mix(in srgb, #C99A2E 18%, #FFFCF6);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="paper"][data-theme="dark"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--sheet:#26211A;--sunk:#25201A;--ink:#EFE6D2;--ink2:#BDB195;--rule:#3B3429;--blue:#3F9A86;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3F9A86 22%, #26211A);--accent:#D9AE4B;--accent-bg:color-mix(in srgb, #D9AE4B 24%, #26211A);--good:#5FB9A3;--good-bg:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-bg:color-mix(in srgb, #D06B74 22%, #26211A);--warn-bg:color-mix(in srgb, #D9AE4B 26%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="paper"]:not([data-theme="light"]){--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--sheet:#26211A;--sunk:#25201A;--ink:#EFE6D2;--ink2:#BDB195;--rule:#3B3429;--blue:#3F9A86;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3F9A86 22%, #26211A);--accent:#D9AE4B;--accent-bg:color-mix(in srgb, #D9AE4B 24%, #26211A);--good:#5FB9A3;--good-bg:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-bg:color-mix(in srgb, #D06B74 22%, #26211A);--warn-bg:color-mix(in srgb, #D9AE4B 26%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin="indigo"]{--app-pattern:radial-gradient(rgba(61,92,240,.10) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#FFFFFF;--app-rule:#CBD3EC;--app-pri:#3D5CF0;--app-ink:#0F1B3D;--app-soft:#4A5680;--app-faint:#67739C;--app-bg:#EEF1FA;--app-deep:#E1E6F5;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#EEF1FA;--sheet:#FFFFFF;--sunk:#E1E6F5;--ink:#0F1B3D;--ink2:#4A5680;--rule:#CBD3EC;--blue:#3D5CF0;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3D5CF0 14%, #FFFFFF);--accent:#D9831A;--accent-bg:color-mix(in srgb, #D9831A 16%, #FFFFFF);--good:#147D53;--good-bg:color-mix(in srgb, #147D53 14%, #FFFFFF);--bad:#C8402F;--bad-bg:color-mix(in srgb, #C8402F 14%, #FFFFFF);--warn-bg:color-mix(in srgb, #F7C548 18%, #FFFFFF);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="indigo"][data-theme="dark"]{--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--sheet:#121D47;--sunk:#0E1839;--ink:#EEF2FF;--ink2:#A7B3DA;--rule:#22306A;--blue:#6F86FF;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #6F86FF 22%, #121D47);--accent:#F7B24D;--accent-bg:color-mix(in srgb, #F7B24D 24%, #121D47);--good:#45C08A;--good-bg:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-bg:color-mix(in srgb, #F07B6E 22%, #121D47);--warn-bg:color-mix(in srgb, #F7C548 26%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="indigo"]:not([data-theme="light"]){--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--sheet:#121D47;--sunk:#0E1839;--ink:#EEF2FF;--ink2:#A7B3DA;--rule:#22306A;--blue:#6F86FF;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #6F86FF 22%, #121D47);--accent:#F7B24D;--accent-bg:color-mix(in srgb, #F7B24D 24%, #121D47);--good:#45C08A;--good-bg:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-bg:color-mix(in srgb, #F07B6E 22%, #121D47);--warn-bg:color-mix(in srgb, #F7C548 26%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin] body{background-color:var(--app-bg);background-image:var(--app-pattern);background-size:var(--app-psize);background-attachment:fixed}
+:root[data-skin] h1,:root[data-skin] h2{letter-spacing:-.01em}
+
+/* ===== Desktop layout (PC / tablet landscape) ===== */
+@media (min-width: 1024px){
+  :root{--side:236px}
+  body{padding-left:var(--side);font-size:16.5px}
+  .top{border-bottom:1px solid var(--rule)}
+  .top-in{max-width:1320px;padding:16px 36px}
+  .brand{font-size:21px}
+  .brand small{font-size:13px}
+  .stat{font-size:13px}
+  .wrap{max-width:1320px;padding:0 36px 56px}
+  .view{padding-top:28px}
+  h1{font-size:34px} h2{font-size:22px} h3{font-size:17px}
+
+  /* bottom tab bar becomes a left sidebar */
+  .nav{top:0;bottom:0;left:0;right:auto;width:var(--side);height:auto;border-top:0;border-right:1px solid var(--rule);padding:84px 14px 20px;display:block;overflow:auto}
+  .nav-in{display:flex;flex-direction:column;gap:4px;height:auto;max-width:none;margin:0}
+  .nav-in::before{content:"Sections";display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);padding:0 14px 8px}
+  .nav button{flex-direction:row;justify-content:flex-start;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;font-size:15px;min-height:0;height:auto;width:100%;text-align:left}
+  .nav button svg{width:20px;height:20px;flex-shrink:0}
+  .nav button:hover{background:var(--sunk)}
+  .nav button[aria-current="page"]{background:var(--blue-bg)}
+  .nav button[aria-current="page"] span{border-bottom:0!important}
+
+  /* home: intro beside progress, lessons as a card grid */
+  .hero{grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);column-gap:48px;align-items:end;padding-bottom:10px}
+  .hero > .eyebrow,.hero > h1,.hero > p{grid-column:1}
+  .hero > .meter{grid-column:2;grid-row:3;align-self:center}
+  .hero > .row{grid-column:2;grid-row:2;align-self:end}
+  .lessons{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;border-top:0}
+  .les{background:var(--sheet);border:1px solid var(--rule);border-radius:16px;padding:16px 18px;transition:transform .15s ease,box-shadow .15s ease,border-color .15s}
+  .les:hover{transform:translateY(-2px);border-color:var(--blue);box-shadow:0 14px 30px -22px rgba(0,0,0,.45)}
+  .les.next{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
+
+  /* lesson reader: facts, timelines, tricks sit side by side */
+  .lhead{margin-bottom:0}
+  .steps{max-width:640px}
+  .steps + .stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+  .steps + .stack > .plain,.steps + .stack > .row,.steps + .stack > p,.steps + .stack > .fig,.steps + .stack > h2,.steps + .stack > .tbl{grid-column:1/-1}
+  .steps + .stack > .plain{max-width:86ch;font-size:17px}
+  .steps + .stack:not(:has(> .block ~ .block)) > .block{grid-column:1/-1}
+  .block,.qcard{padding:18px 20px;border-radius:14px}
+
+  /* quizzes and question bank */
+  #lq > .stack{display:grid;grid-template-columns:minmax(0,1fr);max-width:980px;gap:16px}
+  .opts{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .qt{font-size:18px}
+  #plist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #plist .opts{grid-template-columns:minmax(0,1fr)}
+  .chips{flex-wrap:wrap;overflow:visible}
+
+  /* mock test: question with the answer grid alongside */
+  .mbar{top:calc(env(safe-area-inset-top,0px) + 67px)}
+  .view > .qcard{max-width:1000px}
+  .view > .row.between{max-width:1000px}
+  .view > #msub{max-width:1000px;width:100%}
+  .view > .block.stack{max-width:760px}
+  .pal{grid-template-columns:repeat(auto-fill,minmax(46px,1fr))}
+  .kpis{max-width:760px}
+
+  /* revise: cards in columns */
+  #rkl,#rv > .stack:not(#rkl){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #rv > .search{max-width:520px}
+  .tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .flash{min-height:300px;max-width:760px;margin:0 auto;padding:32px 36px}
+  .flash .front{font-size:22px}
+}
+@media (min-width: 1500px){
+  #plist,#rkl{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+</style>
+</body></html>
