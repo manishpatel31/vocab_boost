@@ -362,6 +362,89 @@
   .hub-meta{ display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:auto; padding-top:10px; border-top:1px dashed var(--rule); font-size:12.5px; color:var(--ink-faint); }
   .hub-meta b{ color:var(--hub-c, var(--teal)); font-weight:700; }
   .hub-card.here{ cursor:default; }
+  .hub-ring{ position:relative; width:50px; height:50px; flex-shrink:0; }
+  .hub-ring span{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:11.5px; font-weight:700; color:var(--ink); font-variant-numeric:tabular-nums; }
+  .hub-stats{ display:flex; gap:14px; flex-wrap:wrap; font-size:13px; color:var(--ink-soft); }
+  .hub-stats b{ color:var(--ink); font-variant-numeric:tabular-nums; }
+  .hub-stats .hub-wrong, .hub-stats .hub-wrong b{ color:var(--maroon); }
+  .hub-big{ margin-left:auto; font-family:var(--font-display); font-weight:var(--h-weight); font-size:30px; line-height:1; color:var(--hub-c); font-variant-numeric:tabular-nums; }
+  .hub-big small{ font-size:15px; color:var(--ink-faint); }
+  .hub-actions{ grid-template-columns:repeat(auto-fill, minmax(min(360px, 100%), 1fr)); }
+  .drill-page{ z-index:395; }
+  .dq-clock{ font-variant-numeric:tabular-nums; font-weight:700; font-size:16px; padding:4px 12px; border-radius:10px; background:var(--bar-hover); }
+  .dq-clock:empty{ display:none; }
+  .dq-clock.low{ background:var(--maroon); color:#fff; }
+  .dq-hero{ margin-bottom:18px; }
+  .dq-hero .eyebrow{ font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); }
+  .dq-hero h1{ font-family:var(--font-display); font-weight:var(--h-weight); font-size:clamp(28px, 4vw, 40px); margin:6px 0; color:var(--ink); line-height:1.1; }
+  .dq-hero p{ margin:0; color:var(--ink-soft); max-width:70ch; }
+  .dq-score{ display:flex; align-items:baseline; gap:8px; margin:8px 0 4px; }
+  .dq-score b{ font-family:var(--font-display); font-size:64px; line-height:1; color:var(--teal); }
+  .dq-score span{ font-size:22px; color:var(--ink-faint); }
+  .dq-empty{ padding:40px 20px; text-align:center; color:var(--ink-soft); background:var(--card); border:1px dashed var(--rule); border-radius:var(--radius-lg); line-height:1.6; }
+  .dq-chips{ display:flex; flex-wrap:wrap; gap:8px; margin:6px 0 14px; }
+  .dq-chips button{ border:1px solid var(--rule); background:var(--card); color:var(--ink); border-radius:999px; padding:7px 14px; font:inherit; font-size:13.5px; font-weight:600; cursor:pointer; }
+  .dq-chips button.on{ background:var(--dq-c, var(--ink)); border-color:var(--dq-c, var(--ink)); color:#fff; }
+  .dq-actions{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:14px 0 18px; }
+  .dq-list{ display:grid; grid-template-columns:repeat(auto-fill, minmax(min(420px, 100%), 1fr)); gap:12px; }
+  .dq-rev, .dq-card{ background:var(--card); border:1px solid var(--rule); border-left:4px solid var(--dq-c, var(--teal)); border-radius:var(--radius); padding:14px 16px; box-shadow:var(--shadow); }
+  .dq-card{ padding:20px 22px; }
+  .dq-meta{ display:flex; flex-wrap:wrap; gap:6px 12px; font-size:12px; font-weight:700; letter-spacing:.04em; color:var(--ink-faint); text-transform:uppercase; margin-bottom:8px; }
+  .dq-q{ font-size:17px; font-weight:600; color:var(--ink); line-height:1.45; }
+  .dq-card .dq-q{ font-size:19px; margin-bottom:14px; }
+  .dq-parts{ margin-top:6px; font-size:14.5px; color:var(--ink-soft); }
+  .dq-parts span{ padding:1px 4px; border-radius:4px; }
+  .dq-parts span.bad{ background:color-mix(in srgb, var(--maroon) 16%, transparent); color:var(--maroon); font-weight:600; }
+  .dq-ans{ margin-top:8px; font-weight:700; color:var(--teal); }
+  .dq-exp{ margin-top:4px; font-size:14px; color:var(--ink-soft); line-height:1.5; }
+  .dq-opts{ display:grid; grid-template-columns:1fr; gap:10px; }
+  .dq-opt{ display:grid; grid-template-columns:30px 1fr; gap:10px; align-items:center; text-align:left; width:100%; padding:12px 14px; border-radius:12px; border:1.5px solid var(--rule); background:var(--paper); color:var(--ink); font:inherit; font-size:16px; cursor:pointer; transition:border-color .15s ease, background .15s ease; }
+  .dq-opt:hover{ border-color:var(--ink-faint); }
+  .dq-opt .k{ width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; background:var(--card); border:1px solid var(--rule); }
+  .dq-opt.sel{ border-color:var(--accent); background:color-mix(in srgb, var(--accent) 12%, var(--card)); }
+  .dq-opt.sel .k{ background:var(--accent); color:var(--accent-fg); border-color:var(--accent); }
+  .dq-opt.ok{ border-color:var(--teal); background:color-mix(in srgb, var(--teal) 14%, var(--card)); }
+  .dq-opt.ok .k{ background:var(--teal); color:#fff; border-color:var(--teal); }
+  .dq-opt.no{ border-color:var(--maroon); background:color-mix(in srgb, var(--maroon) 12%, var(--card)); }
+  .dq-opt.no .k{ background:var(--maroon); color:#fff; border-color:var(--maroon); }
+  .dq-fb{ margin-top:14px; border-radius:12px; padding:12px 14px; font-size:14.5px; line-height:1.5; }
+  .dq-fb.good{ background:color-mix(in srgb, var(--teal) 13%, transparent); } .dq-fb.good b{ color:var(--teal); }
+  .dq-fb.bad{ background:color-mix(in srgb, var(--maroon) 11%, transparent); } .dq-fb.bad b{ color:var(--maroon); }
+  .dq-progress{ height:6px; border-radius:6px; background:var(--rule); overflow:hidden; margin-bottom:14px; }
+  .dq-progress i{ display:block; height:100%; background:var(--teal); }
+  .dq-setup{ display:grid; grid-template-columns:repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap:14px; }
+  .dq-box{ background:var(--card); border:1px solid var(--rule); border-radius:var(--radius-lg); padding:16px 18px; }
+  .dq-box h3{ margin:0 0 10px; font-family:var(--font-display); font-weight:var(--h-weight); font-size:19px; color:var(--ink); }
+  .dq-seg{ display:flex; gap:6px; margin-bottom:10px; }
+  .dq-seg button{ flex:1; border:1px solid var(--rule); background:var(--paper); color:var(--ink); border-radius:10px; padding:9px 0; font:inherit; font-weight:700; cursor:pointer; }
+  .dq-seg button.on{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .dq-tags{ display:flex; flex-wrap:wrap; gap:8px; }
+  .dq-tog{ border:1px solid var(--rule); background:var(--paper); color:var(--ink-soft); border-radius:999px; padding:6px 12px; font:inherit; font-size:13.5px; font-weight:600; cursor:pointer; }
+  .dq-tog.on{ border-color:var(--teal); background:color-mix(in srgb, var(--teal) 14%, var(--card)); color:var(--ink); }
+  .dq-tog.on::before{ content:'✓ '; color:var(--teal); }
+  .dq-h3{ font-family:var(--font-display); font-weight:var(--h-weight); font-size:20px; margin:22px 0 10px; color:var(--ink); }
+  .dq-hist{ display:grid; gap:8px; max-width:640px; }
+  .dq-hist div{ display:flex; justify-content:space-between; gap:12px; background:var(--card); border:1px solid var(--rule); border-radius:12px; padding:10px 14px; font-size:14px; color:var(--ink-soft); }
+  .dq-hist b{ color:var(--ink); font-variant-numeric:tabular-nums; }
+  .dq-kpis{ display:grid; grid-template-columns:repeat(auto-fill, minmax(170px, 1fr)); gap:10px; }
+  .dq-kpis div{ background:var(--card); border:1px solid var(--rule); border-top:3px solid var(--dq-c, var(--ink)); border-radius:12px; padding:12px 14px; }
+  .dq-kpis b{ display:block; font-family:var(--font-display); font-size:26px; color:var(--ink); }
+  .dq-kpis span{ font-size:13px; color:var(--ink-soft); }
+  .dq-run{ display:grid; grid-template-columns:1fr; gap:16px; }
+  .dq-nav{ display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+  .dq-nav .btn.teal{ margin-left:auto; }
+  .dq-side{ background:var(--card); border:1px solid var(--rule); border-radius:var(--radius-lg); padding:14px; align-self:start; }
+  .dq-side-h{ font-size:13.5px; color:var(--ink-soft); margin-bottom:10px; }
+  .dq-pal{ display:grid; grid-template-columns:repeat(auto-fill, minmax(38px, 1fr)); gap:6px; }
+  .dq-pal button{ height:36px; border-radius:8px; border:1px solid var(--rule); background:var(--paper); color:var(--ink); font:inherit; font-size:13px; font-weight:600; cursor:pointer; font-variant-numeric:tabular-nums; }
+  .dq-pal button.a{ background:var(--accent); color:var(--accent-fg); border-color:var(--accent); }
+  .dq-pal button.m{ box-shadow:inset 0 -3px 0 var(--mustard); }
+  .dq-pal button.cur{ outline:2px solid var(--maroon); outline-offset:1px; }
+  @media (min-width: 900px){
+    .dq-opts{ grid-template-columns:1fr 1fr; }
+    .dq-run{ grid-template-columns:minmax(0, 1fr) 300px; align-items:start; }
+    .dq-side{ position:sticky; top:12px; }
+  }
   .hub-card.here .hub-meta b{ color:var(--ink-faint); }
   @media (max-width: 860px){ .brand-group .navmenu{ top:62px; bottom:auto; transform-origin:top center; } .study-sync{ display:none; } }
   .brand-paper{ font-family:'Fraunces', Georgia, serif; font-size:21px; font-weight:600; color:var(--mustard); }
@@ -732,6 +815,15 @@
     <span class="study-title">पाठShala</span>
   </div>
   <div class="hub-scroll"><div class="hub-wrap" id="hubBody"></div></div>
+</div>
+
+<div class="hub-page drill-page" id="drillPage" role="dialog" aria-label="Practice">
+  <div class="study-bar">
+    <button id="drillBack" title="Back to पाठShala"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>पाठShala</button>
+    <span class="study-title" id="drillTitle"></span>
+    <span class="dq-clock" id="drillClock"></span>
+  </div>
+  <div class="hub-scroll" id="drillScroll"><div class="hub-wrap" id="drillBody"></div></div>
 </div>
 
 <div class="study-overlay" id="studyOverlay" role="dialog" aria-label="Study module">
@@ -1342,11 +1434,26 @@
     return 'Opened ' + (d <= 0 ? 'today' : d === 1 ? 'yesterday' : d + ' days ago');
   }
   function hubCard(id){
-    var m = STUDY[id], meta = studyMeta()[id] || {};
+    var m = STUDY[id], meta = studyMeta()[id] || {}, pr = studyProgress(id);
+    var pct = pr.total ? Math.round(pr.done * 100 / pr.total) : 0;
     return '<button class="hub-card" data-open-study="' + id + '" style="--hub-c:' + m.color + ';">' +
-      '<div class="hub-top"><div class="hub-ico">' + m.ico + '</div><div><h3>' + escapeHtml(m.title) + '</h3><div class="hi">' + escapeHtml(m.hi) + '</div></div></div>' +
+      '<div class="hub-top"><div class="hub-ico">' + m.ico + '</div><div style="flex:1; min-width:0;"><h3>' + escapeHtml(m.title) + '</h3><div class="hi">' + escapeHtml(m.hi) + '</div></div>' +
+        '<div class="hub-ring" title="' + pct + '% done">' + ringSvg(pct, m.color, 50) + '<span>' + pct + '%</span></div></div>' +
       '<p>' + escapeHtml(m.desc) + '</p>' +
+      '<div class="hub-stats"><span><b>' + pr.done + '/' + pr.total + '</b> ' + m.unit + '</span><span><b>' + (pr.acc === null ? '—' : pr.acc + '%') + '</b> right</span>' +
+        (pr.wrong ? '<span class="hub-wrong"><b>' + pr.wrong + '</b> mistake' + (pr.wrong === 1 ? '' : 's') + '</span>' : '<span><b>' + pr.tried + '</b> tried</span>') + '</div>' +
       '<div class="hub-meta"><span>' + escapeHtml(m.meta) + '</span><b>' + escapeHtml(agoText(meta.openedAt)) + '</b></div></button>';
+  }
+  function hubPracticeSection(){
+    var totalWrong = 0;
+    Object.keys(STUDY).forEach(function(id){ totalWrong += studyWrongIds(id).length; });
+    var hist = mockHistory(), last = hist[hist.length - 1];
+    return '<section class="hub-sec"><div class="hub-sec-h"><h2>Practice across subjects</h2><span>सभी विषय</span></div><div class="hub-grid hub-actions">' +
+      '<button class="hub-card hub-act" data-hub-act="mistakes" style="--hub-c:var(--maroon);"><div class="hub-top"><div class="hub-ico">📕</div><div><h3>Mistakes book</h3><div class="hi">गलतियाँ · all subjects</div></div><div class="hub-big">' + totalWrong + '</div></div>' +
+        '<p>Every question you got wrong in any mini app or mock — practise them until they’re gone.</p><div class="hub-meta"><span>' + (totalWrong ? totalWrong + ' waiting' : 'Nothing to fix yet') + '</span><b>Open ›</b></div></button>' +
+      '<button class="hub-card hub-act" data-hub-act="mock" style="--hub-c:var(--teal);"><div class="hub-top"><div class="hub-ico">⏱️</div><div><h3>Mixed mock test</h3><div class="hi">English + GS · timed</div></div>' + (last ? '<div class="hub-big">' + last.score + '<small>/' + last.max + '</small></div>' : '') + '</div>' +
+        '<p>Vocab + Grammar + all four GS workbooks in one SSC-style paper, +2 / −0.5, with a subject-wise report.</p><div class="hub-meta"><span>' + (hist.length ? hist.length + ' taken · last ' + agoText(last.at).replace('Opened ', '') : 'Not taken yet') + '</span><b>Start ›</b></div></button>' +
+      '</div></section>';
   }
   function renderHub(){
     var ids = Object.keys(STUDY);
@@ -1356,17 +1463,21 @@
       '<div class="hub-meta"><span>' + (words.length ? words.length + ' words' : 'Vocabulary') + '</span><b>You came from here</b></div></button>';
     document.getElementById('hubBody').innerHTML =
       '<div class="hub-hero"><div class="eyebrow">SSC CGL · all subjects</div><h1>पाठ<span>Shala</span></h1><p>Every mini course in one place. Pick one to study — your progress saves to your account and works offline.</p></div>' +
+      hubPracticeSection() +
       '<section class="hub-sec"><div class="hub-sec-h"><h2>English</h2><span>अंग्रेज़ी</span></div><div class="hub-grid">' + vocabCard + ids.filter(function(id){ return STUDY[id].subj === 'english'; }).map(hubCard).join('') + '</div></section>' +
       '<section class="hub-sec"><div class="hub-sec-h"><h2>General Studies</h2><span>सामान्य अध्ययन</span></div><div class="hub-grid">' + ids.filter(function(id){ return STUDY[id].subj === 'gs'; }).map(hubCard).join('') + '</div></section>';
   }
   document.getElementById('hubBody').addEventListener('click', function(ev){
     var c = ev.target.closest('[data-open-study]');
     if(c){ openStudy(c.dataset.openStudy, false); return; }
+    var act = ev.target.closest('[data-hub-act]');
+    if(act){ if(act.dataset.hubAct === 'mistakes') openMistakes(); else openMock(); return; }
     if(ev.target.closest('[data-hub-close]')) closeHub(false);
   });
   function openHub(fromHistory){
     closeAllMenus();
     renderHub();
+    refreshHubProgress();
     hubOpen = true;
     document.getElementById('hubPage').classList.add('open');
     document.body.classList.add('study-on');
@@ -1389,7 +1500,7 @@
 
   /** Before opening: take the account's copy if it is newer than this device's. */
   async function studyPull(id){
-    var mod = STUDY[id];
+    var mod = studyMod(id);
     if(!currentUser) return;
     try{
       var snap = await studyDocRef(id).get();
@@ -1406,7 +1517,7 @@
     }catch(e){ /* offline or rules not added yet: keep this device's copy */ }
   }
   function studyPush(id){
-    var mod = STUDY[id];
+    var mod = studyMod(id);
     if(!currentUser || !mod) return;
     var data = lsGet(mod.key);
     if(data === null) return;
@@ -1448,7 +1559,7 @@
     await studyPull(id);
     if(studyOpen !== id) return;
     studyLast = lsGet(mod.key);
-    Object.keys(STUDY).forEach(function(k){ studyPush(k); });   // this device's unsaved progress (incl. from before syncing existed)
+    Object.keys(STUDY).concat(Object.keys(STUDY_EXTRA)).forEach(function(k){ studyPush(k); });   // this device's unsaved progress (incl. from before syncing existed)
     document.getElementById('studyFrame').src = mod.file + '?embed=1&skin=' + studySkinValue() + '&theme=' + studyThemeValue();
     studySyncLabel(currentUser ? '✓ Synced with your account' : '');
     clearInterval(studyWatch);
@@ -1469,6 +1580,8 @@
   }
   document.getElementById('studyBack').addEventListener('click', function(){ closeStudy(false); });
   window.addEventListener('popstate', function(){
+    if(location.hash === '#drill') return;
+    if(drillOpen){ closeDrill(true); if(drillOpen) return; }
     var m = /^#study-(\w+)/.exec(location.hash);
     if(m && STUDY[m[1]]){ if(studyOpen !== m[1]) openStudy(m[1], true); return; }
     if(studyOpen) closeStudy(true);
@@ -1493,6 +1606,337 @@
     if(m && STUDY[m[1]]) setTimeout(function(){ if(currentUser) openStudy(m[1], true); }, 1500);
     else if(location.hash === '#pathshala') setTimeout(function(){ if(currentUser) openHub(true); }, 800);
   })();
+
+
+  // ================= पाठShala extras: progress rings, one Mistakes book, mixed mock test =================
+  STUDY.grammar.lessons = 100; STUDY.grammar.unit = 'rules';
+  STUDY.bns.lessons = 12; STUDY.bns.unit = 'lessons';
+  STUDY.schemes.lessons = 15; STUDY.schemes.unit = 'lessons';
+  STUDY.census.lessons = 11; STUDY.census.unit = 'lessons';
+  STUDY.intlorgs.lessons = 12; STUDY.intlorgs.unit = 'lessons';
+  var STUDY_EXTRA = { mocks: { key: 'shabdMockHistory', title: 'Mixed mock history' } };
+  function studyMod(id){ return STUDY[id] || STUDY_EXTRA[id]; }
+  var studyStateTimers = {};
+  function studyState(id){ try{ return JSON.parse(lsGet(studyMod(id).key) || '{}') || {}; }catch(e){ return {}; } }
+  function setStudyState(id, st){
+    lsSet(studyMod(id).key, JSON.stringify(st));
+    setStudyMeta(id, { localAt: Date.now() });
+    clearTimeout(studyStateTimers[id]);
+    studyStateTimers[id] = setTimeout(function(){ studyPush(id); }, 1500);
+  }
+  function studyProgress(id){
+    var m = STUDY[id], st = studyState(id), done = 0, ans = st.ans || {};
+    if(id === 'grammar' || id === 'bns') done = Object.keys(st.done || {}).length;
+    else done = Object.keys(st.les || {}).filter(function(k){ return st.les[k] && st.les[k].done; }).length;
+    var keys = Object.keys(ans), right = keys.filter(function(k){ return ans[k] === 1; }).length;
+    return { done: Math.min(done, m.lessons), total: m.lessons, tried: keys.length, right: right,
+      acc: keys.length ? Math.round(right * 100 / keys.length) : null, wrong: studyWrongIds(id).length };
+  }
+  function studyWrongIds(id){
+    var st = studyState(id);
+    if(id === 'grammar') return Object.keys(st.wrong || {});
+    var a = st.ans || {};
+    return Object.keys(a).filter(function(k){ return a[k] === 0; });
+  }
+  function studyMark(id, qid, ok){
+    var st = studyState(id);
+    st.ans = st.ans || {};
+    st.ans[qid] = ok ? 1 : 0;
+    if(id === 'grammar'){ st.wrong = st.wrong || {}; if(ok) delete st.wrong[qid]; else st.wrong[qid] = 1; }
+    setStudyState(id, st);
+  }
+  function ringSvg(pct, color, size){
+    size = size || 46;
+    var r = size / 2 - 5, c = 2 * Math.PI * r, f = Math.max(0, Math.min(1, pct / 100));
+    return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '" aria-hidden="true" style="transform:rotate(-90deg)">' +
+      '<circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" stroke="var(--rule)" stroke-width="5"/>' +
+      '<circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" stroke="' + color + '" stroke-width="5" stroke-linecap="round" stroke-dasharray="' + c + '" stroke-dashoffset="' + (c * (1 - f)) + '"/></svg>';
+  }
+
+  // ---- question bank (every question from every mini app, built into study-bank.json) ----
+  var studyBank = null, studyBankIdx = {};
+  function loadStudyBank(){
+    if(studyBank) return Promise.resolve(studyBank);
+    return fetch('study-bank.json').then(function(r){ if(!r.ok) throw new Error('study-bank.json missing'); return r.json(); }).then(function(b){
+      studyBank = b; studyBankIdx = {};
+      Object.keys(b.modules).forEach(function(mid){ b.modules[mid].qs.forEach(function(q){ q.mod = mid; studyBankIdx[mid + ':' + q.id] = q; }); });
+      return b;
+    });
+  }
+  function shuffleArr(a){ for(var i = a.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  /** A question ready to show: options possibly shuffled, with the index of the right one. */
+  function prepQ(q){
+    var order = q.o.map(function(_, i){ return i; });
+    if(q.sh) shuffleArr(order);
+    return { src: q, mod: q.mod, id: q.id, q: q.q, tag: q.tag, e: q.e, o: order.map(function(i){ return q.o[i]; }), a: order.indexOf(q.a), pick: null };
+  }
+  function vocabQuestions(n){
+    var pool = words.filter(function(w){ return w.term && w.english_meaning; });
+    if(pool.length < 4) return [];
+    var ranked = shuffleArr(pool.slice()).sort(function(x, y){ return ((progressMap[x.id] || {}).confidence || 0) - ((progressMap[y.id] || {}).confidence || 0); });
+    var pick = shuffleArr(ranked.slice(0, Math.max(n * 3, 30))).slice(0, n);
+    var synPool = [];
+    pool.forEach(function(w){ (w.synonyms || []).forEach(function(s){ synPool.push({ s: s, w: w.id }); }); });
+    var cut = function(s){ s = String(s); return s.length > 120 ? s.slice(0, 117) + '…' : s; };
+    return pick.map(function(w){
+      var useSyn = w.synonyms && w.synonyms.length && synPool.length > 20 && Math.random() < 0.4;
+      var right, wrongs = [], guard = 0;
+      if(useSyn){
+        right = w.synonyms[0];
+        while(wrongs.length < 3 && guard++ < 60){ var s = synPool[Math.floor(Math.random() * synPool.length)]; if(s.w !== w.id && (w.synonyms || []).indexOf(s.s) === -1 && wrongs.indexOf(s.s) === -1 && s.s !== right) wrongs.push(s.s); }
+      } else {
+        right = cut(w.english_meaning);
+        var same = pool.filter(function(x){ return x.id !== w.id && x.type === w.type; });
+        var src = same.length >= 3 ? same : pool.filter(function(x){ return x.id !== w.id; });
+        while(wrongs.length < 3 && guard++ < 60){ var m = cut(src[Math.floor(Math.random() * src.length)].english_meaning); if(m !== right && wrongs.indexOf(m) === -1) wrongs.push(m); }
+      }
+      if(wrongs.length < 3) return null;
+      var opts = shuffleArr([right].concat(wrongs));
+      return { mod: 'vocab', id: w.id, tag: TYPE_LABELS[w.type] || 'Vocabulary', q: useSyn ? 'Choose the synonym of “' + w.term + '”' : 'Choose the meaning of “' + w.term + '”',
+        o: opts, a: opts.indexOf(right), e: w.term + ' — ' + (w.english_meaning || '') + (w.hindi_meaning ? ' (' + w.hindi_meaning + ')' : ''), pick: null };
+    }).filter(Boolean);
+  }
+
+  // ---- the practice / mock screen ----
+  var drill = null, drillOpen = false, drillTimer = null;
+  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations' };
+  function openDrill(title){
+    closeAllMenus();
+    drillOpen = true;
+    document.getElementById('drillTitle').textContent = title;
+    document.getElementById('drillPage').classList.add('open');
+    document.body.classList.add('study-on');
+    try{ history.pushState({ drill: 1 }, '', '#drill'); }catch(e){}
+  }
+  function closeDrill(fromHistory){
+    if(!drillOpen) return;
+    if(drill && drill.kind === 'mock' && drill.phase === 'run' && !confirm('Leave the mock test? Your answers so far will be lost.')){
+      if(fromHistory){ try{ history.pushState({ drill: 1 }, '', '#drill'); }catch(e){} }
+      return;
+    }
+    clearInterval(drillTimer);
+    drillOpen = false; drill = null;
+    document.getElementById('drillPage').classList.remove('open');
+    document.getElementById('drillClock').textContent = '';
+    if(!hubOpen && !studyOpen) document.body.classList.remove('study-on');
+    if(hubOpen) renderHub();
+    if(!fromHistory && location.hash === '#drill'){ try{ history.back(); }catch(e){} }
+  }
+  document.getElementById('drillBack').addEventListener('click', function(){ closeDrill(false); });
+  function drillBody(html){ var b = document.getElementById('drillBody'); b.innerHTML = html; document.getElementById('drillScroll').scrollTop = 0; }
+  function optHtml(q, i, state){
+    return '<button class="dq-opt' + (state || '') + '" data-opt="' + i + '"><span class="k">' + 'ABCD'.charAt(i) + '</span><span>' + escapeHtml(q.o[i]) + '</span></button>';
+  }
+
+  // Mistakes book
+  async function openMistakes(){
+    openDrill('Mistakes book');
+    drillBody('<p class="help">Loading your mistakes…</p>');
+    try{ await loadStudyBank(); }catch(e){ drillBody('<div class="dq-empty">Couldn’t load the question bank. Upload <b>study-bank.json</b> to your site and try again.</div>'); return; }
+    drill = { kind: 'mistakes', phase: 'list', only: null };
+    renderMistakes();
+  }
+  function mistakesByModule(){
+    var out = {};
+    Object.keys(STUDY).forEach(function(mid){
+      out[mid] = studyWrongIds(mid).map(function(id){ return studyBankIdx[mid + ':' + id]; }).filter(Boolean);
+    });
+    return out;
+  }
+  function renderMistakes(){
+    var by = mistakesByModule(), total = 0;
+    Object.keys(by).forEach(function(m){ total += by[m].length; });
+    var mods = Object.keys(by).filter(function(m){ return by[m].length; });
+    if(drill.only && !by[drill.only].length) drill.only = null;
+    var list = drill.only ? by[drill.only] : [].concat.apply([], mods.map(function(m){ return by[m]; }));
+    if(!total){
+      drillBody('<div class="dq-hero"><div class="eyebrow">All subjects</div><h1>Mistakes book</h1></div><div class="dq-empty">No mistakes right now. 🎉<br>Every question you get wrong in Grammar 100, BNS, Schemes, Census or Intl Organisations — or in a mixed mock — lands here until you get it right.</div>');
+      return;
+    }
+    drillBody('<div class="dq-hero"><div class="eyebrow">All subjects · ' + total + ' to fix</div><h1>Mistakes book</h1><p>Every question you got wrong, from every mini app. Get one right here and it leaves the book.</p></div>' +
+      '<div class="dq-chips"><button class="' + (drill.only ? '' : 'on') + '" data-only="">All · ' + total + '</button>' +
+        mods.map(function(m){ return '<button class="' + (drill.only === m ? 'on' : '') + '" data-only="' + m + '" style="--dq-c:' + STUDY[m].color + '">' + escapeHtml(MOD_NAME[m]) + ' · ' + by[m].length + '</button>'; }).join('') + '</div>' +
+      '<div class="dq-actions"><button class="btn teal" id="mbPractice">Practise ' + Math.min(list.length, 30) + (list.length > 30 ? ' of ' + list.length : '') + ' now</button></div>' +
+      '<div class="dq-list">' + list.map(function(q){
+        return '<div class="dq-rev" style="--dq-c:' + STUDY[q.mod].color + '"><div class="dq-meta"><span>' + escapeHtml(MOD_NAME[q.mod]) + '</span>' + (q.tag ? '<span>' + escapeHtml(q.tag) + '</span>' : '') + '</div>' +
+          '<div class="dq-q">' + escapeHtml(q.q) + '</div>' +
+          (q.k === 'e' ? '<div class="dq-parts">' + q.o.map(function(o, i){ return '<span class="' + (i === q.a ? 'bad' : '') + '">' + escapeHtml(o) + '</span>'; }).join(' ') + '</div>' : '') +
+          '<div class="dq-ans">' + (q.k === 'e' ? (/no error/i.test(q.o[q.a]) ? '✓ No error' : 'Error is in: ' + escapeHtml(q.o[q.a])) : '✓ ' + escapeHtml(q.o[q.a])) + '</div>' + (q.e ? '<div class="dq-exp">' + escapeHtml(q.e) + '</div>' : '') + '</div>';
+      }).join('') + '</div>');
+    document.querySelectorAll('#drillBody [data-only]').forEach(function(b){ b.addEventListener('click', function(){ drill.only = b.dataset.only || null; renderMistakes(); }); });
+    document.getElementById('mbPractice').addEventListener('click', function(){
+      startPractice(shuffleArr(list.slice()).slice(0, 30).map(prepQ));
+    });
+  }
+  function startPractice(qs){
+    drill = { kind: 'practice', phase: 'run', qs: qs, i: 0, cleared: 0 };
+    document.getElementById('drillTitle').textContent = 'Practise mistakes';
+    renderPractice();
+  }
+  function renderPractice(){
+    var d = drill;
+    if(d.i >= d.qs.length){
+      drillBody('<div class="dq-hero"><div class="eyebrow">Practice done</div><h1>' + d.cleared + ' of ' + d.qs.length + ' fixed</h1><p>' +
+        (d.cleared === d.qs.length ? 'Clean sweep — all of them left the Mistakes book.' : 'The ones you missed stay in the book for next time.') + '</p></div>' +
+        '<div class="dq-actions"><button class="btn teal" id="pdBack">Back to Mistakes book</button></div>');
+      document.getElementById('pdBack').addEventListener('click', function(){ drill = { kind: 'mistakes', phase: 'list', only: null }; document.getElementById('drillTitle').textContent = 'Mistakes book'; renderMistakes(); });
+      return;
+    }
+    var q = d.qs[d.i], answered = q.pick !== null;
+    drillBody('<div class="dq-progress"><i style="width:' + (d.i / d.qs.length * 100) + '%"></i></div>' +
+      '<div class="dq-card" style="--dq-c:' + (STUDY[q.mod] ? STUDY[q.mod].color : 'var(--mustard)') + '"><div class="dq-meta"><span>Q ' + (d.i + 1) + ' / ' + d.qs.length + '</span><span>' + escapeHtml(MOD_NAME[q.mod]) + '</span>' + (q.tag ? '<span>' + escapeHtml(q.tag) + '</span>' : '') + '</div>' +
+      '<div class="dq-q">' + escapeHtml(q.q) + '</div><div class="dq-opts">' +
+      q.o.map(function(_, i){ return optHtml(q, i, !answered ? '' : (i === q.a ? ' ok' : (i === q.pick ? ' no' : ''))); }).join('') + '</div>' +
+      (answered ? '<div class="dq-fb ' + (q.pick === q.a ? 'good' : 'bad') + '"><b>' + (q.pick === q.a ? 'Right — removed from your Mistakes book.' : 'Not yet — it stays in the book.') + '</b>' + (q.e ? '<div>' + escapeHtml(q.e) + '</div>' : '') + '</div>' : '') +
+      '</div><div class="dq-actions">' + (answered ? '<button class="btn teal" id="pNext">' + (d.i === d.qs.length - 1 ? 'Finish' : 'Next ›') + '</button>' : '<span class="help">Tip: press 1–4 on a keyboard</span>') + '</div>');
+    if(!answered) document.querySelectorAll('#drillBody [data-opt]').forEach(function(b){ b.addEventListener('click', function(){
+      q.pick = +b.dataset.opt;
+      var ok = q.pick === q.a;
+      if(ok) d.cleared++;
+      if(STUDY[q.mod]) studyMark(q.mod, q.id, ok);
+      renderPractice();
+    }); });
+    var nb = document.getElementById('pNext');
+    if(nb) nb.addEventListener('click', function(){ d.i++; renderPractice(); });
+  }
+
+  // Mixed mock test
+  var mockCfg = (function(){ try{ return Object.assign({ en: 25, gs: 25, vocab: true, grammar: true, gsMods: ['bns', 'schemes', 'census', 'intlorgs'], neg: true }, JSON.parse(lsGet('shabdMockCfg') || '{}')); }catch(e){ return { en: 25, gs: 25, vocab: true, grammar: true, gsMods: ['bns', 'schemes', 'census', 'intlorgs'], neg: true }; } })();
+  function mockHistory(){ var h = studyState('mocks'); return Array.isArray(h.list) ? h.list : []; }
+  async function openMock(){
+    openDrill('Mixed mock test');
+    drillBody('<p class="help">Loading questions…</p>');
+    try{ await loadStudyBank(); }catch(e){ drillBody('<div class="dq-empty">Couldn’t load the question bank. Upload <b>study-bank.json</b> to your site and try again.</div>'); return; }
+    drill = { kind: 'mock', phase: 'setup' };
+    renderMockSetup();
+  }
+  function renderMockSetup(){
+    var c = mockCfg, n = c.en + c.gs, mins = Math.round(n * 36 / 60);
+    var seg = function(key, vals){ return '<div class="dq-seg">' + vals.map(function(v){ return '<button data-cfg="' + key + '" data-val="' + v + '" class="' + (c[key] === v ? 'on' : '') + '">' + v + '</button>'; }).join('') + '</div>'; };
+    var tog = function(key, label){ return '<button class="dq-tog' + (c[key] ? ' on' : '') + '" data-tog="' + key + '">' + label + '</button>'; };
+    var gsTog = function(m){ return '<button class="dq-tog' + (c.gsMods.indexOf(m) !== -1 ? ' on' : '') + '" data-gsmod="' + m + '">' + escapeHtml(MOD_NAME[m]) + '</button>'; };
+    var hist = mockHistory().slice(-5).reverse();
+    drillBody('<div class="dq-hero"><div class="eyebrow">English + General Studies · SSC pattern</div><h1>Mixed mock test</h1><p>Questions from your vocab register and every mini app, timed like Tier 1 (36 seconds a question), marked +2 / −0.5. Wrong answers go to your Mistakes book.</p></div>' +
+      '<div class="dq-setup">' +
+        '<div class="dq-box"><h3>English</h3>' + seg('en', [0, 10, 25]) + '<div class="dq-tags">' + tog('vocab', 'Vocabulary (' + words.length + ' words)') + tog('grammar', 'Grammar 100') + '</div></div>' +
+        '<div class="dq-box"><h3>General Studies</h3>' + seg('gs', [0, 10, 25]) + '<div class="dq-tags">' + ['bns', 'schemes', 'census', 'intlorgs'].map(gsTog).join('') + '</div></div>' +
+        '<div class="dq-box"><h3>Marking</h3><div class="dq-tags">' + tog('neg', 'Negative marking −0.5') + '</div><p class="help" style="margin:10px 0 0;">' + n + ' questions · ' + mins + ' minutes · maximum ' + (n * 2) + ' marks</p></div>' +
+      '</div>' +
+      '<div class="dq-actions"><button class="btn teal" id="mkStart"' + (n ? '' : ' disabled') + '>Start test ›</button></div>' +
+      (hist.length ? '<h3 class="dq-h3">Recent tests</h3><div class="dq-hist">' + hist.map(function(h){
+        return '<div><b>' + h.score + ' / ' + h.max + '</b><span>' + new Date(h.at).toLocaleDateString([], { day: 'numeric', month: 'short' }) + ' · English ' + h.en.r + '/' + h.en.t + ' · GS ' + h.gs.r + '/' + h.gs.t + '</span></div>';
+      }).join('') + '</div>' : ''));
+    document.querySelectorAll('#drillBody [data-cfg]').forEach(function(b){ b.addEventListener('click', function(){ mockCfg[b.dataset.cfg] = +b.dataset.val; saveMockCfg(); renderMockSetup(); }); });
+    document.querySelectorAll('#drillBody [data-tog]').forEach(function(b){ b.addEventListener('click', function(){ mockCfg[b.dataset.tog] = !mockCfg[b.dataset.tog]; saveMockCfg(); renderMockSetup(); }); });
+    document.querySelectorAll('#drillBody [data-gsmod]').forEach(function(b){ b.addEventListener('click', function(){
+      var m = b.dataset.gsmod, i = mockCfg.gsMods.indexOf(m);
+      if(i === -1) mockCfg.gsMods.push(m); else if(mockCfg.gsMods.length > 1) mockCfg.gsMods.splice(i, 1);
+      saveMockCfg(); renderMockSetup();
+    }); });
+    document.getElementById('mkStart').addEventListener('click', startMock);
+  }
+  function saveMockCfg(){ lsSet('shabdMockCfg', JSON.stringify(mockCfg)); }
+  function pickFrom(mods, n){
+    var pool = [];
+    mods.forEach(function(m){ if(studyBank.modules[m]) pool = pool.concat(studyBank.modules[m].qs); });
+    return shuffleArr(pool).slice(0, n).map(prepQ);
+  }
+  function startMock(){
+    var c = mockCfg, en = [], gs = [];
+    if(c.en){
+      var nv = c.vocab ? (c.grammar ? Math.round(c.en * 0.6) : c.en) : 0;
+      var v = nv ? vocabQuestions(nv) : [];
+      en = v.concat(c.grammar ? pickFrom(['grammar'], c.en - v.length) : []);
+      if(en.length < c.en && c.vocab) en = en.concat(vocabQuestions(c.en - en.length));
+      en.forEach(function(q){ q.sec = 'en'; });
+    }
+    if(c.gs){ gs = pickFrom(c.gsMods, c.gs); gs.forEach(function(q){ q.sec = 'gs'; }); }
+    var qs = shuffleArr(en).concat(shuffleArr(gs));
+    if(!qs.length){ showToast('No questions available for that choice.'); return; }
+    drill = { kind: 'mock', phase: 'run', qs: qs, i: 0, secs: qs.length * 36, start: Date.now(), marked: {} };
+    clearInterval(drillTimer);
+    drillTimer = setInterval(tickMock, 1000);
+    tickMock();
+    renderMockRun();
+  }
+  function tickMock(){
+    if(!drill || drill.kind !== 'mock' || drill.phase !== 'run') return;
+    var left = Math.max(0, drill.secs - Math.floor((Date.now() - drill.start) / 1000));
+    var el = document.getElementById('drillClock');
+    el.textContent = Math.floor(left / 60) + ':' + ('0' + left % 60).slice(-2);
+    el.classList.toggle('low', left < 60);
+    if(left <= 0) submitMock(true);
+  }
+  function renderMockRun(){
+    var d = drill, q = d.qs[d.i], answered = d.qs.filter(function(x){ return x.pick !== null; }).length;
+    drillBody('<div class="dq-run"><div class="dq-main">' +
+      '<div class="dq-card" style="--dq-c:' + (q.sec === 'en' ? 'var(--mustard)' : 'var(--teal)') + '"><div class="dq-meta"><span>Q ' + (d.i + 1) + ' / ' + d.qs.length + '</span><span>' + (q.sec === 'en' ? 'English' : 'General Studies') + '</span><span>' + escapeHtml(MOD_NAME[q.mod]) + '</span></div>' +
+      '<div class="dq-q">' + escapeHtml(q.q) + '</div><div class="dq-opts">' + q.o.map(function(_, i){ return optHtml(q, i, q.pick === i ? ' sel' : ''); }).join('') + '</div></div>' +
+      '<div class="dq-nav"><button class="btn ghost" id="mkPrev"' + (d.i ? '' : ' disabled') + '>‹ Prev</button><button class="btn ghost" id="mkMark">' + (d.marked[d.i] ? '★ Marked' : '☆ Mark') + '</button><button class="btn ghost" id="mkClear"' + (q.pick === null ? ' disabled' : '') + '>Clear</button><button class="btn teal" id="mkNext">' + (d.i === d.qs.length - 1 ? 'Review' : 'Next ›') + '</button></div></div>' +
+      '<aside class="dq-side"><div class="dq-side-h"><b>' + answered + '</b> of ' + d.qs.length + ' answered</div><div class="dq-pal">' +
+        d.qs.map(function(x, i){ return '<button data-go="' + i + '" class="' + (x.pick !== null ? 'a' : '') + (d.marked[i] ? ' m' : '') + (i === d.i ? ' cur' : '') + '">' + (i + 1) + '</button>'; }).join('') +
+      '</div><button class="btn maroon" id="mkSubmit" style="width:100%; margin-top:12px;">Submit test</button></aside></div>');
+    document.querySelectorAll('#drillBody [data-opt]').forEach(function(b){ b.addEventListener('click', function(){ q.pick = +b.dataset.opt; renderMockRun(); }); });
+    document.querySelectorAll('#drillBody .dq-pal [data-go]').forEach(function(b){ b.addEventListener('click', function(){ d.i = +b.dataset.go; renderMockRun(); }); });
+    document.getElementById('mkPrev').addEventListener('click', function(){ if(d.i){ d.i--; renderMockRun(); } });
+    document.getElementById('mkNext').addEventListener('click', function(){ if(d.i < d.qs.length - 1){ d.i++; renderMockRun(); } else document.getElementById('mkSubmit').scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+    document.getElementById('mkMark').addEventListener('click', function(){ d.marked[d.i] = !d.marked[d.i]; renderMockRun(); });
+    document.getElementById('mkClear').addEventListener('click', function(){ q.pick = null; renderMockRun(); });
+    document.getElementById('mkSubmit').addEventListener('click', function(){
+      var left = d.qs.length - d.qs.filter(function(x){ return x.pick !== null; }).length;
+      if(left && !confirm(left + ' question' + (left === 1 ? ' is' : 's are') + ' unanswered. Submit anyway?')) return;
+      submitMock(false);
+    });
+  }
+  function submitMock(timeUp){
+    var d = drill;
+    clearInterval(drillTimer);
+    d.phase = 'result';
+    document.getElementById('drillClock').textContent = '';
+    var neg = mockCfg.neg, sec = { en: { r: 0, w: 0, t: 0 }, gs: { r: 0, w: 0, t: 0 } }, byMod = {}, score = 0;
+    d.qs.forEach(function(q){
+      var s = sec[q.sec], m = byMod[q.mod] = byMod[q.mod] || { r: 0, t: 0 };
+      s.t++; m.t++;
+      if(q.pick === null) return;
+      if(q.pick === q.a){ s.r++; m.r++; score += 2; } else { s.w++; if(neg) score -= 0.5; }
+      if(STUDY[q.mod]) studyMark(q.mod, q.id, q.pick === q.a);
+      if(q.mod === 'vocab') logQuizAttempt(q.id, (words.find(function(w){ return w.id === q.id; }) || {}).term || '', q.pick === q.a);
+    });
+    var right = sec.en.r + sec.gs.r, wrong = sec.en.w + sec.gs.w, skipped = d.qs.length - right - wrong;
+    var secsUsed = Math.min(d.secs, Math.round((Date.now() - d.start) / 1000));
+    var h = studyState('mocks'); h.list = (Array.isArray(h.list) ? h.list : []).concat([{ at: Date.now(), score: score, max: d.qs.length * 2, right: right, wrong: wrong, skipped: skipped, secs: secsUsed, en: { r: sec.en.r, t: sec.en.t }, gs: { r: sec.gs.r, t: sec.gs.t } }]).slice(-50);
+    setStudyState('mocks', h);
+    var pct = function(r, t){ return t ? Math.round(r * 100 / t) + '%' : '—'; };
+    var review = d.qs.filter(function(q){ return q.pick !== q.a; });
+    drillBody('<div class="dq-hero"><div class="eyebrow">' + (timeUp ? 'Time up · ' : '') + 'Mixed mock result</div>' +
+      '<div class="dq-score"><b>' + score + '</b><span>/ ' + (d.qs.length * 2) + '</span></div>' +
+      '<p>' + right + ' right · ' + wrong + ' wrong · ' + skipped + ' skipped · ' + Math.floor(secsUsed / 60) + ' min ' + (secsUsed % 60) + ' s</p></div>' +
+      '<div class="dq-kpis">' +
+        (sec.en.t ? '<div><b>' + pct(sec.en.r, sec.en.t) + '</b><span>English · ' + sec.en.r + '/' + sec.en.t + '</span></div>' : '') +
+        (sec.gs.t ? '<div><b>' + pct(sec.gs.r, sec.gs.t) + '</b><span>General Studies · ' + sec.gs.r + '/' + sec.gs.t + '</span></div>' : '') +
+        Object.keys(byMod).map(function(m){ return '<div style="--dq-c:' + (STUDY[m] ? STUDY[m].color : 'var(--mustard)') + '"><b>' + pct(byMod[m].r, byMod[m].t) + '</b><span>' + escapeHtml(MOD_NAME[m]) + ' · ' + byMod[m].r + '/' + byMod[m].t + '</span></div>'; }).join('') +
+      '</div>' +
+      '<div class="dq-actions"><button class="btn teal" id="mkAgain">New mock test</button><button class="btn ghost" id="mkMist">Open Mistakes book</button></div>' +
+      (review.length ? '<h3 class="dq-h3">Review · ' + review.length + ' to learn</h3><div class="dq-list">' + review.map(function(q){
+        return '<div class="dq-rev" style="--dq-c:' + (STUDY[q.mod] ? STUDY[q.mod].color : 'var(--mustard)') + '"><div class="dq-meta"><span>' + escapeHtml(MOD_NAME[q.mod]) + '</span>' + (q.tag ? '<span>' + escapeHtml(q.tag) + '</span>' : '') + '<span>' + (q.pick === null ? 'Skipped' : 'You chose ' + 'ABCD'.charAt(q.pick)) + '</span></div>' +
+          '<div class="dq-q">' + escapeHtml(q.q) + '</div>' +
+          (q.src && q.src.k === 'e' ? '<div class="dq-parts">' + q.o.map(function(o, i){ return '<span class="' + (i === q.a ? 'bad' : '') + '">' + escapeHtml(o) + '</span>'; }).join(' ') + '</div>' : '') +
+          '<div class="dq-ans">' + (q.src && q.src.k === 'e' ? (/no error/i.test(q.o[q.a]) ? '✓ No error' : 'Error is in: ' + escapeHtml(q.o[q.a])) : '✓ ' + escapeHtml(q.o[q.a])) + '</div>' + (q.e ? '<div class="dq-exp">' + escapeHtml(q.e) + '</div>' : '') + '</div>';
+      }).join('') + '</div>' : '<div class="dq-empty">Perfect paper. 🏆</div>'));
+    document.getElementById('mkAgain').addEventListener('click', function(){ drill = { kind: 'mock', phase: 'setup' }; renderMockSetup(); });
+    document.getElementById('mkMist').addEventListener('click', function(){ document.getElementById('drillTitle').textContent = 'Mistakes book'; drill = { kind: 'mistakes', phase: 'list', only: null }; renderMistakes(); });
+  }
+  document.addEventListener('keydown', function(ev){
+    if(!drillOpen || !drill || ev.target.closest && ev.target.closest('input,textarea,select')) return;
+    if(/^[1-4]$/.test(ev.key)){ var b = document.querySelector('#drillBody [data-opt="' + (+ev.key - 1) + '"]'); if(b) b.click(); }
+    else if(ev.key === 'ArrowRight' || ev.key === 'Enter'){ var n = document.getElementById('mkNext') || document.getElementById('pNext'); if(n) n.click(); }
+    else if(ev.key === 'ArrowLeft'){ var p = document.getElementById('mkPrev'); if(p) p.click(); }
+  });
+  /** On opening पाठShala: bring every module's progress up to date from the account. */
+  function refreshHubProgress(){
+    if(!currentUser) return;
+    Promise.all(Object.keys(STUDY).concat(Object.keys(STUDY_EXTRA)).map(function(id){ return studyPull(id); })).then(function(){ if(hubOpen && !drillOpen) renderHub(); });
+  }
 
   // ---------------- text-to-speech ----------------
   var ttsSupported = ('speechSynthesis' in window);

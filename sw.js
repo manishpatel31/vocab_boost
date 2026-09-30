@@ -2,11 +2,11 @@
 // - Lets browsers offer "Install app".
 // - Network first: you always get the newest version when online.
 // - Everything opened once is kept, so the app and the study modules open offline too.
-var CACHE = 'shabd-v3';
+var CACHE = 'shabd-v4';
 var PRECACHE = [
   './', './index.html', './manifest.json',
   './study-grammar-100.html', './study-bns-bnss-bsa.html', './study-govt-schemes.html',
-  './study-census.html', './study-intl-orgs.html',
+  './study-census.html', './study-intl-orgs.html', './study-bank.json',
   './icon-192.png', './icon-512.png'
 ];
 

@@ -622,6 +622,9 @@ const KEY="crimlaw-course-v1";
 let prog={done:{}};
 try{const s=localStorage.getItem(KEY); if(s) prog=JSON.parse(s)||prog;}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(prog));}catch(e){}}
+/* शब्दRegister: remember each answer so wrong ones reach the shared Mistakes book */
+function shabdQid(q){let h=0;for(const c of String(q.q))h=(h*31+c.charCodeAt(0))|0;return "b"+(h>>>0).toString(36);}
+function shabdRecord(q,o){try{prog.ans=prog.ans||{};prog.ans[shabdQid(q)]=(o===q.a)?1:0;save();}catch(e){}}
 let view={name:"home"};
 const app=document.getElementById("app");
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -708,7 +711,7 @@ function renderLesson(){
     prog.done[L.id]={s:sc,t:nq}; save();
     if(view.li<COURSE.length-1) go({name:"lesson",li:view.li+1,step:0,ans:{}}); else go({name:"home"});
   };
-  app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{const qi=st-nc; if(view.ans[qi]!==undefined) return; view.ans[qi]=+b.dataset.o; const y=window.scrollY; render(); window.scrollTo(0,y);});
+  app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{const qi=st-nc; if(view.ans[qi]!==undefined) return; view.ans[qi]=+b.dataset.o; shabdRecord(L.quiz[qi],view.ans[qi]); const y=window.scrollY; render(); window.scrollTo(0,y);});
 }
 function quizBlock(Q,chosen,label){
   const L="ABCD";
@@ -760,7 +763,7 @@ function renderMock(){
    <nav class="bottom"><div class="in"><button class="btn" id="next" ${chosen===undefined?"disabled":""}>${m.i===n-1?"See result":"Next question"}</button></div></nav>`;
   document.getElementById("close").onclick=()=>go({name:"home"});
   document.getElementById("next").onclick=()=>{m.i++;render();};
-  app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{if(m.ans[m.i]!==undefined)return; m.ans[m.i]=+b.dataset.o; const y=window.scrollY; render(); window.scrollTo(0,y);});
+  app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{if(m.ans[m.i]!==undefined)return; m.ans[m.i]=+b.dataset.o; shabdRecord(m.qs[m.i],m.ans[m.i]); const y=window.scrollY; render(); window.scrollTo(0,y);});
 }
 
 /* ---------- tricks & finder ---------- */
