@@ -3,21 +3,25 @@
 <head>
 <meta charset="utf-8">
 <script>
-/* शब्दRegister bridge: follows the app's Light / Dark / Auto choice when opened inside the app. */
+/* शब्दRegister bridge: follows the app's look (Paper / Indigo) and Light / Dark / Auto choice. */
 (function(){
   var root = document.documentElement;
-  function apply(t){ if(t === 'dark' || t === 'light') root.setAttribute('data-theme', t); else root.removeAttribute('data-theme'); }
+  function theme(t){ if(t === 'dark' || t === 'light') root.setAttribute('data-theme', t); else root.removeAttribute('data-theme'); }
+  function skin(s){ if(s === 'paper' || s === 'indigo') root.setAttribute('data-skin', s); }
   try{
     var q = new URLSearchParams(location.search);
-    if(q.get('theme')) apply(q.get('theme'));
+    theme(q.get('theme'));
+    skin(q.get('skin') || (q.get('embed') ? 'paper' : ''));
     if(q.get('embed')) root.classList.add('in-shabd');
   }catch(e){}
   window.addEventListener('message', function(e){
-    if(e.origin !== location.origin || !e.data) return;
-    if(e.data.type === 'shabd-theme') apply(e.data.theme);
+    if(e.origin !== location.origin || !e.data || e.data.type !== 'shabd-theme') return;
+    theme(e.data.theme);
+    if(e.data.skin) skin(e.data.skin);
   });
 })();
 </script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>BNS BNSS BSA Revision</title>
@@ -161,6 +165,60 @@ td.n{font-family:var(--mono);font-weight:600;white-space:nowrap;font-variant-num
 .mn .k{font:700 18px/1.2 var(--mono);color:var(--accent);white-space:nowrap}
 </style>
 
+<style id="shabd-skin">
+/* ===== शब्दRegister skin: app colours + fonts (only when opened from the app) ===== */
+:root[data-skin="paper"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(150,128,90,.10) 31px, rgba(150,128,90,.10) 32px);--app-psize:auto;--app-card:#FFFCF6;--app-rule:#DCCFB2;--app-pri:#2F6F63;--app-ink:#221E17;--app-soft:#5E5547;--app-faint:#857B6A;--app-bg:#F3EEE3;--app-deep:#E9E1CF;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--bg:#F3EEE3;--surface:#FFFCF6;--ink:#221E17;--muted:#5E5547;--line:#DCCFB2;--accent:#2F6F63;--accent-ink:#FFFFFF;--accent-soft:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--stamp:#8C2F39;--stamp-soft:color-mix(in srgb, #8C2F39 14%, #FFFCF6);--marker:color-mix(in srgb, #C99A2E 22%, #FFFCF6);--marker-ink:#221E17;--ok:#2F6F63;--ok-soft:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--bad:#8C2F39;--bad-soft:color-mix(in srgb, #8C2F39 14%, #FFFCF6);--sans:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--serif:"Fraunces", Georgia, serif;color-scheme:light;}
+:root[data-skin="paper"][data-theme="dark"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--bg:#1B1813;--surface:#26211A;--ink:#EFE6D2;--muted:#BDB195;--line:#3B3429;--accent:#3F9A86;--accent-ink:#FFFFFF;--accent-soft:color-mix(in srgb, #3F9A86 22%, #26211A);--stamp:#D06B74;--stamp-soft:color-mix(in srgb, #D06B74 22%, #26211A);--marker:color-mix(in srgb, #D9AE4B 30%, #26211A);--marker-ink:#EFE6D2;--ok:#5FB9A3;--ok-soft:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-soft:color-mix(in srgb, #D06B74 22%, #26211A);--sans:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--serif:"Fraunces", Georgia, serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="paper"]:not([data-theme="light"]){--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--bg:#1B1813;--surface:#26211A;--ink:#EFE6D2;--muted:#BDB195;--line:#3B3429;--accent:#3F9A86;--accent-ink:#FFFFFF;--accent-soft:color-mix(in srgb, #3F9A86 22%, #26211A);--stamp:#D06B74;--stamp-soft:color-mix(in srgb, #D06B74 22%, #26211A);--marker:color-mix(in srgb, #D9AE4B 30%, #26211A);--marker-ink:#EFE6D2;--ok:#5FB9A3;--ok-soft:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-soft:color-mix(in srgb, #D06B74 22%, #26211A);--sans:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--serif:"Fraunces", Georgia, serif;color-scheme:dark;}}
+:root[data-skin="indigo"]{--app-pattern:radial-gradient(rgba(61,92,240,.10) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#FFFFFF;--app-rule:#CBD3EC;--app-pri:#3D5CF0;--app-ink:#0F1B3D;--app-soft:#4A5680;--app-faint:#67739C;--app-bg:#EEF1FA;--app-deep:#E1E6F5;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--bg:#EEF1FA;--surface:#FFFFFF;--ink:#0F1B3D;--muted:#4A5680;--line:#CBD3EC;--accent:#3D5CF0;--accent-ink:#FFFFFF;--accent-soft:color-mix(in srgb, #3D5CF0 14%, #FFFFFF);--stamp:#C8402F;--stamp-soft:color-mix(in srgb, #C8402F 14%, #FFFFFF);--marker:color-mix(in srgb, #F7C548 22%, #FFFFFF);--marker-ink:#0F1B3D;--ok:#147D53;--ok-soft:color-mix(in srgb, #147D53 14%, #FFFFFF);--bad:#C8402F;--bad-soft:color-mix(in srgb, #C8402F 14%, #FFFFFF);--sans:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--serif:"Bricolage Grotesque", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="indigo"][data-theme="dark"]{--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--bg:#0B1433;--surface:#121D47;--ink:#EEF2FF;--muted:#A7B3DA;--line:#22306A;--accent:#6F86FF;--accent-ink:#FFFFFF;--accent-soft:color-mix(in srgb, #6F86FF 22%, #121D47);--stamp:#F07B6E;--stamp-soft:color-mix(in srgb, #F07B6E 22%, #121D47);--marker:color-mix(in srgb, #F7C548 30%, #121D47);--marker-ink:#EEF2FF;--ok:#45C08A;--ok-soft:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-soft:color-mix(in srgb, #F07B6E 22%, #121D47);--sans:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--serif:"Bricolage Grotesque", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="indigo"]:not([data-theme="light"]){--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--bg:#0B1433;--surface:#121D47;--ink:#EEF2FF;--muted:#A7B3DA;--line:#22306A;--accent:#6F86FF;--accent-ink:#FFFFFF;--accent-soft:color-mix(in srgb, #6F86FF 22%, #121D47);--stamp:#F07B6E;--stamp-soft:color-mix(in srgb, #F07B6E 22%, #121D47);--marker:color-mix(in srgb, #F7C548 30%, #121D47);--marker-ink:#EEF2FF;--ok:#45C08A;--ok-soft:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-soft:color-mix(in srgb, #F07B6E 22%, #121D47);--sans:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--serif:"Bricolage Grotesque", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin] body{background-color:var(--app-bg);background-image:var(--app-pattern);background-size:var(--app-psize);background-attachment:fixed}
+:root[data-skin] h1,:root[data-skin] h2{letter-spacing:-.01em}
+
+/* ===== Desktop layout (PC / tablet landscape) ===== */
+@media (min-width: 1024px){
+  :root{--side:236px}
+  .app{max-width:1320px}
+  body:has(.bottom .tabs){padding-left:var(--side)}
+  main{padding:26px 36px 120px;gap:16px;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+  main > *{grid-column:1/-1}
+  main > .lesson,main > .mn{grid-column:auto}
+  main > .card p,main > .card ul{max-width:92ch}
+  .topbar{padding:14px 36px}
+  h1{font-size:34px} h2{font-size:25px}
+  body{font-size:16.5px}
+  .hero{max-width:820px;padding-top:12px}
+  .hero .btn{max-width:360px}
+  .group{padding-top:14px}
+  .lesson{padding:16px 18px;transition:transform .15s ease,box-shadow .15s ease}
+  .lesson:hover{transform:translateY(-2px);box-shadow:0 14px 30px -22px rgba(0,0,0,.45)}
+  .card{padding:24px 28px;gap:12px;font-size:17px}
+  main:not(:has(.lesson)) > .card:first-child{margin-top:8px}
+  .pair{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+  .opts{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .q{font-size:20px}
+  #fr{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .search{max-width:560px}
+
+  /* home tabs → left sidebar; lesson Prev / Next bar stays at the bottom but lines up with the content */
+  .bottom:has(.tabs){top:0;bottom:0;left:0;right:auto;width:var(--side);border-top:0;border-right:1px solid var(--line);padding:84px 14px 20px}
+  .bottom:has(.tabs) .in{max-width:none;margin:0}
+  .bottom .tabs{flex-direction:column;gap:4px;width:100%}
+  .bottom .tabs::before{content:"Sections";display:block;font:700 11px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:0 14px 8px}
+  .tab{display:flex;flex:none;justify-content:flex-start;gap:12px;padding:12px 14px;min-height:0;font-size:15px}
+  .tab .ic{width:20px;text-align:center}
+  .tab:hover{background:var(--bg)}
+  .bottom:not(:has(.tabs)) .in{max-width:1248px}
+  .bottom:not(:has(.tabs)) .btn{max-width:340px;margin-left:auto}
+  .bottom:not(:has(.tabs)) .btn.ghost{margin-left:0;margin-right:auto}
+}
+@media (min-width: 1500px){
+  main{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #fr{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+
+</style>
 </head>
 <body>
 <div class="app" id="app"></div>

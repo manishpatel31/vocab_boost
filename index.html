@@ -1367,6 +1367,7 @@
   document.getElementById('hubBack').addEventListener('click', function(){ closeHub(false); });
   function studyMeta(){ try{ return JSON.parse(lsGet('shabdStudySync') || '{}'); }catch(e){ return {}; } }
   function setStudyMeta(id, patch){ var m = studyMeta(); m[id] = Object.assign({}, m[id] || {}, patch); lsSet('shabdStudySync', JSON.stringify(m)); }
+  function studySkinValue(){ return document.body.classList.contains('theme-indigo') ? 'indigo' : 'paper'; }
   function studyThemeValue(){ var v = lsGet('vocabRegisterDarkMode'); return v === '1' ? 'dark' : (v === '0' ? 'light' : 'auto'); }
   function studySyncLabel(t){ var el = document.getElementById('studySync'); if(el) el.textContent = t || ''; }
   function studyDocRef(id){ return db.collection('users').doc(currentUser.uid).collection('study').doc(id); }
@@ -1433,7 +1434,7 @@
     if(studyOpen !== id) return;
     studyLast = lsGet(mod.key);
     Object.keys(STUDY).forEach(function(k){ studyPush(k); });   // this device's unsaved progress (incl. from before syncing existed)
-    document.getElementById('studyFrame').src = mod.file + '?embed=1&theme=' + studyThemeValue();
+    document.getElementById('studyFrame').src = mod.file + '?embed=1&skin=' + studySkinValue() + '&theme=' + studyThemeValue();
     studySyncLabel(currentUser ? '✓ Synced with your account' : '');
     clearInterval(studyWatch);
     studyWatch = setInterval(studyCheckChange, 4000);
@@ -1470,7 +1471,7 @@
   // keep an open module in step with the app's Light / Dark / Auto choice
   new MutationObserver(function(){
     var f = document.getElementById('studyFrame');
-    if(studyOpen && f.contentWindow) f.contentWindow.postMessage({ type: 'shabd-theme', theme: studyThemeValue() }, location.origin);
+    if(studyOpen && f.contentWindow) f.contentWindow.postMessage({ type: 'shabd-theme', theme: studyThemeValue(), skin: studySkinValue() }, location.origin);
   }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
   (function(){
     var m = /^#study-(\w+)/.exec(location.hash);

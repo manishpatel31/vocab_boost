@@ -3,21 +3,25 @@
 <head>
 <meta charset="utf-8">
 <script>
-/* शब्दRegister bridge: follows the app's Light / Dark / Auto choice when opened inside the app. */
+/* शब्दRegister bridge: follows the app's look (Paper / Indigo) and Light / Dark / Auto choice. */
 (function(){
   var root = document.documentElement;
-  function apply(t){ if(t === 'dark' || t === 'light') root.setAttribute('data-theme', t); else root.removeAttribute('data-theme'); }
+  function theme(t){ if(t === 'dark' || t === 'light') root.setAttribute('data-theme', t); else root.removeAttribute('data-theme'); }
+  function skin(s){ if(s === 'paper' || s === 'indigo') root.setAttribute('data-skin', s); }
   try{
     var q = new URLSearchParams(location.search);
-    if(q.get('theme')) apply(q.get('theme'));
+    theme(q.get('theme'));
+    skin(q.get('skin') || (q.get('embed') ? 'paper' : ''));
     if(q.get('embed')) root.classList.add('in-shabd');
   }catch(e){}
   window.addEventListener('message', function(e){
-    if(e.origin !== location.origin || !e.data) return;
-    if(e.data.type === 'shabd-theme') apply(e.data.theme);
+    if(e.origin !== location.origin || !e.data || e.data.type !== 'shabd-theme') return;
+    theme(e.data.theme);
+    if(e.data.skin) skin(e.data.skin);
   });
 })();
 </script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Grammar 100</title>
@@ -182,6 +186,80 @@ details.rv .b{padding:0 14px 12px 56px;font-size:15px}
 @media (prefers-reduced-motion:no-preference){.view{animation:in .18s ease-out}@keyframes in{from{transform:translateY(4px);opacity:.6}to{transform:none;opacity:1}}}
 </style>
 
+<style id="shabd-skin">
+/* ===== शब्दRegister skin: app colours + fonts (only when opened from the app) ===== */
+:root[data-skin="paper"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(150,128,90,.10) 31px, rgba(150,128,90,.10) 32px);--app-psize:auto;--app-card:#FFFCF6;--app-rule:#DCCFB2;--app-pri:#2F6F63;--app-ink:#221E17;--app-soft:#5E5547;--app-faint:#857B6A;--app-bg:#F3EEE3;--app-deep:#E9E1CF;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#F3EEE3;--card:#FFFCF6;--ink:#221E17;--muted:#5E5547;--line:#DCCFB2;--pen:#8C2F39;--pen-soft:color-mix(in srgb, #8C2F39 14%, #FFFCF6);--fix:#2F6F63;--fix-soft:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--hl:#C99A2E;--hl-soft:color-mix(in srgb, #C99A2E 20%, #FFFCF6);--navy:#2F6F63;--navy-soft:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="paper"][data-theme="dark"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--card:#26211A;--ink:#EFE6D2;--muted:#BDB195;--line:#3B3429;--pen:#D06B74;--pen-soft:color-mix(in srgb, #D06B74 22%, #26211A);--fix:#5FB9A3;--fix-soft:color-mix(in srgb, #5FB9A3 22%, #26211A);--hl:#D9AE4B;--hl-soft:color-mix(in srgb, #D9AE4B 28%, #26211A);--navy:#5FB9A3;--navy-soft:color-mix(in srgb, #5FB9A3 22%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="paper"]:not([data-theme="light"]){--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--card:#26211A;--ink:#EFE6D2;--muted:#BDB195;--line:#3B3429;--pen:#D06B74;--pen-soft:color-mix(in srgb, #D06B74 22%, #26211A);--fix:#5FB9A3;--fix-soft:color-mix(in srgb, #5FB9A3 22%, #26211A);--hl:#D9AE4B;--hl-soft:color-mix(in srgb, #D9AE4B 28%, #26211A);--navy:#5FB9A3;--navy-soft:color-mix(in srgb, #5FB9A3 22%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin="indigo"]{--app-pattern:radial-gradient(rgba(61,92,240,.10) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#FFFFFF;--app-rule:#CBD3EC;--app-pri:#3D5CF0;--app-ink:#0F1B3D;--app-soft:#4A5680;--app-faint:#67739C;--app-bg:#EEF1FA;--app-deep:#E1E6F5;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#EEF1FA;--card:#FFFFFF;--ink:#0F1B3D;--muted:#4A5680;--line:#CBD3EC;--pen:#C8402F;--pen-soft:color-mix(in srgb, #C8402F 14%, #FFFFFF);--fix:#147D53;--fix-soft:color-mix(in srgb, #147D53 14%, #FFFFFF);--hl:#F7C548;--hl-soft:color-mix(in srgb, #F7C548 20%, #FFFFFF);--navy:#3D5CF0;--navy-soft:color-mix(in srgb, #3D5CF0 14%, #FFFFFF);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="indigo"][data-theme="dark"]{--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--card:#121D47;--ink:#EEF2FF;--muted:#A7B3DA;--line:#22306A;--pen:#F07B6E;--pen-soft:color-mix(in srgb, #F07B6E 22%, #121D47);--fix:#45C08A;--fix-soft:color-mix(in srgb, #45C08A 22%, #121D47);--hl:#F7C548;--hl-soft:color-mix(in srgb, #F7C548 28%, #121D47);--navy:#8FA3FF;--navy-soft:color-mix(in srgb, #8FA3FF 22%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="indigo"]:not([data-theme="light"]){--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--card:#121D47;--ink:#EEF2FF;--muted:#A7B3DA;--line:#22306A;--pen:#F07B6E;--pen-soft:color-mix(in srgb, #F07B6E 22%, #121D47);--fix:#45C08A;--fix-soft:color-mix(in srgb, #45C08A 22%, #121D47);--hl:#F7C548;--hl-soft:color-mix(in srgb, #F7C548 28%, #121D47);--navy:#8FA3FF;--navy-soft:color-mix(in srgb, #8FA3FF 22%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin] body{background-color:var(--app-bg);background-image:var(--app-pattern);background-size:var(--app-psize);background-attachment:fixed}
+:root[data-skin] h1,:root[data-skin] h2{letter-spacing:-.01em}
+
+/* ===== Desktop layout (PC / tablet landscape) ===== */
+@media (min-width: 1024px){
+  :root{--side:236px}
+  body{padding-left:var(--side);font-size:16.5px}
+  header.top .in{max-width:1320px;padding:16px 36px}
+  .brand{font-size:23px}
+  .stat{font-size:13px}
+  .wrap{max-width:1320px;padding:0 36px 56px}
+  h1{font-size:34px} h2{font-size:23px}
+
+  /* bottom tab bar becomes a left sidebar */
+  nav.tabs{top:0;bottom:0;left:0;right:auto;width:var(--side);height:auto;border-top:0;border-right:1px solid var(--line);padding:86px 14px 20px;display:block;overflow:auto}
+  nav.tabs .in{display:flex;flex-direction:column;gap:4px;height:auto;max-width:none;margin:0}
+  nav.tabs .in::before{content:"Sections";display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:0 14px 8px}
+  nav.tabs button{flex-direction:row;justify-content:flex-start;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;font-size:15px;min-height:0;height:auto;width:100%;text-align:left}
+  nav.tabs button svg{width:20px;height:20px;flex-shrink:0}
+  nav.tabs button:hover{background:var(--paper)}
+  nav.tabs button[aria-current="page"]{background:var(--pen-soft)}
+  nav.tabs button[aria-current="page"] span{border-bottom:0!important}
+
+  nav.tabs{background:var(--card)}
+  /* course: units side by side */
+  .view.stack:has(> .unit){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+  .view.stack:has(> .unit) > :not(.unit){grid-column:1/-1}
+  .view.stack:has(> .unit) > .unit:has(> .ubody){grid-column:1/-1;order:-1}
+  .view.stack:has(> .unit) > .hero{order:-2}
+  .ubody{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:0}
+  .ubody .rl:nth-child(odd){border-right:1px solid var(--line)}
+  .ubody .rl.test{grid-column:1/-1;border-right:0}
+  .hero{padding-block:30px 8px;max-width:820px}
+  .unit{border-radius:16px;transition:box-shadow .15s ease}
+  .unit:hover{box-shadow:0 16px 34px -26px rgba(0,0,0,.5)}
+  button.unit{display:grid;grid-template-columns:52px 1fr auto;gap:14px;align-items:center;text-align:left;padding:16px 18px}
+  .rl:hover{background:var(--paper)}
+  .rl.next:hover{background:var(--hl-soft)}
+
+  /* rule lesson: wide reading column, examples in a grid */
+  .view.stack:has(> .rulehead){padding-top:18px}
+  .logic{font-size:17.5px}
+  .logic p{max-width:80ch}
+  .steps{max-width:520px}
+  .exlist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .ex{padding:14px 16px}
+  .trick,.trap{max-width:980px}
+
+  /* questions */
+  .qcard{padding:20px 22px;max-width:1040px}
+  .qstem{font-size:19px}
+  .opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tiles{grid-template-columns:repeat(6,minmax(0,1fr))}
+  .pal{grid-template-columns:repeat(auto-fill,minmax(40px,1fr))}
+
+  /* revise + mistakes: two columns */
+  #rvlist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
+  .search{max-width:560px}
+  .chiprow{display:flex;flex-wrap:wrap;gap:8px}
+}
+@media (min-width: 1500px){
+  .view.stack:has(> .unit){grid-template-columns:repeat(3,minmax(0,1fr))}
+  .exlist{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+</style>
 </head>
 <body>
 <header class="top"><div class="in">
