@@ -1,0 +1,1431 @@
+<!doctype html><html><head><meta charset=utf8>
+<script>
+/* शब्दRegister bridge: follows the app's look (Paper / Indigo) and Light / Dark / Auto choice. */
+(function(){
+  var root = document.documentElement;
+  function theme(t){ if(t === 'dark' || t === 'light') root.setAttribute('data-theme', t); else root.removeAttribute('data-theme'); }
+  function skin(s){ if(s === 'paper' || s === 'indigo') root.setAttribute('data-skin', s); }
+  try{
+    var q = new URLSearchParams(location.search);
+    theme(q.get('theme'));
+    skin(q.get('skin') || (q.get('embed') ? 'paper' : ''));
+    if(q.get('embed')) root.classList.add('in-shabd');
+  }catch(e){}
+  window.addEventListener('message', function(e){
+    if(e.origin !== location.origin || !e.data || e.data.type !== 'shabd-theme') return;
+    theme(e.data.theme);
+    if(e.data.skin) skin(e.data.skin);
+  });
+})();
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap">
+
+<meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Reports & Indices</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<style>
+/* Layout: Reports & Indices — follows the शब्दRegister Paper / Indigo look; one column + bottom tabs on phones, sidebar on PC. */
+:root{
+  --paper:#f6f3ea; --sheet:#fffdf7; --sunk:#ebe6d8;
+  --ink:#1d2a22; --ink2:#56625a; --rule:#dcd5c3;
+  --blue:#1f5c3d; --on-blue:#ffffff; --blue-bg:#dcebdf;
+  --accent:#b4530f; --accent-bg:#fbe7d3;
+  --good:#1b7547; --good-bg:#dff1e6; --bad:#b0271f; --bad-bg:#f8e1de;
+  --warn-bg:#fff2d2;
+  --f-display:"Fraunces", "Tiro Devanagari Hindi", Georgia, serif;
+  --f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-num:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r:10px; --nav-h:64px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#111612; --sheet:#1a211c; --sunk:#222b25;
+  --ink:#e8eee9; --ink2:#a3b0a7; --rule:#2f3a33;
+  --blue:#86cfa2; --on-blue:#111612; --blue-bg:#1d3a29;
+  --accent:#f3a764; --accent-bg:#3b2614;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#111612; --sheet:#1a211c; --sunk:#222b25;
+  --ink:#e8eee9; --ink2:#a3b0a7; --rule:#2f3a33;
+  --blue:#86cfa2; --on-blue:#111612; --blue-bg:#1d3a29;
+  --accent:#f3a764; --accent-bg:#3b2614;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
+.wrap{max-width:640px;margin:0 auto;padding-inline:16px;padding-block:0 calc(var(--nav-h) + 28px + env(safe-area-inset-bottom,0px))}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);border-bottom:1px solid var(--rule)}
+.top-in{max-width:640px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px}
+.brand{font-family:var(--f-display);font-weight:800;font-size:17px;line-height:1.2;flex:1;min-width:0}
+.brand small{display:block;font-family:var(--f-body);font-weight:500;font-size:12px;color:var(--ink2);letter-spacing:.02em}
+.stat{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right;white-space:nowrap}
+.stat b{color:var(--ink);font-weight:600}
+
+/* bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--sheet);border-top:1px solid var(--rule);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);height:var(--nav-h)}
+.nav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer}
+.nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav button[aria-current="page"]{color:var(--blue)}
+.nav button[aria-current="page"] span{border-bottom:2px solid var(--blue)}
+
+/* type */
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.25;margin:0}
+h1{font-size:24px;font-weight:800}
+h2{font-size:19px;font-weight:800}
+h3{font-size:16px;font-weight:700}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--ink2)}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+p{margin:0}
+.stack{display:flex;flex-direction:column;gap:14px}
+.view{padding-top:18px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--rule);background:var(--sheet);font-weight:600;cursor:pointer;text-decoration:none}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:var(--on-blue)}
+.btn.ghost{background:transparent}
+.btn.sm{min-height:36px;padding:0 14px;font-size:14px}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.end{justify-content:flex-end}
+.row.between{justify-content:space-between}
+
+/* hero */
+.hero{display:grid;gap:10px;padding:4px 0 6px}
+.hero p{color:var(--ink2)}
+.meter{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--blue);border-radius:99px}
+
+/* lesson list */
+.lessons{display:flex;flex-direction:column;border-top:1px solid var(--rule)}
+.les{display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;padding:14px 2px;border-bottom:1px solid var(--rule);background:none;border-left:0;border-right:0;border-top:0;text-align:left;cursor:pointer;width:100%}
+.les .no{font-family:var(--f-num);font-weight:600;font-size:15px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--rule);color:var(--ink2)}
+.les.done .no{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.les .t{min-width:0}
+.les .t b{display:block;font-weight:700;font-size:16px;line-height:1.3}
+.les .t span{font-size:13px;color:var(--ink2)}
+.les .sc{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right}
+.les.next .no{border-color:var(--blue);color:var(--blue)}
+
+/* lesson reader */
+.lhead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.back{background:none;border:0;padding:8px 8px 8px 0;cursor:pointer;color:var(--blue);font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0 4px}
+.steps button{border:1px solid var(--rule);background:var(--sheet);border-radius:8px;padding:8px 4px;font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer}
+.steps button[aria-current="step"]{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.block{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;min-width:0}
+.block h3{margin-bottom:8px}
+.block p + p{margin-top:8px}
+.plain{padding:0 2px}
+.facts{display:grid;gap:0}
+.facts div{display:grid;grid-template-columns:minmax(0,42%) minmax(0,1fr);gap:10px;padding:7px 0;border-top:1px dashed var(--rule)}
+.facts div:first-child{border-top:0}
+.facts dt{font-size:14px;color:var(--ink2);margin:0}
+.facts dd{margin:0;font-weight:600;min-width:0}
+.tl{display:grid;gap:0;margin:0;padding:0;list-style:none}
+.tl li{display:grid;grid-template-columns:92px 1fr;gap:10px;padding:8px 0;border-top:1px dashed var(--rule)}
+.tl li:first-child{border-top:0}
+.tl .y{font-family:var(--f-num);font-weight:600;font-size:13px;color:var(--accent);padding-top:2px}
+.trick,.trap{border-radius:var(--r);padding:12px 14px 12px 14px;border:1px solid var(--rule)}
+.trick{background:var(--accent-bg);border-color:transparent}
+.trap{background:var(--bad-bg);border-color:transparent}
+.trick .lab,.trap .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.trick .lab{color:var(--accent)}
+.trap .lab{color:var(--bad)}
+.tbl{overflow-x:auto;margin:0 -2px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);font-weight:700}
+td.n{font-family:var(--f-num);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fig{margin:0}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-size:13px;color:var(--ink2);margin-top:6px}
+.pyr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pyr div{text-align:center;font-size:13px}
+.pyr b{display:block;font-size:14px}
+.pm{fill:var(--blue)} .pf{fill:var(--accent)}
+.sum{margin:0;padding-left:20px;display:grid;gap:6px}
+
+/* questions */
+.qcard{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px;min-width:0}
+.qmeta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}
+.qno{font-family:var(--f-num);font-weight:600;color:var(--ink2)}
+.tag{background:var(--sunk);color:var(--ink2);border-radius:99px;padding:1px 9px;font-weight:600}
+.tag.pyq{background:var(--accent-bg);color:var(--accent)}
+.bm{margin-left:auto;background:none;border:0;cursor:pointer;color:var(--ink2);font-size:20px;line-height:1;padding:4px}
+.bm[aria-pressed="true"]{color:var(--accent)}
+.qt{font-weight:600;font-size:16px}
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:start;text-align:left;width:100%;border:1.5px solid var(--rule);background:var(--paper);border-radius:9px;padding:10px 12px;cursor:pointer;min-height:44px}
+.opt .k{font-family:var(--f-num);font-weight:600;color:var(--ink2);font-size:14px;padding-top:1px}
+.opt.sel{border-color:var(--blue);background:var(--blue-bg)}
+.opt.ok{border-color:var(--good);background:var(--good-bg)}
+.opt.no{border-color:var(--bad);background:var(--bad-bg)}
+.opt.ok .k{color:var(--good)} .opt.no .k{color:var(--bad)}
+.opt:disabled{cursor:default;color:inherit}
+.exp{font-size:15px;border-left:3px solid var(--blue);padding:4px 0 4px 12px;color:var(--ink)}
+.exp b.okl{color:var(--good)} .exp b.nol{color:var(--bad)}
+
+/* chips */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 13px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.seg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--rule)}
+.seg::-webkit-scrollbar{display:none}
+.seg button{flex:none;background:none;border:0;border-bottom:2px solid transparent;padding:10px 8px;font-weight:600;color:var(--ink2);cursor:pointer}
+.seg button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+
+/* score panel */
+.scorebig{display:flex;align-items:baseline;gap:8px}
+.scorebig .num{font-size:44px;font-weight:600;line-height:1;color:var(--blue)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.kpi{background:var(--sunk);border-radius:8px;padding:8px;text-align:center}
+.kpi .num{display:block;font-size:20px;font-weight:600}
+.kpi span{font-size:12px;color:var(--ink2)}
+.kpi.g .num{color:var(--good)} .kpi.b .num{color:var(--bad)}
+
+/* mock */
+.mbar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 57px);z-index:10;background:var(--paper);padding:10px 0;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--rule)}
+.timer{font-family:var(--f-num);font-weight:600;font-size:18px;padding:4px 10px;border-radius:8px;background:var(--sunk)}
+.timer.low{background:var(--bad-bg);color:var(--bad)}
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px}
+.pal button{height:40px;border-radius:8px;border:1px solid var(--rule);background:var(--sheet);font-family:var(--f-num);font-weight:600;font-size:13px;cursor:pointer}
+.pal button.a{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.pal button.m{box-shadow:inset 0 -4px 0 var(--accent)}
+.pal button.cur{outline:2px solid var(--ink);outline-offset:1px}
+.pal button.ok{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.pal button.no{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.confirm{background:var(--warn-bg);border-radius:var(--r);padding:12px 14px;display:grid;gap:10px}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}
+legend{font-weight:700;margin-bottom:6px;padding:0}
+.radios{display:flex;gap:8px;flex-wrap:wrap}
+.radios label{border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 14px;font-weight:600;cursor:pointer;font-size:14px}
+.radios input{position:absolute;opacity:0;pointer-events:none}
+.radios input:checked + span{color:var(--blue)}
+.radios label:has(input:checked){border-color:var(--blue);background:var(--blue-bg)}
+.radios label:has(input:focus-visible){outline:2px solid var(--blue);outline-offset:2px}
+select{font:inherit;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:8px;padding:8px 10px;max-width:100%}
+.hist{display:grid;gap:0}
+.hist div{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:14px}
+
+/* revise */
+.search{width:100%;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:10px;padding:10px 12px;font:inherit}
+.rk{display:grid;gap:0}
+.rk div{display:grid;grid-template-columns:minmax(0,48%) 1fr;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:15px}
+.rk div:first-child{border-top:0}
+.rk dt{font-size:13px;color:var(--ink2);margin:0}
+.rk dt.up{color:var(--good)} .rk dt.dn{color:var(--bad)}
+.rk dd{margin:0;font-weight:600;min-width:0}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px}
+.tile .num{display:block;font-size:24px;font-weight:600;color:var(--accent);line-height:1.2}
+.tile span{font-size:13px;color:var(--ink2)}
+.gbar{display:grid;grid-template-columns:78px 1fr 52px;gap:8px;align-items:center;font-size:13px;padding:3px 0}
+.gbar .tr{height:12px;background:var(--sunk);border-radius:3px;position:relative;overflow:hidden}
+.gbar .tr i{position:absolute;left:0;top:0;bottom:0;background:var(--blue);border-radius:3px}
+.gbar .tr i.neg{background:var(--bad)}
+.gbar .v{font-family:var(--f-num);text-align:right}
+.flash{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;min-height:240px;padding:20px 18px;display:grid;align-content:center;gap:12px;cursor:pointer;text-align:left;width:100%}
+.flash .side{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.flash .front{font-size:18px;font-weight:600}
+.flash .ans{font-size:20px;font-weight:700;color:var(--good)}
+.empty{padding:24px 4px;color:var(--ink2);text-align:center}
+.foot{font-size:13px;color:var(--ink2);padding-top:10px}
+@media (prefers-reduced-motion: no-preference){ .opt,.chip,.btn{transition:background-color .15s, border-color .15s} }
+.link{background:var(--blue-bg);border-radius:var(--r);padding:12px 14px}
+.link .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;color:var(--blue)}
+.icheck{background:var(--sheet);border:1.5px dashed var(--blue);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px}
+.icheck .lab{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue)}
+.cat{font-size:12px;font-weight:700;border-radius:99px;padding:1px 8px;white-space:nowrap}
+.cat.CS{background:var(--blue-bg);color:var(--blue)} .cat.CSS{background:var(--accent-bg);color:var(--accent)} .cat.ST{background:var(--sunk);color:var(--ink)} .cat.OT{background:var(--sunk);color:var(--ink2)}
+
+/* ---- Reports & Indices additions ---- */
+.ladder{list-style:none;margin:0;padding:0;display:grid;gap:0;border-top:1px solid var(--rule)}
+.ladder li{display:grid;grid-template-columns:62px 1fr auto;gap:12px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--rule)}
+.ladder .rk-n{font-size:22px;font-weight:600;color:var(--blue);text-align:right}
+.ladder .rk-t{min-width:0}
+.ladder .rk-t b{display:block;line-height:1.3}
+.ladder .rk-t span{font-size:13px;color:var(--ink2)}
+.ladder .rk-d{font-weight:700;font-size:14px;white-space:nowrap}
+.ladder li.up .rk-d{color:var(--good)} .ladder li.dn .rk-d{color:var(--bad)}
+.ladder small{font-weight:600;color:var(--ink2)}
+table.cover td{min-width:90px}
+.peek{border:1.5px dashed var(--blue);background:var(--blue-bg);color:var(--blue);border-radius:8px;padding:6px 10px;font-weight:600;cursor:pointer;min-height:36px;width:100%}
+.pubs{display:grid;gap:12px}
+.plist{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.plist li{padding:7px 0;border-top:1px dashed var(--rule);display:grid;gap:1px}
+.plist li:first-child{border-top:0}
+.plist li span{font-size:13px;color:var(--ink2)}
+.seg{scroll-snap-type:x proximity}
+@media (max-width: 700px){
+  table.cover thead{display:none}
+  table.cover tr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px 10px;padding:10px 0;border-bottom:1px solid var(--rule)}
+  table.cover td{border:0;padding:0;min-width:0;font-size:14px}
+  table.cover td:first-child{grid-column:1/-1;font-size:15px}
+  table.cover td[data-l]::before{content:attr(data-l);display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-bottom:2px}
+}
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">Reports &amp; Indices<small>रिपोर्ट और सूचकांक · SSC CGL workbook</small></div>
+    <div class="stat" id="topstat"></div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<nav class="nav" aria-label="Sections">
+  <div class="nav-in">
+    <button type="button" id="nav-learn" data-tab="learn"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg><span>Learn</span></button>
+    <button type="button" id="nav-practice" data-tab="practice"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span>Practice</span></button>
+    <button type="button" id="nav-mock" data-tab="mock"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6M12 2v3"/></svg><span>Mock test</span></button>
+    <button type="button" id="nav-revise" data-tab="revise"><svg viewBox="0 0 24 24"><path d="M12 3 2 8l10 5 10-5z"/><path d="m2 13 10 5 10-5"/></svg><span>Revise</span></button>
+  </div>
+</nav>
+
+<script>
+"use strict";
+const LESSONS = [
+{ id:"L1", title:"How index questions are asked", hi:"सूचकांक कैसे पढ़ें", blocks:[
+ {k:"p", h:"Every CGL shift has 1–2 questions on reports & indices. They come in only <b>four shapes</b>: (1) <b>India's rank</b> (most asked), (2) <b>who is #1</b>, (3) <b>who publishes it</b>, (4) the <b>pillars / indicators</b> of a few famous indices (HDI, MPI, GHI, Gender Gap, WHR, Press Freedom). Sometimes a fifth: <b>did India go up or down</b> from last year? Learn those five things per index and nothing else."},
+ {k:"table", title:"What to learn for each index", head:["Priority","What","Example"], rows:[["★★★","India's rank (+ last year)","Press Freedom 157 (151)"],["★★★","Publisher","Press Freedom → RSF (Paris)"],["★★","Top country","Press Freedom → Norway, 10th year"],["★★","Pillars (famous ones only)","HDI → 3 dimensions, 4 indicators"],["★","Bottom country, India's score","Eritrea last; skip scores except a few"]]},
+ {k:"trick", h:"<b>The Scandinavian rule.</b> In any 'good-life' index (happiness, peace, gender, press, HDI, SDG, corruption, energy) the #1 is almost always one of the five Nordic countries: <b>Finland, Iceland, Norway, Denmark, Sweden</b>. If only one Nordic country is in the options, that is your best guess.<br><b>Who owns what:</b> <b>F</b>inland = Happy + SDG · <b>I</b>celand = Peace + Gender + HDI · <b>N</b>orway = Press + Democracy · <b>D</b>enmark = Corruption-free (+ 4th in climate) · <b>S</b>weden = Energy transition. Say it as “<b>FIND-S</b>”."},
+ {k:"trick", h:"<b>The Singapore rule.</b> In 'business & travel' indices, #1 is Singapore: <b>World Competitiveness, Passport power, Logistics, Economic Freedom, Aviation safety</b>. Hook: <i>“सिंगापुर = सौदा, सामान, सफ़र”</i> (business, cargo, travel)."},
+ {k:"q", q:"If an index measures quality of life and only one option is a Nordic country, the safest guess for #1 is…", o:["The Nordic country","The USA","Singapore","Switzerland"], e:"Nordic countries top almost every well-being index; Singapore tops business/travel ones."},
+ {k:"table", title:"Rank 1 is not always 'best'", head:["Index","Rank 1 means","#1 in latest"], rows:[["Global Terrorism Index","Most affected by terrorism","Pakistan"],["World Air Quality Report (countries)","Most polluted","Chad"],["Global Hunger Index","Least hunger (rank 1 = best)","Belarus (joint)"],["Global Firepower","Strongest military","USA"],["Climate Change Performance Index","Ranks 1–3 are kept empty","Denmark is 4th"]]},
+ {k:"trap", h:"In the <b>Terrorism Index</b> India went from 14 to 13 — a smaller number there means <b>more</b> affected, so it is not an improvement. In the <b>Air Quality</b> report India went from 5th to 6th most polluted — a bigger number there is <b>better</b>. Always ask: “is rank 1 good or bad here?”"},
+ {k:"table", title:"Score direction (asked as statement questions)", head:["Index","Scale","Better is…"], rows:[["Corruption Perceptions","0 (highly corrupt) – 100 (very clean)","Higher"],["HDI","0 – 1","Higher"],["Gender Gap","0 – 1 (1 = full parity)","Higher"],["Global Hunger","0 – 100","Lower"],["Global Firepower PowerIndex","0.0000 is 'perfect'","Lower"],["Global Terrorism","0 – 10","Lower"]]},
+ {k:"link", h:"<b>Group by publisher, not by name.</b> One office usually releases a pair: <b>IEP</b> → Peace + Terrorism · <b>UN SDSN</b> → Happiness + SDG · <b>WEF</b> → Gender Gap + Energy Transition · <b>UNDP</b> → HDI + MPI · <b>EIU</b> → Liveability + Democracy · <b>World Bank</b> → Logistics + Container Port + Global Economic Prospects. Every lesson below keeps these pairs together."},
+ {k:"q", q:"In the Global Terrorism Index, India moving from 14th to 13th means India is…", o:["Slightly more affected by terrorism","Slightly less affected by terrorism","Unchanged","Removed from the index"], e:"Rank 1 = most impacted. A smaller rank number means more impact."},
+ {k:"facts", title:"Where the big publishers sit", rows:[["WEF","Cologny / Geneva, Switzerland"],["IMD","Lausanne, Switzerland"],["WIPO","Geneva (UN agency)"],["RSF (Reporters Without Borders)","Paris, France"],["Transparency International","Berlin, Germany"],["Germanwatch","Bonn, Germany"],["IEP (Institute for Economics & Peace)","Sydney, Australia"],["EIU, Henley & Partners","London, UK"],["SIPRI","Stockholm, Sweden"],["Heritage Foundation","Washington DC, USA"],["IQAir","Switzerland"]]}
+], sum:["Learn per index: India's rank, publisher, #1, pillars, up/down.","FIND-S: Finland happy+SDG, Iceland peace+gender+HDI, Norway press+democracy, Denmark CPI, Sweden energy.","Singapore tops competitiveness, passport, logistics, economic freedom, aviation safety.","Rank 1 is worst in Terrorism and Air Quality; lower score is better in GHI and GFP.","CPI: 0 = highly corrupt, 100 = very clean.","Learn publishers as pairs: IEP, SDSN, WEF, UNDP, EIU, World Bank."]},
+
+{ id:"L2", title:"HDI & poverty indices", hi:"मानव विकास और बहुआयामी गरीबी", blocks:[
+ {k:"p", h:"The <b>Human Development Index</b> was created in <b>1990</b> by Pakistani economist <b>Mahbub ul Haq</b> with Indian economist <b>Amartya Sen</b>, and is published every year by the <b>UNDP</b> in the Human Development Report. Amartya Sen got the Economics Nobel in <b>1998</b> — the first Indian economist to win it (the first Indian Nobel was Rabindranath Tagore, Literature, 1913)."},
+ {k:"table", title:"HDI: 3 dimensions → 4 indicators", head:["Dimension","Indicator(s)"], rows:[["Long & healthy life","Life expectancy at birth"],["Knowledge","Expected years of schooling + Mean years of schooling"],["Decent standard of living","GNI per capita (PPP $)"]]},
+ {k:"trick", h:"<b>HDI = 3-4</b>: 3 dimensions, 4 indicators. <b>Global MPI = 3-10</b>: same 3 areas, 10 indicators. <b>National MPI = 3-12</b>: NITI adds 2 → <b>maternal health</b> and <b>bank account</b>. Hook: <i>“3-4, 3-10, 3-12”</i> — the number of indicators grows as you go from development to poverty to India."},
+ {k:"trap", h:"The lecture said HDI has <b>10 indicators</b>. That is wrong — <b>10 indicators belong to the MPI</b>. HDI has only <b>4</b>. The second lecture gets this right."},
+ {k:"table", title:"HDR 2025 (released 2025)", head:["Item","Fact"], rows:[["Theme","“A Matter of Choice: People and Possibilities in the Age of AI”"],["#1","Iceland (0.972) → 2 Norway → 3 Switzerland"],["India","<b>130th</b>, HDI 0.685 (was 133rd in the previous report)"],["India's category","<b>Medium</b> human development"]]},
+ {k:"trick", h:"<b>Ice-No-Swiss</b> for HDI top 3 (Iceland, Norway, Switzerland). India <b>130</b> → “<b>1 अरब 30 करोड़</b> जैसा” — India's population figure hides its HDI rank. Right next door: Gender Gap is <b>131</b> — HDI 130, Gender 131, consecutive numbers."},
+ {k:"q", q:"How many indicators does the Human Development Index use?", o:["4","3","10","12"], e:"3 dimensions, 4 indicators: life expectancy, expected & mean years of schooling, GNI per capita."},
+ {k:"table", title:"Global MPI (UNDP + OPHI, Oxford) — 3 dimensions, 10 indicators", head:["Dimension","Indicators"], rows:[["Health","Nutrition, Child mortality"],["Education","Years of schooling, School attendance"],["Standard of living","Cooking fuel, Sanitation, Drinking water, Electricity, Housing, Assets"]]},
+ {k:"trick", h:"MPI's three areas: “<b>SHE</b>” — <b>S</b>tandard of living, <b>H</b>ealth, <b>E</b>ducation. Standard of living alone has 6 indicators — <i>“Cook, Clean, Drink, Light, House, Own”</i>."},
+ {k:"facts", title:"National MPI (NITI Aayog)", rows:[["Indicators","12 (10 global + maternal health + bank account)"],["Highest poverty","Bihar"],["Lowest poverty","Kerala"],["Most people out of poverty","Uttar Pradesh"]]},
+ {k:"link", h:"<b>HDI ↔ NFHS.</b> HDI's first indicator is life expectancy at birth, which moves with infant mortality. The NFHS-6 numbers in Lesson 12 (vaccination, institutional births, stunting) are the inputs that push these indices."},
+ {k:"q", q:"The national MPI of NITI Aayog adds which two indicators to the global ten?", o:["Maternal health and bank account","Internet and road access","Income and caste","Employment and migration"], e:"12 indicators = 10 global + maternal health + bank account."}
+], sum:["HDI: 1990, Mahbub ul Haq + Amartya Sen, published by UNDP.","HDI 3 dimensions, 4 indicators; Global MPI 10 (UNDP + OPHI); National MPI 12 (NITI).","HDR 2025: Iceland, Norway, Switzerland; India 130 (0.685), medium category; previous 133.","Theme: A Matter of Choice — People and Possibilities in the Age of AI.","National MPI: Bihar highest poverty, Kerala lowest, UP most lifted out.","Amartya Sen: Economics Nobel 1998."]},
+
+{ id:"L3", title:"Happiness & SDG reports", hi:"खुशहाली और सतत विकास", blocks:[
+ {k:"link", h:"<b>Same office, two reports:</b> the UN <b>Sustainable Development Solutions Network (SDSN)</b> releases both the <b>World Happiness Report</b> and the <b>Sustainable Development Report</b>. Finland tops <b>both</b>. So: SDSN → Finland → Happy + SDG."},
+ {k:"table", title:"World Happiness Report 2026", head:["Item","Fact"], rows:[["Publisher","Wellbeing Research Centre (Oxford) + Gallup + UN SDSN"],["Top 3","Finland (9th year in a row) → Iceland → Denmark"],["India","<b>116</b> (2025: 118 — improved)"],["Neighbours","Nepal 99, Pakistan 104, Sri Lanka 134"],["Last","Afghanistan (147)"]]},
+ {k:"table", title:"6 factors that explain happiness", head:["#","Factor"], rows:[["1","GDP per capita"],["2","Social support"],["3","Healthy life expectancy"],["4","Freedom to make life choices"],["5","Generosity"],["6","Perception of corruption"]]},
+ {k:"trick", h:"<b>WHR factors = “GSH-FGP”</b> → <i>“<b>G</b>ood <b>S</b>ocial <b>H</b>ealth, <b>F</b>ree <b>G</b>enerous <b>P</b>eople”</i>. India <b>116</b>: <i>“एक-एक आदमी अच्छा (1-1) हो तो 6 गुना खुशी”</i>. The idea of <b>Gross National Happiness</b> comes from <b>Bhutan</b>."},
+ {k:"q", q:"Which of these is NOT one of the six factors used in the World Happiness Report?", o:["Literacy rate","Generosity","Social support","Perception of corruption"], e:"The six are GDP per capita, social support, healthy life expectancy, freedom, generosity and perception of corruption."},
+ {k:"table", title:"Sustainable Development Report 2026 (SDSN)", head:["Item","Fact"], rows:[["Top","Finland → Sweden → Denmark"],["India","<b>94</b>, score 68.3 (2025: 99 — first time in top 100)"],["Bottom","Chad, Central African Republic, South Sudan"],["Goals","17 SDGs, to be achieved by <b>2030</b> (Agenda 2030, adopted 2015)"]]},
+ {k:"trick", h:"SDG rank: <b>99 → 94</b>. <i>“निन्यानवे के फेर से निकला, 94 पर आया”</i>. Both numbers are under 100 — India entered the top 100 in 2025."},
+ {k:"table", title:"India's own SDG progress report 2026 (NIF, 17 goals, 277 indicators)", head:["Indicator","Then → now"], rows:[["Social protection coverage","22% (2016) → 65.3%"],["Maternal mortality ratio (per lakh live births)","122 (2015-17) → 87 (2022-24)"],["Sex ratio at birth (females per 1000 males)","896 → 918"],["Ratio of female to male labour participation","48.7% → 51.3%"],["Recycling plants","829 → 3,236 (four-fold)"],["Internet subscriptions","302 mn → 969 mn (three-fold)"],["Ramsar wetland share","4.15% → 8.66%"],["Unemployment","nearly halved"]]},
+ {k:"facts", title:"Census 2011 sex ratio (often mixed up)", rows:[["Overall","943 females / 1000 males"],["Child (0–6)","919"]]},
+ {k:"q", q:"The World Happiness Report and the Sustainable Development Report are both released by…", o:["UN Sustainable Development Solutions Network","World Economic Forum","UNDP","World Bank"], e:"SDSN releases both; Finland tops both."}
+], sum:["WHR 2026: Finland (9th year), Iceland, Denmark; India 116 (from 118); Afghanistan last.","WHR publishers: Oxford Wellbeing Research Centre + Gallup + UN SDSN.","Six factors: GDP per capita, social support, healthy life expectancy, freedom, generosity, corruption perception.","SDR 2026: Finland; India 94 (from 99); Chad near bottom; SDGs by 2030.","NIF 2026: MMR 122→87, SRB 896→918, social protection 22%→65.3%.","Gross National Happiness idea: Bhutan."]},
+
+{ id:"L4", title:"Gender gap & hunger", hi:"लैंगिक अंतर और भुखमरी", blocks:[
+ {k:"table", title:"Global Gender Gap Report 2025 (19th edition, WEF)", head:["Item","Fact"], rows:[["Publisher","World Economic Forum (Cologny, Switzerland)"],["#1","Iceland — 16th year in a row, ~92.6% of the gap closed"],["India","<b>131</b> of 148, score 0.644 (64.4%)"],["India last year","129 (2024) → so India <b>slipped 2 places</b>"],["South Asia","India is among the lowest in South Asia"]]},
+ {k:"table", title:"4 sub-indices (asked often)", head:["Sub-index","India's story"], rows:[["Economic Participation & Opportunity","Slight gain (about 40.7%)"],["Educational Attainment","Improved, near parity"],["Health & Survival","Improved"],["Political Empowerment","Declined (women MPs 14.7% → 13.8%)"]]},
+ {k:"trick", h:"Gender pillars = “<b>E-E-H-P</b>” → <i>“<b>E</b>very <b>E</b>ducated <b>H</b>ealthy <b>P</b>erson”</i> (Economic, Educational, Health, Political). India <b>131</b> → “<b>1 ❤️ 1</b>”: स्त्री (1) — प्रेम (3) — पुरुष (1). The heart sits in the middle of the gap."},
+ {k:"trap", h:"One lecture said India was <b>139</b> in 2024. India was <b>129</b> in 2024 (and 127 in 2023). The direction is still the same: 2025 rank 131 is <b>worse</b>."},
+ {k:"q", q:"Which of these is NOT a sub-index of the Global Gender Gap Index?", o:["Social Security","Political Empowerment","Health and Survival","Educational Attainment"], e:"The four are Economic Participation & Opportunity, Educational Attainment, Health & Survival, Political Empowerment."},
+ {k:"table", title:"Global Hunger Index 2025", head:["Item","Fact"], rows:[["Publishers","Concern Worldwide (Ireland) + Welthungerhilfe (Germany)"],["India","<b>102</b> of 123, score 25.8 → '<b>serious</b>' category (2024: 105)"],["Best","Belarus (group of low-hunger countries)"],["Worst","Somalia (123)"],["Global average","18.3"]]},
+ {k:"table", title:"GHI: 4 indicators with India's value", head:["Indicator","Meaning","India"], rows:[["Undernourishment","Share of people without enough calories","12%"],["Child stunting","Low height for age (under 5)","32.9%"],["Child wasting","Low weight for height (under 5)","18.7%"],["Child mortality","Deaths before age 5","2.8%"]]},
+ {k:"trick", h:"<b>Stunting = S for 'Short'</b> (height for age). <b>Wasting = W for 'Weight'</b> (weight for height). India <b>102</b>: <i>“भूख से <b>102° बुखार</b>”</i>. Three of the four indicators are about children — <b>“1 adult, 3 kids”</b>."},
+ {k:"trap", h:"Lecture spelling “Wealth Hunger Life” — the real name is <b>Welthungerhilfe</b> (German: 'world hunger help'). IFPRI (a UN-linked institute) co-published GHI only until 2018; the current publishers are <b>Concern Worldwide + Welthungerhilfe</b>."},
+ {k:"q", q:"In the Global Hunger Index, 'child wasting' means…", o:["Low weight for height","Low height for age","Death before age five","Low calorie intake"], e:"Wasting = weight for height (acute undernutrition). Stunting = height for age."},
+ {k:"link", h:"<b>GHI ↔ NFHS-6 ↔ schemes.</b> GHI's stunting and wasting come from India's own NFHS data. The government's answer to them: <b>POSHAN Abhiyaan</b>, <b>Saksham Anganwadi & Poshan 2.0</b> (Women & Child Development) and <b>PM POSHAN</b> (mid-day meal, <b>Ministry of Education</b>)."}
+], sum:["Gender Gap 2025 (WEF): Iceland 16th year; India 131 of 148 (2024: 129) — slipped.","4 sub-indices: Economic, Educational, Health & Survival, Political — India fell in political.","GHI 2025: India 102/123, score 25.8, 'serious'; Somalia worst; publishers Concern Worldwide + Welthungerhilfe.","GHI indicators: undernourishment 12%, stunting 32.9%, wasting 18.7%, child mortality 2.8%.","Stunting = height for age; wasting = weight for height."]},
+
+{ id:"L5", title:"Corruption, press & democracy", hi:"भ्रष्टाचार, प्रेस और लोकतंत्र", blocks:[
+ {k:"table", title:"Corruption Perceptions Index 2025 (Transparency International, Berlin)", head:["Item","Fact"], rows:[["Scale","0 = highly corrupt · 100 = very clean"],["#1","Denmark"],["India","<b>91</b>, score 39 (2024: 96 — improved)"],["Global average","42 → India is below average"],["Bottom","Somalia, South Sudan"],["Neighbours","Bhutan 18 · China 76 · Maldives 91 (tied with India) · Sri Lanka 107 · Pakistan 136"]]},
+ {k:"trap", h:"The lecture said on CPI “0 means clean and 100 means corrupt.” It is the <b>other way round</b>: <b>0 = highly corrupt, 100 = very clean</b>. That is why Denmark (clean) has the highest score."},
+ {k:"trick", h:"India <b>91</b> → <i>“Corruption? <b>No-One</b> (9-1)!”</i>. <b>Denmark = 'Clean Mark'</b>. Neighbour order, cleanest first: <b>B</b>hutan 18, <b>C</b>hina 76, <b>I</b>ndia = <b>M</b>aldives 91, <b>S</b>ri Lanka 107, <b>P</b>akistan 136 → “<b>BC-IM-SP</b>”."},
+ {k:"q", q:"In the Corruption Perceptions Index, a score of 100 means a country is perceived as…", o:["Very clean","Highly corrupt","Average","Not assessed"], e:"CPI runs from 0 (highly corrupt) to 100 (very clean)."},
+ {k:"table", title:"World Press Freedom Index 2026 (RSF, Paris) — 180 countries", head:["Item","Fact"], rows:[["#1","Norway — 10th year in a row → 2 Netherlands → 3 Estonia"],["India","<b>157</b> (2025: 151 — fell 6 places), 'very serious' category"],["Bottom three","Eritrea 180, North Korea 179, China 178"],["Most dangerous region","Middle East & North Africa"],["Record","For the first time over half of the 180 countries are 'difficult' or 'very serious'"]]},
+ {k:"table", title:"5 indicators of press freedom", head:["#","Indicator"], rows:[["1","Political context"],["2","Legal framework"],["3","Economic context"],["4","Socio-cultural context"],["5","Safety of journalists"]]},
+ {k:"trick", h:"India <b>157</b> → <i>“प्रेस को आज़ादी मिली <b>15</b> अगस्त को, पर हफ़्ते के <b>7</b> दिन बस बकबक”</i> = 15-7. Indicators: “<b>PLES-S</b>” — Political, Legal, Economic, Socio-cultural, Safety."},
+ {k:"q", q:"Which country has topped the World Press Freedom Index for the tenth straight year in 2026?", o:["Norway","Denmark","Finland","Estonia"], e:"Norway 1, Netherlands 2, Estonia 3; Eritrea last."},
+ {k:"table", title:"Democracy Index (EIU, London)", head:["Item","Fact"], rows:[["#1","Norway → New Zealand"],["Last","Afghanistan (score near zero)"],["India","41, 'flawed democracy'"]]},
+ {k:"link", h:"<b>Norway owns 'freedom'.</b> Free press (RSF) + strongest democracy (EIU). Denmark owns 'clean' (CPI). Both are Nordic — FIND-S from Lesson 1."},
+ {k:"table", title:"Index of Economic Freedom 2026 (Heritage Foundation, USA)", head:["Item","Fact"], rows:[["#1","Singapore"],["India","132 (2025: 128 — fell), score 52.5 'mostly unfree'"]]}
+], sum:["CPI 2025 (TI): Denmark; India 91 (score 39, from 96); global average 42; Somalia & South Sudan last.","CPI scale: 0 highly corrupt, 100 very clean.","Press Freedom 2026 (RSF): Norway 10th year; India 157 (from 151); Eritrea last.","Press indicators: political, legal, economic, socio-cultural, safety.","Democracy Index (EIU): Norway; India 41; Afghanistan last.","Economic Freedom (Heritage): Singapore; India 132."]},
+
+{ id:"L6", title:"Peace, terrorism & military power", hi:"शांति, आतंकवाद, सैन्य शक्ति", blocks:[
+ {k:"link", h:"<b>Peace and Terror come from the same desk</b> — the <b>Institute for Economics & Peace (IEP)</b>. Peace index #1 = Iceland; Terror index #1 = Pakistan. One office, opposite ends."},
+ {k:"table", title:"Global Peace Index 2026 (20th edition, 163 countries)", head:["Item","Fact"], rows:[["Top 3","Iceland (18th year) → New Zealand → Switzerland"],["Least peaceful","Russia"],["India","<b>127</b> (2025: 115 — fell 12 places)"],["South Asia","Bhutan 16 (most peaceful), Sri Lanka 67, Pakistan 152, Afghanistan 157"],["3 domains","Societal safety & security · Ongoing conflict · Militarisation"]]},
+ {k:"trick", h:"Top 3 all end in <b>-land</b>: <b>Ice-land, New Zea-land, Switzer-land</b>. India <b>127</b>: <i>“<b>1</b> देश, <b>2</b> दुश्मन पड़ोसी, हफ़्ते के <b>7</b> दिन तनाव”</i>. (The lecture's older hook “1-1 आदमी + 5 इंद्रियाँ = 115” was last year's rank.)"},
+ {k:"trap", h:"One lecture said IEP is a London-based body. The <b>Institute for Economics & Peace is headquartered in Sydney, Australia</b>. (The EIU, which does Liveability and Democracy, is the London one.)"},
+ {k:"q", q:"The Global Peace Index and the Global Terrorism Index are both released by…", o:["Institute for Economics & Peace","Economist Intelligence Unit","SIPRI","Global Firepower"], e:"IEP (Sydney) publishes both."},
+ {k:"table", title:"Global Terrorism Index 2026 (163 countries; 4 indicators over 5 years)", head:["Rank","Country"], rows:[["1","Pakistan (most impacted)"],["2","Burkina Faso"],["3","Niger"],["4","Nigeria"],["13","India (2025: 14)"]]},
+ {k:"trick", h:"<b>13 = the unlucky number = terror</b>. The top 4 after Pakistan are all in Africa's <b>Sahel</b>: <b>B</b>urkina, <b>N</b>iger, <b>N</b>igeria → “<b>BNN</b>”."},
+ {k:"table", title:"Global Firepower 2026 (military strength)", head:["Rank","Country","PowerIndex"], rows:[["1","USA","0.0741"],["2","Russia",""],["3","China",""],["4","India","0.1346"]]},
+ {k:"trick", h:"India <b>4th</b> → count the letters in <b>F-I-R-E</b> = 4. Lower PowerIndex is stronger (0.0000 is 'perfect')."},
+ {k:"table", title:"SIPRI Yearbook 2026 (released 8 June 2026, Stockholm)", head:["List","Top 3 (India)"], rows:[["Deadliest armed conflicts","Ukraine, Sudan, Israel–Palestine"],["Military spenders","USA, China, Russia, Germany, <b>India 5th</b>"],["Arms exporters (share %)","USA 42, France 9.8, Russia 6.8 (India not in top 10)"],["Arms importers (share %)","Ukraine 9.7, <b>India 8.2 (2nd)</b>, Saudi Arabia 6.8"]]},
+ {k:"trick", h:"India's military numbers: <b>4-5-2</b> → 4th strongest (GFP), 5th biggest spender (SIPRI), 2nd biggest importer (SIPRI)."},
+ {k:"q", q:"According to SIPRI, India is the world's ___ largest importer of major arms.", o:["Second","First","Fifth","Tenth"], e:"Ukraine 1st, India 2nd, Saudi Arabia 3rd."}
+], sum:["IEP (Sydney) → Global Peace Index + Global Terrorism Index.","GPI 2026: Iceland (18th year), New Zealand, Switzerland; Russia last; India 127 (from 115); Bhutan 16.","GTI 2026: Pakistan 1st, Burkina Faso, Niger, Nigeria; India 13 (from 14).","Global Firepower: USA, Russia, China, India 4th (lower score = stronger).","SIPRI 2026: India 5th spender, 2nd importer; USA top exporter (42%)."]},
+
+{ id:"L7", title:"Economy, innovation & startups", hi:"अर्थव्यवस्था, नवाचार, स्टार्टअप", blocks:[
+ {k:"table", title:"IMD World Competitiveness Ranking 2026 (Lausanne)", head:["Item","Fact"], rows:[["Top 3","Singapore → Hong Kong → Switzerland"],["India","<b>44</b> (2025: 41 — fell), score 62"],["4 factors","Economic performance · Government efficiency · Business efficiency · Infrastructure"],["India by factor","Economic performance 15 · Business efficiency 37 · Government efficiency 46 · Infrastructure 54"]]},
+ {k:"trick", h:"IMD = <b>I</b>nstitute for <b>M</b>anagement <b>D</b>evelopment (not the weather IMD!). India <b>44</b> → <i>“चार-चार हाथ से मुकाबला”</i>. India's best factor is economic performance, worst is infrastructure."},
+ {k:"q", q:"The World Competitiveness Ranking is published by…", o:["IMD, Lausanne","India Meteorological Department","IMF","World Economic Forum"], e:"International Institute for Management Development, Lausanne, Switzerland."},
+ {k:"table", title:"Global Innovation Index 2025 (WIPO, Geneva)", head:["Item","Fact"], rows:[["Top 3","Switzerland (15th year) → Sweden → USA"],["China","10th — first time in the top 10"],["India","<b>38</b> (2024: 39; 2020: 48; 2015: 81)"],["Indian clusters in global top 100","Bengaluru 21 · Delhi 26 · Mumbai 46"]]},
+ {k:"trick", h:"India <b>38</b> → <i>“innovation वही करता है जो <b>अड़</b> जाए → अड़-तीस (38)”</i>. <b>Twin 38</b>: India is 38 in the World Bank <b>Logistics</b> Index too (Lesson 9). India's GII climb: <b>81 → 48 → 38</b> in ten years."},
+ {k:"table", title:"Hurun Global Unicorn Index 2026", head:["Rank","Country","Unicorns"], rows:[["1","USA","806"],["2","China","381"],["3","UK","70"],["4","India","61 (2025: 3rd with 64)"]]},
+ {k:"trap", h:"One lecture's hook says India is <b>3rd</b> in unicorns. That was 2025. In <b>2026 India slipped to 4th</b> (61 unicorns) and the <b>UK is 3rd</b>. Bengaluru leads India with 25 unicorns; top Indian ones by value: Zerodha, Zepto, Razorpay."},
+ {k:"facts", title:"Unicorn — definition", rows:[["Unicorn","A privately held startup valued at over US$ 1 billion"],["India #1 city","Bengaluru, then Mumbai"]]},
+ {k:"table", title:"More economy indices", head:["Index","Publisher","#1","India"], rows:[["International IP Index","US Chamber of Commerce (GIPC)","USA","42 (same for four years)"],["Network Readiness Index","Portulans Institute","USA (79.3)","45 (54.43)"],["Global Economic Prospects (June 2026)","World Bank","—","Global growth slowing to about 2.5% in 2026"]]},
+ {k:"table", title:"Network Readiness: 4 pillars", head:["Pillar"], rows:[["Technology"],["People"],["Governance"],["Impact"]]},
+ {k:"q", q:"Which country entered the top 10 of the Global Innovation Index for the first time in 2025?", o:["China","India","Japan","Israel"], e:"China was 10th; India 38th."}
+], sum:["IMD WCR 2026: Singapore, Hong Kong, Switzerland; India 44 (from 41).","GII 2025 (WIPO): Switzerland 15th year, Sweden, USA; China 10th first time; India 38 (from 39).","Indian GII clusters: Bengaluru 21, Delhi 26, Mumbai 46.","Hurun Unicorn 2026: USA 806, China 381, UK 70, India 4th with 61.","IP Index (US Chamber): India 42; NRI (Portulans): USA, India 45."]},
+
+{ id:"L8", title:"Energy, climate & environment", hi:"ऊर्जा, जलवायु, पर्यावरण", blocks:[
+ {k:"table", title:"Energy Transition Index 2026 (WEF)", head:["Item","Fact"], rows:[["Top 3","Sweden → Finland → Denmark"],["India","<b>70</b> (2025: 71), score 54.9"],["China","14"],["Two dimensions","System performance · Transition readiness"]]},
+ {k:"trick", h:"India <b>70</b> → <i>“हफ़्ते के <b>7</b> दिन बिजली बचाओ, <b>0</b> बर्बादी”</i>. The lecture hook “7 days × 1 second = 71” was the 2025 rank. <b>WEF pair</b>: Gender Gap (Iceland) + Energy Transition (Sweden)."},
+ {k:"table", title:"Climate Change Performance Index 2026 (Germanwatch + NewClimate Institute + CAN)", head:["Item","Fact"], rows:[["Released at","COP30, Belém (Brazil), Nov 2025"],["Ranks 1–3","Kept <b>empty</b> — no country does enough"],["4th / 5th","Denmark / UK"],["India","<b>23</b> of 63 + EU (2025: 10 — fell 13 places), score 61.3"],["Why India fell","More coal use in power generation"],["4 categories","GHG emissions · Renewable energy · Energy use · Climate policy (14 indicators)"]]},
+ {k:"trick", h:"CCPI: <b>“ऊपर के तीन सिंहासन खाली, चौथे पर डेनमार्क”</b>. India <b>10 → 23</b>: coal went up, rank went down."},
+ {k:"q", q:"In CCPI 2026, which rank did Denmark get?", o:["4th, the highest awarded","1st","2nd","10th"], e:"Ranks 1–3 are left empty; Denmark is 4th."},
+ {k:"table", title:"Environmental Performance Index 2026 (Yale + Columbia CIESIN)", head:["Item","Fact"], rows:[["Countries","177"],["Top 3","Estonia → Luxembourg → UK"],["India","<b>176</b>, score 22.46 — second last"],["Last","Laos (177)"],["Scope","47 indicators, 12 issue categories"]]},
+ {k:"trick", h:"EPI: <b>177 में 176</b> — India is one step from the bottom. Estonia tops EPI and is 3rd in press freedom — the only non-Nordic Baltic 'good' country to remember."},
+ {k:"table", title:"World Air Quality Report 2025 (IQAir, Swiss)", head:["Item","Fact"], rows:[["Most polluted countries","Chad → Bangladesh → Pakistan"],["India","6th most polluted (2024: 5th — slightly better)"],["Most polluted city","Loni (Ghaziabad, UP)"],["Most polluted capital","New Delhi"],["Top 100 polluted cities","66 are in India (incl. Delhi, Byrnihat, Ghaziabad)"]]},
+ {k:"table", title:"FAO Global Forest Resources Assessment 2025", head:["Item","Fact"], rows:[["World forest","4.14 billion ha = 32% of land"],["Net loss per year","10.7 mn ha (1990s) → 4.12 mn ha (2015–25)"],["India — total forest area","<b>9th</b> in the world (~2% of world forest)"],["India — net annual gain","<b>3rd</b>"],["India — carbon sink","<b>5th</b> (≈150 Mt CO₂ removed a year)"],["Largest share","Europe (25% of world forest)"],["Highest % cover","South America (49% of its land)"]]},
+ {k:"trick", h:"India in FAO-FRA: <b>9-3-5</b> → <i>“9 बजे पेड़ लगाओ, 3 गुना बढ़ें, 5 गुना हवा साफ़”</i> (area 9th, gain 3rd, sink 5th)."},
+ {k:"table", title:"UNICEF Children's Climate Risk (2026)", head:["Hazard","Children exposed"], rows:[["Extreme heat","1.2 bn (1.5 bn to heatwaves)"],["Drought","1.8 bn (over three-quarters)"],["Air pollution","2.3 bn"],["India — extreme heat","≈392 mn (92% of children); 89 mn face repeated heatwaves"]]},
+ {k:"q", q:"According to FAO's Forest Resources Assessment 2025, India ranks ___ in net annual forest area gain.", o:["3rd","9th","5th","1st"], e:"Area 9th, net gain 3rd, carbon sink 5th."}
+], sum:["ETI 2026 (WEF): Sweden, Finland, Denmark; India 70 (from 71).","CCPI 2026 (Germanwatch): ranks 1–3 empty, Denmark 4th; India 23 (from 10) due to coal.","EPI 2026 (Yale/Columbia): Estonia; India 176/177; Laos last.","IQAir 2025: Chad most polluted; India 6th; Loni most polluted city; New Delhi worst capital.","FAO FRA 2025: forests 32% of land; India 9th area, 3rd gain, 5th sink."]},
+
+{ id:"L9", title:"Passports, logistics, cities & universities", hi:"पासपोर्ट, लॉजिस्टिक्स, शहर, विश्वविद्यालय", blocks:[
+ {k:"table", title:"Henley Passport Index 2026 (Henley & Partners, London; IATA data)", head:["Edition","India","Visa-free"], rows:[["Jan 2026","80th","55"],["Feb 2026","75th","56"],["Latest (mid-2026)","<b>81st</b>","55"],["#1 all year","Singapore (192 destinations), then Japan",""],["Weakest","Afghanistan, then Iraq, Syria",""]]},
+ {k:"trap", h:"Henley updates <b>every quarter</b>, so lectures quote different numbers (78, 77, 75). In 2026 India went <b>80 → 75 → 81</b>. If the question says “2026”, look for 75 or 81 in the options; Singapore is #1 in every edition. Maldives is ahead of India; Pakistan, Bangladesh, Nepal are behind."},
+ {k:"trick", h:"Latest India <b>81</b> → <i>“<b>8</b> घंटे की उड़ान, <b>1</b> पासपोर्ट”</i>. Singapore passport: <i>“इतना बढ़िया कि गाना गाते जाओ — सिंगा-पुर”</i>."},
+ {k:"q", q:"Which country has the world's strongest passport in the Henley Passport Index 2026?", o:["Singapore","Japan","Germany","UAE"], e:"Singapore — visa-free access to 192 destinations; Japan second."},
+ {k:"table", title:"Logistics Performance Index 2023 (World Bank, 7th edition)", head:["Item","Fact"], rows:[["#1","Singapore"],["India","<b>38</b> — best ever"],["India, international shipments","22nd"],["Credit","PM Gati Shakti, National Logistics Policy"],["New in 2023","Big-data measures of speed and bottlenecks"],["6 parameters","Customs · Infrastructure · International shipments · Logistics competence · Tracking & tracing · Timeliness"]]},
+ {k:"trap", h:"The lecture said India “moved up to second rank in international shipments.” India is <b>22nd</b> in that sub-index."},
+ {k:"table", title:"More from the World Bank and ICAO", head:["Report","Key fact"], rows:[["Container Port Performance Index 2025 (World Bank)","JNPT (Nhava Sheva) is India's top port — India's largest container port, a satellite port of Mumbai"],["ICAO safety audit (USOAP) 2023","Singapore 1, UAE 2; India <b>55</b> (up from 102 in 2018)"]]},
+ {k:"trap", h:"One lecture said India's aviation safety rank <b>fell</b> from 48 to 55. In fact India <b>rose</b> to 55th from 102nd (score about 85%). ICAO = International Civil Aviation Organization (Montreal)."},
+ {k:"table", title:"QS World University Rankings 2027 (Quacquarelli Symonds, June 2026)", head:["Item","Fact"], rows:[["#1","MIT (USA)"],["India's best","<b>IIT Delhi 118</b>; IIT Bombay 134"],["Indian institutions ranked","52 (54 last year; 11 in 2015)"],["Most represented","USA 184 · UK 93 · China 85 · Germany 60 · <b>India 52 (5th)</b>"]]},
+ {k:"trick", h:"IIT Delhi <b>118</b> → <i>“<b>1-1</b> ईंट जोड़ कर <b>8</b> मंज़िल बनाई — दिल से (Delhi)”</i>. India's top institute in the NIRF (India's own ranking) is <b>IIT Madras</b>."},
+ {k:"table", title:"Global Liveability Index 2025 (EIU)", head:["Item","Fact"], rows:[["#1","Copenhagen (Denmark)"],["Next","Vienna (Austria) and Zurich, then Melbourne (Australia)"],["India","New Delhi is India's best-placed city"],["5 categories","Stability · Healthcare · Culture & environment · Education · Infrastructure"]]},
+ {k:"trap", h:"Lecture: “Vienna in Australia”. <b>Vienna is the capital of Austria</b>. The Australian city in the top list is <b>Melbourne</b>."},
+ {k:"q", q:"Which Indian institution is the highest ranked in QS World University Rankings 2027?", o:["IIT Delhi","IIT Bombay","IIT Madras","IISc Bengaluru"], e:"IIT Delhi at 118; IIT Bombay 134."}
+], sum:["Henley 2026: Singapore #1 (192); India 80 (Jan) → 75 (Feb) → 81 (latest).","LPI 2023 (World Bank): Singapore; India 38, 22nd in international shipments.","CPPI 2025: JNPT India's best port; ICAO 2023: India 55 (from 102).","QS 2027: MIT; IIT Delhi 118; 52 Indian institutions, India 5th most represented.","Liveability 2025 (EIU): Copenhagen, Vienna (Austria)."]},
+
+{ id:"L10", title:"NITI & DPIIT state rankings", hi:"राज्य रैंकिंग: राजकोषीय, निर्यात, लॉजिस्टिक्स", blocks:[
+ {k:"table", title:"Fiscal Health Index 2026 (NITI Aayog, 2nd edition, March 2026)", head:["Group","Top","Bottom"], rows:[["18 major states","<b>Odisha</b> (73.1) → Goa (54.7) → Jharkhand (50.5)","Punjab (worst), Andhra Pradesh, West Bengal"],["10 NE & Himalayan states","Arunachal Pradesh","Manipur"]]},
+ {k:"table", title:"FHI: 5 pillars", head:["#","Pillar"], rows:[["1","Quality of expenditure"],["2","Revenue mobilisation"],["3","Fiscal prudence"],["4","Debt index"],["5","Debt sustainability"]]},
+ {k:"trick", h:"Top 3 = “<b>O-G-J</b>” → <i>“<b>O</b>h <b>G</b>ood <b>J</b>ob!”</i> (Odisha, Goa, Jharkhand). Bottom = Punjab — <i>“पंजाब पर सबसे ज़्यादा कर्ज़”</i>. NE: <b>A</b>runachal top, <b>M</b>anipur bottom (A to M)."},
+ {k:"facts", title:"NITI Aayog now", rows:[["Chairperson","Prime Minister"],["Vice-Chairman","Suman Bery"],["CEO","<b>Anurag Jain</b> (took charge Aug 2026, after B.V.R. Subrahmanyam; Nidhi Chhibber held additional charge in between)"]]},
+ {k:"q", q:"Which state topped NITI Aayog's Fiscal Health Index 2026 among major states?", o:["Odisha","Goa","Gujarat","Maharashtra"], e:"Odisha 73.1, Goa 54.7, Jharkhand 50.5; Punjab last."},
+ {k:"table", title:"LEADS 2025 (DPIIT, Ministry of Commerce) — 'Exemplars'", head:["Group","Exemplar"], rows:[["Coastal","Tamil Nadu"],["Landlocked","Uttar Pradesh"],["North-East","Mizoram"],["UT","Delhi"]]},
+ {k:"table", title:"LEADS 2025 — other categories", head:["Category","Coastal","Landlocked","NE","UT"], rows:[["High performer","Gujarat, Maharashtra, Kerala","Haryana, Telangana, Chhattisgarh, Bihar","Tripura, Meghalaya","J&K, Puducherry"],["Accelerator","Andhra, Odisha, Goa","—","—","—"],["Growth seeker","West Bengal","Rajasthan","Sikkim","Andaman & Nicobar"]]},
+ {k:"trick", h:"LEADS exemplars “<b>TUMD</b>” → <i>“<b>T</b>um <b>U</b>P <b>M</b>ein <b>D</b>elhi”</i> — Tamil Nadu, UP, Mizoram, Delhi. Categories go <b>E-H-A-G</b> (Exemplar, High performer, Accelerator, Growth seeker)."},
+ {k:"table", title:"Export Preparedness Index 2024 (NITI; first edition 2020)", head:["Item","Fact"], rows:[["4 pillars","Export infrastructure · Business ecosystem · Policy & governance · Export performance (13 sub-pillars, 70 indicators)"],["Categories","Leader · Challenger · Aspirer"],["Large-state leaders","Maharashtra, Tamil Nadu, Gujarat, Uttar Pradesh, Andhra Pradesh"],["Small / NE / UT leaders","Uttarakhand, J&K, Nagaland, Dadra & Nagar Haveli and Daman & Diu"]]},
+ {k:"table", title:"Port rankings by cargo type", head:["Cargo","Top port"], rows:[["Dry bulk (ore, coal)","Paradip (Odisha)"],["Liquid bulk (crude oil)","Sikka port & terminals (Gujarat)"],["Container","Mundra (Gujarat)"]]},
+ {k:"link", h:"<b>Odisha everywhere</b>: #1 fiscal health, Paradip #1 dry-bulk port, 'Accelerator' in LEADS, and one of the top gainers of forest cover (Lesson 11)."},
+ {k:"q", q:"In LEADS 2025, which state is the 'Exemplar' among landlocked states?", o:["Uttar Pradesh","Haryana","Telangana","Rajasthan"], e:"TUMD: Tamil Nadu (coastal), UP (landlocked), Mizoram (NE), Delhi (UT)."}
+], sum:["FHI 2026 (NITI): Odisha, Goa, Jharkhand; Punjab last; NE — Arunachal top, Manipur bottom.","FHI pillars: expenditure quality, revenue mobilisation, fiscal prudence, debt index, debt sustainability.","NITI CEO: Anurag Jain (Aug 2026); VC Suman Bery.","LEADS 2025 (DPIIT) exemplars: Tamil Nadu, UP, Mizoram, Delhi.","EPI 2024 (NITI): 4 pillars; leaders Maharashtra, TN, Gujarat, UP, AP.","Ports: Paradip dry bulk, Sikka liquid bulk, Mundra container."]},
+
+{ id:"L11", title:"India State of Forest Report 2023", hi:"भारत वन स्थिति रिपोर्ट", blocks:[
+ {k:"facts", title:"About ISFR", rows:[["Publisher","Forest Survey of India, Dehradun (MoEFCC)"],["Frequency","Biennial (every 2 years); first in 1987"],["Edition","18th (ISFR 2023, released in 2025)"],["Covers","Forest cover, tree cover, mangroves, growing stock, carbon stock"]]},
+ {k:"table", title:"Headline numbers", head:["Item","ISFR 2023"], rows:[["Forest + tree cover","8,27,357 km² = <b>25.17%</b> of area"],["Forest cover","21.76%"],["Tree cover","3.41%"],["ISFR 2021 total","24.62% (so it rose)"],["Mangrove cover","4,992 km²"]]},
+ {k:"trap", h:"The lecture wrote tree cover as 3.14% and the 2021 total as 24.16%. The correct figures are <b>tree cover 3.41%</b> (21.76 + 3.41 = 25.17) and <b>ISFR 2021 total 24.62%</b>."},
+ {k:"trick", h:"<b>25.17 ≈ one-fourth of India</b> is green. Split: <b>21.76</b> forest + <b>3.41</b> trees. Check your memory by adding them."},
+ {k:"table", title:"Rankings by area", head:["Measure","1","2","3"], rows:[["Largest forest + tree cover","Madhya Pradesh","Arunachal Pradesh","Maharashtra"],["Largest forest cover only","Madhya Pradesh","Arunachal Pradesh","Chhattisgarh"]]},
+ {k:"trick", h:"Area: <b>MP → Arunachal</b> always first two. Third changes: forest+tree → <b>M</b>aharashtra, forest-only → <b>C</b>hhattisgarh. <i>“M for More (trees added), C for Canopy only.”</i>"},
+ {k:"table", title:"Rankings by % of own area", head:["Rank","State","UT"], rows:[["1","Mizoram","Lakshadweep (91.33%) — highest overall"],["2","Arunachal Pradesh","Andaman & Nicobar"]]},
+ {k:"q", q:"By percentage of its geographical area, which has the highest forest cover in India (states and UTs together)?", o:["Lakshadweep","Mizoram","Arunachal Pradesh","Andaman & Nicobar Islands"], e:"Lakshadweep 91.33%; among states, Mizoram."},
+ {k:"table", title:"Biggest gainers since 2021", head:["Measure","States"], rows:[["Forest + tree cover increase","Chhattisgarh, UP, Odisha, Rajasthan"],["Forest cover increase","Mizoram, Gujarat, Odisha"]]},
+ {k:"trick", h:"Gainers: <b>“CUOR”</b> (Chhattisgarh, UP, Odisha, Rajasthan) for forest+tree, <b>“MGO”</b> (Mizoram, Gujarat, Odisha) for forest. Odisha is in <b>both</b>."},
+ {k:"link", h:"<b>Two forest reports, don't mix them.</b> ISFR (India, FSI Dehradun) → states. FRA 2025 (FAO, global) → India 9th in area, 3rd in gain, 5th as carbon sink (Lesson 8). Sundarbans (named after the Sundari tree) is the world's largest mangrove forest."}
+], sum:["ISFR 2023: FSI Dehradun, biennial since 1987, 18th edition.","Forest + tree = 25.17% (forest 21.76 + tree 3.41); up from 24.62% in 2021.","Area: MP, Arunachal, Maharashtra (forest+tree); MP, Arunachal, Chhattisgarh (forest).","% area: Lakshadweep 91.33% overall; Mizoram among states.","Gain: Chhattisgarh, UP, Odisha, Rajasthan (F+T); Mizoram, Gujarat, Odisha (forest).","Mangroves 4,992 km²."]},
+
+{ id:"L12", title:"NFHS-6 (2023–24)", hi:"राष्ट्रीय परिवार स्वास्थ्य सर्वेक्षण-6", blocks:[
+ {k:"facts", title:"About the survey", rows:[["Ministry","Health & Family Welfare"],["Nodal agency","International Institute for Population Sciences (IIPS), Mumbai"],["Coverage","≈6.79 lakh households, 700+ districts"]]},
+ {k:"table", title:"Family planning", head:["Indicator","NFHS-5 → NFHS-6"], rows:[["Total fertility rate","2.0 (stable; below replacement 2.1)"],["Contraceptive prevalence rate","66.7% → 69.1%"]]},
+ {k:"trick", h:"<b>Replacement level = 2.1</b> (the number that keeps population steady). India's TFR <b>2.0</b> is just below it. Hook: <i>“दो बच्चे, पर 2.1 नहीं”</i>."},
+ {k:"table", title:"Mother & birth", head:["Indicator","Value"], rows:[["Antenatal care (any)","95.9%"],["ANC in first trimester","76.2%"],["4+ ANC visits","65.2%"],["IFA 100+ days / 180+ days","54.9% / 37.8%"],["Institutional deliveries","<b>90.6%</b>"],["Births by skilled staff","91.3%"],["Newborn check within 2 days","85.3%"]]},
+ {k:"table", title:"Children: vaccination", head:["Indicator","NFHS-5 → NFHS-6"], rows:[["Full vaccination (12–23 months)","83.8% → <b>87.1%</b>"],["Rotavirus","36.4% → 85.4% (biggest jump)"],["Measles 2nd dose","58.6% → 71.8%"],["At least one vaccine","over 96%"],["Given at public facilities","95.6%"]]},
+ {k:"trick", h:"Vaccination: <b>83.8 → 87.1</b>. <i>“<b>8</b>7 में सब <b>8</b>3 से आगे”</i>. Rotavirus nearly <b>2.3×</b> (36 → 85). U-WIN portal tracks vaccination of children up to 16."},
+ {k:"q", q:"According to NFHS-6, full vaccination coverage of children aged 12–23 months is about…", o:["87.1%","83.8%","69.1%","95.6%"], e:"Up from 83.8% in NFHS-5. 69.1% is contraceptive prevalence; 95.6% is vaccines given at public facilities."},
+ {k:"table", title:"Nutrition & breastfeeding", head:["Indicator","NFHS-5 → NFHS-6"], rows:[["Stunting (under 5)","35.5% → <b>29.3%</b>"],["Severe wasting","7.7% → 5.2%"],["Breastfed under 6 months","95.6%"],["Breastfeeding within 1 hour of birth","41.8% → 51.1%"],["Acute respiratory infection","1.9%"]]},
+ {k:"link", h:"<b>NFHS → GHI.</b> GHI 2025 shows India's stunting as 32.9% (older data); NFHS-6 shows 29.3% — the improvement will show up in future GHI editions. Drivers credited: <b>POSHAN Abhiyaan, Saksham Anganwadi & Poshan 2.0</b>, ICDS, NHM nutrition rehabilitation centres, <b>MAA</b> (Mothers' Absolute Affection) breastfeeding programme."},
+ {k:"trap", h:"<b>PM POSHAN</b> (the old Mid-Day Meal of 1995, renamed in 2021) is under the <b>Ministry of Education</b>, not Health and not Women & Child Development."},
+ {k:"q", q:"Which body is the nodal agency for the National Family Health Survey?", o:["IIPS, Mumbai","NSO, New Delhi","ICMR, New Delhi","NITI Aayog"], e:"International Institute for Population Sciences, Mumbai, under the Health Ministry."}
+], sum:["NFHS-6 (2023-24): MoHFW with IIPS Mumbai; ≈6.79 lakh households.","TFR 2.0 (replacement 2.1); CPR 66.7% → 69.1%.","Full vaccination 83.8% → 87.1%; rotavirus 36.4% → 85.4%; measles-2 58.6% → 71.8%.","Institutional births 90.6%; skilled births 91.3%; ANC 95.9%.","Stunting 35.5% → 29.3%; early breastfeeding 41.8% → 51.1%.","PM POSHAN is under the Ministry of Education."]},
+
+{ id:"L13", title:"AISHE, PLFS & prison data", hi:"उच्च शिक्षा, रोज़गार, कारागार आँकड़े", blocks:[
+ {k:"table", title:"AISHE 2023-24 (Ministry of Education)", head:["Indicator","Value"], rows:[["GER (18–23), overall","<b>30%</b> (29.5% in 2022-23)"],["GER female","<b>31.2%</b> — higher than male"],["GER SC / ST","27.8% / 22.8%"],["Gender Parity Index","<b>1.08</b> (above 1 for 7 years in a row)"],["Total enrolment","4.46 crore (2022-23) → <b>4.5 crore</b>; 3.42 crore in 2014-15"],["Female enrolment","1.57 crore (2014-15) → 2.24 crore"],["SC / ST enrolment","69.72 lakh / 28.82 lakh"],["STEM enrolment","91.5 lakh → 1.02 crore; female share 38.4% → 44%"]]},
+ {k:"trick", h:"GER <b>30</b> overall, <b>31.2</b> girls → girls ahead, so GPI > 1 (<b>1.08</b>). SC/ST enrolment: <i>“<b>69</b> SC, <b>2882</b> ST”</i> (69.72 lakh, 28.82 lakh)."},
+ {k:"q", q:"According to AISHE 2023-24, the Gender Parity Index in higher education is…", o:["1.08","0.98","1.00","0.92"], e:"Female GER (31.2%) is higher than male, so GPI is above 1."},
+ {k:"table", title:"PLFS Annual Report 2025 (usual status, rural + urban)", head:["Rate","15 years & above","All ages"], rows:[["LFPR (working or seeking work)","<b>59.3%</b> (male 79.1, female 40.0)","44.9% (male 59.1, female 30.7)"],["Worker Population Ratio (working)","<b>57.4%</b>","43.5% (male 57.2, female 29.8)"],["Unemployment rate","<b>3.1%</b>","3.1%"]]},
+ {k:"trick", h:"PLFS ladder for 15+: <b>59 → 57 → 3</b>. LFPR (59.3) counts <i>working + looking</i>; WPR (57.4) counts only <i>working</i>; the gap is roughly the unemployed (3.1%). PLFS = Periodic Labour Force Survey (NSO, MoSPI)."},
+ {k:"table", title:"NCRB Prison Statistics 2024", head:["Item","Value"], rows:[["All-India occupancy","112.7% (lower than 2023)"],["Most overcrowded","Delhi (~2× capacity), Meghalaya 163%, J&K 148%, MP 147%"],["Big fall","Chhattisgarh 234% (2015) → 127.6%"]]},
+ {k:"q", q:"In the PLFS, the Worker Population Ratio differs from the Labour Force Participation Rate because it…", o:["Counts only people who are working","Counts only people seeking work","Includes students","Counts only women"], e:"LFPR = working + seeking; WPR = working only."}
+], sum:["AISHE 2023-24: GER 30%, female 31.2%, SC 27.8%, ST 22.8%; GPI 1.08.","Enrolment 4.5 crore; female 2.24 crore; STEM 1.02 crore with 44% women.","PLFS 2025 (15+): LFPR 59.3%, WPR 57.4%, UR 3.1%.","LFPR = working + seeking; WPR = working only.","NCRB 2024: prisons at 112.7%; Delhi most crowded; Chhattisgarh 234% → 127.6%."]},
+
+{ id:"L14", title:"Memory palace: all ranks in one story", hi:"एक कहानी में सारी रैंक", blocks:[
+ {k:"p", h:"Read this once a day in the last week. It strings every India rank into one walk from 4 to 176, so recalling one number pulls the next."},
+ {k:"table", title:"India's rank ladder (low to high)", head:["Rank","Index","Hook"], rows:[["4","Global Firepower · Unicorns","F-I-R-E; USA-China-UK-India"],["5","SIPRI military spending","Top-5 spender"],["6","IQAir most polluted","Less bad than 5th"],["13","Global Terrorism","Unlucky 13"],["23","Climate Change Performance","From 10 — coal"],["38","Global Innovation · Logistics","अड़-तीस twins"],["41","Democracy Index","—"],["42","IP Index","Same 4 years"],["44","World Competitiveness","चार-चार"],["45","Network Readiness","—"],["70","Energy Transition","7 days, 0 waste"],["81","Henley Passport (latest)","8 hours, 1 passport"],["91","Corruption Perceptions","No-One"],["94","Sustainable Development","Out of the 99 trap"],["102","Global Hunger","102° fever"],["116","World Happiness","1-1 good man, 6× joy"],["118","QS: IIT Delhi","1-1 brick, 8 floors"],["127","Global Peace","1 nation, 2 rivals, 7 days"],["130","HDI","≈130 crore people"],["131","Gender Gap","1 ❤️ 1"],["132","Economic Freedom","one after Gender"],["157","Press Freedom","15 Aug + 7 days chatter"],["176","Environmental Performance","177 में 176"]]},
+ {k:"trick", h:"<b>The 130s block</b>: HDI <b>130</b> → Gender <b>131</b> → Economic Freedom <b>132</b>. Three consecutive numbers — learn them as one."},
+ {k:"table", title:"Went up or down?", head:["Improved ↑","Declined ↓"], rows:[["HDI 133 → 130","Gender Gap 129 → 131"],["Happiness 118 → 116","Press Freedom 151 → 157"],["CPI 96 → 91","Peace 115 → 127"],["GHI 105 → 102","CCPI 10 → 23"],["GII 39 → 38","World Competitiveness 41 → 44"],["SDR 99 → 94","Economic Freedom 128 → 132"],["ETI 71 → 70","Unicorns 3rd → 4th"],["Air quality 5th → 6th worst","Terrorism 14 → 13 (more impacted)"]]},
+ {k:"trick", h:"<b>Down list = “GPS-CWEU”</b>: Gender, Press, (Global) Security/Peace, Climate, World Competitiveness, Economic freedom, Unicorns. Everything else in the table went up."},
+ {k:"table", title:"#1 map — one country, many crowns", head:["Country","Tops"], rows:[["Iceland","Peace (18 yrs) · Gender Gap (16 yrs) · HDI"],["Finland","Happiness (9 yrs) · SDG report"],["Norway","Press freedom (10 yrs) · Democracy"],["Denmark","CPI · CCPI 4th (1–3 empty) · Copenhagen liveability"],["Sweden","Energy Transition"],["Switzerland","Innovation (15 yrs)"],["Estonia","Environmental Performance"],["Singapore","Competitiveness · Passport · Logistics · Economic Freedom · ICAO safety"],["USA","Firepower · Unicorns · IP · Network Readiness · MIT (QS)"],["Pakistan","Terrorism"],["Chad","Air pollution"]]},
+ {k:"q", q:"Which pair of indices both place India at 38?", o:["Global Innovation Index and Logistics Performance Index","Global Peace Index and HDI","CPI and SDR","Happiness and Hunger"], e:"GII 2025 and LPI 2023 — the 'अड़-तीस twins'."},
+ {k:"q", q:"India's ranks in HDI, Gender Gap and Economic Freedom form which run of numbers?", o:["130, 131, 132","116, 117, 118","91, 92, 93","127, 128, 129"], e:"HDI 130, Gender Gap 131, Economic Freedom 132."}
+], sum:["Ladder: 4 GFP, 13 GTI, 23 CCPI, 38 GII/LPI, 44 WCY, 70 ETI, 81 Henley, 91 CPI, 94 SDR, 102 GHI, 116 WHR, 118 IIT-D, 127 GPI, 130 HDI, 131 GGG, 132 EF, 157 WPFI, 176 EPI.","Down: Gender, Press, Peace, Climate, Competitiveness, Economic Freedom, Unicorns.","Iceland 3 crowns, Finland 2, Norway 2, Singapore 5, USA 5."]}
+];
+
+const QB = [
+/* L1 */
+["L1","Which of these countries tops the most 'well-being' indices such as happiness, peace and press freedom?",["Nordic countries","Gulf countries","Sahel countries","Caribbean countries"],"Finland, Iceland, Norway, Denmark and Sweden top most well-being indices."],
+["L1","Which country tops the Henley Passport Index, the World Competitiveness Ranking and the Logistics Performance Index?",["Singapore","Switzerland","Japan","Denmark"],"The Singapore rule: business, cargo and travel indices."],
+["L1","In which of these indices does rank 1 indicate the WORST situation?",["Global Terrorism Index","Global Peace Index","Human Development Index","Global Innovation Index"],"GTI rank 1 = most impacted by terrorism."],
+["L1","In the Global Hunger Index, a lower score means…",["Less hunger","More hunger","Higher income","More food exports"],"GHI runs 0–100; lower is better."],
+["L1","In the Corruption Perceptions Index, which score is best?",["100","0","50","1"],"100 = very clean; 0 = highly corrupt."],
+["L1","In the Global Firepower PowerIndex, which value represents the 'perfect' military strength?",["0.0000","1.0000","100","10"],"Lower is stronger; USA has the lowest score (0.0741)."],
+["L1","Which pair of indices is released by the same organisation?",["Global Peace Index and Global Terrorism Index","HDI and Global Hunger Index","CPI and Press Freedom Index","Happiness Report and Gender Gap Report"],"Both by the Institute for Economics & Peace."],
+["L1","Which pair of reports is published by the World Economic Forum?",["Global Gender Gap and Energy Transition Index","HDI and MPI","CPI and Democracy Index","GII and IP Index"],"WEF publishes both."],
+["L1","The Economist Intelligence Unit (EIU) publishes…",["Global Liveability Index and Democracy Index","HDI and MPI","Global Peace Index","World Happiness Report"],"EIU (London) → Liveability + Democracy."],
+["L1","Where is the headquarters of Reporters Without Borders?",["Paris","Geneva","Berlin","London"],"RSF — Reporters sans frontières — is French."],
+["L1","Transparency International, which publishes the CPI, is headquartered in…",["Berlin","Paris","Geneva","New York"],"Berlin, Germany."],
+["L1","SIPRI, which publishes a yearbook on armaments, is based in…",["Stockholm","Oslo","Geneva","Vienna"],"Stockholm International Peace Research Institute."],
+["L1","The World Economic Forum is headquartered in…",["Cologny, Switzerland","Davos, Switzerland","Paris, France","New York, USA"],"Cologny near Geneva; its annual meeting is held at Davos."],
+["L1","In the IQAir World Air Quality Report, India moving from 5th to 6th means India is…",["Slightly less polluted than before","More polluted than before","The cleanest country","Excluded from ranking"],"Rank 1 = most polluted, so a bigger rank is better."],
+["L1","Which country is the #1 for the most number of the indices covered here (competitiveness, passport, logistics, economic freedom)?",["Singapore","USA","Switzerland","Norway"],"Singapore tops all four."],
+
+/* L2 */
+["L2","The Human Development Index was first introduced in…",["1990","1985","1995","2000"],"1990, in the first Human Development Report.","p"],
+["L2","Who developed the Human Development Index along with Amartya Sen?",["Mahbub ul Haq","Muhammad Yunus","Jagdish Bhagwati","Raghuram Rajan"],"Pakistani economist Mahbub ul Haq.","p"],
+["L2","The Human Development Report is published by…",["UNDP","World Bank","IMF","UNESCO"],"United Nations Development Programme.","p"],
+["L2","Which is NOT a dimension of HDI?",["Employment","Long and healthy life","Knowledge","Decent standard of living"],"The three are health, knowledge and standard of living.","p"],
+["L2","Which indicator measures 'decent standard of living' in HDI?",["GNI per capita (PPP)","GDP growth rate","Poverty ratio","Unemployment rate"],"Gross National Income per capita at PPP."],
+["L2","The 'knowledge' dimension of HDI uses which indicators?",["Expected years and mean years of schooling","Literacy rate and GER","Number of schools and teachers","Enrolment and dropout rate"],"Expected years of schooling + mean years of schooling."],
+["L2","The 'long and healthy life' dimension of HDI is measured by…",["Life expectancy at birth","Infant mortality rate","Number of hospitals","Calorie intake"],"Life expectancy at birth."],
+["L2","India's rank in the Human Development Report 2025 is…",["130","133","134","126"],"130 with HDI value 0.685 (previous 133)."],
+["L2","India's HDI value in HDR 2025 is…",["0.685","0.644","0.972","0.633"],"0.685 — medium human development. 0.644 is the Gender Gap score."],
+["L2","In HDR 2025 India falls in which category?",["Medium human development","Low human development","High human development","Very high human development"],"Medium."],
+["L2","Which country topped the Human Development Report 2025?",["Iceland","Norway","Switzerland","Finland"],"Iceland (0.972), Norway 2nd, Switzerland 3rd."],
+["L2","The theme of the Human Development Report 2025 is…",["A Matter of Choice: People and Possibilities in the Age of AI","Breaking the Gridlock","Uncertain Times, Unsettled Lives","The Next Frontier"],"HDR 2025 focused on AI."],
+["L2","How many indicators are used in the Global Multidimensional Poverty Index?",["10","4","12","6"],"3 dimensions, 10 indicators."],
+["L2","The Global MPI is released by UNDP together with…",["Oxford Poverty & Human Development Initiative","World Bank","NITI Aayog","ILO"],"OPHI at Oxford."],
+["L2","How many indicators does NITI Aayog's National MPI use?",["12","10","8","14"],"10 global + maternal health + bank account."],
+["L2","Which of these is an indicator in the national MPI but NOT in the global MPI?",["Bank account","Cooking fuel","Electricity","School attendance"],"Bank account and maternal health are the two additions."],
+["L2","Under the Global MPI, 'cooking fuel' falls under which dimension?",["Standard of living","Health","Education","Income"],"Six of ten indicators are under standard of living."],
+["L2","According to NITI Aayog's national MPI, which state has the highest share of multidimensionally poor?",["Bihar","Jharkhand","Uttar Pradesh","Odisha"],"Bihar highest, Kerala lowest."],
+["L2","Which state has the lowest multidimensional poverty in India?",["Kerala","Goa","Punjab","Tamil Nadu"],"Kerala."],
+["L2","Which state saw the largest number of people move out of multidimensional poverty?",["Uttar Pradesh","Bihar","Madhya Pradesh","Rajasthan"],"UP lifted the most people."],
+["L2","Amartya Sen won the Nobel Prize in Economics in…",["1998","1990","2001","1994"],"1998.","p"],
+["L2","'Nutrition' and 'child mortality' are MPI indicators under which dimension?",["Health","Education","Standard of living","Income"],"Health has two indicators."],
+
+/* L3 */
+["L3","The World Happiness Report is released by…",["UN Sustainable Development Solutions Network","World Economic Forum","UNDP","Reporters Without Borders"],"With Gallup and Oxford's Wellbeing Research Centre.","p"],
+["L3","Which country topped the World Happiness Report 2026?",["Finland","Denmark","Iceland","Norway"],"Finland — 9th year in a row.","p"],
+["L3","India's rank in the World Happiness Report 2026 is…",["116","118","126","104"],"116, up from 118."],
+["L3","Which country ranked last in the World Happiness Report 2026?",["Afghanistan","Sierra Leone","Malawi","Lebanon"],"Afghanistan at 147."],
+["L3","Which of India's neighbours ranked highest in the World Happiness Report 2026?",["Nepal","Pakistan","Sri Lanka","Bangladesh"],"Nepal 99, Pakistan 104, India 116, Sri Lanka 134."],
+["L3","In the World Happiness Report 2026, Pakistan's rank was…",["104","99","116","134"],"104 — ahead of India."],
+["L3","Which is NOT among the six factors of the World Happiness Report?",["Population density","Healthy life expectancy","Generosity","Freedom to make life choices"],"Six: GDP per capita, social support, healthy life expectancy, freedom, generosity, corruption perception."],
+["L3","The concept of 'Gross National Happiness' originated in…",["Bhutan","Finland","Nepal","Denmark"],"Bhutan measures GNH instead of only GDP.","p"],
+["L3","Which country ranked 2nd in the World Happiness Report 2026?",["Iceland","Denmark","Sweden","Netherlands"],"Finland, Iceland, Denmark."],
+["L3","The Sustainable Development Report is released by…",["UN SDSN","UNEP","UNDP","World Bank"],"The same SDSN that publishes the Happiness Report."],
+["L3","Which country topped the Sustainable Development Report 2026?",["Finland","Sweden","Denmark","Norway"],"Finland, then Sweden and Denmark."],
+["L3","India's rank in the Sustainable Development Report 2026 is…",["94","99","109","112"],"94, up from 99 (2025)."],
+["L3","In which year did India first enter the top 100 of the SDG Index?",["2025","2023","2026","2024"],"99th in 2025."],
+["L3","How many Sustainable Development Goals are there?",["17","15","8","21"],"17 goals, 169 targets."],
+["L3","By which year are the SDGs to be achieved?",["2030","2025","2035","2047"],"Agenda 2030, adopted in 2015."],
+["L3","According to India's SDG progress report 2026, the maternal mortality ratio fell from 122 to…",["87","97","103","77"],"Per lakh live births, 2015-17 to 2022-24."],
+["L3","According to India's SDG progress report 2026, social protection coverage has risen to about…",["65.3%","22%","48.7%","87%"],"From 22% in 2016."],
+["L3","India's sex ratio at birth rose from 896 to about ___ females per 1000 males (SDG report 2026).",["918","943","919","896"],"943 and 919 are Census 2011 overall and child sex ratios."],
+["L3","What was India's overall sex ratio in Census 2011?",["943","919","933","940"],"Child sex ratio (0–6) was 919.","p"],
+["L3","India's internet subscriptions, per the SDG progress report 2026, grew from about 302 million to…",["969 million","650 million","1.2 billion","800 million"],"About three-fold."],
+["L3","The national indicator framework used for India's SDG progress report has how many indicators?",["277","169","17","300"],"277 national indicators for 17 goals."],
+
+/* L4 */
+["L4","The Global Gender Gap Report is published by…",["World Economic Forum","UN Women","UNDP","World Bank"],"WEF.","p"],
+["L4","Which country topped the Global Gender Gap Index 2025?",["Iceland","Finland","Norway","New Zealand"],"Iceland — 16th year in a row.","p"],
+["L4","India's rank in the Global Gender Gap Index 2025 is…",["131","129","127","139"],"131 of 148; it was 129 in 2024."],
+["L4","India's score in the Global Gender Gap Index 2025 is about…",["0.644","0.685","0.568","0.720"],"64.4% of the gap closed."],
+["L4","How many countries were covered in the Global Gender Gap Report 2025?",["148","146","180","193"],"148."],
+["L4","Which is NOT a sub-index of the Global Gender Gap Index?",["Legal Rights","Economic Participation and Opportunity","Educational Attainment","Political Empowerment"],"Health & Survival is the fourth.","p"],
+["L4","In the Gender Gap Index 2025, in which sub-index did India decline?",["Political Empowerment","Educational Attainment","Health and Survival","Economic Participation"],"Women MPs fell from 14.7% to 13.8%."],
+["L4","Compared with 2024, India's rank in the Gender Gap Index 2025…",["Fell by two places","Rose by two places","Remained the same","Rose by eight places"],"129 → 131."],
+["L4","Which organisations jointly publish the Global Hunger Index?",["Concern Worldwide and Welthungerhilfe","FAO and WFP","UNICEF and WHO","IFAD and World Bank"],"An Irish and a German NGO.","p"],
+["L4","India's rank in the Global Hunger Index 2025 is…",["102","105","111","107"],"102 of 123 (2024: 105)."],
+["L4","India's GHI 2025 score is…",["25.8","18.3","27.3","28.7"],"25.8 — 'serious'. 18.3 is the global average."],
+["L4","In GHI 2025, India falls in which category?",["Serious","Alarming","Moderate","Low"],"Serious."],
+["L4","Which country is ranked last in the Global Hunger Index 2025?",["Somalia","Yemen","Chad","Madagascar"],"Somalia at 123."],
+["L4","Which is NOT an indicator of the Global Hunger Index?",["Adult obesity","Undernourishment","Child stunting","Child mortality"],"Four: undernourishment, stunting, wasting, under-5 mortality.","p"],
+["L4","'Child stunting' in GHI refers to…",["Low height for age","Low weight for height","Low weight for age","Death before age five"],"Stunting = chronic undernutrition."],
+["L4","According to GHI 2025, India's child wasting rate is about…",["18.7%","32.9%","12%","2.8%"],"Among the highest in the world."],
+["L4","According to GHI 2025, what share of India's population is undernourished?",["12%","18.7%","32.9%","25.8%"],"12%."],
+["L4","According to GHI 2025, India's child stunting rate is…",["32.9%","18.7%","29.3%","35.5%"],"29.3% is the newer NFHS-6 figure."],
+["L4","Child mortality in the GHI refers to deaths of children under what age?",["5 years","1 year","2 years","10 years"],"Under-5 mortality."],
+["L4","Only developing countries are ranked in the GHI. The country listed best in GHI 2025 is…",["Belarus","Finland","China","Chile"],"Belarus (among the lowest-hunger group)."],
+["L4","Three of the four GHI indicators relate to…",["Children under five","Adult women","Farmers","Elderly people"],"Stunting, wasting, mortality — all under-5."],
+
+/* L5 */
+["L5","The Corruption Perceptions Index is published by…",["Transparency International","World Bank","Amnesty International","Human Rights Watch"],"Berlin-based TI.","p"],
+["L5","Which country topped the Corruption Perceptions Index 2025?",["Denmark","Finland","Singapore","New Zealand"],"Denmark."],
+["L5","India's rank in CPI 2025 is…",["91","96","93","85"],"91 (score 39); it was 96 in 2024."],
+["L5","India's CPI 2025 score is…",["39","42","38","91"],"39; global average 42."],
+["L5","Compared with the global average CPI score (42), India's score is…",["Below average","Above average","Equal","Not given"],"39 < 42."],
+["L5","Which of India's neighbours has the best CPI 2025 rank?",["Bhutan","China","Sri Lanka","Maldives"],"Bhutan 18th."],
+["L5","In CPI 2025, which country shares India's rank of 91?",["Maldives","Sri Lanka","Nepal","Bangladesh"],"Maldives also 91."],
+["L5","Pakistan's rank in CPI 2025 is…",["136","107","76","91"],"Sri Lanka 107, China 76."],
+["L5","Which countries are at the bottom of CPI 2025?",["Somalia and South Sudan","Afghanistan and Yemen","North Korea and Syria","Chad and Niger"],"Somalia and South Sudan."],
+["L5","The World Press Freedom Index is published by…",["Reporters Without Borders","Freedom House","UNESCO","Committee to Protect Journalists"],"RSF, Paris.","p"],
+["L5","India's rank in the World Press Freedom Index 2026 is…",["157","151","159","161"],"157 of 180; 151 in 2025."],
+["L5","Which country topped the World Press Freedom Index 2026?",["Norway","Netherlands","Estonia","Denmark"],"Norway — tenth year in a row."],
+["L5","Which country ranked last in the World Press Freedom Index 2026?",["Eritrea","North Korea","China","Iran"],"Eritrea 180, North Korea 179, China 178."],
+["L5","How many countries are ranked in the World Press Freedom Index?",["180","193","163","148"],"180."],
+["L5","Which is NOT an indicator of the World Press Freedom Index?",["Internet speed","Political context","Legal framework","Safety of journalists"],"Five: political, legal, economic, socio-cultural, safety."],
+["L5","Which region is the most dangerous for journalists as per RSF 2026?",["Middle East and North Africa","Latin America","South Asia","Eastern Europe"],"MENA."],
+["L5","Which country ranked 2nd in World Press Freedom Index 2026?",["Netherlands","Estonia","Sweden","Finland"],"Norway, Netherlands, Estonia."],
+["L5","The Democracy Index is published by…",["Economist Intelligence Unit","Freedom House","V-Dem Institute","International IDEA"],"EIU, London."],
+["L5","Which country tops the EIU Democracy Index?",["Norway","New Zealand","Iceland","Sweden"],"Norway, then New Zealand."],
+["L5","In the EIU Democracy Index, India is classified as a…",["Flawed democracy","Full democracy","Hybrid regime","Authoritarian regime"],"Rank 41."],
+["L5","The Index of Economic Freedom is published by…",["Heritage Foundation","Fraser Institute","World Bank","IMF"],"Washington DC think tank."],
+["L5","India's rank in the Index of Economic Freedom 2026 is…",["132","128","126","44"],"132, down from 128."],
+["L5","Which country tops the Index of Economic Freedom 2026?",["Singapore","Switzerland","Ireland","Hong Kong"],"Singapore."],
+
+/* L6 */
+["L6","The Global Peace Index is published by…",["Institute for Economics & Peace","SIPRI","UN Peacebuilding Commission","Global Firepower"],"IEP.","p"],
+["L6","The Institute for Economics & Peace is headquartered in…",["Sydney","London","Geneva","Stockholm"],"Sydney, Australia."],
+["L6","Which country topped the Global Peace Index 2026?",["Iceland","New Zealand","Switzerland","Ireland"],"Iceland — 18th straight year."],
+["L6","India's rank in the Global Peace Index 2026 is…",["127","115","116","132"],"127; 115 in 2025."],
+["L6","Which is the least peaceful country in the Global Peace Index 2026?",["Russia","Afghanistan","Yemen","Sudan"],"Russia."],
+["L6","Which is the most peaceful country in South Asia as per GPI 2026?",["Bhutan","Sri Lanka","Nepal","Maldives"],"Bhutan (16th globally)."],
+["L6","Which country ranked 2nd in the Global Peace Index 2026?",["New Zealand","Ireland","Switzerland","Austria"],"Iceland, New Zealand, Switzerland."],
+["L6","Pakistan's rank in the Global Peace Index 2026 is…",["152","127","157","140"],"152; Afghanistan 157."],
+["L6","Which is NOT a domain of the Global Peace Index?",["Economic growth","Societal safety and security","Ongoing conflict","Militarisation"],"Three domains."],
+["L6","Which country tops the Global Terrorism Index 2026 (most impacted)?",["Pakistan","Burkina Faso","Afghanistan","Nigeria"],"Pakistan, then Burkina Faso, Niger, Nigeria."],
+["L6","India's rank in the Global Terrorism Index 2026 is…",["13","14","8","4"],"13 (2025: 14)."],
+["L6","The Global Terrorism Index is released by…",["Institute for Economics & Peace","Europol","UN Office of Counter-Terrorism","Interpol"],"IEP."],
+["L6","How many countries does the Global Terrorism Index cover?",["163","180","148","193"],"163; four indicators weighted over five years."],
+["L6","Which of these is NOT among the top four in the Global Terrorism Index 2026?",["Syria","Burkina Faso","Niger","Nigeria"],"Top 4: Pakistan, Burkina Faso, Niger, Nigeria."],
+["L6","In the Global Firepower Index 2026, India is ranked…",["4th","3rd","5th","6th"],"USA, Russia, China, India.","p"],
+["L6","Which country has the most powerful military as per Global Firepower 2026?",["USA","Russia","China","India"],"USA (PowerIndex 0.0741)."],
+["L6","In the Global Firepower Index, a lower PowerIndex means…",["A stronger military","A weaker military","A bigger army size only","More nuclear weapons"],"0.0000 is 'perfect'."],
+["L6","Which country ranked 2nd in Global Firepower 2026?",["Russia","China","India","UK"],"Russia."],
+["L6","SIPRI stands for…",["Stockholm International Peace Research Institute","Swiss Institute of Peace and Research International","Standing International Peace Research Initiative","South Asian International Peace Research Institute"],"Based in Stockholm."],
+["L6","As per SIPRI, India's rank among military spenders is…",["5th","3rd","4th","2nd"],"USA, China, Russia, Germany, India."],
+["L6","According to SIPRI Yearbook 2026, the world's largest arms importer is…",["Ukraine","India","Saudi Arabia","Qatar"],"Ukraine 9.7%, India 8.2%, Saudi Arabia 6.8%."],
+["L6","According to SIPRI, which country is the largest exporter of major arms?",["USA","Russia","France","China"],"USA with 42% share; France 2nd."],
+["L6","Which country is the second-largest arms exporter according to SIPRI Yearbook 2026?",["France","Russia","China","Germany"],"France 9.8%, Russia 6.8%."],
+["L6","As per SIPRI 2026, which conflict caused the most estimated deaths?",["Ukraine","Sudan","Israel–Palestine","Myanmar"],"Ukraine, Sudan, Israel–Palestine."],
+
+/* L7 */
+["L7","The World Competitiveness Ranking is released by…",["International Institute for Management Development","World Economic Forum","World Bank","OECD"],"IMD, Lausanne."],
+["L7","Which economy topped the IMD World Competitiveness Ranking 2026?",["Singapore","Hong Kong","Switzerland","USA"],"Singapore, Hong Kong, Switzerland."],
+["L7","India's rank in the IMD World Competitiveness Ranking 2026 is…",["44","41","39","45"],"44; 41 in 2025."],
+["L7","Which is NOT one of the four factors of the IMD World Competitiveness Ranking?",["Military strength","Economic performance","Government efficiency","Infrastructure"],"Business efficiency is the fourth."],
+["L7","In IMD WCR 2026, India's weakest factor was…",["Infrastructure","Economic performance","Business efficiency","Government efficiency"],"Infrastructure 54th; economic performance 15th (best)."],
+["L7","The Global Innovation Index is published by…",["WIPO","WTO","UNESCO","OECD"],"World Intellectual Property Organization, Geneva.","p"],
+["L7","Which country topped the Global Innovation Index 2025?",["Switzerland","Sweden","USA","South Korea"],"Switzerland for the 15th year."],
+["L7","India's rank in the Global Innovation Index 2025 is…",["38","39","40","48"],"38 (39 in 2024)."],
+["L7","Which country entered the GII top 10 for the first time in 2025?",["China","India","Israel","Japan"],"China at 10th."],
+["L7","Which Indian city cluster ranks highest in the GII 2025 science & technology clusters?",["Bengaluru","Delhi","Mumbai","Chennai"],"Bengaluru 21, Delhi 26, Mumbai 46."],
+["L7","India's rank in the Global Innovation Index in 2015 was…",["81","48","60","38"],"81 → 48 (2020) → 38 (2025)."],
+["L7","The Global Unicorn Index is released by…",["Hurun Research Institute","CB Insights","Forbes","NASSCOM"],"Hurun."],
+["L7","A unicorn is a privately held startup valued at over…",["US$ 1 billion","US$ 100 million","US$ 10 billion","₹1,000 crore"],"$1 billion."],
+["L7","India's rank in the Hurun Global Unicorn Index 2026 is…",["4th","3rd","2nd","5th"],"USA, China, UK, India."],
+["L7","How many unicorns does India have as per Hurun Global Unicorn Index 2026?",["61","64","70","806"],"61 (64 last year)."],
+["L7","Which country has the most unicorns?",["USA","China","UK","India"],"806 unicorns."],
+["L7","Which Indian city has the most unicorns?",["Bengaluru","Mumbai","Delhi-NCR","Hyderabad"],"Bengaluru (25)."],
+["L7","The International IP Index is published by…",["US Chamber of Commerce (GIPC)","WIPO","WTO","USTR"],"Global Innovation Policy Center of the US Chamber."],
+["L7","India's rank in the International IP Index is…",["42","38","45","44"],"42 — unchanged for four years."],
+["L7","The Network Readiness Index is released by…",["Portulans Institute","ITU","World Economic Forum","IMD"],"Portulans Institute."],
+["L7","India's rank in the Network Readiness Index is…",["45","38","44","42"],"45 (score 54.43); USA first."],
+["L7","Which is NOT a pillar of the Network Readiness Index?",["Trade","Technology","People","Governance"],"Four pillars: Technology, People, Governance, Impact."],
+["L7","Global Economic Prospects report is released by…",["World Bank","IMF","UNCTAD","OECD"],"World Bank; June 2026 projected global growth slowing to about 2.5%."],
+
+/* L8 */
+["L8","The Energy Transition Index is released by…",["World Economic Forum","International Energy Agency","IRENA","UNEP"],"WEF.","p"],
+["L8","Which country topped the Energy Transition Index 2026?",["Sweden","Finland","Denmark","Norway"],"Sweden, Finland, Denmark."],
+["L8","India's rank in the Energy Transition Index 2026 is…",["70","71","72","63"],"70 (71 in 2025)."],
+["L8","The two dimensions of the Energy Transition Index are…",["System performance and transition readiness","Supply and demand","Coal and renewables","Access and price"],"System performance + transition readiness."],
+["L8","The Climate Change Performance Index is published by Germanwatch along with…",["NewClimate Institute and Climate Action Network","UNEP and IPCC","WWF and Greenpeace","IEA and IRENA"],"Released at COP30 in Belém."],
+["L8","In CCPI 2026, which country was ranked highest?",["Denmark at 4th","Sweden at 1st","UK at 1st","India at 10th"],"Ranks 1–3 left empty."],
+["L8","India's rank in CCPI 2026 is…",["23","10","7","31"],"23; it was 10 in 2025."],
+["L8","Why did India's rank fall in CCPI 2026?",["Higher coal use in power generation","Leaving the Paris Agreement","Lower renewable capacity","Population growth"],"Coal consumption for electricity rose."],
+["L8","Why are the first three ranks of CCPI left empty?",["No country is doing enough to meet the climate goals","The top three countries withdrew","They are reserved for the EU","The data was missing"],"No country's performance is rated 'very high' overall."],
+["L8","CCPI 2026 was released at…",["COP30, Belém","COP29, Baku","COP28, Dubai","G20 Summit"],"Belém, Brazil, Nov 2025."],
+["L8","Which is NOT a category in the Climate Change Performance Index?",["Forest cover","GHG emissions","Renewable energy","Climate policy"],"Four: GHG emissions, renewable energy, energy use, climate policy."],
+["L8","The Environmental Performance Index is published by…",["Yale and Columbia universities","UNEP","WWF","World Bank"],"Yale Center for Environmental Law & Policy + Columbia CIESIN."],
+["L8","Which country topped the Environmental Performance Index 2026?",["Estonia","Luxembourg","Denmark","Switzerland"],"Estonia, Luxembourg, UK."],
+["L8","India's rank in the Environmental Performance Index 2026 is…",["176","180","170","166"],"176 of 177."],
+["L8","Which country ranked last in the EPI 2026?",["Laos","India","Vietnam","Pakistan"],"Laos at 177."],
+["L8","The World Air Quality Report is published by…",["IQAir","WHO","CPCB","UNEP"],"Swiss company IQAir."],
+["L8","Which is the most polluted country in the World Air Quality Report 2025?",["Chad","Bangladesh","Pakistan","India"],"Chad, Bangladesh, Pakistan."],
+["L8","India's position among the most polluted countries in the IQAir 2025 report is…",["6th","5th","3rd","1st"],"6th (5th in 2024)."],
+["L8","The world's most polluted city in the IQAir 2025 report is…",["Loni (Ghaziabad)","Byrnihat","New Delhi","Lahore"],"Loni, Uttar Pradesh."],
+["L8","The most polluted capital city in the IQAir report is…",["New Delhi","Dhaka","N'Djamena","Islamabad"],"New Delhi."],
+["L8","How many of the world's 100 most polluted cities are in India (IQAir 2025)?",["66","83","50","74"],"66."],
+["L8","The Global Forest Resources Assessment is released by…",["FAO","UNEP","FSI","IUCN"],"Food and Agriculture Organization."],
+["L8","According to FRA 2025, forests cover about ___ of the Earth's land area.",["32%","25%","41%","21%"],"4.14 billion hectares."],
+["L8","India's rank by total forest area in the world as per FRA 2025 is…",["9th","10th","3rd","5th"],"9th; 3rd in net gain; 5th as carbon sink."],
+["L8","As per FRA 2025, India ranks ___ as a carbon sink.",["5th","3rd","9th","1st"],"About 150 Mt CO₂ a year."],
+["L8","Which continent has the largest share (about 25%) of the world's forests?",["Europe","South America","Africa","Asia"],"South America has the highest percentage cover of its own land (49%)."],
+["L8","According to UNICEF's 2026 report, about how many children in India are exposed to extreme heat?",["392 million","89 million","1.2 billion","92 million"],"≈92% of India's children."],
+
+/* L9 */
+["L9","The Henley Passport Index is released by…",["Henley & Partners","IATA","UNWTO","Visa Inc."],"Using IATA data.","p"],
+["L9","Which country has the most powerful passport in 2026?",["Singapore","Japan","South Korea","Germany"],"192 visa-free destinations."],
+["L9","In the Henley Passport Index of February 2026, India's rank was…",["75","80","85","81"],"Up from 80 in January."],
+["L9","In the latest (mid-2026) Henley Passport Index, India is ranked…",["81st","75th","77th","85th"],"With 55 visa-free destinations."],
+["L9","Which passport is the weakest in the Henley Passport Index?",["Afghanistan","Iraq","Syria","Pakistan"],"Afghanistan, then Iraq and Syria."],
+["L9","Which South Asian country's passport ranks above India's?",["Maldives","Pakistan","Bangladesh","Nepal"],"Maldives."],
+["L9","The Logistics Performance Index is released by…",["World Bank","WTO","UNCTAD","World Economic Forum"],"World Bank.","p"],
+["L9","India's rank in the Logistics Performance Index 2023 is…",["38","44","22","54"],"38 — India's best."],
+["L9","Which country topped the LPI 2023?",["Singapore","Germany","Netherlands","Denmark"],"Singapore."],
+["L9","In LPI 2023, India's rank in 'international shipments' is…",["22nd","2nd","38th","44th"],"22nd."],
+["L9","Which Indian initiatives are credited for India's LPI improvement?",["PM Gati Shakti and National Logistics Policy","Make in India and Startup India","Digital India and UPI","Smart Cities and AMRUT"],"Infrastructure master plan + NLP."],
+["L9","Which is NOT one of the six LPI parameters?",["Labour cost","Customs","Infrastructure","Timeliness"],"Customs, infrastructure, international shipments, logistics competence, tracking & tracing, timeliness."],
+["L9","Which Indian port was ranked highest in the World Bank Container Port Performance Index 2025?",["JNPT (Nhava Sheva)","Mundra","Visakhapatnam","Chennai"],"India's largest container port."],
+["L9","ICAO stands for…",["International Civil Aviation Organization","International Commercial Airlines Organization","Indian Civil Aviation Office","International Council of Airport Operators"],"A UN agency in Montreal."],
+["L9","In the ICAO safety audit results of 2023, India's rank was…",["55","48","102","22"],"Up from 102 in 2018."],
+["L9","Which country topped ICAO's aviation safety ranking (2023)?",["Singapore","UAE","USA","Japan"],"Singapore, then UAE."],
+["L9","QS World University Rankings are published by…",["Quacquarelli Symonds","Times Higher Education","NIRF","Shanghai Jiao Tong University"],"QS, London."],
+["L9","Which university topped the QS World University Rankings 2027?",["MIT","Imperial College London","Stanford","Oxford"],"MIT."],
+["L9","IIT Delhi's rank in QS World University Rankings 2027 is…",["118","123","134","150"],"India's best; IIT Bombay 134."],
+["L9","How many Indian institutions feature in QS World University Rankings 2027?",["52","54","46","11"],"52 (54 last year)."],
+["L9","In the number of institutions ranked in QS 2027, India stands…",["5th","3rd","4th","2nd"],"USA, UK, China, Germany, India."],
+["L9","Which Indian institute is ranked No. 1 in India's own NIRF ranking?",["IIT Madras","IIT Delhi","IISc Bengaluru","IIT Bombay"],"IIT Madras (overall)."],
+["L9","Which city topped the EIU Global Liveability Index 2025?",["Copenhagen","Vienna","Melbourne","Zurich"],"Copenhagen replaced Vienna at the top."],
+["L9","Vienna, a top city in the Liveability Index, is the capital of…",["Austria","Australia","Switzerland","Germany"],"Melbourne is the Australian city."],
+["L9","Which is NOT a category of the Global Liveability Index?",["Nightlife","Stability","Healthcare","Education"],"Stability, healthcare, culture & environment, education, infrastructure."],
+
+/* L10 */
+["L10","The Fiscal Health Index is released by…",["NITI Aayog","RBI","Ministry of Finance","CAG"],"2nd edition in March 2026."],
+["L10","Which state topped the Fiscal Health Index 2026 among 18 major states?",["Odisha","Goa","Jharkhand","Gujarat"],"Odisha 73.1."],
+["L10","Which state ranked second in the Fiscal Health Index 2026?",["Goa","Jharkhand","Chhattisgarh","Maharashtra"],"Odisha, Goa, Jharkhand."],
+["L10","Which major state has the worst fiscal health in FHI 2026?",["Punjab","West Bengal","Andhra Pradesh","Kerala"],"Punjab, then Andhra Pradesh and West Bengal."],
+["L10","Among North-Eastern and Himalayan states, which topped FHI 2026?",["Arunachal Pradesh","Mizoram","Sikkim","Uttarakhand"],"Manipur is at the bottom."],
+["L10","Which is NOT one of the five pillars of the Fiscal Health Index?",["GDP growth","Quality of expenditure","Revenue mobilisation","Debt sustainability"],"Five: quality of expenditure, revenue mobilisation, fiscal prudence, debt index, debt sustainability."],
+["L10","How many North-Eastern and Himalayan states were added to FHI 2026?",["10","8","11","18"],"10 alongside 18 major states."],
+["L10","Who is the current CEO of NITI Aayog?",["Anurag Jain","B.V.R. Subrahmanyam","Nidhi Chhibber","Amitabh Kant"],"Took charge in August 2026."],
+["L10","Who is the Vice-Chairman of NITI Aayog?",["Suman Bery","Rajiv Kumar","Arvind Panagariya","V.K. Paul"],"Suman Bery."],
+["L10","LEADS ranking is released by…",["DPIIT, Ministry of Commerce & Industry","NITI Aayog","Ministry of Road Transport","Ministry of Shipping"],"Logistics Ease Across Different States."],
+["L10","In LEADS 2025, the 'Exemplar' among coastal states is…",["Tamil Nadu","Gujarat","Maharashtra","Kerala"],"Gujarat, Maharashtra, Kerala are High Performers."],
+["L10","In LEADS 2025, the 'Exemplar' among North-Eastern states is…",["Mizoram","Tripura","Meghalaya","Sikkim"],"Mizoram."],
+["L10","In LEADS 2025, the 'Exemplar' among Union Territories is…",["Delhi","Jammu & Kashmir","Puducherry","Chandigarh"],"Delhi."],
+["L10","Which is NOT a LEADS 2025 performance category?",["Leader","Exemplar","Accelerator","Growth Seeker"],"'Leader' belongs to the Export Preparedness Index."],
+["L10","The Export Preparedness Index is released by…",["NITI Aayog","DGFT","Ministry of Commerce","EXIM Bank"],"First edition 2020."],
+["L10","Which is NOT a pillar of the Export Preparedness Index?",["Human capital","Export infrastructure","Business ecosystem","Policy and governance"],"Fourth pillar: export performance."],
+["L10","The Export Preparedness Index classifies states as…",["Leader, Challenger, Aspirer","Exemplar, Achiever, Aspirant","Front runner, Performer, Aspirant","Gold, Silver, Bronze"],"Leader, Challenger, Aspirer."],
+["L10","Which of these is a 'Leader' among large states in EPI 2024?",["Uttar Pradesh","Bihar","Rajasthan","Punjab"],"Maharashtra, TN, Gujarat, UP, AP."],
+["L10","Which port is top-ranked for dry bulk cargo?",["Paradip","Mundra","Sikka","JNPT"],"Paradip, Odisha."],
+["L10","Which port is top-ranked for container cargo?",["Mundra","Paradip","Sikka","Kandla"],"Mundra, Gujarat."],
+["L10","Sikka port, top-ranked for liquid bulk, is in…",["Gujarat","Odisha","Maharashtra","Andhra Pradesh"],"Gujarat."],
+
+/* L11 */
+["L11","The India State of Forest Report is released by…",["Forest Survey of India, Dehradun","FAO","ICFRE, Dehradun","Wildlife Institute of India"],"Under MoEFCC.","p"],
+["L11","How often is the ISFR published?",["Every two years","Every year","Every five years","Every ten years"],"Biennial.","p"],
+["L11","The first India State of Forest Report was published in…",["1987","1981","1991","2001"],"1987."],
+["L11","ISFR 2023 is which edition?",["18th","17th","19th","16th"],"18th."],
+["L11","According to ISFR 2023, India's total forest and tree cover is…",["25.17%","24.62%","21.76%","33%"],"8,27,357 km²."],
+["L11","According to ISFR 2023, India's forest cover alone is…",["21.76%","25.17%","3.41%","24.62%"],"Tree cover is 3.41%."],
+["L11","According to ISFR 2023, India's tree cover is…",["3.41%","3.14%","2.91%","4.15%"],"21.76 + 3.41 = 25.17."],
+["L11","Which state has the largest forest and tree cover by area?",["Madhya Pradesh","Arunachal Pradesh","Maharashtra","Chhattisgarh"],"MP, Arunachal, Maharashtra.","p"],
+["L11","Which state is third by forest cover (forest only) in ISFR 2023?",["Chhattisgarh","Maharashtra","Odisha","Arunachal Pradesh"],"MP, Arunachal, Chhattisgarh."],
+["L11","Which state has the highest forest cover as a percentage of its area?",["Mizoram","Arunachal Pradesh","Meghalaya","Manipur"],"Among states, Mizoram.","p"],
+["L11","Which UT has the highest forest cover percentage (91.33%)?",["Lakshadweep","Andaman & Nicobar","Ladakh","Puducherry"],"Highest overall."],
+["L11","Which state recorded the maximum increase in forest and tree cover since 2021?",["Chhattisgarh","Mizoram","Madhya Pradesh","Assam"],"Chhattisgarh, UP, Odisha, Rajasthan."],
+["L11","Which state recorded the maximum increase in forest cover since 2021?",["Mizoram","Gujarat","Odisha","Chhattisgarh"],"Mizoram, Gujarat, Odisha."],
+["L11","India's total mangrove cover per ISFR 2023 is about…",["4,992 km²","8,27,357 km²","2,114 km²","7,500 km²"],"4,992 km²."],
+["L11","Sundarbans, the world's largest mangrove forest, is named after…",["Sundari tree","Sundar river","A king","Its beauty"],"Heritiera fomes, the Sundari tree."],
+["L11","In ISFR 2021, India's total forest and tree cover was…",["24.62%","24.16%","25.17%","23.81%"],"It rose to 25.17% in 2023."],
+["L11","Which state appears among the top gainers in both forest+tree and forest-only categories?",["Odisha","Gujarat","Rajasthan","Uttar Pradesh"],"Odisha."],
+
+/* L12 */
+["L12","NFHS is conducted by the Ministry of Health with which nodal agency?",["IIPS, Mumbai","NSO","ICMR","AIIMS"],"International Institute for Population Sciences.","p"],
+["L12","NFHS-6 was conducted in…",["2023-24","2019-21","2021-22","2025-26"],"2023-24."],
+["L12","According to NFHS-6, India's Total Fertility Rate is…",["2.0","2.1","2.2","1.9"],"Below the replacement level of 2.1."],
+["L12","Replacement level fertility is a TFR of about…",["2.1","2.0","1.5","3.0"],"2.1."],
+["L12","According to NFHS-6, the contraceptive prevalence rate rose to…",["69.1%","66.7%","87.1%","76.2%"],"From 66.7%."],
+["L12","According to NFHS-6, institutional deliveries are about…",["90.6%","88.6%","95.9%","85.3%"],"Near universal."],
+["L12","According to NFHS-6, births attended by skilled health personnel are…",["91.3%","90.6%","85.3%","76.2%"],"91.3%."],
+["L12","According to NFHS-6, the share of pregnant women receiving any antenatal care is…",["95.9%","76.2%","65.2%","54.9%"],"First-trimester ANC 76.2%."],
+["L12","According to NFHS-6, stunting among children under five fell to…",["29.3%","32.9%","35.5%","18.7%"],"From 35.5%."],
+["L12","Which vaccine saw the biggest coverage jump in NFHS-6?",["Rotavirus","Measles","BCG","Polio"],"36.4% → 85.4%."],
+["L12","Measles second-dose coverage in NFHS-6 is…",["71.8%","58.6%","85.4%","96%"],"From 58.6%."],
+["L12","Early initiation of breastfeeding (within one hour of birth) rose from 41.8% to…",["51.1%","95.6%","45.9%","61.2%"],"51.1%."],
+["L12","According to NFHS-6, the share of vaccinations given at public health facilities is…",["95.6%","87.1%","76.2%","69.1%"],"Shows trust in the public system."],
+["L12","The U-WIN portal is used to track…",["Vaccination of children up to 16","Unemployment","Women's enrolment","University admissions"],"Universal Immunisation Programme."],
+["L12","PM POSHAN (earlier Mid-Day Meal) comes under which ministry?",["Ministry of Education","Ministry of Health & Family Welfare","Ministry of Women & Child Development","Ministry of Rural Development"],"Renamed in 2021; started 1995.","p"],
+["L12","The Mid-Day Meal scheme was renamed PM POSHAN in…",["2021","2018","2019","2023"],"2021."],
+["L12","Which programme promotes breastfeeding under the National Health Mission?",["MAA — Mothers' Absolute Affection","Mission Indradhanush","JSSK","LaQshya"],"MAA programme."],
+
+/* L13 */
+["L13","AISHE is conducted by the…",["Ministry of Education","UGC","NITI Aayog","NSO"],"All India Survey on Higher Education."],
+["L13","According to AISHE 2023-24, the GER in higher education (18–23) is…",["30%","29.5%","27.3%","31.2%"],"31.2% is female GER."],
+["L13","According to AISHE 2023-24, the female GER is…",["31.2%","30%","28.5%","27.8%"],"Higher than male GER."],
+["L13","According to AISHE 2023-24, the Gender Parity Index is…",["1.08","1.00","0.98","1.12"],"Above 1 for seven years."],
+["L13","For how many consecutive years has the GPI in higher education stayed above 1?",["7","5","3","10"],"Seven."],
+["L13","Total enrolment in higher education in 2023-24 is about…",["4.5 crore","3.42 crore","4.46 crore","2.24 crore"],"3.42 crore in 2014-15."],
+["L13","Female enrolment in higher education in 2023-24 is about…",["2.24 crore","1.57 crore","4.5 crore","1.02 crore"],"From 1.57 crore in 2014-15."],
+["L13","SC students' enrolment in higher education in 2023-24 is about…",["69.72 lakh","46.07 lakh","28.82 lakh","1.02 crore"],"ST: 28.82 lakh."],
+["L13","The GER for ST students in 2023-24 is…",["22.8%","27.8%","30%","18.9%"],"SC 27.8%."],
+["L13","STEM enrolment reached about ___ in 2023-24.",["1.02 crore","91.5 lakh","4.5 crore","2.24 crore"],"Women's share 44%."],
+["L13","The share of women in STEM enrolment in 2023-24 is about…",["44%","38.4%","31.2%","51%"],"From 38.4% in 2014-15."],
+["L13","PLFS stands for…",["Periodic Labour Force Survey","Primary Labour Force Statistics","Periodic Livelihood Framework Survey","Public Labour Finance Survey"],"By NSO, MoSPI."],
+["L13","According to PLFS 2025, the LFPR for persons aged 15 and above is…",["59.3%","57.4%","44.9%","79.1%"],"Male 79.1%, female 40%."],
+["L13","According to PLFS 2025, the Worker Population Ratio (15+) is…",["57.4%","59.3%","43.5%","40%"],"WPR counts only those working."],
+["L13","According to PLFS 2025, the unemployment rate (15+) is…",["3.1%","3.2%","4.1%","6.1%"],"3.1%."],
+["L13","According to PLFS 2025, female LFPR (15+) is about…",["40%","30.7%","79.1%","59.3%"],"30.7% is for all ages."],
+["L13","Which measures people who are working or seeking work?",["Labour Force Participation Rate","Worker Population Ratio","Unemployment rate","Dependency ratio"],"LFPR."],
+["L13","NCRB Prison Statistics 2024 put all-India prison occupancy at about…",["112.7%","100%","130%","95%"],"Above capacity."],
+["L13","Which state/UT has the most overcrowded prisons as per NCRB 2024?",["Delhi","Meghalaya","Uttar Pradesh","Madhya Pradesh"],"Delhi nearly 2× capacity; Meghalaya 163%."],
+["L13","Chhattisgarh's prison occupancy fell from 234% in 2015 to about…",["127.6%","112.7%","148%","100%"],"Still above the national average."],
+
+/* L14 */
+["L14","In which index is India ranked 157?",["World Press Freedom Index","Global Peace Index","Gender Gap Index","World Happiness Report"],"15 August + 7 days of chatter."],
+["L14","India's rank of 91 belongs to which index?",["Corruption Perceptions Index","Sustainable Development Report","Global Hunger Index","Henley Passport Index"],"No-One (9-1)."],
+["L14","India's rank of 102 belongs to which index?",["Global Hunger Index","World Happiness Report","HDI","Global Peace Index"],"102° fever from hunger."],
+["L14","India ranks 116 in which report?",["World Happiness Report","Global Hunger Index","QS (IIT Delhi)","Global Peace Index"],"1-1 good man, 6× joy."],
+["L14","India ranks 127 in which index?",["Global Peace Index","Gender Gap Index","HDI","World Press Freedom Index"],"Down from 115."],
+["L14","India ranks 176 in which index?",["Environmental Performance Index","World Press Freedom Index","Global Peace Index","CPI"],"177 में 176."],
+["L14","In which of these did India's rank DECLINE in the latest edition?",["World Press Freedom Index","HDI","Corruption Perceptions Index","Global Innovation Index"],"151 → 157."],
+["L14","In which of these did India's rank IMPROVE in the latest edition?",["Corruption Perceptions Index","Global Peace Index","Gender Gap Index","CCPI"],"96 → 91."],
+["L14","Iceland tops all of these EXCEPT…",["World Happiness Report","Global Peace Index","Gender Gap Index","HDI 2025"],"Finland tops happiness."],
+["L14","Finland tops which pair?",["Happiness Report and SDG Report","Press Freedom and Democracy","Peace and Gender Gap","CPI and CCPI"],"Both SDSN reports."],
+["L14","Norway tops which pair?",["Press Freedom and Democracy Index","Happiness and SDG","Peace and HDI","ETI and CPI"],"RSF + EIU."],
+["L14","In which index is India ranked 4th?",["Global Firepower Index","Global Terrorism Index","Global Innovation Index","CCPI"],"F-I-R-E."],
+["L14","India is ranked 70 in which index?",["Energy Transition Index","Logistics Performance Index","Global Innovation Index","Henley Passport Index"],"7 days, 0 waste."],
+["L14","India's rank of 23 belongs to…",["Climate Change Performance Index 2026","Global Terrorism Index","Global Firepower","SDR 2026"],"Down from 10."],
+["L14","Which is the correct match of index and India's rank?",["HDI – 130","Gender Gap – 130","HDI – 131","Economic Freedom – 131"],"HDI 130, Gender Gap 131, Economic Freedom 132."],
+["L14","Which pair of indices has the USA as #1?",["Global Firepower and Unicorn Index","Innovation and Competitiveness","Peace and Passport","CPI and HDI"],"USA also tops IP Index and NRI."],
+["L14","Switzerland has topped which index for 15 consecutive years?",["Global Innovation Index","Global Peace Index","World Competitiveness Ranking","HDI"],"GII."],
+["L14","Which of these indices has India's best (lowest-number) rank?",["Global Firepower (4)","Global Innovation Index (38)","Energy Transition (70)","CPI (91)"],"4th in military strength."]
+];
+
+/* Index finder: [index, publisher, #1, India now, India before, category, hook, lesson] */
+const IDX = [
+ ["Human Development Index (HDR 2025)","UNDP","Iceland","130","133","SOC","≈130 crore people","L2"],
+ ["Global MPI","UNDP + OPHI (Oxford)","—","—","","SOC","3 dimensions · 10 indicators","L2"],
+ ["National MPI","NITI Aayog","Kerala (lowest poverty)","Bihar poorest","","NAT","12 indicators","L2"],
+ ["World Happiness Report 2026","UN SDSN + Gallup + Oxford WRC","Finland (9th yr)","116","118","SOC","1-1 good man, 6× joy","L3"],
+ ["Sustainable Development Report 2026","UN SDSN","Finland","94","99","SOC","out of the 99 trap","L3"],
+ ["Global Gender Gap 2025","World Economic Forum","Iceland (16th yr)","131","129","SOC","1 ❤️ 1","L4"],
+ ["Global Hunger Index 2025","Concern Worldwide + Welthungerhilfe","Belarus","102","105","SOC","102° fever","L4"],
+ ["Corruption Perceptions 2025","Transparency International","Denmark","91","96","GOV","No-One","L5"],
+ ["World Press Freedom 2026","Reporters Without Borders","Norway (10th yr)","157","151","GOV","15 Aug + 7 days","L5"],
+ ["Democracy Index","Economist Intelligence Unit","Norway","41","","GOV","flawed democracy","L5"],
+ ["Index of Economic Freedom 2026","Heritage Foundation","Singapore","132","128","ECO","after Gender 131","L5"],
+ ["Global Peace Index 2026","Institute for Economics & Peace","Iceland (18th yr)","127","115","SEC","1 nation, 2 rivals, 7 days","L6"],
+ ["Global Terrorism Index 2026","Institute for Economics & Peace","Pakistan (worst)","13","14","SEC","unlucky 13","L6"],
+ ["Global Firepower 2026","Global Firepower","USA","4","4","SEC","F-I-R-E","L6"],
+ ["SIPRI Yearbook 2026 (spending)","SIPRI, Stockholm","USA","5th spender · 2nd importer","","SEC","4-5-2","L6"],
+ ["World Competitiveness 2026","IMD, Lausanne","Singapore","44","41","ECO","चार-चार","L7"],
+ ["Global Innovation Index 2025","WIPO","Switzerland (15th yr)","38","39","ECO","अड़-तीस","L7"],
+ ["Global Unicorn Index 2026","Hurun","USA (806)","4th (61)","3rd (64)","ECO","USA-China-UK-India","L7"],
+ ["International IP Index","US Chamber of Commerce (GIPC)","USA","42","42","ECO","same 4 years","L7"],
+ ["Network Readiness Index","Portulans Institute","USA","45","","ECO","4 pillars T-P-G-I","L7"],
+ ["Energy Transition Index 2026","World Economic Forum","Sweden","70","71","ENV","7 days, 0 waste","L8"],
+ ["Climate Change Performance 2026","Germanwatch + NewClimate + CAN","1–3 empty · Denmark 4th","23","10","ENV","coal up, rank down","L8"],
+ ["Environmental Performance 2026","Yale + Columbia","Estonia","176","","ENV","177 में 176","L8"],
+ ["World Air Quality 2025","IQAir","Chad (most polluted)","6th most polluted","5th","ENV","Loni worst city","L8"],
+ ["Forest Resources Assessment 2025","FAO","—","9th area · 3rd gain · 5th sink","","ENV","9-3-5","L8"],
+ ["Henley Passport 2026","Henley & Partners","Singapore (192)","81 (latest)","75 (Feb)","TRV","8 hours, 1 passport","L9"],
+ ["Logistics Performance 2023","World Bank","Singapore","38","44","TRV","अड़-तीस twin","L9"],
+ ["Container Port Performance 2025","World Bank","—","JNPT India's best","","TRV","Nhava Sheva","L9"],
+ ["ICAO aviation safety 2023","ICAO","Singapore","55","102","TRV","big jump","L9"],
+ ["QS World University 2027","Quacquarelli Symonds","MIT","IIT Delhi 118","123","EDU","1-1 brick, 8 floors","L9"],
+ ["Global Liveability 2025","Economist Intelligence Unit","Copenhagen","New Delhi best Indian","","TRV","Vienna = Austria","L9"],
+ ["Fiscal Health Index 2026","NITI Aayog","Odisha","Punjab last","","NAT","Oh Good Job","L10"],
+ ["LEADS 2025","DPIIT","TN · UP · Mizoram · Delhi","—","","NAT","Tum UP mein Delhi","L10"],
+ ["Export Preparedness Index 2024","NITI Aayog","Maharashtra, TN, Gujarat, UP, AP","—","","NAT","4 pillars","L10"],
+ ["ISFR 2023","Forest Survey of India","MP (area) · Mizoram (%)","25.17% green","24.62%","NAT","21.76 + 3.41","L11"],
+ ["NFHS-6 (2023-24)","MoHFW + IIPS Mumbai","—","TFR 2.0 · vaccination 87.1%","83.8%","NAT","below 2.1","L12"],
+ ["AISHE 2023-24","Ministry of Education","—","GER 30% · female 31.2%","29.5%","NAT","GPI 1.08","L13"],
+ ["PLFS 2025","NSO (MoSPI)","—","LFPR 59.3 · WPR 57.4 · UR 3.1","","NAT","59-57-3","L13"]
+];
+const CATS = [["all","All"],["SOC","Society"],["GOV","Governance"],["SEC","Security"],["ECO","Economy"],["ENV","Environment"],["TRV","Travel & cities"],["EDU","Education"],["NAT","India's own"]];
+const TILES = [["4","Global Firepower"],["13","Terrorism (13 = more hit)"],["23","CCPI (from 10)"],["38","GII & LPI twins"],["44","World Competitiveness"],["70","Energy Transition"],["81","Henley latest"],["91","CPI (score 39)"],["94","SDG Report"],["102","Global Hunger (25.8)"],["116","Happiness"],["118","IIT Delhi, QS"],["127","Global Peace"],["130","HDI (0.685)"],["131","Gender Gap (0.644)"],["157","Press Freedom"],["176","EPI (of 177)"],["25.17%","Forest + tree cover"]];
+const PAIRS = [["Global Peace vs Global Terrorism","Same publisher (IEP, Sydney); Iceland vs Pakistan at #1"],["Happiness vs SDG report","Both UN SDSN; both Finland"],["Gender Gap vs Energy Transition","Both WEF; Iceland vs Sweden"],["Liveability vs Democracy","Both EIU (London)"],["HDI vs MPI","HDI 4 indicators; MPI 10; national MPI 12"],["World Competitiveness (IMD) vs Global Competitiveness","IMD Lausanne vs WEF (discontinued)"],["LEADS vs Export Preparedness","DPIIT (Exemplar…) vs NITI (Leader…)"],["ISFR vs FRA","FSI Dehradun, India vs FAO, world"],["Stunting vs Wasting","Height for age vs Weight for height"],["LFPR vs WPR","Working + seeking vs working only"],["Vienna vs Melbourne","Austria vs Australia"],["GHI publisher","Welthungerhilfe (not 'Wealth Hunger Life'); IFPRI left in 2018"],["CPI scale","0 highly corrupt → 100 very clean"],["PM POSHAN","Ministry of Education"],["Unicorn #3 in 2026","UK — India slipped to 4th"]];
+const FULLFORMS = [["UNDP","United Nations Development Programme"],["OPHI","Oxford Poverty & Human Development Initiative"],["SDSN","Sustainable Development Solutions Network"],["WEF","World Economic Forum"],["RSF","Reporters sans frontières (Reporters Without Borders)"],["TI","Transparency International"],["EIU","Economist Intelligence Unit"],["IEP","Institute for Economics & Peace"],["SIPRI","Stockholm International Peace Research Institute"],["IMD","International Institute for Management Development"],["WIPO","World Intellectual Property Organization"],["GIPC","Global Innovation Policy Center (US Chamber)"],["CCPI","Climate Change Performance Index"],["CAN","Climate Action Network"],["CIESIN","Center for International Earth Science Information Network"],["FAO","Food and Agriculture Organization"],["FRA","Forest Resources Assessment"],["ICAO","International Civil Aviation Organization"],["USOAP","Universal Safety Oversight Audit Programme"],["LPI","Logistics Performance Index"],["CPPI","Container Port Performance Index"],["JNPT","Jawaharlal Nehru Port Trust (Nhava Sheva)"],["QS","Quacquarelli Symonds"],["NIRF","National Institutional Ranking Framework"],["FHI","Fiscal Health Index"],["LEADS","Logistics Ease Across Different States"],["DPIIT","Department for Promotion of Industry and Internal Trade"],["ISFR","India State of Forest Report"],["FSI","Forest Survey of India"],["NFHS","National Family Health Survey"],["IIPS","International Institute for Population Sciences"],["AISHE","All India Survey on Higher Education"],["GER","Gross Enrolment Ratio"],["GPI (AISHE)","Gender Parity Index"],["PLFS","Periodic Labour Force Survey"],["LFPR","Labour Force Participation Rate"],["WPR","Worker Population Ratio"],["NCRB","National Crime Records Bureau"],["MPI","Multidimensional Poverty Index"],["GNI","Gross National Income"],["TFR","Total Fertility Rate"],["CPR","Contraceptive Prevalence Rate"],["MAA","Mothers' Absolute Affection"]];
+
+const APP = { key:"reports_indices_workbook_v1", brand:"Reports & Indices", sub:"रिपोर्ट और सूचकांक · SSC CGL workbook",
+  eyebrow:"International · National · 2025–26 editions",
+  intro:"14 short lessons from your four lectures, grouped by who publishes what (IEP → Peace + Terror, SDSN → Happiness + SDG, WEF → Gender + Energy), with number hooks for every India rank, lecture slips corrected in red boxes, quick checks inside lessons and data checked to September 2026." };
+
+
+/* ============================================================
+   HELPERS & STATE
+   ============================================================ */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const hash = s => { let h = 5381; for (let i=0;i<s.length;i++) h = ((h<<5)+h + s.charCodeAt(i))|0; return "q"+(h>>>0).toString(36); };
+const shuffle = a => { const b=a.slice(); for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]];} return b; };
+const L = id => LESSONS.find(l => l.id === id);
+const LNUM = id => LESSONS.findIndex(l => l.id === id) + 1;
+
+const QS = QB.map(r => {
+  const fixed = !!r[6];
+  return { t:r[0], q:r[1], o:r[2], e:r[3], p:(r[4]||"").includes("p"), a: fixed ? (r[5]||0) : 0, fixed, id:hash(r[1]) };
+});
+const byLesson = id => QS.filter(q => q.t === id);
+// order of options to show: array of original indexes
+const makePerm = q => q.fixed ? q.o.map((_,i)=>i) : shuffle(q.o.map((_,i)=>i));
+
+const KEY = APP.key;
+let S = { ans:{}, bm:{}, les:{}, mocks:[] };
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch(e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
+const record = (q, ok) => { S.ans[q.id] = ok ? 1 : 0; save(); renderTop(); };
+
+function renderTop(){
+  const ids = Object.keys(S.ans).filter(k => QS.some(q => q.id === k));
+  const right = ids.filter(k => S.ans[k] === 1).length;
+  const pct = ids.length ? Math.round(right*100/ids.length) : 0;
+  $("#topstat").innerHTML = `<b>${ids.length}</b>/${QS.length} tried<br><b>${pct}%</b> right now`;
+}
+
+/* ============================================================
+   ROUTING
+   ============================================================ */
+let TAB = "learn";
+let timerId = null;
+function go(tab){
+  TAB = tab;
+  document.querySelectorAll(".nav button").forEach(b => b.setAttribute("aria-current", b.dataset.tab===tab ? "page" : "false"));
+  if (tab === "learn") renderLearn();
+  if (tab === "practice") renderPractice();
+  if (tab === "mock") renderMock();
+  if (tab === "revise") renderRevise();
+  window.scrollTo(0,0);
+  try { history.replaceState(null, "", "#"+tab); } catch(e) {}
+}
+document.querySelectorAll(".nav button").forEach(b => b.addEventListener("click", () => {
+  if (TAB === "mock" && M && M.running && b.dataset.tab !== "mock") { go("mock"); showMockLeave(b.dataset.tab); return; }
+  go(b.dataset.tab);
+}));
+
+/* ============================================================
+   LEARN
+   ============================================================ */
+function renderLearn(){
+  const done = LESSONS.filter(l => S.les[l.id] && S.les[l.id].done).length;
+  const nextIdx = LESSONS.findIndex(l => !(S.les[l.id] && S.les[l.id].done));
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="hero">
+      <span class="eyebrow">${APP.eyebrow}</span>
+      <h1>Learn it, test it, revise it</h1>
+      <p>${APP.intro} ${QS.length} exam-style questions in all.</p>
+      <div class="meter" aria-label="Lessons done"><i style="width:${done/LESSONS.length*100}%"></i></div>
+      <div class="row between"><span class="muted num" style="font-size:13px">${done}/${LESSONS.length} lessons done</span>
+      ${nextIdx>=0 ? `<button class="btn pri sm" type="button" data-open="${LESSONS[nextIdx].id}">${done? "Continue" : "Start"}: Lesson ${nextIdx+1}</button>` : `<span class="muted" style="font-size:13px">All lessons done. Try a mock test.</span>`}</div>
+    </div>
+    <div class="lessons">${LESSONS.map((l,i) => {
+      const st = S.les[l.id] || {}; const n = byLesson(l.id).length;
+      return `<button type="button" class="les ${st.done?"done":""} ${i===nextIdx?"next":""}" data-open="${l.id}">
+        <span class="no">${st.done ? "✓" : i+1}</span>
+        <span class="t"><b>${esc(l.title)}</b><span>${l.hi} · ${n} questions</span></span>
+        <span class="sc">${st.best!=null ? `best<br>${st.best}/${n}` : ""}</span></button>`;}).join("")}
+    </div>
+    <p class="foot">Ranks are the latest editions released up to September 2026. Where a lecture got a fact wrong, the lesson flags it in a red “Trap” box. Revise → Rank ladder and Cover drill are the fastest last-week tools.</p>
+  </section>`;
+  $("#app").querySelectorAll("[data-open]").forEach(b => b.addEventListener("click", () => openLesson(b.dataset.open, "learn")));
+}
+
+function blockHTML(b){
+  if (b.k==="p") return `<div class="plain"><p>${b.h}</p></div>`;
+  if (b.k==="trick") return `<div class="trick"><span class="lab">Trick</span>${b.h}</div>`;
+  if (b.k==="link") return `<div class="link"><span class="lab">Link · connect the indices</span>${b.h}</div>`;
+  if (b.k==="q") { const perm = shuffle(b.o.map((_,i)=>i)); return `<div class="icheck" data-ic><span class="lab">Quick check</span><p class="qt">${esc(b.q)}</p><div class="opts">${perm.map((oi,k)=>`<button type="button" class="opt" data-ioi="${oi}"><span class="k">${"ABCD"[k]}</span><span>${esc(b.o[oi])}</span></button>`).join("")}</div><div class="exp" hidden><b class="okl"></b> ${esc(b.e)}</div></div>`; }
+  if (b.k==="trap") return `<div class="trap"><span class="lab">Trap · correction</span>${b.h}</div>`;
+  if (b.k==="facts") return `<div class="block"><h3>${b.title}</h3><dl class="facts">${b.rows.map(r=>`<div><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join("")}</dl></div>`;
+  if (b.k==="tl") return `<div class="block"><h3>${b.title}</h3><ul class="tl">${b.rows.map(r=>`<li><span class="y">${r[0]}</span><span>${r[1]}</span></li>`).join("")}</ul></div>`;
+  if (b.k==="table") {
+    const isNum = (ci) => b.numcol==="all" ? ci>0 : (b.numcol===1 && ci===1) || (typeof b.numcol==="string" && b.numcol.includes(String(ci)));
+    return `<div class="block"><h3>${b.title}</h3><div class="tbl"><table><thead><tr>${b.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${b.rows.map(r=>`<tr>${r.map((c,ci)=>`<td class="${isNum(ci)?"n":""}">${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+  }
+  if (b.k==="fig") return `<div class="block"><h3>${b.title}</h3><figure class="fig">${b.svg}<figcaption>${b.cap}</figcaption></figure></div>`;
+  if (b.k==="pyr") return `<div class="block"><h3>${b.title}</h3><div class="pyr">${b.items.map(it=>`<div>${PYR(it.rows)}<b>${it.name}</b><span class="muted">${it.note}</span></div>`).join("")}</div><p class="muted" style="font-size:13px;margin-top:8px"><span style="color:var(--blue)">■</span> males · <span style="color:var(--accent)">■</span> females · top = old, base = young</p></div>`;
+  return "";
+}
+
+let LQ = null;
+function openLesson(id, step){
+  const l = L(id), i = LNUM(id);
+  if (step === "quiz") { LQ = { id, list: shuffle(byLesson(id)).map(q => ({q, perm:makePerm(q)})), i:0, score:0, picked:null }; }
+  const head = `<div class="lhead"><button class="back" type="button" id="lback">‹ Lessons</button></div>
+    <span class="eyebrow">Lesson ${i} of ${LESSONS.length} · ${l.hi}</span><h1>${esc(l.title)}</h1>
+    <div class="steps" role="tablist">
+      <button type="button" data-step="learn" aria-current="${step==="learn"?"step":"false"}">1 · Learn</button>
+      <button type="button" data-step="quiz" aria-current="${step==="quiz"?"step":"false"}">2 · Quiz</button>
+      <button type="button" data-step="sum" aria-current="${step==="sum"?"step":"false"}">3 · Summary</button>
+    </div>`;
+  let body = "";
+  if (step === "learn") {
+    body = `<div class="stack">${l.blocks.map(blockHTML).join("")}
+      <div class="row end"><button class="btn pri" type="button" id="toquiz">Take the lesson quiz · ${byLesson(id).length} questions</button></div></div>`;
+  } else if (step === "quiz") {
+    body = `<div id="lq"></div>`;
+  } else {
+    const nxt = LESSONS[i];
+    body = `<div class="stack"><div class="block"><h3>Remember these</h3><ul class="sum">${l.sum.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>
+      <div class="row between"><button class="btn" type="button" id="relearn">Read again</button>
+      ${nxt ? `<button class="btn pri" type="button" id="nextles">Next: ${esc(nxt.title)}</button>` : `<button class="btn pri" type="button" id="tomock">Take a mock test</button>`}</div></div>`;
+    S.les[id] = Object.assign(S.les[id]||{}, {done:1}); save();
+  }
+  $("#app").innerHTML = `<section class="view stack">${head}${body}</section>`;
+  $("#lback").onclick = () => renderLearn();
+  $("#app").querySelectorAll("[data-step]").forEach(b => b.onclick = () => openLesson(id, b.dataset.step));
+  if (step==="learn") { $("#toquiz").onclick = () => openLesson(id,"quiz");
+    const ics = l.blocks.filter(b=>b.k==="q");
+    $("#app").querySelectorAll("[data-ic]").forEach((box,n) => { const b = ics[n];
+      box.querySelectorAll("[data-ioi]").forEach(btn => btn.onclick = () => {
+        if (box.dataset.done) return; box.dataset.done = 1; const pick = +btn.dataset.ioi;
+        box.querySelectorAll("[data-ioi]").forEach(x => { const oi=+x.dataset.ioi; x.disabled = true; if (oi===0) x.classList.add("ok"); else if (oi===pick) x.classList.add("no"); });
+        const ex = box.querySelector(".exp"); ex.hidden = false; const lab = ex.querySelector("b");
+        if (pick===0) { lab.textContent = "Correct."; } else { lab.className = "nol"; lab.textContent = "Answer: " + b.o[0] + "."; }
+      }); }); }
+  if (step==="quiz") renderLQ();
+  if (step==="sum") {
+    $("#relearn").onclick = () => openLesson(id,"learn");
+    const n = $("#nextles"); if (n) n.onclick = () => openLesson(LESSONS[i].id,"learn");
+    const m = $("#tomock"); if (m) m.onclick = () => go("mock");
+  }
+  window.scrollTo(0,0);
+}
+
+function optsHTML(q, perm, state){
+  // state: {picked: originalIndex|null, reveal: bool, sel: originalIndex|null}
+  return perm.map((oi, k) => {
+    let cls = "opt";
+    if (state.reveal) { if (oi === q.a) cls += " ok"; else if (oi === state.picked) cls += " no"; }
+    else if (state.sel === oi) cls += " sel";
+    return `<button type="button" class="${cls}" data-oi="${oi}" ${state.reveal?"disabled":""}><span class="k">${"ABCD"[k]}</span><span>${esc(q.o[oi])}</span></button>`;
+  }).join("");
+}
+function expHTML(q, picked){
+  const ok = picked === q.a;
+  return `<div class="exp">${ok ? `<b class="okl">Correct.</b>` : `<b class="nol">Answer: ${esc(q.o[q.a])}.</b>`} ${esc(q.e)}</div>`;
+}
+function metaHTML(q, no){
+  return `<div class="qmeta"><span class="qno">${no}</span><span class="tag">L${LNUM(q.t)} · ${esc(L(q.t).title)}</span>${q.p?`<span class="tag pyq">Exam-asked</span>`:""}
+  <button type="button" class="bm" data-bm="${q.id}" aria-pressed="${S.bm[q.id]?"true":"false"}" aria-label="Bookmark">${S.bm[q.id]?"★":"☆"}</button></div>`;
+}
+
+function renderLQ(){
+  const box = $("#lq");
+  if (LQ.i >= LQ.list.length) {
+    const n = LQ.list.length, l = L(LQ.id);
+    const st = S.les[LQ.id] || {}; st.best = Math.max(st.best||0, LQ.score); S.les[LQ.id] = st; save();
+    box.innerHTML = `<div class="stack"><div class="block stack"><span class="eyebrow">Quiz done</span>
+      <div class="scorebig"><span class="num">${LQ.score}</span><span class="muted">/ ${n} correct</span></div>
+      <p class="muted">${LQ.score===n ? "Full marks." : LQ.score >= n*0.8 ? "Strong. Review the ones you missed in Practice → Mistakes." : "Read the lesson once more, then retry. Missed questions are saved under Practice → Mistakes."}</p></div>
+      <div class="row between"><button class="btn" type="button" id="retry">Retry quiz</button><button class="btn pri" type="button" id="tosum">See summary</button></div></div>`;
+    $("#retry").onclick = () => openLesson(LQ.id,"quiz");
+    $("#tosum").onclick = () => openLesson(LQ.id,"sum");
+    return;
+  }
+  const it = LQ.list[LQ.i], q = it.q;
+  const reveal = LQ.picked !== null;
+  box.innerHTML = `<div class="stack"><div class="meter"><i style="width:${LQ.i/LQ.list.length*100}%"></i></div>
+    <article class="qcard">${metaHTML(q, `Q${LQ.i+1}/${LQ.list.length}`)}
+    <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {picked:LQ.picked, reveal})}</div>
+    ${reveal ? expHTML(q, LQ.picked) : ""}</article>
+    ${reveal ? `<div class="row end"><button class="btn pri" type="button" id="lqnext">${LQ.i+1 < LQ.list.length ? "Next question" : "Finish"}</button></div>` : `<p class="muted" style="font-size:13px">Score so far: <span class="num">${LQ.score}</span></p>`}</div>`;
+  box.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    if (LQ.picked !== null) return;
+    LQ.picked = +b.dataset.oi; const ok = LQ.picked === q.a; if (ok) LQ.score++; record(q, ok); renderLQ();
+  });
+  bindBM(box);
+  const nx = $("#lqnext"); if (nx) nx.onclick = () => { LQ.i++; LQ.picked = null; renderLQ(); window.scrollTo(0,0); };
+}
+
+function bindBM(root){
+  root.querySelectorAll("[data-bm]").forEach(b => b.onclick = (ev) => {
+    ev.stopPropagation();
+    const id = b.dataset.bm; if (S.bm[id]) delete S.bm[id]; else S.bm[id] = 1; save();
+    b.setAttribute("aria-pressed", S.bm[id] ? "true":"false"); b.textContent = S.bm[id] ? "★" : "☆";
+  });
+}
+
+/* ============================================================
+   PRACTICE
+   ============================================================ */
+let PF = "all", PSHOW = 20, PORDER = null, PPERM = {}, PPICK = {};
+function practiceList(){
+  let list = QS;
+  if (PF === "pyq") list = QS.filter(q => q.p);
+  else if (PF === "wrong") list = QS.filter(q => S.ans[q.id] === 0);
+  else if (PF === "new") list = QS.filter(q => S.ans[q.id] === undefined);
+  else if (PF === "bm") list = QS.filter(q => S.bm[q.id]);
+  else if (PF !== "all") list = QS.filter(q => q.t === PF);
+  if (PORDER) { const pos = new Map(PORDER.map((id,i)=>[id,i])); list = list.slice().sort((a,b)=>(pos.get(a.id)??0)-(pos.get(b.id)??0)); }
+  return list;
+}
+function renderPractice(){
+  const wrongN = QS.filter(q => S.ans[q.id] === 0).length, bmN = QS.filter(q=>S.bm[q.id]).length, pyqN = QS.filter(q=>q.p).length;
+  const chips = [["all",`All ${QS.length}`],["new","Not tried"],["wrong",`Mistakes ${wrongN}`],["pyq",`Exam-asked ${pyqN}`],["bm",`Starred ${bmN}`]].concat(LESSONS.map((l,i)=>[l.id,`L${i+1} ${l.title}`]));
+  const list = practiceList();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Question bank</span><h1>Practice</h1>
+    <p class="muted">Tap an option to check it. Wrong answers go to <b>Mistakes</b> until you get them right.</p></div>
+    <div class="chips" role="group" aria-label="Filter">${chips.map(c=>`<button type="button" class="chip" data-f="${c[0]}" aria-pressed="${PF===c[0]}">${esc(c[1])}</button>`).join("")}</div>
+    <div class="row between"><span class="muted num" style="font-size:13px">${list.length} questions</span>
+      <div class="row"><button class="btn sm ghost" type="button" id="pshuf">${PORDER?"In order":"Shuffle"}</button></div></div>
+    <div class="stack" id="plist"></div>
+  </section>`;
+  $("#app").querySelectorAll("[data-f]").forEach(b => b.onclick = () => { PF = b.dataset.f; PSHOW = 20; PPICK = {}; renderPractice(); });
+  $("#pshuf").onclick = () => { PORDER = PORDER ? null : shuffle(QS.map(q=>q.id)); PSHOW = 20; renderPractice(); };
+  const chipOn = $(`.chip[aria-pressed="true"]`); if (chipOn) chipOn.scrollIntoView({block:"nearest", inline:"center"});
+  drawPList();
+}
+function pCard(q, idx){
+  if (!PPERM[q.id]) PPERM[q.id] = makePerm(q);
+  const picked = PPICK[q.id]; const reveal = picked !== undefined;
+  return `<article class="qcard" data-q="${q.id}">${metaHTML(q, "Q"+(idx+1))}<p class="qt">${esc(q.q)}</p>
+    <div class="opts">${optsHTML(q, PPERM[q.id], {picked: reveal?picked:null, reveal})}</div>${reveal?expHTML(q,picked):""}</article>`;
+}
+function drawPList(){
+  const list = practiceList(), box = $("#plist");
+  if (!list.length) { box.innerHTML = `<p class="empty">${PF==="wrong"?"No mistakes saved. Answer some questions first, or you've cleared them all.":PF==="bm"?"Nothing starred yet. Tap ☆ on any question.":"Nothing here."}</p>`; return; }
+  box.innerHTML = list.slice(0, PSHOW).map((q,i)=>pCard(q,i)).join("") + (list.length > PSHOW ? `<button class="btn" type="button" id="pmore">Show 20 more (${list.length-PSHOW} left)</button>` : "");
+  bindP(box);
+  const more = $("#pmore"); if (more) more.onclick = () => { PSHOW += 20; drawPList(); };
+}
+function bindP(box){ box.querySelectorAll(".qcard").forEach(bindCard); }
+function bindCard(card){
+  card.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    const q = QS.find(x => x.id === card.dataset.q); if (PPICK[q.id] !== undefined) return;
+    PPICK[q.id] = +b.dataset.oi; record(q, PPICK[q.id] === q.a);
+    const idx = +card.querySelector(".qno").textContent.slice(1) - 1;
+    const tmp = document.createElement("div"); tmp.innerHTML = pCard(q, idx); const nc = tmp.firstElementChild;
+    card.replaceWith(nc); bindCard(nc);
+  });
+  bindBM(card);
+}
+
+/* ============================================================
+   MOCK TEST
+   ============================================================ */
+let M = null, MCFG = {n:25, scope:"all", neg:1}, LEAVE_TO = null;
+function renderMock(){
+  if (M && M.running) return drawMockRun();
+  if (M && M.done) return drawMockResult();
+  const hist = (S.mocks||[]).slice(-6).reverse();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Timed, SSC pattern</span><h1>Mock test</h1>
+    <p class="muted">+2 for a right answer, −0.5 for a wrong one, 36 seconds per question (CGL Tier-1 pace). Answers show only after you submit.</p></div>
+    <div class="block stack">
+      <fieldset><legend>Questions</legend><div class="radios">${[10,25,50,100].map(n=>`<label><input type="radio" name="mn" id="mn${n}" value="${n}" ${MCFG.n===n?"checked":""}><span>${n} · ${Math.round(n*36/60)} min</span></label>`).join("")}</div></fieldset>
+      <fieldset><legend>From</legend><select id="mscope" aria-label="Lessons to draw from"><option value="all">All lessons</option><option value="pyq">Exam-asked only</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}" ${MCFG.scope===l.id?"selected":""}>L${i+1} · ${esc(l.title)}</option>`).join("")}</select></fieldset>
+      <label class="row" style="gap:8px;font-weight:600"><input type="checkbox" id="mneg" ${MCFG.neg?"checked":""}> Negative marking (−0.5)</label>
+      <div id="merr" class="muted" style="font-size:14px"></div>
+      <div class="row end"><button class="btn pri" type="button" id="mstart">Start test</button></div>
+    </div>
+    ${hist.length ? `<div class="block"><h3>Recent attempts</h3><div class="hist">${hist.map(h=>`<div><span>${esc(h.d)} · ${h.n} Q</span><span class="num">${h.score}/${h.max} · ${h.acc}%</span></div>`).join("")}</div></div>` : ""}
+  </section>`;
+  $("#mscope").value = MCFG.scope;
+  $("#mstart").onclick = () => {
+    MCFG.n = +(document.querySelector('input[name="mn"]:checked')||{value:25}).value;
+    MCFG.scope = $("#mscope").value; MCFG.neg = $("#mneg").checked ? 1 : 0;
+    let pool = MCFG.scope==="all" ? QS : MCFG.scope==="pyq" ? QS.filter(q=>q.p) : MCFG.scope==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===MCFG.scope);
+    if (!pool.length) { $("#merr").textContent = "No questions in that set yet. Pick another source."; return; }
+    const qs = shuffle(pool).slice(0, MCFG.n);
+    M = { running:true, list: qs.map(q=>({q, perm:makePerm(q)})), ans: qs.map(()=>null), mark: qs.map(()=>false), i:0, neg:MCFG.neg, secs: qs.length*36, start: Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000;
+    startTimer(); drawMockRun();
+  };
+}
+function startTimer(){
+  clearInterval(timerId);
+  timerId = setInterval(() => {
+    if (!M || !M.running) { clearInterval(timerId); return; }
+    const left = Math.max(0, Math.round((M.end - Date.now())/1000));
+    const el = $("#mtime"); if (el) { el.textContent = fmt(left); el.classList.toggle("low", left <= 60); }
+    if (left <= 0) submitMock();
+  }, 1000);
+}
+const fmt = s => `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+function drawMockRun(){
+  const it = M.list[M.i], q = it.q, left = Math.max(0, Math.round((M.end-Date.now())/1000));
+  const answered = M.ans.filter(a=>a!==null).length;
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="mbar"><span class="timer num ${left<=60?"low":""}" id="mtime">${fmt(left)}</span>
+      <span class="muted num" style="font-size:13px;flex:1">Q ${M.i+1}/${M.list.length} · ${answered} answered</span>
+      <button class="btn sm" type="button" id="mpal">${M.showPal?"Hide":"All Qs"}</button></div>
+    ${LEAVE_TO ? `<div class="confirm"><b>Leave the test?</b><span>Your answers so far will be scored now.</span><div class="row"><button class="btn sm pri" type="button" id="lvy">Submit and leave</button><button class="btn sm" type="button" id="lvn">Stay</button></div></div>` : ""}
+    ${M.showPal ? `<div class="block"><div class="pal">${M.list.map((_,k)=>`<button type="button" data-j="${k}" class="${M.ans[k]!==null?"a":""} ${M.mark[k]?"m":""} ${k===M.i?"cur":""}" aria-label="Question ${k+1}">${k+1}</button>`).join("")}</div>
+      <p class="muted" style="font-size:12px;margin-top:8px">Filled = answered · orange line = marked for review</p></div>` : ""}
+    <article class="qcard"><div class="qmeta"><span class="qno">Q${M.i+1}</span><span class="tag">L${LNUM(q.t)}</span>${M.mark[M.i]?`<span class="tag pyq">Marked</span>`:""}</div>
+      <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {sel:M.ans[M.i], reveal:false})}</div></article>
+    <div class="row between"><button class="btn" type="button" id="mprev" ${M.i===0?"disabled":""}>‹ Prev</button>
+      <button class="btn ghost" type="button" id="mmark">${M.mark[M.i]?"Unmark":"Mark"}</button>
+      <button class="btn ghost" type="button" id="mclr" ${M.ans[M.i]===null?"disabled":""}>Clear</button>
+      <button class="btn ${M.i<M.list.length-1?"pri":""}" type="button" id="mnext" ${M.i===M.list.length-1?"disabled":""}>Next ›</button></div>
+    ${M.confirm ? `<div class="confirm"><b>Submit the test?</b><span>${M.list.length-answered} unanswered${M.mark.filter(Boolean).length?`, ${M.mark.filter(Boolean).length} marked for review`:""}.</span><div class="row"><button class="btn sm pri" type="button" id="msubY">Submit</button><button class="btn sm" type="button" id="msubN">Keep going</button></div></div>`
+      : `<button class="btn pri" type="button" id="msub">Submit test</button>`}
+  </section>`;
+  $("#app").querySelectorAll(".opt").forEach(b => b.onclick = () => { M.ans[M.i] = +b.dataset.oi; drawMockRun(); });
+  $("#mprev").onclick = () => { if (M.i>0){M.i--; drawMockRun();} };
+  $("#mnext").onclick = () => { if (M.i<M.list.length-1){M.i++; drawMockRun(); window.scrollTo(0,0);} };
+  $("#mmark").onclick = () => { M.mark[M.i] = !M.mark[M.i]; drawMockRun(); };
+  $("#mclr").onclick = () => { M.ans[M.i] = null; drawMockRun(); };
+  $("#mpal").onclick = () => { M.showPal = !M.showPal; drawMockRun(); };
+  $("#app").querySelectorAll("[data-j]").forEach(b => b.onclick = () => { M.i = +b.dataset.j; drawMockRun(); });
+  const s = $("#msub"); if (s) s.onclick = () => { M.confirm = true; drawMockRun(); };
+  const y = $("#msubY"); if (y) y.onclick = submitMock;
+  const n = $("#msubN"); if (n) n.onclick = () => { M.confirm = false; drawMockRun(); };
+  const lvy = $("#lvy"); if (lvy) lvy.onclick = () => { const t = LEAVE_TO; LEAVE_TO = null; submitMock(); go(t); };
+  const lvn = $("#lvn"); if (lvn) lvn.onclick = () => { LEAVE_TO = null; drawMockRun(); };
+}
+function showMockLeave(tab){ LEAVE_TO = tab; drawMockRun(); }
+function submitMock(){
+  if (!M || !M.running) return;
+  clearInterval(timerId);
+  M.running = false; M.done = true; M.confirm = false;
+  let c=0,w=0,sk=0; const per = {};
+  M.list.forEach((it,k) => {
+    const a = M.ans[k]; const t = it.q.t; per[t] = per[t] || {c:0,n:0}; per[t].n++;
+    if (a===null) sk++; else if (a===it.q.a) { c++; per[t].c++; S.ans[it.q.id]=1; } else { w++; S.ans[it.q.id]=0; }
+  });
+  const max = M.list.length*2, score = +(c*2 - (M.neg? w*0.5 : 0)).toFixed(1);
+  const used = Math.min(M.secs, Math.round((Date.now()-M.start)/1000));
+  M.res = {c,w,sk,score,max,used,per, acc: (c+w) ? Math.round(c*100/(c+w)) : 0};
+  const d = new Date(); const ds = d.toLocaleDateString("en-IN",{day:"numeric",month:"short"})+" "+d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
+  S.mocks = (S.mocks||[]).concat([{d:ds, n:M.list.length, score, max, acc:M.res.acc}]).slice(-20); save(); renderTop();
+  M.filter = "wrong";
+  if (TAB==="mock") drawMockResult();
+}
+function drawMockResult(){
+  const r = M.res;
+  const per = Object.keys(r.per).sort((a,b)=>LNUM(a)-LNUM(b)).map(t => `<div><span>L${LNUM(t)} · ${esc(L(t).title)}</span><span class="num">${r.per[t].c}/${r.per[t].n}</span></div>`).join("");
+  const rows = M.list.map((it,k)=>({it,k})).filter(({it,k}) => M.filter==="all" ? true : M.filter==="wrong" ? (M.ans[k]!==null && M.ans[k]!==it.q.a) : M.ans[k]===null);
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Result</span>
+    <div class="scorebig"><span class="num">${r.score}</span><span class="muted">/ ${r.max} marks</span></div></div>
+    <div class="kpis"><div class="kpi g"><span class="num">${r.c}</span><span>right</span></div><div class="kpi b"><span class="num">${r.w}</span><span>wrong</span></div><div class="kpi"><span class="num">${r.sk}</span><span>skipped</span></div><div class="kpi"><span class="num">${r.acc}%</span><span>accuracy</span></div></div>
+    <p class="muted num" style="font-size:13px">Time used ${fmt(r.used)} of ${fmt(M.secs)}</p>
+    <div class="block"><h3>By lesson</h3><div class="hist">${per}</div></div>
+    <div class="row between"><button class="btn" type="button" id="mnew">New test</button><button class="btn pri" type="button" id="mretry">Retake same questions</button></div>
+    <h2>Review</h2>
+    <div class="chips">${[["wrong",`Wrong ${r.w}`],["skip",`Skipped ${r.sk}`],["all",`All ${M.list.length}`]].map(c=>`<button class="chip" type="button" data-rf="${c[0]}" aria-pressed="${M.filter===c[0]}">${c[1]}</button>`).join("")}</div>
+    <div class="stack">${rows.length ? rows.map(({it,k}) => `<article class="qcard">${metaHTML(it.q, "Q"+(k+1))}<p class="qt">${esc(it.q.q)}</p><div class="opts">${optsHTML(it.q, it.perm, {picked:M.ans[k], reveal:true})}</div>${M.ans[k]===null?`<div class="exp"><b class="nol">Skipped. Answer: ${esc(it.q.o[it.q.a])}.</b> ${esc(it.q.e)}</div>`:expHTML(it.q, M.ans[k])}</article>`).join("") : `<p class="empty">Nothing in this list.</p>`}</div>
+  </section>`;
+  bindBM($("#app"));
+  $("#app").querySelectorAll("[data-rf]").forEach(b => b.onclick = () => { M.filter = b.dataset.rf; drawMockResult(); });
+  $("#mnew").onclick = () => { M = null; renderMock(); };
+  $("#mretry").onclick = () => {
+    const list = M.list.map(it=>({q:it.q, perm:makePerm(it.q)}));
+    M = { running:true, list, ans:list.map(()=>null), mark:list.map(()=>false), i:0, neg:MCFG.neg, secs:list.length*36, start:Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000; startTimer(); drawMockRun();
+  };
+}
+
+/* ============================================================
+   REVISE
+   ============================================================ */
+let RV = "ladder", FC = null, FCSCOPE = "all", ISF = "all", HIDE = {pub:1, top:0, ind:1}, CREV = {}, CORDER = null;
+const INV = /Terrorism|Air Quality/;
+const numOf = s => { const m = String(s).match(/(\d+)/); return m ? +m[1] : null; };
+function ladderRows(){
+  return IDX.map(r => {
+    const now = numOf(r[3]), prev = numOf(r[4]);
+    let dir = "";
+    if (now!=null && prev!=null && now!==prev) { let better = now < prev; if (INV.test(r[0])) better = !better; dir = better ? "up" : "dn"; }
+    return {r, now, prev, dir};
+  }).filter(x => x.now!=null && x.r[5]!=="NAT" && !/Forest Resources/.test(x.r[0])).sort((a,b)=>a.now-b.now);
+}
+function renderRevise(){
+  const tabs = [["ladder","Rank ladder"],["cover","Cover drill"],["finder","Index finder"],["pubs","Who publishes"],["nums","Numbers & pairs"],["ff","Full forms"],["links","Links"],["tricks","Tricks"],["traps","Traps"],["flash","Flashcards"]];
+  if (!tabs.some(t=>t[0]===RV)) RV = "ladder";
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Last-day revision</span><h1>Revise</h1></div>
+    <div class="seg" role="tablist">${tabs.map(t=>`<button type="button" role="tab" data-rv="${t[0]}" aria-selected="${RV===t[0]}">${t[1]}</button>`).join("")}</div>
+    <div id="rv" class="stack"></div></section>`;
+  $("#app").querySelectorAll("[data-rv]").forEach(b => b.onclick = () => { RV = b.dataset.rv; renderRevise(); });
+  const on = $(`.seg [aria-selected="true"]`); if (on) on.scrollIntoView({block:"nearest", inline:"center"});
+  const box = $("#rv");
+  if (RV === "ladder") {
+    const rows = ladderRows();
+    box.innerHTML = `<p class="muted">Every India rank on one line, smallest to largest. Read it top to bottom once a day — each hook pulls the next number. <span style="color:var(--good);font-weight:700">▲</span> improved · <span style="color:var(--bad);font-weight:700">▼</span> declined (for Terrorism and Air Quality a smaller number is worse).</p>
+      <ol class="ladder">${rows.map(x=>`<li class="${x.dir}"><span class="rk-n num">${x.now}</span><span class="rk-t"><b>${esc(x.r[0])}</b><span>${esc(x.r[6])} · #1 ${esc(x.r[2])}</span></span><span class="rk-d">${x.dir==="up"?`▲ <small class="num">${x.prev}</small>`:x.dir==="dn"?`▼ <small class="num">${x.prev}</small>`:""}</span></li>`).join("")}</ol>`;
+  }
+  if (RV === "cover") {
+    const list = CORDER ? CORDER.map(i=>IDX[i]) : IDX;
+    box.innerHTML = `<p class="muted">Cover mode: pick what to hide, say the answer aloud, then tap the cell to check it.</p>
+      <div class="chips" role="group" aria-label="Hide columns">${[["pub","Hide publisher"],["top","Hide #1"],["ind","Hide India"]].map(c=>`<button type="button" class="chip" data-hide="${c[0]}" aria-pressed="${!!HIDE[c[0]]}">${c[1]}</button>`).join("")}
+      <button type="button" class="chip" id="cshuf">${CORDER?"In order":"Shuffle rows"}</button><button type="button" class="chip" id="creset">Cover all again</button></div>
+      <div class="block"><div class="tbl"><table class="cover"><thead><tr><th>Index</th><th>Publisher</th><th>#1</th><th>India</th></tr></thead><tbody>${list.map(r=>{ const k = IDX.indexOf(r);
+        const LBL = {pub:"Publisher", top:"#1", ind:"India"};
+        const cell = (col, v) => (HIDE[col] && !CREV[k+col] && !/^—/.test(v)) ? `<td data-l="${LBL[col]}"><button type="button" class="peek" data-peek="${k+col}" aria-label="Show ${LBL[col]}">tap</button></td>` : `<td data-l="${LBL[col]}">${esc(v)}</td>`;
+        return `<tr><td><b>${esc(r[0])}</b></td>${cell("pub",r[1])}${cell("top",r[2])}${cell("ind",r[3] + (r[4]?` (was ${r[4]})`:""))}</tr>`; }).join("")}</tbody></table></div></div>`;
+    box.querySelectorAll("[data-hide]").forEach(b => b.onclick = () => { const c=b.dataset.hide; HIDE[c] = HIDE[c]?0:1; renderRevise(); });
+    box.querySelectorAll("[data-peek]").forEach(b => b.onclick = () => { CREV[b.dataset.peek] = 1; renderRevise(); });
+    $("#cshuf").onclick = () => { CORDER = CORDER ? null : shuffle(IDX.map((_,i)=>i)); renderRevise(); };
+    $("#creset").onclick = () => { CREV = {}; renderRevise(); };
+  }
+  if (RV === "finder") {
+    box.innerHTML = `<input class="search" id="rks" type="search" placeholder="Search an index, publisher, country or rank (e.g. WEF, Iceland, 131)" aria-label="Search indices">
+      <div class="chips" role="group" aria-label="Category">${CATS.map(c=>`<button type="button" class="chip" data-is="${c[0]}" aria-pressed="${ISF===c[0]}">${c[1]}</button>`).join("")}</div>
+      <div class="block"><div class="tbl"><table><thead><tr><th>Index</th><th>Publisher</th><th>#1</th><th>India</th></tr></thead><tbody id="orgb"></tbody></table></div></div>`;
+    const draw = () => {
+      const q = $("#rks").value.trim().toLowerCase();
+      const rows = IDX.filter(r => (!q || (r.join(" ") + " " + FULLFORMS.filter(f => r[1].includes(f[1].split(" (")[0])).map(f=>f[0]).join(" ")).toLowerCase().includes(q)) && (ISF==="all" || r[5]===ISF));
+      $("#orgb").innerHTML = rows.length ? rows.map(r=>`<tr><td><b>${esc(r[0])}</b><br><span class="muted" style="font-size:13px">${esc(r[6])} · L${LNUM(r[7])}</span></td><td>${esc(r[1])}</td><td>${esc(r[2])}</td><td class="n">${esc(r[3])}${r[4]?`<br><span class="muted" style="font-size:12px">was ${esc(r[4])}</span>`:""}</td></tr>`).join("") : `<tr><td colspan="4" class="muted">No match.</td></tr>`;
+    };
+    $("#rks").oninput = draw;
+    box.querySelectorAll("[data-is]").forEach(b => b.onclick = () => { ISF = b.dataset.is; box.querySelectorAll("[data-is]").forEach(x=>x.setAttribute("aria-pressed", x.dataset.is===ISF)); draw(); });
+    draw();
+  }
+  if (RV === "pubs") {
+    const g = {};
+    IDX.forEach(r => { const p = r[1].split(/ \+ |, /)[0].replace(/ \(.*\)/,""); (g[p] = g[p] || []).push(r); });
+    const keys = Object.keys(g).sort((a,b)=>g[b].length-g[a].length || a.localeCompare(b));
+    box.innerHTML = `<p class="muted">One office, several reports. Learn the family, then the members.</p><div class="pubs">${keys.map(k=>`<div class="block"><h3>${esc(k)} <span class="muted num" style="font-size:13px;font-weight:600">· ${g[k].length}</span></h3><ul class="plist">${g[k].map(r=>`<li><b>${esc(r[0])}</b><span>#1 ${esc(r[2])} · India ${esc(r[3])}</span></li>`).join("")}</ul></div>`).join("")}</div>`;
+  }
+  if (RV === "ff") {
+    box.innerHTML = `<input class="search" id="ffs" type="search" placeholder="Search a short form" aria-label="Search full forms"><div class="block"><dl class="rk" id="ffl"></dl></div>`;
+    const draw = () => { const q=$("#ffs").value.trim().toLowerCase(); const r=FULLFORMS.filter(f=>!q||f.join(" ").toLowerCase().includes(q));
+      $("#ffl").innerHTML = r.length ? r.map(f=>`<div><dt><b style="color:var(--ink)">${esc(f[0])}</b></dt><dd>${esc(f[1])}</dd></div>`).join("") : `<p class="muted">No match.</p>`; };
+    $("#ffs").oninput = draw; draw();
+  }
+  if (RV === "links") {
+    const items = LESSONS.flatMap((l,i) => l.blocks.filter(b=>b.k==="link").map(b=>({l:i+1, t:l.title, h:b.h})));
+    box.innerHTML = items.map(x => `<div class="link"><span class="lab">L${x.l} · ${esc(x.t)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "nums") {
+    box.innerHTML = `<div class="tiles">${TILES.map(t=>`<div class="tile"><span class="num">${t[0]}</span><span>${t[1]}</span></div>`).join("")}</div>
+    <div class="block"><h3>Confusing pairs</h3><dl class="rk">${PAIRS.map(p=>`<div><dt>${esc(p[0])}</dt><dd>${esc(p[1])}</dd></div>`).join("")}</dl></div>`;
+  }
+  if (RV === "tricks" || RV === "traps") {
+    const kind = RV==="tricks" ? "trick" : "trap";
+    const items = LESSONS.flatMap((l,i) => l.blocks.filter(b=>b.k===kind).map(b=>({l:i+1, t:l.title, h:b.h})));
+    box.innerHTML = items.map(x => `<div class="${kind}"><span class="lab">L${x.l} · ${esc(x.t)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "flash") drawFlash(box);
+}
+function drawFlash(box){
+  if (!FC) { const pool = FCSCOPE==="all" ? QS : FCSCOPE==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===FCSCOPE); FC = {list: shuffle(pool), i:0, flip:false, known:0}; }
+  const sel = `<select id="fcs" aria-label="Flashcard set"><option value="all">All questions</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}">L${i+1} · ${esc(l.title)}</option>`).join("")}</select>`;
+  if (!FC.list.length || FC.i >= FC.list.length) {
+    box.innerHTML = `<div class="row">${sel}</div><div class="block stack"><h3>${FC.list.length ? "Deck finished" : "No cards in this set"}</h3>${FC.list.length?`<p class="muted">You knew ${FC.known} of ${FC.list.length} on first look.</p>`:""}<div class="row"><button class="btn pri" type="button" id="fcr">Shuffle and restart</button></div></div>`;
+    $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+    $("#fcr").onclick = () => { FC = null; drawFlash(box); }; return;
+  }
+  const q = FC.list[FC.i];
+  box.innerHTML = `<div class="row between">${sel}<span class="muted num" style="font-size:13px">${FC.i+1}/${FC.list.length}</span></div>
+    <button type="button" class="flash" id="fcard" aria-label="Flip card">
+      <span class="side">${FC.flip?"Answer":"Question · tap to flip"}</span>
+      <span class="front">${esc(q.q)}</span>
+      ${FC.flip ? `<span class="ans">${esc(q.o[q.a])}</span><span class="muted">${esc(q.e)}</span>` : ""}
+    </button>
+    <div class="row between"><button class="btn" type="button" id="fca" ${FC.flip?"":"disabled"}>Again later</button><button class="btn pri" type="button" id="fck" ${FC.flip?"":"disabled"}>Got it</button></div>`;
+  $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+  $("#fcard").onclick = () => { FC.flip = !FC.flip; drawFlash(box); };
+  $("#fca").onclick = () => { FC.list.push(q); FC.list.splice(FC.i,1); FC.flip=false; drawFlash(box); };
+  $("#fck").onclick = () => { FC.known++; FC.i++; FC.flip=false; drawFlash(box); };
+}
+
+/* boot */
+renderTop();
+const start = (location.hash||"").replace("#","");
+go(["learn","practice","mock","revise"].includes(start) ? start : "learn");
+</script>
+
+<style id="shabd-skin">
+/* ===== शब्दRegister skin: app colours + fonts (only when opened from the app) ===== */
+:root[data-skin="paper"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(150,128,90,.10) 31px, rgba(150,128,90,.10) 32px);--app-psize:auto;--app-card:#FFFCF6;--app-rule:#DCCFB2;--app-pri:#2F6F63;--app-ink:#221E17;--app-soft:#5E5547;--app-faint:#857B6A;--app-bg:#F3EEE3;--app-deep:#E9E1CF;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#F3EEE3;--sheet:#FFFCF6;--sunk:#E9E1CF;--ink:#221E17;--ink2:#5E5547;--rule:#DCCFB2;--blue:#2F6F63;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--accent:#A87E1F;--accent-bg:color-mix(in srgb, #A87E1F 16%, #FFFCF6);--good:#2F6F63;--good-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--bad:#8C2F39;--bad-bg:color-mix(in srgb, #8C2F39 14%, #FFFCF6);--warn-bg:color-mix(in srgb, #C99A2E 18%, #FFFCF6);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="paper"][data-theme="dark"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--sheet:#26211A;--sunk:#25201A;--ink:#EFE6D2;--ink2:#BDB195;--rule:#3B3429;--blue:#3F9A86;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3F9A86 22%, #26211A);--accent:#D9AE4B;--accent-bg:color-mix(in srgb, #D9AE4B 24%, #26211A);--good:#5FB9A3;--good-bg:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-bg:color-mix(in srgb, #D06B74 22%, #26211A);--warn-bg:color-mix(in srgb, #D9AE4B 26%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="paper"]:not([data-theme="light"]){--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--sheet:#26211A;--sunk:#25201A;--ink:#EFE6D2;--ink2:#BDB195;--rule:#3B3429;--blue:#3F9A86;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3F9A86 22%, #26211A);--accent:#D9AE4B;--accent-bg:color-mix(in srgb, #D9AE4B 24%, #26211A);--good:#5FB9A3;--good-bg:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-bg:color-mix(in srgb, #D06B74 22%, #26211A);--warn-bg:color-mix(in srgb, #D9AE4B 26%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin="indigo"]{--app-pattern:radial-gradient(rgba(61,92,240,.10) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#FFFFFF;--app-rule:#CBD3EC;--app-pri:#3D5CF0;--app-ink:#0F1B3D;--app-soft:#4A5680;--app-faint:#67739C;--app-bg:#EEF1FA;--app-deep:#E1E6F5;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#EEF1FA;--sheet:#FFFFFF;--sunk:#E1E6F5;--ink:#0F1B3D;--ink2:#4A5680;--rule:#CBD3EC;--blue:#3D5CF0;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3D5CF0 14%, #FFFFFF);--accent:#D9831A;--accent-bg:color-mix(in srgb, #D9831A 16%, #FFFFFF);--good:#147D53;--good-bg:color-mix(in srgb, #147D53 14%, #FFFFFF);--bad:#C8402F;--bad-bg:color-mix(in srgb, #C8402F 14%, #FFFFFF);--warn-bg:color-mix(in srgb, #F7C548 18%, #FFFFFF);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="indigo"][data-theme="dark"]{--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--sheet:#121D47;--sunk:#0E1839;--ink:#EEF2FF;--ink2:#A7B3DA;--rule:#22306A;--blue:#6F86FF;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #6F86FF 22%, #121D47);--accent:#F7B24D;--accent-bg:color-mix(in srgb, #F7B24D 24%, #121D47);--good:#45C08A;--good-bg:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-bg:color-mix(in srgb, #F07B6E 22%, #121D47);--warn-bg:color-mix(in srgb, #F7C548 26%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="indigo"]:not([data-theme="light"]){--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--sheet:#121D47;--sunk:#0E1839;--ink:#EEF2FF;--ink2:#A7B3DA;--rule:#22306A;--blue:#6F86FF;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #6F86FF 22%, #121D47);--accent:#F7B24D;--accent-bg:color-mix(in srgb, #F7B24D 24%, #121D47);--good:#45C08A;--good-bg:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-bg:color-mix(in srgb, #F07B6E 22%, #121D47);--warn-bg:color-mix(in srgb, #F7C548 26%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin] body{background-color:var(--app-bg);background-image:var(--app-pattern);background-size:var(--app-psize);background-attachment:fixed}
+:root[data-skin] h1,:root[data-skin] h2{letter-spacing:-.01em}
+
+/* ===== Desktop layout (PC / tablet landscape) ===== */
+@media (min-width: 1024px){
+  :root{--side:236px}
+  body{padding-left:var(--side);font-size:16.5px}
+  .top{border-bottom:1px solid var(--rule)}
+  .top-in{max-width:1320px;padding:16px 36px}
+  .brand{font-size:21px}
+  .brand small{font-size:13px}
+  .stat{font-size:13px}
+  .wrap{max-width:1320px;padding:0 36px 56px}
+  .view{padding-top:28px}
+  h1{font-size:34px} h2{font-size:22px} h3{font-size:17px}
+
+  /* bottom tab bar becomes a left sidebar */
+  .nav{top:0;bottom:0;left:0;right:auto;width:var(--side);height:auto;border-top:0;border-right:1px solid var(--rule);padding:84px 14px 20px;display:block;overflow:auto}
+  .nav-in{display:flex;flex-direction:column;gap:4px;height:auto;max-width:none;margin:0}
+  .nav-in::before{content:"Sections";display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);padding:0 14px 8px}
+  .nav button{flex-direction:row;justify-content:flex-start;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;font-size:15px;min-height:0;height:auto;width:100%;text-align:left}
+  .nav button svg{width:20px;height:20px;flex-shrink:0}
+  .nav button:hover{background:var(--sunk)}
+  .nav button[aria-current="page"]{background:var(--blue-bg)}
+  .nav button[aria-current="page"] span{border-bottom:0!important}
+
+  /* home: intro beside progress, lessons as a card grid */
+  .hero{grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);column-gap:48px;align-items:end;padding-bottom:10px}
+  .hero > .eyebrow,.hero > h1,.hero > p{grid-column:1}
+  .hero > .meter{grid-column:2;grid-row:3;align-self:center}
+  .hero > .row{grid-column:2;grid-row:2;align-self:end}
+  .lessons{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;border-top:0}
+  .les{background:var(--sheet);border:1px solid var(--rule);border-radius:16px;padding:16px 18px;transition:transform .15s ease,box-shadow .15s ease,border-color .15s}
+  .les:hover{transform:translateY(-2px);border-color:var(--blue);box-shadow:0 14px 30px -22px rgba(0,0,0,.45)}
+  .les.next{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
+
+  /* lesson reader: facts, timelines, tricks sit side by side */
+  .lhead{margin-bottom:0}
+  .steps{max-width:640px}
+  .steps + .stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+  .steps + .stack > .plain,.steps + .stack > .row,.steps + .stack > p,.steps + .stack > .fig,.steps + .stack > h2,.steps + .stack > .tbl{grid-column:1/-1}
+  .steps + .stack > .plain{max-width:86ch;font-size:17px}
+  .steps + .stack:not(:has(> .block ~ .block)) > .block{grid-column:1/-1}
+  .block,.qcard{padding:18px 20px;border-radius:14px}
+
+  /* quizzes and question bank */
+  #lq > .stack{display:grid;grid-template-columns:minmax(0,1fr);max-width:980px;gap:16px}
+  .opts{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .qt{font-size:18px}
+  #plist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #plist .opts{grid-template-columns:minmax(0,1fr)}
+  .chips{flex-wrap:wrap;overflow:visible}
+
+  /* mock test: question with the answer grid alongside */
+  .mbar{top:calc(env(safe-area-inset-top,0px) + 67px)}
+  .view > .qcard{max-width:1000px}
+  .view > .row.between{max-width:1000px}
+  .view > #msub{max-width:1000px;width:100%}
+  .view > .block.stack{max-width:760px}
+  .pal{grid-template-columns:repeat(auto-fill,minmax(46px,1fr))}
+  .kpis{max-width:760px}
+
+  /* revise: cards in columns */
+  #rkl,#rv > .stack:not(#rkl){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #rv > .search{max-width:520px}
+  .tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .flash{min-height:300px;max-width:760px;margin:0 auto;padding:32px 36px}
+  .flash .front{font-size:22px}
+}
+@media (min-width: 1500px){
+  #plist,#rkl{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+</style>
+</body></html>

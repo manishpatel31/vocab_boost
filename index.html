@@ -886,7 +886,7 @@
     </button>
     <div class="navmenu" id="subjectsMenu">
       <button class="subj-item" data-go="vocab"><b>शब्दRegister <span class="here">you are here</span></b><span>Vocabulary · words, idioms, spellings, roots, quizzes</span></button>
-      <button class="subj-item" data-go="hub"><b>पाठShala</b><span>All subjects · Grammar, Polity, Schemes, Census, Intl Orgs</span></button>
+      <button class="subj-item" data-go="hub"><b>पाठShala</b><span>All subjects · Grammar, Polity, Schemes, Census, Reports, Sports, Festivals…</span></button>
     </div>
     </div>
 
@@ -1420,13 +1420,19 @@
     bns:      { title: 'BNS · BNSS · BSA',             file: 'study-bns-bnss-bsa.html', key: 'crimlaw-course-v1' },
     schemes:  { title: 'Government Schemes',           file: 'study-govt-schemes.html', key: 'govt_schemes_workbook_v1' },
     census:   { title: 'Census & Population',          file: 'study-census.html',       key: 'census_workbook_v1' },
-    intlorgs: { title: 'International Organisations', file: 'study-intl-orgs.html',    key: 'intl_orgs_workbook_v1' }
+    intlorgs: { title: 'International Organisations', file: 'study-intl-orgs.html',    key: 'intl_orgs_workbook_v1' },
+    reports:  { title: 'Reports & Indices',            file: 'study-reports-indices.html', key: 'reports_indices_workbook_v1' },
+    sports:   { title: 'Sports',                       file: 'study-sports.html',       key: 'sports_workbook_v1' },
+    festivals:{ title: 'Festivals of India',           file: 'study-festivals.html',    key: 'festivals_workbook_v1' }
   };
   STUDY.grammar.subj = 'english'; STUDY.grammar.ico = '✍️'; STUDY.grammar.hi = 'व्याकरण · error spotting'; STUDY.grammar.desc = '100 rules with logic, tricks and examples; unit tests after every 10 rules; revise and mistakes lists.'; STUDY.grammar.meta = '100 rules · unit tests'; STUDY.grammar.color = '#C8402F';
   STUDY.bns.subj = 'gs'; STUDY.bns.ico = '⚖️'; STUDY.bns.hi = 'नए आपराधिक क़ानून · Polity'; STUDY.bns.desc = 'The three new criminal laws — what replaced what, key offences, police & court procedure, evidence.'; STUDY.bns.meta = '12 lessons · mock test'; STUDY.bns.color = '#3D5CF0';
   STUDY.schemes.subj = 'gs'; STUDY.schemes.ico = '🏛️'; STUDY.schemes.hi = 'सरकारी योजनाएँ'; STUDY.schemes.desc = 'Central, centrally sponsored and state schemes linked as stories, with 2025–26 updates.'; STUDY.schemes.meta = '15 lessons · 359 questions'; STUDY.schemes.color = '#2F6F63';
   STUDY.census.subj = 'gs'; STUDY.census.ico = '📊'; STUDY.census.hi = 'जनगणना · जनसंख्या'; STUDY.census.desc = 'Census 2011 & 2027 and population geography — size, growth, density, sex ratio, literacy.'; STUDY.census.meta = '11 lessons · 250 questions'; STUDY.census.color = '#C99A2E';
   STUDY.intlorgs.subj = 'gs'; STUDY.intlorgs.ico = '🌐'; STUDY.intlorgs.hi = 'अंतरराष्ट्रीय संगठन'; STUDY.intlorgs.desc = 'UN bodies, financial and regional groupings — HQs, heads, members and recent news.'; STUDY.intlorgs.meta = 'Lessons · practice · mock'; STUDY.intlorgs.color = '#8C2F39';
+  STUDY.reports.subj = 'gs'; STUDY.reports.ico = '📈'; STUDY.reports.hi = 'रिपोर्ट और सूचकांक'; STUDY.reports.desc = 'Global and national reports & indices — who publishes them, what rank 1 means, India’s latest positions.'; STUDY.reports.meta = '14 lessons · 294 questions'; STUDY.reports.color = '#6A4C93';
+  STUDY.sports.subj = 'gs'; STUDY.sports.ico = '🏏'; STUDY.sports.hi = 'खेल'; STUDY.sports.desc = 'Players per side, field and ball dimensions, terms, trophies, firsts and 2025–26 results — with a one-page dimension sheet.'; STUDY.sports.meta = '15 lessons · 349 questions'; STUDY.sports.color = '#1F7A5A';
+  STUDY.festivals.subj = 'gs'; STUDY.festivals.ico = '🪔'; STUDY.festivals.hi = 'भारत के त्योहार'; STUDY.festivals.desc = 'About 140 festivals state by state — tribe, deity, harvest and new-year links, with name-ending tricks.'; STUDY.festivals.meta = '16 lessons · 415 questions'; STUDY.festivals.color = '#C2571A';
   var studyOpen = null, studyWatch = null, studyPushTimer = null, studyLast = null, hubOpen = false;
   function agoText(ms){
     if(!ms) return 'Not started yet';
@@ -1452,7 +1458,7 @@
       '<button class="hub-card hub-act" data-hub-act="mistakes" style="--hub-c:var(--maroon);"><div class="hub-top"><div class="hub-ico">📕</div><div><h3>Mistakes book</h3><div class="hi">गलतियाँ · all subjects</div></div><div class="hub-big">' + totalWrong + '</div></div>' +
         '<p>Every question you got wrong in any mini app or mock — practise them until they’re gone.</p><div class="hub-meta"><span>' + (totalWrong ? totalWrong + ' waiting' : 'Nothing to fix yet') + '</span><b>Open ›</b></div></button>' +
       '<button class="hub-card hub-act" data-hub-act="mock" style="--hub-c:var(--teal);"><div class="hub-top"><div class="hub-ico">⏱️</div><div><h3>Mixed mock test</h3><div class="hi">English + GS · timed</div></div>' + (last ? '<div class="hub-big">' + last.score + '<small>/' + last.max + '</small></div>' : '') + '</div>' +
-        '<p>Vocab + Grammar + all four GS workbooks in one SSC-style paper, +2 / −0.5, with a subject-wise report.</p><div class="hub-meta"><span>' + (hist.length ? hist.length + ' taken · last ' + agoText(last.at).replace('Opened ', '') : 'Not taken yet') + '</span><b>Start ›</b></div></button>' +
+        '<p>Vocab + Grammar + all ' + gsIds().length + ' GS mini apps in one SSC-style paper, +2 / −0.5, with a subject-wise report.</p><div class="hub-meta"><span>' + (hist.length ? hist.length + ' taken · last ' + agoText(last.at).replace('Opened ', '') : 'Not taken yet') + '</span><b>Start ›</b></div></button>' +
       '</div></section>';
   }
   function renderHub(){
@@ -1614,6 +1620,10 @@
   STUDY.schemes.lessons = 15; STUDY.schemes.unit = 'lessons';
   STUDY.census.lessons = 11; STUDY.census.unit = 'lessons';
   STUDY.intlorgs.lessons = 12; STUDY.intlorgs.unit = 'lessons';
+  STUDY.reports.lessons = 14; STUDY.reports.unit = 'lessons';
+  STUDY.sports.lessons = 15; STUDY.sports.unit = 'lessons';
+  STUDY.festivals.lessons = 16; STUDY.festivals.unit = 'lessons';
+  function gsIds(){ return Object.keys(STUDY).filter(function(id){ return STUDY[id].subj === 'gs'; }); }
   var STUDY_EXTRA = { mocks: { key: 'shabdMockHistory', title: 'Mixed mock history' } };
   function studyMod(id){ return STUDY[id] || STUDY_EXTRA[id]; }
   var studyStateTimers = {};
@@ -1699,7 +1709,7 @@
 
   // ---- the practice / mock screen ----
   var drill = null, drillOpen = false, drillTimer = null;
-  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations' };
+  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals' };
   function openDrill(title){
     closeAllMenus();
     drillOpen = true;
@@ -1750,7 +1760,7 @@
     if(drill.only && !by[drill.only].length) drill.only = null;
     var list = drill.only ? by[drill.only] : [].concat.apply([], mods.map(function(m){ return by[m]; }));
     if(!total){
-      drillBody('<div class="dq-hero"><div class="eyebrow">All subjects</div><h1>Mistakes book</h1></div><div class="dq-empty">No mistakes right now. 🎉<br>Every question you get wrong in Grammar 100, BNS, Schemes, Census or Intl Organisations — or in a mixed mock — lands here until you get it right.</div>');
+      drillBody('<div class="dq-hero"><div class="eyebrow">All subjects</div><h1>Mistakes book</h1></div><div class="dq-empty">No mistakes right now. 🎉<br>Every question you get wrong in any mini app — or in a mixed mock — lands here until you get it right.</div>');
       return;
     }
     drillBody('<div class="dq-hero"><div class="eyebrow">All subjects · ' + total + ' to fix</div><h1>Mistakes book</h1><p>Every question you got wrong, from every mini app. Get one right here and it leaves the book.</p></div>' +
@@ -1801,7 +1811,16 @@
   }
 
   // Mixed mock test
-  var mockCfg = (function(){ try{ return Object.assign({ en: 25, gs: 25, vocab: true, grammar: true, gsMods: ['bns', 'schemes', 'census', 'intlorgs'], neg: true }, JSON.parse(lsGet('shabdMockCfg') || '{}')); }catch(e){ return { en: 25, gs: 25, vocab: true, grammar: true, gsMods: ['bns', 'schemes', 'census', 'intlorgs'], neg: true }; } })();
+  var mockCfg = (function(){
+    var def = { en: 25, gs: 25, vocab: true, grammar: true, gsMods: gsIds(), neg: true, known: gsIds() };
+    var c;
+    try{ c = Object.assign({}, def, JSON.parse(lsGet('shabdMockCfg') || '{}')); }catch(e){ c = def; }
+    var known = c.known || ['bns', 'schemes', 'census', 'intlorgs'];
+    gsIds().forEach(function(id){ if(known.indexOf(id) === -1 && c.gsMods.indexOf(id) === -1) c.gsMods.push(id); });
+    c.known = gsIds();
+    c.gsMods = c.gsMods.filter(function(id){ return STUDY[id]; });
+    return c;
+  })();
   function mockHistory(){ var h = studyState('mocks'); return Array.isArray(h.list) ? h.list : []; }
   async function openMock(){
     openDrill('Mixed mock test');
@@ -1819,7 +1838,7 @@
     drillBody('<div class="dq-hero"><div class="eyebrow">English + General Studies · SSC pattern</div><h1>Mixed mock test</h1><p>Questions from your vocab register and every mini app, timed like Tier 1 (36 seconds a question), marked +2 / −0.5. Wrong answers go to your Mistakes book.</p></div>' +
       '<div class="dq-setup">' +
         '<div class="dq-box"><h3>English</h3>' + seg('en', [0, 10, 25]) + '<div class="dq-tags">' + tog('vocab', 'Vocabulary (' + words.length + ' words)') + tog('grammar', 'Grammar 100') + '</div></div>' +
-        '<div class="dq-box"><h3>General Studies</h3>' + seg('gs', [0, 10, 25]) + '<div class="dq-tags">' + ['bns', 'schemes', 'census', 'intlorgs'].map(gsTog).join('') + '</div></div>' +
+        '<div class="dq-box"><h3>General Studies</h3>' + seg('gs', [0, 10, 25]) + '<div class="dq-tags">' + gsIds().map(gsTog).join('') + '</div></div>' +
         '<div class="dq-box"><h3>Marking</h3><div class="dq-tags">' + tog('neg', 'Negative marking −0.5') + '</div><p class="help" style="margin:10px 0 0;">' + n + ' questions · ' + mins + ' minutes · maximum ' + (n * 2) + ' marks</p></div>' +
       '</div>' +
       '<div class="dq-actions"><button class="btn teal" id="mkStart"' + (n ? '' : ' disabled') + '>Start test ›</button></div>' +

@@ -1,0 +1,1583 @@
+<!doctype html><html><head><meta charset=utf8>
+<script>
+/* शब्दRegister bridge: follows the app's look (Paper / Indigo) and Light / Dark / Auto choice. */
+(function(){
+  var root = document.documentElement;
+  function theme(t){ if(t === 'dark' || t === 'light') root.setAttribute('data-theme', t); else root.removeAttribute('data-theme'); }
+  function skin(s){ if(s === 'paper' || s === 'indigo') root.setAttribute('data-skin', s); }
+  try{
+    var q = new URLSearchParams(location.search);
+    theme(q.get('theme'));
+    skin(q.get('skin') || (q.get('embed') ? 'paper' : ''));
+    if(q.get('embed')) root.classList.add('in-shabd');
+  }catch(e){}
+  window.addEventListener('message', function(e){
+    if(e.origin !== location.origin || !e.data || e.data.type !== 'shabd-theme') return;
+    theme(e.data.theme);
+    if(e.data.skin) skin(e.data.skin);
+  });
+})();
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap">
+
+<meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Sports</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<style>
+/* Layout: Sports — follows the शब्दRegister Paper / Indigo look; one column + bottom tabs on phones, sidebar on PC. */
+:root{
+  --paper:#f6f3ea; --sheet:#fffdf7; --sunk:#ebe6d8;
+  --ink:#1d2a22; --ink2:#56625a; --rule:#dcd5c3;
+  --blue:#1f5c3d; --on-blue:#ffffff; --blue-bg:#dcebdf;
+  --accent:#b4530f; --accent-bg:#fbe7d3;
+  --good:#1b7547; --good-bg:#dff1e6; --bad:#b0271f; --bad-bg:#f8e1de;
+  --warn-bg:#fff2d2;
+  --f-display:"Fraunces", "Tiro Devanagari Hindi", Georgia, serif;
+  --f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-num:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r:10px; --nav-h:64px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#111612; --sheet:#1a211c; --sunk:#222b25;
+  --ink:#e8eee9; --ink2:#a3b0a7; --rule:#2f3a33;
+  --blue:#86cfa2; --on-blue:#111612; --blue-bg:#1d3a29;
+  --accent:#f3a764; --accent-bg:#3b2614;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#111612; --sheet:#1a211c; --sunk:#222b25;
+  --ink:#e8eee9; --ink2:#a3b0a7; --rule:#2f3a33;
+  --blue:#86cfa2; --on-blue:#111612; --blue-bg:#1d3a29;
+  --accent:#f3a764; --accent-bg:#3b2614;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
+.wrap{max-width:640px;margin:0 auto;padding-inline:16px;padding-block:0 calc(var(--nav-h) + 28px + env(safe-area-inset-bottom,0px))}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);border-bottom:1px solid var(--rule)}
+.top-in{max-width:640px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px}
+.brand{font-family:var(--f-display);font-weight:800;font-size:17px;line-height:1.2;flex:1;min-width:0}
+.brand small{display:block;font-family:var(--f-body);font-weight:500;font-size:12px;color:var(--ink2);letter-spacing:.02em}
+.stat{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right;white-space:nowrap}
+.stat b{color:var(--ink);font-weight:600}
+
+/* bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--sheet);border-top:1px solid var(--rule);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);height:var(--nav-h)}
+.nav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer}
+.nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav button[aria-current="page"]{color:var(--blue)}
+.nav button[aria-current="page"] span{border-bottom:2px solid var(--blue)}
+
+/* type */
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.25;margin:0}
+h1{font-size:24px;font-weight:800}
+h2{font-size:19px;font-weight:800}
+h3{font-size:16px;font-weight:700}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--ink2)}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+p{margin:0}
+.stack{display:flex;flex-direction:column;gap:14px}
+.view{padding-top:18px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--rule);background:var(--sheet);font-weight:600;cursor:pointer;text-decoration:none}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:var(--on-blue)}
+.btn.ghost{background:transparent}
+.btn.sm{min-height:36px;padding:0 14px;font-size:14px}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.end{justify-content:flex-end}
+.row.between{justify-content:space-between}
+
+/* hero */
+.hero{display:grid;gap:10px;padding:4px 0 6px}
+.hero p{color:var(--ink2)}
+.meter{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--blue);border-radius:99px}
+
+/* lesson list */
+.lessons{display:flex;flex-direction:column;border-top:1px solid var(--rule)}
+.les{display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;padding:14px 2px;border-bottom:1px solid var(--rule);background:none;border-left:0;border-right:0;border-top:0;text-align:left;cursor:pointer;width:100%}
+.les .no{font-family:var(--f-num);font-weight:600;font-size:15px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--rule);color:var(--ink2)}
+.les.done .no{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.les .t{min-width:0}
+.les .t b{display:block;font-weight:700;font-size:16px;line-height:1.3}
+.les .t span{font-size:13px;color:var(--ink2)}
+.les .sc{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right}
+.les.next .no{border-color:var(--blue);color:var(--blue)}
+
+/* lesson reader */
+.lhead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.back{background:none;border:0;padding:8px 8px 8px 0;cursor:pointer;color:var(--blue);font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0 4px}
+.steps button{border:1px solid var(--rule);background:var(--sheet);border-radius:8px;padding:8px 4px;font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer}
+.steps button[aria-current="step"]{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.block{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;min-width:0}
+.block h3{margin-bottom:8px}
+.block p + p{margin-top:8px}
+.plain{padding:0 2px}
+.facts{display:grid;gap:0}
+.facts div{display:grid;grid-template-columns:minmax(0,42%) minmax(0,1fr);gap:10px;padding:7px 0;border-top:1px dashed var(--rule)}
+.facts div:first-child{border-top:0}
+.facts dt{font-size:14px;color:var(--ink2);margin:0}
+.facts dd{margin:0;font-weight:600;min-width:0}
+.tl{display:grid;gap:0;margin:0;padding:0;list-style:none}
+.tl li{display:grid;grid-template-columns:92px 1fr;gap:10px;padding:8px 0;border-top:1px dashed var(--rule)}
+.tl li:first-child{border-top:0}
+.tl .y{font-family:var(--f-num);font-weight:600;font-size:13px;color:var(--accent);padding-top:2px}
+.trick,.trap{border-radius:var(--r);padding:12px 14px 12px 14px;border:1px solid var(--rule)}
+.trick{background:var(--accent-bg);border-color:transparent}
+.trap{background:var(--bad-bg);border-color:transparent}
+.trick .lab,.trap .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.trick .lab{color:var(--accent)}
+.trap .lab{color:var(--bad)}
+.tbl{overflow-x:auto;margin:0 -2px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);font-weight:700}
+td.n{font-family:var(--f-num);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fig{margin:0}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-size:13px;color:var(--ink2);margin-top:6px}
+.pyr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pyr div{text-align:center;font-size:13px}
+.pyr b{display:block;font-size:14px}
+.pm{fill:var(--blue)} .pf{fill:var(--accent)}
+.sum{margin:0;padding-left:20px;display:grid;gap:6px}
+
+/* questions */
+.qcard{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px;min-width:0}
+.qmeta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}
+.qno{font-family:var(--f-num);font-weight:600;color:var(--ink2)}
+.tag{background:var(--sunk);color:var(--ink2);border-radius:99px;padding:1px 9px;font-weight:600}
+.tag.pyq{background:var(--accent-bg);color:var(--accent)}
+.bm{margin-left:auto;background:none;border:0;cursor:pointer;color:var(--ink2);font-size:20px;line-height:1;padding:4px}
+.bm[aria-pressed="true"]{color:var(--accent)}
+.qt{font-weight:600;font-size:16px}
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:start;text-align:left;width:100%;border:1.5px solid var(--rule);background:var(--paper);border-radius:9px;padding:10px 12px;cursor:pointer;min-height:44px}
+.opt .k{font-family:var(--f-num);font-weight:600;color:var(--ink2);font-size:14px;padding-top:1px}
+.opt.sel{border-color:var(--blue);background:var(--blue-bg)}
+.opt.ok{border-color:var(--good);background:var(--good-bg)}
+.opt.no{border-color:var(--bad);background:var(--bad-bg)}
+.opt.ok .k{color:var(--good)} .opt.no .k{color:var(--bad)}
+.opt:disabled{cursor:default;color:inherit}
+.exp{font-size:15px;border-left:3px solid var(--blue);padding:4px 0 4px 12px;color:var(--ink)}
+.exp b.okl{color:var(--good)} .exp b.nol{color:var(--bad)}
+
+/* chips */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 13px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.seg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--rule)}
+.seg::-webkit-scrollbar{display:none}
+.seg button{flex:none;background:none;border:0;border-bottom:2px solid transparent;padding:10px 8px;font-weight:600;color:var(--ink2);cursor:pointer}
+.seg button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+
+/* score panel */
+.scorebig{display:flex;align-items:baseline;gap:8px}
+.scorebig .num{font-size:44px;font-weight:600;line-height:1;color:var(--blue)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.kpi{background:var(--sunk);border-radius:8px;padding:8px;text-align:center}
+.kpi .num{display:block;font-size:20px;font-weight:600}
+.kpi span{font-size:12px;color:var(--ink2)}
+.kpi.g .num{color:var(--good)} .kpi.b .num{color:var(--bad)}
+
+/* mock */
+.mbar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 57px);z-index:10;background:var(--paper);padding:10px 0;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--rule)}
+.timer{font-family:var(--f-num);font-weight:600;font-size:18px;padding:4px 10px;border-radius:8px;background:var(--sunk)}
+.timer.low{background:var(--bad-bg);color:var(--bad)}
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px}
+.pal button{height:40px;border-radius:8px;border:1px solid var(--rule);background:var(--sheet);font-family:var(--f-num);font-weight:600;font-size:13px;cursor:pointer}
+.pal button.a{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.pal button.m{box-shadow:inset 0 -4px 0 var(--accent)}
+.pal button.cur{outline:2px solid var(--ink);outline-offset:1px}
+.pal button.ok{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.pal button.no{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.confirm{background:var(--warn-bg);border-radius:var(--r);padding:12px 14px;display:grid;gap:10px}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}
+legend{font-weight:700;margin-bottom:6px;padding:0}
+.radios{display:flex;gap:8px;flex-wrap:wrap}
+.radios label{border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 14px;font-weight:600;cursor:pointer;font-size:14px}
+.radios input{position:absolute;opacity:0;pointer-events:none}
+.radios input:checked + span{color:var(--blue)}
+.radios label:has(input:checked){border-color:var(--blue);background:var(--blue-bg)}
+.radios label:has(input:focus-visible){outline:2px solid var(--blue);outline-offset:2px}
+select{font:inherit;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:8px;padding:8px 10px;max-width:100%}
+.hist{display:grid;gap:0}
+.hist div{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:14px}
+
+/* revise */
+.search{width:100%;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:10px;padding:10px 12px;font:inherit}
+.rk{display:grid;gap:0}
+.rk div{display:grid;grid-template-columns:minmax(0,48%) 1fr;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:15px}
+.rk div:first-child{border-top:0}
+.rk dt{font-size:13px;color:var(--ink2);margin:0}
+.rk dt.up{color:var(--good)} .rk dt.dn{color:var(--bad)}
+.rk dd{margin:0;font-weight:600;min-width:0}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px}
+.tile .num{display:block;font-size:24px;font-weight:600;color:var(--accent);line-height:1.2}
+.tile span{font-size:13px;color:var(--ink2)}
+.gbar{display:grid;grid-template-columns:78px 1fr 52px;gap:8px;align-items:center;font-size:13px;padding:3px 0}
+.gbar .tr{height:12px;background:var(--sunk);border-radius:3px;position:relative;overflow:hidden}
+.gbar .tr i{position:absolute;left:0;top:0;bottom:0;background:var(--blue);border-radius:3px}
+.gbar .tr i.neg{background:var(--bad)}
+.gbar .v{font-family:var(--f-num);text-align:right}
+.flash{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;min-height:240px;padding:20px 18px;display:grid;align-content:center;gap:12px;cursor:pointer;text-align:left;width:100%}
+.flash .side{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.flash .front{font-size:18px;font-weight:600}
+.flash .ans{font-size:20px;font-weight:700;color:var(--good)}
+.empty{padding:24px 4px;color:var(--ink2);text-align:center}
+.foot{font-size:13px;color:var(--ink2);padding-top:10px}
+@media (prefers-reduced-motion: no-preference){ .opt,.chip,.btn{transition:background-color .15s, border-color .15s} }
+.link{background:var(--blue-bg);border-radius:var(--r);padding:12px 14px}
+.link .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;color:var(--blue)}
+.icheck{background:var(--sheet);border:1.5px dashed var(--blue);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px}
+.icheck .lab{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue)}
+.cat{font-size:12px;font-weight:700;border-radius:99px;padding:1px 8px;white-space:nowrap}
+.cat.CS{background:var(--blue-bg);color:var(--blue)} .cat.CSS{background:var(--accent-bg);color:var(--accent)} .cat.ST{background:var(--sunk);color:var(--ink)} .cat.OT{background:var(--sunk);color:var(--ink2)}
+
+/* ---- Sports additions ---- */
+.plist .dl{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.plist .dl em{font-style:normal;font-weight:700;color:var(--blue);text-align:right}
+.ladder{list-style:none;margin:0;padding:0;display:grid;gap:0;border-top:1px solid var(--rule)}
+.ladder li{display:grid;grid-template-columns:62px 1fr auto;gap:12px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--rule)}
+.ladder .rk-n{font-size:22px;font-weight:600;color:var(--blue);text-align:right}
+.ladder .rk-t{min-width:0}
+.ladder .rk-t b{display:block;line-height:1.3}
+.ladder .rk-t span{font-size:13px;color:var(--ink2)}
+.ladder .rk-d{font-weight:700;font-size:14px;white-space:nowrap}
+.ladder li.up .rk-d{color:var(--good)} .ladder li.dn .rk-d{color:var(--bad)}
+.ladder small{font-weight:600;color:var(--ink2)}
+table.cover td{min-width:90px}
+.peek{border:1.5px dashed var(--blue);background:var(--blue-bg);color:var(--blue);border-radius:8px;padding:6px 10px;font-weight:600;cursor:pointer;min-height:36px;width:100%}
+.pubs{display:grid;gap:12px}
+.plist{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.plist li{padding:7px 0;border-top:1px dashed var(--rule);display:grid;gap:1px}
+.plist li:first-child{border-top:0}
+.plist li span{font-size:13px;color:var(--ink2)}
+.seg{scroll-snap-type:x proximity}
+@media (max-width: 700px){
+  table.cover thead{display:none}
+  table.cover tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 10px;padding:10px 0;border-bottom:1px solid var(--rule)}
+  table.cover td{border:0;padding:0;min-width:0;font-size:14px}
+  table.cover td:first-child{grid-column:1/-1;font-size:15px}
+  table.cover td[data-l]::before{content:attr(data-l);display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-bottom:2px}
+}
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">Sports<small>खेल · SSC CGL workbook</small></div>
+    <div class="stat" id="topstat"></div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<nav class="nav" aria-label="Sections">
+  <div class="nav-in">
+    <button type="button" id="nav-learn" data-tab="learn"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg><span>Learn</span></button>
+    <button type="button" id="nav-practice" data-tab="practice"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span>Practice</span></button>
+    <button type="button" id="nav-mock" data-tab="mock"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6M12 2v3"/></svg><span>Mock test</span></button>
+    <button type="button" id="nav-revise" data-tab="revise"><svg viewBox="0 0 24 24"><path d="M12 3 2 8l10 5 10-5z"/><path d="m2 13 10 5 10-5"/></svg><span>Revise</span></button>
+  </div>
+</nav>
+
+<script>
+"use strict";
+const LESSONS = [
+{ id:"L1", title:"How sports questions are asked", hi:"खेल के प्रश्न कैसे आते हैं", blocks:[
+ {k:"p", h:"Sports is now the <b>single biggest static-GK topic</b> in CGL: one teacher counted about 470 of roughly 1,100 static questions from sports in the recent papers. They come in six shapes: <b>(1) field dimensions</b> (most asked), <b>(2) number of players & match time</b>, <b>(3) rules & terms</b> (Ippon, lona, follow-on, yorker), <b>(4) history</b> (who invented it, when, where), <b>(5) Indian firsts</b> (first Olympic gold, first woman medallist), <b>(6) trophies & current events</b>."},
+ {k:"trick", h:"<b>Make a one-page 'dimension sheet'.</b> Every lecture said the same: numbers are learnt by seeing them daily, not by one reading. This app's <b>Revise → Dimension sheet</b> is that sheet, with a cover mode — hide the values, say them aloud, tap to check."},
+ {k:"table", title:"Players on the field (per side)", head:["No.","Sports"], rows:[["5","Basketball"],["6","Volleyball, Ice hockey"],["7","Kabaddi, Handball, Netball, Water polo"],["9","Kho-Kho, Baseball"],["11","Cricket, Football, Hockey"],["15","Rugby union"]]},
+ {k:"trick", h:"<b>“5 बास्केट लाओ, उसमें 6 वॉली डालो, सातों दिन हाथ (Hand) और नेट का यूज़ करो, 9 पर बेस (Base) मिल गया”</b> → 5 basketball, 6 volleyball, 7 handball/netball, 9 baseball. Add <b>Kabaddi 7</b> and <b>Kho-kho 9</b> (“खो-खो में ज़्यादा खिलाड़ी — 9”)."},
+ {k:"q", q:"How many players of one team are on court at a time in basketball?", o:["5","6","7","9"], e:"5 basketball, 6 volleyball, 7 handball/netball/kabaddi, 9 kho-kho/baseball."},
+ {k:"table", title:"Where each game was born", head:["Sport","Origin","Credited to"], rows:[["Basketball","USA, 1891","James Naismith"],["Volleyball","USA, 1895","William G. Morgan"],["Judo","Japan, 1882","Jigoro Kano"],["Kabaddi","India (rules framed in Maharashtra)","—"],["Chess","India (chaturanga)","—"],["Badminton","India (Poona)/England","—"],["Hockey (modern)","England","—"],["Football (modern)","England","—"]]},
+ {k:"trap", h:"<b>No official national sport.</b> Hockey is widely called India's national game, but the government has never officially declared any sport as the national sport. Examiners use this."},
+ {k:"link", h:"<b>Governing bodies come in pairs — world & India.</b> FIH (1924) → Indian Hockey Federation (1925, now Hockey India). FIFA (1904) → AIFF (1937). ICC (1909) → BCCI (1928). World Athletics → AFI (1946). You will meet each pair in its lesson."},
+ {k:"facts", title:"National Sports Day", rows:[["Date","29 August"],["Why","Birthday of hockey wizard Major Dhyan Chand"],["Highest sports award","Major Dhyan Chand Khel Ratna"]]}
+], sum:["Six question shapes: dimensions, players/time, rules & terms, history, Indian firsts, trophies/current.","5 basketball, 6 volleyball, 7 handball/netball/kabaddi, 9 kho-kho/baseball, 11 cricket/football/hockey.","India has no officially declared national sport.","National Sports Day 29 August (Dhyan Chand)."]},
+
+{ id:"L2", title:"Cricket I — field, pitch & ball", hi:"क्रिकेट: मैदान, पिच, गेंद", blocks:[
+ {k:"table", title:"The pitch", head:["Item","Value"], rows:[["Length (wicket to wicket)","<b>22 yards</b> = 66 ft = <b>20.12 m</b>"],["Width","10 ft = 3.05 m"],["Popping crease","4 ft (1.22 m) in front of the stumps"],["Stumps","28 in high; set 9 in wide; 3 stumps + 2 bails"],["Bat","Max width 4.25 in (10.8 cm); max length 38 in"],["Boundary","Not fixed; varies by ground"]]},
+ {k:"trick", h:"<b>22 yards = 22 players</b> on the pitch (11 + 11). 1 yard = 3 ft → 66 ft → about 20 m. Stumps <b>28 × 9</b> → “<b>28 दिन का महीना, 9 बजे मैच</b>”."},
+ {k:"trap", h:"One lecture said the bat's maximum width is 4½ in. The Laws of Cricket say <b>4.25 in (108 mm)</b>."},
+ {k:"table", title:"Creases", head:["Crease","What it does"], rows:[["Bowling crease","The line the stumps stand on (both ends)"],["Popping crease","Batter safe behind it; bowler's front foot beyond it = no-ball; decides run-out & stumping"],["Return crease","Side lines; bowler's back foot must land inside"]]},
+ {k:"q", q:"Which crease decides whether a batter is run out or stumped?", o:["Popping crease","Bowling crease","Return crease","Boundary line"], e:"The batter must have bat or body grounded behind the popping crease."},
+ {k:"table", title:"The ball", head:["Item","Value"], rows:[["Weight (men)","155.9 – 163 g"],["Circumference","22.4 – 22.9 cm"],["Red ball","Test cricket"],["White ball","ODI and T20"],["Pink ball","Day-night Tests"],["New ball","Fielding captain may take it after <b>80 overs</b> (optional)"]]},
+ {k:"trick", h:"Ball colours by light: <b>Red = Real (Test)</b>, <b>White = floodlights (ODI/T20)</b>, <b>Pink = day + night</b>. New ball after <b>80</b> overs → “<b>80 में बूढ़ी गेंद बदलो</b>”. Why is weight fixed? Weight and size change bounce, swing and fairness."},
+ {k:"facts", title:"Formats", rows:[["Test","5 days, 2 innings each"],["ODI","50 overs a side"],["T20","20 overs a side, about 3 hours"],["Over","6 legal balls; wides and no-balls are bowled again"],["Umpires","2 on field + TV (third) umpire"]]},
+ {k:"table", title:"Fielding restrictions & field", head:["Term","Meaning"], rows:[["Infield / 30-yard circle","Dotted ring around the pitch"],["Powerplay","Only 2 fielders allowed outside the circle in the first 10 overs of an ODI"],["Boundary","4 if the ball touches the ground first, 6 if it clears it on the full"]]},
+ {k:"q", q:"After how many overs may the fielding captain ask for a new ball in a Test match?", o:["80","60","90","100"], e:"80 completed overs; it is optional, not compulsory."}
+], sum:["Pitch 22 yd = 20.12 m, 10 ft wide; popping crease 4 ft ahead.","Stumps 28 in × 9 in; bat max 4.25 in wide.","Ball 155.9–163 g, 22.4–22.9 cm; red Test, white ODI/T20, pink day-night.","New ball after 80 overs; 6 legal balls an over; 2 on-field umpires."]},
+
+{ id:"L3", title:"Cricket II — rules, extras & dismissals", hi:"क्रिकेट: नियम, अतिरिक्त रन, आउट", blocks:[
+ {k:"table", title:"Four kinds of extras", head:["Extra","When","Auto run?"], rows:[["Wide","Ball out of the batter's reach (measured from the outer guideline)","Yes, 1 + any runs/boundary"],["No-ball","Front-foot fault; full toss above waist; bouncer above head","Yes, 1 + runs off the bat"],["Bye","Ball misses bat and body; batters run","No"],["Leg bye","Ball hits body (not bat); batters run","No"]]},
+ {k:"trick", h:"<b>W-N get the auto run, B-LB don't.</b> “<b>Wide-No = Wow, Now 1</b>”. A wide or no-ball is not one of the six legal balls."},
+ {k:"table", title:"Umpire signals", head:["Signal","Means"], rows:[["Index finger raised","Out"],["Both arms stretched sideways","Wide"],["One arm stretched sideways","No-ball"],["Wrists crossed and uncrossed below the waist","Dead ball"],["One open hand raised","Bye"],["Touching a raised knee","Leg bye"],["Arm waved side to side","Four"],["Both arms raised above head","Six"]]},
+ {k:"trap", h:"A lecture said the no-ball signal is “one hand raised above the head”. That is the <b>OUT</b> signal (a raised finger). <b>No-ball = one arm held out horizontally.</b>"},
+ {k:"table", title:"Ways to get out", head:["Dismissal","Bowler credited?","Note"], rows:[["Bowled","Yes","Any one bail off is enough; not on a no-ball"],["Caught","Yes","Fielder must have full control"],["LBW","Yes","Ball must hit pad before bat; Hawk-Eye checks path"],["Stumped","Yes","Keeper breaks wicket, batter out of crease"],["Hit wicket","Yes","Batter breaks own wicket"],["Run out","No","Team credit"],["Hit the ball twice","No","Not out if protecting the wicket"],["Obstructing the field","No","Only if deliberate"],["Timed out","No","New batter not ready in 3 minutes"],["Retired out","No","Retired hurt may come back"]]},
+ {k:"trick", h:"Bowler gets credit for <b>“B-C-L-S-H”</b> (Bowled, Caught, LBW, Stumped, Hit wicket). Run out goes to the team."},
+ {k:"trap", h:"A lecture said a South African batter was timed out searching for his helmet. The first timed-out in international cricket was <b>Angelo Mathews (Sri Lanka) v Bangladesh, 2023 World Cup</b>."},
+ {k:"q", q:"Which of these dismissals is NOT credited to the bowler?", o:["Run out","Stumped","LBW","Bowled"], e:"Run out is credited to the fielding side, not the bowler."},
+ {k:"facts", title:"Follow-on (Test)", rows:[["Lead needed (5-day Test)","200 runs"],["3–4 day match","150"],["2-day","100"],["1-day","75"],["Compulsory?","No — the captain's choice"]]},
+ {k:"table", title:"Fast bowling", head:["Ball","What it does"], rows:[["Yorker","Lands at the batter's feet / base of stumps; stops big shots"],["Full toss","Reaches the batter without bouncing"],["Good length","Batter unsure whether to go forward or back"],["Bouncer","Pitched short, rises to head height (legal)"],["In-swinger","Swings in the air into a right-hander"],["Out-swinger","Swings away from a right-hander"],["Off-cutter","Moves off the pitch from off side into the batter"],["Leg-cutter","Moves off the pitch from leg side away from the batter"]]},
+ {k:"table", title:"Spin bowling", head:["Ball","Bowler","Turns"], rows:[["Off-break","Right-arm finger spinner","Into a right-hander (off → leg)"],["Leg-break","Wrist spinner","Away from a right-hander (leg → off)"],["Googly","Wrist spinner","Looks like a leg-break but turns the other way"],["Doosra","Off-spinner","Turns away — the off-spinner's 'other one'"]]},
+ {k:"trap", h:"A lecture called Harbhajan Singh a leg-spinner. Harbhajan is an <b>off-spinner</b>; Anil Kumble is the famous Indian leg-spinner. The lecture also mixed up the cutters — the table above is the standard definition."},
+ {k:"table", title:"Fielding positions (right-hander)", head:["Off side","Leg side"], rows:[["Slip (next to keeper), Gully, Point, Cover, Extra cover, Mid-off, Third man","Leg slip, Short leg, Square leg, Mid-wicket, Mid-on, Fine leg"]]},
+ {k:"q", q:"A delivery aimed at the batter's toes near the base of the stumps is called a…", o:["Yorker","Bouncer","Googly","Doosra"], e:"Asked in a 2025 paper."}
+], sum:["Wide & no-ball: 1 auto run; bye & leg bye: none.","Signals: no-ball one arm out; wide both arms; dead ball crossed wrists below waist; out = raised finger.","Bowler credited for bowled, caught, LBW, stumped, hit wicket — not run out.","Follow-on lead 200 in a 5-day Test (optional).","Yorker, bouncer, swing, cutters; off-break, leg-break, googly, doosra."]},
+
+{ id:"L4", title:"Cricket III — history, trophies & champions", hi:"क्रिकेट: इतिहास, ट्रॉफी, विजेता", blocks:[
+ {k:"tl", title:"BCCI & India", rows:[["1927","Provisional board at Bombay Gymkhana"],["1928","BCCI formed; first president R.E. Grant Govan, secretary Anthony de Mello; HQ now Wankhede, Mumbai"],["1932","India's first Test — at Lord's v England (C.K. Nayudu captain)"],["1934-35","First Ranji Trophy; Bombay won"]]},
+ {k:"table", title:"Domestic trophies", head:["Trophy","Format","Named after"], rows:[["Ranji Trophy","First-class (multi-day), state teams","K.S. Ranjitsinhji"],["Vijay Hazare Trophy","One-day (List A)","Vijay Hazare"],["Syed Mushtaq Ali Trophy","T20","Syed Mushtaq Ali"],["Duleep Trophy","First-class, zonal teams","K.S. Duleepsinhji"],["Deodhar Trophy","One-day, zonal","D.B. Deodhar"],["Irani Cup","Ranji champion v Rest of India","Z.R. Irani"],["C.K. Nayudu Trophy","Under-23","C.K. Nayudu"]]},
+ {k:"trick", h:"<b>Bigger name, bigger format:</b> Ku-mar Shri Ranjit-sinhji (longest name) → longest format; Vijay Hazare (shorter) → one-day; A-L-I (3 letters) → shortest T20. <b>Duleep = Distance (zones)</b>."},
+ {k:"q", q:"The Syed Mushtaq Ali Trophy is India's domestic competition in which format?", o:["T20","One-day","First-class","Zonal first-class"], e:"Ranji = first-class, Vijay Hazare = one-day, Mushtaq Ali = T20, Duleep = zonal."},
+ {k:"table", title:"India's world titles", head:["Title","Year","Captain","Beat / venue"], rows:[["ODI World Cup","1983","Kapil Dev","West Indies, Lord's"],["T20 World Cup (first edition)","2007","M.S. Dhoni","Pakistan, Johannesburg"],["ODI World Cup","2011","M.S. Dhoni","Sri Lanka, Mumbai"],["Champions Trophy","2013","M.S. Dhoni","England"],["T20 World Cup","2024","Rohit Sharma","South Africa, Barbados"],["Champions Trophy","2025","Rohit Sharma","New Zealand, Dubai"],["Women's ODI World Cup (first)","2025","Harmanpreet Kaur","South Africa, Navi Mumbai"],["T20 World Cup","2026","Suryakumar Yadav","New Zealand by 96 runs, Ahmedabad"]]},
+ {k:"trick", h:"1983 → “<b>We were the Best because we beat the West</b>” (West Indies) at <b>Lord's</b> — “lords of cricket” — led by <b>Kapil Dev</b> (“स्वयं देव साथ थे”). 2011 → “<b>11 = two parallel lines = second title</b>”, <b>Captain Cool</b> Dhoni."},
+ {k:"facts", title:"2026 T20 World Cup (India & Sri Lanka)", rows:[["Final","8 March 2026, Narendra Modi Stadium, Ahmedabad"],["Result","India beat New Zealand by 96 runs"],["Record","India's 3rd T20 title; first team to defend it"],["Player of the Tournament","Sanju Samson"]]},
+ {k:"facts", title:"Other recent cricket", rows:[["First ODI World Cup","1975 (England); West Indies won"],["IPL 2025 & 2026","Royal Challengers Bengaluru (2026 final v Gujarat Titans)"],["Women's WC 2025 final","India beat South Africa by 52 runs (2 Nov 2025)"],["Asian Games 2026","Cricket included; India women reached the final"]]},
+ {k:"link", h:"<b>Lord's is the thread:</b> India's first Test (1932) and first World Cup win (1983) were both at Lord's, London — the 'Home of Cricket'."},
+ {k:"q", q:"India played its first-ever Test match in 1932 at…", o:["Lord's","The Oval","Eden Gardens","Bombay Gymkhana"], e:"v England at Lord's; BCCI had been formed in 1928."}
+], sum:["BCCI 1928 (Grant Govan, Anthony de Mello); first Test 1932 at Lord's.","Ranji first-class, Vijay Hazare one-day, Mushtaq Ali T20, Duleep zonal.","ODI WC 1983 (Kapil, beat WI at Lord's), 2011 (Dhoni); T20 WC 2007, 2024, 2026.","2026 T20 WC: India beat NZ by 96 runs in Ahmedabad; first to defend; Sanju Samson PoT.","Women's ODI World Cup 2025: India (Harmanpreet)."]},
+
+{ id:"L5", title:"Athletics I — track & relay", hi:"एथलेटिक्स: ट्रैक और रिले", blocks:[
+ {k:"p", h:"Athletics has three families: <b>running</b> (on the track), <b>jumping</b> and <b>throwing</b> (both in the infield). The standard track is an oval of <b>400 m</b> with a <b>100 m straight</b>."},
+ {k:"table", title:"The track", head:["Item","Value"], rows:[["Lap","400 m"],["Lanes","8"],["Lane width","1.22 m (up to 1.25 m)"],["Lane lines","5 cm (50 mm) wide"],["Finish","Decided when the <b>torso</b> crosses the line (not head, hand or foot)"]]},
+ {k:"table", title:"Five kinds of running events", head:["Type","Events"], rows:[["Sprint","100 m, 200 m, 400 m"],["Middle distance","800 m, 1500 m"],["Long distance","5000 m, 10,000 m"],["Hurdles","Women 100 m, Men 110 m, both 400 m"],["Steeplechase","3000 m — 28 barriers + 7 water jumps = 35 obstacles"]]},
+ {k:"trick", h:"<b>Staggered start</b> only where there is a bend: 200 m and 400 m (outer lanes start ahead). The 100 m is run on the straight, so no stagger. Hurdles: <b>“लड़कियाँ 100, लड़के 10 ज़्यादा (110), दोनों 400”</b>."},
+ {k:"trap", h:"Knocking a hurdle over accidentally is <b>not</b> a foul. Only deliberately knocking it or running around it is."},
+ {k:"table", title:"Starts", head:["Term","Meaning"], rows:[["Starting blocks","Foot plates used in sprints"],["Crouch start","The crouched sprint start"],["Bunch start","Feet placed close together on the blocks"]]},
+ {k:"table", title:"Relay", head:["Item","Value"], rows:[["Runners","4; each stage is a <b>leg</b>"],["Anchor leg","The last leg, usually the fastest runner"],["Takeover zone 4×100 m","<b>30 m</b> (was 20 m)"],["Takeover zone 4×400 m","<b>20 m</b>"],["Measured by","Position of the baton, not the runner"],["Baton","28–30 cm long, at least 50 g; dropped baton may be picked up"]]},
+ {k:"trick", h:"<b>Short race, big zone; long race, small zone.</b> 4×100 runners are at top speed, so they need 30 m to pass the baton; 4×400 runners are slower at the change, so 20 m is enough."},
+ {k:"q", q:"Under current rules, the takeover zone in the 4×100 m relay is…", o:["30 m","20 m","10 m","40 m"], e:"30 m for 4×100; 20 m for 4×400."},
+ {k:"facts", title:"Road running", rows:[["Marathon","42.195 km"],["Half marathon","21.0975 km"],["Steeplechase","3000 m — Avinash Sable is India's steeplechase star"]]},
+ {k:"q", q:"In which of these races do runners NOT get a staggered start?", o:["100 m","200 m","400 m","4×400 m relay"], e:"The 100 m is on the straight."}
+], sum:["Track 400 m, 8 lanes of 1.22 m, lines 5 cm; winner by torso.","Sprint 100/200/400; middle 800/1500; long 5000/10000; hurdles W100/M110/400; steeplechase 3000 m (28 + 7).","Staggered start in 200 & 400, not 100.","Relay: anchor = last leg; takeover zone 30 m (4×100), 20 m (4×400); baton 28–30 cm, ≥50 g."]},
+
+{ id:"L6", title:"Athletics II — jumps, throws & Indian athletes", hi:"एथलेटिक्स: कूद, फेंक और भारतीय खिलाड़ी", blocks:[
+ {k:"table", title:"Jumps", head:["Event","Key rule"], rows:[["Long jump","18–22 strides; take-off before the foul line; measured to the <b>nearest</b> mark in the sand"],["High jump","<b>One-foot</b> take-off (two-foot is invalid); 3 failures eliminate; bar 3 cm thick; run-up ≥15 m"],["Triple jump","<b>Hop → Step → Jump</b> (hop lands on the take-off foot)"],["Pole vault","Pole planted in the box; 3 consecutive failures eliminate"]]},
+ {k:"trick", h:"<b>Fosbury Flop</b>: head and back first over the bar, landing on the shoulders. Popularised by <b>Dick Fosbury</b>, gold at the <b>1968 Mexico City</b> Olympics. Older styles: scissors, western roll, straddle. Not used in pole vault."},
+ {k:"q", q:"What is the correct sequence in the triple jump?", o:["Hop, step, jump","Step, hop, jump","Jump, step, hop","Hop, jump, step"], e:"Hop (same foot), step (other foot), jump into the pit."},
+ {k:"table", title:"Throws — implement weights", head:["Event","Men","Women"], rows:[["Shot put","7.26 kg","4 kg"],["Hammer","7.26 kg","4 kg"],["Discus","2 kg","1 kg"],["Javelin","800 g","600 g"]]},
+ {k:"trick", h:"<b>Shot = Hammer</b> (7.26 / 4). <b>Discus halves</b> (2 / 1). Javelin in grams: <b>8-6</b>. Shot, hammer and discus are thrown from a circle (hammer 2.135 m, discus 2.5 m, both inside a cage); the javelin is thrown overhead from a runway and its metal head must land first inside the sector."},
+ {k:"table", title:"Indian athletics landmarks", head:["Athlete","Feat"], rows:[["Levy Pinto","First athletics golds at the 1st Asian Games, Delhi 1951 (100 m & 200 m)"],["Milkha Singh — 'Flying Sikh'","CWG gold 1958 (Cardiff); 4th in 400 m at Rome 1960; nickname given by Pakistan's General Ayub Khan"],["Kamaljeet Sandhu","First Indian woman to win individual Asian Games gold (400 m, 1970)"],["P.T. Usha — 'Payyoli Express'","4th in 400 m hurdles, Los Angeles 1984"],["Anju Bobby George","Bronze, long jump, 2003 World Championships (Paris) — first Indian medal at Worlds"],["Neeraj Chopra","Javelin: Olympic gold Tokyo 2020, silver Paris 2024; World champion 2023"],["Eldhose Paul","Triple jump gold, CWG 2022"],["Praveen Kumar Sobti","Discus/hammer thrower; played Bhima in TV's Mahabharat"]]},
+ {k:"trick", h:"India's “so close” club: <b>Milkha (1960) and P.T. Usha (1984) both finished 4th</b> at the Olympics. Neeraj ended the drought with gold in Tokyo 2020."},
+ {k:"facts", title:"Body", rows:[["Athletics Federation of India","1946"],["World body","World Athletics (earlier IAAF), Monaco"]]},
+ {k:"q", q:"Who was the first Indian to win a medal at the World Athletics Championships?", o:["Anju Bobby George","P.T. Usha","Neeraj Chopra","Milkha Singh"], e:"Bronze in long jump, Paris 2003."}
+], sum:["Long jump measured to the nearest mark; high jump one-foot take-off, 3 failures out.","Triple jump = hop, step, jump; Fosbury Flop (1968).","Shot & hammer 7.26/4 kg; discus 2/1 kg; javelin 800/600 g.","Levy Pinto 1951; Milkha 4th 1960; Usha 4th 1984; Anju Bobby George 2003 bronze; Neeraj gold 2020.","AFI 1946."]},
+
+{ id:"L7", title:"Hockey", hi:"हॉकी", blocks:[
+ {k:"table", title:"Field & equipment", head:["Item","Value"], rows:[["Field","<b>91.4 m × 55 m</b> (100 yd × 60 yd)"],["Shooting circle ('D') radius","<b>14.63 m</b> (16 yd)"],["Goal","3.66 m wide × 2.14 m high"],["Penalty spot","6.40 m in front of goal"],["'23 m line'","Actually 22.90 m (25 yd) from the back line"],["Stick","Max 105 cm; only the flat (left) side may be used"],["Ball","156–163 g"]]},
+ {k:"trick", h:"<b>91-55-14</b>: “<b>91 की लंबाई, 55 की चौड़ाई, D में 14</b>”. Goal <b>3.66 × 2.14</b> — both have a 6 or a 4 in them. Football's penalty area is 16.5 m — don't mix it with hockey's 14.63 m circle."},
+ {k:"table", title:"Rules", head:["Rule","Detail"], rows:[["Players","11 a side"],["Match","60 min = 4 × 15 min quarters (earlier 2 × 35 = 70 min)"],["Breaks","2 min after Q1 and Q3; half-time 10 min"],["Umpires","2, one for each half"],["Goal","Only if the ball is played from inside the D"],["Penalty stroke","One attacker v goalkeeper from 6.40 m"],["Raised ball","No raised hit/scoop if an opponent is within 5 m"],["Fouls","Foot, obstruction, backstick (round side), dangerous play"],["Bully","Method to restart play"]]},
+ {k:"table", title:"Cards", head:["Card","Suspension"], rows:[["Green","2 minutes"],["Yellow","At least 5 minutes"],["Red","Rest of the match"],["Replacement?","No — team plays a player short"]]},
+ {k:"trick", h:"Cards count up: <b>Green 2, Yellow 5, Red out</b> — like traffic lights getting worse."},
+ {k:"q", q:"What is the radius of the shooting circle in field hockey?", o:["14.63 m","16.5 m","9.15 m","6.40 m"], e:"16.5 m is football's penalty area; 9.15 m football's centre circle; 6.40 m hockey's penalty spot."},
+ {k:"tl", title:"History", rows:[["1885","First hockey club, Calcutta; Beighton Cup (Calcutta) is one of the oldest tournaments"],["1924","FIH founded in Paris (7 Jan) by Paul Léautey — after hockey was left out of the 1924 Paris Olympics; HQ now Lausanne"],["1925","Indian Hockey Federation, Gwalior (now Hockey India)"],["1928","First Olympic gold, Amsterdam — captain Jaipal Singh Munda; Dhyan Chand the star"],["1932","Los Angeles: India beat USA 24–1; Roop Singh scored 10"],["1936","Berlin gold (third in a row)"],["1948","London: first gold as an independent nation, beat Great Britain 4–0"],["1952","Helsinki: Balbir Singh Sr scored 5 in the final (record)"],["1956, 1964, 1980","Melbourne, Tokyo, Moscow — total 8 Olympic golds"],["1975","World Cup, Kuala Lumpur — beat Pakistan 2–1; captain Ajit Pal Singh"],["2020, 2024","Olympic bronzes (Tokyo, Paris)"]]},
+ {k:"trick", h:"Olympic record: <b>8 gold, 1 silver (1960), 4 bronze (1968, 1972, 2020, 2024)</b>. First gold 1928 → captain <b>Jai</b>pal → “<b>जय-जयकार</b>”. World Cup 1975 → “<b>हम जीते → A-jeet</b> Pal Singh”."},
+ {k:"trap", h:"One lecture named the 1975 captain as “Amritpal Singh”. It was <b>Ajit Pal Singh</b>. Also, Dhyan Chand was the star of 1928 but <b>not</b> the captain."},
+ {k:"q", q:"In which Olympics did India win its first hockey gold as an independent nation?", o:["London 1948","Helsinki 1952","Berlin 1936","Melbourne 1956"], e:"Beat Great Britain 4–0 in the final."}
+], sum:["Field 91.4 × 55 m; D radius 14.63 m; goal 3.66 × 2.14 m; penalty spot 6.40 m.","60 min in 4 quarters; 2 umpires; goal only from inside the D.","Cards: green 2 min, yellow ≥5 min, red out.","FIH 1924 Paris; IHF 1925 Gwalior; 8 Olympic golds (1928–1980); WC 1975 (Ajit Pal Singh)."]},
+
+{ id:"L8", title:"Football", hi:"फ़ुटबॉल", blocks:[
+ {k:"table", title:"Field", head:["Item","Any match","International match"], rows:[["Touch line (length)","90–120 m","100–110 m"],["Goal line (width)","45–90 m","64–75 m"]]},
+ {k:"trap", h:"Read the question: “maximum length of the goal line” = <b>90 m</b>. Only if it says “in an <b>international</b> match” is it 75 m. Touch line: 120 m / 110 m."},
+ {k:"table", title:"Markings", head:["Item","Value"], rows:[["Goal","7.32 m wide × 2.44 m high (8 yd × 8 ft); posts white, max 12 cm"],["Penalty mark","11 m from goal line"],["Penalty area","16.5 m deep, 40.3 m wide"],["Goal area","5.5 m"],["Centre circle radius","9.15 m (10 yd)"],["Penalty arc","9.15 m from the penalty mark"],["Ball","410–450 g; circumference 68–70 cm"]]},
+ {k:"trick", h:"<b>9.15 = 10 yards</b> appears twice (centre circle and penalty arc). Goal <b>732 × 244</b> → the width is exactly 3 × the height. Penalty <b>11 m = 11 players</b>."},
+ {k:"table", title:"Rules", head:["Rule","Detail"], rows:[["Players","11 a side; match can't start/continue with fewer than 7"],["Duration","45 + 45 min; half-time up to 15 min"],["Extra time","2 × 15 min, then penalty shoot-out (5 kicks each)"],["Goal","Whole ball must cross the whole line"],["Yellow card","Caution; 2 yellows = red"],["Red card","Sent off; no replacement"],["Goalkeeper 8-second rule","From 1 July 2025: holding the ball more than 8 s gives a corner kick"],["Referee's kit","Whistle, watch, red & yellow cards, notebook (not a white flag)"]]},
+ {k:"table", title:"Terms", head:["Term","Meaning"], rows:[["Brace","2 goals by one player in a match"],["Hat-trick","3 goals by one player"],["Own goal","Scored into one's own net by mistake"]]},
+ {k:"q", q:"From 1 July 2025, a goalkeeper who holds the ball in hand for more than ___ seconds concedes a corner kick.", o:["8","6","10","5"], e:"New IFAB law; the old limit was 6 seconds with an indirect free kick."},
+ {k:"table", title:"Bodies & Indian football", head:["Item","Fact"], rows:[["FIFA","Governs world football (1904, Paris; HQ Zurich)"],["IFAB","Makes the Laws of the Game"],["AIFF","1937, at Army HQ Shimla"],["Calcutta FC","1872"],["Durand Cup","Oldest tournament in India (1888, Shimla; Sir Henry Mortimer Durand)"],["Santosh Trophy","National championship for state teams (Sir Manmatha Nath Roy Chowdhury, Raja of Santosh)"],["Indian Super League","2014; first match in Kolkata; ATK first champions"],["Indian Women's League","2017, Ambedkar Stadium, Delhi"],["First foreign tour","1924 to Ceylon, led by Gostho Pal"],["SAFF Championship","India has won it 9 times"],["Sunil Chhetri","Passed Pelé's 77 international goals in 2021"]]},
+ {k:"trap", h:"It is the <b>Indian Super League</b>, not “Indian Soccer League”. The 2014 final was won by ATK against Kerala Blasters (in Mumbai), not against Mumbai as one lecture said."},
+ {k:"facts", title:"FIFA World Cup", rows:[["First","1930 — Uruguay hosted and won"],["2022","Qatar — Argentina won"],["2026 (USA, Canada, Mexico; first with 48 teams)","<b>Spain</b> beat Argentina 1–0 after extra time (Ferran Torres, 106'), 19 July 2026, MetLife Stadium — Spain's 2nd title"],["2026 awards","Golden Ball: Rodri · Golden Glove: Unai Simón · Young Player: Pau Cubarsí"]]},
+ {k:"q", q:"Which is India's oldest football tournament?", o:["Durand Cup","Santosh Trophy","IFA Shield","Federation Cup"], e:"Started 1888 in Shimla."}
+], sum:["Touch line 90–120 m (intl 100–110); goal line 45–90 m (intl 64–75).","Goal 7.32 × 2.44; penalty mark 11 m; penalty area 16.5 m; centre circle 9.15 m.","11 a side, minimum 7; 90 min; extra time 2 × 15; GK 8-second rule from July 2025.","FIFA 1904; AIFF 1937 Shimla; Durand Cup oldest; Santosh Trophy states; ISL 2014.","FIFA WC 2026: Spain beat Argentina 1–0 aet."]},
+
+{ id:"L9", title:"Judo", hi:"जूडो", blocks:[
+ {k:"p", h:"Judo means <b>“the gentle way”</b>. <b>Jigoro Kano</b> created it in <b>1882</b> in Tokyo, Japan, by taking the dangerous parts (punches and kicks) out of <b>ju-jitsu</b>, the samurai fighting art. His school, the <b>Kodokan</b>, was the first judo school."},
+ {k:"table", title:"Two principles", head:["Principle","Meaning"], rows:[["Seiryoku Zenyo","Maximum efficiency, minimum effort"],["Jita Kyoei","Mutual welfare and benefit"]]},
+ {k:"table", title:"People & place", head:["Term","Meaning","Hook"], rows:[["Judoka","A judo player","—"],["Judogi","Judo uniform (white/blue)","Yogi wears a chola → judo's chola = judo-gi"],["Dojo","Training hall","Where 'do jan' sweat together"],["Tatami","The mat","So much 'taam-jhaam' to keep it flat"],["Tori","The one who throws","—"],["Uke","The one thrown","Whose feet 'ukhad' (uproot)"],["Rei","Bow of respect","R for Respect"]]},
+ {k:"table", title:"Technique families (waza)", head:["Waza","Meaning","Hook"], rows:[["Tachi-waza","Standing techniques","Stand 'tan ke'"],["Ne-waza","Ground techniques","—"],["Nage-waza","Throwing techniques","'Naang' = lift over"],["Katame-waza","Grappling / control on the ground","Lies like a 'kata ped' (felled tree)"],["Osaekomi-waza","Hold-downs","Pinned like in a 'coma'"],["Shime-waza","Strangles / chokes","—"],["Kansetsu-waza","Joint locks","The ear ('kaan') has no joint"],["Atemi-waza","Strikes — not allowed in sport judo","—"],["Te / Koshi / Ashi / Sutemi-waza","Hand / hip / foot / sacrifice throws","—"]]},
+ {k:"table", title:"Scoring", head:["Score","Meaning"], rows:[["Ippon","Full point — ends the match (big throw on the back, 20 s hold, or submission)"],["Waza-ari","Half point — two make an ippon (10 s hold or lesser throw)"],["Yuko","Smaller score (5–9 s hold); can decide golden score"],["Golden score","Extra time after the 4-minute bout; first score wins"]]},
+ {k:"table", title:"Referee calls", head:["Call","Meaning","Hook"], rows:[["Hajime","Begin","“हाँ जी, मैं तैयार हूँ”"],["Mate","Stop","“माते (माँ) आ गई — रुको”"],["Osaekomi","Hold is on","—"],["Toketa","Hold broken","“टूट गया”"],["Sono-mama","Freeze","“सुनो मामा — वहीं रुको”"],["Yoshi","Continue","“Yo yo, शुरू करो”"],["Kuzushi","Breaking the opponent's balance","—"],["Ukemi","Breakfall — learning to fall safely","—"]]},
+ {k:"table", title:"Penalties", head:["Penalty","Meaning"], rows:[["Shido","Minor fault — “सीधे हो लो भैया”"],["3 × Shido","Leads to hansoku-make"],["Hansoku-make","Disqualification — “हँस के बोलो: भाई तू तो गया”"]]},
+ {k:"table", title:"Mat & colours", head:["Item","Value"], rows:[["Shape","Square"],["Contest area","8 × 8 m to 10 × 10 m"],["Safety area","3 m; 3 m shared between two mats"],["Colours","White is called first, then blue"],["Match","4 minutes + golden score"]]},
+ {k:"table", title:"Belts", head:["Grade","Belt"], rows:[["6th kyu → 1st kyu (students)","White → yellow → orange → green → blue → brown"],["1st–5th dan","Black"],["6th–8th dan","Red and white"],["9th–10th dan","Solid red"]]},
+ {k:"trick", h:"Kyu counts <b>down</b> (6 → 1) as you improve; dan counts <b>up</b> (1 → 10). Olympic debut: <b>JUDO has 4 letters → 1964</b> (Tokyo, its home); women from <b>1992 Barcelona</b>. Asian Games 1986; CWG medal sport 1990."},
+ {k:"table", title:"Indian judo", head:["Name","Feat"], rows:[["Kalpana Devi","Bronze, 2010 World Judo Championships"],["Linthoi Chanambam","First Indian gold at a World Judo Championship (cadet, 2022)"],["Tulika Maan","Silver, +78 kg, CWG 2022"],["Asmita Dey & Harsh Singh","India's first CWG judo golds — same day, Glasgow 2026 (Asmita in golden score)"]]},
+ {k:"trap", h:"Lectures said “Kalpana Devi won gold at the Judo World Cup” (she won <b>bronze at the 2010 World Championships</b>) and “Kanika Maan, 78 kg” (it is <b>Tulika Maan, +78 kg</b>)."},
+ {k:"q", q:"In judo, the referee's call 'Mate' means…", o:["Stop","Begin","Hold broken","Freeze"], e:"Hajime begin, Mate stop, Toketa hold broken, Sono-mama freeze, Yoshi continue."}
+], sum:["Judo = gentle way; Jigoro Kano 1882, Kodokan, from ju-jitsu.","Judoka, judogi, dojo, tatami, tori, uke, rei.","Tachi standing, ne ground, nage throws, katame control, osaekomi holds, shime chokes, kansetsu joint locks; atemi banned.","Ippon ends match; 2 waza-ari = ippon; shido minor, 3 shidos = hansoku-make.","Olympics 1964 (women 1992); white called first; 3 m safety area."]},
+
+{ id:"L10", title:"Kabaddi & Kho-Kho", hi:"कबड्डी और खो-खो", blocks:[
+ {k:"table", title:"Kabaddi court", head:["Item","Men","Women"], rows:[["Court","13 m × 10 m","12 m × 8 m"],["Match","20 – 5 – 20 min","15 – 5 – 15 min"]]},
+ {k:"trick", h:"Men's court <b>13 × 10</b> → “unlucky 13”. Women: length −1, width −2 → <b>12 × 8</b>; time −5 each half → <b>15-5-15</b>."},
+ {k:"table", title:"Lines", head:["Line","Detail"], rows:[["Mid line","Divides the court"],["Baulk line","3.75 m from mid line; raider must cross it"],["Bonus line","1 m beyond baulk line"],["Lobby","1 m strips on the sides; active only after contact/struggle"],["End line","Crossing it = out"]]},
+ {k:"table", title:"Rules & terms", head:["Term","Meaning"], rows:[["Players","12 in squad, 7 on court"],["Raider / Antis","Attacker / defenders"],["Cant","Chanting 'kabaddi' in one breath"],["Raid time","30 seconds; next raid within 5 seconds"],["Do-or-die raid","After two empty raids in a row"],["Bonus point","Only if 6 or more defenders; one foot beyond the bonus line, the other in the air; +1, no revival"],["Super raid","3 or more points in one raid"],["Super tackle","3 or fewer defenders tackle the raider; 2 points"],["Lona","All-out: +2 points and the whole team is revived"],["Revival","Each point scored revives one out player of your team"]]},
+ {k:"trick", h:"<b>Super raid ≥ 3, super tackle ≤ 3</b> — the same number, opposite directions. <b>Lona = “लो ना, 2 और”</b>."},
+ {k:"q", q:"In kabaddi, a bonus point can be awarded only when at least how many defenders are on court?", o:["6","5","7","4"], e:"Six or more defenders."},
+ {k:"facts", title:"Kabaddi history", rows:[["Rules","First framed in Maharashtra (1918), printed 1923"],["Asian Games","Since 1990 Beijing"],["Asian Games 2026 (Aichi-Nagoya)","India won men's and women's gold, both finals v Iran; men now 9-time champions"],["Pro Kabaddi League","Started 2014"]]},
+ {k:"table", title:"Kho-Kho", head:["Item","Value"], rows:[["Squad / on field","12 / 9"],["Field","Rectangular, with two poles and a central lane"],["Kho","Chaser touches a sitting chaser's back and says 'kho' to pass the chase"],["Match","2 innings (4 turns) — 36 minutes, not 48"],["Kho-Kho World Cup 2025","First edition, New Delhi — India won men's and women's titles"]]},
+ {k:"link", h:"<b>Two desi games, two layouts:</b> kabaddi has baulk & bonus lines; kho-kho has poles & a central lane. Kabaddi 7 on court, kho-kho 9."},
+ {k:"q", q:"What is the term for an all-out in kabaddi that gives 2 extra points?", o:["Lona","Cant","Do-or-die","Super tackle"], e:"Lona."}
+], sum:["Kabaddi men 13 × 10 m, 20-5-20; women 12 × 8 m, 15-5-15; 7 on court.","Raid 30 s; bonus needs ≥6 defenders; super raid ≥3; super tackle ≤3 (2 pts); lona +2.","Rules framed in Maharashtra; Asian Games since 1990; India double gold 2026.","Kho-kho 12/9 players, poles & central lane; first World Cup 2025 (India won both)."]},
+
+{ id:"L11", title:"Chess", hi:"शतरंज", blocks:[
+ {k:"table", title:"Board & pieces", head:["Item","Value"], rows:[["Squares","64 (8 × 8)"],["Ranks / Files","Horizontal rows / vertical columns"],["Pieces","32 (16 each): 8 pawns, 2 knights, 2 bishops, 2 rooks, 1 queen, 1 king"],["Knight","Moves in an L ('ढाई घर')"],["Bishop","Diagonal"],["Rook","Straight lines"]]},
+ {k:"table", title:"Special rules", head:["Term","Meaning"], rows:[["Castling","King and rook swap sides — once, only if neither has moved and the king is not in check"],["En passant","A pawn captures an enemy pawn that just moved two squares alongside it — only on the very next move"],["Promotion","A pawn reaching the 8th rank becomes a queen (or other piece), even if a queen is still on the board"],["Checkmate","King attacked with no escape — game over"],["Stalemate","No legal move but not in check — draw"],["Réti opening","An opening for White"]]},
+ {k:"trick", h:"<b>Checkmate = game over; stalemate = draw</b> (the winner hates it). Castling is the <b>only move where two pieces move together</b>."},
+ {k:"q", q:"In chess, stalemate results in…", o:["A draw","A win for the player to move","A win for the other player","A replay"], e:"No legal move and not in check → draw."},
+ {k:"facts", title:"Chess in multi-sport games", rows:[["Asian Games","Since 2006 Doha"],["Commonwealth Games","Not included"]]},
+ {k:"table", title:"Indian chess milestones", head:["Name","Feat"], rows:[["Viswanathan Anand","India's first Grandmaster (1988); 5-time world champion"],["D. Gukesh","Youngest undisputed World Champion (Dec 2024, aged 18)"],["Divya Deshmukh","Won the FIDE Women's World Cup 2025; became a Grandmaster"],["Koneru Humpy","Runner-up to Divya in the 2025 Women's World Cup final"],["Chess Olympiad 2024 (Budapest)","India won both open and women's golds"]]},
+ {k:"q", q:"Chess was first included in the Asian Games in…", o:["2006 Doha","2010 Guangzhou","1990 Beijing","2002 Busan"], e:"Not part of the Commonwealth Games."}
+], sum:["64 squares, 32 pieces; ranks horizontal, files vertical.","Castling once (king & rook unmoved, not in check); en passant; promotion.","Checkmate ends; stalemate = draw.","Asian Games chess since 2006; not in CWG.","Gukesh youngest world champion (2024); Divya Deshmukh Women's World Cup 2025."]},
+
+{ id:"L12", title:"Court & net games, golf", hi:"कोर्ट खेल: बास्केटबॉल, वॉलीबॉल, बैडमिंटन, टेनिस, गोल्फ़", blocks:[
+ {k:"table", title:"Basketball", head:["Item","Value"], rows:[["Court","28 m × 15 m"],["Ring height","3.05 m"],["Backboard","1.80 m wide × 1.05 m high; lines white, 50 mm"],["Ring inner diameter","450–459 mm; net white with 12 loops"],["Centre circle","3.6 m diameter"],["3-point line","6.75 m (since 2010; was 6.25 m)"],["Shot clock","24 seconds"],["Fouled out","5 personal fouls"],["Invented","James Naismith, USA, 1891"]]},
+ {k:"trick", h:"Court <b>28 × 15</b> → “28 का आधा 14, एक ज़्यादा 15”. Backboard: <b>1.80 wide, 1.05 tall</b> (examiners swap them)."},
+ {k:"trap", h:"A lecture said the ring diameter can be 460–490 mm. FIBA's rule is <b>450–459 mm</b> inner diameter."},
+ {k:"table", title:"Basketball terms", head:["Term","Meaning"], rows:[["Swish","Ball goes straight through without touching the ring"],["Slam dunk","Player jumps and forces the ball down through the hoop"],["Lay-up","Close-range shot off the backboard"],["Alley-oop","Mid-air catch and score from a teammate's lob"],["Air ball","Shot that misses rim and board"],["Double dribble","Illegal — dribbling with both hands or restarting a dribble"]]},
+ {k:"table", title:"Badminton", head:["Item","Value"], rows:[["Court length","13.4 m"],["Width","Singles 5.18 m, doubles 6.1 m"],["Net height","5 ft 1 in at posts, 5 ft at centre"],["Short service line","1.98 m from net"],["Doubles long service line","0.76 m inside the back line"]]},
+ {k:"table", title:"Tennis", head:["Item","Value"], rows:[["Court length","23.77 m (78 ft)"],["Width","Doubles 36 ft (10.97 m), singles 27 ft (8.23 m)"],["Net","3 ft (0.914 m) at centre"],["Service line","21 ft (6.40 m) from net"],["Love / Deuce","0 / 40-40"]]},
+ {k:"trick", h:"Tennis <b>78 × 36 (27)</b>; badminton <b>13.4 × 6.1 (5.18)</b>. Same trick in both: <b>doubles wider, length the same</b>."},
+ {k:"table", title:"Other games", head:["Sport","Key fact"], rows:[["Volleyball","6 players; invented by William G. Morgan, 1895"],["Handball","7 players; pulling or punching the ball from an opponent's hands not allowed"],["Netball","7 players"],["Dump shot","Soft surprise shot over the net (volleyball/badminton)"]]},
+ {k:"table", title:"Golf scoring", head:["Term","Strokes v par"], rows:[["Par","Set number of strokes for a hole"],["Birdie","1 under par"],["Eagle","2 under"],["Albatross","3 under"],["Ace (hole-in-one)","Ball in the hole with the first shot"],["Bogey","1 over"],["Double bogey","2 over"]]},
+ {k:"trick", h:"Birds get bigger as you go further under par: <b>Birdie (1) → Eagle (2) → Albatross (3)</b>. Bad news = ‘Bogey’ ghost."},
+ {k:"q", q:"In golf, completing a hole two strokes under par is called…", o:["Eagle","Birdie","Albatross","Bogey"], e:"Birdie −1, eagle −2, albatross −3, bogey +1."}
+], sum:["Basketball 28 × 15 m; ring 3.05 m; 3-pt line 6.75 m; 24-s clock; backboard 1.80 × 1.05.","Badminton 13.4 m long; 5.18 / 6.1 m wide; short service line 1.98 m.","Tennis 23.77 m; 36 / 27 ft; net 3 ft; deuce 40-40, love 0.","Volleyball 6, handball 7; golf birdie −1, eagle −2, albatross −3, bogey +1."]},
+
+{ id:"L13", title:"Olympics, Asian & Commonwealth Games", hi:"ओलंपिक, एशियाई और राष्ट्रमंडल खेल", blocks:[
+ {k:"table", title:"India's Olympic landmarks", head:["Year","Feat"], rows:[["1900 Paris","Norman Pritchard — 2 athletics silvers (British-Indian)"],["1928","First gold — hockey"],["1952 Helsinki","K.D. Jadhav — first individual medal (wrestling bronze)"],["2000 Sydney","Karnam Malleswari — first woman medallist (weightlifting bronze)"],["2008 Beijing","Abhinav Bindra — first individual gold (10 m air rifle)"],["2020 Tokyo","Neeraj Chopra — first athletics gold (javelin); India's best haul, 7 medals"],["2024 Paris","6 medals: Neeraj silver; Manu Bhaker 2 bronzes (first Indian with two medals at one Games since independence); Manu–Sarabjot bronze; Swapnil Kusale bronze; hockey bronze; Aman Sehrawat bronze (youngest Indian medallist)"]]},
+ {k:"trick", h:"Firsts ladder: <b>Team gold 1928 → individual medal 1952 (Jadhav) → woman 2000 (Malleswari) → individual gold 2008 (Bindra) → athletics gold 2020 (Neeraj)</b>."},
+ {k:"facts", title:"Future Olympics", rows:[["Winter 2026","Milan–Cortina, Italy"],["Summer 2028","Los Angeles — cricket (T20) returns"],["Summer 2032","Brisbane"]]},
+ {k:"table", title:"Asian Games", head:["Edition","Fact"], rows:[["1st, 1951","New Delhi — India hosted"],["1982","New Delhi again (9th Asian Games)"],["Kabaddi","From 1990 Beijing"],["Chess","From 2006 Doha"],["2026 (20th)","Aichi–Nagoya, Japan, 19 Sep – 4 Oct 2026; India's flag bearers Manu Bhaker & Pawan Sehrawat; kabaddi double gold v Iran"]]},
+ {k:"table", title:"Commonwealth Games", head:["Edition","Fact"], rows:[["1930","First, Hamilton (Canada)"],["2010","Delhi hosted"],["2022","Birmingham"],["2026","Glasgow (23 Jul – 2 Aug), a 10-sport Games — no wrestling, shooting, badminton, hockey, table tennis or cricket"],["India at Glasgow 2026","4th: 13 gold, 17 silver, 9 bronze (39); 7 golds in boxing; Mirabai Chanu gold; first judo golds (Asmita Dey, Harsh Singh)"],["Top at Glasgow 2026","Australia, then England, Canada"]]},
+ {k:"trap", h:"One lecture said India had never won Asian Games judo gold and then corrected itself to <b>Commonwealth Games</b>. The historic double judo gold (Asmita Dey, Harsh Singh) was at the <b>2026 Commonwealth Games, Glasgow</b>."},
+ {k:"table", title:"When a sport joined", head:["Sport","Olympics","Asian Games","CWG"], rows:[["Judo","1964 (women 1992)","1986","1990 (medal sport)"],["Kabaddi","—","1990","—"],["Chess","—","2006","—"],["Hockey","1908","1958","1998"]]},
+ {k:"q", q:"Who was India's first individual Olympic gold medallist?", o:["Abhinav Bindra","Neeraj Chopra","K.D. Jadhav","Rajyavardhan Rathore"], e:"Bindra, 10 m air rifle, Beijing 2008. Jadhav won India's first individual medal (1952 bronze)."}
+], sum:["Olympic firsts: 1928 hockey gold; 1952 Jadhav; 2000 Malleswari; 2008 Bindra; 2020 Neeraj.","Paris 2024: 6 medals (1 silver, 5 bronze); Manu Bhaker 2 bronzes.","Asian Games: 1951 Delhi first; kabaddi 1990; chess 2006; 2026 Aichi–Nagoya.","CWG 2026 Glasgow: 10 sports; India 4th with 13 gold; first judo golds."]},
+
+{ id:"L14", title:"Trophies, terms & awards", hi:"ट्रॉफ़ी, शब्दावली और पुरस्कार", blocks:[
+ {k:"table", title:"Trophy → sport", head:["Trophy / Cup","Sport"], rows:[["Ranji, Duleep, Irani, Deodhar, Vijay Hazare, Mushtaq Ali","Cricket"],["Durand Cup, Santosh Trophy, IFA Shield, Subroto Cup","Football"],["Beighton Cup, Aga Khan Cup, Rangaswamy Cup, Dhyan Chand Trophy","Hockey"],["Thomas Cup (men), Uber Cup (women), Sudirman Cup (mixed)","Badminton"],["Davis Cup (men), Billie Jean King Cup (women)","Tennis"],["Ryder Cup","Golf"],["Stanley Cup","Ice hockey"],["Swaythling Cup (men), Corbillon Cup (women)","Table tennis"],["Federation Cup","Football / volleyball"]]},
+ {k:"trick", h:"<b>“Thomas Uber Sudir”</b> = badminton's three cups. <b>Davis</b> = Tennis (“D for Deuce”). <b>Durand</b> = oldest football (“D for Durability”). <b>Beighton</b> = hockey (“beat on the ball”)."},
+ {k:"table", title:"Term → sport", head:["Terms","Sport"], rows:[["Ippon, waza-ari, hajime, tatami","Judo"],["Lona, cant, raider, antis, baulk line","Kabaddi"],["Googly, yorker, LBW, follow-on, maiden","Cricket"],["Bully, penalty corner, D, short corner","Hockey"],["Brace, hat-trick, offside, penalty kick","Football"],["Deuce, love, ace, let","Tennis"],["Birdie, eagle, par, bogey","Golf"],["Checkmate, castling, en passant","Chess"],["Swish, slam dunk, alley-oop","Basketball"],["Smash, drop, let","Badminton"],["Kho, pole, chaser","Kho-kho"]]},
+ {k:"table", title:"National sports awards", head:["Award","For"], rows:[["Major Dhyan Chand Khel Ratna","Highest sports honour (renamed 2021 from Rajiv Gandhi Khel Ratna)"],["Arjuna Award","Outstanding performance (since 1961)"],["Dronacharya Award","Coaches"],["Dhyan Chand Award","Lifetime achievement (now Arjuna Lifetime)"],["Maulana Abul Kalam Azad (MAKA) Trophy","Best university in sports"]]},
+ {k:"table", title:"Recent awards", head:["Year","Winners"], rows:[["Khel Ratna 2024","Manu Bhaker, D. Gukesh, Harmanpreet Singh (hockey), Praveen Kumar (para high jump)"],["Khel Ratna 2025 (announced 18 Aug 2026)","No one recommended — only the third time (after 2008 and 2014)"],["Arjuna 2025","17 names incl. Divya Deshmukh & Vidit Gujrathi (chess), Tejaswin Shankar (athletics), Lalremsiami (hockey)"],["Dronacharya 2025","Parveer Singh (athletics), Chhote Lal Yadav (boxing), Neha Chavan (shooting)"]]},
+ {k:"q", q:"The Thomas Cup is associated with…", o:["Badminton","Tennis","Table tennis","Golf"], e:"Thomas (men), Uber (women), Sudirman (mixed) — all badminton."},
+ {k:"q", q:"'Lona' is a term used in…", o:["Kabaddi","Kho-kho","Judo","Hockey"], e:"All-out bonus of 2 points in kabaddi."}
+], sum:["Thomas/Uber/Sudirman = badminton; Davis/BJK = tennis; Ryder = golf; Swaythling/Corbillon = TT.","Durand, Santosh, Subroto = football; Beighton, Aga Khan = hockey.","Khel Ratna highest; Arjuna players; Dronacharya coaches.","Khel Ratna 2024: Manu Bhaker, Gukesh, Harmanpreet, Praveen Kumar; none in 2025."]},
+
+{ id:"L15", title:"Memory palace: the dimension sheet", hi:"एक पन्ने में सारे माप", blocks:[
+ {k:"p", h:"All the numbers from lessons 2–12 in one sheet. Read it morning and evening for five days — the lectures promise it will stick as a picture."},
+ {k:"table", title:"Fields", head:["Sport","Length × width","Special number"], rows:[["Cricket pitch","22 yd (20.12 m) × 10 ft","Popping crease 4 ft"],["Hockey","91.4 × 55 m","D 14.63 m; spot 6.40 m"],["Football","100–110 × 64–75 m (intl)","Penalty 11 m; circle 9.15 m; box 16.5 m"],["Basketball","28 × 15 m","Ring 3.05 m; 3-pt 6.75 m"],["Kabaddi","13 × 10 m (women 12 × 8)","Baulk 3.75 m; bonus +1 m"],["Badminton","13.4 m × 6.1 (5.18)","Short service 1.98 m"],["Tennis","23.77 m × 36 ft (27)","Service line 21 ft"],["Judo","Square, 8–10 m","Safety 3 m"],["Athletics","400 m track","Lane 1.22 m"]]},
+ {k:"table", title:"Goals & hoops", head:["Sport","Goal / target"], rows:[["Football","7.32 × 2.44 m"],["Hockey","3.66 × 2.14 m"],["Basketball","Ring 3.05 m high; board 1.80 × 1.05 m"],["Cricket","Stumps 28 × 9 in"]]},
+ {k:"table", title:"Time", head:["Sport","Duration"], rows:[["Football","45 + 45 (+2 × 15 extra)"],["Hockey","4 × 15 = 60"],["Kabaddi","20-5-20 (women 15-5-15); raid 30 s"],["Judo","4 min + golden score"],["Kho-kho","36 min"],["Basketball","24-s shot clock"],["Cricket","Timed out: 3 min; new ball after 80 overs"]]},
+ {k:"table", title:"Weights", head:["Object","Weight"], rows:[["Cricket ball","155.9–163 g"],["Hockey ball","156–163 g"],["Football","410–450 g"],["Shot / hammer","7.26 / 4 kg"],["Discus","2 / 1 kg"],["Javelin","800 / 600 g"],["Relay baton","≥ 50 g"]]},
+ {k:"trick", h:"<b>Twin numbers:</b> cricket ball ≈ hockey ball (≈160 g). Shot = hammer. <b>9.15</b> twice in football. <b>3.05</b> twice: cricket pitch width (m) and basketball ring height. <b>1.22</b> twice: athletics lane and cricket popping crease (m)."},
+ {k:"q", q:"Which two measurements are both 3.05 m?", o:["Cricket pitch width and basketball ring height","Hockey goal width and football goal height","Kabaddi baulk line and badminton service line","Tennis net and judo safety area"], e:"Cricket pitch 10 ft = 3.05 m; basketball ring 3.05 m."},
+ {k:"q", q:"Which two measurements are both 1.22 m?", o:["Athletics lane width and cricket's popping-crease distance","Hockey goal and badminton court","Football goal area and tennis net","Judo mat and kabaddi lobby"], e:"Lane 1.22 m; popping crease 4 ft = 1.22 m."}
+], sum:["Hockey 91.4 × 55, D 14.63; football goal 7.32 × 2.44, penalty 11 m, circle 9.15.","Basketball 28 × 15, ring 3.05; kabaddi 13 × 10; badminton 13.4; tennis 23.77.","Twins: 3.05 (pitch width, ring), 1.22 (lane, crease), 9.15 (circle, arc)."]}
+];
+
+const QB = [
+/* L1 */
+["L1","How many players does a volleyball team have on court?",["6","5","7","9"],"5 basketball, 6 volleyball, 7 handball/netball.","p"],
+["L1","How many players of a team are on the field in kho-kho?",["9","7","11","12"],"12 in the squad, 9 on the field."],
+["L1","Which of these sports has 7 players on court per side?",["Netball","Volleyball","Basketball","Baseball"],"Netball, handball, kabaddi and water polo have 7."],
+["L1","How many players are there in a baseball team on the field?",["9","7","11","6"],"'Base milne par 9'."],
+["L1","Which sport has 15 players a side?",["Rugby union","Hockey","Cricket","Handball"],"Rugby union 15; rugby league 13."],
+["L1","Which game was invented by James Naismith?",["Basketball","Volleyball","Handball","Baseball"],"1891, Springfield, USA.","p"],
+["L1","Volleyball was invented by…",["William G. Morgan","James Naismith","Jigoro Kano","Abner Doubleday"],"1895, USA."],
+["L1","National Sports Day in India is celebrated on…",["29 August","15 August","2 October","14 November"],"Birthday of Major Dhyan Chand.","p"],
+["L1","Which statement about India's national sport is correct?",["No sport has been officially declared the national sport","Hockey is officially the national sport","Kabaddi is officially the national sport","Cricket was declared national sport in 2011"],"Hockey is popularly called the national game but it has no official status."],
+["L1","In which country did judo originate?",["Japan","China","Korea","India"],"Jigoro Kano, 1882."],
+["L1","Ice hockey is played with how many players a side on the ice?",["6","5","11","7"],"Five skaters and a goalkeeper."],
+["L1","Match the sport with players per side: which pairing is WRONG?",["Handball – 6","Basketball – 5","Kabaddi – 7","Cricket – 11"],"Handball has 7."],
+["L1","Which of these is a governing body for world football?",["FIFA","FIH","ICC","FIDE"],"FIH hockey, ICC cricket, FIDE chess."],
+["L1","FIDE is the world governing body of…",["Chess","Fencing","Football","Judo"],"Fédération Internationale des Échecs."],
+
+/* L2 */
+["L2","What is the length of a cricket pitch?",["22 yards","20 yards","24 yards","21 yards"],"22 yd = 66 ft = 20.12 m.","p"],
+["L2","The length of a cricket pitch in metres is about…",["20.12 m","22 m","18.5 m","24.2 m"],"22 yards."],
+["L2","What is the width of a cricket pitch?",["10 ft (3.05 m)","8 ft","12 ft","9 ft"],"10 ft."],
+["L2","The 22-yard length of the pitch is measured between…",["The two sets of stumps (bowling creases)","The two popping creases","The two return creases","Boundary to boundary"],"Stump to stump."],
+["L2","The popping crease is marked how far in front of the stumps?",["4 ft (1.22 m)","3 ft","5 ft","6 ft"],"4 ft.","p"],
+["L2","What is the height of the stumps in cricket?",["28 inches","26 inches","30 inches","24 inches"],"28 in high, 9 in wide."],
+["L2","The total width of the three stumps together is…",["9 inches","8 inches","10 inches","12 inches"],"9 in."],
+["L2","The maximum permitted width of a cricket bat is…",["4.25 inches","4.5 inches","5 inches","4 inches"],"108 mm."],
+["L2","The weight of a men's cricket ball is…",["155.9 – 163 g","140 – 150 g","165 – 175 g","120 – 130 g"],"About 5.5 oz."],
+["L2","The circumference of a men's cricket ball is…",["22.4 – 22.9 cm","20 – 21 cm","24 – 25 cm","68 – 70 cm"],"68–70 cm is a football."],
+["L2","Which colour ball is used in day-night Test matches?",["Pink","Red","White","Orange"],"Red for normal Tests, white for ODI & T20."],
+["L2","Which colour ball is used in ODI cricket?",["White","Red","Pink","Yellow"],"White for coloured-clothing limited-overs games."],
+["L2","After how many overs can a new ball be taken in a Test match?",["80","60","90","100"],"Optional, at the fielding captain's request.","p"],
+["L2","Taking the new ball after 80 overs is…",["Optional, at the fielding captain's choice","Compulsory","Decided by the umpire","Decided by the batting captain"],"The captain may ask for it."],
+["L2","Why are the weight and circumference of a cricket ball strictly regulated?",["Variations affect bounce, swing and fairness","To reduce the cost of balls","To make balls last longer","To help batters only"],"Asked in a 2025 paper."],
+["L2","How many legal deliveries make an over?",["6","8","5","7"],"Wides and no-balls are re-bowled."],
+["L2","How many umpires are on the field in cricket at a time?",["2","1","3","4"],"Plus a TV (third) umpire."],
+["L2","During the first powerplay in an ODI, how many fielders may be outside the 30-yard circle?",["2","4","5","3"],"First 10 overs."],
+["L2","The line on which the stumps are placed is called the…",["Bowling crease","Popping crease","Return crease","Boundary"],"Bowling crease."],
+["L2","A bowler's front foot landing fully beyond the popping crease results in a…",["No-ball","Wide","Dead ball","Bye"],"Front-foot no-ball."],
+
+/* L3 */
+["L3","What is the minimum penalty for a wide ball?",["1 run","2 runs","No run","4 runs"],"1 run plus any runs taken.","p"],
+["L3","For which of these extras is NO run automatically awarded?",["Bye","Wide","No-ball","Both wide and no-ball"],"Byes and leg byes need running or a boundary."],
+["L3","A leg bye is when the ball…",["Hits the batter's body (not bat) and runs are taken","Misses bat and body","Is too wide to reach","Is a full toss above waist"],"Leg bye."],
+["L3","A bye is when the ball…",["Misses both bat and body and runs are taken","Hits the pad","Hits the bat twice","Crosses the boundary on the full"],"Bye."],
+["L3","How does an umpire signal a dead ball?",["Crossing and uncrossing wrists below the waist","Raising one arm above the head","Stretching both arms sideways","Waving one arm"],"Asked in a 2025 paper."],
+["L3","How does an umpire signal a wide?",["Both arms stretched out horizontally","One arm horizontal","Index finger raised","Touching a raised knee"],"One arm horizontal = no-ball."],
+["L3","The signal for a no-ball is…",["One arm extended horizontally","Index finger raised","Both arms above the head","Crossed wrists below waist"],"Raised finger = out."],
+["L3","Both arms raised above the head signals a…",["Six","Four","Wide","Dead ball"],"A waving arm signals four."],
+["L3","Touching a raised knee is the umpire's signal for…",["Leg bye","Bye","No-ball","Short run"],"Bye = open hand raised."],
+["L3","Which mode of dismissal is NOT credited to the bowler?",["Run out","Stumped","LBW","Hit wicket"],"Run out goes to the fielding team.","p"],
+["L3","A batter is stumped when…",["They step out of the crease to play and the keeper breaks the wicket","They are out of the crease while running","They hit their own wicket","The ball hits the pad"],"Stumped."],
+["L3","For LBW, the ball must hit…",["The pad before the bat","The bat before the pad","The glove","The helmet"],"If bat first, not LBW."],
+["L3","Which technology is used to track the path of the ball for LBW decisions?",["Hawk-Eye","Snickometer","Hot Spot","Speed gun"],"Ball-tracking."],
+["L3","For a batter to be bowled…",["At least one bail must be dislodged","All three stumps must fall","Both bails must fall","The keeper must catch the ball"],"Any one bail is enough."],
+["L3","Can a batter be bowled off a no-ball?",["No","Yes","Only in Tests","Only if both bails fall"],"No-ball is not a legal delivery for that dismissal."],
+["L3","How much time does a new batter get to reach the crease before being timed out?",["3 minutes","2 minutes","5 minutes","90 seconds"],"Angelo Mathews was the first international victim (2023)."],
+["L3","Hitting the ball twice is NOT out when the batter…",["Hits it again only to protect the wicket","Hits it again to take a run","Hits it towards a fielder","Hits it again after the fielder touches it"],"Protecting the wicket is allowed."],
+["L3","'Obstructing the field' leads to dismissal only when the obstruction is…",["Deliberate","Accidental","By the non-striker only","Verbal only"],"Accidental obstruction is not out."],
+["L3","A batter who retires hurt…",["Can resume batting later","Is always out","Can never return","Is replaced by a substitute batter"],"Retired out cannot return."],
+["L3","What is the minimum lead needed to enforce the follow-on in a five-day Test?",["200 runs","150 runs","100 runs","250 runs"],"150 for 3-4 day, 100 for 2-day, 75 for 1-day.","p"],
+["L3","Enforcing the follow-on is…",["The option of the leading side's captain","Compulsory","Decided by umpires","Decided by the match referee"],"Optional."],
+["L3","A fast delivery that lands at the batter's feet near the base of the stumps is a…",["Yorker","Bouncer","Beamer","Googly"],"Asked in 2025.","p"],
+["L3","A ball that pitches short and rises towards the batter's head is a…",["Bouncer","Yorker","Full toss","Leg-break"],"Legal unless above head height rules are breached."],
+["L3","A ball that swings in the air into a right-handed batter is an…",["In-swinger","Out-swinger","Leg-cutter","Off-break"],"Out-swinger moves away."],
+["L3","A googly is bowled by a…",["Wrist (leg) spinner","Fast bowler","Off-spinner","Medium pacer only"],"It turns opposite to a leg-break."],
+["L3","The 'doosra' is associated with…",["Off-spin bowling","Leg-spin bowling","Fast bowling","Wicket-keeping"],"The off-spinner's ball that turns away."],
+["L3","An off-break, bowled by a right-arm finger spinner, turns…",["Into a right-handed batter","Away from a right-handed batter","Straight on","In the air only"],"Off to leg."],
+["L3","Harbhajan Singh is best known as a(n)…",["Off-spinner","Leg-spinner","Fast bowler","Wicket-keeper"],"Anil Kumble was the leg-spinner."],
+["L3","The fielding position right next to the wicket-keeper on the off side is…",["Slip","Gully","Point","Mid-off"],"Slip.","p"],
+["L3","Which of these fielding positions is on the leg side?",["Square leg","Gully","Point","Cover"],"Square leg, mid-wicket, fine leg are leg side."],
+["L3","A good-length delivery is one that…",["Leaves the batter unsure whether to play forward or back","Lands at the feet","Rises over the head","Does not bounce"],"Hence edges and catches."],
+
+/* L4 */
+["L4","The BCCI was established in…",["1928","1926","1932","1930"],"A provisional board met in 1927.","p"],
+["L4","Who was the first president of the BCCI?",["R.E. Grant Govan","Anthony de Mello","Maharaja of Patiala","C.K. Nayudu"],"Anthony de Mello was the first secretary."],
+["L4","Who was the first secretary of the BCCI?",["Anthony de Mello","R.E. Grant Govan","Vizzy","Jagmohan Dalmiya"],"Grant Govan was president."],
+["L4","India played its first Test match in 1932 at…",["Lord's","The Oval","Eden Gardens","Chepauk"],"v England; C.K. Nayudu captain."],
+["L4","Where is the BCCI headquartered?",["Wankhede Stadium, Mumbai","Eden Gardens, Kolkata","Feroz Shah Kotla, Delhi","Chinnaswamy, Bengaluru"],"Mumbai."],
+["L4","The Ranji Trophy is named after…",["K.S. Ranjitsinhji","Vijay Hazare","C.K. Nayudu","K.B. Deodhar"],"He played for England.","p"],
+["L4","The Ranji Trophy was first played in…",["1934-35","1928-29","1947-48","1950-51"],"Bombay were the first champions."],
+["L4","The Vijay Hazare Trophy is India's domestic competition in…",["One-day (List A) cricket","First-class cricket","T20 cricket","Women's cricket"],"50 overs."],
+["L4","The Duleep Trophy is contested between…",["Zonal teams","State teams","Universities","Railway zones only"],"First-class, zonal."],
+["L4","Match correctly: Ranji – Vijay Hazare – Syed Mushtaq Ali",["First-class – One-day – T20","One-day – T20 – First-class","T20 – First-class – One-day","First-class – T20 – One-day"],"Longest name = longest format."],
+["L4","The Irani Cup is played between…",["Ranji Trophy champion and Rest of India","Two zonal teams","India A and England A","Under-23 teams"],"Irani Cup."],
+["L4","In which year did India win its first ODI World Cup?",["1983","1975","1987","2011"],"Kapil Dev's team.","p"],
+["L4","India won the 1983 World Cup by defeating…",["West Indies","Australia","England","Pakistan"],"At Lord's."],
+["L4","The first ODI World Cup was held in…",["1975","1979","1983","1971"],"England; West Indies won."],
+["L4","Who captained India to the 2011 ODI World Cup title?",["M.S. Dhoni","Sourav Ganguly","Rahul Dravid","Virat Kohli"],"Beat Sri Lanka in Mumbai."],
+["L4","India won the first ever T20 World Cup in…",["2007","2009","2010","2012"],"Beat Pakistan in Johannesburg."],
+["L4","Who won the 2026 ICC Men's T20 World Cup?",["India","New Zealand","Australia","England"],"Beat NZ by 96 runs in Ahmedabad."],
+["L4","In the 2026 T20 World Cup final, India beat New Zealand by…",["96 runs","7 runs","6 wickets","52 runs"],"8 March 2026."],
+["L4","The 2026 T20 World Cup final was played at…",["Narendra Modi Stadium, Ahmedabad","Eden Gardens, Kolkata","R. Premadasa, Colombo","Wankhede, Mumbai"],"Co-hosts India and Sri Lanka."],
+["L4","Who was India's captain in the 2026 T20 World Cup triumph?",["Suryakumar Yadav","Rohit Sharma","Hardik Pandya","Shubman Gill"],"Rohit led in 2024."],
+["L4","Who was named Player of the Tournament at the 2026 T20 World Cup?",["Sanju Samson","Jasprit Bumrah","Abhishek Sharma","Rachin Ravindra"],"ICC announcement."],
+["L4","With the 2026 title, India became the first team to…",["Defend the T20 World Cup","Win the T20 World Cup twice","Host and win the ODI World Cup","Win without losing a match"],"Won 2024 and 2026."],
+["L4","India won the ICC Champions Trophy 2025 by beating…",["New Zealand","Australia","South Africa","Pakistan"],"In Dubai, under Rohit Sharma."],
+["L4","India's women won their first ODI World Cup in 2025 under…",["Harmanpreet Kaur","Mithali Raj","Smriti Mandhana","Jhulan Goswami"],"Beat South Africa by 52 runs."],
+["L4","Which team won IPL 2026?",["Royal Challengers Bengaluru","Gujarat Titans","Mumbai Indians","Chennai Super Kings"],"Beat Gujarat Titans in the final."],
+["L4","The Deodhar Trophy is a…",["Zonal one-day competition","State first-class competition","T20 league","Women's tournament"],"Named after D.B. Deodhar."],
+
+/* L5 */
+["L5","What is the length of one lap of a standard athletics track?",["400 m","200 m","300 m","500 m"],"With a 100 m straight."],
+["L5","The standard width of a lane in an athletics track is…",["1.22 m","1.5 m","1 m","2 m"],"Up to 1.25 m.","p"],
+["L5","The width of the lane lines on an athletics track is…",["5 cm","10 cm","2 cm","15 cm"],"50 mm."],
+["L5","In a sprint finish, the winner is decided when which part crosses the line?",["Torso","Head","Foot","Hand"],"Chest/trunk."],
+["L5","In which race is there NO staggered start?",["100 m","200 m","400 m","400 m hurdles"],"The 100 m is on the straight."],
+["L5","Which of these is a middle-distance event?",["1500 m","400 m","10,000 m","200 m"],"800 m and 1500 m.","p"],
+["L5","Which of these is a sprint event?",["400 m","800 m","1500 m","5000 m"],"100, 200, 400 m."],
+["L5","The standard steeplechase race is…",["3000 m","2000 m","5000 m","1500 m"],"With barriers and a water jump."],
+["L5","How many obstacles in total are there in a 3000 m steeplechase?",["35","28","7","40"],"28 barriers + 7 water jumps."],
+["L5","The women's sprint hurdles race is run over…",["100 m","110 m","200 m","80 m"],"Men run 110 m."],
+["L5","The men's sprint hurdles race is run over…",["110 m","100 m","120 m","200 m"],"Both run the 400 m hurdles."],
+["L5","In hurdles, accidentally knocking down a hurdle…",["Is not a foul","Leads to disqualification","Adds a time penalty","Means the race is rerun"],"Only deliberate knocking is a foul."],
+["L5","The crouched starting position used by sprinters is called the…",["Crouch start","Standing start","Rolling start","Flying start"],"Using starting blocks.","p"],
+["L5","A start with the feet placed close together on the blocks is a…",["Bunch start","Crouch start","Elongated start","Standing start"],"Suits some athletes."],
+["L5","What is the length of the takeover zone in the 4×100 m relay under current rules?",["30 m","20 m","10 m","40 m"],"It used to be 20 m.","p"],
+["L5","What is the length of the takeover zone in the 4×400 m relay?",["20 m","30 m","10 m","40 m"],"Short race, big zone; long race, small zone."],
+["L5","A designated portion of a relay race run by one athlete is called a…",["Leg","Heat","Lap","Spike"],"Asked in a 2025 paper."],
+["L5","The last runner in a relay team is called the…",["Anchor leg","Lead-off leg","Pacer","Sweeper"],"Usually the fastest."],
+["L5","Whether a baton exchange is inside the zone is judged by the position of…",["The baton","The incoming runner's foot","The outgoing runner's foot","The runner's torso"],"Baton position."],
+["L5","If a relay runner drops the baton, the runner…",["May pick it up and continue","Is immediately disqualified","Must restart from the start line","Must hand over a new baton"],"Not a foul by itself."],
+["L5","The length of a relay baton is…",["28–30 cm","50 cm","15 cm","40–45 cm"],"Mass at least 50 g."],
+["L5","The marathon distance is…",["42.195 km","40 km","21.1 km","45 km"],"Half marathon 21.0975 km."],
+["L5","Avinash Sable is associated with which event?",["3000 m steeplechase","Javelin","Long jump","400 m"],"Asked in CPO 2025."],
+
+/* L6 */
+["L6","In the high jump, the take-off must be from…",["One foot","Both feet","Either, as the athlete wishes","A springboard"],"Two-foot take-off is invalid.","p"],
+["L6","The high-jump technique of going over the bar head and back first is called…",["Fosbury Flop","Western Roll","Straddle","Scissors"],"Dick Fosbury, 1968."],
+["L6","Dick Fosbury popularised the Fosbury Flop at which Olympics?",["Mexico City 1968","Tokyo 1964","Munich 1972","Rome 1960"],"He won gold."],
+["L6","After how many consecutive failures is an athlete eliminated in high jump or pole vault?",["3","2","4","5"],"Three."],
+["L6","In the triple jump, which phase comes second?",["Step","Hop","Jump","Run-up"],"Hop, step, jump.","p"],
+["L6","What is the correct order of phases in the triple jump?",["Hop, step, jump","Step, hop, jump","Jump, hop, step","Hop, jump, step"],"Asked in 2025 papers."],
+["L6","In the long jump, the distance is measured from the take-off line to…",["The nearest mark made in the sand","The farthest mark","The heel mark only","The centre of the pit"],"Nearest mark — hence legs thrown forward."],
+["L6","What is the weight of the shot put for senior men?",["7.26 kg","6 kg","8 kg","5 kg"],"Women 4 kg.","p"],
+["L6","The standard weight of the hammer for senior women is…",["4 kg","7.26 kg","3 kg","2 kg"],"Same as the women's shot.","p"],
+["L6","The weight of the discus for senior men is…",["2 kg","1 kg","4 kg","1.5 kg"],"Women 1 kg."],
+["L6","The weight of the javelin for senior men is…",["800 g","600 g","1 kg","700 g"],"Women 600 g."],
+["L6","For a javelin throw to be valid, which part must strike the ground first?",["The metal head","The tail","The grip","Any part"],"And inside the sector."],
+["L6","The area in which a thrown javelin, discus or shot must land is called the…",["Sector","Circle","Runway","Pit"],"Sector."],
+["L6","Which throwing events are held inside a safety cage?",["Hammer and discus","Javelin and shot","Only javelin","Only shot put"],"Hammer circle 2.135 m, discus 2.5 m."],
+["L6","Anju Bobby George made history at the 2003 World Athletics Championships in which event?",["Long jump","Triple jump","High jump","400 m"],"Bronze, Paris 2003."],
+["L6","India's first-ever medal at the World Athletics Championships was won by…",["Anju Bobby George","P.T. Usha","Neeraj Chopra","Seema Punia"],"Long jump bronze, Paris 2003.","p"],
+["L6","Milkha Singh finished 4th in the 400 m at which Olympics?",["Rome 1960","Melbourne 1956","Tokyo 1964","Helsinki 1952"],"By a whisker."],
+["L6","Who gave Milkha Singh the title 'Flying Sikh'?",["General Ayub Khan","Jawaharlal Nehru","Queen Elizabeth II","Dhyan Chand"],"After he beat Pakistan's Abdul Khaliq."],
+["L6","P.T. Usha finished 4th in which event at the 1984 Los Angeles Olympics?",["400 m hurdles","100 m","200 m","Long jump"],"Missed bronze narrowly."],
+["L6","Who won India's first athletics gold medals at the 1951 Asian Games?",["Levy Pinto","Milkha Singh","Gurbachan Randhawa","Kamaljeet Sandhu"],"100 m and 200 m, Delhi."],
+["L6","Who was the first Indian woman to win an individual Asian Games gold?",["Kamaljeet Sandhu","P.T. Usha","Shiny Abraham","Anju Bobby George"],"400 m, Bangkok 1970."],
+["L6","Neeraj Chopra won Olympic gold in javelin at…",["Tokyo 2020","Paris 2024","Rio 2016","London 2012"],"Silver at Paris 2024."],
+["L6","Eldhose Paul won CWG 2022 gold in…",["Triple jump","Long jump","High jump","Pole vault"],"Birmingham."],
+["L6","The Athletics Federation of India was formed in…",["1946","1936","1951","1928"],"80 years ago."],
+["L6","Praveen Kumar Sobti, who played Bhima in the TV Mahabharat, was a…",["Discus and hammer thrower","Wrestler","Weightlifter","Boxer"],"Asian Games medallist."],
+
+/* L7 */
+["L7","What are the dimensions of a standard hockey field?",["91.4 m × 55 m","100 m × 64 m","105 m × 68 m","90 m × 60 m"],"100 yd × 60 yd.","p"],
+["L7","What is the radius of the shooting circle (D) in hockey?",["14.63 m","16.5 m","9.15 m","6.40 m"],"Asked 2025.","p"],
+["L7","What are the dimensions of a hockey goal?",["3.66 m wide × 2.14 m high","7.32 m × 2.44 m","3 m × 2 m","4 m × 2.5 m"],"7.32 × 2.44 is football."],
+["L7","From what distance is a penalty stroke taken in hockey?",["6.40 m","11 m","14.63 m","9.15 m"],"One attacker v goalkeeper."],
+["L7","How many attackers are involved in a hockey penalty stroke?",["1","2","3","5"],"Just the striker v the goalkeeper."],
+["L7","The '23 m line' in hockey is actually…",["22.90 m from the back line","23 m exactly","25 m","20 m"],"25 yards."],
+["L7","What is the duration of an international hockey match?",["60 minutes","70 minutes","80 minutes","90 minutes"],"4 × 15 min; earlier 2 × 35.","p"],
+["L7","In hockey, a goal is valid only when the ball is played from…",["Inside the shooting circle","Anywhere in the attacking half","Behind the 23 m line","The penalty spot"],"Asked 2025."],
+["L7","Hockey players may play the ball only with…",["The flat side of the stick","The rounded side","Either side","The foot"],"Round side = backstick foul."],
+["L7","Why can hockey players use only the flat side of the stick?",["Better control and less risk of injury","It is cheaper","To help left-handers","To reduce the ball's speed"],"Asked in CGL 2025."],
+["L7","Which card in hockey gives a minimum 5-minute suspension?",["Yellow","Green","Red","Blue"],"Green 2 min, red rest of match."],
+["L7","A green card in hockey means a suspension of…",["2 minutes","5 minutes","10 minutes","The rest of the match"],"Cards: 2, 5, out."],
+["L7","A player deliberately stopping the ball with the foot in hockey is called…",["Foot","Obstruction","Backstick","Bully"],"Foot foul."],
+["L7","'Bully' in hockey refers to…",["A method of restarting play","A foul","A penalty","A type of stick"],"Not a foul."],
+["L7","How many umpires control a hockey match on the field?",["2","1","3","4"],"One for each half."],
+["L7","The International Hockey Federation (FIH) was founded in…",["1924, Paris","1925, Gwalior","1908, London","1928, Amsterdam"],"By Paul Léautey.","p"],
+["L7","The Indian Hockey Federation was formed in 1925 at…",["Gwalior","Calcutta","Bombay","Lahore"],"Now Hockey India."],
+["L7","India won its first Olympic hockey gold in…",["1928, Amsterdam","1932, Los Angeles","1936, Berlin","1948, London"],"Captain Jaipal Singh Munda.","p"],
+["L7","Who captained India to the 1928 Olympic hockey gold?",["Jaipal Singh Munda","Dhyan Chand","Roop Singh","Balbir Singh Sr"],"Dhyan Chand was the star, not captain."],
+["L7","Who scored 10 goals in India's 24–1 win over the USA at the 1932 Olympics?",["Roop Singh","Dhyan Chand","Balbir Singh Sr","Leslie Claudius"],"Asked in 2025.","p"],
+["L7","India's first Olympic hockey gold as an independent nation came at…",["London 1948","Helsinki 1952","Melbourne 1956","Berlin 1936"],"Beat Great Britain 4–0."],
+["L7","How many Olympic gold medals has the Indian men's hockey team won?",["8","6","7","9"],"1928, 32, 36, 48, 52, 56, 64, 80."],
+["L7","India's last Olympic hockey gold was won at…",["Moscow 1980","Tokyo 1964","Mexico 1968","Montreal 1976"],"After that: bronzes in 2020 and 2024."],
+["L7","India won the Hockey World Cup in…",["1975","1971","1982","1980"],"Kuala Lumpur; beat Pakistan 2–1."],
+["L7","Who captained India to the 1975 Hockey World Cup?",["Ajit Pal Singh","Amritpal Singh","Dhanraj Pillay","Pargat Singh"],"'Hum jeete → A-jeet'."],
+["L7","Balbir Singh Sr set the Olympic record for most goals in a final (5) at…",["Helsinki 1952","London 1948","Melbourne 1956","Rome 1960"],"v Netherlands."],
+["L7","The Beighton Cup is associated with…",["Hockey","Football","Badminton","Cricket"],"One of the oldest hockey tournaments, Calcutta."],
+
+/* L8 */
+["L8","What is the height of a football goal?",["2.44 m","2.14 m","3.05 m","2.00 m"],"8 ft.","p"],
+["L8","What is the width of a football goal?",["7.32 m","3.66 m","6.40 m","8.00 m"],"8 yards."],
+["L8","The penalty mark in football is how far from the goal line?",["11 m","9.15 m","16.5 m","12 m"],"Asked often.","p"],
+["L8","What is the radius of the centre circle in football?",["9.15 m","10 m","14.63 m","11 m"],"10 yards."],
+["L8","The penalty area in football extends how far into the field from the goal line?",["16.5 m","11 m","5.5 m","20 m"],"And 40.3 m wide."],
+["L8","The maximum length of the goal line in football (any match) is…",["90 m","75 m","110 m","120 m"],"International: 64–75 m."],
+["L8","The length of the touch line in an international football match is…",["100–110 m","90–120 m","64–75 m","80–90 m"],"Any match: 90–120 m."],
+["L8","The weight of a standard football is…",["410–450 g","300–350 g","500–550 g","155–163 g"],"Circumference 68–70 cm."],
+["L8","The circumference of a standard football is…",["68–70 cm","60–62 cm","72–75 cm","22–23 cm"],"Size 5 ball."],
+["L8","What colour must the goalposts and crossbar be?",["White","Yellow","Red","Any colour"],"Laws of the Game."],
+["L8","What is the minimum number of players a football team needs to start or continue a match?",["7","8","9","6"],"Maximum 11.","p"],
+["L8","How long is each half in a standard football match?",["45 minutes","40 minutes","35 minutes","50 minutes"],"Half-time up to 15 minutes."],
+["L8","If a knockout match is level after 90 minutes, extra time consists of…",["Two halves of 15 minutes","One period of 30 minutes","Two halves of 10 minutes","Golden goal only"],"Then penalties."],
+["L8","From 1 July 2025, a goalkeeper holding the ball for more than 8 seconds concedes a…",["Corner kick","Penalty","Indirect free kick","Throw-in"],"New IFAB law."],
+["L8","Which of these is NOT compulsory equipment for a football referee?",["White flag","Whistle","Watch","Red and yellow cards"],"Plus a notebook."],
+["L8","Scoring two goals in a single match is called a…",["Brace","Hat-trick","Double","Twin"],"Asked 2025."],
+["L8","An 'own goal' in football is…",["A goal accidentally scored into one's own net","A goal by the goalkeeper","A goal from a penalty","A goal in extra time"],"Own goal."],
+["L8","Which body frames the Laws of the Game in football?",["IFAB","FIFA","UEFA","AIFF"],"FIFA governs; IFAB makes laws."],
+["L8","The All India Football Federation was formed in 1937 at…",["Army Headquarters, Shimla","Calcutta","Delhi","Bombay"],"Ten years before independence."],
+["L8","Which is the oldest football tournament in India?",["Durand Cup","Santosh Trophy","IFA Shield","Federation Cup"],"1888, Shimla.","p"],
+["L8","The Santosh Trophy is named after…",["Sir Manmatha Nath Roy Chowdhury","Henry Mortimer Durand","Syed Abdul Rahim","Salim Manna"],"Raja of Santosh.","p"],
+["L8","The Santosh Trophy is India's national football championship for…",["State teams","Club teams","Army teams","Universities"],"Like cricket's Ranji Trophy."],
+["L8","The first match of the Indian Super League (2014) was played in…",["Kolkata","Mumbai","Goa","Kochi"],"ATK became first champions."],
+["L8","'ISL' in Indian football stands for…",["Indian Super League","Indian Soccer League","Indian Sports League","International Soccer League"],"Not 'Soccer'."],
+["L8","The Indian Women's League began in…",["2017","2014","2020","2010"],"Ambedkar Stadium, Delhi."],
+["L8","Which country hosted and won the first FIFA World Cup (1930)?",["Uruguay","Brazil","Italy","Argentina"],"Montevideo."],
+["L8","Who won the 2026 FIFA World Cup?",["Spain","Argentina","France","Brazil"],"1–0 after extra time v Argentina."],
+["L8","Spain's winning goal in the 2026 World Cup final was scored by…",["Ferran Torres","Lamine Yamal","Álvaro Morata","Rodri"],"106th minute."],
+["L8","The 2026 FIFA World Cup was the first with…",["48 teams","32 teams","Three final venues","VAR"],"Hosted by USA, Canada and Mexico."],
+["L8","Sunil Chhetri overtook whose tally of 77 international goals in 2021?",["Pelé","Maradona","Messi","Ronaldo"],"First Indian to do so."],
+
+/* L9 */
+["L9","Judo was created by…",["Jigoro Kano","Morihei Ueshiba","Bruce Lee","Gichin Funakoshi"],"1882.","p"],
+["L9","In which year was judo introduced?",["1882","1864","1904","1964"],"Asked 2025.","p"],
+["L9","'Judo' literally means…",["The gentle way","The strong way","The empty hand","The way of the sword"],"Ju = gentle, do = way."],
+["L9","Judo developed from which martial art?",["Ju-jitsu","Karate","Kung fu","Taekwondo"],"Kano removed strikes."],
+["L9","The first judo school, founded by Jigoro Kano, is the…",["Kodokan","Dojo","Tatami","Budokan"],"Tokyo."],
+["L9","What is the shape of a judo competition area?",["Square","Circle","Rectangle","Hexagon"],"Asked in CHSL 2025.","p"],
+["L9","The inner contest area in judo is…",["8 m × 8 m to 10 m × 10 m","14 m × 14 m","6 m × 6 m","12 m × 12 m"],"Safety area 3 m."],
+["L9","In judo, which colour judogi contestant is called first?",["White","Blue","Red","Black"],"Then blue."],
+["L9","The judo uniform is called…",["Judogi","Dojo","Tatami","Judoka"],"'Yogi ka chola'."],
+["L9","A judo player is called a…",["Judoka","Judogi","Tori","Sensei"],"Judoka."],
+["L9","The judo training hall is called the…",["Dojo","Tatami","Kodokan","Dan"],"Tatami is the mat."],
+["L9","In judo, the person who performs the throw is…",["Tori","Uke","Rei","Sensei"],"Uke receives the throw."],
+["L9","The judo mat is called the…",["Tatami","Dojo","Judogi","Ukemi"],"Tatami."],
+["L9","'Tachi-waza' refers to techniques done…",["Standing","On the ground","With the hips only","With strikes"],"Asked in 2025."],
+["L9","'Shime-waza' in judo refers to…",["Choking/strangle techniques","Joint locks","Throws","Hold-downs"],"Kansetsu = joint locks."],
+["L9","'Kansetsu-waza' refers to…",["Joint locks","Chokes","Throws","Strikes"],"Arm locks at the elbow."],
+["L9","Which group of techniques is NOT allowed in sport judo?",["Atemi-waza (strikes)","Nage-waza (throws)","Osaekomi-waza (holds)","Shime-waza (chokes)"],"Punches and kicks were removed by Kano."],
+["L9","An 'Ippon' in judo means…",["A full point that ends the match","A half point","A minor penalty","Stop the fight"],"Asked 2025."],
+["L9","Two waza-ari in judo equal…",["One ippon","One yuko","One shido","Nothing"],"Match ends."],
+["L9","A hold-down maintained for how long earns an ippon?",["20 seconds","10 seconds","15 seconds","30 seconds"],"10 s = waza-ari."],
+["L9","'Hansoku-make' in judo means…",["Disqualification","Begin","Minor penalty","Hold broken"],"Most serious penalty."],
+["L9","'Shido' in judo is a…",["Minor penalty","Disqualification","Full point","Stop command"],"Three shidos → hansoku-make."],
+["L9","How many shidos lead to disqualification?",["3","2","4","5"],"Hansoku-make."],
+["L9","The referee's command 'Hajime' means…",["Begin","Stop","Freeze","Bow"],"Asked in Selection Post."],
+["L9","The call 'Toketa' means…",["The hold has been broken","Begin","Stop","Continue"],"'Toot gaya'."],
+["L9","'Sono-mama' in judo means…",["Freeze — do not move","Begin","Hold broken","Match over"],"'Suno mama'."],
+["L9","'Kuzushi' in judo refers to…",["Breaking the opponent's balance","A breakfall","A choke","A bow"],"Ukemi = breakfall."],
+["L9","'Ukemi' in judo means…",["Breakfall — falling safely","Throwing","Bowing","Groundwork"],"Taught first to beginners."],
+["L9","In judo, the red-and-white belt is worn by holders of…",["6th to 8th dan","1st to 5th dan","9th and 10th dan","1st kyu"],"Black 1–5, solid red 9–10."],
+["L9","Judo was first included in the Olympics in…",["1964 Tokyo","1965","1972 Munich","1956 Melbourne"],"Women's judo from 1992.","p"],
+["L9","Women's judo became an Olympic sport at…",["Barcelona 1992","Seoul 1988","Atlanta 1996","Tokyo 1964"],"Barcelona."],
+["L9","Kalpana Devi won which medal at the 2010 World Judo Championships?",["Bronze","Gold","Silver","No medal"],"First Indian medal at Worlds."],
+["L9","Who won India's first-ever Commonwealth Games judo golds, on the same day at Glasgow 2026?",["Asmita Dey and Harsh Singh","Tulika Maan and Vijay Yadav","Sushila Devi and Avtar Singh","Kalpana Devi and Jasleen Saini"],"Asmita won in golden score."],
+["L9","Tulika Maan won a CWG 2022 silver in which weight category?",["+78 kg","48 kg","63 kg","57 kg"],"Birmingham."],
+["L9","Linthoi Chanambam is known as the first Indian to win gold at…",["A World Judo Championship (cadet)","The Olympics","The Asian Games","The CWG"],"2022, cadet level."],
+
+/* L10 */
+["L10","What are the dimensions of a men's kabaddi court?",["13 m × 10 m","12 m × 8 m","15 m × 10 m","10 m × 8 m"],"Women 12 × 8.","p"],
+["L10","What are the dimensions of a women's kabaddi court?",["12 m × 8 m","13 m × 10 m","11 m × 7 m","12 m × 10 m"],"One less in length, two less in width."],
+["L10","How many players of a kabaddi team are on court at a time?",["7","6","9","12"],"12 in the squad.","p"],
+["L10","The maximum time for a raid in professional kabaddi is…",["30 seconds","20 seconds","40 seconds","1 minute"],"Asked 2025."],
+["L10","The duration of each half of a men's kabaddi match is…",["20 minutes","15 minutes","25 minutes","30 minutes"],"With a 5-minute break."],
+["L10","A women's kabaddi match is played as…",["15 – 5 – 15 minutes","20 – 5 – 20 minutes","10 – 5 – 10 minutes","25 – 5 – 25 minutes"],"Minutes: half, break, half."],
+["L10","The raider must cross which line for a raid to be valid?",["Baulk line","Bonus line","End line","Mid line"],"The 'Lakshman rekha'."],
+["L10","The distance between the mid line and the baulk line in kabaddi is…",["3.75 m","1 m","1.75 m","3 m"],"Bonus line is 1 m beyond it."],
+["L10","A bonus point in kabaddi is available only if the defending side has at least…",["6 players on court","5 players","7 players","4 players"],"Asked 2025."],
+["L10","Earning a bonus point revives…",["No player","One player","Two players","The whole team"],"Bonus gives +1 only."],
+["L10","A 'super tackle' in kabaddi is when the raider is tackled by…",["Three or fewer defenders","Four or more defenders","Exactly five defenders","All seven defenders"],"Worth 2 points."],
+["L10","A 'super raid' means the raider scores…",["Three or more points in one raid","Only a bonus point","A tackle point","One point"],"Super raid ≥ 3."],
+["L10","In kabaddi, 'Lona' refers to…",["Bonus points for an all-out","A raid chant","A foul","The playing mat"],"+2 points.","p"],
+["L10","How many extra points are given for an all-out (lona)?",["2","1","3","5"],"All out players are revived."],
+["L10","The continuous chanting of 'kabaddi' by a raider is called…",["Cant","Lona","Bonus","Tag"],"Cant."],
+["L10","The defenders in kabaddi are also called…",["Antis","Chasers","Strikers","Jammers"],"Raider v antis."],
+["L10","The lobby in kabaddi becomes active…",["Only after contact or a struggle","From the start of the raid","Only in the second half","Only for the raider"],"Stepping in earlier means out."],
+["L10","A do-or-die raid in kabaddi comes after…",["Two consecutive empty raids","One empty raid","Three tackles","An all-out"],"The raider must score or be out."],
+["L10","The first rules of kabaddi were framed in which state?",["Maharashtra","Punjab","Tamil Nadu","Gujarat"],"1918; printed 1923."],
+["L10","Kabaddi was introduced in the Asian Games in…",["1990 Beijing","1982 Delhi","1994 Hiroshima","2006 Doha"],"Men's; women's from 2010."],
+["L10","At the 2026 Asian Games, India won kabaddi gold in both men's and women's finals against…",["Iran","Pakistan","South Korea","Bangladesh"],"Aichi–Nagoya."],
+["L10","How many players of a kho-kho team take the field?",["9","7","12","11"],"12 in the squad.","p"],
+["L10","A standard kho-kho match lasts…",["36 minutes","48 minutes","40 minutes","60 minutes"],"Two innings, four turns."],
+["L10","Which features belong to a kho-kho field?",["Poles and a central lane","Baulk and bonus lines","A D and penalty spot","A crease and stumps"],"Kabaddi has baulk/bonus lines."],
+["L10","The first Kho-Kho World Cup (2025) was held in…",["New Delhi","Mumbai","Kathmandu","Dhaka"],"India won both titles."],
+
+/* L11 */
+["L11","How many squares are there on a chessboard?",["64","32","81","100"],"8 × 8.","p"],
+["L11","How many pieces does each player have at the start of a chess game?",["16","8","32","12"],"32 in total."],
+["L11","The horizontal rows on a chessboard are called…",["Ranks","Files","Diagonals","Lanes"],"Vertical columns are files."],
+["L11","Which chess piece moves in an L-shape?",["Knight","Bishop","Rook","Queen"],"'Dhai ghar'."],
+["L11","Castling in chess involves the king and the…",["Rook","Queen","Bishop","Knight"],"The only move of two pieces together."],
+["L11","Which is a condition for castling?",["Neither the king nor that rook has moved","The king must be in check","The queen must have moved","It can be done twice"],"And the king is not in check."],
+["L11","A stalemate in chess results in…",["A draw","A win for White","A win for Black","A replay"],"No legal move, not in check."],
+["L11","'En passant' in chess is a special capture by a…",["Pawn","Knight","King","Rook"],"Only on the very next move."],
+["L11","A pawn reaching the last (8th) rank can be…",["Promoted to a queen or another piece","Removed","Moved backward","Exchanged for the king"],"Even if a queen is already on the board."],
+["L11","When was chess introduced in the Asian Games?",["2006","2010","1998","2002"],"Doha."],
+["L11","Chess is part of which of these multi-sport events?",["Asian Games","Commonwealth Games","Summer Olympics","All three"],"Not in CWG or Olympics."],
+["L11","Who was India's first Grandmaster?",["Viswanathan Anand","D. Gukesh","Dibyendu Barua","Praggnanandhaa"],"1988."],
+["L11","Who became the youngest undisputed World Chess Champion in December 2024?",["D. Gukesh","R. Praggnanandhaa","Arjun Erigaisi","Magnus Carlsen"],"Aged 18."],
+["L11","Who won the FIDE Women's World Cup 2025?",["Divya Deshmukh","Koneru Humpy","Harika Dronavalli","Vaishali R."],"Beat Humpy in the final; became a GM."],
+["L11","At the 2024 Chess Olympiad in Budapest, India won…",["Both open and women's golds","Only the open gold","Only the women's gold","Silver in both"],"Historic double."],
+["L11","The 'Réti' is a…",["Chess opening for White","Football formation","Judo throw","Golf score"],"Mentioned in lecture."],
+
+/* L12 */
+["L12","What is the height of a basketball ring from the floor?",["3.05 m","2.44 m","3.5 m","2.75 m"],"10 feet.","p"],
+["L12","What are the dimensions of a basketball court?",["28 m × 15 m","30 m × 18 m","26 m × 14 m","24 m × 12 m"],"FIBA."],
+["L12","The distance of the three-point line in international basketball is…",["6.75 m","6.25 m","7.25 m","5.75 m"],"Since 2010.","p"],
+["L12","A basketball team must attempt a shot within…",["24 seconds","30 seconds","35 seconds","20 seconds"],"Shot clock."],
+["L12","The basketball backboard measures…",["1.80 m wide × 1.05 m high","1.05 m wide × 1.80 m high","1.5 m × 1 m","2 m × 1.2 m"],"Examiners swap them."],
+["L12","A basketball net has how many loops to attach it to the ring?",["12","10","8","16"],"And it must be white."],
+["L12","A shot that goes through the hoop without touching the ring is a…",["Swish","Slam dunk","Lay-up","Alley-oop"],"Asked 2025."],
+["L12","A player jumping and forcefully pushing the ball down through the hoop is a…",["Slam dunk","Swish","Air ball","Rebound"],"Dunk."],
+["L12","In basketball, a player is 'fouled out' after how many personal fouls?",["5","4","6","3"],"FIBA rule."],
+["L12","The diameter of the centre circle in basketball is…",["3.6 m","3 m","4 m","1.8 m"],"FIBA."],
+["L12","What is the length of a badminton court?",["13.4 m","12 m","23.77 m","14 m"],"Same for singles and doubles."],
+["L12","What is the width of a singles badminton court?",["5.18 m","6.1 m","4.5 m","8.23 m"],"Doubles 6.1 m.","p"],
+["L12","The short service line in badminton is how far from the net?",["1.98 m","1.5 m","2.5 m","0.76 m"],"6 ft 6 in."],
+["L12","The height of a badminton net at the centre is…",["5 ft","5 ft 1 in","3 ft","6 ft"],"5 ft 1 in at the posts."],
+["L12","What is the length of a tennis court?",["23.77 m","13.4 m","28 m","20.12 m"],"78 ft."],
+["L12","The width of a singles tennis court is…",["27 ft","36 ft","30 ft","21 ft"],"Doubles 36 ft."],
+["L12","The height of a tennis net at the centre is…",["3 ft","3.5 ft","5 ft","4 ft"],"0.914 m."],
+["L12","In tennis, a score of 40-40 is called…",["Deuce","Love","Advantage","Let"],"Love = zero.","p"],
+["L12","'Love' in tennis means a score of…",["Zero","15","40","Game point"],"Love."],
+["L12","In handball, which action is NOT allowed?",["Pulling or punching the ball out of an opponent's hands","Dribbling","Blocking","Intercepting a pass"],"Asked in 2025."],
+["L12","In golf, 'par' means…",["The set number of strokes for a hole","One under the set number","A hole in one","One over"],"Standard strokes."],
+["L12","In golf, a 'birdie' is…",["One stroke under par","Two under par","One over par","A hole in one"],"Eagle −2, albatross −3."],
+["L12","In golf, a 'bogey' is…",["One stroke over par","One stroke under par","Two under par","Par"],"Double bogey +2."],
+["L12","In golf, three strokes under par is called…",["Albatross","Eagle","Birdie","Ace"],"Rare."],
+["L12","A 'hole in one' in golf is also called an…",["Ace","Eagle","Albatross","Birdie"],"First-shot hole."],
+["L12","A soft, surprise shot just over the net in volleyball or badminton is a…",["Dump shot","Smash","Lob","Drive"],"Mentioned in lecture."],
+
+/* L13 */
+["L13","Who won India's first individual Olympic medal?",["K.D. Jadhav","Abhinav Bindra","Milkha Singh","Leander Paes"],"Wrestling bronze, Helsinki 1952.","p"],
+["L13","India's first individual Olympic gold was won in which event?",["10 m air rifle shooting","Javelin throw","Wrestling","Boxing"],"Abhinav Bindra, Beijing 2008."],
+["L13","Who won India's first individual Olympic gold medal?",["Abhinav Bindra","Neeraj Chopra","Rajyavardhan Rathore","Sushil Kumar"],"Beijing 2008, 10 m air rifle.","p"],
+["L13","Who was the first Indian woman to win an Olympic medal?",["Karnam Malleswari","P.T. Usha","Saina Nehwal","Mary Kom"],"Weightlifting bronze, Sydney 2000."],
+["L13","Who won India's first Olympic gold in athletics?",["Neeraj Chopra","Milkha Singh","Norman Pritchard","Avinash Sable"],"Tokyo 2020."],
+["L13","How many medals did India win at the Paris 2024 Olympics?",["6","7","5","8"],"1 silver, 5 bronze."],
+["L13","Who became the first Indian since independence to win two medals at a single Olympics (Paris 2024)?",["Manu Bhaker","Neeraj Chopra","P.V. Sindhu","Sarabjot Singh"],"Two shooting bronzes."],
+["L13","Who became India's youngest Olympic medallist at Paris 2024?",["Aman Sehrawat","Swapnil Kusale","Sarabjot Singh","Manu Bhaker"],"Wrestling bronze, aged 21."],
+["L13","India's best-ever Olympic medal haul (7) came at…",["Tokyo 2020","Paris 2024","London 2012","Beijing 2008"],"Including Neeraj's gold."],
+["L13","The 2028 Summer Olympics, where cricket returns, will be held in…",["Los Angeles","Brisbane","Paris","Tokyo"],"Brisbane hosts 2032."],
+["L13","The 2026 Winter Olympics were held in…",["Milan–Cortina, Italy","Beijing, China","Salt Lake City, USA","Sapporo, Japan"],"February 2026."],
+["L13","The first Asian Games were held in 1951 at…",["New Delhi","Tokyo","Manila","Bangkok"],"India hosted again in 1982."],
+["L13","The 2026 Asian Games were held in…",["Aichi–Nagoya, Japan","Hangzhou, China","Doha, Qatar","Jakarta, Indonesia"],"19 Sep – 4 Oct 2026."],
+["L13","Who were India's flag bearers at the 2026 Asian Games opening ceremony?",["Manu Bhaker and Pawan Sehrawat","Neeraj Chopra and Mary Kom","P.V. Sindhu and Harmanpreet Singh","Lovlina and Sharath Kamal"],"Shooter and kabaddi captain."],
+["L13","The 2026 Commonwealth Games were held in…",["Glasgow","Birmingham","Gold Coast","Victoria"],"23 July – 2 August 2026."],
+["L13","India's position in the Glasgow 2026 Commonwealth Games medal table was…",["4th","3rd","2nd","5th"],"13 gold, 17 silver, 9 bronze."],
+["L13","In which sport did India win 7 golds at Glasgow 2026?",["Boxing","Weightlifting","Judo","Athletics"],"Topped the boxing table."],
+["L13","Which of these sports was NOT on the Glasgow 2026 CWG programme?",["Wrestling","Boxing","Judo","Weightlifting"],"Also dropped: shooting, badminton, hockey, TT, cricket."],
+["L13","Which country topped the Glasgow 2026 Commonwealth Games medal table?",["Australia","England","Canada","India"],"62 golds."],
+["L13","The first Commonwealth Games (British Empire Games) were held in 1930 at…",["Hamilton, Canada","London","Sydney","Glasgow"],"Hamilton."],
+["L13","Hockey was introduced at the Commonwealth Games in…",["1998","1990","2002","1986"],"Kuala Lumpur."],
+["L13","Norman Pritchard won two silver medals for India at which Olympics?",["Paris 1900","London 1908","Stockholm 1912","Athens 1896"],"Athletics."],
+
+/* L14 */
+["L14","The Thomas Cup is the world team championship for…",["Men's badminton","Women's badminton","Men's tennis","Mixed table tennis"],"Men's team badminton.","p"],
+["L14","The Uber Cup is associated with…",["Women's badminton","Women's tennis","Women's hockey","Women's golf"],"Team championship."],
+["L14","The Sudirman Cup is a championship in…",["Mixed team badminton","Tennis","Football","Table tennis"],"Thomas, Uber, Sudirman."],
+["L14","The Davis Cup is associated with…",["Tennis","Badminton","Golf","Polo"],"Men's team tennis.","p"],
+["L14","The Ryder Cup is associated with…",["Golf","Tennis","Cricket","Rowing"],"Europe v USA."],
+["L14","The Swaythling Cup is associated with…",["Table tennis","Tennis","Badminton","Squash"],"Men's; Corbillon for women."],
+["L14","The Stanley Cup is awarded in…",["Ice hockey","Field hockey","Rugby","Baseball"],"NHL."],
+["L14","The Aga Khan Cup is associated with…",["Hockey","Football","Polo","Cricket"],"Hockey."],
+["L14","The Subroto Cup is associated with…",["Football","Hockey","Basketball","Kabaddi"],"Inter-school football."],
+["L14","The Durand Cup is associated with…",["Football","Hockey","Cricket","Golf"],"Oldest in India.","p"],
+["L14","'Bully' and 'short corner' are terms used in…",["Hockey","Football","Polo","Basketball"],"Field hockey."],
+["L14","'Deuce' and 'ace' are terms used in…",["Tennis","Golf","Chess","Cricket"],"Tennis."],
+["L14","'Alley-oop' is a term used in…",["Basketball","Volleyball","Tennis","Football"],"Basketball."],
+["L14","'Tatami' and 'ippon' are associated with…",["Judo","Karate","Wrestling","Taekwondo"],"Judo."],
+["L14","Which is India's highest sporting honour?",["Major Dhyan Chand Khel Ratna","Arjuna Award","Dronacharya Award","Padma Shri"],"Renamed in 2021.","p"],
+["L14","The Dronacharya Award is given to…",["Coaches","Players","Sports journalists","Universities"],"Arjuna = players."],
+["L14","The Maulana Abul Kalam Azad (MAKA) Trophy is given to…",["The best university in sports","The best coach","The best athlete","The best state"],"Inter-university sports."],
+["L14","The Rajiv Gandhi Khel Ratna was renamed Major Dhyan Chand Khel Ratna in…",["2021","2019","2023","2017"],"August 2021."],
+["L14","Who received the Khel Ratna for 2024?",["Manu Bhaker, D. Gukesh, Harmanpreet Singh and Praveen Kumar","Neeraj Chopra alone","Sindhu and Mary Kom","Sharath Kamal alone"],"Announced January 2025."],
+["L14","For the National Sports Awards 2025 (announced August 2026), how many Khel Ratna awards were given?",["None","One","Two","Four"],"Only the third time, after 2008 and 2014."],
+["L14","Which chess players received the Arjuna Award 2025?",["Divya Deshmukh and Vidit Gujrathi","Gukesh and Praggnanandhaa","Humpy and Harika","Anand and Arjun"],"Announced 18 Aug 2026."],
+
+/* L15 */
+["L15","The height of a basketball ring equals which cricket measurement?",["Width of the pitch (3.05 m)","Height of the stumps","Length of the pitch","Popping crease distance"],"Both 3.05 m (10 ft)."],
+["L15","Which two measurements are both 9.15 m in football?",["Centre-circle radius and penalty-arc radius","Goal width and height","Penalty mark and goal area","Touch line and goal line"],"10 yards each."],
+["L15","Which is the correct match of sport and goal size?",["Hockey – 3.66 m × 2.14 m","Hockey – 7.32 m × 2.44 m","Football – 3.66 m × 2.14 m","Football – 6 m × 2 m"],"Football 7.32 × 2.44."],
+["L15","Which object weighs 7.26 kg?",["Men's shot and men's hammer","Men's discus","Men's javelin","Women's shot"],"Twins."],
+["L15","14.63 m and 16.5 m are, respectively, the…",["Hockey D radius and football penalty-area depth","Football circle and hockey circle","Basketball court and tennis court widths","Kabaddi and kho-kho fields"],"Don't mix them."],
+["L15","Which court is 13.4 m long?",["Badminton","Tennis","Kabaddi","Basketball"],"Kabaddi 13 m; tennis 23.77 m."],
+["L15","Which of these has the LONGEST playing duration?",["Football (90 min)","Hockey (60 min)","Kabaddi (40 min)","Kho-kho (36 min)"],"Football."],
+["L15","Arrange by players per side (low to high): basketball, volleyball, handball, kho-kho",["5, 6, 7, 9","6, 5, 7, 9","5, 7, 6, 9","7, 6, 5, 9"],"Basketball 5, volleyball 6, handball 7, kho-kho 9."]
+];
+
+/* Dimension sheet: [sport, item, value, hook, lesson] */
+const DIMS = [
+ ["Cricket","Pitch length","22 yd = 20.12 m","22 yards, stump to stump","L2"],
+ ["Cricket","Pitch width","10 ft = 3.05 m","3.05 twin of basketball ring","L2"],
+ ["Cricket","Popping crease from stumps","4 ft = 1.22 m","4 → a boundary four; 1.22 twin of lane","L2"],
+ ["Cricket","Stumps","28 in high × 9 in wide","28 days in Feb, 9 months","L2"],
+ ["Cricket","Bat width (max)","4.25 in (108 mm)","not 4.5","L2"],
+ ["Cricket","Ball weight (men)","155.9–163 g","≈ hockey ball","L2"],
+ ["Cricket","Ball circumference","22.4–22.9 cm","22 again, like the pitch","L2"],
+ ["Cricket","New ball in Tests","after 80 overs","optional","L2"],
+ ["Cricket","Timed out","3 minutes","Mathews 2023","L3"],
+ ["Cricket","Follow-on lead (5-day)","200 runs","200-150-100-75","L3"],
+ ["Athletics","Track lap","400 m","100 m straight","L5"],
+ ["Athletics","Lane width","1.22 m","twin of popping crease","L5"],
+ ["Athletics","Lane line width","5 cm","","L5"],
+ ["Athletics","4×100 takeover zone","30 m","short race, big zone","L5"],
+ ["Athletics","4×400 takeover zone","20 m","long race, small zone","L5"],
+ ["Athletics","Relay baton","28–30 cm · ≥ 50 g","","L5"],
+ ["Athletics","Steeplechase","3000 m · 28 barriers + 7 water","35 obstacles","L5"],
+ ["Athletics","Hurdles","110 m men · 100 m women","men get 10 extra","L5"],
+ ["Athletics","Marathon","42.195 km","half 21.0975","L5"],
+ ["Athletics","Shot put","7.26 kg men · 4 kg women","= hammer","L6"],
+ ["Athletics","Hammer","7.26 kg men · 4 kg women","= shot","L6"],
+ ["Athletics","Discus","2 kg men · 1 kg women","double","L6"],
+ ["Athletics","Javelin","800 g men · 600 g women","8 vs 6","L6"],
+ ["Hockey","Field","91.4 × 55 m","100 × 60 yards","L7"],
+ ["Hockey","Shooting circle (D) radius","14.63 m","16 yards","L7"],
+ ["Hockey","Goal","3.66 m wide × 2.14 m high","half of football's width","L7"],
+ ["Hockey","Penalty spot","6.40 m","7 yards","L7"],
+ ["Hockey","23 m line","22.90 m","25 yards","L7"],
+ ["Hockey","Match","4 × 15 = 60 min","","L7"],
+ ["Hockey","Ball","156–163 g","≈ cricket ball","L7"],
+ ["Football","Field (international)","100–110 × 64–75 m","any match: 90–120 × 45–90","L8"],
+ ["Football","Goal","7.32 m wide × 2.44 m high","8 yd × 8 ft","L8"],
+ ["Football","Penalty mark","11 m","11 players, 11 m","L8"],
+ ["Football","Centre circle radius","9.15 m","10 yards; arc same","L8"],
+ ["Football","Penalty area depth","16.5 m","18 yards","L8"],
+ ["Football","Goal area depth","5.5 m","6 yards","L8"],
+ ["Football","Ball","410–450 g · 68–70 cm","size 5","L8"],
+ ["Football","Match","45 + 45 (+ 2 × 15)","","L8"],
+ ["Football","Keeper holding limit","8 seconds → corner","from July 2025","L8"],
+ ["Judo","Contest area","8 × 8 to 10 × 10 m","square","L9"],
+ ["Judo","Safety area","3 m","","L9"],
+ ["Judo","Hold-down (osaekomi)","10 s waza-ari · 20 s ippon","","L9"],
+ ["Judo","Bout (seniors)","4 min + golden score","","L9"],
+ ["Kabaddi","Court (men)","13 × 10 m","","L10"],
+ ["Kabaddi","Court (women)","12 × 8 m","","L10"],
+ ["Kabaddi","Baulk line","3.75 m from mid line","bonus line 1 m further","L10"],
+ ["Kabaddi","Raid","30 seconds","","L10"],
+ ["Kabaddi","Match (men)","20 – 5 – 20 min","women 15 – 5 – 15","L10"],
+ ["Kho-kho","Match","36 min","9 on field","L10"],
+ ["Chess","Board","8 × 8 = 64 squares","32 pieces","L11"],
+ ["Basketball","Court","28 × 15 m","","L12"],
+ ["Basketball","Ring height","3.05 m (10 ft)","twin of pitch width","L12"],
+ ["Basketball","Ring inner diameter","450–459 mm","","L12"],
+ ["Basketball","Backboard","1.80 wide × 1.05 high","","L12"],
+ ["Basketball","3-point line","6.75 m","","L12"],
+ ["Basketball","Shot clock","24 s","","L12"],
+ ["Badminton","Court","13.4 × 6.1 m (singles 5.18)","","L12"],
+ ["Badminton","Short service line","1.98 m from net","","L12"],
+ ["Badminton","Net","5 ft centre · 5 ft 1 in posts","","L12"],
+ ["Tennis","Court","23.77 m × 8.23 m singles","78 × 27 ft; doubles 36 ft","L12"],
+ ["Tennis","Net (centre)","3 ft (0.914 m)","","L12"]
+];
+const SPORTS = [...new Set(DIMS.map(d=>d[0]))];
+
+/* Players per side: [sport, on field, notes, body, lesson] */
+const PLAYERS = [
+ ["Basketball","5","Naismith, 1891","FIBA","L12"],
+ ["Ice hockey","6","5 skaters + keeper","IIHF","L1"],
+ ["Volleyball","6","Morgan, 1895","FIVB","L12"],
+ ["Handball","7","","IHF","L12"],
+ ["Netball","7","","World Netball","L1"],
+ ["Kabaddi","7","12 in squad","IKF / AKFI","L10"],
+ ["Water polo","7","","World Aquatics","L1"],
+ ["Kho-kho","9","12 in squad","KKFI","L10"],
+ ["Baseball","9","","WBSC","L1"],
+ ["Cricket","11","","ICC / BCCI","L2"],
+ ["Football","11","min 7 to play","FIFA / AIFF","L8"],
+ ["Hockey","11","","FIH / Hockey India","L7"],
+ ["Rugby league","13","","IRL","L1"],
+ ["Rugby union","15","","World Rugby","L1"],
+ ["Polo","4","","FIP","L1"]
+];
+
+/* Term → sport */
+const TERMS = [
+ ["Googly · doosra · yorker · LBW · follow-on · silly point · gully","Cricket"],
+ ["Bully · short corner · penalty stroke · backstick · D","Hockey"],
+ ["Brace · hat-trick · offside · own goal · corner kick","Football"],
+ ["Ippon · waza-ari · shido · hajime · tatami · judogi · tori · uke","Judo"],
+ ["Raid · cant · lona · baulk line · bonus line · antis · super tackle","Kabaddi"],
+ ["Chaser · runner · pole dive · kho","Kho-kho"],
+ ["Castling · en passant · stalemate · checkmate · rank · file","Chess"],
+ ["Swish · slam dunk · alley-oop · rebound · air ball","Basketball"],
+ ["Deuce · love · ace · let · advantage","Tennis"],
+ ["Par · birdie · eagle · albatross · bogey · tee","Golf"],
+ ["Smash · drop · service line · shuttlecock","Badminton"],
+ ["Anchor leg · takeover zone · baton · crouch start · bunch start","Athletics (relay / sprint)"],
+ ["Fosbury flop · hop-step-jump · sector · foul throw","Athletics (jumps & throws)"],
+ ["Dump shot · spike · libero · block","Volleyball"]
+];
+
+/* Trophy → sport */
+const CUPS = [
+ ["Thomas Cup","Badminton (men's team)"],["Uber Cup","Badminton (women's team)"],["Sudirman Cup","Badminton (mixed team)"],
+ ["Davis Cup","Tennis (men's team)"],["Billie Jean King Cup","Tennis (women's team)"],
+ ["Swaythling Cup","Table tennis (men)"],["Corbillon Cup","Table tennis (women)"],
+ ["Ryder Cup","Golf"],["Stanley Cup","Ice hockey"],
+ ["Aga Khan Cup","Hockey"],["Beighton Cup","Hockey"],["Dhyan Chand Trophy","Hockey"],
+ ["Durand Cup","Football (oldest in India, 1888)"],["Santosh Trophy","Football (states)"],["Subroto Cup","Football (schools)"],["IFA Shield","Football"],["Federation Cup","Football"],
+ ["Ranji Trophy","Cricket (first-class)"],["Vijay Hazare Trophy","Cricket (one-day)"],["Syed Mushtaq Ali Trophy","Cricket (T20)"],["Duleep Trophy","Cricket (zonal)"],["Deodhar Trophy","Cricket (zonal one-day)"],["Irani Cup","Cricket (Ranji champion v Rest of India)"],["C.K. Nayudu Trophy","Cricket (U-23)"]
+];
+
+/* Firsts & records: [feat, who, when/where, lesson] */
+const FIRSTS = [
+ ["First individual Olympic medal","K.D. Jadhav","Wrestling bronze · Helsinki 1952","L13"],
+ ["First individual Olympic gold","Abhinav Bindra","10 m air rifle · Beijing 2008","L13"],
+ ["First woman Olympic medallist","Karnam Malleswari","Weightlifting bronze · Sydney 2000","L13"],
+ ["First Olympic athletics gold","Neeraj Chopra","Javelin · Tokyo 2020","L6"],
+ ["Two medals at one Games (post-1947)","Manu Bhaker","Shooting bronzes · Paris 2024","L13"],
+ ["First World Athletics medal","Anju Bobby George","Long jump bronze · Paris 2003","L6"],
+ ["First Asian Games athletics golds","Levy Pinto","100 m & 200 m · Delhi 1951","L6"],
+ ["First woman individual Asian Games gold","Kamaljeet Sandhu","400 m · Bangkok 1970","L6"],
+ ["First Olympic hockey gold (captain)","Jaipal Singh Munda","Amsterdam 1928","L7"],
+ ["10 goals v USA","Roop Singh","24–1 · Los Angeles 1932","L7"],
+ ["Hockey World Cup win (captain)","Ajit Pal Singh","Kuala Lumpur 1975","L7"],
+ ["First Test captain","C.K. Nayudu","Lord's 1932","L4"],
+ ["ODI World Cup (captain)","Kapil Dev","Lord's 1983","L4"],
+ ["T20 World Cup 2026 (captain)","Suryakumar Yadav","beat NZ by 96 runs · Ahmedabad","L4"],
+ ["Women's ODI World Cup (captain)","Harmanpreet Kaur","2025","L4"],
+ ["World Judo Championships medal","Kalpana Devi","Bronze · 2010","L9"],
+ ["First CWG judo golds","Asmita Dey & Harsh Singh","Glasgow 2026","L9"],
+ ["First Grandmaster","Viswanathan Anand","1988","L11"],
+ ["Youngest undisputed world chess champion","D. Gukesh","Singapore, Dec 2024","L11"],
+ ["FIDE Women's World Cup","Divya Deshmukh","2025, beat Humpy","L11"],
+ ["First timed-out batter (intl)","Angelo Mathews","ODI World Cup 2023","L3"]
+];
+
+const TILES = [["22","yards — cricket pitch"],["4","ft — popping crease"],["80","overs — new ball"],["200","run follow-on lead"],["1.22","m — lane width"],["30 / 20","m — relay zones"],["35","steeplechase obstacles"],["7.26","kg — shot & hammer"],["14.63","m — hockey D"],["6.40","m — hockey stroke"],["8","Olympic hockey golds"],["7.32 × 2.44","football goal"],["11","m — penalty mark"],["9.15","m — centre circle"],["1882","judo born"],["1964","judo in Olympics"],["13 × 10","kabaddi court"],["30","s — raid"],["3.05","m — basketball ring"],["6.75","m — 3-point line"],["13.4","m — badminton court"],["23.77","m — tennis court"],["1928","BCCI + 1st hockey gold"],["96","runs — T20 WC 2026 final margin"]];
+const PAIRS = [["Hockey goal vs football goal","3.66 × 2.14 vs 7.32 × 2.44"],["Hockey D vs football box","14.63 m radius vs 16.5 m deep"],["4×100 vs 4×400 zone","30 m vs 20 m"],["Men's vs women's hurdles","110 m vs 100 m"],["Shot vs hammer","same weights: 7.26 / 4 kg"],["Tori vs uke","thrower vs receiver"],["Dojo vs tatami","hall vs mat"],["Shime vs kansetsu","choke vs joint lock"],["Hajime vs sono-mama","begin vs freeze"],["Bye vs leg bye","misses all vs off the body"],["Wide vs no-ball signal","both arms vs one arm"],["Run out vs stumped","fielding team vs bowler credited"],["Govan vs de Mello","first BCCI president vs secretary"],["Durand vs Santosh","oldest (clubs) vs states"],["Thomas vs Uber","men vs women badminton"],["Arjuna vs Dronacharya","players vs coaches"],["Birdie vs bogey","−1 vs +1"],["Ranks vs files","rows vs columns"],["Kabaddi men vs women","13 × 10 vs 12 × 8"],["National sport","none official — hockey only by tradition"]];
+const FULLFORMS = [["FIFA","Fédération Internationale de Football Association"],["IFAB","International Football Association Board"],["AIFF","All India Football Federation"],["ISL","Indian Super League"],["IWL","Indian Women's League"],["SAFF","South Asian Football Federation"],["FIH","Fédération Internationale de Hockey"],["ICC","International Cricket Council"],["BCCI","Board of Control for Cricket in India"],["IPL","Indian Premier League"],["LBW","Leg Before Wicket"],["DRS","Decision Review System"],["AFI","Athletics Federation of India"],["IOC","International Olympic Committee"],["IOA","Indian Olympic Association"],["OCA","Olympic Council of Asia"],["CGF","Commonwealth Games Federation"],["FIBA","Fédération Internationale de Basketball"],["FIVB","Fédération Internationale de Volleyball"],["FIDE","Fédération Internationale des Échecs"],["BWF","Badminton World Federation"],["ITF","International Tennis Federation"],["IJF","International Judo Federation"],["PKL","Pro Kabaddi League"],["AKFI","Amateur Kabaddi Federation of India"],["KKFI","Kho Kho Federation of India"],["SAI","Sports Authority of India"],["NADA","National Anti-Doping Agency"],["WADA","World Anti-Doping Agency"],["MAKA","Maulana Abul Kalam Azad Trophy"]];
+
+const APP = { key:"sports_workbook_v1", brand:"Sports", sub:"खेल · SSC CGL workbook",
+  eyebrow:"Rules · Dimensions · History · 2025–26 results",
+  intro:"15 short lessons from your six lectures: players per side, every field and goal size, cricket extras and dismissals, relay zones, judo Japanese terms with Hindi hooks, kabaddi scoring, trophies and firsts — ending with a one-page dimension sheet. Lecture slips are flagged in red Trap boxes and results are checked to September 2026." };
+
+
+/* ============================================================
+   HELPERS & STATE
+   ============================================================ */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const hash = s => { let h = 5381; for (let i=0;i<s.length;i++) h = ((h<<5)+h + s.charCodeAt(i))|0; return "q"+(h>>>0).toString(36); };
+const shuffle = a => { const b=a.slice(); for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]];} return b; };
+const L = id => LESSONS.find(l => l.id === id);
+const LNUM = id => LESSONS.findIndex(l => l.id === id) + 1;
+
+const QS = QB.map(r => {
+  const fixed = !!r[6];
+  return { t:r[0], q:r[1], o:r[2], e:r[3], p:(r[4]||"").includes("p"), a: fixed ? (r[5]||0) : 0, fixed, id:hash(r[1]) };
+});
+const byLesson = id => QS.filter(q => q.t === id);
+// order of options to show: array of original indexes
+const makePerm = q => q.fixed ? q.o.map((_,i)=>i) : shuffle(q.o.map((_,i)=>i));
+
+const KEY = APP.key;
+let S = { ans:{}, bm:{}, les:{}, mocks:[] };
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch(e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
+const record = (q, ok) => { S.ans[q.id] = ok ? 1 : 0; save(); renderTop(); };
+
+function renderTop(){
+  const ids = Object.keys(S.ans).filter(k => QS.some(q => q.id === k));
+  const right = ids.filter(k => S.ans[k] === 1).length;
+  const pct = ids.length ? Math.round(right*100/ids.length) : 0;
+  $("#topstat").innerHTML = `<b>${ids.length}</b>/${QS.length} tried<br><b>${pct}%</b> right now`;
+}
+
+/* ============================================================
+   ROUTING
+   ============================================================ */
+let TAB = "learn";
+let timerId = null;
+function go(tab){
+  TAB = tab;
+  document.querySelectorAll(".nav button").forEach(b => b.setAttribute("aria-current", b.dataset.tab===tab ? "page" : "false"));
+  if (tab === "learn") renderLearn();
+  if (tab === "practice") renderPractice();
+  if (tab === "mock") renderMock();
+  if (tab === "revise") renderRevise();
+  window.scrollTo(0,0);
+  try { history.replaceState(null, "", "#"+tab); } catch(e) {}
+}
+document.querySelectorAll(".nav button").forEach(b => b.addEventListener("click", () => {
+  if (TAB === "mock" && M && M.running && b.dataset.tab !== "mock") { go("mock"); showMockLeave(b.dataset.tab); return; }
+  go(b.dataset.tab);
+}));
+
+/* ============================================================
+   LEARN
+   ============================================================ */
+function renderLearn(){
+  const done = LESSONS.filter(l => S.les[l.id] && S.les[l.id].done).length;
+  const nextIdx = LESSONS.findIndex(l => !(S.les[l.id] && S.les[l.id].done));
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="hero">
+      <span class="eyebrow">${APP.eyebrow}</span>
+      <h1>Learn it, test it, revise it</h1>
+      <p>${APP.intro} ${QS.length} exam-style questions in all.</p>
+      <div class="meter" aria-label="Lessons done"><i style="width:${done/LESSONS.length*100}%"></i></div>
+      <div class="row between"><span class="muted num" style="font-size:13px">${done}/${LESSONS.length} lessons done</span>
+      ${nextIdx>=0 ? `<button class="btn pri sm" type="button" data-open="${LESSONS[nextIdx].id}">${done? "Continue" : "Start"}: Lesson ${nextIdx+1}</button>` : `<span class="muted" style="font-size:13px">All lessons done. Try a mock test.</span>`}</div>
+    </div>
+    <div class="lessons">${LESSONS.map((l,i) => {
+      const st = S.les[l.id] || {}; const n = byLesson(l.id).length;
+      return `<button type="button" class="les ${st.done?"done":""} ${i===nextIdx?"next":""}" data-open="${l.id}">
+        <span class="no">${st.done ? "✓" : i+1}</span>
+        <span class="t"><b>${esc(l.title)}</b><span>${l.hi} · ${n} questions</span></span>
+        <span class="sc">${st.best!=null ? `best<br>${st.best}/${n}` : ""}</span></button>`;}).join("")}
+    </div>
+    <p class="foot">Results are checked to September 2026. Where a lecture got a fact wrong, the lesson flags it in a red “Trap” box. Revise → Dimension sheet and Cover drill are the fastest last-week tools.</p>
+  </section>`;
+  $("#app").querySelectorAll("[data-open]").forEach(b => b.addEventListener("click", () => openLesson(b.dataset.open, "learn")));
+}
+
+function blockHTML(b){
+  if (b.k==="p") return `<div class="plain"><p>${b.h}</p></div>`;
+  if (b.k==="trick") return `<div class="trick"><span class="lab">Trick</span>${b.h}</div>`;
+  if (b.k==="link") return `<div class="link"><span class="lab">Link · connect the sports</span>${b.h}</div>`;
+  if (b.k==="q") { const perm = shuffle(b.o.map((_,i)=>i)); return `<div class="icheck" data-ic><span class="lab">Quick check</span><p class="qt">${esc(b.q)}</p><div class="opts">${perm.map((oi,k)=>`<button type="button" class="opt" data-ioi="${oi}"><span class="k">${"ABCD"[k]}</span><span>${esc(b.o[oi])}</span></button>`).join("")}</div><div class="exp" hidden><b class="okl"></b> ${esc(b.e)}</div></div>`; }
+  if (b.k==="trap") return `<div class="trap"><span class="lab">Trap · correction</span>${b.h}</div>`;
+  if (b.k==="facts") return `<div class="block"><h3>${b.title}</h3><dl class="facts">${b.rows.map(r=>`<div><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join("")}</dl></div>`;
+  if (b.k==="tl") return `<div class="block"><h3>${b.title}</h3><ul class="tl">${b.rows.map(r=>`<li><span class="y">${r[0]}</span><span>${r[1]}</span></li>`).join("")}</ul></div>`;
+  if (b.k==="table") {
+    const isNum = (ci) => b.numcol==="all" ? ci>0 : (b.numcol===1 && ci===1) || (typeof b.numcol==="string" && b.numcol.includes(String(ci)));
+    return `<div class="block"><h3>${b.title}</h3><div class="tbl"><table><thead><tr>${b.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${b.rows.map(r=>`<tr>${r.map((c,ci)=>`<td class="${isNum(ci)?"n":""}">${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+  }
+  if (b.k==="fig") return `<div class="block"><h3>${b.title}</h3><figure class="fig">${b.svg}<figcaption>${b.cap}</figcaption></figure></div>`;
+  if (b.k==="pyr") return `<div class="block"><h3>${b.title}</h3><div class="pyr">${b.items.map(it=>`<div>${PYR(it.rows)}<b>${it.name}</b><span class="muted">${it.note}</span></div>`).join("")}</div><p class="muted" style="font-size:13px;margin-top:8px"><span style="color:var(--blue)">■</span> males · <span style="color:var(--accent)">■</span> females · top = old, base = young</p></div>`;
+  return "";
+}
+
+let LQ = null;
+function openLesson(id, step){
+  const l = L(id), i = LNUM(id);
+  if (step === "quiz") { LQ = { id, list: shuffle(byLesson(id)).map(q => ({q, perm:makePerm(q)})), i:0, score:0, picked:null }; }
+  const head = `<div class="lhead"><button class="back" type="button" id="lback">‹ Lessons</button></div>
+    <span class="eyebrow">Lesson ${i} of ${LESSONS.length} · ${l.hi}</span><h1>${esc(l.title)}</h1>
+    <div class="steps" role="tablist">
+      <button type="button" data-step="learn" aria-current="${step==="learn"?"step":"false"}">1 · Learn</button>
+      <button type="button" data-step="quiz" aria-current="${step==="quiz"?"step":"false"}">2 · Quiz</button>
+      <button type="button" data-step="sum" aria-current="${step==="sum"?"step":"false"}">3 · Summary</button>
+    </div>`;
+  let body = "";
+  if (step === "learn") {
+    body = `<div class="stack">${l.blocks.map(blockHTML).join("")}
+      <div class="row end"><button class="btn pri" type="button" id="toquiz">Take the lesson quiz · ${byLesson(id).length} questions</button></div></div>`;
+  } else if (step === "quiz") {
+    body = `<div id="lq"></div>`;
+  } else {
+    const nxt = LESSONS[i];
+    body = `<div class="stack"><div class="block"><h3>Remember these</h3><ul class="sum">${l.sum.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>
+      <div class="row between"><button class="btn" type="button" id="relearn">Read again</button>
+      ${nxt ? `<button class="btn pri" type="button" id="nextles">Next: ${esc(nxt.title)}</button>` : `<button class="btn pri" type="button" id="tomock">Take a mock test</button>`}</div></div>`;
+    S.les[id] = Object.assign(S.les[id]||{}, {done:1}); save();
+  }
+  $("#app").innerHTML = `<section class="view stack">${head}${body}</section>`;
+  $("#lback").onclick = () => renderLearn();
+  $("#app").querySelectorAll("[data-step]").forEach(b => b.onclick = () => openLesson(id, b.dataset.step));
+  if (step==="learn") { $("#toquiz").onclick = () => openLesson(id,"quiz");
+    const ics = l.blocks.filter(b=>b.k==="q");
+    $("#app").querySelectorAll("[data-ic]").forEach((box,n) => { const b = ics[n];
+      box.querySelectorAll("[data-ioi]").forEach(btn => btn.onclick = () => {
+        if (box.dataset.done) return; box.dataset.done = 1; const pick = +btn.dataset.ioi;
+        box.querySelectorAll("[data-ioi]").forEach(x => { const oi=+x.dataset.ioi; x.disabled = true; if (oi===0) x.classList.add("ok"); else if (oi===pick) x.classList.add("no"); });
+        const ex = box.querySelector(".exp"); ex.hidden = false; const lab = ex.querySelector("b");
+        if (pick===0) { lab.textContent = "Correct."; } else { lab.className = "nol"; lab.textContent = "Answer: " + b.o[0] + "."; }
+      }); }); }
+  if (step==="quiz") renderLQ();
+  if (step==="sum") {
+    $("#relearn").onclick = () => openLesson(id,"learn");
+    const n = $("#nextles"); if (n) n.onclick = () => openLesson(LESSONS[i].id,"learn");
+    const m = $("#tomock"); if (m) m.onclick = () => go("mock");
+  }
+  window.scrollTo(0,0);
+}
+
+function optsHTML(q, perm, state){
+  // state: {picked: originalIndex|null, reveal: bool, sel: originalIndex|null}
+  return perm.map((oi, k) => {
+    let cls = "opt";
+    if (state.reveal) { if (oi === q.a) cls += " ok"; else if (oi === state.picked) cls += " no"; }
+    else if (state.sel === oi) cls += " sel";
+    return `<button type="button" class="${cls}" data-oi="${oi}" ${state.reveal?"disabled":""}><span class="k">${"ABCD"[k]}</span><span>${esc(q.o[oi])}</span></button>`;
+  }).join("");
+}
+function expHTML(q, picked){
+  const ok = picked === q.a;
+  return `<div class="exp">${ok ? `<b class="okl">Correct.</b>` : `<b class="nol">Answer: ${esc(q.o[q.a])}.</b>`} ${esc(q.e)}</div>`;
+}
+function metaHTML(q, no){
+  return `<div class="qmeta"><span class="qno">${no}</span><span class="tag">L${LNUM(q.t)} · ${esc(L(q.t).title)}</span>${q.p?`<span class="tag pyq">Exam-asked</span>`:""}
+  <button type="button" class="bm" data-bm="${q.id}" aria-pressed="${S.bm[q.id]?"true":"false"}" aria-label="Bookmark">${S.bm[q.id]?"★":"☆"}</button></div>`;
+}
+
+function renderLQ(){
+  const box = $("#lq");
+  if (LQ.i >= LQ.list.length) {
+    const n = LQ.list.length, l = L(LQ.id);
+    const st = S.les[LQ.id] || {}; st.best = Math.max(st.best||0, LQ.score); S.les[LQ.id] = st; save();
+    box.innerHTML = `<div class="stack"><div class="block stack"><span class="eyebrow">Quiz done</span>
+      <div class="scorebig"><span class="num">${LQ.score}</span><span class="muted">/ ${n} correct</span></div>
+      <p class="muted">${LQ.score===n ? "Full marks." : LQ.score >= n*0.8 ? "Strong. Review the ones you missed in Practice → Mistakes." : "Read the lesson once more, then retry. Missed questions are saved under Practice → Mistakes."}</p></div>
+      <div class="row between"><button class="btn" type="button" id="retry">Retry quiz</button><button class="btn pri" type="button" id="tosum">See summary</button></div></div>`;
+    $("#retry").onclick = () => openLesson(LQ.id,"quiz");
+    $("#tosum").onclick = () => openLesson(LQ.id,"sum");
+    return;
+  }
+  const it = LQ.list[LQ.i], q = it.q;
+  const reveal = LQ.picked !== null;
+  box.innerHTML = `<div class="stack"><div class="meter"><i style="width:${LQ.i/LQ.list.length*100}%"></i></div>
+    <article class="qcard">${metaHTML(q, `Q${LQ.i+1}/${LQ.list.length}`)}
+    <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {picked:LQ.picked, reveal})}</div>
+    ${reveal ? expHTML(q, LQ.picked) : ""}</article>
+    ${reveal ? `<div class="row end"><button class="btn pri" type="button" id="lqnext">${LQ.i+1 < LQ.list.length ? "Next question" : "Finish"}</button></div>` : `<p class="muted" style="font-size:13px">Score so far: <span class="num">${LQ.score}</span></p>`}</div>`;
+  box.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    if (LQ.picked !== null) return;
+    LQ.picked = +b.dataset.oi; const ok = LQ.picked === q.a; if (ok) LQ.score++; record(q, ok); renderLQ();
+  });
+  bindBM(box);
+  const nx = $("#lqnext"); if (nx) nx.onclick = () => { LQ.i++; LQ.picked = null; renderLQ(); window.scrollTo(0,0); };
+}
+
+function bindBM(root){
+  root.querySelectorAll("[data-bm]").forEach(b => b.onclick = (ev) => {
+    ev.stopPropagation();
+    const id = b.dataset.bm; if (S.bm[id]) delete S.bm[id]; else S.bm[id] = 1; save();
+    b.setAttribute("aria-pressed", S.bm[id] ? "true":"false"); b.textContent = S.bm[id] ? "★" : "☆";
+  });
+}
+
+/* ============================================================
+   PRACTICE
+   ============================================================ */
+let PF = "all", PSHOW = 20, PORDER = null, PPERM = {}, PPICK = {};
+function practiceList(){
+  let list = QS;
+  if (PF === "pyq") list = QS.filter(q => q.p);
+  else if (PF === "wrong") list = QS.filter(q => S.ans[q.id] === 0);
+  else if (PF === "new") list = QS.filter(q => S.ans[q.id] === undefined);
+  else if (PF === "bm") list = QS.filter(q => S.bm[q.id]);
+  else if (PF !== "all") list = QS.filter(q => q.t === PF);
+  if (PORDER) { const pos = new Map(PORDER.map((id,i)=>[id,i])); list = list.slice().sort((a,b)=>(pos.get(a.id)??0)-(pos.get(b.id)??0)); }
+  return list;
+}
+function renderPractice(){
+  const wrongN = QS.filter(q => S.ans[q.id] === 0).length, bmN = QS.filter(q=>S.bm[q.id]).length, pyqN = QS.filter(q=>q.p).length;
+  const chips = [["all",`All ${QS.length}`],["new","Not tried"],["wrong",`Mistakes ${wrongN}`],["pyq",`Exam-asked ${pyqN}`],["bm",`Starred ${bmN}`]].concat(LESSONS.map((l,i)=>[l.id,`L${i+1} ${l.title}`]));
+  const list = practiceList();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Question bank</span><h1>Practice</h1>
+    <p class="muted">Tap an option to check it. Wrong answers go to <b>Mistakes</b> until you get them right.</p></div>
+    <div class="chips" role="group" aria-label="Filter">${chips.map(c=>`<button type="button" class="chip" data-f="${c[0]}" aria-pressed="${PF===c[0]}">${esc(c[1])}</button>`).join("")}</div>
+    <div class="row between"><span class="muted num" style="font-size:13px">${list.length} questions</span>
+      <div class="row"><button class="btn sm ghost" type="button" id="pshuf">${PORDER?"In order":"Shuffle"}</button></div></div>
+    <div class="stack" id="plist"></div>
+  </section>`;
+  $("#app").querySelectorAll("[data-f]").forEach(b => b.onclick = () => { PF = b.dataset.f; PSHOW = 20; PPICK = {}; renderPractice(); });
+  $("#pshuf").onclick = () => { PORDER = PORDER ? null : shuffle(QS.map(q=>q.id)); PSHOW = 20; renderPractice(); };
+  const chipOn = $(`.chip[aria-pressed="true"]`); if (chipOn) chipOn.scrollIntoView({block:"nearest", inline:"center"});
+  drawPList();
+}
+function pCard(q, idx){
+  if (!PPERM[q.id]) PPERM[q.id] = makePerm(q);
+  const picked = PPICK[q.id]; const reveal = picked !== undefined;
+  return `<article class="qcard" data-q="${q.id}">${metaHTML(q, "Q"+(idx+1))}<p class="qt">${esc(q.q)}</p>
+    <div class="opts">${optsHTML(q, PPERM[q.id], {picked: reveal?picked:null, reveal})}</div>${reveal?expHTML(q,picked):""}</article>`;
+}
+function drawPList(){
+  const list = practiceList(), box = $("#plist");
+  if (!list.length) { box.innerHTML = `<p class="empty">${PF==="wrong"?"No mistakes saved. Answer some questions first, or you've cleared them all.":PF==="bm"?"Nothing starred yet. Tap ☆ on any question.":"Nothing here."}</p>`; return; }
+  box.innerHTML = list.slice(0, PSHOW).map((q,i)=>pCard(q,i)).join("") + (list.length > PSHOW ? `<button class="btn" type="button" id="pmore">Show 20 more (${list.length-PSHOW} left)</button>` : "");
+  bindP(box);
+  const more = $("#pmore"); if (more) more.onclick = () => { PSHOW += 20; drawPList(); };
+}
+function bindP(box){ box.querySelectorAll(".qcard").forEach(bindCard); }
+function bindCard(card){
+  card.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    const q = QS.find(x => x.id === card.dataset.q); if (PPICK[q.id] !== undefined) return;
+    PPICK[q.id] = +b.dataset.oi; record(q, PPICK[q.id] === q.a);
+    const idx = +card.querySelector(".qno").textContent.slice(1) - 1;
+    const tmp = document.createElement("div"); tmp.innerHTML = pCard(q, idx); const nc = tmp.firstElementChild;
+    card.replaceWith(nc); bindCard(nc);
+  });
+  bindBM(card);
+}
+
+/* ============================================================
+   MOCK TEST
+   ============================================================ */
+let M = null, MCFG = {n:25, scope:"all", neg:1}, LEAVE_TO = null;
+function renderMock(){
+  if (M && M.running) return drawMockRun();
+  if (M && M.done) return drawMockResult();
+  const hist = (S.mocks||[]).slice(-6).reverse();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Timed, SSC pattern</span><h1>Mock test</h1>
+    <p class="muted">+2 for a right answer, −0.5 for a wrong one, 36 seconds per question (CGL Tier-1 pace). Answers show only after you submit.</p></div>
+    <div class="block stack">
+      <fieldset><legend>Questions</legend><div class="radios">${[10,25,50,100].map(n=>`<label><input type="radio" name="mn" id="mn${n}" value="${n}" ${MCFG.n===n?"checked":""}><span>${n} · ${Math.round(n*36/60)} min</span></label>`).join("")}</div></fieldset>
+      <fieldset><legend>From</legend><select id="mscope" aria-label="Lessons to draw from"><option value="all">All lessons</option><option value="pyq">Exam-asked only</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}" ${MCFG.scope===l.id?"selected":""}>L${i+1} · ${esc(l.title)}</option>`).join("")}</select></fieldset>
+      <label class="row" style="gap:8px;font-weight:600"><input type="checkbox" id="mneg" ${MCFG.neg?"checked":""}> Negative marking (−0.5)</label>
+      <div id="merr" class="muted" style="font-size:14px"></div>
+      <div class="row end"><button class="btn pri" type="button" id="mstart">Start test</button></div>
+    </div>
+    ${hist.length ? `<div class="block"><h3>Recent attempts</h3><div class="hist">${hist.map(h=>`<div><span>${esc(h.d)} · ${h.n} Q</span><span class="num">${h.score}/${h.max} · ${h.acc}%</span></div>`).join("")}</div></div>` : ""}
+  </section>`;
+  $("#mscope").value = MCFG.scope;
+  $("#mstart").onclick = () => {
+    MCFG.n = +(document.querySelector('input[name="mn"]:checked')||{value:25}).value;
+    MCFG.scope = $("#mscope").value; MCFG.neg = $("#mneg").checked ? 1 : 0;
+    let pool = MCFG.scope==="all" ? QS : MCFG.scope==="pyq" ? QS.filter(q=>q.p) : MCFG.scope==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===MCFG.scope);
+    if (!pool.length) { $("#merr").textContent = "No questions in that set yet. Pick another source."; return; }
+    const qs = shuffle(pool).slice(0, MCFG.n);
+    M = { running:true, list: qs.map(q=>({q, perm:makePerm(q)})), ans: qs.map(()=>null), mark: qs.map(()=>false), i:0, neg:MCFG.neg, secs: qs.length*36, start: Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000;
+    startTimer(); drawMockRun();
+  };
+}
+function startTimer(){
+  clearInterval(timerId);
+  timerId = setInterval(() => {
+    if (!M || !M.running) { clearInterval(timerId); return; }
+    const left = Math.max(0, Math.round((M.end - Date.now())/1000));
+    const el = $("#mtime"); if (el) { el.textContent = fmt(left); el.classList.toggle("low", left <= 60); }
+    if (left <= 0) submitMock();
+  }, 1000);
+}
+const fmt = s => `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+function drawMockRun(){
+  const it = M.list[M.i], q = it.q, left = Math.max(0, Math.round((M.end-Date.now())/1000));
+  const answered = M.ans.filter(a=>a!==null).length;
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="mbar"><span class="timer num ${left<=60?"low":""}" id="mtime">${fmt(left)}</span>
+      <span class="muted num" style="font-size:13px;flex:1">Q ${M.i+1}/${M.list.length} · ${answered} answered</span>
+      <button class="btn sm" type="button" id="mpal">${M.showPal?"Hide":"All Qs"}</button></div>
+    ${LEAVE_TO ? `<div class="confirm"><b>Leave the test?</b><span>Your answers so far will be scored now.</span><div class="row"><button class="btn sm pri" type="button" id="lvy">Submit and leave</button><button class="btn sm" type="button" id="lvn">Stay</button></div></div>` : ""}
+    ${M.showPal ? `<div class="block"><div class="pal">${M.list.map((_,k)=>`<button type="button" data-j="${k}" class="${M.ans[k]!==null?"a":""} ${M.mark[k]?"m":""} ${k===M.i?"cur":""}" aria-label="Question ${k+1}">${k+1}</button>`).join("")}</div>
+      <p class="muted" style="font-size:12px;margin-top:8px">Filled = answered · orange line = marked for review</p></div>` : ""}
+    <article class="qcard"><div class="qmeta"><span class="qno">Q${M.i+1}</span><span class="tag">L${LNUM(q.t)}</span>${M.mark[M.i]?`<span class="tag pyq">Marked</span>`:""}</div>
+      <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {sel:M.ans[M.i], reveal:false})}</div></article>
+    <div class="row between"><button class="btn" type="button" id="mprev" ${M.i===0?"disabled":""}>‹ Prev</button>
+      <button class="btn ghost" type="button" id="mmark">${M.mark[M.i]?"Unmark":"Mark"}</button>
+      <button class="btn ghost" type="button" id="mclr" ${M.ans[M.i]===null?"disabled":""}>Clear</button>
+      <button class="btn ${M.i<M.list.length-1?"pri":""}" type="button" id="mnext" ${M.i===M.list.length-1?"disabled":""}>Next ›</button></div>
+    ${M.confirm ? `<div class="confirm"><b>Submit the test?</b><span>${M.list.length-answered} unanswered${M.mark.filter(Boolean).length?`, ${M.mark.filter(Boolean).length} marked for review`:""}.</span><div class="row"><button class="btn sm pri" type="button" id="msubY">Submit</button><button class="btn sm" type="button" id="msubN">Keep going</button></div></div>`
+      : `<button class="btn pri" type="button" id="msub">Submit test</button>`}
+  </section>`;
+  $("#app").querySelectorAll(".opt").forEach(b => b.onclick = () => { M.ans[M.i] = +b.dataset.oi; drawMockRun(); });
+  $("#mprev").onclick = () => { if (M.i>0){M.i--; drawMockRun();} };
+  $("#mnext").onclick = () => { if (M.i<M.list.length-1){M.i++; drawMockRun(); window.scrollTo(0,0);} };
+  $("#mmark").onclick = () => { M.mark[M.i] = !M.mark[M.i]; drawMockRun(); };
+  $("#mclr").onclick = () => { M.ans[M.i] = null; drawMockRun(); };
+  $("#mpal").onclick = () => { M.showPal = !M.showPal; drawMockRun(); };
+  $("#app").querySelectorAll("[data-j]").forEach(b => b.onclick = () => { M.i = +b.dataset.j; drawMockRun(); });
+  const s = $("#msub"); if (s) s.onclick = () => { M.confirm = true; drawMockRun(); };
+  const y = $("#msubY"); if (y) y.onclick = submitMock;
+  const n = $("#msubN"); if (n) n.onclick = () => { M.confirm = false; drawMockRun(); };
+  const lvy = $("#lvy"); if (lvy) lvy.onclick = () => { const t = LEAVE_TO; LEAVE_TO = null; submitMock(); go(t); };
+  const lvn = $("#lvn"); if (lvn) lvn.onclick = () => { LEAVE_TO = null; drawMockRun(); };
+}
+function showMockLeave(tab){ LEAVE_TO = tab; drawMockRun(); }
+function submitMock(){
+  if (!M || !M.running) return;
+  clearInterval(timerId);
+  M.running = false; M.done = true; M.confirm = false;
+  let c=0,w=0,sk=0; const per = {};
+  M.list.forEach((it,k) => {
+    const a = M.ans[k]; const t = it.q.t; per[t] = per[t] || {c:0,n:0}; per[t].n++;
+    if (a===null) sk++; else if (a===it.q.a) { c++; per[t].c++; S.ans[it.q.id]=1; } else { w++; S.ans[it.q.id]=0; }
+  });
+  const max = M.list.length*2, score = +(c*2 - (M.neg? w*0.5 : 0)).toFixed(1);
+  const used = Math.min(M.secs, Math.round((Date.now()-M.start)/1000));
+  M.res = {c,w,sk,score,max,used,per, acc: (c+w) ? Math.round(c*100/(c+w)) : 0};
+  const d = new Date(); const ds = d.toLocaleDateString("en-IN",{day:"numeric",month:"short"})+" "+d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
+  S.mocks = (S.mocks||[]).concat([{d:ds, n:M.list.length, score, max, acc:M.res.acc}]).slice(-20); save(); renderTop();
+  M.filter = "wrong";
+  if (TAB==="mock") drawMockResult();
+}
+function drawMockResult(){
+  const r = M.res;
+  const per = Object.keys(r.per).sort((a,b)=>LNUM(a)-LNUM(b)).map(t => `<div><span>L${LNUM(t)} · ${esc(L(t).title)}</span><span class="num">${r.per[t].c}/${r.per[t].n}</span></div>`).join("");
+  const rows = M.list.map((it,k)=>({it,k})).filter(({it,k}) => M.filter==="all" ? true : M.filter==="wrong" ? (M.ans[k]!==null && M.ans[k]!==it.q.a) : M.ans[k]===null);
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Result</span>
+    <div class="scorebig"><span class="num">${r.score}</span><span class="muted">/ ${r.max} marks</span></div></div>
+    <div class="kpis"><div class="kpi g"><span class="num">${r.c}</span><span>right</span></div><div class="kpi b"><span class="num">${r.w}</span><span>wrong</span></div><div class="kpi"><span class="num">${r.sk}</span><span>skipped</span></div><div class="kpi"><span class="num">${r.acc}%</span><span>accuracy</span></div></div>
+    <p class="muted num" style="font-size:13px">Time used ${fmt(r.used)} of ${fmt(M.secs)}</p>
+    <div class="block"><h3>By lesson</h3><div class="hist">${per}</div></div>
+    <div class="row between"><button class="btn" type="button" id="mnew">New test</button><button class="btn pri" type="button" id="mretry">Retake same questions</button></div>
+    <h2>Review</h2>
+    <div class="chips">${[["wrong",`Wrong ${r.w}`],["skip",`Skipped ${r.sk}`],["all",`All ${M.list.length}`]].map(c=>`<button class="chip" type="button" data-rf="${c[0]}" aria-pressed="${M.filter===c[0]}">${c[1]}</button>`).join("")}</div>
+    <div class="stack">${rows.length ? rows.map(({it,k}) => `<article class="qcard">${metaHTML(it.q, "Q"+(k+1))}<p class="qt">${esc(it.q.q)}</p><div class="opts">${optsHTML(it.q, it.perm, {picked:M.ans[k], reveal:true})}</div>${M.ans[k]===null?`<div class="exp"><b class="nol">Skipped. Answer: ${esc(it.q.o[it.q.a])}.</b> ${esc(it.q.e)}</div>`:expHTML(it.q, M.ans[k])}</article>`).join("") : `<p class="empty">Nothing in this list.</p>`}</div>
+  </section>`;
+  bindBM($("#app"));
+  $("#app").querySelectorAll("[data-rf]").forEach(b => b.onclick = () => { M.filter = b.dataset.rf; drawMockResult(); });
+  $("#mnew").onclick = () => { M = null; renderMock(); };
+  $("#mretry").onclick = () => {
+    const list = M.list.map(it=>({q:it.q, perm:makePerm(it.q)}));
+    M = { running:true, list, ans:list.map(()=>null), mark:list.map(()=>false), i:0, neg:MCFG.neg, secs:list.length*36, start:Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000; startTimer(); drawMockRun();
+  };
+}
+
+/* ============================================================
+   REVISE
+   ============================================================ */
+let RV = "sheet", FC = null, FCSCOPE = "all", SPF = "all", HIDEV = 1, HIDEH = 0, CREV = {}, CORDER = null;
+function sportChips(){ return `<div class="chips" role="group" aria-label="Sport">${[["all","All"],...SPORTS.map(s=>[s,s])].map(c=>`<button type="button" class="chip" data-sp="${esc(c[0])}" aria-pressed="${SPF===c[0]}">${esc(c[1])}</button>`).join("")}</div>`; }
+function renderRevise(){
+  const tabs = [["sheet","Dimension sheet"],["cover","Cover drill"],["players","Players & bodies"],["finder","Term & trophy finder"],["firsts","Firsts"],["nums","Numbers & pairs"],["ff","Full forms"],["links","Links"],["tricks","Tricks"],["traps","Traps"],["flash","Flashcards"]];
+  if (!tabs.some(t=>t[0]===RV)) RV = "sheet";
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Last-day revision</span><h1>Revise</h1></div>
+    <div class="seg" role="tablist">${tabs.map(t=>`<button type="button" role="tab" data-rv="${t[0]}" aria-selected="${RV===t[0]}">${t[1]}</button>`).join("")}</div>
+    <div id="rv" class="stack"></div></section>`;
+  $("#app").querySelectorAll("[data-rv]").forEach(b => b.onclick = () => { RV = b.dataset.rv; renderRevise(); });
+  const on = $(`.seg [aria-selected="true"]`); if (on) on.scrollIntoView({block:"nearest", inline:"center"});
+  const box = $("#rv");
+  const bindSp = () => box.querySelectorAll("[data-sp]").forEach(b => b.onclick = () => { SPF = b.dataset.sp; CORDER = null; renderRevise(); });
+  if (RV === "sheet") {
+    const g = SPORTS.filter(s => SPF==="all" || s===SPF);
+    box.innerHTML = `<p class="muted">Every measurement from the lectures, grouped by sport. Read it once in the morning and once at night — the hooks tie look-alike numbers together.</p>${sportChips()}
+      <div class="pubs">${g.map(s=>`<div class="block"><h3>${esc(s)}</h3><ul class="plist">${DIMS.filter(d=>d[0]===s).map(d=>`<li><span class="dl"><b>${esc(d[1])}</b><em class="num">${esc(d[2])}</em></span>${d[3]?`<span>${esc(d[3])}</span>`:""}</li>`).join("")}</ul></div>`).join("")}</div>`;
+    bindSp();
+  }
+  if (RV === "cover") {
+    const base = DIMS.map((d,i)=>i).filter(i => SPF==="all" || DIMS[i][0]===SPF);
+    const order = CORDER || base;
+    box.innerHTML = `<p class="muted">Cover mode: say the number aloud, then tap to check. Shuffle to break the order you memorised.</p>${sportChips()}
+      <div class="chips" role="group" aria-label="Options"><button type="button" class="chip" id="chv" aria-pressed="${!!HIDEV}">Hide value</button><button type="button" class="chip" id="chh" aria-pressed="${!!HIDEH}">Hide hook</button>
+      <button type="button" class="chip" id="cshuf">${CORDER?"In order":"Shuffle rows"}</button><button type="button" class="chip" id="creset">Cover all again</button></div>
+      <div class="block"><div class="tbl"><table class="cover"><thead><tr><th>Sport · item</th><th>Value</th><th>Hook</th></tr></thead><tbody>${order.map(k=>{ const d = DIMS[k];
+        const cell = (col, v, hid, lbl) => (hid && !CREV[k+col] && v) ? `<td data-l="${lbl}"><button type="button" class="peek" data-peek="${k+col}" aria-label="Show ${lbl}">tap</button></td>` : `<td data-l="${lbl}">${esc(v||"—")}</td>`;
+        return `<tr><td><b>${esc(d[1])}</b> <span class="muted" style="font-size:13px">· ${esc(d[0])}</span></td>${cell("v",d[2],HIDEV,"Value")}${cell("h",d[3],HIDEH,"Hook")}</tr>`; }).join("")}</tbody></table></div></div>`;
+    bindSp();
+    box.querySelectorAll("[data-peek]").forEach(b => b.onclick = () => { CREV[b.dataset.peek] = 1; renderRevise(); });
+    $("#chv").onclick = () => { HIDEV = HIDEV?0:1; renderRevise(); };
+    $("#chh").onclick = () => { HIDEH = HIDEH?0:1; renderRevise(); };
+    $("#cshuf").onclick = () => { CORDER = CORDER ? null : shuffle(base.slice()); renderRevise(); };
+    $("#creset").onclick = () => { CREV = {}; renderRevise(); };
+  }
+  if (RV === "players") {
+    const rows = PLAYERS.slice().sort((a,b)=>(+a[1])-(+b[1]));
+    box.innerHTML = `<p class="muted">Count up the ladder: 5 basketball → 6 volleyball → 7 handball / kabaddi → 9 kho-kho / baseball → 11 cricket, football, hockey → 15 rugby.</p>
+      <div class="block"><div class="tbl"><table><thead><tr><th>Sport</th><th>On field</th><th>Body</th><th>Note</th></tr></thead><tbody>${rows.map(r=>`<tr><td><b>${esc(r[0])}</b></td><td class="n num">${esc(r[1])}</td><td>${esc(r[3])}</td><td class="muted">${esc(r[2])}</td></tr>`).join("")}</tbody></table></div></div>`;
+  }
+  if (RV === "finder") {
+    box.innerHTML = `<input class="search" id="tfs" type="search" placeholder="Search a term, trophy or sport (e.g. lona, Uber, golf)" aria-label="Search terms and trophies">
+      <div class="block"><h3>Trophies</h3><dl class="rk" id="tfc"></dl></div>
+      <div class="block"><h3>Terms</h3><dl class="rk" id="tft"></dl></div>`;
+    const draw = () => {
+      const q = $("#tfs").value.trim().toLowerCase(), f = r => !q || r.join(" ").toLowerCase().includes(q);
+      const c = CUPS.filter(f), t = TERMS.filter(f);
+      $("#tfc").innerHTML = c.length ? c.map(r=>`<div><dt>${esc(r[0])}</dt><dd>${esc(r[1])}</dd></div>`).join("") : `<p class="muted">No trophy matches.</p>`;
+      $("#tft").innerHTML = t.length ? t.map(r=>`<div><dt>${esc(r[1])}</dt><dd>${esc(r[0])}</dd></div>`).join("") : `<p class="muted">No term matches.</p>`;
+    };
+    $("#tfs").oninput = draw; draw();
+  }
+  if (RV === "firsts") {
+    box.innerHTML = `<p class="muted">“Who was the first…” is a favourite SSC pattern. Cover the name, read the feat, recall.</p>
+      <div class="block"><dl class="rk">${FIRSTS.map(r=>`<div><dt>${esc(r[0])}</dt><dd><b style="color:var(--ink)">${esc(r[1])}</b> · ${esc(r[2])} <span class="muted num" style="font-size:12px">· L${LNUM(r[3])}</span></dd></div>`).join("")}</dl></div>`;
+  }
+  if (RV === "ff") {
+    box.innerHTML = `<input class="search" id="ffs" type="search" placeholder="Search a short form" aria-label="Search full forms"><div class="block"><dl class="rk" id="ffl"></dl></div>`;
+    const draw = () => { const q=$("#ffs").value.trim().toLowerCase(); const r=FULLFORMS.filter(f=>!q||f.join(" ").toLowerCase().includes(q));
+      $("#ffl").innerHTML = r.length ? r.map(f=>`<div><dt><b style="color:var(--ink)">${esc(f[0])}</b></dt><dd>${esc(f[1])}</dd></div>`).join("") : `<p class="muted">No match.</p>`; };
+    $("#ffs").oninput = draw; draw();
+  }
+  if (RV === "links") {
+    const items = LESSONS.flatMap((l,i) => l.blocks.filter(b=>b.k==="link").map(b=>({l:i+1, t:l.title, h:b.h})));
+    box.innerHTML = items.map(x => `<div class="link"><span class="lab">L${x.l} · ${esc(x.t)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "nums") {
+    box.innerHTML = `<div class="tiles">${TILES.map(t=>`<div class="tile"><span class="num">${t[0]}</span><span>${t[1]}</span></div>`).join("")}</div>
+    <div class="block"><h3>Confusing pairs</h3><dl class="rk">${PAIRS.map(p=>`<div><dt>${esc(p[0])}</dt><dd>${esc(p[1])}</dd></div>`).join("")}</dl></div>`;
+  }
+  if (RV === "tricks" || RV === "traps") {
+    const kind = RV==="tricks" ? "trick" : "trap";
+    const items = LESSONS.flatMap((l,i) => l.blocks.filter(b=>b.k===kind).map(b=>({l:i+1, t:l.title, h:b.h})));
+    box.innerHTML = items.map(x => `<div class="${kind}"><span class="lab">L${x.l} · ${esc(x.t)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "flash") drawFlash(box);
+}
+function drawFlash(box){
+  if (!FC) { const pool = FCSCOPE==="all" ? QS : FCSCOPE==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===FCSCOPE); FC = {list: shuffle(pool), i:0, flip:false, known:0}; }
+  const sel = `<select id="fcs" aria-label="Flashcard set"><option value="all">All questions</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}">L${i+1} · ${esc(l.title)}</option>`).join("")}</select>`;
+  if (!FC.list.length || FC.i >= FC.list.length) {
+    box.innerHTML = `<div class="row">${sel}</div><div class="block stack"><h3>${FC.list.length ? "Deck finished" : "No cards in this set"}</h3>${FC.list.length?`<p class="muted">You knew ${FC.known} of ${FC.list.length} on first look.</p>`:""}<div class="row"><button class="btn pri" type="button" id="fcr">Shuffle and restart</button></div></div>`;
+    $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+    $("#fcr").onclick = () => { FC = null; drawFlash(box); }; return;
+  }
+  const q = FC.list[FC.i];
+  box.innerHTML = `<div class="row between">${sel}<span class="muted num" style="font-size:13px">${FC.i+1}/${FC.list.length}</span></div>
+    <button type="button" class="flash" id="fcard" aria-label="Flip card">
+      <span class="side">${FC.flip?"Answer":"Question · tap to flip"}</span>
+      <span class="front">${esc(q.q)}</span>
+      ${FC.flip ? `<span class="ans">${esc(q.o[q.a])}</span><span class="muted">${esc(q.e)}</span>` : ""}
+    </button>
+    <div class="row between"><button class="btn" type="button" id="fca" ${FC.flip?"":"disabled"}>Again later</button><button class="btn pri" type="button" id="fck" ${FC.flip?"":"disabled"}>Got it</button></div>`;
+  $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+  $("#fcard").onclick = () => { FC.flip = !FC.flip; drawFlash(box); };
+  $("#fca").onclick = () => { FC.list.push(q); FC.list.splice(FC.i,1); FC.flip=false; drawFlash(box); };
+  $("#fck").onclick = () => { FC.known++; FC.i++; FC.flip=false; drawFlash(box); };
+}
+
+/* boot */
+renderTop();
+const start = (location.hash||"").replace("#","");
+go(["learn","practice","mock","revise"].includes(start) ? start : "learn");
+</script>
+
+<style id="shabd-skin">
+/* ===== शब्दRegister skin: app colours + fonts (only when opened from the app) ===== */
+:root[data-skin="paper"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(150,128,90,.10) 31px, rgba(150,128,90,.10) 32px);--app-psize:auto;--app-card:#FFFCF6;--app-rule:#DCCFB2;--app-pri:#2F6F63;--app-ink:#221E17;--app-soft:#5E5547;--app-faint:#857B6A;--app-bg:#F3EEE3;--app-deep:#E9E1CF;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#F3EEE3;--sheet:#FFFCF6;--sunk:#E9E1CF;--ink:#221E17;--ink2:#5E5547;--rule:#DCCFB2;--blue:#2F6F63;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--accent:#A87E1F;--accent-bg:color-mix(in srgb, #A87E1F 16%, #FFFCF6);--good:#2F6F63;--good-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--bad:#8C2F39;--bad-bg:color-mix(in srgb, #8C2F39 14%, #FFFCF6);--warn-bg:color-mix(in srgb, #C99A2E 18%, #FFFCF6);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="paper"][data-theme="dark"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--sheet:#26211A;--sunk:#25201A;--ink:#EFE6D2;--ink2:#BDB195;--rule:#3B3429;--blue:#3F9A86;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3F9A86 22%, #26211A);--accent:#D9AE4B;--accent-bg:color-mix(in srgb, #D9AE4B 24%, #26211A);--good:#5FB9A3;--good-bg:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-bg:color-mix(in srgb, #D06B74 22%, #26211A);--warn-bg:color-mix(in srgb, #D9AE4B 26%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="paper"]:not([data-theme="light"]){--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--sheet:#26211A;--sunk:#25201A;--ink:#EFE6D2;--ink2:#BDB195;--rule:#3B3429;--blue:#3F9A86;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3F9A86 22%, #26211A);--accent:#D9AE4B;--accent-bg:color-mix(in srgb, #D9AE4B 24%, #26211A);--good:#5FB9A3;--good-bg:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-bg:color-mix(in srgb, #D06B74 22%, #26211A);--warn-bg:color-mix(in srgb, #D9AE4B 26%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin="indigo"]{--app-pattern:radial-gradient(rgba(61,92,240,.10) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#FFFFFF;--app-rule:#CBD3EC;--app-pri:#3D5CF0;--app-ink:#0F1B3D;--app-soft:#4A5680;--app-faint:#67739C;--app-bg:#EEF1FA;--app-deep:#E1E6F5;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#EEF1FA;--sheet:#FFFFFF;--sunk:#E1E6F5;--ink:#0F1B3D;--ink2:#4A5680;--rule:#CBD3EC;--blue:#3D5CF0;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3D5CF0 14%, #FFFFFF);--accent:#D9831A;--accent-bg:color-mix(in srgb, #D9831A 16%, #FFFFFF);--good:#147D53;--good-bg:color-mix(in srgb, #147D53 14%, #FFFFFF);--bad:#C8402F;--bad-bg:color-mix(in srgb, #C8402F 14%, #FFFFFF);--warn-bg:color-mix(in srgb, #F7C548 18%, #FFFFFF);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="indigo"][data-theme="dark"]{--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--sheet:#121D47;--sunk:#0E1839;--ink:#EEF2FF;--ink2:#A7B3DA;--rule:#22306A;--blue:#6F86FF;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #6F86FF 22%, #121D47);--accent:#F7B24D;--accent-bg:color-mix(in srgb, #F7B24D 24%, #121D47);--good:#45C08A;--good-bg:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-bg:color-mix(in srgb, #F07B6E 22%, #121D47);--warn-bg:color-mix(in srgb, #F7C548 26%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="indigo"]:not([data-theme="light"]){--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--sheet:#121D47;--sunk:#0E1839;--ink:#EEF2FF;--ink2:#A7B3DA;--rule:#22306A;--blue:#6F86FF;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #6F86FF 22%, #121D47);--accent:#F7B24D;--accent-bg:color-mix(in srgb, #F7B24D 24%, #121D47);--good:#45C08A;--good-bg:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-bg:color-mix(in srgb, #F07B6E 22%, #121D47);--warn-bg:color-mix(in srgb, #F7C548 26%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin] body{background-color:var(--app-bg);background-image:var(--app-pattern);background-size:var(--app-psize);background-attachment:fixed}
+:root[data-skin] h1,:root[data-skin] h2{letter-spacing:-.01em}
+
+/* ===== Desktop layout (PC / tablet landscape) ===== */
+@media (min-width: 1024px){
+  :root{--side:236px}
+  body{padding-left:var(--side);font-size:16.5px}
+  .top{border-bottom:1px solid var(--rule)}
+  .top-in{max-width:1320px;padding:16px 36px}
+  .brand{font-size:21px}
+  .brand small{font-size:13px}
+  .stat{font-size:13px}
+  .wrap{max-width:1320px;padding:0 36px 56px}
+  .view{padding-top:28px}
+  h1{font-size:34px} h2{font-size:22px} h3{font-size:17px}
+
+  /* bottom tab bar becomes a left sidebar */
+  .nav{top:0;bottom:0;left:0;right:auto;width:var(--side);height:auto;border-top:0;border-right:1px solid var(--rule);padding:84px 14px 20px;display:block;overflow:auto}
+  .nav-in{display:flex;flex-direction:column;gap:4px;height:auto;max-width:none;margin:0}
+  .nav-in::before{content:"Sections";display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);padding:0 14px 8px}
+  .nav button{flex-direction:row;justify-content:flex-start;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;font-size:15px;min-height:0;height:auto;width:100%;text-align:left}
+  .nav button svg{width:20px;height:20px;flex-shrink:0}
+  .nav button:hover{background:var(--sunk)}
+  .nav button[aria-current="page"]{background:var(--blue-bg)}
+  .nav button[aria-current="page"] span{border-bottom:0!important}
+
+  /* home: intro beside progress, lessons as a card grid */
+  .hero{grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);column-gap:48px;align-items:end;padding-bottom:10px}
+  .hero > .eyebrow,.hero > h1,.hero > p{grid-column:1}
+  .hero > .meter{grid-column:2;grid-row:3;align-self:center}
+  .hero > .row{grid-column:2;grid-row:2;align-self:end}
+  .lessons{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;border-top:0}
+  .les{background:var(--sheet);border:1px solid var(--rule);border-radius:16px;padding:16px 18px;transition:transform .15s ease,box-shadow .15s ease,border-color .15s}
+  .les:hover{transform:translateY(-2px);border-color:var(--blue);box-shadow:0 14px 30px -22px rgba(0,0,0,.45)}
+  .les.next{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
+
+  /* lesson reader: facts, timelines, tricks sit side by side */
+  .lhead{margin-bottom:0}
+  .steps{max-width:640px}
+  .steps + .stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+  .steps + .stack > .plain,.steps + .stack > .row,.steps + .stack > p,.steps + .stack > .fig,.steps + .stack > h2,.steps + .stack > .tbl{grid-column:1/-1}
+  .steps + .stack > .plain{max-width:86ch;font-size:17px}
+  .steps + .stack:not(:has(> .block ~ .block)) > .block{grid-column:1/-1}
+  .block,.qcard{padding:18px 20px;border-radius:14px}
+
+  /* quizzes and question bank */
+  #lq > .stack{display:grid;grid-template-columns:minmax(0,1fr);max-width:980px;gap:16px}
+  .opts{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .qt{font-size:18px}
+  #plist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #plist .opts{grid-template-columns:minmax(0,1fr)}
+  .chips{flex-wrap:wrap;overflow:visible}
+
+  /* mock test: question with the answer grid alongside */
+  .mbar{top:calc(env(safe-area-inset-top,0px) + 67px)}
+  .view > .qcard{max-width:1000px}
+  .view > .row.between{max-width:1000px}
+  .view > #msub{max-width:1000px;width:100%}
+  .view > .block.stack{max-width:760px}
+  .pal{grid-template-columns:repeat(auto-fill,minmax(46px,1fr))}
+  .kpis{max-width:760px}
+
+  /* revise: cards in columns */
+  #rkl,#rv > .stack:not(#rkl){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #rv > .search{max-width:520px}
+  .tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .flash{min-height:300px;max-width:760px;margin:0 auto;padding:32px 36px}
+  .flash .front{font-size:22px}
+}
+@media (min-width: 1500px){
+  #plist,#rkl{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+</style>
+</body></html>
