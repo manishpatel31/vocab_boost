@@ -1,16 +1,36 @@
 {
-  "name": "CGL Vocabulary Register",
-  "short_name": "Vocab Register",
-  "description": "Shared SSC CGL vocabulary register with admin-approved submissions and confidence tracking.",
+  "name": "पाठShala — SSC CGL study",
+  "short_name": "पाठShala",
+  "description": "SSC CGL study in one place: vocabulary register, Grammar 100 and General Studies mini apps, mistakes book and mixed mocks.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#EDE7D8",
   "theme_color": "#242019",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }

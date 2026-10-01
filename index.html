@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>शब्दRegister — CGL Vocab Register</title>
+<title>पाठShala — SSC CGL study</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#242019">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="favicon-32.png" sizes="32x32">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Vocab Register">
+<meta name="apple-mobile-web-app-title" content="पाठShala">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -813,23 +813,125 @@
     .celebrate{ right:16px; bottom:96px; }
     .toast{ bottom:96px; }
   }
+  /* ---------- पाठShala home (default page) ---------- */
+  body.on-home header.top, .main:has(#view-home.active) header.top{ display:none; }
+  .h1-sub{ font-family:var(--font-body); font-size:.42em; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint); margin-left:8px; vertical-align:middle; }
+  @media (min-width: 861px){ .phone-only{ display:none !important; } }
+  @media (max-width: 860px){ .desk-only{ display:none !important; } }
+  .home .eyebrow{ font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); }
+  .home-hero{ display:flex; align-items:flex-end; justify-content:space-between; gap:20px; margin:2px 0 22px; }
+  .home-greet{ min-width:0; }
+  .home-greet h1{ font-family:var(--font-display); font-weight:var(--h-weight); font-size:clamp(30px, 4.2vw, 46px); line-height:1.05; margin:6px 0 8px; color:var(--ink); }
+  .home-greet h1 span{ color:var(--mustard); }
+  .home-greet p{ margin:0; color:var(--ink-soft); max-width:58ch; font-size:15px; }
+  .home-exam{ flex-shrink:0; display:grid; grid-template-columns:auto auto; column-gap:12px; align-items:center; justify-content:start; text-align:left; padding:14px 20px; border-radius:var(--radius-lg); border:1px solid var(--rule); background:var(--card); color:var(--ink); box-shadow:var(--shadow); cursor:pointer; font:inherit; }
+  .home-exam b{ grid-row:span 2; font-family:var(--font-display); font-weight:var(--h-weight); font-size:46px; line-height:1; color:var(--maroon); font-variant-numeric:tabular-nums; }
+  .home-exam span{ font-weight:700; font-size:15px; align-self:end; }
+  .home-exam small{ color:var(--ink-faint); font-size:12.5px; align-self:start; }
+  .home-exam.past{ display:block; }
+  .home-row1{ display:grid; grid-template-columns:minmax(0, 1.25fr) minmax(0, 1fr); gap:14px; }
+  .home-row2{ display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:14px; margin-top:14px; }
+  .home-card{ position:relative; overflow:hidden; text-align:left; display:flex; flex-direction:column; gap:10px; padding:18px; background:var(--card); color:var(--ink); border:1px solid var(--rule); border-radius:var(--radius-lg); box-shadow:var(--shadow); font:inherit; min-width:0; }
+  button.home-card{ cursor:pointer; transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease; }
+  button.home-card:hover{ transform:translateY(-2px); box-shadow:var(--shadow-lg); }
+  .home-card-h{ display:flex; justify-content:space-between; gap:8px; font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint); }
+  .home-card-h .lvl{ letter-spacing:.04em; color:var(--teal); }
+  .home-today{ flex-direction:row; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:18px; background:linear-gradient(135deg, color-mix(in srgb, var(--mustard) 12%, var(--card)), var(--card) 70%); }
+  .home-today.met{ background:linear-gradient(135deg, color-mix(in srgb, var(--teal) 14%, var(--card)), var(--card) 70%); }
+  .home-today-main{ display:flex; align-items:center; gap:16px; min-width:0; }
+  .home-ring{ position:relative; width:96px; height:96px; flex-shrink:0; }
+  .home-ring > span{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1; }
+  .home-ring b{ font-family:var(--font-display); font-weight:var(--h-weight); font-size:30px; color:var(--ink); font-variant-numeric:tabular-nums; }
+  .home-ring small{ font-size:12px; color:var(--ink-faint); margin-top:3px; font-weight:700; }
+  .home-streak{ display:flex; align-items:center; gap:6px; font-size:15px; color:var(--ink-soft); margin:4px 0 8px; }
+  .home-streak svg{ color:var(--maroon); width:22px; height:22px; }
+  .home-streak b{ font-family:var(--font-display); font-weight:var(--h-weight); font-size:26px; color:var(--ink); }
+  .home-split{ display:flex; flex-wrap:wrap; gap:4px 12px; font-size:13px; color:var(--ink-faint); }
+  .home-split b{ color:var(--ink); font-variant-numeric:tabular-nums; }
+  .home-nudge{ margin-top:6px; font-size:13px; font-weight:700; color:var(--teal); }
+  .home-week{ display:flex; gap:8px; align-items:flex-end; height:70px; }
+  .home-week div{ display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:5px; height:100%; }
+  .home-week i{ display:block; width:14px; border-radius:5px; background:var(--rule); }
+  .home-week .now i{ background:var(--mustard); }
+  .home-week .ok i{ background:var(--teal); }
+  .home-week span{ font-size:10.5px; font-weight:700; color:var(--ink-faint); }
+  .home-week .now span{ color:var(--ink); }
+  .home-cont::before, .home-wotd::before{ content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--hub-c, var(--teal)); }
+  .home-cont h3{ margin:0; font-family:var(--font-display); font-weight:var(--h-weight); font-size:21px; line-height:1.15; }
+  .home-cont .hi, .home-wotd .hi{ font-size:13px; color:var(--ink-faint); margin-top:2px; }
+  .home-bar{ height:7px; border-radius:7px; background:var(--rule); overflow:hidden; }
+  .home-bar i{ display:block; height:100%; border-radius:7px; }
+  .home-due{ gap:2px; }
+  .home-due .home-card-h{ margin-bottom:4px; }
+  .home-due-row{ display:flex; align-items:center; gap:12px; width:100%; text-align:left; padding:9px 8px; border:none; background:none; border-radius:12px; color:var(--ink); font:inherit; cursor:pointer; }
+  .home-due-row:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent); }
+  .home-due-row .ic{ width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:var(--paper); font-size:19px; flex-shrink:0; }
+  .home-due-row .tx{ flex:1; min-width:0; display:flex; flex-direction:column; }
+  .home-due-row .tx b{ font-size:15px; }
+  .home-due-row small{ font-size:12.5px; color:var(--ink-faint); }
+  .home-due-row .n{ font-family:var(--font-display); font-weight:var(--h-weight); font-size:26px; font-variant-numeric:tabular-nums; color:var(--ink-faint); }
+  .home-due-row.hot .n{ color:var(--maroon); }
+  .home-wotd{ --hub-c:var(--accent); }
+  .home-wotd-term{ font-family:var(--font-display); font-weight:var(--h-weight); font-size:32px; line-height:1.05; color:var(--ink); overflow-wrap:anywhere; }
+  .home-wotd p{ margin:0; color:var(--ink-soft); font-size:14.5px; line-height:1.45; }
+  .home-wotd .home-hi{ color:var(--ink); font-family:var(--font-hindi); }
+  .home-wotd .hub-meta b, .home-cont .hub-meta b{ color:var(--hub-c, var(--teal)); }
+  @media (min-width: 720px){
+    .hub-subs{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); grid-auto-flow:row dense; column-gap:14px; }
+    .hub-subs .hub-sub{ grid-column:span min(var(--n), 2); }
+    .hub-subs .hub-sub .hub-grid{ grid-template-columns:repeat(min(var(--n), 2), minmax(0, 1fr)); }
+  }
+  @media (min-width: 1100px){
+    .hub-subs{ grid-template-columns:repeat(3, minmax(0, 1fr)); }
+    .hub-subs .hub-sub{ grid-column:span var(--n); }
+    .hub-subs .hub-sub .hub-grid{ grid-template-columns:repeat(var(--n), minmax(0, 1fr)); }
+  }
+  .home-tools{ display:grid; grid-template-columns:repeat(6, minmax(0, 1fr)); gap:10px; }
+  .home-tools button{ display:flex; flex-direction:column; align-items:flex-start; gap:2px; padding:14px; background:var(--card); border:1px solid var(--rule); border-radius:var(--radius-lg); color:var(--ink); font:inherit; cursor:pointer; text-align:left; box-shadow:var(--shadow); transition:transform .15s ease, border-color .15s ease; min-width:0; }
+  .home-tools button:hover{ border-color:var(--ink-faint); transform:translateY(-2px); }
+  .home-tools .ic{ font-size:22px; margin-bottom:6px; }
+  .home-tools b{ font-size:14.5px; }
+  .home-tools small{ font-size:12px; color:var(--ink-faint); }
+  @media (max-width: 1060px){ .home-tools{ grid-template-columns:repeat(3, minmax(0, 1fr)); } }
+  @media (max-width: 860px){
+    .home-hero{ flex-direction:column; align-items:stretch; gap:14px; margin-bottom:16px; }
+    .home-greet p{ display:none; }
+    .home-row1, .home-row2{ grid-template-columns:1fr; gap:12px; }
+    .home-row2{ margin-top:12px; }
+    .home-tools{ gap:8px; }
+    .home-tools button{ padding:12px 6px; align-items:center; text-align:center; }
+    .home-tools small{ display:none; }
+    .home-tools b{ font-size:13px; }
+    .home-week{ width:100%; justify-content:space-between; }
+    .home-exam b{ font-size:38px; }
+  }
+  /* Progress tab: every subject */
+  .ss-list{ display:grid; gap:8px; }
+  .ss-row{ display:grid; grid-template-columns:44px minmax(0, 1fr) 80px 80px 74px; align-items:center; gap:12px; padding:8px 14px 8px 10px; background:var(--paper); border:1px solid var(--rule); border-left:4px solid var(--hub-c); border-radius:12px; color:var(--ink); font:inherit; text-align:left; cursor:pointer; }
+  .ss-row:hover{ border-color:var(--hub-c); }
+  .ss-row .hub-ring{ width:44px; height:44px; }
+  .ss-row .hub-ring span{ font-size:10.5px; }
+  .ss-name{ min-width:0; }
+  .ss-name b{ display:block; font-size:14.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ss-name small, .ss-num small{ display:block; font-size:11.5px; color:var(--ink-faint); }
+  .ss-num{ text-align:right; }
+  .ss-num b{ font-variant-numeric:tabular-nums; }
+  .ss-num.bad b{ color:var(--maroon); }
+  @media (max-width: 600px){ .ss-row{ grid-template-columns:44px minmax(0, 1fr) 62px 58px; gap:8px; } .ss-row .ss-acc{ display:none; } }
+  .ss-mocks{ display:flex; gap:8px; align-items:flex-end; height:130px; padding:6px 0 4px; }
+  .ss-mocks div{ flex:1; max-width:60px; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:4px; height:100%; }
+  .ss-mocks i{ display:block; width:100%; background:var(--teal); border-radius:7px 7px 3px 3px; }
+  .ss-mocks span{ font-size:12px; font-weight:700; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
 </style>
 </head>
 <body>
 <script>(function(){try{var t=localStorage.getItem("vocabRegisterTheme");var m=localStorage.getItem("vocabRegisterDarkMode");var d=m==="1"||(m===null&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.body.className=(t==="indigo"?"theme-indigo":"theme-paper")+(d?" dark":"");}catch(e){document.body.className="theme-paper";}})();</script>
 
-<div class="loading-overlay" id="loadingOverlay"><div>Opening your register…</div></div>
-<div class="hub-page" id="hubPage" role="dialog" aria-label="पाठShala — all subjects">
-  <div class="study-bar">
-    <button id="hubBack" title="Back to शब्दRegister"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>शब्दRegister</button>
-    <span class="study-title">पाठShala</span>
-  </div>
-  <div class="hub-scroll"><div class="hub-wrap" id="hubBody"></div></div>
-</div>
+<div class="loading-overlay" id="loadingOverlay"><div>Opening पाठShala…</div></div>
 
 <div class="hub-page drill-page" id="drillPage" role="dialog" aria-label="Practice">
   <div class="study-bar">
-    <button id="drillBack" title="Back to पाठShala"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>पाठShala</button>
+    <button id="drillBack" title="Back to पाठShala"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg><span id="drillBackLabel">पाठShala</span></button>
     <span class="study-title" id="drillTitle"></span>
     <span class="dq-clock" id="drillClock"></span>
   </div>
@@ -880,49 +982,51 @@
 
 <div class="gate-screen" id="signedOutScreen" style="display:none;">
   <div class="gate-card">
-    <h2 style="margin-top:0;">CGL Vocabulary Register</h2>
-    <p class="help">Sign in to add words, review submissions, and practice — synced across all your devices.</p>
+    <h2 style="margin-top:0;">पाठShala</h2>
+    <p class="help">SSC CGL study in one place — vocabulary, grammar and General Studies. Sign in to save your progress across all your devices.</p>
     <button class="google-btn" id="signInBtn">Sign in with Google</button>
   </div>
 </div>
 
 <div id="appShell" style="display:none;">
   <header class="appbar">
-    <div class="navgroup brand-group" data-group="subjects">
-    <button class="brand brand-btn" id="subjectsBtn" aria-haspopup="true" aria-expanded="false" title="Subjects">
-      <span class="brand-paper">शब्द<span>Register</span></span>
-      <span class="brand-indigo"><span class="brand-mark"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 5h6a4 4 0 0 1 4 4v11a3 3 0 0 0-3-3H2z"></path><path d="M22 5h-6a4 4 0 0 0-4 4v11a3 3 0 0 1 3-3h7z"></path></svg></span>Vocab Register</span>
-      <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+    <div class="brand-group">
+    <button class="brand brand-btn" id="homeBrand" title="पाठShala — home">
+      <span class="brand-paper">पाठ<span>Shala</span></span>
+      <span class="brand-indigo"><span class="brand-mark"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 5h6a4 4 0 0 1 4 4v11a3 3 0 0 0-3-3H2z"></path><path d="M22 5h-6a4 4 0 0 0-4 4v11a3 3 0 0 1 3-3h7z"></path></svg></span>पाठShala</span>
     </button>
-    <div class="navmenu" id="subjectsMenu">
-      <button class="subj-item" data-go="vocab"><b>शब्दRegister <span class="here">you are here</span></b><span>Vocabulary · words, idioms, spellings, roots, quizzes</span></button>
-      <button class="subj-item" data-go="hub"><b>पाठShala</b><span>All subjects · English + GS by subject: Polity, Economy, Geography, Culture, Static GK…</span></button>
-    </div>
     </div>
 
     <nav class="navgroups" aria-label="Main">
-      <div class="navgroup" data-group="library">
-        <button class="nav-btn" aria-haspopup="true" aria-expanded="false"><svg class="nav-ico" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5z"></path><path d="M4 19a2 2 0 0 1 2-2h13"></path></svg><span>Library</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+      <button class="tab active" data-tab="home"><svg class="nav-ico" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"></path><path d="M5 10v10h5v-6h4v6h5V10"></path></svg><span>Home</span></button>
+      <div class="navgroup" data-group="vocab">
+        <button class="nav-btn" aria-haspopup="true" aria-expanded="false"><svg class="nav-ico" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5z"></path><path d="M4 19a2 2 0 0 1 2-2h13"></path></svg><span>Vocab</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
         <div class="navmenu">
-          <button class="tab active" data-tab="library"><b>All words</b><span>Your full register, with filters</span></button>
+          <div class="menu-label">Your words</div>
+          <button class="tab" data-tab="library"><b>All words</b><span>Your full register, with filters</span></button>
           <button class="tab" data-tab="spellbank"><b>Spelling Bank</b><span>Words you know but keep misspelling</span></button>
           <button class="tab" data-tab="roots"><b>Roots</b><span>Word families grouped by a shared root</span></button>
+          <button class="tab" data-tab="add"><b>Add words</b><span>Paste a list from any AI and send it in</span></button>
+          <div class="menu-label">Revise</div>
+          <button id="navPresentBtn"><b>Present</b><span>Full-screen flash cards of your current filters</span></button>
+          <button id="navAodBtn"><b>AOD mode</b><span>Dim black screen that stays on — tap for the next word</span></button>
+          <button id="navAudioBtn"><b>Audio revision</b><span>Words read aloud one after another — hands-free</span></button>
         </div>
       </div>
       <div class="navgroup" data-group="practice">
         <button class="nav-btn" aria-haspopup="true" aria-expanded="false"><svg class="nav-ico" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="3"></circle></svg><span>Practice</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
         <div class="navmenu">
-          <button class="tab" data-tab="quiz"><b>Quiz</b><span>Fill in the blank, confusables, spelling</span></button>
+          <div class="menu-label">All subjects</div>
+          <button id="navMistakesBtn"><b>Mistakes book</b><span>Every question you got wrong, in one place</span></button>
+          <button id="navMockBtn"><b>Mixed mock test</b><span>English + GS, timed, +2 / −0.5</span></button>
+          <div class="menu-label">Vocabulary</div>
+          <button class="tab" data-tab="quiz"><b>Vocab quiz</b><span>Fill in the blank, confusables, spelling</span></button>
           <button class="tab" data-tab="revision"><b>Revision rounds</b><span>Memorized words come back after 7, 14 and 30 days</span></button>
-          <button id="navPresentBtn"><b>Present</b><span>Full-screen flash cards of your current filters</span></button>
-          <button id="navAodBtn"><b>AOD mode</b><span>Dim black screen that stays on — tap for the next word</span></button>
-          <button id="navAudioBtn"><b>Audio revision</b><span>Words read aloud one after another — hands-free</span></button>
           <button id="navPanicBtn"><b>Exam tomorrow</b><span>Cram your 30 weakest words</span></button>
         </div>
       </div>
-      <button class="tab" data-tab="add"><svg class="nav-ico" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg><span>Add words</span></button>
       <button class="tab" data-tab="stats"><svg class="nav-ico" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7"></path></svg><span>Progress</span></button>
-      <div class="navgroup mod-only" data-group="manage" style="display:none;">
+      <div class="navgroup mod-only desk-only" data-group="manage" style="display:none;">
         <button class="nav-btn" aria-haspopup="true" aria-expanded="false"><svg class="nav-ico" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path></svg><span>Manage</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
         <div class="navmenu">
           <button class="tab" data-tab="review"><b>Review</b><span>Approve pending submissions</span></button>
@@ -955,9 +1059,13 @@
         <button class="account-btn" aria-label="Account menu" aria-haspopup="true" aria-expanded="false"><span class="who" id="whoBox"></span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
         <div class="navmenu align-right">
           <button id="alertsSettingsBtn"><b>Alerts</b><span>Evening streak nudge, word reminders, new words</span></button>
-          <button id="goalSettingsBtn"><b>Daily goal</b><span>Words per day and your streak</span></button>
+          <button id="goalSettingsBtn"><b>Daily goal</b><span>How much to study each day, and your streak</span></button>
           <button id="lockLinkBtn"><b>Phone app (Vocab Lock)</b><span>Link it so your phone knows your progress</span></button>
           <button id="displaySettingsBtn"><b>Display</b><span>Text size and dyslexia-friendly font</span></button>
+          <div class="mod-only phone-only" style="display:none;"><div class="menu-label">Manage</div>
+          <button class="tab" data-tab="review"><b>Review</b><span>Approve pending submissions</span></button>
+          <button class="tab" data-tab="enrich"><b>Enrich</b><span>Backfill missing details with AI</span></button>
+          <button class="tab" data-tab="admin"><b>Admin</b><span>Moderators, duplicates, tag and root tools</span></button></div>
           <button class="tab" data-tab="backup"><b>Backup</b><span>Export or import your register</span></button>
           <button id="installBtn" style="display:none;"><b>Install app</b><span>Add to your home screen or desktop</span></button>
           <button id="signOutBtn"><b>Sign out</b></button>
@@ -970,7 +1078,7 @@
     <header class="top">
       <div>
         <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-          <h1 style="margin:0;">CGL Vocabulary Register</h1>
+          <h1 style="margin:0;">शब्दRegister <small class="h1-sub">Vocabulary</small></h1>
           <button class="btn ghost sm" id="presentBtn" title="Open full-screen slide view" style="display:inline-flex; align-items:center; gap:6px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg>Present</button>
           <button class="btn ghost sm" id="aodBtn" title="Dim black screen that stays on — tap for the next word" style="display:inline-flex; align-items:center; gap:6px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>AOD mode</button>
           <button class="btn maroon sm" id="panicBtn" title="Build a cram list of your weakest words" style="display:inline-flex; align-items:center; gap:6px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"></path></svg>Exam tomorrow</button>
@@ -980,7 +1088,9 @@
       <div class="top-right"><button class="rev-due-btn" id="revDueBtn" style="display:none;"></button><button class="goal-widget" id="goalWidget" style="display:none;" aria-label="Daily goal and streak"></button><div class="stat-strip" id="statStrip"></div></div>
     </header>
 
-    <section class="view active" id="view-library">
+    <section class="view active" id="view-home"><div class="home" id="homeBody"></div></section>
+
+    <section class="view" id="view-library">
       <div class="toolbar">
         <input type="search" id="searchBox" placeholder="Search term…">
         <select id="filterType">
@@ -1251,6 +1361,7 @@
 
     <section class="view" id="view-stats">
       <div class="panel" style="max-width:900px;" id="streakPanel"></div>
+      <div class="panel" style="max-width:900px;" id="studyStatsPanel"></div>
       <div class="panel" style="max-width:560px;"><h2>By confidence</h2><div id="statsByConf"></div></div>
       <div class="panel" style="max-width:560px;"><h2>By type</h2><div id="statsByType"></div></div>
       <div class="panel" style="max-width:560px;"><h2>By tag</h2><div id="statsByTag"></div></div>
@@ -1435,7 +1546,8 @@
     sports:   { title: 'Sports',                       file: 'study-sports.html',       key: 'sports_workbook_v1' },
     festivals:{ title: 'Festivals of India',           file: 'study-festivals.html',    key: 'festivals_workbook_v1' },
     iprplans: { title: 'IPR & Five Year Plans',        file: 'study-ipr-plans.html',    key: 'economy_ipr_plans_v1' },
-    folkdances:{ title: 'Folk Dances of India',        file: 'study-folk-dances.html',  key: 'folk_dances_workbook_v1' }
+    folkdances:{ title: 'Folk Dances of India',        file: 'study-folk-dances.html',  key: 'folk_dances_workbook_v1' },
+    appointments:{ title: 'Appointments 2026',          file: 'study-appointments.html', key: 'appointments_workbook_v1' }
   };
   STUDY.grammar.subj = 'english'; STUDY.grammar.ico = '✍️'; STUDY.grammar.hi = 'व्याकरण · error spotting'; STUDY.grammar.desc = '100 rules with logic, tricks and examples; unit tests after every 10 rules; revise and mistakes lists.'; STUDY.grammar.meta = '100 rules · unit tests'; STUDY.grammar.color = '#C8402F';
   STUDY.bns.subj = 'gs'; STUDY.bns.ico = '⚖️'; STUDY.bns.hi = 'नए आपराधिक क़ानून · Polity'; STUDY.bns.desc = 'The three new criminal laws — what replaced what, key offences, police & court procedure, evidence.'; STUDY.bns.meta = '12 lessons · mock test'; STUDY.bns.color = '#3D5CF0';
@@ -1447,6 +1559,7 @@
   STUDY.festivals.subj = 'gs'; STUDY.festivals.ico = '🪔'; STUDY.festivals.hi = 'भारत के त्योहार'; STUDY.festivals.desc = 'About 140 festivals state by state — tribe, deity, harvest and new-year links, with name-ending tricks.'; STUDY.festivals.meta = '16 lessons · 415 questions'; STUDY.festivals.color = '#C2571A';
   STUDY.iprplans.subj = 'gs'; STUDY.iprplans.ico = '🏭'; STUDY.iprplans.hi = 'औद्योगिक नीति · पंचवर्षीय योजनाएँ'; STUDY.iprplans.desc = 'Industrial Policy Resolutions (1948, 1956, 1991 …) and the Five Year Plans — aims, models, highlights and NITI Aayog.'; STUDY.iprplans.meta = '12 lessons · 252 questions'; STUDY.iprplans.color = '#8C5A2B';
   STUDY.folkdances.subj = 'gs'; STUDY.folkdances.ico = '💃'; STUDY.folkdances.hi = 'भारत के लोक नृत्य'; STUDY.folkdances.desc = 'Folk and tribal dances state by state — who performs them, when, and the tricks to tell look-alikes apart.'; STUDY.folkdances.meta = '16 lessons · 444 questions'; STUDY.folkdances.color = '#B0306A';
+  STUDY.appointments.subj = 'gs'; STUDY.appointments.ico = '🎖️'; STUDY.appointments.hi = 'नियुक्तियाँ · कौन कहाँ'; STUDY.appointments.desc = 'Who heads what in 2026 — constitutional posts, forces, RBI & regulators, international bodies and recent appointments.'; STUDY.appointments.meta = '13 lessons · 269 questions'; STUDY.appointments.color = '#2E6DA4';
   // General Studies is split by subject in पाठShala
   var GS_SUBJECTS = [
     ['history', 'History', 'इतिहास'], ['culture', 'Art & Culture', 'कला एवं संस्कृति'], ['polity', 'Polity', 'राजव्यवस्था'],
@@ -1455,8 +1568,8 @@
   ];
   STUDY.bns.gsub = 'polity'; STUDY.schemes.gsub = 'economy'; STUDY.iprplans.gsub = 'economy'; STUDY.census.gsub = 'geography';
   STUDY.festivals.gsub = 'culture'; STUDY.folkdances.gsub = 'culture'; STUDY.sports.gsub = 'staticgk'; STUDY.intlorgs.gsub = 'staticgk';
-  STUDY.reports.gsub = 'current';
-  var studyOpen = null, studyWatch = null, studyPushTimer = null, studyLast = null, hubOpen = false;
+  STUDY.reports.gsub = 'current'; STUDY.appointments.gsub = 'current';
+  var studyOpen = null, studyWatch = null, studyPushTimer = null, studyLast = null;
   function agoText(ms){
     if(!ms) return 'Not started yet';
     var d = Math.floor((Date.now() - ms) / DAY_MS);
@@ -1484,54 +1597,207 @@
         '<p>Vocab + Grammar + all ' + gsIds().length + ' GS mini apps in one SSC-style paper, +2 / −0.5, with a subject-wise report.</p><div class="hub-meta"><span>' + (hist.length ? hist.length + ' taken · last ' + agoText(last.at).replace('Opened ', '') : 'Not taken yet') + '</span><b>Start ›</b></div></button>' +
       '</div></section>';
   }
+  // ================= पाठShala home: the app's front page =================
+  var EXAM_DEFAULT = '2026-10-13';
+  function examDay(){ var v = lsGet('pathshalaExamDate'); return /^\d{4}-\d{2}-\d{2}$/.test(v || '') ? v : EXAM_DEFAULT; }
+  function daysToExam(){
+    var p = examDay().split('-'), d = new Date(+p[0], +p[1] - 1, +p[2]), t = new Date();
+    t.setHours(0, 0, 0, 0);
+    return Math.round((d - t) / DAY_MS);
+  }
+  function examDateText(){ var p = examDay().split('-'); return new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }); }
+  function greetText(){ var h = new Date().getHours(); return h < 5 ? 'Up late' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening'; }
+  function firstName(){ var n = (currentUser && (currentUser.displayName || currentUser.email || '')) || ''; return n.split(/[\s@]/)[0]; }
+  function lastStudyId(){
+    var meta = studyMeta(), best = null, at = 0;
+    Object.keys(STUDY).forEach(function(id){ var o = (meta[id] || {}).openedAt || 0; if(o > at){ at = o; best = id; } });
+    return best;
+  }
+  function hashStr(s){ var h = 0; for(var i = 0; i < s.length; i++){ h = (h * 31 + s.charCodeAt(i)) | 0; } return Math.abs(h); }
+  function wordOfDay(){
+    var list = viewEntries().filter(function(e){ return e.term && (e.english_meaning || e.hindi_meaning); });
+    if(!list.length) return null;
+    var pool = list.filter(function(e){ return e.confidence < 5; });
+    if(!pool.length) pool = list;
+    pool.sort(function(a, b){ return a.id < b.id ? -1 : 1; });
+    return pool[hashStr(todayKey() + (currentUser ? currentUser.uid : '')) % pool.length];
+  }
+  function totalMistakes(){ var n = 0; Object.keys(STUDY).forEach(function(id){ n += studyWrongIds(id).length; }); return n; }
+
+  function homeTodayCard(){
+    var prof = myProfile || {}, goal = prof.dailyGoal || 0, count = todayCount(), extra = todayExtra();
+    var wordsToday = count - extra, streak = streakOf(prof), best = prof.streakBest || 0, met = prof.lastMetDay === todayKey();
+    var pct = goal ? Math.min(100, Math.round(count * 100 / goal)) : 0;
+    var hist = prof.history || {}, days = [], max = Math.max(goal, 1);
+    for(var i = -6; i <= 0; i++){
+      var k = dayKey(i), v = i === 0 ? count : (hist[k] || 0);
+      max = Math.max(max, v);
+      days.push({ k: k, v: v, l: 'SMTWTFS'.charAt(new Date(Date.now() + i * DAY_MS).getDay()) });
+    }
+    var week = '<div class="home-week" aria-label="Last 7 days">' + days.map(function(d, i){
+      var h = Math.max(4, Math.round(d.v * 44 / max)), ok = goal && d.v >= goal;
+      return '<div class="' + (ok ? 'ok' : '') + (i === 6 ? ' now' : '') + '" title="' + d.k + ': ' + d.v + '"><i style="height:' + h + 'px"></i><span>' + d.l + '</span></div>';
+    }).join('') + '</div>';
+    return '<button class="home-card home-today' + (met ? ' met' : '') + '" data-home-act="goal">' +
+      '<div class="home-today-main"><div class="home-ring">' + ringSvg(goal ? pct : 0, met ? 'var(--teal)' : 'var(--mustard)', 96) +
+        '<span><b>' + count + '</b><small>' + (goal ? '/ ' + goal : 'today') + '</small></span></div>' +
+      '<div class="home-today-txt"><div class="eyebrow">' + (met ? 'Goal done ✓' : 'Today') + '</div>' +
+        '<div class="home-streak">' + FLAME_SVG + '<b>' + streak + '</b> day' + (streak === 1 ? '' : 's') + ' streak</div>' +
+        '<div class="home-split"><span><b>' + wordsToday + '</b> words</span><span><b>' + extra + '</b> study pts</span><span>best <b>' + best + '</b></span></div>' +
+        (goal ? '' : '<div class="home-nudge">Tap to set a daily goal</div>') + '</div></div>' + week + '</button>';
+  }
+  function homeHero(){
+    var d = daysToExam(), cd = '';
+    if(d >= 0) cd = '<button class="home-exam" data-home-act="exam" title="Change the exam date"><b>' + (d === 0 ? 'Today' : d) + '</b><span>' + (d === 0 ? 'Exam day — all the best!' : d === 1 ? 'day to go' : 'days to go') + '</span><small>SSC CGL · ' + escapeHtml(examDateText()) + '</small></button>';
+    else cd = '<button class="home-exam past" data-home-act="exam" title="Set your next exam date"><span>Set your next exam date</span></button>';
+    return '<div class="home-hero"><div class="home-greet"><div class="eyebrow">' + escapeHtml(new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })) + '</div>' +
+      '<h1>' + greetText() + (firstName() ? ', <span>' + escapeHtml(firstName()) + '</span>' : '') + '</h1>' +
+      '<p>Everything for SSC CGL in one place — vocabulary, grammar and General Studies. One goal, one streak.</p></div>' + cd + '</div>';
+  }
+  function homeContinueCard(){
+    var id = lastStudyId();
+    var m = STUDY[id || 'grammar'], pr = studyProgress(id || 'grammar'), pct = pr.total ? Math.round(pr.done * 100 / pr.total) : 0;
+    return '<button class="home-card home-cont" data-open-study="' + (id || 'grammar') + '" style="--hub-c:' + m.color + ';">' +
+      '<div class="home-card-h">' + (id ? 'Continue where you left off' : 'Start here') + '</div>' +
+      '<div class="hub-top"><div class="hub-ico">' + m.ico + '</div><div style="flex:1; min-width:0;"><h3>' + escapeHtml(m.title) + '</h3><div class="hi">' + pr.done + ' / ' + pr.total + ' ' + m.unit + ' · ' + escapeHtml(id ? agoText((studyMeta()[id] || {}).openedAt).replace('Opened ', '') : (pr.done || pr.tried ? 'in progress' : 'not started')) + '</div></div>' +
+      '<div class="hub-ring">' + ringSvg(pct, m.color, 50) + '<span>' + pct + '%</span></div></div>' +
+      '<div class="home-bar"><i style="width:' + pct + '%; background:' + m.color + ';"></i></div>' +
+      '<div class="hub-meta"><span>' + escapeHtml(m.hi) + '</span><b>' + (id ? 'Resume' : 'Open') + ' ›</b></div></button>';
+  }
+  function homeDueCard(){
+    var due = currentUser ? dueRevisions().length : 0, mist = totalMistakes();
+    var ve = viewEntries(), mem = ve.filter(function(e){ return e.confidence >= 5; }).length, left = ve.length - mem;
+    var row = function(act, ico, n, label, sub, cls){ return '<button class="home-due-row ' + (cls || '') + '" data-home-act="' + act + '"><span class="ic">' + ico + '</span><span class="tx"><b>' + label + '</b><small>' + sub + '</small></span><span class="n">' + n + '</span></button>'; };
+    return '<div class="home-card home-due"><div class="home-card-h">Waiting for you</div>' +
+      row('revision', '🔁', due, 'Revision rounds', due ? 'Memorized words due back today' : 'Nothing due today', due ? 'hot' : '') +
+      row('mistakes', '📕', mist, 'Mistakes book', mist ? 'Wrong answers from every subject' : 'No mistakes waiting', mist ? 'hot' : '') +
+      row('library', '📖', left, 'Words to master', mem + ' of ' + ve.length + ' memorized', '') + '</div>';
+  }
+  function homeWordCard(){
+    var w = wordOfDay();
+    if(!w) return '<div class="home-card home-wotd"><div class="home-card-h">Word of the day</div><p class="help">Words appear here once your register has some.</p></div>';
+    return '<button class="home-card home-wotd" data-home-act="word" data-id="' + escapeAttr(w.id) + '"><div class="home-card-h">Word of the day <span class="lvl">Level ' + (w.confidence || 0) + '</span></div>' +
+      '<div class="home-wotd-term">' + escapeHtml(w.term) + '</div>' + (w.type ? '<div class="hi">' + escapeHtml(w.type) + '</div>' : '') +
+      (w.english_meaning ? '<p>' + escapeHtml(w.english_meaning) + '</p>' : '') + (w.hindi_meaning ? '<p class="home-hi">' + escapeHtml(w.hindi_meaning) + '</p>' : '') +
+      '<div class="hub-meta"><span>शब्दRegister</span><b>Open card ›</b></div></button>';
+  }
+  function homeTools(){
+    var t = [['present', '🖥️', 'Present', 'Flash cards'], ['aod', '🌙', 'AOD mode', 'Always-on revision'], ['audio', '🎧', 'Audio', 'Hands-free'],
+      ['quiz', '🧩', 'Vocab quiz', 'Blanks · spellings'], ['add', '➕', 'Add words', 'From any AI'], ['panic', '⚡', 'Exam tomorrow', '30 weakest words']];
+    return '<section class="hub-sec"><div class="hub-sec-h"><h2>Vocab tools</h2><span>शब्दावली अभ्यास</span></div><div class="home-tools">' +
+      t.map(function(x){ return '<button data-home-act="' + x[0] + '"><span class="ic">' + x[1] + '</span><b>' + x[2] + '</b><small>' + x[3] + '</small></button>'; }).join('') + '</div></section>';
+  }
+  function homeVocabCard(){
+    var ve = viewEntries(), mem = ve.filter(function(e){ return e.confidence >= 5; }).length, pct = ve.length ? Math.round(mem * 100 / ve.length) : 0;
+    var due = currentUser ? dueRevisions().length : 0;
+    return '<button class="hub-card" data-home-act="library" style="--hub-c:var(--mustard);">' +
+      '<div class="hub-top"><div class="hub-ico">📖</div><div style="flex:1; min-width:0;"><h3>शब्दRegister</h3><div class="hi">शब्दावली · Vocabulary</div></div>' +
+        '<div class="hub-ring" title="' + pct + '% memorized">' + ringSvg(pct, 'var(--mustard)', 50) + '<span>' + pct + '%</span></div></div>' +
+      '<p>Meanings, idioms, one-word substitutions, spellings and roots — with quizzes and spaced revision.</p>' +
+      '<div class="hub-stats"><span><b>' + ve.length + '</b> words</span><span><b>' + mem + '</b> memorized</span>' + (due ? '<span class="hub-wrong"><b>' + due + '</b> due</span>' : '') + '</div>' +
+      '<div class="hub-meta"><span>Library · Spelling Bank · Roots</span><b>Open ›</b></div></button>';
+  }
   function renderHub(){
+    var box = document.getElementById('homeBody');
+    if(!box) return;
     var ids = Object.keys(STUDY);
-    var vocabCard = '<button class="hub-card here" data-hub-close="1" style="--hub-c:var(--mustard);">' +
-      '<div class="hub-top"><div class="hub-ico">📖</div><div><h3>शब्दRegister</h3><div class="hi">शब्दावली · Vocabulary</div></div></div>' +
-      '<p>Your word register — meanings, idioms, one-word substitutions, spellings, roots, quizzes and revision rounds.</p>' +
-      '<div class="hub-meta"><span>' + (words.length ? words.length + ' words' : 'Vocabulary') + '</span><b>You came from here</b></div></button>';
-    document.getElementById('hubBody').innerHTML =
-      '<div class="hub-hero"><div class="eyebrow">SSC CGL · all subjects</div><h1>पाठ<span>Shala</span></h1><p>Every mini course in one place. Pick one to study — your progress saves to your account and works offline.</p></div>' +
+    box.innerHTML = homeHero() +
+      '<div class="home-row1">' + homeTodayCard() + homeContinueCard() + '</div>' +
+      '<div class="home-row2">' + homeDueCard() + homeWordCard() + '</div>' +
+      homeTools() +
       hubPracticeSection() +
-      '<section class="hub-sec"><div class="hub-sec-h"><h2>English</h2><span>अंग्रेज़ी</span></div><div class="hub-grid">' + vocabCard + ids.filter(function(id){ return STUDY[id].subj === 'english'; }).map(hubCard).join('') + '</div></section>' +
-      '<section class="hub-sec"><div class="hub-sec-h"><h2>General Studies</h2><span>सामान्य अध्ययन · ' + gsIds().length + ' mini apps</span></div>' +
+      '<section class="hub-sec"><div class="hub-sec-h"><h2>English</h2><span>अंग्रेज़ी</span></div><div class="hub-grid">' + homeVocabCard() + ids.filter(function(id){ return STUDY[id].subj === 'english'; }).map(hubCard).join('') + '</div></section>' +
+      '<section class="hub-sec" id="homeGs"><div class="hub-sec-h"><h2>General Studies</h2><span>सामान्य अध्ययन · ' + gsIds().length + ' mini apps</span></div>' +
         '<div class="hub-jump">' + GS_SUBJECTS.filter(function(g){ return gsIds().some(function(id){ return STUDY[id].gsub === g[0]; }); }).map(function(g){
           var n = gsIds().filter(function(id){ return STUDY[id].gsub === g[0]; }).length;
           return '<button data-hub-jump="' + g[0] + '">' + g[1] + ' <small>' + n + '</small></button>';
-        }).join('') + '</div>' +
+        }).join('') + '</div><div class="hub-subs">' +
         GS_SUBJECTS.concat([['other', 'More', 'अन्य']]).map(function(g){
           var list = gsIds().filter(function(id){ return (STUDY[id].gsub || 'other') === g[0]; });
           if(!list.length) return '';
-          return '<div class="hub-sub" id="hubsub-' + g[0] + '"><div class="hub-sub-h"><h3>' + g[1] + '</h3><span>' + g[2] + '</span></div><div class="hub-grid">' + list.map(hubCard).join('') + '</div></div>';
+          return '<div class="hub-sub" id="hubsub-' + g[0] + '" style="--n:' + Math.min(3, list.length) + ';"><div class="hub-sub-h"><h3>' + g[1] + '</h3><span>' + g[2] + '</span></div><div class="hub-grid">' + list.map(hubCard).join('') + '</div></div>';
         }).join('') +
-      '</section>';
+      '</div></section>';
   }
-  document.getElementById('hubBody').addEventListener('click', function(ev){
+  var renderHome = renderHub, homeTimer = null;
+  function renderHomeSoon(){
+    clearTimeout(homeTimer);
+    homeTimer = setTimeout(function(){
+      if(isActive('home') && !drillOpen) renderHub();
+      if(isActive('stats')) renderStudyStats();
+    }, 250);
+  }
+  function setExamDate(){
+    modalBodyRef().innerHTML = '<h3>Exam date</h3><p class="help" style="margin-top:0;">The countdown on the home page counts down to this day.</p>' +
+      '<div class="field"><label class="field-label" for="examDateIn">Date</label><input type="date" id="examDateIn" value="' + examDay() + '"></div>' +
+      '<div class="modal-actions"><button class="btn ghost" id="examCancel">Cancel</button><button class="btn teal" id="examSave">Save</button></div>';
+    modalBgRef().classList.add('open');
+    document.getElementById('examCancel').addEventListener('click', function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML = ''; });
+    document.getElementById('examSave').addEventListener('click', function(){
+      var v = document.getElementById('examDateIn').value;
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(v)){ showToast('Pick a date.'); return; }
+      lsSet('pathshalaExamDate', v);
+      modalBgRef().classList.remove('open'); modalBodyRef().innerHTML = '';
+      renderHub();
+    });
+  }
+  function homeAction(a, el){
+    if(a === 'goal') openGoalModal(!(myProfile && myProfile.dailyGoal));
+    else if(a === 'exam') setExamDate();
+    else if(a === 'mistakes') openMistakes();
+    else if(a === 'mock') openMock();
+    else if(a === 'revision' || a === 'library' || a === 'quiz' || a === 'add') switchTab(a);
+    else if(a === 'word') openWordPreviewModal(el.dataset.id);
+    else if(a === 'present') document.getElementById('presentBtn').click();
+    else if(a === 'aod') document.getElementById('navAodBtn').click();
+    else if(a === 'audio') document.getElementById('navAudioBtn').click();
+    else if(a === 'panic') document.getElementById('panicBtn').click();
+  }
+  function studyClick(ev){
     var c = ev.target.closest('[data-open-study]');
     if(c){ openStudy(c.dataset.openStudy, false); return; }
     var jump = ev.target.closest('[data-hub-jump]');
     if(jump){ var t = document.getElementById('hubsub-' + jump.dataset.hubJump); if(t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
     var act = ev.target.closest('[data-hub-act]');
     if(act){ if(act.dataset.hubAct === 'mistakes') openMistakes(); else openMock(); return; }
-    if(ev.target.closest('[data-hub-close]')) closeHub(false);
-  });
-  function openHub(fromHistory){
-    closeAllMenus();
-    renderHub();
-    refreshHubProgress();
-    hubOpen = true;
-    document.getElementById('hubPage').classList.add('open');
-    document.body.classList.add('study-on');
-    if(!fromHistory){ try{ history.pushState({ hub: 1 }, '', '#pathshala'); }catch(e){} }
+    var h = ev.target.closest('[data-home-act]');
+    if(h) homeAction(h.dataset.homeAct, h);
   }
-  function closeHub(fromHistory){
-    if(!hubOpen) return;
-    hubOpen = false;
-    document.getElementById('hubPage').classList.remove('open');
-    if(!studyOpen) document.body.classList.remove('study-on');
-    if(!fromHistory && location.hash === '#pathshala'){ try{ history.back(); }catch(e){} }
+  document.getElementById('homeBody').addEventListener('click', studyClick);
+  function openHub(){ closeAllMenus(); if(studyOpen) closeStudy(false); switchTab('home'); }
+  document.getElementById('homeBrand').addEventListener('click', function(ev){ ev.stopPropagation(); openHub(); });
+  document.getElementById('navMistakesBtn').addEventListener('click', function(){ closeAllMenus(); openMistakes(); });
+  document.getElementById('navMockBtn').addEventListener('click', function(){ closeAllMenus(); openMock(); });
+
+  // ---- Progress tab: every subject at a glance ----
+  function renderStudyStats(){
+    var box = document.getElementById('studyStatsPanel');
+    if(!box) return;
+    var ids = Object.keys(STUDY), tq = 0, tr = 0, tl = 0, tt = 0;
+    var rows = ids.map(function(id){
+      var m = STUDY[id], pr = studyProgress(id), pct = pr.total ? Math.round(pr.done * 100 / pr.total) : 0;
+      tq += pr.tried; tr += pr.right; tl += pr.done; tt += pr.total;
+      return '<button class="ss-row" data-open-study="' + id + '" style="--hub-c:' + m.color + ';"><span class="hub-ring">' + ringSvg(pct, m.color, 44) + '<span>' + pct + '%</span></span>' +
+        '<span class="ss-name"><b>' + m.ico + ' ' + escapeHtml(m.title) + '</b><small>' + (m.subj === 'english' ? 'English' : ((GS_SUBJECTS.filter(function(g){ return g[0] === m.gsub; })[0] || ['', 'GS'])[1])) + '</small></span>' +
+        '<span class="ss-num"><b>' + pr.done + '/' + pr.total + '</b><small>' + m.unit + '</small></span>' +
+        '<span class="ss-num ss-acc"><b>' + (pr.acc === null ? '—' : pr.acc + '%') + '</b><small>' + pr.tried + ' tried</small></span>' +
+        '<span class="ss-num' + (pr.wrong ? ' bad' : '') + '"><b>' + pr.wrong + '</b><small>mistakes</small></span></button>';
+    }).join('');
+    var hist = mockHistory().slice(-8);
+    var mocks = hist.length ? '<div class="ss-mocks">' + hist.map(function(h){
+      var p = h.max ? Math.max(0, Math.round(h.score * 100 / h.max)) : 0;
+      return '<div title="' + escapeAttr(new Date(h.at).toLocaleDateString('en-IN') + ' · ' + h.score + '/' + h.max) + '"><i style="height:' + Math.max(4, Math.round(p * 1.05)) + 'px"></i><span>' + h.score + '</span></div>';
+    }).join('') + '</div>' : '<p class="help">No mixed mock taken yet.</p>';
+    box.innerHTML = '<h2>All subjects · पाठShala</h2>' +
+      '<div class="dq-kpis" style="margin-bottom:14px;"><div style="--dq-c:var(--teal);"><b>' + tl + '<small style="font-size:15px; color:var(--ink-faint);"> / ' + tt + '</small></b><span>lessons & rules done</span></div>' +
+        '<div style="--dq-c:var(--mustard);"><b>' + tq + '</b><span>questions answered</span></div>' +
+        '<div style="--dq-c:var(--accent);"><b>' + (tq ? Math.round(tr * 100 / tq) + '%' : '—') + '</b><span>accuracy</span></div>' +
+        '<div style="--dq-c:var(--maroon);"><b>' + totalMistakes() + '</b><span>in Mistakes book</span></div></div>' +
+      '<div class="ss-list">' + rows + '</div>' +
+      '<h3 class="dq-h3">Mixed mock scores</h3>' + mocks +
+      '<div class="dq-nav"><button class="btn ghost" data-hub-act="mistakes">Open Mistakes book</button><button class="btn teal" data-hub-act="mock">New mixed mock</button></div>';
   }
-  document.getElementById('hubBack').addEventListener('click', function(){ closeHub(false); });
+  document.getElementById('studyStatsPanel').addEventListener('click', studyClick);
   function studyMeta(){ try{ return JSON.parse(lsGet('shabdStudySync') || '{}'); }catch(e){ return {}; } }
   function setStudyMeta(id, patch){ var m = studyMeta(); m[id] = Object.assign({}, m[id] || {}, patch); lsSet('shabdStudySync', JSON.stringify(m)); }
   function studySkinValue(){ return document.body.classList.contains('theme-indigo') ? 'indigo' : 'paper'; }
@@ -1573,10 +1839,21 @@
       if(studyOpen === id) studySyncLabel(String(e.message || '').indexOf('permission') !== -1 ? 'Progress on this device only (add the study rule)' : 'Offline — will save later');
     });
   }
+  /** How many questions answered and lessons finished a module's saved state shows. */
+  function studyCounts(id, json){
+    var st; try{ st = JSON.parse(json || '{}') || {}; }catch(e){ st = {}; }
+    var q = Object.keys(st.ans || {}).length, l = 0;
+    if(id === 'grammar' || id === 'bns') l = Object.keys(st.done || {}).length;
+    else l = Object.keys(st.les || {}).filter(function(k){ return st.les[k] && st.les[k].done; }).length;
+    return { q: q, l: l };
+  }
   function studyCheckChange(){
     if(!studyOpen) return;
     var cur = lsGet(STUDY[studyOpen].key);
     if(cur === studyLast) return;
+    var a = studyCounts(studyOpen, studyLast), b = studyCounts(studyOpen, cur);
+    var pts = Math.max(0, b.q - a.q) * GOAL_PER_Q + Math.max(0, b.l - a.l) * GOAL_PER_LESSON;
+    if(pts) addGoalExtra(pts);
     studyLast = cur;
     setStudyMeta(studyOpen, { localAt: Date.now() });
     clearTimeout(studyPushTimer);
@@ -1592,7 +1869,7 @@
     studyOpen = id;
     setStudyMeta(id, { openedAt: Date.now() });
     document.getElementById('studyTitle').textContent = mod.title;
-    document.getElementById('studyBackLabel').textContent = hubOpen ? 'पाठShala' : 'शब्दRegister';
+    document.getElementById('studyBackLabel').textContent = isActive('stats') ? 'Progress' : 'पाठShala';
     studySyncLabel('Loading your progress…');
     document.getElementById('studyOverlay').classList.add('open');
     document.body.classList.add('study-on');
@@ -1615,7 +1892,8 @@
     clearInterval(studyWatch);
     studyOpen = null;
     document.getElementById('studyOverlay').classList.remove('open');
-    if(!hubOpen) document.body.classList.remove('study-on'); else renderHub();
+    if(!drillOpen) document.body.classList.remove('study-on');
+    renderHomeSoon();
     document.getElementById('studyFrame').src = 'about:blank';
     if(!fromHistory && location.hash.indexOf('#study-') === 0){ try{ history.back(); }catch(e){} }
   }
@@ -1626,15 +1904,6 @@
     var m = /^#study-(\w+)/.exec(location.hash);
     if(m && STUDY[m[1]]){ if(studyOpen !== m[1]) openStudy(m[1], true); return; }
     if(studyOpen) closeStudy(true);
-    if(location.hash === '#pathshala'){ if(!hubOpen) openHub(true); }
-    else if(hubOpen) closeHub(true);
-  });
-  document.querySelectorAll('#subjectsMenu [data-go]').forEach(function(b){
-    b.addEventListener('click', function(ev){
-      ev.stopPropagation();
-      closeAllMenus();
-      if(b.dataset.go === 'hub') openHub(false);
-    });
   });
   window.addEventListener('pagehide', function(){ if(studyOpen){ studyCheckChange(); studyPush(studyOpen); } });
   // keep an open module in step with the app's Light / Dark / Auto choice
@@ -1645,7 +1914,7 @@
   (function(){
     var m = /^#study-(\w+)/.exec(location.hash);
     if(m && STUDY[m[1]]) setTimeout(function(){ if(currentUser) openStudy(m[1], true); }, 1500);
-    else if(location.hash === '#pathshala') setTimeout(function(){ if(currentUser) openHub(true); }, 800);
+    else if(location.hash === '#pathshala'){ try{ history.replaceState(null, '', location.pathname + location.search); }catch(e){} }
   })();
 
 
@@ -1660,6 +1929,7 @@
   STUDY.festivals.lessons = 16; STUDY.festivals.unit = 'lessons';
   STUDY.iprplans.lessons = 12; STUDY.iprplans.unit = 'lessons';
   STUDY.folkdances.lessons = 16; STUDY.folkdances.unit = 'lessons';
+  STUDY.appointments.lessons = 13; STUDY.appointments.unit = 'lessons';
   function gsIds(){ return Object.keys(STUDY).filter(function(id){ return STUDY[id].subj === 'gs'; }); }
   var STUDY_EXTRA = { mocks: { key: 'shabdMockHistory', title: 'Mixed mock history' } };
   function studyMod(id){ return STUDY[id] || STUDY_EXTRA[id]; }
@@ -1746,11 +2016,12 @@
 
   // ---- the practice / mock screen ----
   var drill = null, drillOpen = false, drillTimer = null;
-  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances' };
+  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments' };
   function openDrill(title){
     closeAllMenus();
     drillOpen = true;
     document.getElementById('drillTitle').textContent = title;
+    document.getElementById('drillBackLabel').textContent = isActive('home') ? 'पाठShala' : (isActive('stats') ? 'Progress' : 'Back');
     document.getElementById('drillPage').classList.add('open');
     document.body.classList.add('study-on');
     try{ history.pushState({ drill: 1 }, '', '#drill'); }catch(e){}
@@ -1765,8 +2036,8 @@
     drillOpen = false; drill = null;
     document.getElementById('drillPage').classList.remove('open');
     document.getElementById('drillClock').textContent = '';
-    if(!hubOpen && !studyOpen) document.body.classList.remove('study-on');
-    if(hubOpen) renderHub();
+    if(!studyOpen) document.body.classList.remove('study-on');
+    renderHomeSoon();
     if(!fromHistory && location.hash === '#drill'){ try{ history.back(); }catch(e){} }
   }
   document.getElementById('drillBack').addEventListener('click', function(){ closeDrill(false); });
@@ -1841,6 +2112,7 @@
       var ok = q.pick === q.a;
       if(ok) d.cleared++;
       if(STUDY[q.mod]) studyMark(q.mod, q.id, ok);
+      addGoalExtra(GOAL_PER_Q);
       renderPractice();
     }); });
     var nb = document.getElementById('pNext');
@@ -1959,6 +2231,7 @@
       if(q.mod === 'vocab') logQuizAttempt(q.id, (words.find(function(w){ return w.id === q.id; }) || {}).term || '', q.pick === q.a);
     });
     var right = sec.en.r + sec.gs.r, wrong = sec.en.w + sec.gs.w, skipped = d.qs.length - right - wrong;
+    addGoalExtra((right + wrong) * GOAL_PER_Q);
     var secsUsed = Math.min(d.secs, Math.round((Date.now() - d.start) / 1000));
     var h = studyState('mocks'); h.list = (Array.isArray(h.list) ? h.list : []).concat([{ at: Date.now(), score: score, max: d.qs.length * 2, right: right, wrong: wrong, skipped: skipped, secs: secsUsed, en: { r: sec.en.r, t: sec.en.t }, gs: { r: sec.gs.r, t: sec.gs.t } }]).slice(-50);
     setStudyState('mocks', h);
@@ -1989,9 +2262,12 @@
     else if(ev.key === 'ArrowLeft'){ var p = document.getElementById('mkPrev'); if(p) p.click(); }
   });
   /** On opening पाठShala: bring every module's progress up to date from the account. */
+  var hubPulledAt = 0;
+  function refreshHubProgressSoon(){ if(Date.now() - hubPulledAt > 120000) refreshHubProgress(); }
   function refreshHubProgress(){
     if(!currentUser) return;
-    Promise.all(Object.keys(STUDY).concat(Object.keys(STUDY_EXTRA)).map(function(id){ return studyPull(id); })).then(function(){ if(hubOpen && !drillOpen) renderHub(); });
+    hubPulledAt = Date.now();
+    Promise.all(Object.keys(STUDY).concat(Object.keys(STUDY_EXTRA)).map(function(id){ return studyPull(id); })).then(function(){ renderHomeSoon(); });
   }
 
   // ---------------- text-to-speech ----------------
@@ -2076,7 +2352,7 @@
     modalBody.innerHTML = '<h3>Install this app</h3>' +
       '<p class="help"><strong>iPhone / iPad (Safari):</strong> tap the Share icon, then "Add to Home Screen".</p>' +
       '<p class="help"><strong>Android (Chrome):</strong> tap the ⋮ menu, then "Install app" or "Add to Home screen".</p>' +
-      '<p class="help"><strong>Computer (Chrome / Edge):</strong> click the install icon in the address bar, or the browser menu → "Install CGL Vocabulary Register".</p>' +
+      '<p class="help"><strong>Computer (Chrome / Edge):</strong> click the install icon in the address bar, or the browser menu → "Install पाठShala".</p>' +
       '<div class="modal-actions"><button class="btn ghost" id="closeInstallInfo">Close</button></div>';
     modalBg.classList.add('open');
     document.getElementById('closeInstallInfo').addEventListener('click', function(){ modalBg.classList.remove('open'); modalBody.innerHTML=''; });
@@ -2301,7 +2577,7 @@
       var body = newer.length === 1
         ? ('"'+newer[0].term+'" was just added to the register.')
         : (newer.length + ' new words were added to the register.');
-      try{ new Notification('CGL Vocabulary Register', {body: body, icon: 'icon-192.png'}); }catch(e){}
+      try{ new Notification('पाठShala', {body: body, icon: 'icon-192.png'}); }catch(e){}
     }
     if(maxTs > last) setLastWordCheck(maxTs);
   }
@@ -2435,6 +2711,7 @@
       myProfile = doc.exists ? (doc.data() || {}) : {};
       renderGoalWidget();
       if(isActive('stats')) renderStreakPanel();
+      renderHomeSoon();
       maybeAskGoal();
     }, function(err){ /* streaks are optional; the widget just stays hidden */ });
 
@@ -2579,10 +2856,12 @@
     views.forEach(function(v){ v.classList.toggle('active', v.id === 'view-' + name); });
     refreshNavActive();
     closeAllMenus();
+    document.body.classList.toggle('on-home', name === 'home');
     if(name === 'library') libraryAnimate = true;
     window.scrollTo(0, 0);
     if(name === 'library') renderLibrary();
-    if(name === 'stats'){ renderStreakPanel(); renderStats(); renderLeaderboard(); renderAllUsers(); }
+    if(name === 'home'){ renderHub(); refreshHubProgressSoon(); }
+    if(name === 'stats'){ renderStreakPanel(); renderStudyStats(); renderStats(); renderLeaderboard(); renderAllUsers(); refreshHubProgressSoon(); }
     if(name === 'review'){ renderReview(); renderSpellReview(); }
     if(name === 'quiz') renderQuizHome();
     if(name === 'roots') renderRoots();
@@ -4115,7 +4394,20 @@ list.map(function(w, i){ return (i + 1) + '. ' + w.term; }).join('\n'),
   function dayKey(offset){ var d = new Date(); d.setDate(d.getDate() + (offset || 0)); return dateKey(d); }
   function todayKey(){ return dayKey(0); }
   function streakOf(u){ u = u || {}; var last = u.lastMetDay || ''; return (last === todayKey() || last === dayKey(-1)) ? (u.streakCurrent || 0) : 0; }
-  function todayCount(){ return (myProfile && myProfile.goalDay === todayKey()) ? (myProfile.goalIds || []).length : 0; }
+  function todayExtra(){ return (myProfile && myProfile.goalDay === todayKey()) ? (myProfile.goalExtra || 0) : 0; }
+  function todayCount(){ return (myProfile && myProfile.goalDay === todayKey()) ? (myProfile.goalIds || []).length + (myProfile.goalExtra || 0) : 0; }
+  /** पाठShala study counts toward the same goal: 1 per question answered, 5 per lesson finished. */
+  var GOAL_PER_Q = 1, GOAL_PER_LESSON = 5;
+  function addGoalExtra(n){
+    if(!currentUser || !myProfile || !(n > 0)) return;
+    var t = todayKey();
+    var same = myProfile.goalDay === t;
+    var ids = same ? (myProfile.goalIds || []).slice() : [];
+    var extra = (same ? (myProfile.goalExtra || 0) : 0) + n;
+    var upd = { goalDay: t, goalIds: ids, goalExtra: extra, history: {} };
+    upd.history[t] = ids.length + extra;
+    applyGoalUpdate(upd);
+  }
   function streakBadgeHtml(u){ var n = streakOf(u); return n ? ' · <span class="lb-streak" title="' + n + '-day streak">' + FLAME_SVG + n + '</span>' : ''; }
 
   function renderGoalWidget(){
@@ -4139,7 +4431,7 @@ list.map(function(w, i){ return (i + 1) + '. ' + w.term; }).join('\n'),
     var tip = streak ? (streak + '-day streak' + (!met && late ? ' — finish today to keep it!' : '')) : 'Hit today\'s goal to start a streak';
     el.classList.toggle('done', met);
     el.innerHTML = '<span class="gw-ring"><svg width="48" height="48" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="19" fill="none" stroke="var(--paper-deep)" stroke-width="5"></circle><circle class="gw-arc" cx="24" cy="24" r="19" fill="none" stroke-width="5" stroke-linecap="round" stroke-dasharray="' + (frac * circ).toFixed(1) + ' ' + circ.toFixed(1) + '"></circle></svg><span class="gw-num">' + count + '</span></span>' +
-      '<span class="gw-text"><span class="gw-label">' + (met ? 'Goal done' : 'Today') + '</span><span class="gw-val">' + count + ' / ' + goal + ' words</span></span>' +
+      '<span class="gw-text"><span class="gw-label">' + (met ? 'Goal done' : 'Today') + '</span><span class="gw-val">' + count + ' / ' + goal + '</span></span>' +
       '<span class="gw-streak ' + streakCls + '" title="' + escapeAttr(tip) + '">' + FLAME_SVG + streak + '</span>';
   }
 
@@ -4156,12 +4448,12 @@ list.map(function(w, i){ return (i + 1) + '. ' + w.term; }).join('\n'),
     var presets = [5, 10, 15, 20, 30, 50];
     var hints = {5: 'Gentle', 10: 'Steady', 15: 'Focused', 20: 'Serious', 30: 'Intense', 50: 'Exam mode'};
     modalBodyRef().innerHTML = '<h3>' + (isFirst ? 'Set your daily goal' : 'Daily goal') + '</h3>' +
-      '<p class="help" style="margin-top:0;">How many words do you want to learn each day? Hit it every day to build a streak.</p>' +
+      '<p class="help" style="margin-top:0;">How much do you want to study each day? Everything counts toward one goal and one streak: <b>1</b> for each word you level up, <b>1</b> for each question you answer in पाठShala or a mock, and <b>' + GOAL_PER_LESSON + '</b> for each lesson or rule you finish.</p>' +
       '<div class="goal-presets">' + presets.map(function(n){ return '<button class="goal-preset' + (n === goal ? ' on' : '') + '" data-goal="' + n + '">' + n + '<small>' + hints[n] + '</small></button>'; }).join('') + '</div>' +
       '<div class="field"><label class="field-label" for="goalCustom">Or your own number</label><input type="text" inputmode="numeric" id="goalCustom" placeholder="e.g. 25" value="' + (presets.indexOf(goal) === -1 ? goal : '') + '"></div>' +
       '<div class="menu-label" style="padding-left:0;">What counts toward the goal</div>' +
       '<div class="seg-toggle" style="margin:0 0 8px;"><button data-gmode="levelup" class="' + (mode === 'levelup' ? 'on' : '') + '">Any word I level up</button><button data-gmode="memorized" class="' + (mode === 'memorized' ? 'on' : '') + '">Only words I fully memorize</button></div>' +
-      '<p class="help" style="font-size:12.5px;">Each word counts once per day. Just opening a card doesn\'t count — rating it higher, or answering it right in a quiz, does.</p>' +
+      '<p class="help" style="font-size:12.5px;">Each word counts once per day. Just opening a card doesn\'t count — rating it higher, or answering it right in a quiz, does. This choice is only about words.</p>' +
       '<div class="modal-actions"><button class="btn ghost" id="goalLater">' + (isFirst ? 'Maybe later' : 'Cancel') + '</button><button class="btn teal" id="goalSave">Save goal</button></div>';
     modalBgRef().classList.add('open');
     var chosen = goal, chosenMode = mode;
@@ -4194,7 +4486,7 @@ list.map(function(w, i){ return (i + 1) + '. ' + w.term; }).join('\n'),
       db.collection('users').doc(currentUser.uid).set(upd, {merge: true}).catch(function(e){ showToast('Could not save your goal: ' + e.message); });
       lsSet('vocabGoalAsked', '1');
       modalBgRef().classList.remove('open'); modalBodyRef().innerHTML = '';
-      showToast('Goal set: ' + chosen + ' word' + (chosen === 1 ? '' : 's') + ' a day.');
+      showToast('Goal set: ' + chosen + ' a day.');
       renderGoalWidget();
       if(isActive('stats')) renderStreakPanel();
       applyGoalUpdate({});
@@ -4212,8 +4504,9 @@ list.map(function(w, i){ return (i + 1) + '. ' + w.term; }).join('\n'),
     var ids = myProfile.goalDay === t ? (myProfile.goalIds || []).slice() : [];
     if(ids.indexOf(id) !== -1) return;
     ids.push(id);
-    var upd = { goalDay: t, goalIds: ids, history: {} };
-    upd.history[t] = ids.length;
+    var extra = myProfile.goalDay === t ? (myProfile.goalExtra || 0) : 0;
+    var upd = { goalDay: t, goalIds: ids, goalExtra: extra, history: {} };
+    upd.history[t] = ids.length + extra;
     applyGoalUpdate(upd);
   }
 
@@ -4222,9 +4515,10 @@ list.map(function(w, i){ return (i + 1) + '. ' + w.term; }).join('\n'),
     var t = todayKey();
     var goal = myProfile.dailyGoal || 0;
     var ids = upd.goalIds || (myProfile.goalDay === t ? (myProfile.goalIds || []) : []);
+    var extra = typeof upd.goalExtra === 'number' ? upd.goalExtra : (myProfile.goalDay === t ? (myProfile.goalExtra || 0) : 0);
     var milestone = null;
     var justMet = false;
-    if(goal && ids.length >= goal && myProfile.lastMetDay !== t){
+    if(goal && ids.length + extra >= goal && myProfile.lastMetDay !== t){
       var cur = (myProfile.lastMetDay === dayKey(-1) ? (myProfile.streakCurrent || 0) : 0) + 1;
       upd.streakCurrent = cur;
       upd.streakBest = Math.max(cur, myProfile.streakBest || 0);
@@ -4237,6 +4531,7 @@ list.map(function(w, i){ return (i + 1) + '. ' + w.term; }).join('\n'),
     myProfile = Object.assign({}, myProfile, upd, { history: hist });
     renderGoalWidget();
     if(isActive('stats')) renderStreakPanel();
+    renderHomeSoon();
     db.collection('users').doc(currentUser.uid).set(upd, {merge: true}).catch(function(e){ showToast('Could not save your streak: ' + e.message); });
     if(justMet){
       var n = upd.streakCurrent;
@@ -4271,7 +4566,7 @@ list.map(function(w, i){ return (i + 1) + '. ' + w.term; }).join('\n'),
     box.innerHTML = '<h2 style="margin-bottom:14px;">Daily goal &amp; streak</h2>' +
       '<div class="streak-hero">' +
         '<div class="streak-big' + (streak ? '' : ' cold') + '">' + FLAME_SVG + '<span>' + streak + '</span></div>' +
-        '<div class="streak-meta"><b>' + (streak ? streak + '-day streak' : 'No active streak') + '</b><span>Best: ' + best + ' day' + (best === 1 ? '' : 's') + (goal ? ' · Today: ' + count + ' / ' + goal + ' words' : ' · No goal set yet') + '</span></div>' +
+        '<div class="streak-meta"><b>' + (streak ? streak + '-day streak' : 'No active streak') + '</b><span>Best: ' + best + ' day' + (best === 1 ? '' : 's') + (goal ? ' · Today: ' + count + ' / ' + goal : ' · No goal set yet') + '</span></div>' +
         '<button class="btn ghost sm" id="streakGoalBtn" style="margin-left:auto;">' + (goal ? 'Change goal' : 'Set a daily goal') + '</button>' +
       '</div>' +
       '<div class="menu-label" style="padding-left:0; margin-top:18px;">Last 12 weeks</div>' +
@@ -4585,7 +4880,7 @@ list.map(function(w, i){ return (i + 1) + '. ' + w.term; }).join('\n'),
     var pct = total ? Math.round(correctCount/total*100) : 0;
     var missed = quizResults.filter(function(r){ return !r.correct; }).map(function(r){ return r.term; });
     var grade = pct >= 90 ? 'Excellent!' : pct >= 75 ? 'Great job!' : pct >= 50 ? 'Good effort!' : 'Keep practicing!';
-    var shareText = 'I scored ' + correctCount + '/' + total + ' (' + pct + '%) on my CGL Vocabulary Register quiz — ' + grade;
+    var shareText = 'I scored ' + correctCount + '/' + total + ' (' + pct + '%) on my पाठShala vocab quiz — ' + grade;
     area.innerHTML =
       '<div class="quiz-wrap"><div class="report-card">' +
         '<div class="report-score">'+pct+'%</div>' +
@@ -4601,7 +4896,7 @@ list.map(function(w, i){ return (i + 1) + '. ' + w.term; }).join('\n'),
     document.getElementById('quizBackBtn').addEventListener('click', backToQuizHome);
     document.getElementById('shareReportBtn').addEventListener('click', async function(){
       if(navigator.share){
-        try{ await navigator.share({ title: 'CGL Vocabulary Register', text: shareText }); }
+        try{ await navigator.share({ title: 'पाठShala', text: shareText }); }
         catch(e){ /* user cancelled the share sheet, ignore */ }
       } else {
         await copyTextToClipboard(shareText);
@@ -5841,6 +6136,7 @@ listBlock,
       '<div class="stat-chip"><span class="num">'+memorized+'</span><span class="lbl">memorized</span></div>' +
       '<div class="stat-chip"><span class="num">'+(total-memorized)+'</span><span class="lbl">to revise</span></div>';
     renderRevDueBtn();
+    renderHomeSoon();
   }
 
   // ---------------- backup ----------------
@@ -6174,10 +6470,16 @@ listBlock,
     return JSON.stringify({
       v: 1, p: p, total: words.length,
       goal: prof.dailyGoal || 0, mode: prof.goalMode || 'levelup',
-      goalDay: prof.goalDay || '', goalIds: prof.goalDay === t ? (prof.goalIds || []) : [],
+      goalDay: prof.goalDay || '', goalIds: prof.goalDay === t ? lockGoalIds(prof) : [],
       streak: prof.streakCurrent || 0, lastMet: prof.lastMetDay || '', best: prof.streakBest || 0,
       lastEventT: lockLastEventT, pushedAt: Date.now()
     });
+  }
+  // the phone and wallpaper count today's ids; पाठShala study is added as stand-in ids so all three show one number
+  function lockGoalIds(prof){
+    var a = (prof.goalIds || []).slice(), n = Math.min(prof.goalExtra || 0, 500);
+    for(var i = 1; i <= n; i++) a.push('study:' + i);
+    return a;
   }
   function lockPushSummary(force){
     if(!lockReady()) return Promise.resolve();
@@ -6546,6 +6848,7 @@ listBlock,
   function isActive(name){ var v = document.getElementById('view-' + name); return !!(v && v.classList.contains('active')); }
   function renderAll(){
     renderStatStrip();
+    if(isActive('home') && !drillOpen) renderHub();
     if(isActive('library')) renderLibrary();
     if(isActive('stats')) renderStats();
     if(isActive('roots')) renderRoots();

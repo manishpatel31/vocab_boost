@@ -1,0 +1,1430 @@
+<!doctype html><html><head><meta charset=utf8>
+<script>
+/* शब्दRegister bridge: follows the app's look (Paper / Indigo) and Light / Dark / Auto choice. */
+(function(){
+  var root = document.documentElement;
+  function theme(t){ if(t === 'dark' || t === 'light') root.setAttribute('data-theme', t); else root.removeAttribute('data-theme'); }
+  function skin(s){ if(s === 'paper' || s === 'indigo') root.setAttribute('data-skin', s); }
+  try{
+    var q = new URLSearchParams(location.search);
+    theme(q.get('theme'));
+    skin(q.get('skin') || (q.get('embed') ? 'paper' : ''));
+    if(q.get('embed')) root.classList.add('in-shabd');
+  }catch(e){}
+  window.addEventListener('message', function(e){
+    if(e.origin !== location.origin || !e.data || e.data.type !== 'shabd-theme') return;
+    theme(e.data.theme);
+    if(e.data.skin) skin(e.data.skin);
+  });
+})();
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap">
+<meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Appointments 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<style>
+/* Layout: Appointments 2026 — follows the शब्दRegister Paper / Indigo look; one column + bottom tabs on phones, sidebar on PC. */
+:root{
+  --paper:#f6f3ea; --sheet:#fffdf7; --sunk:#ebe6d8;
+  --ink:#1d2a22; --ink2:#56625a; --rule:#dcd5c3;
+  --blue:#1f5c3d; --on-blue:#ffffff; --blue-bg:#dcebdf;
+  --accent:#b4530f; --accent-bg:#fbe7d3;
+  --good:#1b7547; --good-bg:#dff1e6; --bad:#b0271f; --bad-bg:#f8e1de;
+  --warn-bg:#fff2d2;
+  --f-display:"Fraunces", "Tiro Devanagari Hindi", Georgia, serif;
+  --f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-num:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r:10px; --nav-h:64px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#111612; --sheet:#1a211c; --sunk:#222b25;
+  --ink:#e8eee9; --ink2:#a3b0a7; --rule:#2f3a33;
+  --blue:#86cfa2; --on-blue:#111612; --blue-bg:#1d3a29;
+  --accent:#f3a764; --accent-bg:#3b2614;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#111612; --sheet:#1a211c; --sunk:#222b25;
+  --ink:#e8eee9; --ink2:#a3b0a7; --rule:#2f3a33;
+  --blue:#86cfa2; --on-blue:#111612; --blue-bg:#1d3a29;
+  --accent:#f3a764; --accent-bg:#3b2614;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
+.wrap{max-width:640px;margin:0 auto;padding-inline:16px;padding-block:0 calc(var(--nav-h) + 28px + env(safe-area-inset-bottom,0px))}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);border-bottom:1px solid var(--rule)}
+.top-in{max-width:640px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px}
+.brand{font-family:var(--f-display);font-weight:800;font-size:17px;line-height:1.2;flex:1;min-width:0}
+.brand small{display:block;font-family:var(--f-body);font-weight:500;font-size:12px;color:var(--ink2);letter-spacing:.02em}
+.stat{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right;white-space:nowrap}
+.stat b{color:var(--ink);font-weight:600}
+
+/* bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--sheet);border-top:1px solid var(--rule);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);height:var(--nav-h)}
+.nav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer}
+.nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav button[aria-current="page"]{color:var(--blue)}
+.nav button[aria-current="page"] span{border-bottom:2px solid var(--blue)}
+
+/* type */
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.25;margin:0}
+h1{font-size:24px;font-weight:800}
+h2{font-size:19px;font-weight:800}
+h3{font-size:16px;font-weight:700}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--ink2)}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+p{margin:0}
+.stack{display:flex;flex-direction:column;gap:14px}
+.view{padding-top:18px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--rule);background:var(--sheet);font-weight:600;cursor:pointer;text-decoration:none}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:var(--on-blue)}
+.btn.ghost{background:transparent}
+.btn.sm{min-height:36px;padding:0 14px;font-size:14px}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.end{justify-content:flex-end}
+.row.between{justify-content:space-between}
+
+/* hero */
+.hero{display:grid;gap:10px;padding:4px 0 6px}
+.hero p{color:var(--ink2)}
+.meter{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--blue);border-radius:99px}
+
+/* lesson list */
+.lessons{display:flex;flex-direction:column;border-top:1px solid var(--rule)}
+.les{display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;padding:14px 2px;border-bottom:1px solid var(--rule);background:none;border-left:0;border-right:0;border-top:0;text-align:left;cursor:pointer;width:100%}
+.les .no{font-family:var(--f-num);font-weight:600;font-size:15px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--rule);color:var(--ink2)}
+.les.done .no{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.les .t{min-width:0}
+.les .t b{display:block;font-weight:700;font-size:16px;line-height:1.3}
+.les .t span{font-size:13px;color:var(--ink2)}
+.les .sc{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right}
+.les.next .no{border-color:var(--blue);color:var(--blue)}
+
+/* lesson reader */
+.lhead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.back{background:none;border:0;padding:8px 8px 8px 0;cursor:pointer;color:var(--blue);font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0 4px}
+.steps button{border:1px solid var(--rule);background:var(--sheet);border-radius:8px;padding:8px 4px;font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer}
+.steps button[aria-current="step"]{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.block{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;min-width:0}
+.block h3{margin-bottom:8px}
+.block p + p{margin-top:8px}
+.plain{padding:0 2px}
+.facts{display:grid;gap:0}
+.facts div{display:grid;grid-template-columns:minmax(0,42%) minmax(0,1fr);gap:10px;padding:7px 0;border-top:1px dashed var(--rule)}
+.facts div:first-child{border-top:0}
+.facts dt{font-size:14px;color:var(--ink2);margin:0}
+.facts dd{margin:0;font-weight:600;min-width:0}
+.tl{display:grid;gap:0;margin:0;padding:0;list-style:none}
+.tl li{display:grid;grid-template-columns:92px 1fr;gap:10px;padding:8px 0;border-top:1px dashed var(--rule)}
+.tl li:first-child{border-top:0}
+.tl .y{font-family:var(--f-num);font-weight:600;font-size:13px;color:var(--accent);padding-top:2px}
+.trick,.trap{border-radius:var(--r);padding:12px 14px 12px 14px;border:1px solid var(--rule)}
+.trick{background:var(--accent-bg);border-color:transparent}
+.trap{background:var(--bad-bg);border-color:transparent}
+.trick .lab,.trap .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.trick .lab{color:var(--accent)}
+.trap .lab{color:var(--bad)}
+.tbl{overflow-x:auto;margin:0 -2px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);font-weight:700}
+td.n{font-family:var(--f-num);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fig{margin:0}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-size:13px;color:var(--ink2);margin-top:6px}
+.pyr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pyr div{text-align:center;font-size:13px}
+.pyr b{display:block;font-size:14px}
+.pm{fill:var(--blue)} .pf{fill:var(--accent)}
+.sum{margin:0;padding-left:20px;display:grid;gap:6px}
+
+/* questions */
+.qcard{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px;min-width:0}
+.qmeta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}
+.qno{font-family:var(--f-num);font-weight:600;color:var(--ink2)}
+.tag{background:var(--sunk);color:var(--ink2);border-radius:99px;padding:1px 9px;font-weight:600}
+.tag.pyq{background:var(--accent-bg);color:var(--accent)}
+.bm{margin-left:auto;background:none;border:0;cursor:pointer;color:var(--ink2);font-size:20px;line-height:1;padding:4px}
+.bm[aria-pressed="true"]{color:var(--accent)}
+.qt{font-weight:600;font-size:16px}
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:start;text-align:left;width:100%;border:1.5px solid var(--rule);background:var(--paper);border-radius:9px;padding:10px 12px;cursor:pointer;min-height:44px}
+.opt .k{font-family:var(--f-num);font-weight:600;color:var(--ink2);font-size:14px;padding-top:1px}
+.opt.sel{border-color:var(--blue);background:var(--blue-bg)}
+.opt.ok{border-color:var(--good);background:var(--good-bg)}
+.opt.no{border-color:var(--bad);background:var(--bad-bg)}
+.opt.ok .k{color:var(--good)} .opt.no .k{color:var(--bad)}
+.opt:disabled{cursor:default;color:inherit}
+.exp{font-size:15px;border-left:3px solid var(--blue);padding:4px 0 4px 12px;color:var(--ink)}
+.exp b.okl{color:var(--good)} .exp b.nol{color:var(--bad)}
+
+/* chips */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 13px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.seg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--rule)}
+.seg::-webkit-scrollbar{display:none}
+.seg button{flex:none;background:none;border:0;border-bottom:2px solid transparent;padding:10px 8px;font-weight:600;color:var(--ink2);cursor:pointer}
+.seg button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+
+/* score panel */
+.scorebig{display:flex;align-items:baseline;gap:8px}
+.scorebig .num{font-size:44px;font-weight:600;line-height:1;color:var(--blue)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.kpi{background:var(--sunk);border-radius:8px;padding:8px;text-align:center}
+.kpi .num{display:block;font-size:20px;font-weight:600}
+.kpi span{font-size:12px;color:var(--ink2)}
+.kpi.g .num{color:var(--good)} .kpi.b .num{color:var(--bad)}
+
+/* mock */
+.mbar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 57px);z-index:10;background:var(--paper);padding:10px 0;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--rule)}
+.timer{font-family:var(--f-num);font-weight:600;font-size:18px;padding:4px 10px;border-radius:8px;background:var(--sunk)}
+.timer.low{background:var(--bad-bg);color:var(--bad)}
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px}
+.pal button{height:40px;border-radius:8px;border:1px solid var(--rule);background:var(--sheet);font-family:var(--f-num);font-weight:600;font-size:13px;cursor:pointer}
+.pal button.a{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.pal button.m{box-shadow:inset 0 -4px 0 var(--accent)}
+.pal button.cur{outline:2px solid var(--ink);outline-offset:1px}
+.pal button.ok{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.pal button.no{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.confirm{background:var(--warn-bg);border-radius:var(--r);padding:12px 14px;display:grid;gap:10px}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}
+legend{font-weight:700;margin-bottom:6px;padding:0}
+.radios{display:flex;gap:8px;flex-wrap:wrap}
+.radios label{border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 14px;font-weight:600;cursor:pointer;font-size:14px}
+.radios input{position:absolute;opacity:0;pointer-events:none}
+.radios input:checked + span{color:var(--blue)}
+.radios label:has(input:checked){border-color:var(--blue);background:var(--blue-bg)}
+.radios label:has(input:focus-visible){outline:2px solid var(--blue);outline-offset:2px}
+select{font:inherit;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:8px;padding:8px 10px;max-width:100%}
+.hist{display:grid;gap:0}
+.hist div{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:14px}
+
+/* revise */
+.search{width:100%;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:10px;padding:10px 12px;font:inherit}
+.rk{display:grid;gap:0}
+.rk div{display:grid;grid-template-columns:minmax(0,48%) 1fr;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:15px}
+.rk div:first-child{border-top:0}
+.rk dt{font-size:13px;color:var(--ink2);margin:0}
+.rk dt.up{color:var(--good)} .rk dt.dn{color:var(--bad)}
+.rk dd{margin:0;font-weight:600;min-width:0}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px}
+.tile .num{display:block;font-size:24px;font-weight:600;color:var(--accent);line-height:1.2}
+.tile span{font-size:13px;color:var(--ink2)}
+.gbar{display:grid;grid-template-columns:78px 1fr 52px;gap:8px;align-items:center;font-size:13px;padding:3px 0}
+.gbar .tr{height:12px;background:var(--sunk);border-radius:3px;position:relative;overflow:hidden}
+.gbar .tr i{position:absolute;left:0;top:0;bottom:0;background:var(--blue);border-radius:3px}
+.gbar .tr i.neg{background:var(--bad)}
+.gbar .v{font-family:var(--f-num);text-align:right}
+.flash{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;min-height:240px;padding:20px 18px;display:grid;align-content:center;gap:12px;cursor:pointer;text-align:left;width:100%}
+.flash .side{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.flash .front{font-size:18px;font-weight:600}
+.flash .ans{font-size:20px;font-weight:700;color:var(--good)}
+.empty{padding:24px 4px;color:var(--ink2);text-align:center}
+.foot{font-size:13px;color:var(--ink2);padding-top:10px}
+@media (prefers-reduced-motion: no-preference){ .opt,.chip,.btn{transition:background-color .15s, border-color .15s} }
+.link{background:var(--blue-bg);border-radius:var(--r);padding:12px 14px}
+.link .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;color:var(--blue)}
+.icheck{background:var(--sheet);border:1.5px dashed var(--blue);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px}
+.icheck .lab{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue)}
+.cat{font-size:12px;font-weight:700;border-radius:99px;padding:1px 8px;white-space:nowrap}
+.cat.CS{background:var(--blue-bg);color:var(--blue)} .cat.CSS{background:var(--accent-bg);color:var(--accent)} .cat.ST{background:var(--sunk);color:var(--ink)} .cat.OT{background:var(--sunk);color:var(--ink2)}
+
+/* ---- workbook additions ---- */
+table.cover td:nth-child(4){min-width:180px}
+.plist .dl{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.plist .dl em{font-style:normal;font-weight:700;color:var(--blue);text-align:right}
+.ladder{list-style:none;margin:0;padding:0;display:grid;gap:0;border-top:1px solid var(--rule)}
+.ladder li{display:grid;grid-template-columns:62px 1fr auto;gap:12px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--rule)}
+.ladder .rk-n{font-size:22px;font-weight:600;color:var(--blue);text-align:right}
+.ladder .rk-t{min-width:0}
+.ladder .rk-t b{display:block;line-height:1.3}
+.ladder .rk-t span{font-size:13px;color:var(--ink2)}
+.ladder .rk-d{font-weight:700;font-size:14px;white-space:nowrap}
+.ladder li.up .rk-d{color:var(--good)} .ladder li.dn .rk-d{color:var(--bad)}
+.ladder small{font-weight:600;color:var(--ink2)}
+table.cover td{min-width:90px}
+.peek{border:1.5px dashed var(--blue);background:var(--blue-bg);color:var(--blue);border-radius:8px;padding:6px 10px;font-weight:600;cursor:pointer;min-height:36px;width:100%}
+.pubs{display:grid;gap:12px}
+.plist{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.plist li{padding:7px 0;border-top:1px dashed var(--rule);display:grid;gap:1px}
+.plist li:first-child{border-top:0}
+.plist li span{font-size:13px;color:var(--ink2)}
+.seg{scroll-snap-type:x proximity}
+@media (max-width: 700px){
+  table.cover thead{display:none}
+  table.cover tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 10px;padding:10px 0;border-bottom:1px solid var(--rule)}
+  table.cover td{border:0;padding:0;min-width:0;font-size:14px}
+  table.cover td:first-child{grid-column:1/-1;font-size:15px}
+  table.cover td:nth-child(4){grid-column:1/-1;min-width:0}
+  table.cover td[data-l]::before{content:attr(data-l);display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-bottom:2px}
+}
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">Appointments 2026<small>नियुक्तियाँ · SSC CGL workbook</small></div>
+    <div class="stat" id="topstat"></div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<nav class="nav" aria-label="Sections">
+  <div class="nav-in">
+    <button type="button" id="nav-learn" data-tab="learn"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg><span>Learn</span></button>
+    <button type="button" id="nav-practice" data-tab="practice"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span>Practice</span></button>
+    <button type="button" id="nav-mock" data-tab="mock"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6M12 2v3"/></svg><span>Mock test</span></button>
+    <button type="button" id="nav-revise" data-tab="revise"><svg viewBox="0 0 24 24"><path d="M12 3 2 8l10 5 10-5z"/><path d="m2 13 10 5 10-5"/></svg><span>Revise</span></button>
+  </div>
+</nav>
+
+<script>
+"use strict";
+const LESSONS = [
+{ id:"L1", title:"How appointment questions are asked", hi:"नियुक्ति के प्रश्न कैसे आते हैं", blocks:[
+ {k:"p", h:"Appointments are pure facts, so there's little to understand and a lot to remember. SSC asks them in four shapes: <b>(1) who has been appointed as…</b> (most common), <b>(2) which number</b> (26th CEC, 53rd CJI), <b>(3) first woman / first from a country</b>, and <b>(4) the static part behind the post</b> — the Article, the Act, the tenure, who appoints and who removes. The lecture's advice: when you read a name, ask <b>which Part and Article is this body in, what is the tenure, and can the person be reappointed?</b>"},
+ {k:"table", title:"Three kinds of bodies — know which is which", head:["Type","Made by","Examples"], rows:[["<b>Constitutional</b>","Named in the Constitution","ECI (Art 324), UPSC (315), CAG (148), Finance Commission (280), AG (76), Advocate General (165), NCSC (338), NCST (338A), NCBC (338B)"],["<b>Statutory</b>","An Act of Parliament","CIC (RTI Act 2005), NHRC (PHRA 1993), NCW (1990 Act), CVC (CVC Act 2003), NGT (NGT Act 2010), SEBI (1992), Lokpal (2013)"],["<b>Executive / extra-constitutional</b>","A government (cabinet) resolution","NITI Aayog (2015), Planning Commission (1950), Law Commission, CBI (powers from DSPE Act 1946)"]]},
+ {k:"trick", h:"<b>Ask “कौन बनाया?”</b> If the Constitution made it → constitutional. If Parliament passed an Act → statutory. If the cabinet just decided → executive. <b>NITI Aayog, Law Commission and CBI</b> are the three favourite traps — none is constitutional, none is statutory."},
+ {k:"table", title:"Which number? — the most-asked ordinals", head:["Post","Holder","Number"], rows:[["Chief Election Commissioner","Gyanesh Kumar","<b>26th</b>"],["RBI Governor","Sanjay Malhotra","<b>26th</b>"],["Chief Justice of India","Justice Surya Kant","<b>53rd</b>"],["Vice-President","C.P. Radhakrishnan","<b>15th</b>"],["CAG","K. Sanjay Murthy","<b>15th</b>"],["Attorney General","R. Venkataramani","<b>16th</b>"],["Finance Commission","Arvind Panagariya","<b>16th</b>"],["Chief of Army Staff","Gen Dhiraj Seth","<b>31st</b>"],["Chief of Naval Staff","Adm Krishna Swaminathan","<b>27th</b>"],["Chief of Air Staff","ACM Amar Preet Singh","<b>28th</b>"],["Chief of Defence Staff","Gen N.S. Raja Subramani","<b>3rd</b>"],["Law Commission","Justice Dinesh Maheshwari","<b>23rd</b>"],["BCCI President","Mithun Manhas","<b>37th</b>"],["UNGA session","Khalilur Rahman (Bangladesh)","<b>81st</b>"],["Central Pay Commission","Justice Ranjana Prakash Desai","<b>8th</b>"]]},
+ {k:"trick", h:"<b>Pair the numbers.</b> <b>26–26</b>: CEC and RBI Governor (26 जनवरी — both run a Republic). <b>15–15</b>: Vice-President and CAG. <b>16–16</b>: Attorney General and Finance Commission. Then <b>3-27-28-31</b>: CDS 3rd, Navy 27th, Air 28th, Army 31st."},
+ {k:"q", q:"Which of these is an executive (non-constitutional, non-statutory) body?", o:["NITI Aayog","Election Commission","NHRC","Finance Commission"], e:"NITI Aayog was set up by a cabinet resolution in 2015."},
+ {k:"q", q:"Gyanesh Kumar is India's ___ Chief Election Commissioner.", o:["26th","25th","27th","24th"], e:"26th CEC — same number as RBI Governor Sanjay Malhotra."},
+ {k:"link", h:"<b>Appointments link to Polity.</b> Every constitutional post in this workbook has an Article. Learn the name and the Article together — SSC often asks the Article in the same question (\"The CAG, presently K. Sanjay Murthy, is appointed under Article…\")."}
+], sum:["Constitutional = in the Constitution; statutory = Act of Parliament; executive = cabinet resolution.","NITI Aayog, Law Commission, CBI: neither constitutional nor statutory.","Number pairs: 26 CEC & RBI; 15 VP & CAG; 16 AG & FC; CDS 3, Navy 27, Air 28, Army 31; CJI 53."]},
+
+{ id:"L2", title:"ECI, UPSC, CAG & Finance Commission", hi:"चुनाव आयोग, UPSC, CAG, वित्त आयोग", blocks:[
+ {k:"facts", title:"Election Commission of India", rows:[["Chief Election Commissioner","<b>Gyanesh Kumar</b> — 26th CEC (from Feb 2025)"],["Election Commissioners","Sukhbir Singh Sandhu, Vivek Joshi"],["Constitution","<b>Part XV, Articles 324–329</b>"],["First CEC","<b>Sukumar Sen</b>"],["Tenure","6 years or age 65"],["Selection (2023 Act)","Committee: PM, Leader of Opposition in Lok Sabha, a Union Cabinet Minister"],["Removal","CEC — like a Supreme Court judge. ECs — by the President <b>on the CEC's recommendation</b>"],["Also","Gyanesh Kumar chairs <b>International IDEA</b> (Council of Member States) for 2026"]]},
+ {k:"tl", title:"ECI — single member to multi-member", rows:[["1950","Single-member body (only the CEC)"],["16 Oct 1989","Two ECs added — first time multi-member"],["1990","Back to single-member"],["1 Oct 1993","Multi-member <b>permanently</b> (CEC + 2 ECs)"]]},
+ {k:"trap", h:"<b>The 61st Amendment (1988) did not make the ECI multi-member.</b> It lowered the <b>voting age from 21 to 18</b>. The lecture linked the two. The 1989 expansion was a presidential order, not an amendment."},
+ {k:"facts", title:"UPSC", rows:[["Chairman","<b>Dr. Ajay Kumar</b> (from May 2025)"],["Constitution","<b>Part XIV, Articles 315–323</b>"],["Appointed by","President"],["Tenure","6 years or age 65"],["Removal","President, after a Supreme Court inquiry for misbehaviour"],["Reappointment","Not eligible for further government employment (Art 319)"]]},
+ {k:"facts", title:"Comptroller & Auditor General (CAG)", rows:[["CAG","<b>K. Sanjay Murthy</b> — 15th CAG (from Nov 2024)"],["Constitution","<b>Part V, Chapter V, Articles 148–151</b>"],["148","Appointed by the President; removed like an SC judge"],["149","Duties and powers"],["150","Form of accounts of Union and States"],["151","Audit reports — to the President (Union) / Governor (State), then laid before the legislature"],["Tenure","6 years or age 65"],["Called","'Friend, philosopher and guide' of the <b>Public Accounts Committee</b>"]]},
+ {k:"trap", h:"<b>CAG gives audit reports, not binding orders.</b> The lecture's rule holds for advisory bodies in general — Finance Commission, Law Commission, CAG reports — they are <b>not binding</b>; government decides. If unsure in an exam, 'not binding' is the safe answer."},
+ {k:"facts", title:"16th Finance Commission", rows:[["Chairman","<b>Dr. Arvind Panagariya</b>"],["Constitution","<b>Article 280</b> (composition); Art 281 (recommendations laid before Parliament)"],["Composition","Chairman + 4 members (<b>1 + 4</b>); chairman should have experience in public affairs"],["Award period","<b>1 April 2026 – 31 March 2031</b>"],["Members","Annie George Mathew, Manoj Kumar Panda (full-time); Soumya Kanti Ghosh, T. Rabi Sankar (part-time)"],["Key outcome","States' share of central taxes kept at <b>41%</b>"],["First FC","<b>K.C. Neogy</b> (1951)"]]},
+ {k:"trick", h:"<b>Panagariya links two bodies:</b> first Vice-Chairman of <b>NITI Aayog</b> (2015) and now chairman of the <b>16th Finance Commission</b>. Gyanesh = ज्ञान → he runs elections and IDEA (an idea!)."},
+ {k:"q", q:"Election Commissioners other than the CEC can be removed by the President…", o:["On the recommendation of the CEC","Only by impeachment","On the advice of the Speaker","Only by the Supreme Court"], e:"The CEC is removed like an SC judge; ECs on the CEC's recommendation."},
+ {k:"q", q:"The Finance Commission is constituted under Article…", o:["280","148","324","315"], e:"1 chairman + 4 members, every five years."}
+], sum:["ECI: Gyanesh Kumar 26th CEC; Part XV, Art 324–329; first CEC Sukumar Sen; multi-member 1989, permanently 1993.","UPSC: Dr Ajay Kumar; Part XIV, Art 315–323.","CAG: K. Sanjay Murthy 15th; Art 148–151.","16th FC: Arvind Panagariya; Art 280; 1+4; 2026–31; 41% share; first K.C. Neogy."]},
+
+{ id:"L3", title:"Law officers & the SC/ST/OBC commissions", hi:"विधि अधिकारी और SC/ST/OBC आयोग", blocks:[
+ {k:"facts", title:"Attorney General (Art 76)", rows:[["Attorney General","<b>R. Venkataramani</b> — 16th AG"],["Appointed by","President"],["Qualification","Must be qualified to be a <b>Supreme Court judge</b>"],["Rights","<b>Right of audience in all courts</b> of India; may speak in Parliament (Art 88) but cannot vote"],["Tenure","During the <b>pleasure of the President</b> (no fixed term)"],["Private practice","Allowed — but not against the Government of India"],["First AG","<b>M.C. Setalvad</b>"]]},
+ {k:"table", title:"The three law officers", head:["Post","Now","Status"], rows:[["Attorney General","R. Venkataramani","Constitutional — <b>Art 76</b>; highest law officer of the Centre"],["Solicitor General","<b>Tushar Mehta</b> (reappointed for 3 years)","<b>Not constitutional</b> — assists the AG"],["Advocate General","(one per state)","Constitutional — <b>Art 165</b>; highest law officer of a State"]]},
+ {k:"trap", h:"<b>The Solicitor General is not a constitutional post.</b> Only the AG (Art 76) and the Advocate General (Art 165) are in the Constitution."},
+ {k:"table", title:"SC, ST, OBC commissions", head:["Commission","Chairperson","Article","Made constitutional by"], rows:[["National Commission for SCs","<b>Kishor Makwana</b>","<b>338</b>","65th Amendment 1990 (joint SC/ST commission); split by 89th (2003)"],["National Commission for STs","<b>Antar Singh Arya</b>","<b>338A</b>","<b>89th Amendment 2003</b>"],["National Commission for BCs","<b>Sadhvi Niranjan Jyoti</b>","<b>338B</b>","<b>102nd Amendment 2018</b>"]]},
+ {k:"tl", title:"How the SC/ST body grew", rows:[["1950","A <b>Special Officer</b> for SCs and STs (Art 338)"],["1990","<b>65th Amendment</b> — a multi-member National Commission for SCs and STs"],["2003","<b>89th Amendment</b> — split into NCSC (338) and NCST (338A)"],["2018","<b>102nd Amendment</b> — NCBC becomes constitutional (338B)"]]},
+ {k:"table", title:"Amendments 101 to 106 — asked with these bodies", head:["Amendment","Year","What"], rows:[["<b>101st</b>","2016","<b>GST</b>"],["<b>102nd</b>","2018","NCBC constitutional (338B)"],["<b>103rd</b>","2019","<b>10% EWS</b> reservation"],["<b>104th</b>","2020","Ended Anglo-Indian nomination to Lok Sabha & Assemblies; extended SC/ST reservation by 10 years"],["<b>105th</b>","2021","Restored states' power to identify OBCs"],["<b>106th</b>","2023","Women's reservation (Nari Shakti Vandan)"]]},
+ {k:"trap", h:"<b>The 101st Amendment is GST, not NGT.</b> The lecture said NGT. The National Green Tribunal is a <b>statutory</b> body under the NGT Act 2010 — no amendment created it."},
+ {k:"trick", h:"<b>338 → A → B in order of birth:</b> SC (338) → ST (338<b>A</b>, 2003) → BC (338<b>B</b>, 2018). <b>“102 = Backward 2”</b>: the 102nd made the backward classes commission."},
+ {k:"q", q:"Who is the current Solicitor General of India?", o:["Tushar Mehta","R. Venkataramani","K.K. Venugopal","Mukul Rohatgi"], e:"Reappointed for three more years; R. Venkataramani is the Attorney General."},
+ {k:"q", q:"The National Commission for Backward Classes gets constitutional status under Article…", o:["338B","338A","338","340"], e:"Inserted by the 102nd Amendment, 2018."}
+], sum:["AG R. Venkataramani (16th), Art 76, pleasure of President; SG Tushar Mehta — not constitutional; Advocate General Art 165.","NCSC Kishor Makwana (338); NCST Antar Singh Arya (338A, 89th Amend 2003); NCBC Sadhvi Niranjan Jyoti (338B, 102nd 2018).","101 GST · 102 NCBC · 103 EWS · 104 Anglo-Indian out · 106 women's reservation."]},
+
+{ id:"L4", title:"Statutory bodies & judiciary", hi:"वैधानिक निकाय और न्यायपालिका", blocks:[
+ {k:"table", title:"Statutory & other bodies — head, law, year", head:["Body","Head","Made by"], rows:[["Central Information Commission","<b>Raj Kumar Goyal</b> (CIC)","RTI Act <b>2005</b>"],["NHRC","<b>Justice V. Ramasubramanian</b>","Protection of Human Rights Act <b>1993</b>"],["National Commission for Women","<b>Vijaya Rahatkar</b>","NCW Act <b>1990</b> (set up 1992)"],["Central Vigilance Commission","<b>Praveen Kumar Srivastava</b> (CVC)","1964 by resolution (Santhanam Committee); statutory by CVC Act <b>2003</b>"],["National Green Tribunal","<b>Justice Prakash Shrivastava</b>","NGT Act <b>2010</b>"],["Lokpal","<b>Justice A.M. Khanwilkar</b>","Lokpal & Lokayuktas Act 2013"],["CBI","Director <b>Praveen Sood</b> (extended to 2027)","Set up 1963; powers from <b>DSPE Act 1946</b> — not statutory itself"],["23rd Law Commission","<b>Justice (retd) Dinesh Maheshwari</b>","Executive body"],["GST Appellate Tribunal","President <b>Justice (retd) Sanjaya Kumar Mishra</b>","CGST Act"],["NALSA","Executive Chairman <b>Justice Vikram Nath</b>","Legal Services Authorities Act 1987"]]},
+ {k:"trick", h:"<b>Lecture hooks:</b> जानकारी जिसके पास, उसी का <b>राज</b> → <b>Raj</b> Kumar Goyal (CIC). <b>राम जी</b> मानव अधिकार देखते हैं → Rama<b>subramanian</b> (NHRC). NALSA gives free justice; poor man says “आप ही हमारे <b>नाथ</b>” → Vikram <b>Nath</b>. CVC = <b>PK</b> (Praveen Kumar). NGT and CVC both have a <b>Shrivastava/Srivastava</b>."},
+ {k:"facts", title:"Law Commission", rows:[["First (pre-independence)","1834, <b>Lord Macaulay</b>"],["First after independence","1955, <b>M.C. Setalvad</b> (also first Attorney General)"],["Now","23rd, <b>Justice Dinesh Maheshwari</b>"],["Status","Neither constitutional nor statutory"]]},
+ {k:"facts", title:"Supreme Court & High Courts", rows:[["Chief Justice of India","<b>Justice Surya Kant</b> — 53rd CJI (from 24 Nov 2025)"],["First woman CJ, Andhra Pradesh HC","<b>Justice Lisa Gill</b>"],["First CJ of Meghalaya HC","Justice T. Meena Kumari (2013)"],["First visually impaired judge, Kerala","T.C. Nathan (lecture)"]]},
+ {k:"trap", h:"<b>CBI is neither constitutional nor statutory.</b> It was created by a 1963 Home Ministry resolution and takes its powers from the Delhi Special Police Establishment Act, 1946. CVC was also an executive body until the 2003 Act."},
+ {k:"q", q:"The Central Information Commission was set up under…", o:["RTI Act 2005","PHRA 1993","CVC Act 2003","Lokpal Act 2013"], e:"Raj Kumar Goyal is the Chief Information Commissioner."},
+ {k:"q", q:"Who is the Executive Chairman of NALSA?", o:["Justice Vikram Nath","Justice Surya Kant","Justice B.R. Gavai","Justice Sanjiv Khanna"], e:"The CJI is NALSA's Patron-in-Chief; the next senior judge is Executive Chairman."}
+], sum:["CIC Raj Kumar Goyal (RTI 2005); NHRC V. Ramasubramanian (1993); NCW Vijaya Rahatkar (1990); CVC P.K. Srivastava (2003 Act); NGT Prakash Shrivastava (2010); Lokpal A.M. Khanwilkar.","CBI Praveen Sood — DSPE Act 1946, not statutory.","CJI Surya Kant 53rd; Law Commission 23rd Dinesh Maheshwari; GSTAT S.K. Mishra; NALSA Vikram Nath."]},
+
+{ id:"L5", title:"Top government posts & NITI Aayog", hi:"शीर्ष सरकारी पद और नीति आयोग", blocks:[
+ {k:"table", title:"Who runs the government", head:["Post","Holder","Note"], rows:[["President","<b>Droupadi Murmu</b>","15th President"],["Vice-President","<b>C.P. Radhakrishnan</b>","<b>15th</b> VP (Sept 2025); ex-officio Chairman of Rajya Sabha (Art 64, 89)"],["Deputy Chairman, Rajya Sabha","<b>Harivansh Narayan Singh</b>","Long-serving"],["Cabinet Secretary","<b>T.V. Somanathan</b>","Top civil servant"],["Defence Secretary","<b>Rajesh Kumar Singh</b>","Also holds additional charge of DRDO"],["Chair, Lok Sabha Estimates Committee","<b>Sanjay Jaiswal</b>","—"],["Private Secretary to PM","<b>Nidhi Tewari</b>","—"],["Union Law Secretary","<b>Anju Rathi Rana</b>","—"],["Chairman, PM's Economic Advisory Council","<b>Prof. S. Mahendra Dev</b>","After Bibek Debroy"],["Chair, 8th Central Pay Commission","<b>Justice Ranjana Prakash Desai</b>","Also chaired Uttarakhand UCC panel"]]},
+ {k:"facts", title:"NITI Aayog", rows:[["Chairperson","Prime Minister"],["Vice-Chairperson","<b>Ashok Kumar Lahiri</b> (April 2026; after Suman Bery)"],["CEO","<b>Anurag Jain</b> (Aug 2026; after B.V.R. Subrahmanyam, with Nidhi Chhibber holding interim charge)"],["Status","<b>Executive body</b> — set up 1 Jan 2015 by cabinet resolution, replacing the Planning Commission"]]},
+ {k:"trap", h:"<b>Three NITI slips in the lectures.</b> (1) NITI is <b>not statutory</b> — one lecture said so before correcting itself. (2) The Vice-Chairperson is <b>Ashok</b> Kumar Lahiri, not 'Arvind' Lahiri. (3) The CEO is <b>Anurag Jain</b>; Nidhi Chhibber only held charge briefly."},
+ {k:"trick", h:"<b>NITI = अनुराग (love) + अशोक (no sorrow):</b> CEO <b>Anurag</b> Jain, VC <b>Ashok</b> Lahiri — a happy think tank."},
+ {k:"table", title:"Secretaries & commissions (lecture list)", head:["Post","Holder"], rows:[["Secretary, MSME","Bharat Khera"],["Secretary, Chemicals & Petrochemicals","Tejveer Singh"],["Secretary, DARPG & Pensions","Niveditha Shukla Verma"],["Secretary, Higher Education","Naresh Pal Gangwar"],["Secretary, School Education","T.K. Anil Kumar"],["Secretary, Revenue","Arvind Shrivastava"],["Secretary, I&B","Chanchal Kumar"],["Chair, Capacity Building Commission","S. Radha Chauhan"],["CEO, Digital India Corporation","Akhil Kumar"],["First woman Municipal Commissioner of Mumbai","Ashwini Bhide"],["First woman Chief Secretary of Odisha","Anu Garg"]]},
+ {k:"trick", h:"<b>Anu Garg — गर्व की बात:</b> first woman Chief Secretary of Odisha. Chief Secretary = the senior-most IAS officer of a state."},
+ {k:"q", q:"Who is the 15th Vice-President of India?", o:["C.P. Radhakrishnan","Jagdeep Dhankhar","Harivansh Narayan Singh","M. Venkaiah Naidu"], e:"He is also ex-officio Chairman of the Rajya Sabha."},
+ {k:"q", q:"Who was appointed CEO of NITI Aayog in August 2026?", o:["Anurag Jain","Nidhi Chhibber","B.V.R. Subrahmanyam","Amitabh Kant"], e:"Nidhi Chhibber held interim charge before him."}
+], sum:["President Murmu; VP C.P. Radhakrishnan 15th (Art 64, 89); Cabinet Secy T.V. Somanathan; RS Dy Chairman Harivansh.","NITI: VC Ashok Kumar Lahiri, CEO Anurag Jain; executive body.","PMEAC S. Mahendra Dev; 8th CPC Justice Ranjana Prakash Desai.","First women: Anu Garg (Odisha CS), Ashwini Bhide (Mumbai MC)."]},
+
+{ id:"L6", title:"Defence chiefs", hi:"रक्षा प्रमुख", blocks:[
+ {k:"table", title:"Service chiefs", head:["Post","Holder","Number / note"], rows:[["Chief of Defence Staff","<b>Gen N.S. Raja Subramani</b>","<b>3rd</b> CDS (took charge 31 May 2026)"],["Chief of Army Staff","<b>Gen Dhiraj Seth</b>","<b>31st</b> COAS (30 June 2026; after Gen Upendra Dwivedi)"],["Chief of Naval Staff","<b>Adm Krishna Swaminathan</b>","<b>27th</b> CNS (31 May 2026; after Adm Dinesh K. Tripathi)"],["Chief of Air Staff","<b>ACM Amar Preet Singh</b>","<b>28th</b> CAS (Sept 2024)"],["Vice Chief of Air Staff","<b>Air Marshal Ashutosh Dixit</b>","From 1 July 2026"]]},
+ {k:"tl", title:"All three CDSs", rows:[["2020","<b>Gen Bipin Rawat</b> — 1st CDS (died in helicopter crash, Dec 2021)"],["2022","<b>Gen Anil Chauhan</b> — 2nd CDS"],["2026","<b>Gen N.S. Raja Subramani</b> — 3rd CDS"]]},
+ {k:"trick", h:"<b>Lecture hooks:</b> CDS is the <b>राजा</b> of all three forces → <b>Raja</b> Subramani. Army needs a man who works with <b>धीरज</b> (patience) → <b>Dhiraj</b> Seth. The navy chief is the <b>स्वामी</b> of the sea → <b>Swami</b>nathan."},
+ {k:"table", title:"Other defence posts", head:["Post","Holder"], rows:[["Commander-in-Chief, Andaman & Nicobar Command (20th)","Vice Adm <b>Vineet McCarty</b>"],["DG, Indian Coast Guard","<b>Paramesh Sivamani</b>"],["DG, Armed Forces Medical Services","Vice Adm <b>Arti Sarin</b> (first woman)"],["DG Military Operations (DGMO)","Lt Gen <b>Abhijit S. Pendharkar</b>"],["DRDO Chairman","<b>Rajesh Kumar Singh</b> — Defence Secretary, additional charge (from 31 May 2026)"],["Controller General of Defence Accounts","Anugrah Narain Das"]]},
+ {k:"trap", h:"<b>DRDO chief is Rajesh Kumar Singh, not 'Rakesh'.</b> Dr Samir V. Kamat's term ended on 31 May 2026, and Defence Secretary Rajesh Kumar Singh was given <b>additional charge</b>. One lecture said Rakesh Kumar Singh."},
+ {k:"trap", h:"<b>Andaman & Nicobar Command is India's only tri-service theatre command</b> (set up 2001). Don't confuse 'Commander-in-Chief, ANC' with the service chiefs."},
+ {k:"q", q:"Who is the 3rd Chief of Defence Staff of India?", o:["Gen N.S. Raja Subramani","Gen Anil Chauhan","Gen Bipin Rawat","Gen Upendra Dwivedi"], e:"Took charge on 31 May 2026."},
+ {k:"q", q:"Gen Dhiraj Seth is India's ___ Chief of Army Staff.", o:["31st","30th","29th","32nd"], e:"He succeeded Gen Upendra Dwivedi (30th) on 30 June 2026."}
+,
+ {k:"link", h:"<b>One man, two chairs.</b> Defence Secretary Rajesh Kumar Singh also runs DRDO (additional charge). Similar doubles: Saurabh Vijay (UIDAI + IndiaAI), Gyanesh Kumar (CEC + International IDEA chair)."}
+], sum:["CDS Raja Subramani (3rd); Army Dhiraj Seth (31st); Navy Krishna Swaminathan (27th); Air Amar Preet Singh (28th); VCAS Ashutosh Dixit.","CDS line: Rawat → Chauhan → Raja Subramani.","DRDO: Defence Secretary Rajesh Kumar Singh (additional charge)."]},
+
+{ id:"L7", title:"Security, intelligence & police forces", hi:"सुरक्षा, खुफिया और पुलिस बल", blocks:[
+ {k:"table", title:"Intelligence & investigation", head:["Post","Holder"], rows:[["National Security Adviser","<b>Ajit Doval</b>"],["Deputy NSA","<b>Anish Dayal Singh</b>"],["Chief, RAW","<b>Parag Jain</b>"],["Director, Intelligence Bureau","<b>Mahesh Dixit</b> (June 2026; after Tapan Deka)"],["DG, NIA","<b>Rakesh Aggarwal</b>"],["DG, Narcotics Control Bureau","<b>Anurag Garg</b>"],["Director, CBI","<b>Praveen Sood</b>"],["Director, Enforcement Directorate","<b>Rahul Navin</b>"],["Director, NCRB","<b>Amit Garg</b>"],["Chairman, National Security Advisory Board","<b>Alok Joshi</b>"],["DG, RPF","<b>Sonali Mishra</b> (first woman)"]]},
+ {k:"trick", h:"<b>IB = तीसरी आंख.</b> Intelligence sees what two eyes miss; the third eye belongs to Lord Shiva = <b>Mahesh</b> → <b>Mahesh</b> Dixit. <b>RAW → Parag</b> (pollen travels abroad, like RAW agents)."},
+ {k:"table", title:"Central Armed Police Forces (CAPFs)", head:["Force","DG"], rows:[["Assam Rifles","Lt Gen <b>Vikas Lakhera</b>"],["BSF","<b>Praveen Kumar</b>"],["CISF","<b>Praveen Ranjan</b>"],["CRPF","<b>Gyanendra Pratap Singh</b>"],["ITBP","<b>Shatrujeet Singh Kapur</b>"],["NSG","<b>B. Srinivasan</b>"],["SSB","<b>Sanjay Singhal</b>"]]},
+ {k:"trick", h:"<b>ITBP guards the China border — the शत्रु's border</b> → <b>Shatru</b>jeet Kapur. <b>Two Praveens</b> in uniform: BSF Praveen <b>Kumar</b>, CISF Praveen <b>Ranjan</b> (Industrial = Ranjan, the 'R' of Refinery)."},
+ {k:"trap", h:"<b>Assam Rifles is headed by an Army officer</b> (a Lieutenant General), though it falls under the Home Ministry. The other CAPFs are led by IPS officers."},
+ {k:"q", q:"Who has been appointed Director of the Intelligence Bureau in 2026?", o:["Mahesh Dixit","Tapan Deka","Parag Jain","Rakesh Aggarwal"], e:"He succeeded Tapan Kumar Deka."},
+ {k:"q", q:"Who heads the ITBP?", o:["Shatrujeet Singh Kapur","Praveen Ranjan","Gyanendra Pratap Singh","Sanjay Singhal"], e:"ITBP guards the India–China border."}
+], sum:["NSA Ajit Doval; Dy NSA Anish Dayal Singh; RAW Parag Jain; IB Mahesh Dixit; NIA Rakesh Aggarwal; NCB Anurag Garg; CBI Praveen Sood; ED Rahul Navin; RPF Sonali Mishra.","CAPFs: AR Vikas Lakhera, BSF Praveen Kumar, CISF Praveen Ranjan, CRPF G.P. Singh, ITBP Shatrujeet Kapur, NSG B. Srinivasan, SSB Sanjay Singhal."]},
+
+{ id:"L8", title:"Economy, banking & markets", hi:"अर्थव्यवस्था, बैंकिंग और बाज़ार", blocks:[
+ {k:"table", title:"Regulators", head:["Body","Head","Static fact"], rows:[["RBI","Governor <b>Sanjay Malhotra</b> (26th)","Set up 1935; nationalised 1949"],["RBI Deputy Governors","Swaminathan J, Poonam Gupta, Shirish Chandra Murmu, Rohit Jain","Four deputy governors; Executive Directors include Gunveer Singh, Ravi Shankar"],["SEBI","<b>Tuhin Kanta Pandey</b>","Set up 1988; statutory 1992"],["IRDAI","<b>Ajay Seth</b>","Statutory 1999"],["PFRDA","<b>S. Ramann</b> (Sivasubramanian Ramann)","Statutory 2013"],["CBDT","<b>Ravi Agrawal</b>","Under Central Board of Revenue Act 1963"],["NSE Governing Board","<b>Srinivas Injeti</b>","—"],["Controller General of Accounts","<b>T.C.A. Kalyani</b>","—"]]},
+ {k:"trap", h:"<b>C.S. Setty (Challa Sreenivasulu Setty) is Chairman of SBI, not SEBI.</b> One lecture said 'Chairman of SEBI'. SEBI is Tuhin Kanta Pandey. Read S-B-I vs S-E-B-I slowly."},
+ {k:"table", title:"Finance companies & platforms", head:["Post","Holder"], rows:[["Chairman, GIFT City (Gujarat International Finance Tec-City)","<b>Uday Kotak</b>"],["MD & CEO, ONDC","<b>Vibhor Jain</b>"],["MD & CEO, India Digital Payments Intelligence Corp.","K. Satyanarayana Raju"],["MD, IIFCL","Rohit Rishi"],["Chairman, SBI","<b>C.S. Setty</b>"]]},
+ {k:"trap", h:"<b>GIFT City is in Gujarat</b> (Gandhinagar), not Goa — the lecture slipped and corrected itself."},
+ {k:"facts", title:"Statistics & base years", rows:[["NSO","Formed 2019 by merging <b>CSO + NSSO</b>, under MoSPI; publishes GDP and CPI"],["GDP","Base <b>2022–23</b> (released 27 Feb 2026)"],["CPI","Base <b>2024</b> (released 12 Feb 2026)"],["IIP","Base <b>2022–23</b> (June 2026)"],["WPI","Base <b>2022–23</b> (15 June 2026) — compiled by <b>Office of Economic Adviser, DPIIT</b>"]]},
+ {k:"trap", h:"<b>GDP's new base year is 2022–23, not 2023–24</b> (one lecture said 2023–24). And WPI is compiled by DPIIT's Office of Economic Adviser, <b>not NSO</b>."},
+ {k:"q", q:"Who is the chairperson of SEBI?", o:["Tuhin Kanta Pandey","C.S. Setty","Sanjay Malhotra","Ajay Seth"], e:"C.S. Setty heads SBI; Ajay Seth heads IRDAI."},
+ {k:"q", q:"The new base year of CPI is…", o:["2024","2022–23","2012","2023–24"], e:"GDP, IIP and WPI moved to 2022–23."}
+,
+ {k:"link", h:"<b>Base years link to the Economy workbook.</b> New GDP base 2022–23 (Feb 2026) and the CPI base 2024 are the same facts your Industrial Policy & Plans lesson on national income uses."}
+], sum:["RBI Sanjay Malhotra 26th; SEBI Tuhin Kanta Pandey (1988/1992); IRDAI Ajay Seth; PFRDA S. Ramann; CBDT Ravi Agrawal; SBI C.S. Setty.","GIFT City (Gujarat) Uday Kotak; ONDC Vibhor Jain.","Base years: GDP, IIP, WPI 2022–23; CPI 2024."]},
+
+{ id:"L9", title:"Maharatna PSUs", hi:"महारत्न सार्वजनिक उपक्रम", blocks:[
+ {k:"facts", title:"Basics", rows:[["Scheme","Maharatna 2009 (Navratna & Miniratna 1997)"],["How many","<b>14</b> (HAL became the 14th in Oct 2024)"],["Dividend from a PSU","<b>Revenue receipt</b> — creates no asset or liability"],["Disinvestment money","<b>Capital receipt</b> — an asset is being sold"]]},
+ {k:"table", title:"All 14 Maharatnas and their heads", head:["Company","Head"], rows:[["BHEL — Bharat Heavy <b>Electricals</b>","K. Sadashiv Murthy"],["BPCL","Sanjay Khanna"],["Coal India","B. Sairam"],["GAIL","Deepak Gupta"],["HAL","Ravi Kota"],["HPCL","Vikas Kaushal"],["Indian Oil (IOCL)","Arvinder Singh Sahney"],["NTPC","Gurdeep Singh"],["ONGC","Arun Kumar Singh"],["Oil India","Dr Ranjit Rath"],["Power Finance Corp. (PFC)","Parminder Chopra"],["Power Grid","Burra Vamsi Rama Mohan"],["REC","Jitendra Srivastava"],["SAIL","Dr Ashok Kumar Panda"]]},
+ {k:"trick", h:"<b>Remember the 14 as 4 groups:</b> Oil 6 — BPCL, HPCL, IOCL, ONGC, OIL, GAIL. Power 4 — NTPC, Power Grid, PFC, REC. Metal & coal 2 — SAIL, Coal India. Engineering 2 — BHEL, HAL."},
+ {k:"trick", h:"<b>SAIL → Kung Fu Panda</b>: strong as steel → Ashok Kumar <b>Panda</b>. <b>GAIL → Gupta gas</b>. NTPC's Gurdeep Singh is one of the longest-serving PSU heads."},
+ {k:"trap", h:"<b>BHEL is Bharat Heavy Electricals, not 'Electronics'.</b> And <b>GAIL was incorporated in 1984</b>; it then built the <b>Hazira–Vijaipur–Jagdishpur (HVJ)</b> pipeline (Gujarat → MP → UP), commissioned in 1987. The pipeline did not create GAIL."},
+ {k:"table", title:"Other PSUs & aviation", head:["Post","Holder"], rows:[["CMD, Hindustan Shipyard","Chandrashekharan Raghuram"],["CMD, NMDC","Amitava Mukherjee"],["CMD, ITDC","Mugdha Sinha"],["DG, DGCA","<b>Vir Vikram Yadav</b>"],["First woman Director (HR), Airports Authority of India","<b>Nivedita Dubey</b>"],["CEO, Delhi Metro Rail International","Sanjay Jamore"]]},
+ {k:"trick", h:"<b>DGCA → वीर</b>: only the brave fly planes → <b>Vir</b> Vikram Yadav."},
+ {k:"q", q:"Disinvestment proceeds are part of the government's…", o:["Capital receipts","Revenue receipts","Revenue expenditure","Capital expenditure"], e:"An asset is sold; PSU dividends are revenue receipts."},
+ {k:"q", q:"Which was the 14th company to get Maharatna status?", o:["HAL","REC","Oil India","PFC"], e:"Hindustan Aeronautics Ltd, October 2024."}
+], sum:["14 Maharatnas: oil 6, power 4, SAIL & Coal India, BHEL & HAL.","Dividend = revenue receipt; disinvestment = capital receipt.","SAIL Ashok Kumar Panda; GAIL Deepak Gupta; NTPC Gurdeep Singh; DGCA Vir Vikram Yadav."]},
+
+{ id:"L10", title:"Science, health, education & media", hi:"विज्ञान, स्वास्थ्य, शिक्षा और मीडिया", blocks:[
+ {k:"table", title:"Science, tech & health", head:["Post","Holder"], rows:[["ISRO Chairman","<b>Dr V. Narayanan</b>"],["Chairman, Atomic Energy Regulatory Board","<b>A.K. Balasubramanian</b>"],["CEO, UIDAI <i>and</i> IndiaAI Mission","<b>Saurabh Vijay</b> (one person, two posts)"],["Chairperson, National Medical Commission","Dr Abhijat Sheth"],["Drugs Controller General of India","Rajeev Raghuvanshi"],["Director, Ayushman Bharat Digital Mission","Piyush Singla"],["Director, BRIC-NCCS","Dr Thomas Pucadyil"]]},
+ {k:"trick", h:"<b>AERB → सारा बल</b> atomic energy में → <b>Bala</b>subramanian. <b>UIDAI → विजय</b>: making Aadhaar for a billion people is a victory → Saurabh <b>Vijay</b>, who also runs the IndiaAI Mission."},
+ {k:"table", title:"Education, media & culture", head:["Post","Holder"], rows:[["Chairman, Prasar Bharati","<b>Prasoon Joshi</b>"],["Chairperson, CBFC (Censor Board)","<b>Shashi Shekhar Vempati</b>"],["Chairperson, CBSE","<b>Lokhande Prashant Sitaram</b>"],["First woman VC of IGNOU","<b>Uma Kanjilal</b>"],["First woman President, Press Club of India","<b>Sangeeta Barooah Pisharoty</b>"],["Festival Director, 57th IFFI","<b>Ashutosh Gowariker</b>"],["Brand ambassador, Census 2027","<b>Sudarsan Pattnaik</b> (sand artist)"]]},
+ {k:"trap", h:"<b>Prasoon Joshi and Vempati swapped worlds.</b> Prasoon Joshi was CBFC chairperson; he is now <b>Prasar Bharati</b> chairman. Shashi Shekhar Vempati was Prasar Bharati's CEO; he is now <b>CBFC</b> chairperson (May 2026)."},
+ {k:"trick", h:"<b>P–P</b>: <b>P</b>rasar Bharati → <b>P</b>rasoon. CBFC sits on the <b>शिखर</b> (top) of the gate and decides which film passes → Shashi <b>Shekhar</b>."},
+ {k:"q", q:"Who is the chairperson of the Central Board of Film Certification?", o:["Shashi Shekhar Vempati","Prasoon Joshi","Ashutosh Gowariker","Navneet Sehgal"], e:"Prasoon Joshi moved to Prasar Bharati."},
+ {k:"q", q:"Saurabh Vijay is CEO of UIDAI and also of…", o:["IndiaAI Mission","Digital India Corporation","ONDC","NPCI"], e:"One person, two posts."}
+,
+ {k:"link", h:"<b>The P–P swap.</b> Prasoon Joshi went CBFC → Prasar Bharati; Shashi Shekhar Vempati went Prasar Bharati → CBFC. If an option pairs either man with his <i>old</i> body, it is the trap."}
+], sum:["ISRO V. Narayanan; AERB A.K. Balasubramanian; UIDAI & IndiaAI Saurabh Vijay; NMC Abhijat Sheth; DCGI Rajeev Raghuvanshi.","Prasar Bharati Prasoon Joshi; CBFC Shashi Shekhar Vempati; CBSE Lokhande Prashant Sitaram; IFFI 57 Ashutosh Gowariker; Census 2027 Sudarsan Pattnaik."]},
+
+{ id:"L11", title:"Industry bodies, corporate & sports", hi:"उद्योग संगठन, कॉर्पोरेट और खेल", blocks:[
+ {k:"table", title:"Industry chambers", head:["Body","Head","Static fact"], rows:[["FICCI","Secretary General <b>Anant Swarup</b>","Founded <b>1927</b> by G.D. Birla & Purshottamdas Thakurdas"],["CII","President <b>R. Mukundan</b>","Confederation of Indian Industry"],["ASSOCHAM","President <b>Nirmal Kumar Minda</b>","Associated Chambers of Commerce & Industry"],["NASSCOM","Chairperson <b>Srikanth Velamakanni</b>","Software & IT body"]]},
+ {k:"trick", h:"<b>FICCI = अनंत पैसा</b> of big business houses → <b>Anant</b> Swarup. <b>NASSCOM = software = पैसा = लक्ष्मी = श्री</b> → <b>Sri</b>kanth."},
+ {k:"table", title:"Corporate", head:["Post","Holder"], rows:[["CEO, IndiGo","<b>William (Willie) Walsh</b> — ex-IATA chief; after Pieter Elbers"],["CEO, Microsoft Gaming","<b>Asha Sharma</b>"],["Global brand ambassador, Infosys","<b>Carlos Alcaraz</b> (Spanish tennis player)"],["Director-General, BBC","Matt Brittin"],["Country MD, YouTube India","Gunjan Soni"]]},
+ {k:"table", title:"Sports", head:["Post","Holder"], rows:[["President, International Olympic Committee","<b>Kirsty Coventry</b> (Zimbabwe) — 10th IOC president; first woman & first African; Olympic swimmer; after Thomas Bach (2025)"],["Vice-President, IOC","Juan Antonio Samaranch Salisachs"],["First Iranian woman IOC member","Soraya Aghaei Hajiagha"],["BCCI President","<b>Mithun Manhas</b> — 37th"],["ICC CEO","<b>Sanjog Gupta</b>"],["Chair, AFI Athletes' Commission","<b>Anju Bobby George</b>"],["Head coach, Indian women's football","Crispin Chettri"],["President, Boxing Federation of India","Ajay Singh"],["Chef de Mission, India, Commonwealth Games 2026","<b>Rohit Rajpal</b> (tennis)"],["Goodwill ambassador, Pune Grand Tour","<b>M.S. Dhoni</b>"]]},
+ {k:"trick", h:"<b>Kirsty Coventry = 3 firsts:</b> first <b>woman</b>, first <b>African</b> (Zimbabwe), and a <b>swimmer</b>. Elected 2025 — so expect it in every 2026 paper."},
+ {k:"trap", h:"<b>Chef de Mission</b> is the person who leads a country's whole contingent at a multi-sport event — not a coach or a flag-bearer."},
+ {k:"q", q:"Who is the first woman President of the International Olympic Committee?", o:["Kirsty Coventry","Thomas Bach","Nita Ambani","Sebastian Coe"], e:"From Zimbabwe — also the first African IOC president."},
+ {k:"q", q:"Who has been appointed CEO of IndiGo?", o:["William Walsh","Pieter Elbers","Rahul Bhatia","Campbell Wilson"], e:"Former IATA Director General; Campbell Wilson heads Air India."}
+], sum:["FICCI Anant Swarup (1927); CII R. Mukundan; ASSOCHAM N.K. Minda; NASSCOM Srikanth Velamakanni.","IndiGo William Walsh; Microsoft Gaming Asha Sharma; Infosys ambassador Carlos Alcaraz.","IOC Kirsty Coventry (first woman & African); BCCI Mithun Manhas 37th; ICC CEO Sanjog Gupta; CWG 2026 Chef de Mission Rohit Rajpal."]},
+
+{ id:"L12", title:"International bodies & diplomacy", hi:"अंतरराष्ट्रीय संगठन और कूटनीति", blocks:[
+ {k:"table", title:"International organisations", head:["Post","Holder"], rows:[["President, 81st UN General Assembly","<b>Khalilur Rahman</b> (Bangladesh)"],["President, World Bank","<b>Ajay Banga</b>"],["President, Asian Development Bank","<b>Masato Kanda</b> (Japan)"],["President, AIIB","<b>Zou Jiayi</b> (China)"],["DG, UNESCO","<b>Khaled El-Enany</b> (Egypt)"],["UN High Commissioner for Refugees","<b>Barham Salih</b> (Iraq)"],["First woman head of UN Tourism","<b>Shaikha Nasser Al Nowais</b> (UAE)"],["CEO, World Economic Forum","Alois Zwinggi"],["Executive Director (India), IMF","<b>Urjit Patel</b> (ex-RBI governor)"],["Executive Director (India), World Bank","<b>Neelkanth Mishra</b>"],["Vice-President, FATF","<b>Vivek Aggarwal</b>"],["Chair, International IDEA","<b>Gyanesh Kumar</b> (CEC)"],["First Asian chair, IUCN Species Survival Commission","<b>Vivek Menon</b>"]]},
+ {k:"trick", h:"<b>UNGA 81 → खाली आदमी</b> → <b>Khali</b>lur Rahman. <b>Two Indians at Bretton Woods:</b> IMF → Urjit (U for 'U'nited money), World Bank → Neelkanth. Ajay <b>Banga</b> — the Indian-American who heads the World Bank itself."},
+ {k:"table", title:"Indian envoys & foreign leaders", head:["Post","Holder"], rows:[["Ambassador to China","<b>Vikram Doraiswami</b>"],["High Commissioner to Bangladesh","<b>Dinesh Trivedi</b>"],["Ambassador to Oman","<b>Prashant Pise</b>"],["Prime Minister of Barbados","<b>Mia Mottley</b> — third straight term"]]},
+ {k:"trick", h:"<b>China → विक्रम</b> (the one who wins) → <b>Vikram</b> Doraiswami. <b>Oman → आदमी पिसता है</b> → Prashant <b>Pise</b>."},
+ {k:"trap", h:"<b>Dinesh Trivedi ≠ Dinesh Tripathi.</b> Trivedi is the High Commissioner to Bangladesh (and an ex-Railway Minister). Admiral Dinesh K. <b>Tripathi</b> was the 26th Navy chief."},
+ {k:"q", q:"Who is the President of the 81st session of the UN General Assembly?", o:["Khalilur Rahman","Annalena Baerbock","Philemon Yang","Dennis Francis"], e:"Bangladesh's Khalilur Rahman; Baerbock presided over the 80th."},
+ {k:"q", q:"Who has been appointed India's Executive Director at the IMF?", o:["Urjit Patel","Neelkanth Mishra","Raghuram Rajan","Vivek Aggarwal"], e:"Neelkanth Mishra is ED at the World Bank."}
+,
+ {k:"link", h:"<b>Ex-Indian officials abroad.</b> Urjit Patel (ex-RBI) → IMF; Neelkanth Mishra → World Bank; Vivek Aggarwal → FATF; Gyanesh Kumar (CEC) → International IDEA. Ajay Banga is Indian-born but heads the World Bank as an American nominee."}
+], sum:["UNGA 81 Khalilur Rahman; World Bank Ajay Banga; ADB Masato Kanda; AIIB Zou Jiayi; UNESCO Khaled El-Enany; UNHCR Barham Salih; UN Tourism Shaikha Al Nowais.","IMF ED Urjit Patel; WB ED Neelkanth Mishra; FATF VP Vivek Aggarwal; IDEA Gyanesh Kumar; IUCN SSC Vivek Menon.","China Vikram Doraiswami; Bangladesh Dinesh Trivedi; Oman Prashant Pise."]},
+
+{ id:"L13", title:"Firsts & grand revision", hi:"पहली बार और संपूर्ण पुनरावृत्ति", blocks:[
+ {k:"table", title:"First women & other firsts", head:["First","Who"], rows:[["First woman IOC President (also first African)","Kirsty Coventry"],["First woman DG, RPF","Sonali Mishra"],["First woman DG, Armed Forces Medical Services","Vice Adm Arti Sarin"],["First woman Chief Secretary, Odisha","Anu Garg"],["First woman Municipal Commissioner, Mumbai","Ashwini Bhide"],["First woman VC, IGNOU","Uma Kanjilal"],["First woman President, Press Club of India","Sangeeta Barooah Pisharoty"],["First woman Director (HR), AAI","Nivedita Dubey"],["First woman head, Srinagar Central Jail","Saba Shawl"],["First woman CJ, Andhra Pradesh HC","Justice Lisa Gill"],["First woman head, UN Tourism","Shaikha Nasser Al Nowais"],["First Asian chair, IUCN SSC","Vivek Menon"],["First Iranian woman IOC member","Soraya Aghaei Hajiagha"]]},
+ {k:"trick", h:"<b>Which section matters most?</b> The lecture's priority: <b>constitutional & statutory</b> → <b>defence</b> → <b>judiciary & legal</b> → <b>sports</b>. Private banks and company heads are the least asked — read once, don't memorise hard."},
+ {k:"trick", h:"<b>One-line revision chain:</b> राजा (CDS) ने धीरज (Army) से स्वामी (Navy) को बुलाया; महेश (IB) की तीसरी आंख, शत्रु (ITBP) सीमा पर; राज (CIC) के पास जानकारी, नाथ (NALSA) गरीबों के; P-P (Prasar–Prasoon), शिखर (CBFC), विजय (UIDAI), बल (AERB), पांडा (SAIL), वीर (DGCA), अनंत (FICCI), श्री (NASSCOM), विक्रम (China), खाली (UNGA)."},
+ {k:"q", q:"Who is the first woman Director General of the Railway Protection Force?", o:["Sonali Mishra","Arti Sarin","Anu Garg","Saba Shawl"], e:"Arti Sarin is first woman DGAFMS; Anu Garg first woman CS of Odisha."},
+ {k:"q", q:"Which pair is correctly matched?", o:["SAIL – Ashok Kumar Panda","SEBI – C.S. Setty","CBFC – Prasoon Joshi","DRDO – Samir V. Kamat"], e:"Setty is SBI; Prasoon Joshi now Prasar Bharati; Kamat left DRDO in May 2026."}
+], sum:["Firsts: Coventry (IOC), Sonali Mishra (RPF), Arti Sarin (DGAFMS), Anu Garg (Odisha CS), Ashwini Bhide (Mumbai), Uma Kanjilal (IGNOU), Al Nowais (UN Tourism).","Priority: constitutional/statutory, defence, judiciary, sports.","Hook chain: राजा-धीरज-स्वामी-महेश-शत्रु-राज-नाथ-P-P-शिखर-विजय-बल-पांडा-वीर-अनंत-श्री-विक्रम-खाली."]}
+];
+
+const QB = [
+/* L1 */
+["L1","Which of these is a constitutional body?",["Finance Commission","NITI Aayog","NHRC","Central Information Commission"],"Article 280. NHRC and CIC are statutory; NITI is executive.","p"],
+["L1","Which of these is a statutory body?",["National Human Rights Commission","Election Commission of India","UPSC","Finance Commission"],"Protection of Human Rights Act 1993."],
+["L1","The Law Commission of India is a…",["Non-constitutional, non-statutory (executive) body","Constitutional body","Statutory body","Quasi-judicial constitutional body"],"Set up by executive order."],
+["L1","The CBI derives its powers from the…",["Delhi Special Police Establishment Act, 1946","CBI Act, 1963","Constitution, Article 312","Police Act, 1861"],"There is no 'CBI Act'."],
+["L1","Sanjay Malhotra is the ___ Governor of RBI.",["26th","25th","24th","27th"],"Same number as CEC Gyanesh Kumar.","p"],
+["L1","Justice Surya Kant is the ___ Chief Justice of India.",["53rd","52nd","51st","54th"],"Took oath 24 November 2025.","p"],
+["L1","K. Sanjay Murthy is the ___ CAG of India.",["15th","14th","16th","13th"],"Same number as Vice-President C.P. Radhakrishnan."],
+["L1","R. Venkataramani is the ___ Attorney General of India.",["16th","15th","14th","17th"],"Same number as the Finance Commission."],
+["L1","Which pairing of 'same ordinal number' is correct?",["CEC and RBI Governor — both 26th","CAG and CJI — both 15th","AG and VP — both 16th","Army and Navy chiefs — both 31st"],"26–26, 15–15 (VP & CAG), 16–16 (AG & FC)."],
+["L1","A body created by an Act of Parliament is called…",["Statutory","Constitutional","Executive","Quasi-federal"],"E.g. CIC under the RTI Act 2005."],
+["L1","Which of the following is NOT a constitutional body?",["Central Vigilance Commission","CAG","UPSC","National Commission for SCs"],"CVC is statutory (CVC Act 2003)."],
+["L1","Which of the following is NOT a statutory body?",["NITI Aayog","SEBI","NGT","NCW"],"NITI Aayog is executive."],
+["L1","Which body was set up by a cabinet resolution on 1 January 2015?",["NITI Aayog","GST Council","Lokpal","NGT"],"Replaced the Planning Commission."],
+["L1","Which is the correct type for the Lokpal?",["Statutory","Constitutional","Executive","Private"],"Lokpal and Lokayuktas Act 2013."],
+["L1","Which is the correct type for SEBI?",["Statutory (1992)","Constitutional","Executive only","Cooperative"],"Set up 1988; statutory powers in 1992."],
+/* L2 */
+["L2","Who is the Chief Election Commissioner of India?",["Gyanesh Kumar","Rajiv Kumar","Sukhbir Singh Sandhu","Vivek Joshi"],"26th CEC since February 2025.","p"],
+["L2","Which Part of the Constitution deals with elections?",["Part XV","Part XIV","Part V","Part XVIII"],"Articles 324–329."],
+["L2","The Election Commission is provided for under Article…",["324","315","148","280"],"Superintendence, direction and control of elections."],
+["L2","Who was the first Chief Election Commissioner of India?",["Sukumar Sen","T.N. Seshan","K.V.K. Sundaram","S.P. Sen Verma"],"Conducted the first general election 1951–52."],
+["L2","The Election Commission permanently became a multi-member body in…",["1993","1989","1950","1988"],"First made multi-member on 16 Oct 1989, reverted in 1990."],
+["L2","The 61st Constitutional Amendment (1988)…",["Lowered the voting age from 21 to 18","Made ECI multi-member","Created the NCBC","Introduced GST"],"A common trap linked with ECI."],
+["L2","The Chief Election Commissioner can be removed…",["In the same manner as a Supreme Court judge","By the President at will","By the Prime Minister","By the Speaker"],"Proved misbehaviour or incapacity, special majority."],
+["L2","Under the 2023 Act, the selection committee for CEC and ECs includes…",["PM, Leader of Opposition in Lok Sabha, a Union Cabinet Minister","PM, CJI, Leader of Opposition","President, PM, CJI","PM, Speaker, CJI"],"The CJI was dropped from the panel."],
+["L2","Who are the two Election Commissioners serving with Gyanesh Kumar?",["Sukhbir Singh Sandhu and Vivek Joshi","Rajiv Kumar and Arun Goel","Anup Chandra Pandey and Arun Goel","Sushil Chandra and Rajiv Kumar"],"Appointed 2024 and 2025."],
+["L2","The tenure of the CEC is…",["6 years or 65 years of age, whichever is earlier","5 years or 62","6 years or 62","Until 70"],"Same as CAG and UPSC chairman."],
+["L2","Who is the Chairman of UPSC?",["Dr Ajay Kumar","Preeti Sudan","Manoj Soni","Arvind Saxena"],"Former Defence Secretary.","p"],
+["L2","UPSC is dealt with in which Part of the Constitution?",["Part XIV","Part XV","Part XII","Part V"],"Articles 315–323."],
+["L2","Who appoints the Chairman of UPSC?",["The President","The Prime Minister","The CJI","Parliament"],"Removal also by the President after SC inquiry."],
+["L2","Who is the Comptroller and Auditor General of India?",["K. Sanjay Murthy","Girish Chandra Murmu","Rajiv Mehrishi","Shashi Kant Sharma"],"Since November 2024.","p"],
+["L2","The CAG is appointed under Article…",["148","149","151","76"],"148 appointment; 149 duties; 150 form of accounts; 151 audit reports."],
+["L2","Article 151 relates to…",["Audit reports of the CAG","Appointment of the CAG","Duties of the CAG","Form of accounts"],"Reports go to the President/Governor, then the legislature."],
+["L2","The CAG's provisions are in which chapter of Part V?",["Chapter V","Chapter IV","Chapter II","Chapter I"],"Part V, Chapter V."],
+["L2","The CAG is called the friend, philosopher and guide of the…",["Public Accounts Committee","Estimates Committee","Finance Commission","GST Council"],"His reports are examined by the PAC."],
+["L2","Who chairs the 16th Finance Commission?",["Arvind Panagariya","N.K. Singh","Y.V. Reddy","Vijay Kelkar"],"N.K. Singh chaired the 15th.","p"],
+["L2","The 16th Finance Commission's award covers…",["2026–27 to 2030–31","2021–22 to 2025–26","2025–26 to 2029–30","2027–28 to 2031–32"],"1 April 2026 to 31 March 2031."],
+["L2","The Finance Commission consists of…",["A chairman and four other members","A chairman and two members","Five members including the FM","A chairman and six members"],"Article 280."],
+["L2","Who chaired the first Finance Commission?",["K.C. Neogy","K. Santhanam","P.V. Rajamannar","A.K. Chanda"],"1951."],
+["L2","The 16th Finance Commission recommended the states' share of central taxes at…",["41%","42%","32%","50%"],"Same as the 15th FC."],
+["L2","Which is a full-time member of the 16th Finance Commission?",["Annie George Mathew","N.K. Singh","Ajay Bhushan Pandey","Suman Bery"],"Manoj Kumar Panda is the other full-time member."],
+["L2","Arvind Panagariya was earlier the first…",["Vice-Chairman of NITI Aayog","CEO of NITI Aayog","Chief Economic Adviser","RBI Deputy Governor"],"2015–17."],
+["L2","Gyanesh Kumar also chairs which international body in 2026?",["International IDEA","IMF Board","World Bank Board","UN Electoral Assistance Division"],"International Institute for Democracy and Electoral Assistance."],
+/* L3 */
+["L3","Who is the Attorney General of India?",["R. Venkataramani","Tushar Mehta","K.K. Venugopal","Mukul Rohatgi"],"16th AG.","p"],
+["L3","The Attorney General is appointed under Article…",["76","165","148","124"],"165 is the Advocate General of a State."],
+["L3","The Advocate General of a State is provided under Article…",["165","76","148","233"],"Highest law officer of a State."],
+["L3","The Attorney General must be qualified to be appointed as…",["A judge of the Supreme Court","A High Court judge","A member of Parliament","The CAG"],"Art 76(1)."],
+["L3","The Attorney General holds office…",["During the pleasure of the President","For a fixed 5-year term","Until age 65","For 6 years"],"No fixed tenure in the Constitution."],
+["L3","Which statement about the Attorney General is correct?",["He has the right of audience in all courts of India","He is a member of the Union Cabinet","He can vote in Parliament","He cannot do private practice"],"He can speak in Parliament but not vote; private practice allowed except against the government."],
+["L3","Who was the first Attorney General of India?",["M.C. Setalvad","C.K. Daphtary","Niren De","Soli Sorabjee"],"Also chaired the first post-independence Law Commission."],
+["L3","Who is the Solicitor General of India?",["Tushar Mehta","R. Venkataramani","Ranjit Kumar","Harish Salve"],"Reappointed for three years.","p"],
+["L3","The post of Solicitor General is…",["Not mentioned in the Constitution","Under Article 76","Under Article 165","Under Article 124"],"Statutory/executive post assisting the AG."],
+["L3","Who is the Chairperson of the National Commission for Scheduled Castes?",["Kishor Makwana","Antar Singh Arya","Vijay Sampla","Hansraj Ahir"],"Article 338."],
+["L3","Who is the Chairperson of the National Commission for Scheduled Tribes?",["Antar Singh Arya","Kishor Makwana","Harsh Chouhan","Rameshwar Oraon"],"Article 338A."],
+["L3","Who is the Chairperson of the National Commission for Backward Classes?",["Sadhvi Niranjan Jyoti","Hansraj Gangaram Ahir","Bhagwan Lal Sahni","Kishor Makwana"],"Succeeded Hansraj Ahir.","p"],
+["L3","The National Commission for STs was created as a separate body by the…",["89th Amendment, 2003","65th Amendment, 1990","102nd Amendment, 2018","73rd Amendment, 1992"],"Article 338A."],
+["L3","The 65th Amendment (1990) created…",["A multi-member National Commission for SCs and STs","The NCBC","The National Commission for Women","The NHRC"],"Replaced the Special Officer."],
+["L3","The NCBC got constitutional status through the…",["102nd Amendment","101st Amendment","103rd Amendment","89th Amendment"],"2018, Article 338B."],
+["L3","The 101st Constitutional Amendment is related to…",["GST","NGT","EWS reservation","NCBC"],"2016. NGT is a statutory body."],
+["L3","The 103rd Amendment provided…",["10% reservation for EWS","GST","Women's reservation","NCBC status"],"2019."],
+["L3","The 104th Amendment…",["Ended Anglo-Indian nomination to Lok Sabha and Assemblies","Introduced GST","Created NCBC","Lowered voting age"],"Also extended SC/ST seat reservation by 10 years."],
+["L3","Article 338 deals with…",["National Commission for SCs","National Commission for STs","National Commission for BCs","Finance Commission"],"338A ST, 338B BC."],
+["L3","Which law officer is the highest legal officer of a State?",["Advocate General","Solicitor General","Attorney General","Additional Solicitor General"],"Art 165."],
+["L3","The Attorney General may take part in Parliament's proceedings under Article…",["88","76","165","105"],"Without the right to vote."],
+["L3","Which amendment gave women one-third reservation in Lok Sabha and Assemblies?",["106th","104th","103rd","73rd"],"Nari Shakti Vandan Adhiniyam, 2023."],
+/* L4 */
+["L4","Who is the Chief Information Commissioner of India?",["Raj Kumar Goyal","Heeralal Samariya","Y.K. Sinha","Bimal Julka"],"Statutory under the RTI Act 2005.","p"],
+["L4","The Central Information Commission was constituted under the…",["RTI Act, 2005","RTI Act, 2002","PHRA, 1993","IT Act, 2000"],"Statutory body."],
+["L4","Who is the Chairperson of the NHRC?",["Justice V. Ramasubramanian","Justice Arun Kumar Mishra","Justice H.L. Dattu","Justice K.G. Balakrishnan"],"Since December 2024.","p"],
+["L4","The NHRC was established under the…",["Protection of Human Rights Act, 1993","Human Rights Act, 1990","Constitution, Article 21","CrPC"],"Statutory body."],
+["L4","Who is the Chairperson of the National Commission for Women?",["Vijaya Rahatkar","Rekha Sharma","Lalitha Kumaramangalam","Mamta Sharma"],"Statutory under the NCW Act 1990.","p"],
+["L4","The NCW was set up under an Act of…",["1990","1993","2005","1985"],"Commission constituted in January 1992."],
+["L4","Who is the Central Vigilance Commissioner?",["Praveen Kumar Srivastava","Suresh N. Patel","Sanjay Kothari","K.V. Chowdary"],"Anti-corruption body.","p"],
+["L4","The CVC got statutory status in…",["2003","1964","1993","2013"],"Set up in 1964 on the Santhanam Committee's advice."],
+["L4","The CVC was originally set up on the recommendation of the…",["Santhanam Committee","Sarkaria Commission","Shah Commission","Kothari Committee"],"1964."],
+["L4","Who chairs the National Green Tribunal?",["Justice Prakash Shrivastava","Justice A.K. Goel","Justice Swatanter Kumar","Justice Lokeshwar Singh Panta"],"NGT Act 2010."],
+["L4","The NGT was established under the…",["NGT Act, 2010","Environment Protection Act, 1986","101st Amendment","Forest Act, 1980"],"Statutory body."],
+["L4","Who is the Chairperson of the Lokpal?",["Justice A.M. Khanwilkar","Justice P.C. Ghose","Justice Pradip Kumar Mohanty","Justice Surya Kant"],"First chair was P.C. Ghose."],
+["L4","Who is the Director of the CBI?",["Praveen Sood","Subodh Kumar Jaiswal","Rakesh Asthana","Alok Verma"],"Extended by one year in May 2026."],
+["L4","The CBI was set up in…",["1963","1946","1971","2003"],"By a Home Ministry resolution."],
+["L4","Who chairs the 23rd Law Commission?",["Justice (retd) Dinesh Maheshwari","Justice Ritu Raj Awasthi","Justice B.S. Chauhan","Justice A.P. Shah"],"Ritu Raj Awasthi chaired the 22nd.","p"],
+["L4","Who chaired the first Law Commission (1834)?",["Lord Macaulay","Lord Ripon","Lord Curzon","Lord Cornwallis"],"Pre-independence."],
+["L4","Who chaired the first Law Commission of independent India (1955)?",["M.C. Setalvad","B.R. Ambedkar","K.M. Munshi","Alladi Krishnaswamy Iyer"],"He was also the first Attorney General."],
+["L4","Who is the President of the GST Appellate Tribunal?",["Justice (retd) Sanjaya Kumar Mishra","Justice Dinesh Maheshwari","Justice Prakash Shrivastava","Justice Vikram Nath"],"GSTAT, under the CGST Act."],
+["L4","Who is the Executive Chairman of NALSA?",["Justice Vikram Nath","Justice Surya Kant","Justice Sanjiv Khanna","Justice B.V. Nagarathna"],"NALSA gives free legal aid."],
+["L4","NALSA was constituted under the…",["Legal Services Authorities Act, 1987","Advocates Act, 1961","Article 39A directly","Lok Adalat Act"],"Art 39A is the DPSP behind it."],
+["L4","Who is the 53rd Chief Justice of India?",["Justice Surya Kant","Justice B.R. Gavai","Justice Sanjiv Khanna","Justice D.Y. Chandrachud"],"Gavai was the 52nd.","p"],
+["L4","Who is the first woman Chief Justice of the Andhra Pradesh High Court?",["Justice Lisa Gill","Justice T. Meena Kumari","Justice Indira Banerjee","Justice Hima Kohli"],"Lecture fact."],
+["L4","Who was the first Chief Justice of the Meghalaya High Court?",["Justice T. Meena Kumari","Justice Lisa Gill","Justice Gita Mittal","Justice Manjula Chellur"],"2013."],
+["L4","Which pair of body and law is correct?",["CIC – RTI Act 2005","NHRC – RTI Act 2005","CVC – PHRA 1993","NGT – 101st Amendment"],"NHRC 1993, CVC 2003, NGT 2010."],
+/* L5 */
+["L5","Who is the President of India?",["Droupadi Murmu","Ram Nath Kovind","Pratibha Patil","C.P. Radhakrishnan"],"15th President."],
+["L5","Who is the 15th Vice-President of India?",["C.P. Radhakrishnan","Jagdeep Dhankhar","M. Venkaiah Naidu","Harivansh"],"Elected September 2025.","p"],
+["L5","The Vice-President is the ex-officio Chairman of the Rajya Sabha under Articles…",["64 and 89","63 and 79","65 and 93","66 and 80"],"Lecture fact."],
+["L5","Who is the Deputy Chairman of the Rajya Sabha?",["Harivansh Narayan Singh","P.J. Kurien","Om Birla","Jagdeep Dhankhar"],"Long-serving deputy chairman."],
+["L5","Who is the Cabinet Secretary of India?",["T.V. Somanathan","Rajiv Gauba","P.K. Sinha","Ajay Seth"],"Since August 2024.","p"],
+["L5","Who is the Vice-Chairperson of NITI Aayog?",["Ashok Kumar Lahiri","Suman Bery","Arvind Panagariya","Rajiv Kumar"],"Notified April 2026.","p"],
+["L5","Who is the CEO of NITI Aayog?",["Anurag Jain","B.V.R. Subrahmanyam","Nidhi Chhibber","Amitabh Kant"],"Appointed August 2026."],
+["L5","Who chairs the PM's Economic Advisory Council?",["S. Mahendra Dev","Bibek Debroy","V. Anantha Nageswaran","Shamika Ravi"],"Succeeded Bibek Debroy."],
+["L5","Who chairs the 8th Central Pay Commission?",["Justice Ranjana Prakash Desai","Justice A.K. Mathur","Justice Ashok Bhushan","Justice R.F. Nariman"],"Also chaired Uttarakhand's UCC committee.","p"],
+["L5","Who chairs the Lok Sabha Estimates Committee?",["Sanjay Jaiswal","K.C. Venugopal","Om Birla","Bhartruhari Mahtab"],"Lecture fact."],
+["L5","Who is Private Secretary to PM Modi?",["Nidhi Tewari","Nidhi Chhibber","Anju Rathi Rana","S. Radha Chauhan"],"An IFS officer."],
+["L5","Who is the Union Law Secretary?",["Anju Rathi Rana","Nidhi Tewari","Niveditha Shukla Verma","Radha Chauhan"],"Lecture fact."],
+["L5","Who is the first woman Chief Secretary of Odisha?",["Anu Garg","Ashwini Bhide","Sonali Mishra","Saba Shawl"],"Chief Secretary = senior-most IAS officer of a state.","p"],
+["L5","Who is the first woman Municipal Commissioner of Mumbai (BMC)?",["Ashwini Bhide","Anu Garg","Nivedita Dubey","Uma Kanjilal"],"Lecture fact."],
+["L5","Who chairs the Capacity Building Commission?",["S. Radha Chauhan","Adil Zainulbhai","Anju Rathi Rana","Niveditha Shukla Verma"],"Mission Karmayogi."],
+["L5","Who is Secretary, Department of Higher Education?",["Naresh Pal Gangwar","T.K. Anil Kumar","Sanjay Kumar","K. Sanjay Murthy"],"T.K. Anil Kumar is School Education secretary."],
+["L5","Who is Secretary, Ministry of MSME?",["Bharat Khera","Tejveer Singh","Chanchal Kumar","Manish Yadav"],"Lecture fact."],
+["L5","Who is Secretary, Ministry of Information & Broadcasting?",["Chanchal Kumar","Sanjay Jaju","Apurva Chandra","Arvind Shrivastava"],"Lecture fact."],
+["L5","NITI Aayog is a…",["Executive body set up by cabinet resolution","Statutory body under NITI Act 2015","Constitutional body under Article 280","Body under the Planning Act"],"Not statutory, not constitutional."],
+["L5","Who is the Defence Secretary of India?",["Rajesh Kumar Singh","Giridhar Aramane","Ajay Kumar","T.V. Somanathan"],"Since November 2024; also DRDO additional charge."],
+["L5","Who is CEO of Digital India Corporation?",["Akhil Kumar","Saurabh Vijay","Abhishek Singh","Vibhor Jain"],"Lecture fact."],
+/* L6 */
+["L6","Who is the Chief of Defence Staff?",["Gen N.S. Raja Subramani","Gen Anil Chauhan","Gen Manoj Pande","Gen Upendra Dwivedi"],"3rd CDS.","p"],
+["L6","Who was India's first Chief of Defence Staff?",["Gen Bipin Rawat","Gen Anil Chauhan","Gen M.M. Naravane","Gen Dalbir Singh"],"January 2020."],
+["L6","Who was the 2nd Chief of Defence Staff?",["Gen Anil Chauhan","Gen Bipin Rawat","Gen Raja Subramani","Gen Manoj Pande"],"2022–2026."],
+["L6","Who is the Chief of Army Staff?",["Gen Dhiraj Seth","Gen Upendra Dwivedi","Gen Manoj Pande","Gen N.S. Raja Subramani"],"31st COAS from 30 June 2026.","p"],
+["L6","Gen Dhiraj Seth succeeded…",["Gen Upendra Dwivedi","Gen Manoj Pande","Gen M.M. Naravane","Gen Anil Chauhan"],"Dwivedi was the 30th COAS."],
+["L6","Before becoming Army chief, Gen Dhiraj Seth was…",["Vice Chief of the Army Staff","DGMO","Commandant, NDA","CDS"],"49th VCOAS."],
+["L6","Who is the Chief of Naval Staff?",["Adm Krishna Swaminathan","Adm Dinesh K. Tripathi","Adm R. Hari Kumar","Adm Karambir Singh"],"27th CNS from 31 May 2026.","p"],
+["L6","Adm Krishna Swaminathan is the ___ Chief of Naval Staff.",["27th","26th","25th","28th"],"Succeeded Adm Dinesh K. Tripathi (26th)."],
+["L6","Who is the Chief of Air Staff?",["ACM Amar Preet Singh","ACM V.R. Chaudhari","Air Marshal Ashutosh Dixit","ACM R.K.S. Bhadauria"],"28th CAS.","p"],
+["L6","Who is the Vice Chief of Air Staff?",["Air Marshal Ashutosh Dixit","ACM Amar Preet Singh","Air Marshal A.P. Singh","Air Marshal S.P. Dharkar"],"From 1 July 2026."],
+["L6","Who has additional charge as DRDO Chairman?",["Rajesh Kumar Singh","Rakesh Kumar Singh","Samir V. Kamat","G. Satheesh Reddy"],"Defence Secretary, from 31 May 2026.","p"],
+["L6","Dr Samir V. Kamat's tenure as DRDO chairman ended in…",["May 2026","August 2022","December 2025","June 2027"],"He served from August 2022."],
+["L6","Who is Commander-in-Chief of the Andaman and Nicobar Command?",["Vice Adm Vineet McCarty","Vice Adm Arti Sarin","Paramesh Sivamani","Lt Gen Abhijit Pendharkar"],"20th CINCAN."],
+["L6","The Andaman and Nicobar Command is India's…",["Only tri-service theatre command","Only naval command","Army training command","Coast Guard HQ"],"Set up 2001."],
+["L6","Who is the Director General of the Indian Coast Guard?",["Paramesh Sivamani","Rakesh Pal","Vineet McCarty","Anurag Garg"],"Lecture fact."],
+["L6","Who is the first woman DG of Armed Forces Medical Services?",["Vice Adm Arti Sarin","Lt Gen Madhuri Kanitkar","Sonali Mishra","Punita Arora"],"DGAFMS.","p"],
+["L6","Who is the Director General of Military Operations?",["Lt Gen Abhijit S. Pendharkar","Lt Gen Rajiv Ghai","Lt Gen Vikas Lakhera","Lt Gen Dhiraj Seth"],"DGMO."],
+["L6","Who is the Controller General of Defence Accounts?",["Anugrah Narain Das","T.C.A. Kalyani","Rajesh Kumar Singh","Arvind Shrivastava"],"Lecture fact."],
+["L6","Which order of service-chief numbers is correct?",["CDS 3rd, Navy 27th, Air 28th, Army 31st","CDS 2nd, Navy 28th, Air 27th, Army 30th","CDS 3rd, Navy 26th, Air 28th, Army 31st","CDS 4th, Navy 27th, Air 29th, Army 31st"],"3-27-28-31."],
+/* L7 */
+["L7","Who is the National Security Adviser?",["Ajit Doval","Anish Dayal Singh","Pankaj Saran","Vikram Misri"],"Since 2014."],
+["L7","Who is the Deputy National Security Adviser?",["Anish Dayal Singh","Ajit Doval","Rajinder Khanna","Parag Jain"],"Ex-CRPF DG."],
+["L7","Who is the chief of RAW?",["Parag Jain","Ravi Sinha","Samant Goel","Mahesh Dixit"],"Research & Analysis Wing — external intelligence.","p"],
+["L7","Who is the Director of the Intelligence Bureau?",["Mahesh Dixit","Tapan Deka","Arvind Kumar","Parag Jain"],"Appointed June 2026.","p"],
+["L7","Who is the Director General of the NIA?",["Rakesh Aggarwal","Sadanand Date","Dinkar Gupta","Anurag Garg"],"National Investigation Agency."],
+["L7","Who heads the Narcotics Control Bureau?",["Anurag Garg","Rakesh Aggarwal","S.N. Pradhan","Amit Garg"],"Amit Garg heads NCRB."],
+["L7","Who is the Director of the Enforcement Directorate?",["Rahul Navin","Sanjay Kumar Mishra","Praveen Sood","Ravi Agrawal"],"ED enforces PMLA and FEMA."],
+["L7","Who is the first woman DG of the Railway Protection Force?",["Sonali Mishra","Arti Sarin","Anu Garg","Rashmi Shukla"],"RPF.","p"],
+["L7","Who is the Director of the National Crime Records Bureau?",["Amit Garg","Anurag Garg","Rahul Navin","Alok Joshi"],"NCRB."],
+["L7","Who chairs the National Security Advisory Board?",["Alok Joshi","P.S. Raghavan","Ajit Doval","Anish Dayal Singh"],"NSAB."],
+["L7","Who is the DG of the Assam Rifles?",["Lt Gen Vikas Lakhera","Lt Gen Abhijit Pendharkar","Praveen Kumar","Sanjay Singhal"],"An Army officer heads it."],
+["L7","Who is the DG of the BSF?",["Praveen Kumar","Praveen Ranjan","Daljit Singh Chawdhary","Nitin Agrawal"],"Lecture fact."],
+["L7","Who is the DG of the CISF?",["Praveen Ranjan","Praveen Kumar","R.S. Bhatti","Sheel Vardhan Singh"],"Lecture fact."],
+["L7","Who is the DG of the CRPF?",["Gyanendra Pratap Singh","Anish Dayal Singh","Sujoy Lal Thaosen","B. Srinivasan"],"Lecture fact."],
+["L7","Who is the DG of the National Security Guard?",["B. Srinivasan","Sanjay Singhal","Shatrujeet Kapur","M.A. Ganapathy"],"NSG — the Black Cats."],
+["L7","Who is the DG of the Sashastra Seema Bal?",["Sanjay Singhal","B. Srinivasan","Rashmi Shukla","Amrit Mohan Prasad"],"SSB guards Nepal and Bhutan borders."],
+["L7","The ITBP mainly guards the border with…",["China","Pakistan","Nepal","Myanmar"],"Indo-Tibetan Border Police."],
+["L7","Which force is headed by a serving Army Lieutenant General?",["Assam Rifles","CRPF","ITBP","SSB"],"Under MHA, officered by the Army."],
+["L7","Mahesh Dixit succeeded whom as IB Director?",["Tapan Kumar Deka","Arvind Kumar","Rajiv Jain","Samant Goel"],"Deka served 2022–2026."],
+/* L8 */
+["L8","Who is the Governor of RBI?",["Sanjay Malhotra","Shaktikanta Das","Urjit Patel","Poonam Gupta"],"26th Governor.","p"],
+["L8","Which of these is a Deputy Governor of RBI?",["Poonam Gupta","Tuhin Kanta Pandey","Ajay Seth","Ravi Agrawal"],"Others: Swaminathan J, Shirish Chandra Murmu, Rohit Jain."],
+["L8","Who is the Chairperson of SEBI?",["Tuhin Kanta Pandey","Madhabi Puri Buch","C.S. Setty","Ajay Tyagi"],"Since March 2025.","p"],
+["L8","SEBI was established in ___ and got statutory powers in ___.",["1988; 1992","1992; 1988","1991; 1993","1988; 1999"],"Lecture fact."],
+["L8","Who is the Chairman of the State Bank of India?",["C.S. Setty","Tuhin Kanta Pandey","Dinesh Kumar Khara","Rajnish Kumar"],"Challa Sreenivasulu Setty."],
+["L8","Who chairs IRDAI?",["Ajay Seth","Debasish Panda","S. Ramann","Ravi Agrawal"],"Former Finance Secretary."],
+["L8","Who chairs PFRDA?",["S. Ramann","Deepak Mohanty","Ajay Seth","Hemant Contractor"],"Pension regulator."],
+["L8","Who chairs the CBDT?",["Ravi Agrawal","Nitin Gupta","Sanjay Kumar Agarwal","Arvind Shrivastava"],"Central Board of Direct Taxes."],
+["L8","Who chairs the Governing Board of the National Stock Exchange?",["Srinivas Injeti","Ashish Chauhan","Tuhin Kanta Pandey","Uday Kotak"],"Lecture fact."],
+["L8","Who is the Controller General of Accounts?",["T.C.A. Kalyani","Anugrah Narain Das","K. Sanjay Murthy","Bharti Das"],"CGA."],
+["L8","Who has been appointed Chairman of GIFT City?",["Uday Kotak","Hasmukh Adhia","Deepak Parekh","K.V. Kamath"],"In Gandhinagar, Gujarat.","p"],
+["L8","GIFT City is located in…",["Gujarat","Goa","Maharashtra","Karnataka"],"Gujarat International Finance Tec-City."],
+["L8","Who is MD & CEO of ONDC?",["Vibhor Jain","T. Koshy","Dilip Asbe","Saurabh Vijay"],"Open Network for Digital Commerce."],
+["L8","The National Statistics Office (NSO) was formed by merging…",["CSO and NSSO","CSO and RBI's statistics wing","NSSO and NITI","CSO and Census office"],"2019, under MoSPI."],
+["L8","The new base year of the GDP series is…",["2022–23","2023–24","2011–12","2024"],"Released 27 February 2026."],
+["L8","The new base year of the Consumer Price Index is…",["2024","2022–23","2012","2023"],"Released February 2026."],
+["L8","The new WPI series (base 2022–23) is compiled by…",["Office of Economic Adviser, DPIIT","NSO","RBI","Labour Bureau"],"Released 15 June 2026."],
+["L8","Who is MD of India Infrastructure Finance Company Ltd (IIFCL)?",["Rohit Rishi","P.R. Jaishankar","Vibhor Jain","Parminder Chopra"],"Lecture fact."],
+["L8","Which pair is correctly matched?",["IRDAI – Ajay Seth","SEBI – C.S. Setty","PFRDA – Tuhin Kanta Pandey","CBDT – S. Ramann"],"SEBI Pandey, PFRDA Ramann, CBDT Ravi Agrawal."],
+["L8","The IIP's new base year is…",["2022–23","2024","2011–12","2023–24"],"June 2026."],
+/* L9 */
+["L9","How many Maharatna CPSEs are there?",["14","13","12","10"],"HAL was added in October 2024."],
+["L9","The Maharatna scheme was introduced in…",["2009","1997","1991","2014"],"Navratna and Miniratna in 1997."],
+["L9","Dividends received by the government from PSUs are…",["Revenue receipts","Capital receipts","Revenue expenditure","Borrowings"],"They create no asset or liability.","p"],
+["L9","Money from disinvestment of PSUs is a…",["Capital receipt","Revenue receipt","Tax revenue","Grant"],"Sale of an asset."],
+["L9","Who heads SAIL?",["Dr Ashok Kumar Panda","Amarendu Prakash","Gurdeep Singh","Arun Kumar Singh"],"Steel Authority of India Ltd.","p"],
+["L9","Who heads GAIL?",["Deepak Gupta","Sandeep Kumar Gupta","Sanjay Khanna","Vikas Kaushal"],"Gas Authority of India Ltd."],
+["L9","Who heads BPCL?",["Sanjay Khanna","G. Krishnakumar","Vikas Kaushal","Arvinder Singh Sahney"],"Bharat Petroleum."],
+["L9","Who heads HPCL?",["Vikas Kaushal","Sanjay Khanna","Pushp Kumar Joshi","Ranjit Rath"],"Hindustan Petroleum."],
+["L9","Who heads Indian Oil Corporation?",["Arvinder Singh Sahney","Shrikant Madhav Vaidya","Arun Kumar Singh","Deepak Gupta"],"IOCL."],
+["L9","Who heads NTPC?",["Gurdeep Singh","Parminder Chopra","Jitendra Srivastava","B. Sairam"],"Long-serving CMD."],
+["L9","Who heads ONGC?",["Arun Kumar Singh","Ranjit Rath","Arvinder Singh Sahney","Shashi Shanker"],"Oil and Natural Gas Corporation."],
+["L9","Who heads Oil India Ltd?",["Dr Ranjit Rath","Arun Kumar Singh","Vikas Kaushal","Sushil Chandra Mishra"],"Lecture fact."],
+["L9","Who heads Coal India?",["B. Sairam","P.M. Prasad","Ashok Kumar Panda","Amitava Mukherjee"],"Lecture fact."],
+["L9","Who heads Power Finance Corporation?",["Parminder Chopra","Jitendra Srivastava","Rajesh Kumar Agarwal","Gurdeep Singh"],"PFC."],
+["L9","Who heads Power Grid Corporation?",["Burra Vamsi Rama Mohan","R.K. Tyagi","Parminder Chopra","K. Sreekant"],"Lecture fact."],
+["L9","Who heads REC Ltd?",["Jitendra Srivastava","Vivek Kumar Dewangan","Parminder Chopra","Rohit Rishi"],"Rural Electrification Corporation."],
+["L9","Who heads BHEL?",["K. Sadashiv Murthy","Nalin Shinghal","Ravi Kota","Gurdeep Singh"],"Bharat Heavy Electricals Ltd."],
+["L9","BHEL stands for…",["Bharat Heavy Electricals Ltd","Bharat Heavy Electronics Ltd","Bharat Heavy Engineering Ltd","Bharat Hydro Electric Ltd"],"Not 'Electronics'."],
+["L9","The HVJ gas pipeline connects…",["Hazira (Gujarat) – Vijaipur (MP) – Jagdishpur (UP)","Haldia – Varanasi – Jamshedpur","Hazira – Vadodara – Jaipur","Hyderabad – Vizag – Jabalpur"],"Built by GAIL, 1987."],
+["L9","GAIL was incorporated in…",["1984","1987","1991","1974"],"It then built the HVJ pipeline (1987)."],
+["L9","Which company became India's 14th Maharatna?",["HAL","Oil India","REC","PFC"],"October 2024."],
+["L9","Who heads NMDC?",["Amitava Mukherjee","Sumit Deb","B. Sairam","Mugdha Sinha"],"National Mineral Development Corporation."],
+["L9","Who is the Director General of Civil Aviation (DGCA)?",["Vir Vikram Yadav","Faiz Ahmed Kidwai","Arun Kumar","Vikram Dev Dutt"],"Appointed 2026.","p"],
+["L9","Who is the first woman Director (HR) of the Airports Authority of India?",["Nivedita Dubey","Sonali Mishra","Anu Garg","Mugdha Sinha"],"AAI."],
+["L9","Who heads ITDC?",["Mugdha Sinha","Nivedita Dubey","Ashwini Bhide","Sangeeta Pisharoty"],"India Tourism Development Corporation."],
+["L9","Which group of Maharatnas is entirely in the power sector?",["NTPC, Power Grid, PFC, REC","NTPC, ONGC, SAIL, BHEL","GAIL, IOCL, HPCL, BPCL","Coal India, SAIL, HAL, BHEL"],"Oil group: BPCL, HPCL, IOCL, ONGC, OIL, GAIL."],
+/* L10 */
+["L10","Who is the Chairman of ISRO?",["Dr V. Narayanan","S. Somanath","K. Sivan","A.S. Kiran Kumar"],"Since January 2025.","p"],
+["L10","Who chairs the Atomic Energy Regulatory Board?",["A.K. Balasubramanian","Ajit Kumar Mohanty","Dinesh Kumar Shukla","V. Narayanan"],"AERB."],
+["L10","Who is CEO of UIDAI?",["Saurabh Vijay","Amit Agrawal","Bhuvnesh Kumar","Nandan Nilekani"],"Also CEO of IndiaAI Mission.","p"],
+["L10","Who was the first Chairman of UIDAI?",["Nandan Nilekani","Ram Sewak Sharma","J. Satyanarayana","Saurabh Vijay"],"Co-founder of Infosys."],
+["L10","Who chairs the National Medical Commission?",["Dr Abhijat Sheth","Dr Suresh Chandra Sharma","Dr Rajiv Bahl","Dr V.K. Paul"],"NMC."],
+["L10","Who is the Drugs Controller General of India?",["Rajeev Raghuvanshi","V.G. Somani","Piyush Singla","Abhijat Sheth"],"DCGI."],
+["L10","Who is Director of the Ayushman Bharat Digital Mission?",["Piyush Singla","Rajeev Raghuvanshi","Saurabh Vijay","Akhil Kumar"],"ABDM."],
+["L10","Who is the Chairman of Prasar Bharati?",["Prasoon Joshi","Shashi Shekhar Vempati","Navneet Sehgal","A. Surya Prakash"],"Moved from CBFC.","p"],
+["L10","Who is the Chairperson of the Central Board of Film Certification?",["Shashi Shekhar Vempati","Prasoon Joshi","Pahlaj Nihalani","Ashutosh Gowariker"],"May 2026.","p"],
+["L10","Before heading CBFC, Shashi Shekhar Vempati was…",["CEO of Prasar Bharati","Chairman of Doordarshan","I&B Secretary","IFFI director"],"The two men swapped bodies."],
+["L10","Who is the Chairperson of CBSE?",["Lokhande Prashant Sitaram","Rahul Singh","Nidhi Chhibber","Manoj Ahuja"],"2026."],
+["L10","Who is the first woman Vice-Chancellor of IGNOU?",["Uma Kanjilal","Najma Akhtar","Santishree Pandit","Anu Garg"],"Indira Gandhi National Open University."],
+["L10","Who is the first woman President of the Press Club of India?",["Sangeeta Barooah Pisharoty","Nidhi Razdan","Barkha Dutt","Sonali Mishra"],"Lecture fact."],
+["L10","Who is Festival Director of the 57th IFFI?",["Ashutosh Gowariker","Shekhar Kapur","Prasoon Joshi","Shashi Shekhar Vempati"],"International Film Festival of India, Goa."],
+["L10","Who is the brand ambassador of Census 2027?",["Sudarsan Pattnaik","Amitabh Bachchan","M.S. Dhoni","Neeraj Chopra"],"Sand artist from Odisha.","p"],
+["L10","Saurabh Vijay holds which two posts?",["CEO of UIDAI and CEO of IndiaAI Mission","CEO of UIDAI and ONDC","DG of NIC and UIDAI","CEO of NITI and UIDAI"],"One person, two posts."],
+["L10","Who is Director of BRIC-NCCS?",["Dr Thomas Pucadyil","Dr V. Narayanan","Dr Abhijat Sheth","Dr Rajeev Raghuvanshi"],"National Centre for Cell Science, Pune."],
+["L10","Which pair is correctly matched (set 2)?",["Prasar Bharati – Prasoon Joshi","CBFC – Prasoon Joshi","CBSE – Shashi Shekhar Vempati","IGNOU – Sangeeta Pisharoty"],"P–P trick."],
+/* L11 */
+["L11","Who is Secretary General of FICCI?",["Anant Swarup","Anant Goenka","Jyoti Vij","Chandrajit Banerjee"],"Appointed April 2026.","p"],
+["L11","FICCI was founded in…",["1927","1920","1947","1885"],"By G.D. Birla and Purshottamdas Thakurdas."],
+["L11","FICCI was founded by…",["G.D. Birla and Purshottamdas Thakurdas","J.R.D. Tata and G.D. Birla","Jamsetji Tata and Dadabhai Naoroji","Lala Lajpat Rai and Birla"],"1927."],
+["L11","Who is President of the CII?",["R. Mukundan","Rajiv Memani","Sanjiv Puri","Chandrajit Banerjee"],"Confederation of Indian Industry."],
+["L11","Who is President of ASSOCHAM?",["Nirmal Kumar Minda","Sanjay Nayar","Sajan Jindal","R. Mukundan"],"Lecture fact."],
+["L11","Who chairs NASSCOM?",["Srikanth Velamakanni","Debjani Ghosh","Rajesh Nambiar","Anant Maheshwari"],"IT industry body."],
+["L11","Who has been appointed CEO of IndiGo?",["William Walsh","Pieter Elbers","Campbell Wilson","Rahul Bhatia"],"Former IATA Director General.","p"],
+["L11","Who is CEO of Microsoft Gaming?",["Asha Sharma","Phil Spencer","Satya Nadella","Sarah Bond"],"Lecture fact."],
+["L11","Who is the global brand ambassador of Infosys?",["Carlos Alcaraz","Rafael Nadal","Novak Djokovic","Jannik Sinner"],"Spanish tennis player."],
+["L11","Who is the Director-General of the BBC?",["Matt Brittin","Tim Davie","Deborah Turness","Richard Sharp"],"Lecture fact."],
+["L11","Who is Country MD of YouTube India?",["Gunjan Soni","Ishan John Chatterjee","Sanjay Gupta","Anuradha Aggarwal"],"Lecture fact."],
+["L11","Who is the President of the International Olympic Committee?",["Kirsty Coventry","Thomas Bach","Sebastian Coe","Juan Antonio Samaranch Jr"],"From 2025.","p"],
+["L11","Kirsty Coventry is from…",["Zimbabwe","South Africa","Kenya","Nigeria"],"First African IOC President."],
+["L11","Kirsty Coventry is a former Olympic…",["Swimmer","Sprinter","Rower","Tennis player"],"Multiple Olympic medals."],
+["L11","Kirsty Coventry is the IOC's ___ President.",["10th","9th","11th","8th"],"Succeeded Thomas Bach (9th)."],
+["L11","Who is the President of the BCCI?",["Mithun Manhas","Roger Binny","Sourav Ganguly","Jay Shah"],"37th president.","p"],
+["L11","Who is the CEO of the ICC?",["Sanjog Gupta","Geoff Allardice","Jay Shah","Manu Sawhney"],"Jay Shah is ICC Chairman.","p"],
+["L11","Who chairs the Athletics Federation of India's Athletes' Commission?",["Anju Bobby George","P.T. Usha","Neeraj Chopra","Hima Das"],"Lecture fact."],
+["L11","Who is head coach of the Indian women's football team?",["Crispin Chettri","Igor Stimac","Manolo Marquez","Khalid Jamil"],"Lecture fact."],
+["L11","Who is India's Chef de Mission for the 2026 Commonwealth Games?",["Rohit Rajpal","Mary Kom","Gagan Narang","Abhinav Bindra"],"Tennis figure.","p"],
+["L11","Who is Goodwill Ambassador of the Pune Grand Tour?",["M.S. Dhoni","Virat Kohli","Shreyas Iyer","Sachin Tendulkar"],"Cycling race."],
+["L11","Who is brand ambassador of F1 Sim Racing India Open 2026?",["Shreyas Iyer","M.S. Dhoni","Karun Chandhok","Narain Karthikeyan"],"Lecture fact."],
+["L11","Who is the President of the Boxing Federation of India?",["Ajay Singh","Mary Kom","Hemant Kalita","Rajesh Bhandari"],"Lecture fact."],
+["L11","Who became the first Iranian woman member of the IOC?",["Soraya Aghaei Hajiagha","Kimia Alizadeh","Niloufar Ardalan","Zahra Nemati"],"Lecture fact."],
+["L11","A 'Chef de Mission' at the Games is…",["The leader of a country's whole contingent","The head chef of the athletes' village","The chief coach of one sport","The flag-bearer"],"Leads the delegation."],
+/* L12 */
+["L12","Who is President of the 81st UN General Assembly?",["Khalilur Rahman","Annalena Baerbock","Philemon Yang","Csaba Kőrösi"],"Bangladesh.","p"],
+["L12","Khalilur Rahman is from…",["Bangladesh","Pakistan","Malaysia","Indonesia"],"Elected June 2026."],
+["L12","Who is the President of the World Bank?",["Ajay Banga","David Malpass","Kristalina Georgieva","Masato Kanda"],"Indian-American."],
+["L12","Who is the President of the Asian Development Bank?",["Masato Kanda","Masatsugu Asakawa","Zou Jiayi","Jin Liqun"],"Japan."],
+["L12","Who is the President of the AIIB?",["Zou Jiayi","Jin Liqun","Masato Kanda","Dilma Rousseff"],"From January 2026; Jin Liqun was the founding president."],
+["L12","Who is the Director-General of UNESCO?",["Khaled El-Enany","Audrey Azoulay","Irina Bokova","Tedros Ghebreyesus"],"Egypt.","p"],
+["L12","Who is the UN High Commissioner for Refugees?",["Barham Salih","Filippo Grandi","António Guterres","Volker Türk"],"Former Iraqi President."],
+["L12","Who is the first woman to head UN Tourism?",["Shaikha Nasser Al Nowais","Zurab Pololikashvili","Rebeca Grynspan","Ngozi Okonjo-Iweala"],"UAE."],
+["L12","Who is CEO of the World Economic Forum?",["Alois Zwinggi","Klaus Schwab","Børge Brende","Saadia Zahidi"],"Lecture fact."],
+["L12","Who is India's Executive Director at the IMF?",["Urjit Patel","Krishnamurthy Subramanian","Neelkanth Mishra","Gita Gopinath"],"Former RBI Governor.","p"],
+["L12","Who is India's Executive Director at the World Bank?",["Neelkanth Mishra","Urjit Patel","Parameswaran Iyer","Vivek Aggarwal"],"Three-year term."],
+["L12","Who is Vice-President of the FATF?",["Vivek Aggarwal","Neelkanth Mishra","Urjit Patel","T. Rabi Sankar"],"Financial Action Task Force."],
+["L12","Which Indian chairs International IDEA in 2026?",["Gyanesh Kumar","Rajiv Kumar","S.Y. Quraishi","Sukhbir Sandhu"],"Institute for Democracy and Electoral Assistance."],
+["L12","Who is the first Asian chair of the IUCN Species Survival Commission?",["Vivek Menon","Vandana Shiva","Sunita Narain","Rajendra Pachauri"],"Wildlife Trust of India founder."],
+["L12","Who is India's Ambassador to China?",["Vikram Doraiswami","Pradeep Kumar Rawat","Vikram Misri","Dinesh Trivedi"],"Lecture fact.","p"],
+["L12","Who is India's High Commissioner to Bangladesh?",["Dinesh Trivedi","Pranay Verma","Dinesh K. Tripathi","Vikram Doraiswami"],"Not to be confused with ex-Navy chief Tripathi."],
+["L12","Who is India's Ambassador to Oman?",["Prashant Pise","Amit Narang","Vipul","Vikram Doraiswami"],"Lecture fact."],
+["L12","Mia Mottley has won a third straight term as Prime Minister of…",["Barbados","Jamaica","Trinidad and Tobago","Guyana"],"Caribbean."],
+["L12","Which pair is correctly matched (set 3)?",["ADB – Masato Kanda","AIIB – Ajay Banga","World Bank – Zou Jiayi","UNESCO – Barham Salih"],"Banga WB, Zou AIIB, Salih UNHCR."],
+["L12","Who is the Vice-President of the International Olympic Committee mentioned in the lecture?",["Juan Antonio Samaranch Salisachs","Thomas Bach","Sebastian Coe","Nita Ambani"],"He also contested the presidency."],
+/* L13 */
+["L13","Who is the first woman Director General of Armed Forces Medical Services?",["Vice Adm Arti Sarin","Sonali Mishra","Anu Garg","Lisa Gill"],"DGAFMS.","p"],
+["L13","Who is the first woman head of Srinagar Central Jail?",["Saba Shawl","Anu Garg","Ashwini Bhide","Nivedita Dubey"],"Lecture fact."],
+["L13","Which is a correct 'first' pair?",["Uma Kanjilal – first woman VC of IGNOU","Sonali Mishra – first woman CS of Odisha","Anu Garg – first woman DG RPF","Arti Sarin – first woman IGNOU VC"],"Mix-up test."],
+["L13","Which pair is mismatched?",["DRDO – Samir V. Kamat (2026)","Navy – Krishna Swaminathan","Army – Dhiraj Seth","CDS – N.S. Raja Subramani"],"DRDO is now with Rajesh Kumar Singh (additional charge)."],
+["L13","Which pair is mismatched (set 2)?",["SEBI – C.S. Setty","SBI – C.S. Setty","RBI – Sanjay Malhotra","IRDAI – Ajay Seth"],"SEBI is Tuhin Kanta Pandey."],
+["L13","Which pair is mismatched (set 3)?",["NITI Aayog CEO – Nidhi Chhibber","NITI VC – Ashok Kumar Lahiri","16th FC – Arvind Panagariya","PMEAC – S. Mahendra Dev"],"CEO is Anurag Jain."],
+["L13","Arrange the CDSs in order: 1. Anil Chauhan 2. Bipin Rawat 3. N.S. Raja Subramani",["2, 1, 3","1, 2, 3","2, 3, 1","3, 1, 2"],"Rawat 2020, Chauhan 2022, Raja Subramani 2026.","",0,1],
+["L13","Which two posts are both held by people numbered '26th'?",["CEC and RBI Governor","CJI and CAG","Army chief and Navy chief","AG and VP"],"Gyanesh Kumar and Sanjay Malhotra."],
+["L13","Which body's head is matched with the right law?",["NHRC – V. Ramasubramanian – PHRA 1993","CIC – Raj Kumar Goyal – PHRA 1993","CVC – P.K. Srivastava – RTI 2005","NGT – Prakash Shrivastava – 101st Amendment"],"CIC RTI 2005; CVC 2003; NGT Act 2010."],
+["L13","Who among these is NOT a woman 'first' from the lectures?",["Mithun Manhas","Ashwini Bhide","Sonali Mishra","Kirsty Coventry"],"Manhas is the 37th BCCI president."],
+["L13","Which pair of 'hook' and person is correct?",["राजा – CDS Raja Subramani","धीरज – Navy chief","स्वामी – Army chief","महेश – RAW chief"],"धीरज Army, स्वामी Navy, महेश IB."],
+["L13","Who heads the body that certifies films?",["Shashi Shekhar Vempati","Prasoon Joshi","Ashutosh Gowariker","Sudarsan Pattnaik"],"CBFC."],
+["L13","Which is the correct pair of ex-RBI Governor and new role?",["Urjit Patel – IMF Executive Director","Shaktikanta Das – World Bank President","Raghuram Rajan – UNGA President","D. Subbarao – NITI CEO"],"Urjit Patel."],
+["L13","The 81st UNGA President, the AIIB President and the ADB President are from…",["Bangladesh, China and Japan","India, China and Japan","Bangladesh, Japan and China","Pakistan, China and Korea"],"Rahman, Zou Jiayi, Masato Kanda.","",0,1]
+];
+
+/* Who's who: [post, person, category, note, lesson] */
+const APPTS = [
+ ["Chief Election Commissioner","Gyanesh Kumar","Constitutional","26th CEC; Art 324","L2"],
+ ["Election Commissioners","Sukhbir Singh Sandhu, Vivek Joshi","Constitutional","2 ECs","L2"],
+ ["Chairman, UPSC","Dr Ajay Kumar","Constitutional","Art 315–323","L2"],
+ ["CAG","K. Sanjay Murthy","Constitutional","15th CAG; Art 148","L2"],
+ ["Chairman, 16th Finance Commission","Arvind Panagariya","Constitutional","Art 280; 2026–31","L2"],
+ ["Attorney General","R. Venkataramani","Constitutional","16th AG; Art 76","L3"],
+ ["Solicitor General","Tushar Mehta","Legal","Not constitutional","L3"],
+ ["Chairperson, NCSC","Kishor Makwana","Constitutional","Art 338","L3"],
+ ["Chairperson, NCST","Antar Singh Arya","Constitutional","Art 338A","L3"],
+ ["Chairperson, NCBC","Sadhvi Niranjan Jyoti","Constitutional","Art 338B","L3"],
+ ["Chief Information Commissioner","Raj Kumar Goyal","Statutory","RTI Act 2005","L4"],
+ ["Chairperson, NHRC","Justice V. Ramasubramanian","Statutory","PHRA 1993","L4"],
+ ["Chairperson, NCW","Vijaya Rahatkar","Statutory","NCW Act 1990","L4"],
+ ["Central Vigilance Commissioner","Praveen Kumar Srivastava","Statutory","CVC Act 2003","L4"],
+ ["Chairperson, NGT","Justice Prakash Shrivastava","Statutory","NGT Act 2010","L4"],
+ ["Chairperson, Lokpal","Justice A.M. Khanwilkar","Statutory","Lokpal Act 2013","L4"],
+ ["Director, CBI","Praveen Sood","Security","DSPE Act 1946","L4"],
+ ["Chairman, 23rd Law Commission","Justice Dinesh Maheshwari","Legal","Executive body","L4"],
+ ["President, GSTAT","Justice Sanjaya Kumar Mishra","Legal","GST Appellate Tribunal","L4"],
+ ["Executive Chairman, NALSA","Justice Vikram Nath","Legal","Free legal aid","L4"],
+ ["Chief Justice of India","Justice Surya Kant","Legal","53rd CJI","L4"],
+ ["First woman CJ, Andhra Pradesh HC","Justice Lisa Gill","Legal","First","L4"],
+ ["President","Droupadi Murmu","Government","15th President","L5"],
+ ["Vice-President","C.P. Radhakrishnan","Government","15th VP; RS Chairman","L5"],
+ ["Deputy Chairman, Rajya Sabha","Harivansh Narayan Singh","Government","—","L5"],
+ ["Cabinet Secretary","T.V. Somanathan","Government","Top civil servant","L5"],
+ ["Defence Secretary","Rajesh Kumar Singh","Government","+ DRDO additional charge","L5"],
+ ["Vice-Chairperson, NITI Aayog","Ashok Kumar Lahiri","Government","April 2026","L5"],
+ ["CEO, NITI Aayog","Anurag Jain","Government","August 2026","L5"],
+ ["Chairman, PM's Economic Advisory Council","S. Mahendra Dev","Government","After Bibek Debroy","L5"],
+ ["Chair, 8th Central Pay Commission","Justice Ranjana Prakash Desai","Government","8th CPC","L5"],
+ ["Chair, Lok Sabha Estimates Committee","Sanjay Jaiswal","Government","—","L5"],
+ ["Private Secretary to PM","Nidhi Tewari","Government","—","L5"],
+ ["Union Law Secretary","Anju Rathi Rana","Government","—","L5"],
+ ["First woman Chief Secretary, Odisha","Anu Garg","Government","First","L5"],
+ ["First woman Municipal Commissioner, Mumbai","Ashwini Bhide","Government","First","L5"],
+ ["Chief of Defence Staff","Gen N.S. Raja Subramani","Defence","3rd CDS","L6"],
+ ["Chief of Army Staff","Gen Dhiraj Seth","Defence","31st COAS","L6"],
+ ["Chief of Naval Staff","Adm Krishna Swaminathan","Defence","27th CNS","L6"],
+ ["Chief of Air Staff","ACM Amar Preet Singh","Defence","28th CAS","L6"],
+ ["Vice Chief of Air Staff","Air Marshal Ashutosh Dixit","Defence","July 2026","L6"],
+ ["DRDO Chairman (additional charge)","Rajesh Kumar Singh","Defence","After Samir V. Kamat","L6"],
+ ["C-in-C, Andaman & Nicobar Command","Vice Adm Vineet McCarty","Defence","20th CINCAN","L6"],
+ ["DG, Indian Coast Guard","Paramesh Sivamani","Defence","—","L6"],
+ ["DG, Armed Forces Medical Services","Vice Adm Arti Sarin","Defence","First woman","L6"],
+ ["DG Military Operations","Lt Gen Abhijit S. Pendharkar","Defence","DGMO","L6"],
+ ["National Security Adviser","Ajit Doval","Security","—","L7"],
+ ["Deputy NSA","Anish Dayal Singh","Security","—","L7"],
+ ["Chief, RAW","Parag Jain","Security","External intelligence","L7"],
+ ["Director, Intelligence Bureau","Mahesh Dixit","Security","After Tapan Deka","L7"],
+ ["DG, NIA","Rakesh Aggarwal","Security","—","L7"],
+ ["DG, NCB","Anurag Garg","Security","Narcotics","L7"],
+ ["Director, ED","Rahul Navin","Security","PMLA, FEMA","L7"],
+ ["DG, RPF","Sonali Mishra","Security","First woman","L7"],
+ ["Director, NCRB","Amit Garg","Security","—","L7"],
+ ["Chairman, NSAB","Alok Joshi","Security","—","L7"],
+ ["DG, Assam Rifles","Lt Gen Vikas Lakhera","Security","CAPF","L7"],
+ ["DG, BSF","Praveen Kumar","Security","CAPF","L7"],
+ ["DG, CISF","Praveen Ranjan","Security","CAPF","L7"],
+ ["DG, CRPF","Gyanendra Pratap Singh","Security","CAPF","L7"],
+ ["DG, ITBP","Shatrujeet Singh Kapur","Security","China border","L7"],
+ ["DG, NSG","B. Srinivasan","Security","CAPF","L7"],
+ ["DG, SSB","Sanjay Singhal","Security","Nepal & Bhutan borders","L7"],
+ ["RBI Governor","Sanjay Malhotra","Economy","26th","L8"],
+ ["Chairperson, SEBI","Tuhin Kanta Pandey","Economy","1988 / 1992","L8"],
+ ["Chairman, SBI","C.S. Setty","Economy","Not SEBI!","L8"],
+ ["Chairman, IRDAI","Ajay Seth","Economy","Insurance","L8"],
+ ["Chairperson, PFRDA","S. Ramann","Economy","Pensions","L8"],
+ ["Chairman, CBDT","Ravi Agrawal","Economy","Direct taxes","L8"],
+ ["Chair, NSE Governing Board","Srinivas Injeti","Economy","—","L8"],
+ ["Controller General of Accounts","T.C.A. Kalyani","Economy","—","L8"],
+ ["Chairman, GIFT City","Uday Kotak","Economy","Gujarat","L8"],
+ ["MD & CEO, ONDC","Vibhor Jain","Economy","—","L8"],
+ ["CMD, SAIL","Dr Ashok Kumar Panda","PSU","Maharatna","L9"],
+ ["CMD, GAIL","Deepak Gupta","PSU","Maharatna","L9"],
+ ["CMD, BPCL","Sanjay Khanna","PSU","Maharatna","L9"],
+ ["CMD, HPCL","Vikas Kaushal","PSU","Maharatna","L9"],
+ ["Chairman, IOCL","Arvinder Singh Sahney","PSU","Maharatna","L9"],
+ ["CMD, NTPC","Gurdeep Singh","PSU","Maharatna","L9"],
+ ["CMD, ONGC","Arun Kumar Singh","PSU","Maharatna","L9"],
+ ["CMD, Oil India","Dr Ranjit Rath","PSU","Maharatna","L9"],
+ ["Chairman, Coal India","B. Sairam","PSU","Maharatna","L9"],
+ ["CMD, PFC","Parminder Chopra","PSU","Maharatna","L9"],
+ ["CMD, Power Grid","Burra Vamsi Rama Mohan","PSU","Maharatna","L9"],
+ ["CMD, REC","Jitendra Srivastava","PSU","Maharatna","L9"],
+ ["CMD, BHEL","K. Sadashiv Murthy","PSU","Maharatna","L9"],
+ ["CMD, HAL","Ravi Kota","PSU","14th Maharatna","L9"],
+ ["DG, DGCA","Vir Vikram Yadav","PSU","Civil aviation","L9"],
+ ["First woman Director (HR), AAI","Nivedita Dubey","PSU","First","L9"],
+ ["Chairman, ISRO","Dr V. Narayanan","Science & media","—","L10"],
+ ["Chairman, AERB","A.K. Balasubramanian","Science & media","Atomic regulator","L10"],
+ ["CEO, UIDAI & IndiaAI Mission","Saurabh Vijay","Science & media","Two posts","L10"],
+ ["Chairperson, NMC","Dr Abhijat Sheth","Science & media","—","L10"],
+ ["DCGI","Rajeev Raghuvanshi","Science & media","Drugs","L10"],
+ ["Chairman, Prasar Bharati","Prasoon Joshi","Science & media","Ex-CBFC","L10"],
+ ["Chairperson, CBFC","Shashi Shekhar Vempati","Science & media","Ex-Prasar Bharati CEO","L10"],
+ ["Chairperson, CBSE","Lokhande Prashant Sitaram","Science & media","—","L10"],
+ ["First woman VC, IGNOU","Uma Kanjilal","Science & media","First","L10"],
+ ["First woman President, Press Club of India","Sangeeta Barooah Pisharoty","Science & media","First","L10"],
+ ["Festival Director, 57th IFFI","Ashutosh Gowariker","Science & media","—","L10"],
+ ["Brand ambassador, Census 2027","Sudarsan Pattnaik","Science & media","Sand artist","L10"],
+ ["Secretary General, FICCI","Anant Swarup","Business & sports","FICCI 1927","L11"],
+ ["President, CII","R. Mukundan","Business & sports","—","L11"],
+ ["President, ASSOCHAM","Nirmal Kumar Minda","Business & sports","—","L11"],
+ ["Chairperson, NASSCOM","Srikanth Velamakanni","Business & sports","—","L11"],
+ ["CEO, IndiGo","William Walsh","Business & sports","Ex-IATA","L11"],
+ ["CEO, Microsoft Gaming","Asha Sharma","Business & sports","—","L11"],
+ ["Global brand ambassador, Infosys","Carlos Alcaraz","Business & sports","Tennis","L11"],
+ ["President, IOC","Kirsty Coventry","Business & sports","First woman & African","L11"],
+ ["President, BCCI","Mithun Manhas","Business & sports","37th","L11"],
+ ["CEO, ICC","Sanjog Gupta","Business & sports","—","L11"],
+ ["Chair, AFI Athletes' Commission","Anju Bobby George","Business & sports","—","L11"],
+ ["Chef de Mission, CWG 2026","Rohit Rajpal","Business & sports","—","L11"],
+ ["President, 81st UNGA","Khalilur Rahman","International","Bangladesh","L12"],
+ ["President, World Bank","Ajay Banga","International","—","L12"],
+ ["President, ADB","Masato Kanda","International","Japan","L12"],
+ ["President, AIIB","Zou Jiayi","International","China","L12"],
+ ["DG, UNESCO","Khaled El-Enany","International","Egypt","L12"],
+ ["UN High Commissioner for Refugees","Barham Salih","International","Iraq","L12"],
+ ["Secretary-General, UN Tourism","Shaikha Nasser Al Nowais","International","First woman","L12"],
+ ["India's ED, IMF","Urjit Patel","International","Ex-RBI Governor","L12"],
+ ["India's ED, World Bank","Neelkanth Mishra","International","—","L12"],
+ ["Vice-President, FATF","Vivek Aggarwal","International","—","L12"],
+ ["Chair, International IDEA","Gyanesh Kumar","International","Also CEC","L12"],
+ ["Chair, IUCN Species Survival Commission","Vivek Menon","International","First Asian","L12"],
+ ["Ambassador to China","Vikram Doraiswami","International","—","L12"],
+ ["High Commissioner to Bangladesh","Dinesh Trivedi","International","—","L12"],
+ ["Ambassador to Oman","Prashant Pise","International","—","L12"],
+ ["PM of Barbados","Mia Mottley","International","3rd straight term","L12"]
+];
+const CATS = [...new Set(APPTS.map(a=>a[2]))];
+
+/* Body types: [body, type, basis] */
+const BODIES = [["Election Commission","Constitutional","Art 324 (Part XV)"],["UPSC","Constitutional","Art 315–323 (Part XIV)"],["CAG","Constitutional","Art 148–151"],["Finance Commission","Constitutional","Art 280"],["Attorney General","Constitutional","Art 76"],["Advocate General","Constitutional","Art 165"],["NCSC","Constitutional","Art 338"],["NCST","Constitutional","Art 338A (89th Amend 2003)"],["NCBC","Constitutional","Art 338B (102nd Amend 2018)"],["GST Council","Constitutional","Art 279A (101st Amend)"],["CIC","Statutory","RTI Act 2005"],["NHRC","Statutory","PHRA 1993"],["NCW","Statutory","NCW Act 1990"],["CVC","Statutory","CVC Act 2003 (set up 1964)"],["NGT","Statutory","NGT Act 2010"],["Lokpal","Statutory","Lokpal & Lokayuktas Act 2013"],["SEBI","Statutory","SEBI Act 1992 (set up 1988)"],["IRDAI","Statutory","IRDA Act 1999"],["PFRDA","Statutory","PFRDA Act 2013"],["NALSA","Statutory","Legal Services Authorities Act 1987"],["Solicitor General","Not constitutional","Law officer assisting AG"],["NITI Aayog","Executive","Cabinet resolution, 1 Jan 2015"],["Law Commission","Executive","Government order"],["CBI","Executive","1963 resolution; powers from DSPE Act 1946"],["PM's Economic Advisory Council","Executive","Advisory body"]];
+
+const TILES = [["26th","CEC & RBI Governor"],["53rd","CJI Surya Kant"],["15th","VP & CAG"],["16th","AG & Finance Commission"],["3rd","CDS"],["31st","Army chief"],["27th","Navy chief"],["28th","Air chief"],["23rd","Law Commission"],["37th","BCCI President"],["81st","UNGA session"],["8th","Central Pay Commission"],["10th","IOC President"],["14","Maharatnas"],["41%","States' share (16th FC)"],["1 + 4","Finance Commission size"],["6 yrs / 65","CEC, CAG, UPSC tenure"],["1993","ECI permanently multi-member"],["1927","FICCI founded"],["2022–23","GDP, IIP, WPI base"]];
+
+const PAIRS = [["SEBI vs SBI","Tuhin Kanta Pandey vs C.S. Setty"],["Prasar Bharati vs CBFC","Prasoon Joshi vs Shashi Shekhar Vempati (they swapped)"],["IMF ED vs World Bank ED","Urjit Patel vs Neelkanth Mishra"],["World Bank vs AIIB vs ADB","Ajay Banga vs Zou Jiayi vs Masato Kanda"],["RAW vs IB","Parag Jain vs Mahesh Dixit"],["NIA vs NCB vs NCRB","Rakesh Aggarwal vs Anurag Garg vs Amit Garg"],["BSF vs CISF","Praveen Kumar vs Praveen Ranjan"],["NGT vs CVC","Prakash Shrivastava vs Praveen Kumar Srivastava"],["AG vs SG","R. Venkataramani (Art 76) vs Tushar Mehta (not constitutional)"],["NITI VC vs CEO","Ashok Kumar Lahiri vs Anurag Jain"],["Dinesh Trivedi vs Dinesh Tripathi","HC to Bangladesh vs ex-Navy chief"],["Nidhi Tewari vs Nidhi Chhibber","PM's private secretary vs ex-interim NITI CEO"],["Anu Garg vs Anurag Garg","Odisha CS vs NCB DG"],["Rajesh vs Rakesh","Rajesh Kumar Singh (DRDO) vs Rakesh Aggarwal (NIA)"],["Sanjay Malhotra vs K. Sanjay Murthy","RBI vs CAG"],["NCSC vs NCST vs NCBC","Makwana (338) vs Arya (338A) vs Niranjan Jyoti (338B)"],["Dividend vs disinvestment","Revenue receipt vs capital receipt"],["101st vs 102nd vs 103rd","GST vs NCBC vs EWS"],["ICC CEO vs ICC Chairman","Sanjog Gupta vs Jay Shah"],["Ashok Lahiri vs Ashok Panda","NITI VC vs SAIL"]];
+
+const APP = { key:"appointments_workbook_v1", brand:"Appointments 2026", sub:"नियुक्तियाँ · SSC CGL workbook",
+  eyebrow:"Who's who · Static facts · Updated to Oct 2026",
+  intro:"13 short lessons from your two appointments lectures, grouped the way SSC asks them — constitutional & statutory bodies, judiciary, government, defence, security, economy, PSUs, science & media, business & sports, and international. Every lecture hook is kept (राजा, धीरज, स्वामी, महेश, शत्रु, P–P…), the Article, Act and number behind each post is added, and lecture slips are corrected in red Trap boxes. Names checked to 1 October 2026." };
+
+
+/* ============================================================
+   HELPERS & STATE
+   ============================================================ */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const hash = s => { let h = 5381; for (let i=0;i<s.length;i++) h = ((h<<5)+h + s.charCodeAt(i))|0; return "q"+(h>>>0).toString(36); };
+const shuffle = a => { const b=a.slice(); for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]];} return b; };
+const L = id => LESSONS.find(l => l.id === id);
+const LNUM = id => LESSONS.findIndex(l => l.id === id) + 1;
+
+const QS = QB.map(r => {
+  const fixed = !!r[6];
+  return { t:r[0], q:r[1], o:r[2], e:r[3], p:(r[4]||"").includes("p"), a: fixed ? (r[5]||0) : 0, fixed, id:hash(r[1]) };
+});
+const byLesson = id => QS.filter(q => q.t === id);
+// order of options to show: array of original indexes
+const makePerm = q => q.fixed ? q.o.map((_,i)=>i) : shuffle(q.o.map((_,i)=>i));
+
+const KEY = APP.key;
+let S = { ans:{}, bm:{}, les:{}, mocks:[] };
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch(e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
+const record = (q, ok) => { S.ans[q.id] = ok ? 1 : 0; save(); renderTop(); };
+
+function renderTop(){
+  const ids = Object.keys(S.ans).filter(k => QS.some(q => q.id === k));
+  const right = ids.filter(k => S.ans[k] === 1).length;
+  const pct = ids.length ? Math.round(right*100/ids.length) : 0;
+  $("#topstat").innerHTML = `<b>${ids.length}</b>/${QS.length} tried<br><b>${pct}%</b> right now`;
+}
+
+/* ============================================================
+   ROUTING
+   ============================================================ */
+let TAB = "learn";
+let timerId = null;
+function go(tab){
+  TAB = tab;
+  document.querySelectorAll(".nav button").forEach(b => b.setAttribute("aria-current", b.dataset.tab===tab ? "page" : "false"));
+  if (tab === "learn") renderLearn();
+  if (tab === "practice") renderPractice();
+  if (tab === "mock") renderMock();
+  if (tab === "revise") renderRevise();
+  window.scrollTo(0,0);
+  try { history.replaceState(null, "", "#"+tab); } catch(e) {}
+}
+document.querySelectorAll(".nav button").forEach(b => b.addEventListener("click", () => {
+  if (TAB === "mock" && M && M.running && b.dataset.tab !== "mock") { go("mock"); showMockLeave(b.dataset.tab); return; }
+  go(b.dataset.tab);
+}));
+
+/* ============================================================
+   LEARN
+   ============================================================ */
+function renderLearn(){
+  const done = LESSONS.filter(l => S.les[l.id] && S.les[l.id].done).length;
+  const nextIdx = LESSONS.findIndex(l => !(S.les[l.id] && S.les[l.id].done));
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="hero">
+      <span class="eyebrow">${APP.eyebrow}</span>
+      <h1>Learn it, test it, revise it</h1>
+      <p>${APP.intro} ${QS.length} exam-style questions in all.</p>
+      <div class="meter" aria-label="Lessons done"><i style="width:${done/LESSONS.length*100}%"></i></div>
+      <div class="row between"><span class="muted num" style="font-size:13px">${done}/${LESSONS.length} lessons done</span>
+      ${nextIdx>=0 ? `<button class="btn pri sm" type="button" data-open="${LESSONS[nextIdx].id}">${done? "Continue" : "Start"}: Lesson ${nextIdx+1}</button>` : `<span class="muted" style="font-size:13px">All lessons done. Try a mock test.</span>`}</div>
+    </div>
+    <div class="lessons">${LESSONS.map((l,i) => {
+      const st = S.les[l.id] || {}; const n = byLesson(l.id).length;
+      return `<button type="button" class="les ${st.done?"done":""} ${i===nextIdx?"next":""}" data-open="${l.id}">
+        <span class="no">${st.done ? "✓" : i+1}</span>
+        <span class="t"><b>${esc(l.title)}</b><span>${l.hi} · ${n} questions</span></span>
+        <span class="sc">${st.best!=null ? `best<br>${st.best}/${n}` : ""}</span></button>`;}).join("")}
+    </div>
+    <p class="foot">Names are checked to 1 October 2026 — appointments change, so re-check anything older than a month before the exam. Where a lecture got a fact wrong, the lesson flags it in a red “Trap” box. Revise → Who's who and Body types are the fastest last-week tools.</p>
+  </section>`;
+  $("#app").querySelectorAll("[data-open]").forEach(b => b.addEventListener("click", () => openLesson(b.dataset.open, "learn")));
+}
+
+function blockHTML(b){
+  if (b.k==="p") return `<div class="plain"><p>${b.h}</p></div>`;
+  if (b.k==="trick") return `<div class="trick"><span class="lab">Trick</span>${b.h}</div>`;
+  if (b.k==="link") return `<div class="link"><span class="lab">Link · connect the dots</span>${b.h}</div>`;
+  if (b.k==="q") { const perm = shuffle(b.o.map((_,i)=>i)); return `<div class="icheck" data-ic><span class="lab">Quick check</span><p class="qt">${esc(b.q)}</p><div class="opts">${perm.map((oi,k)=>`<button type="button" class="opt" data-ioi="${oi}"><span class="k">${"ABCD"[k]}</span><span>${esc(b.o[oi])}</span></button>`).join("")}</div><div class="exp" hidden><b class="okl"></b> ${esc(b.e)}</div></div>`; }
+  if (b.k==="trap") return `<div class="trap"><span class="lab">Trap · correction</span>${b.h}</div>`;
+  if (b.k==="facts") return `<div class="block"><h3>${b.title}</h3><dl class="facts">${b.rows.map(r=>`<div><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join("")}</dl></div>`;
+  if (b.k==="tl") return `<div class="block"><h3>${b.title}</h3><ul class="tl">${b.rows.map(r=>`<li><span class="y">${r[0]}</span><span>${r[1]}</span></li>`).join("")}</ul></div>`;
+  if (b.k==="table") {
+    const isNum = (ci) => b.numcol==="all" ? ci>0 : (b.numcol===1 && ci===1) || (typeof b.numcol==="string" && b.numcol.includes(String(ci)));
+    return `<div class="block"><h3>${b.title}</h3><div class="tbl"><table><thead><tr>${b.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${b.rows.map(r=>`<tr>${r.map((c,ci)=>`<td class="${isNum(ci)?"n":""}">${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+  }
+  if (b.k==="fig") return `<div class="block"><h3>${b.title}</h3><figure class="fig">${b.svg}<figcaption>${b.cap}</figcaption></figure></div>`;
+  if (b.k==="pyr") return `<div class="block"><h3>${b.title}</h3><div class="pyr">${b.items.map(it=>`<div>${PYR(it.rows)}<b>${it.name}</b><span class="muted">${it.note}</span></div>`).join("")}</div><p class="muted" style="font-size:13px;margin-top:8px"><span style="color:var(--blue)">■</span> males · <span style="color:var(--accent)">■</span> females · top = old, base = young</p></div>`;
+  return "";
+}
+
+let LQ = null;
+function openLesson(id, step){
+  const l = L(id), i = LNUM(id);
+  if (step === "quiz") { LQ = { id, list: shuffle(byLesson(id)).map(q => ({q, perm:makePerm(q)})), i:0, score:0, picked:null }; }
+  const head = `<div class="lhead"><button class="back" type="button" id="lback">‹ Lessons</button></div>
+    <span class="eyebrow">Lesson ${i} of ${LESSONS.length} · ${l.hi}</span><h1>${esc(l.title)}</h1>
+    <div class="steps" role="tablist">
+      <button type="button" data-step="learn" aria-current="${step==="learn"?"step":"false"}">1 · Learn</button>
+      <button type="button" data-step="quiz" aria-current="${step==="quiz"?"step":"false"}">2 · Quiz</button>
+      <button type="button" data-step="sum" aria-current="${step==="sum"?"step":"false"}">3 · Summary</button>
+    </div>`;
+  let body = "";
+  if (step === "learn") {
+    body = `<div class="stack">${l.blocks.map(blockHTML).join("")}
+      <div class="row end"><button class="btn pri" type="button" id="toquiz">Take the lesson quiz · ${byLesson(id).length} questions</button></div></div>`;
+  } else if (step === "quiz") {
+    body = `<div id="lq"></div>`;
+  } else {
+    const nxt = LESSONS[i];
+    body = `<div class="stack"><div class="block"><h3>Remember these</h3><ul class="sum">${l.sum.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>
+      <div class="row between"><button class="btn" type="button" id="relearn">Read again</button>
+      ${nxt ? `<button class="btn pri" type="button" id="nextles">Next: ${esc(nxt.title)}</button>` : `<button class="btn pri" type="button" id="tomock">Take a mock test</button>`}</div></div>`;
+    S.les[id] = Object.assign(S.les[id]||{}, {done:1}); save();
+  }
+  $("#app").innerHTML = `<section class="view stack">${head}${body}</section>`;
+  $("#lback").onclick = () => renderLearn();
+  $("#app").querySelectorAll("[data-step]").forEach(b => b.onclick = () => openLesson(id, b.dataset.step));
+  if (step==="learn") { $("#toquiz").onclick = () => openLesson(id,"quiz");
+    const ics = l.blocks.filter(b=>b.k==="q");
+    $("#app").querySelectorAll("[data-ic]").forEach((box,n) => { const b = ics[n];
+      box.querySelectorAll("[data-ioi]").forEach(btn => btn.onclick = () => {
+        if (box.dataset.done) return; box.dataset.done = 1; const pick = +btn.dataset.ioi;
+        box.querySelectorAll("[data-ioi]").forEach(x => { const oi=+x.dataset.ioi; x.disabled = true; if (oi===0) x.classList.add("ok"); else if (oi===pick) x.classList.add("no"); });
+        const ex = box.querySelector(".exp"); ex.hidden = false; const lab = ex.querySelector("b");
+        if (pick===0) { lab.textContent = "Correct."; } else { lab.className = "nol"; lab.textContent = "Answer: " + b.o[0] + "."; }
+      }); }); }
+  if (step==="quiz") renderLQ();
+  if (step==="sum") {
+    $("#relearn").onclick = () => openLesson(id,"learn");
+    const n = $("#nextles"); if (n) n.onclick = () => openLesson(LESSONS[i].id,"learn");
+    const m = $("#tomock"); if (m) m.onclick = () => go("mock");
+  }
+  window.scrollTo(0,0);
+}
+
+function optsHTML(q, perm, state){
+  // state: {picked: originalIndex|null, reveal: bool, sel: originalIndex|null}
+  return perm.map((oi, k) => {
+    let cls = "opt";
+    if (state.reveal) { if (oi === q.a) cls += " ok"; else if (oi === state.picked) cls += " no"; }
+    else if (state.sel === oi) cls += " sel";
+    return `<button type="button" class="${cls}" data-oi="${oi}" ${state.reveal?"disabled":""}><span class="k">${"ABCD"[k]}</span><span>${esc(q.o[oi])}</span></button>`;
+  }).join("");
+}
+function expHTML(q, picked){
+  const ok = picked === q.a;
+  return `<div class="exp">${ok ? `<b class="okl">Correct.</b>` : `<b class="nol">Answer: ${esc(q.o[q.a])}.</b>`} ${esc(q.e)}</div>`;
+}
+function metaHTML(q, no){
+  return `<div class="qmeta"><span class="qno">${no}</span><span class="tag">L${LNUM(q.t)} · ${esc(L(q.t).title)}</span>${q.p?`<span class="tag pyq">High-yield</span>`:""}
+  <button type="button" class="bm" data-bm="${q.id}" aria-pressed="${S.bm[q.id]?"true":"false"}" aria-label="Bookmark">${S.bm[q.id]?"★":"☆"}</button></div>`;
+}
+
+function renderLQ(){
+  const box = $("#lq");
+  if (LQ.i >= LQ.list.length) {
+    const n = LQ.list.length, l = L(LQ.id);
+    const st = S.les[LQ.id] || {}; st.best = Math.max(st.best||0, LQ.score); S.les[LQ.id] = st; save();
+    box.innerHTML = `<div class="stack"><div class="block stack"><span class="eyebrow">Quiz done</span>
+      <div class="scorebig"><span class="num">${LQ.score}</span><span class="muted">/ ${n} correct</span></div>
+      <p class="muted">${LQ.score===n ? "Full marks." : LQ.score >= n*0.8 ? "Strong. Review the ones you missed in Practice → Mistakes." : "Read the lesson once more, then retry. Missed questions are saved under Practice → Mistakes."}</p></div>
+      <div class="row between"><button class="btn" type="button" id="retry">Retry quiz</button><button class="btn pri" type="button" id="tosum">See summary</button></div></div>`;
+    $("#retry").onclick = () => openLesson(LQ.id,"quiz");
+    $("#tosum").onclick = () => openLesson(LQ.id,"sum");
+    return;
+  }
+  const it = LQ.list[LQ.i], q = it.q;
+  const reveal = LQ.picked !== null;
+  box.innerHTML = `<div class="stack"><div class="meter"><i style="width:${LQ.i/LQ.list.length*100}%"></i></div>
+    <article class="qcard">${metaHTML(q, `Q${LQ.i+1}/${LQ.list.length}`)}
+    <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {picked:LQ.picked, reveal})}</div>
+    ${reveal ? expHTML(q, LQ.picked) : ""}</article>
+    ${reveal ? `<div class="row end"><button class="btn pri" type="button" id="lqnext">${LQ.i+1 < LQ.list.length ? "Next question" : "Finish"}</button></div>` : `<p class="muted" style="font-size:13px">Score so far: <span class="num">${LQ.score}</span></p>`}</div>`;
+  box.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    if (LQ.picked !== null) return;
+    LQ.picked = +b.dataset.oi; const ok = LQ.picked === q.a; if (ok) LQ.score++; record(q, ok); renderLQ();
+  });
+  bindBM(box);
+  const nx = $("#lqnext"); if (nx) nx.onclick = () => { LQ.i++; LQ.picked = null; renderLQ(); window.scrollTo(0,0); };
+}
+
+function bindBM(root){
+  root.querySelectorAll("[data-bm]").forEach(b => b.onclick = (ev) => {
+    ev.stopPropagation();
+    const id = b.dataset.bm; if (S.bm[id]) delete S.bm[id]; else S.bm[id] = 1; save();
+    b.setAttribute("aria-pressed", S.bm[id] ? "true":"false"); b.textContent = S.bm[id] ? "★" : "☆";
+  });
+}
+
+/* ============================================================
+   PRACTICE
+   ============================================================ */
+let PF = "all", PSHOW = 20, PORDER = null, PPERM = {}, PPICK = {};
+function practiceList(){
+  let list = QS;
+  if (PF === "pyq") list = QS.filter(q => q.p);
+  else if (PF === "wrong") list = QS.filter(q => S.ans[q.id] === 0);
+  else if (PF === "new") list = QS.filter(q => S.ans[q.id] === undefined);
+  else if (PF === "bm") list = QS.filter(q => S.bm[q.id]);
+  else if (PF !== "all") list = QS.filter(q => q.t === PF);
+  if (PORDER) { const pos = new Map(PORDER.map((id,i)=>[id,i])); list = list.slice().sort((a,b)=>(pos.get(a.id)??0)-(pos.get(b.id)??0)); }
+  return list;
+}
+function renderPractice(){
+  const wrongN = QS.filter(q => S.ans[q.id] === 0).length, bmN = QS.filter(q=>S.bm[q.id]).length, pyqN = QS.filter(q=>q.p).length;
+  const chips = [["all",`All ${QS.length}`],["new","Not tried"],["wrong",`Mistakes ${wrongN}`],["pyq",`High-yield ${pyqN}`],["bm",`Starred ${bmN}`]].concat(LESSONS.map((l,i)=>[l.id,`L${i+1} ${l.title}`]));
+  const list = practiceList();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Question bank</span><h1>Practice</h1>
+    <p class="muted">Tap an option to check it. Wrong answers go to <b>Mistakes</b> until you get them right.</p></div>
+    <div class="chips" role="group" aria-label="Filter">${chips.map(c=>`<button type="button" class="chip" data-f="${c[0]}" aria-pressed="${PF===c[0]}">${esc(c[1])}</button>`).join("")}</div>
+    <div class="row between"><span class="muted num" style="font-size:13px">${list.length} questions</span>
+      <div class="row"><button class="btn sm ghost" type="button" id="pshuf">${PORDER?"In order":"Shuffle"}</button></div></div>
+    <div class="stack" id="plist"></div>
+  </section>`;
+  $("#app").querySelectorAll("[data-f]").forEach(b => b.onclick = () => { PF = b.dataset.f; PSHOW = 20; PPICK = {}; renderPractice(); });
+  $("#pshuf").onclick = () => { PORDER = PORDER ? null : shuffle(QS.map(q=>q.id)); PSHOW = 20; renderPractice(); };
+  const chipOn = $(`.chip[aria-pressed="true"]`); if (chipOn) chipOn.scrollIntoView({block:"nearest", inline:"center"});
+  drawPList();
+}
+function pCard(q, idx){
+  if (!PPERM[q.id]) PPERM[q.id] = makePerm(q);
+  const picked = PPICK[q.id]; const reveal = picked !== undefined;
+  return `<article class="qcard" data-q="${q.id}">${metaHTML(q, "Q"+(idx+1))}<p class="qt">${esc(q.q)}</p>
+    <div class="opts">${optsHTML(q, PPERM[q.id], {picked: reveal?picked:null, reveal})}</div>${reveal?expHTML(q,picked):""}</article>`;
+}
+function drawPList(){
+  const list = practiceList(), box = $("#plist");
+  if (!list.length) { box.innerHTML = `<p class="empty">${PF==="wrong"?"No mistakes saved. Answer some questions first, or you've cleared them all.":PF==="bm"?"Nothing starred yet. Tap ☆ on any question.":"Nothing here."}</p>`; return; }
+  box.innerHTML = list.slice(0, PSHOW).map((q,i)=>pCard(q,i)).join("") + (list.length > PSHOW ? `<button class="btn" type="button" id="pmore">Show 20 more (${list.length-PSHOW} left)</button>` : "");
+  bindP(box);
+  const more = $("#pmore"); if (more) more.onclick = () => { PSHOW += 20; drawPList(); };
+}
+function bindP(box){ box.querySelectorAll(".qcard").forEach(bindCard); }
+function bindCard(card){
+  card.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    const q = QS.find(x => x.id === card.dataset.q); if (PPICK[q.id] !== undefined) return;
+    PPICK[q.id] = +b.dataset.oi; record(q, PPICK[q.id] === q.a);
+    const idx = +card.querySelector(".qno").textContent.slice(1) - 1;
+    const tmp = document.createElement("div"); tmp.innerHTML = pCard(q, idx); const nc = tmp.firstElementChild;
+    card.replaceWith(nc); bindCard(nc);
+  });
+  bindBM(card);
+}
+
+/* ============================================================
+   MOCK TEST
+   ============================================================ */
+let M = null, MCFG = {n:25, scope:"all", neg:1}, LEAVE_TO = null;
+function renderMock(){
+  if (M && M.running) return drawMockRun();
+  if (M && M.done) return drawMockResult();
+  const hist = (S.mocks||[]).slice(-6).reverse();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Timed, SSC pattern</span><h1>Mock test</h1>
+    <p class="muted">+2 for a right answer, −0.5 for a wrong one, 36 seconds per question (CGL Tier-1 pace). Answers show only after you submit.</p></div>
+    <div class="block stack">
+      <fieldset><legend>Questions</legend><div class="radios">${[10,25,50,100].map(n=>`<label><input type="radio" name="mn" id="mn${n}" value="${n}" ${MCFG.n===n?"checked":""}><span>${n} · ${Math.round(n*36/60)} min</span></label>`).join("")}</div></fieldset>
+      <fieldset><legend>From</legend><select id="mscope" aria-label="Lessons to draw from"><option value="all">All lessons</option><option value="pyq">High-yield only</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}" ${MCFG.scope===l.id?"selected":""}>L${i+1} · ${esc(l.title)}</option>`).join("")}</select></fieldset>
+      <label class="row" style="gap:8px;font-weight:600"><input type="checkbox" id="mneg" ${MCFG.neg?"checked":""}> Negative marking (−0.5)</label>
+      <div id="merr" class="muted" style="font-size:14px"></div>
+      <div class="row end"><button class="btn pri" type="button" id="mstart">Start test</button></div>
+    </div>
+    ${hist.length ? `<div class="block"><h3>Recent attempts</h3><div class="hist">${hist.map(h=>`<div><span>${esc(h.d)} · ${h.n} Q</span><span class="num">${h.score}/${h.max} · ${h.acc}%</span></div>`).join("")}</div></div>` : ""}
+  </section>`;
+  $("#mscope").value = MCFG.scope;
+  $("#mstart").onclick = () => {
+    MCFG.n = +(document.querySelector('input[name="mn"]:checked')||{value:25}).value;
+    MCFG.scope = $("#mscope").value; MCFG.neg = $("#mneg").checked ? 1 : 0;
+    let pool = MCFG.scope==="all" ? QS : MCFG.scope==="pyq" ? QS.filter(q=>q.p) : MCFG.scope==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===MCFG.scope);
+    if (!pool.length) { $("#merr").textContent = "No questions in that set yet. Pick another source."; return; }
+    const qs = shuffle(pool).slice(0, MCFG.n);
+    M = { running:true, list: qs.map(q=>({q, perm:makePerm(q)})), ans: qs.map(()=>null), mark: qs.map(()=>false), i:0, neg:MCFG.neg, secs: qs.length*36, start: Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000;
+    startTimer(); drawMockRun();
+  };
+}
+function startTimer(){
+  clearInterval(timerId);
+  timerId = setInterval(() => {
+    if (!M || !M.running) { clearInterval(timerId); return; }
+    const left = Math.max(0, Math.round((M.end - Date.now())/1000));
+    const el = $("#mtime"); if (el) { el.textContent = fmt(left); el.classList.toggle("low", left <= 60); }
+    if (left <= 0) submitMock();
+  }, 1000);
+}
+const fmt = s => `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+function drawMockRun(){
+  const it = M.list[M.i], q = it.q, left = Math.max(0, Math.round((M.end-Date.now())/1000));
+  const answered = M.ans.filter(a=>a!==null).length;
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="mbar"><span class="timer num ${left<=60?"low":""}" id="mtime">${fmt(left)}</span>
+      <span class="muted num" style="font-size:13px;flex:1">Q ${M.i+1}/${M.list.length} · ${answered} answered</span>
+      <button class="btn sm" type="button" id="mpal">${M.showPal?"Hide":"All Qs"}</button></div>
+    ${LEAVE_TO ? `<div class="confirm"><b>Leave the test?</b><span>Your answers so far will be scored now.</span><div class="row"><button class="btn sm pri" type="button" id="lvy">Submit and leave</button><button class="btn sm" type="button" id="lvn">Stay</button></div></div>` : ""}
+    ${M.showPal ? `<div class="block"><div class="pal">${M.list.map((_,k)=>`<button type="button" data-j="${k}" class="${M.ans[k]!==null?"a":""} ${M.mark[k]?"m":""} ${k===M.i?"cur":""}" aria-label="Question ${k+1}">${k+1}</button>`).join("")}</div>
+      <p class="muted" style="font-size:12px;margin-top:8px">Filled = answered · orange line = marked for review</p></div>` : ""}
+    <article class="qcard"><div class="qmeta"><span class="qno">Q${M.i+1}</span><span class="tag">L${LNUM(q.t)}</span>${M.mark[M.i]?`<span class="tag pyq">Marked</span>`:""}</div>
+      <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {sel:M.ans[M.i], reveal:false})}</div></article>
+    <div class="row between"><button class="btn" type="button" id="mprev" ${M.i===0?"disabled":""}>‹ Prev</button>
+      <button class="btn ghost" type="button" id="mmark">${M.mark[M.i]?"Unmark":"Mark"}</button>
+      <button class="btn ghost" type="button" id="mclr" ${M.ans[M.i]===null?"disabled":""}>Clear</button>
+      <button class="btn ${M.i<M.list.length-1?"pri":""}" type="button" id="mnext" ${M.i===M.list.length-1?"disabled":""}>Next ›</button></div>
+    ${M.confirm ? `<div class="confirm"><b>Submit the test?</b><span>${M.list.length-answered} unanswered${M.mark.filter(Boolean).length?`, ${M.mark.filter(Boolean).length} marked for review`:""}.</span><div class="row"><button class="btn sm pri" type="button" id="msubY">Submit</button><button class="btn sm" type="button" id="msubN">Keep going</button></div></div>`
+      : `<button class="btn pri" type="button" id="msub">Submit test</button>`}
+  </section>`;
+  $("#app").querySelectorAll(".opt").forEach(b => b.onclick = () => { M.ans[M.i] = +b.dataset.oi; drawMockRun(); });
+  $("#mprev").onclick = () => { if (M.i>0){M.i--; drawMockRun();} };
+  $("#mnext").onclick = () => { if (M.i<M.list.length-1){M.i++; drawMockRun(); window.scrollTo(0,0);} };
+  $("#mmark").onclick = () => { M.mark[M.i] = !M.mark[M.i]; drawMockRun(); };
+  $("#mclr").onclick = () => { M.ans[M.i] = null; drawMockRun(); };
+  $("#mpal").onclick = () => { M.showPal = !M.showPal; drawMockRun(); };
+  $("#app").querySelectorAll("[data-j]").forEach(b => b.onclick = () => { M.i = +b.dataset.j; drawMockRun(); });
+  const s = $("#msub"); if (s) s.onclick = () => { M.confirm = true; drawMockRun(); };
+  const y = $("#msubY"); if (y) y.onclick = submitMock;
+  const n = $("#msubN"); if (n) n.onclick = () => { M.confirm = false; drawMockRun(); };
+  const lvy = $("#lvy"); if (lvy) lvy.onclick = () => { const t = LEAVE_TO; LEAVE_TO = null; submitMock(); go(t); };
+  const lvn = $("#lvn"); if (lvn) lvn.onclick = () => { LEAVE_TO = null; drawMockRun(); };
+}
+function showMockLeave(tab){ LEAVE_TO = tab; drawMockRun(); }
+function submitMock(){
+  if (!M || !M.running) return;
+  clearInterval(timerId);
+  M.running = false; M.done = true; M.confirm = false;
+  let c=0,w=0,sk=0; const per = {};
+  M.list.forEach((it,k) => {
+    const a = M.ans[k]; const t = it.q.t; per[t] = per[t] || {c:0,n:0}; per[t].n++;
+    if (a===null) sk++; else if (a===it.q.a) { c++; per[t].c++; S.ans[it.q.id]=1; } else { w++; S.ans[it.q.id]=0; }
+  });
+  const max = M.list.length*2, score = +(c*2 - (M.neg? w*0.5 : 0)).toFixed(1);
+  const used = Math.min(M.secs, Math.round((Date.now()-M.start)/1000));
+  M.res = {c,w,sk,score,max,used,per, acc: (c+w) ? Math.round(c*100/(c+w)) : 0};
+  const d = new Date(); const ds = d.toLocaleDateString("en-IN",{day:"numeric",month:"short"})+" "+d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
+  S.mocks = (S.mocks||[]).concat([{d:ds, n:M.list.length, score, max, acc:M.res.acc}]).slice(-20); save(); renderTop();
+  M.filter = "wrong";
+  if (TAB==="mock") drawMockResult();
+}
+function drawMockResult(){
+  const r = M.res;
+  const per = Object.keys(r.per).sort((a,b)=>LNUM(a)-LNUM(b)).map(t => `<div><span>L${LNUM(t)} · ${esc(L(t).title)}</span><span class="num">${r.per[t].c}/${r.per[t].n}</span></div>`).join("");
+  const rows = M.list.map((it,k)=>({it,k})).filter(({it,k}) => M.filter==="all" ? true : M.filter==="wrong" ? (M.ans[k]!==null && M.ans[k]!==it.q.a) : M.ans[k]===null);
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Result</span>
+    <div class="scorebig"><span class="num">${r.score}</span><span class="muted">/ ${r.max} marks</span></div></div>
+    <div class="kpis"><div class="kpi g"><span class="num">${r.c}</span><span>right</span></div><div class="kpi b"><span class="num">${r.w}</span><span>wrong</span></div><div class="kpi"><span class="num">${r.sk}</span><span>skipped</span></div><div class="kpi"><span class="num">${r.acc}%</span><span>accuracy</span></div></div>
+    <p class="muted num" style="font-size:13px">Time used ${fmt(r.used)} of ${fmt(M.secs)}</p>
+    <div class="block"><h3>By lesson</h3><div class="hist">${per}</div></div>
+    <div class="row between"><button class="btn" type="button" id="mnew">New test</button><button class="btn pri" type="button" id="mretry">Retake same questions</button></div>
+    <h2>Review</h2>
+    <div class="chips">${[["wrong",`Wrong ${r.w}`],["skip",`Skipped ${r.sk}`],["all",`All ${M.list.length}`]].map(c=>`<button class="chip" type="button" data-rf="${c[0]}" aria-pressed="${M.filter===c[0]}">${c[1]}</button>`).join("")}</div>
+    <div class="stack">${rows.length ? rows.map(({it,k}) => `<article class="qcard">${metaHTML(it.q, "Q"+(k+1))}<p class="qt">${esc(it.q.q)}</p><div class="opts">${optsHTML(it.q, it.perm, {picked:M.ans[k], reveal:true})}</div>${M.ans[k]===null?`<div class="exp"><b class="nol">Skipped. Answer: ${esc(it.q.o[it.q.a])}.</b> ${esc(it.q.e)}</div>`:expHTML(it.q, M.ans[k])}</article>`).join("") : `<p class="empty">Nothing in this list.</p>`}</div>
+  </section>`;
+  bindBM($("#app"));
+  $("#app").querySelectorAll("[data-rf]").forEach(b => b.onclick = () => { M.filter = b.dataset.rf; drawMockResult(); });
+  $("#mnew").onclick = () => { M = null; renderMock(); };
+  $("#mretry").onclick = () => {
+    const list = M.list.map(it=>({q:it.q, perm:makePerm(it.q)}));
+    M = { running:true, list, ans:list.map(()=>null), mark:list.map(()=>false), i:0, neg:MCFG.neg, secs:list.length*36, start:Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000; startTimer(); drawMockRun();
+  };
+}
+
+/* ============================================================
+   REVISE
+   ============================================================ */
+let RV = "who", FC = null, FCSCOPE = "all", CATF = "all", HIDE = {name:1, post:0, note:0}, CREV = {}, CORDER = null, BHIDE = 1, BREV = {};
+function renderRevise(){
+  const tabs = [["who","Who's who"],["bodies","Body types"],["finder","Search"],["firsts","Firsts"],["nums","Numbers & pairs"],["links","Links"],["tricks","Tricks"],["traps","Traps"],["flash","Flashcards"]];
+  if (!tabs.some(t=>t[0]===RV)) RV = "who";
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Last-day revision</span><h1>Revise</h1></div>
+    <div class="seg" role="tablist">${tabs.map(t=>`<button type="button" role="tab" data-rv="${t[0]}" aria-selected="${RV===t[0]}">${t[1]}</button>`).join("")}</div>
+    <div id="rv" class="stack"></div></section>`;
+  $("#app").querySelectorAll("[data-rv]").forEach(b => b.onclick = () => { RV = b.dataset.rv; renderRevise(); });
+  const on = $(`.seg [aria-selected="true"]`); if (on) on.scrollIntoView({block:"nearest", inline:"center"});
+  const box = $("#rv");
+  const catSel = `<select id="catf" aria-label="Category"><option value="all">All categories</option>${CATS.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("")}</select>`;
+  const bindCat = () => { const s=$("#catf"); if(!s) return; s.value = CATF; s.onchange = e => { CATF = e.target.value; CORDER = null; renderRevise(); }; };
+  if (RV === "who") {
+    const base = APPTS.map((_,i)=>i).filter(i => CATF==="all" || APPTS[i][2]===CATF), order = CORDER || base;
+    const LBL = {post:"Post", name:"Person", note:"Note"};
+    const cell = (k, col, v, bold) => (HIDE[col] && !CREV[k+col] && v!=="—") ? `<td data-l="${LBL[col]}"><button type="button" class="peek" data-peek="${k+col}" aria-label="Show ${LBL[col]}">tap</button></td>` : `<td data-l="${LBL[col]}">${bold?"<b>":""}${esc(v)}${bold?"</b>":""}</td>`;
+    box.innerHTML = `<p class="muted">Cover drill for all ${APPTS.length} appointments. Hide the person (or the post), say it aloud, tap to check. Shuffle so the order stops helping.</p><div class="row">${catSel}</div>
+      <div class="chips" role="group" aria-label="Hide columns">${[["name","Hide person"],["post","Hide post"],["note","Hide note"]].map(c=>`<button type="button" class="chip" data-hide="${c[0]}" aria-pressed="${!!HIDE[c[0]]}">${c[1]}</button>`).join("")}
+      <button type="button" class="chip" id="cshuf">${CORDER?"In order":"Shuffle rows"}</button><button type="button" class="chip" id="creset">Cover all again</button></div>
+      <div class="block"><div class="tbl"><table class="cover"><thead><tr><th>Post</th><th>Person</th><th>Note</th></tr></thead><tbody>${order.map(k=>{ const a = APPTS[k];
+        return `<tr>${cell(k,"post",a[0],1)}${cell(k,"name",a[1])}${cell(k,"note",a[3])}</tr>`; }).join("")}</tbody></table></div></div>`;
+    bindCat();
+    box.querySelectorAll("[data-hide]").forEach(b => b.onclick = () => { const c=b.dataset.hide; HIDE[c] = HIDE[c]?0:1; renderRevise(); });
+    box.querySelectorAll("[data-peek]").forEach(b => b.onclick = () => { CREV[b.dataset.peek] = 1; renderRevise(); });
+    $("#cshuf").onclick = () => { CORDER = CORDER ? null : shuffle(base.slice()); renderRevise(); };
+    $("#creset").onclick = () => { CREV = {}; renderRevise(); };
+  }
+  if (RV === "bodies") {
+    const groups = ["Constitutional","Statutory","Executive","Not constitutional"];
+    box.innerHTML = `<p class="muted">Constitutional, statutory or executive — and the Article or Act behind each. ${BHIDE?"Tap a cell to reveal the basis.":""}</p>
+      <div class="chips"><button type="button" class="chip" id="bh" aria-pressed="${!!BHIDE}">Hide Article / Act</button><button type="button" class="chip" id="br">Cover all again</button></div>
+      <div class="pubs">${groups.map(g=>{ const list = BODIES.map((b,i)=>[b,i]).filter(x=>x[0][1]===g); if(!list.length) return ""; return `<div class="block"><h3>${g} <span class="muted num" style="font-size:13px;font-weight:600">· ${list.length}</span></h3><ul class="plist">${list.map(([b,i])=>`<li><b>${esc(b[0])}</b><span>${BHIDE && !BREV[i] ? `<button type="button" class="peek" data-bp="${i}">tap</button>` : esc(b[2])}</span></li>`).join("")}</ul></div>`; }).join("")}</div>`;
+    $("#bh").onclick = () => { BHIDE = BHIDE?0:1; renderRevise(); };
+    $("#br").onclick = () => { BREV = {}; renderRevise(); };
+    box.querySelectorAll("[data-bp]").forEach(b => b.onclick = () => { BREV[b.dataset.bp]=1; renderRevise(); });
+  }
+  if (RV === "finder") {
+    box.innerHTML = `<input class="search" id="fs" type="search" placeholder="Search a name, post or clue (e.g. Garg, first woman, 26th)" aria-label="Search appointments">
+      <div class="block"><div class="tbl"><table><thead><tr><th>Post</th><th>Person</th><th>Category</th><th>Note</th></tr></thead><tbody id="fb"></tbody></table></div></div>`;
+    const draw = () => { const q = $("#fs").value.trim().toLowerCase();
+      const rows = APPTS.filter(f => !q || f.join(" ").toLowerCase().includes(q));
+      $("#fb").innerHTML = rows.length ? rows.map(f=>`<tr><td><b>${esc(f[0])}</b><br><span class="muted" style="font-size:12px">L${LNUM(f[4])}</span></td><td>${esc(f[1])}</td><td>${esc(f[2])}</td><td>${esc(f[3])}</td></tr>`).join("") : `<tr><td colspan="4" class="muted">No match.</td></tr>`; };
+    $("#fs").oninput = draw; draw();
+  }
+  if (RV === "firsts") {
+    const t = LESSONS.find(l=>l.id==="L13").blocks.find(b=>b.k==="table");
+    box.innerHTML = `<p class="muted">Every 'first' from the lectures — cover the right side and recall.</p><div class="block"><dl class="rk">${t.rows.map(r=>`<div><dt>${esc(r[0])}</dt><dd><b style="color:var(--ink)">${esc(r[1])}</b></dd></div>`).join("")}</dl></div>`;
+  }
+  if (RV === "links") {
+    const items = LESSONS.flatMap((l,i) => l.blocks.filter(b=>b.k==="link").map(b=>({l:i+1, t:l.title, h:b.h})));
+    box.innerHTML = items.map(x => `<div class="link"><span class="lab">L${x.l} · ${esc(x.t)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "nums") {
+    box.innerHTML = `<div class="tiles">${TILES.map(t=>`<div class="tile"><span class="num">${t[0]}</span><span>${t[1]}</span></div>`).join("")}</div>
+    <div class="block"><h3>Confusing pairs</h3><dl class="rk">${PAIRS.map(p=>`<div><dt>${esc(p[0])}</dt><dd>${esc(p[1])}</dd></div>`).join("")}</dl></div>`;
+  }
+  if (RV === "tricks" || RV === "traps") {
+    const kind = RV==="tricks" ? "trick" : "trap";
+    const items = LESSONS.flatMap((l,i) => l.blocks.filter(b=>b.k===kind).map(b=>({l:i+1, t:l.title, h:b.h})));
+    box.innerHTML = items.map(x => `<div class="${kind}"><span class="lab">L${x.l} · ${esc(x.t)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "flash") drawFlash(box);
+}
+function drawFlash(box){
+  if (!FC) { const pool = FCSCOPE==="all" ? QS : FCSCOPE==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===FCSCOPE); FC = {list: shuffle(pool), i:0, flip:false, known:0}; }
+  const sel = `<select id="fcs" aria-label="Flashcard set"><option value="all">All questions</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}">L${i+1} · ${esc(l.title)}</option>`).join("")}</select>`;
+  if (!FC.list.length || FC.i >= FC.list.length) {
+    box.innerHTML = `<div class="row">${sel}</div><div class="block stack"><h3>${FC.list.length ? "Deck finished" : "No cards in this set"}</h3>${FC.list.length?`<p class="muted">You knew ${FC.known} of ${FC.list.length} on first look.</p>`:""}<div class="row"><button class="btn pri" type="button" id="fcr">Shuffle and restart</button></div></div>`;
+    $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+    $("#fcr").onclick = () => { FC = null; drawFlash(box); }; return;
+  }
+  const q = FC.list[FC.i];
+  box.innerHTML = `<div class="row between">${sel}<span class="muted num" style="font-size:13px">${FC.i+1}/${FC.list.length}</span></div>
+    <button type="button" class="flash" id="fcard" aria-label="Flip card">
+      <span class="side">${FC.flip?"Answer":"Question · tap to flip"}</span>
+      <span class="front">${esc(q.q)}</span>
+      ${FC.flip ? `<span class="ans">${esc(q.o[q.a])}</span><span class="muted">${esc(q.e)}</span>` : ""}
+    </button>
+    <div class="row between"><button class="btn" type="button" id="fca" ${FC.flip?"":"disabled"}>Again later</button><button class="btn pri" type="button" id="fck" ${FC.flip?"":"disabled"}>Got it</button></div>`;
+  $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+  $("#fcard").onclick = () => { FC.flip = !FC.flip; drawFlash(box); };
+  $("#fca").onclick = () => { FC.list.push(q); FC.list.splice(FC.i,1); FC.flip=false; drawFlash(box); };
+  $("#fck").onclick = () => { FC.known++; FC.i++; FC.flip=false; drawFlash(box); };
+}
+
+/* boot */
+renderTop();
+const start = (location.hash||"").replace("#","");
+go(["learn","practice","mock","revise"].includes(start) ? start : "learn");
+</script>
+
+
+<style id="shabd-skin">
+/* ===== शब्दRegister skin: app colours + fonts (only when opened from the app) ===== */
+:root[data-skin="paper"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(150,128,90,.10) 31px, rgba(150,128,90,.10) 32px);--app-psize:auto;--app-card:#FFFCF6;--app-rule:#DCCFB2;--app-pri:#2F6F63;--app-ink:#221E17;--app-soft:#5E5547;--app-faint:#857B6A;--app-bg:#F3EEE3;--app-deep:#E9E1CF;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#F3EEE3;--sheet:#FFFCF6;--sunk:#E9E1CF;--ink:#221E17;--ink2:#5E5547;--rule:#DCCFB2;--blue:#2F6F63;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--accent:#A87E1F;--accent-bg:color-mix(in srgb, #A87E1F 16%, #FFFCF6);--good:#2F6F63;--good-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--bad:#8C2F39;--bad-bg:color-mix(in srgb, #8C2F39 14%, #FFFCF6);--warn-bg:color-mix(in srgb, #C99A2E 18%, #FFFCF6);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="paper"][data-theme="dark"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--sheet:#26211A;--sunk:#25201A;--ink:#EFE6D2;--ink2:#BDB195;--rule:#3B3429;--blue:#3F9A86;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3F9A86 22%, #26211A);--accent:#D9AE4B;--accent-bg:color-mix(in srgb, #D9AE4B 24%, #26211A);--good:#5FB9A3;--good-bg:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-bg:color-mix(in srgb, #D06B74 22%, #26211A);--warn-bg:color-mix(in srgb, #D9AE4B 26%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="paper"]:not([data-theme="light"]){--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--sheet:#26211A;--sunk:#25201A;--ink:#EFE6D2;--ink2:#BDB195;--rule:#3B3429;--blue:#3F9A86;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3F9A86 22%, #26211A);--accent:#D9AE4B;--accent-bg:color-mix(in srgb, #D9AE4B 24%, #26211A);--good:#5FB9A3;--good-bg:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-bg:color-mix(in srgb, #D06B74 22%, #26211A);--warn-bg:color-mix(in srgb, #D9AE4B 26%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin="indigo"]{--app-pattern:radial-gradient(rgba(61,92,240,.10) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#FFFFFF;--app-rule:#CBD3EC;--app-pri:#3D5CF0;--app-ink:#0F1B3D;--app-soft:#4A5680;--app-faint:#67739C;--app-bg:#EEF1FA;--app-deep:#E1E6F5;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#EEF1FA;--sheet:#FFFFFF;--sunk:#E1E6F5;--ink:#0F1B3D;--ink2:#4A5680;--rule:#CBD3EC;--blue:#3D5CF0;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3D5CF0 14%, #FFFFFF);--accent:#D9831A;--accent-bg:color-mix(in srgb, #D9831A 16%, #FFFFFF);--good:#147D53;--good-bg:color-mix(in srgb, #147D53 14%, #FFFFFF);--bad:#C8402F;--bad-bg:color-mix(in srgb, #C8402F 14%, #FFFFFF);--warn-bg:color-mix(in srgb, #F7C548 18%, #FFFFFF);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="indigo"][data-theme="dark"]{--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--sheet:#121D47;--sunk:#0E1839;--ink:#EEF2FF;--ink2:#A7B3DA;--rule:#22306A;--blue:#6F86FF;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #6F86FF 22%, #121D47);--accent:#F7B24D;--accent-bg:color-mix(in srgb, #F7B24D 24%, #121D47);--good:#45C08A;--good-bg:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-bg:color-mix(in srgb, #F07B6E 22%, #121D47);--warn-bg:color-mix(in srgb, #F7C548 26%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="indigo"]:not([data-theme="light"]){--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--sheet:#121D47;--sunk:#0E1839;--ink:#EEF2FF;--ink2:#A7B3DA;--rule:#22306A;--blue:#6F86FF;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #6F86FF 22%, #121D47);--accent:#F7B24D;--accent-bg:color-mix(in srgb, #F7B24D 24%, #121D47);--good:#45C08A;--good-bg:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-bg:color-mix(in srgb, #F07B6E 22%, #121D47);--warn-bg:color-mix(in srgb, #F7C548 26%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin] body{background-color:var(--app-bg);background-image:var(--app-pattern);background-size:var(--app-psize);background-attachment:fixed}
+:root[data-skin] h1,:root[data-skin] h2{letter-spacing:-.01em}
+
+/* ===== Desktop layout (PC / tablet landscape) ===== */
+@media (min-width: 1024px){
+  :root{--side:236px}
+  body{padding-left:var(--side);font-size:16.5px}
+  .top{border-bottom:1px solid var(--rule)}
+  .top-in{max-width:1320px;padding:16px 36px}
+  .brand{font-size:21px}
+  .brand small{font-size:13px}
+  .stat{font-size:13px}
+  .wrap{max-width:1320px;padding:0 36px 56px}
+  .view{padding-top:28px}
+  h1{font-size:34px} h2{font-size:22px} h3{font-size:17px}
+
+  /* bottom tab bar becomes a left sidebar */
+  .nav{top:0;bottom:0;left:0;right:auto;width:var(--side);height:auto;border-top:0;border-right:1px solid var(--rule);padding:84px 14px 20px;display:block;overflow:auto}
+  .nav-in{display:flex;flex-direction:column;gap:4px;height:auto;max-width:none;margin:0}
+  .nav-in::before{content:"Sections";display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);padding:0 14px 8px}
+  .nav button{flex-direction:row;justify-content:flex-start;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;font-size:15px;min-height:0;height:auto;width:100%;text-align:left}
+  .nav button svg{width:20px;height:20px;flex-shrink:0}
+  .nav button:hover{background:var(--sunk)}
+  .nav button[aria-current="page"]{background:var(--blue-bg)}
+  .nav button[aria-current="page"] span{border-bottom:0!important}
+
+  /* home: intro beside progress, lessons as a card grid */
+  .hero{grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);column-gap:48px;align-items:end;padding-bottom:10px}
+  .hero > .eyebrow,.hero > h1,.hero > p{grid-column:1}
+  .hero > .meter{grid-column:2;grid-row:3;align-self:center}
+  .hero > .row{grid-column:2;grid-row:2;align-self:end}
+  .lessons{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;border-top:0}
+  .les{background:var(--sheet);border:1px solid var(--rule);border-radius:16px;padding:16px 18px;transition:transform .15s ease,box-shadow .15s ease,border-color .15s}
+  .les:hover{transform:translateY(-2px);border-color:var(--blue);box-shadow:0 14px 30px -22px rgba(0,0,0,.45)}
+  .les.next{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
+
+  /* lesson reader: facts, timelines, tricks sit side by side */
+  .lhead{margin-bottom:0}
+  .steps{max-width:640px}
+  .steps + .stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+  .steps + .stack > .plain,.steps + .stack > .row,.steps + .stack > p,.steps + .stack > .fig,.steps + .stack > h2,.steps + .stack > .tbl{grid-column:1/-1}
+  .steps + .stack > .plain{max-width:86ch;font-size:17px}
+  .steps + .stack:not(:has(> .block ~ .block)) > .block{grid-column:1/-1}
+  .block,.qcard{padding:18px 20px;border-radius:14px}
+
+  /* quizzes and question bank */
+  #lq > .stack{display:grid;grid-template-columns:minmax(0,1fr);max-width:980px;gap:16px}
+  .opts{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .qt{font-size:18px}
+  #plist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #plist .opts{grid-template-columns:minmax(0,1fr)}
+  .chips{flex-wrap:wrap;overflow:visible}
+
+  /* mock test: question with the answer grid alongside */
+  .mbar{top:calc(env(safe-area-inset-top,0px) + 67px)}
+  .view > .qcard{max-width:1000px}
+  .view > .row.between{max-width:1000px}
+  .view > #msub{max-width:1000px;width:100%}
+  .view > .block.stack{max-width:760px}
+  .pal{grid-template-columns:repeat(auto-fill,minmax(46px,1fr))}
+  .kpis{max-width:760px}
+
+  /* revise: cards in columns */
+  #rkl,#rv > .stack:not(#rkl){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #rv > .search{max-width:520px}
+  .tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .flash{min-height:300px;max-width:760px;margin:0 auto;padding:32px 36px}
+  .flash .front{font-size:22px}
+}
+@media (min-width: 1500px){
+  #plist,#rkl{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+</style>
+</body></html>
