@@ -885,17 +885,30 @@
   .home-wotd p{ margin:0; color:var(--ink-soft); font-size:14.5px; line-height:1.45; }
   .home-wotd .home-hi{ color:var(--ink); font-family:var(--font-hindi); }
   .home-wotd .hub-meta b, .home-cont .hub-meta b{ color:var(--hub-c, var(--teal)); }
-  @media (min-width: 720px){
-    .hub-subs{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); grid-auto-flow:row dense; column-gap:14px; }
-    .hub-subs .hub-sub{ grid-column:span min(var(--n), 2); }
-    .hub-subs .hub-sub .hub-grid{ grid-template-columns:repeat(min(var(--n), 2), minmax(0, 1fr)); }
-  }
-  @media (min-width: 1100px){
-    .hub-subs{ grid-template-columns:repeat(3, minmax(0, 1fr)); }
-    .hub-subs .hub-sub{ grid-column:span var(--n); }
-    .hub-subs .hub-sub .hub-grid{ grid-template-columns:repeat(var(--n), minmax(0, 1fr)); }
-  }
   .home-tools{ display:grid; grid-template-columns:repeat(6, minmax(0, 1fr)); gap:10px; }
+  /* subject tiles + one row per subject */
+  .subj-tiles{ display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:10px; }
+  .subj-tile{ display:flex; flex-direction:column; align-items:flex-start; gap:1px; padding:13px 14px 12px; background:var(--card); border:1px solid var(--rule); border-radius:var(--radius-lg); color:var(--ink); font:inherit; text-align:left; cursor:pointer; box-shadow:var(--shadow); transition:transform .15s ease, border-color .15s ease; min-width:0; }
+  .subj-tile:hover{ transform:translateY(-2px); border-color:var(--ink-faint); }
+  .subj-tile .ic{ font-size:22px; margin-bottom:6px; }
+  .subj-tile b{ font-size:14.5px; }
+  .subj-tile small{ font-size:12px; color:var(--ink-faint); }
+  .subj-tile .bar{ display:block; width:100%; height:5px; border-radius:5px; background:var(--rule); overflow:hidden; margin:9px 0 6px; }
+  .subj-tile .bar i{ display:block; height:100%; background:var(--teal); border-radius:5px; }
+  .subj-tile em{ font-style:normal; font-size:11.5px; font-weight:600; color:var(--ink-soft); }
+  .subj-tile.empty{ cursor:default; box-shadow:none; background:transparent; border-style:dashed; opacity:.7; }
+  .subj-tile.empty em{ margin-top:auto; padding-top:9px; color:var(--ink-faint); }
+  .hub-sub{ margin-top:26px; scroll-margin-top:80px; }
+  .hub-sub-h{ align-items:center; flex-wrap:wrap; }
+  .hub-sub-h .sub-ico{ font-size:20px; color:inherit; }
+  .hub-sub-h .sub-prog{ margin-left:auto; display:flex; align-items:center; gap:8px; font-weight:600; color:var(--ink-soft); }
+  .hub-sub-h .sub-prog i{ display:block; width:90px; height:5px; border-radius:5px; background:var(--rule); overflow:hidden; }
+  .hub-sub-h .sub-prog i b{ display:block; height:100%; background:var(--teal); }
+  @media (min-width: 1100px){ .subj-tiles{ grid-template-columns:repeat(9, minmax(0, 1fr)); } .subj-tile{ padding:12px 11px 11px; } }
+  @media (min-width: 1000px){ #homeBody .hub-grid{ grid-template-columns:repeat(3, minmax(0, 1fr)); } }
+  @media (max-width: 860px){ .subj-tiles{ grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; } .subj-tile{ padding:10px; } .subj-tile em{ font-size:10.5px; } .hub-sub-h .sub-prog i{ width:60px; } }
+  @media (max-width: 460px){ .subj-tile .ic{ font-size:19px; margin-bottom:3px; } .subj-tile b{ font-size:13px; } .subj-tile small{ font-size:10.5px; } .subj-tile .bar{ margin:6px 0 4px; } }
+  @media (max-width: 340px){ .subj-tiles{ grid-template-columns:repeat(2, minmax(0, 1fr)); } }
   .home-tools button{ display:flex; flex-direction:column; align-items:flex-start; gap:2px; padding:14px; background:var(--card); border:1px solid var(--rule); border-radius:var(--radius-lg); color:var(--ink); font:inherit; cursor:pointer; text-align:left; box-shadow:var(--shadow); transition:transform .15s ease, border-color .15s ease; min-width:0; }
   .home-tools button:hover{ border-color:var(--ink-faint); transform:translateY(-2px); }
   .home-tools .ic{ font-size:22px; margin-bottom:6px; }
@@ -1560,6 +1573,8 @@
     appointments:{ title: 'Appointments 2026',          file: 'study-appointments.html', key: 'appointments_workbook_v1' },
     polity:   { title: 'Indian Polity',                file: 'study-polity.html',       key: 'polity_pyq_workbook_v1' },
     economics:{ title: 'Indian Economy',               file: 'study-economics.html',    key: 'economics_pyq_workbook_v1' },
+    physics:  { title: 'Physics',                      file: 'study-physics.html',      key: 'physics_pyq_workbook_v1' },
+    biology:  { title: 'Biology',                      file: 'study-biology.html',      key: 'biology_pyq_workbook_v1' },
     space:    { title: 'Space & ISRO Missions',              file: 'study-space.html',        key: 'space_missions_workbook_v1' }
   };
   STUDY.grammar.subj = 'english'; STUDY.grammar.ico = '✍️'; STUDY.grammar.hi = 'व्याकरण · error spotting'; STUDY.grammar.desc = '100 rules with logic, tricks and examples; unit tests after every 10 rules; revise and mistakes lists.'; STUDY.grammar.meta = '100 rules · unit tests'; STUDY.grammar.color = '#C8402F';
@@ -1576,6 +1591,8 @@
   STUDY.polity.subj = 'gs'; STUDY.polity.ico = '📜'; STUDY.polity.hi = 'भारतीय राजव्यवस्था · PYQ'; STUDY.polity.desc = 'The whole Constitution the SSC way — Parts, Schedules, key Articles, President to Parliament, emergencies and amendments.'; STUDY.polity.meta = '20 lessons · 481 questions'; STUDY.polity.color = '#3A4F9A';
   STUDY.economics.subj = 'gs'; STUDY.economics.ico = '💹'; STUDY.economics.hi = 'भारतीय अर्थव्यवस्था · PYQ'; STUDY.economics.desc = 'Demand to GDP, inflation, RBI & banking, budget, GST, 1991 reforms and trade — built from past SSC questions.'; STUDY.economics.meta = '20 lessons · 530 questions'; STUDY.economics.color = '#1E7A8C';
   STUDY.space.subj = 'gs'; STUDY.space.ico = '🚀'; STUDY.space.hi = 'अंतरिक्ष मिशन · Science & Tech'; STUDY.space.desc = 'Orbits, rockets and ISRO centres; Chandrayaan, Aditya-L1, Gaganyaan, NISAR and the 2024–26 launches.'; STUDY.space.meta = '16 lessons · 374 questions'; STUDY.space.color = '#5B45B0';
+  STUDY.physics.subj = 'gs'; STUDY.physics.ico = '🔭'; STUDY.physics.hi = 'भौतिकी · PYQ'; STUDY.physics.desc = 'SI units, motion, Newton’s laws, gravitation, pressure, heat, sound, mirrors, lenses and the human eye.'; STUDY.physics.meta = '16 lessons · 321 questions'; STUDY.physics.color = '#C4572A';
+  STUDY.biology.subj = 'gs'; STUDY.biology.ico = '🧬'; STUDY.biology.hi = 'जीव विज्ञान · PYQ'; STUDY.biology.desc = 'Cell to classification, vitamins, human body systems, hormones, plants, genetics and diseases.'; STUDY.biology.meta = '24 lessons · 461 questions'; STUDY.biology.color = '#3E8A4F';
   // General Studies is split by subject in पाठShala
   var GS_SUBJECTS = [
     ['history', 'History', 'इतिहास'], ['culture', 'Art & Culture', 'कला एवं संस्कृति'], ['polity', 'Polity', 'राजव्यवस्था'],
@@ -1585,7 +1602,8 @@
   STUDY.bns.gsub = 'polity'; STUDY.schemes.gsub = 'economy'; STUDY.iprplans.gsub = 'economy'; STUDY.census.gsub = 'geography';
   STUDY.festivals.gsub = 'culture'; STUDY.folkdances.gsub = 'culture'; STUDY.sports.gsub = 'staticgk'; STUDY.intlorgs.gsub = 'staticgk';
   STUDY.reports.gsub = 'current'; STUDY.appointments.gsub = 'current';
-  STUDY.polity.core = STUDY.economics.core = 1;
+  STUDY.polity.core = STUDY.economics.core = 1; STUDY.physics.core = 2; STUDY.biology.core = 1;
+  STUDY.physics.gsub = 'science'; STUDY.biology.gsub = 'science';
   STUDY.polity.gsub = 'polity'; STUDY.economics.gsub = 'economy'; STUDY.space.gsub = 'science';
   var studyOpen = null, studyWatch = null, studyPushTimer = null, studyLast = null;
   function agoText(ms){
@@ -1715,6 +1733,32 @@
       '<div class="hub-stats"><span><b>' + ve.length + '</b> words</span><span><b>' + mem + '</b> memorized</span>' + (due ? '<span class="hub-wrong"><b>' + due + '</b> due</span>' : '') + '</div>' +
       '<div class="hub-meta"><span>Library · Spelling Bank · Roots</span><b>Open ›</b></div></button>';
   }
+  var SUBJ_ICO = { english: '🔤', history: '🏺', culture: '🎭', polity: '⚖️', geography: '🗺️', economy: '💰', science: '🔬', staticgk: '📚', current: '📰', other: '📘' };
+  function subjIds(key){
+    return gsIds().filter(function(id){ return (STUDY[id].gsub || 'other') === key; }).sort(function(a, b){ return (STUDY[b].core || 0) - (STUDY[a].core || 0); });
+  }
+  function subjProgress(list){
+    var done = 0, total = 0, tried = 0, right = 0;
+    list.forEach(function(id){ var p = studyProgress(id); done += p.done; total += p.total; tried += p.tried; right += p.right; });
+    return { pct: total ? Math.round(done * 100 / total) : 0, done: done, total: total, tried: tried, acc: tried ? Math.round(right * 100 / tried) : null };
+  }
+  /** One tile per subject: how far along it is; tap to jump to its row. */
+  function homeSubjects(){
+    var en = ['grammar'], ve = viewEntries(), mem = ve.filter(function(e){ return e.confidence >= 5; }).length;
+    var gp = subjProgress(en), vocPct = ve.length ? Math.round(mem * 100 / ve.length) : 0;
+    var tiles = [{ key: 'english', name: 'English', hi: 'अंग्रेज़ी', n: 2, pct: Math.round((gp.pct + vocPct) / 2), acc: gp.acc, jump: 'english' }];
+    GS_SUBJECTS.forEach(function(g){
+      var list = subjIds(g[0]);
+      var sp = subjProgress(list);
+      tiles.push({ key: g[0], name: g[1], hi: g[2], n: list.length, pct: sp.pct, acc: sp.acc, jump: list.length ? g[0] : '' });
+    });
+    return '<section class="hub-sec"><div class="hub-sec-h"><h2>Your subjects</h2><span>विषय · tap one to jump to its apps</span></div><div class="subj-tiles">' +
+      tiles.map(function(t){
+        if(!t.n) return '<div class="subj-tile empty"><span class="ic">' + SUBJ_ICO[t.key] + '</span><b>' + t.name + '</b><small>' + t.hi + '</small><em>No app yet</em></div>';
+        return '<button class="subj-tile" data-hub-jump="' + t.jump + '"><span class="ic">' + SUBJ_ICO[t.key] + '</span><b>' + t.name + '</b><small>' + t.hi + '</small>' +
+          '<span class="bar"><i style="width:' + t.pct + '%"></i></span><em>' + t.pct + '% · ' + t.n + ' app' + (t.n === 1 ? '' : 's') + '</em></button>';
+      }).join('') + '</div></section>';
+  }
   function renderHub(){
     var box = document.getElementById('homeBody');
     if(!box) return;
@@ -1722,19 +1766,19 @@
     box.innerHTML = homeHero() +
       '<div class="home-row1">' + homeTodayCard() + homeContinueCard() + '</div>' +
       '<div class="home-row2">' + homeDueCard() + '</div>' +
+      homeSubjects() +
       hubPracticeSection() +
-      '<section class="hub-sec"><div class="hub-sec-h"><h2>English</h2><span>अंग्रेज़ी</span></div><div class="hub-grid">' + homeVocabCard() + ids.filter(function(id){ return STUDY[id].subj === 'english'; }).map(hubCard).join('') + '</div></section>' +
-      '<section class="hub-sec" id="homeGs"><div class="hub-sec-h"><h2>General Studies</h2><span>सामान्य अध्ययन · ' + gsIds().length + ' mini apps</span></div>' +
-        '<div class="hub-jump">' + GS_SUBJECTS.filter(function(g){ return gsIds().some(function(id){ return STUDY[id].gsub === g[0]; }); }).map(function(g){
-          var n = gsIds().filter(function(id){ return STUDY[id].gsub === g[0]; }).length;
-          return '<button data-hub-jump="' + g[0] + '">' + g[1] + ' <small>' + n + '</small></button>';
-        }).join('') + '</div><div class="hub-subs">' +
+      '<section class="hub-sec hub-sub" id="hubsub-english"><div class="hub-sec-h"><h2>English</h2><span>अंग्रेज़ी</span></div><div class="hub-grid">' + homeVocabCard() + ids.filter(function(id){ return STUDY[id].subj === 'english'; }).map(hubCard).join('') + '</div></section>' +
+      '<section class="hub-sec" id="homeGs"><div class="hub-sec-h"><h2>General Studies</h2><span>सामान्य अध्ययन · ' + gsIds().length + ' mini apps in ' + GS_SUBJECTS.filter(function(g){ return subjIds(g[0]).length; }).length + ' subjects</span></div>' +
         GS_SUBJECTS.concat([['other', 'More', 'अन्य']]).map(function(g){
-          var list = gsIds().filter(function(id){ return (STUDY[id].gsub || 'other') === g[0]; }).sort(function(a, b){ return (STUDY[b].core ? 1 : 0) - (STUDY[a].core ? 1 : 0); });
+          var list = subjIds(g[0]);
           if(!list.length) return '';
-          return '<div class="hub-sub" id="hubsub-' + g[0] + '" style="--n:' + Math.min(3, list.length) + ';"><div class="hub-sub-h"><h3>' + g[1] + '</h3><span>' + g[2] + '</span></div><div class="hub-grid">' + list.map(hubCard).join('') + '</div></div>';
+          var sp = subjProgress(list);
+          return '<div class="hub-sub" id="hubsub-' + g[0] + '"><div class="hub-sub-h"><span class="sub-ico">' + (SUBJ_ICO[g[0]] || '📘') + '</span><h3>' + g[1] + '</h3><span>' + g[2] + '</span>' +
+            '<span class="sub-prog"><i><b style="width:' + sp.pct + '%"></b></i>' + list.length + ' app' + (list.length === 1 ? '' : 's') + ' · ' + sp.pct + '% done</span></div>' +
+            '<div class="hub-grid">' + list.map(hubCard).join('') + '</div></div>';
         }).join('') +
-      '</div></section>';
+      '</section>';
   }
   function renderVocabDash(){
     var box = document.getElementById('vocabDash');
@@ -1956,6 +2000,8 @@
   STUDY.polity.lessons = 20; STUDY.polity.unit = 'lessons';
   STUDY.economics.lessons = 20; STUDY.economics.unit = 'lessons';
   STUDY.space.lessons = 16; STUDY.space.unit = 'lessons';
+  STUDY.physics.lessons = 16; STUDY.physics.unit = 'lessons';
+  STUDY.biology.lessons = 24; STUDY.biology.unit = 'lessons';
   function gsIds(){ return Object.keys(STUDY).filter(function(id){ return STUDY[id].subj === 'gs'; }); }
   var STUDY_EXTRA = { mocks: { key: 'shabdMockHistory', title: 'Mixed mock history' } };
   function studyMod(id){ return STUDY[id] || STUDY_EXTRA[id]; }
@@ -2042,7 +2088,7 @@
 
   // ---- the practice / mock screen ----
   var drill = null, drillOpen = false, drillTimer = null;
-  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments', polity: 'Polity', economics: 'Economy', space: 'Space' };
+  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments', polity: 'Polity', economics: 'Economy', space: 'Space', physics: 'Physics', biology: 'Biology' };
   function openDrill(title){
     closeAllMenus();
     drillOpen = true;

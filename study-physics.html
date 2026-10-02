@@ -1,0 +1,1492 @@
+<!doctype html><html><head><meta charset=utf8>
+<script>
+/* शब्दRegister bridge: follows the app's look (Paper / Indigo) and Light / Dark / Auto choice. */
+(function(){
+  var root = document.documentElement;
+  function theme(t){ if(t === 'dark' || t === 'light') root.setAttribute('data-theme', t); else root.removeAttribute('data-theme'); }
+  function skin(s){ if(s === 'paper' || s === 'indigo') root.setAttribute('data-skin', s); }
+  try{
+    var q = new URLSearchParams(location.search);
+    theme(q.get('theme'));
+    skin(q.get('skin') || (q.get('embed') ? 'paper' : ''));
+    if(q.get('embed')) root.classList.add('in-shabd');
+  }catch(e){}
+  window.addEventListener('message', function(e){
+    if(e.origin !== location.origin || !e.data || e.data.type !== 'shabd-theme') return;
+    theme(e.data.theme);
+    if(e.data.skin) skin(e.data.skin);
+  });
+})();
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap">
+<meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Physics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<style>
+/* Layout: Physics PYQ Workbook — follows the शब्दRegister Paper / Indigo look; one column + bottom tabs on phones, sidebar on PC. */
+:root{
+  --paper:#f6f3ea; --sheet:#fffdf7; --sunk:#ebe6d8;
+  --ink:#1d2a22; --ink2:#56625a; --rule:#dcd5c3;
+  --blue:#1f5c3d; --on-blue:#ffffff; --blue-bg:#dcebdf;
+  --accent:#b4530f; --accent-bg:#fbe7d3;
+  --good:#1b7547; --good-bg:#dff1e6; --bad:#b0271f; --bad-bg:#f8e1de;
+  --warn-bg:#fff2d2;
+  --f-display:"Fraunces", "Tiro Devanagari Hindi", Georgia, serif;
+  --f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-num:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r:10px; --nav-h:64px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#111612; --sheet:#1a211c; --sunk:#222b25;
+  --ink:#e8eee9; --ink2:#a3b0a7; --rule:#2f3a33;
+  --blue:#86cfa2; --on-blue:#111612; --blue-bg:#1d3a29;
+  --accent:#f3a764; --accent-bg:#3b2614;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#111612; --sheet:#1a211c; --sunk:#222b25;
+  --ink:#e8eee9; --ink2:#a3b0a7; --rule:#2f3a33;
+  --blue:#86cfa2; --on-blue:#111612; --blue-bg:#1d3a29;
+  --accent:#f3a764; --accent-bg:#3b2614;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
+.wrap{max-width:640px;margin:0 auto;padding-inline:16px;padding-block:0 calc(var(--nav-h) + 28px + env(safe-area-inset-bottom,0px))}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);border-bottom:1px solid var(--rule)}
+.top-in{max-width:640px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px}
+.brand{font-family:var(--f-display);font-weight:800;font-size:17px;line-height:1.2;flex:1;min-width:0}
+.brand small{display:block;font-family:var(--f-body);font-weight:500;font-size:12px;color:var(--ink2);letter-spacing:.02em}
+.stat{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right;white-space:nowrap}
+.stat b{color:var(--ink);font-weight:600}
+
+/* bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--sheet);border-top:1px solid var(--rule);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);height:var(--nav-h)}
+.nav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer}
+.nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav button[aria-current="page"]{color:var(--blue)}
+.nav button[aria-current="page"] span{border-bottom:2px solid var(--blue)}
+
+/* type */
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.25;margin:0}
+h1{font-size:24px;font-weight:800}
+h2{font-size:19px;font-weight:800}
+h3{font-size:16px;font-weight:700}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--ink2)}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+p{margin:0}
+.stack{display:flex;flex-direction:column;gap:14px}
+.view{padding-top:18px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--rule);background:var(--sheet);font-weight:600;cursor:pointer;text-decoration:none}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:var(--on-blue)}
+.btn.ghost{background:transparent}
+.btn.sm{min-height:36px;padding:0 14px;font-size:14px}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.end{justify-content:flex-end}
+.row.between{justify-content:space-between}
+
+/* hero */
+.hero{display:grid;gap:10px;padding:4px 0 6px}
+.hero p{color:var(--ink2)}
+.meter{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--blue);border-radius:99px}
+
+/* lesson list */
+.lessons{display:flex;flex-direction:column;border-top:1px solid var(--rule)}
+.les{display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;padding:14px 2px;border-bottom:1px solid var(--rule);background:none;border-left:0;border-right:0;border-top:0;text-align:left;cursor:pointer;width:100%}
+.les .no{font-family:var(--f-num);font-weight:600;font-size:15px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--rule);color:var(--ink2)}
+.les.done .no{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.les .t{min-width:0}
+.les .t b{display:block;font-weight:700;font-size:16px;line-height:1.3}
+.les .t span{font-size:13px;color:var(--ink2)}
+.les .sc{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right}
+.les.next .no{border-color:var(--blue);color:var(--blue)}
+
+/* lesson reader */
+.lhead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.back{background:none;border:0;padding:8px 8px 8px 0;cursor:pointer;color:var(--blue);font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0 4px}
+.steps button{border:1px solid var(--rule);background:var(--sheet);border-radius:8px;padding:8px 4px;font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer}
+.steps button[aria-current="step"]{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.block{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;min-width:0}
+.block h3{margin-bottom:8px}
+.block p + p{margin-top:8px}
+.plain{padding:0 2px}
+.facts{display:grid;gap:0}
+.facts div{display:grid;grid-template-columns:minmax(0,42%) minmax(0,1fr);gap:10px;padding:7px 0;border-top:1px dashed var(--rule)}
+.facts div:first-child{border-top:0}
+.facts dt{font-size:14px;color:var(--ink2);margin:0}
+.facts dd{margin:0;font-weight:600;min-width:0}
+.tl{display:grid;gap:0;margin:0;padding:0;list-style:none}
+.tl li{display:grid;grid-template-columns:92px 1fr;gap:10px;padding:8px 0;border-top:1px dashed var(--rule)}
+.tl li:first-child{border-top:0}
+.tl .y{font-family:var(--f-num);font-weight:600;font-size:13px;color:var(--accent);padding-top:2px}
+.trick,.trap{border-radius:var(--r);padding:12px 14px 12px 14px;border:1px solid var(--rule)}
+.trick{background:var(--accent-bg);border-color:transparent}
+.trap{background:var(--bad-bg);border-color:transparent}
+.trick .lab,.trap .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.trick .lab{color:var(--accent)}
+.trap .lab{color:var(--bad)}
+.rk div{grid-template-columns:minmax(0,48%) minmax(0,1fr)}
+.rk dd{min-width:0;overflow-wrap:anywhere}
+.hot{border-radius:var(--r);padding:12px 14px;background:var(--warn-bg,var(--accent-bg));border-left:4px solid var(--warn,var(--accent))}
+.hot .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;color:var(--warn,var(--accent))}
+.heatb{display:inline-block;font-size:11px;letter-spacing:-.1em;margin-left:6px;vertical-align:1px}
+.heat{display:flex;flex-direction:column;gap:2px}
+.hrow{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(60px,1fr) 44px;gap:10px;align-items:center;text-align:left;background:none;border:0;border-bottom:1px solid var(--rule);padding:9px 2px;color:inherit;font:inherit;cursor:pointer}
+.hrow:last-child{border-bottom:0}
+.hrow .ht{display:flex;flex-direction:column;min-width:0}
+.hrow .ht .muted{font-size:12px}
+.hbar{height:10px;border-radius:5px;background:var(--rule);overflow:hidden}
+.hbar i{display:block;height:100%;background:var(--accent);border-radius:5px}
+.hp{text-align:right;font-weight:700}
+
+.tbl{overflow-x:auto;margin:0 -2px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);font-weight:700}
+td.n{font-family:var(--f-num);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fig{margin:0}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-size:13px;color:var(--ink2);margin-top:6px}
+.pyr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pyr div{text-align:center;font-size:13px}
+.pyr b{display:block;font-size:14px}
+.pm{fill:var(--blue)} .pf{fill:var(--accent)}
+.sum{margin:0;padding-left:20px;display:grid;gap:6px}
+
+/* questions */
+.qcard{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px;min-width:0}
+.qmeta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}
+.qno{font-family:var(--f-num);font-weight:600;color:var(--ink2)}
+.tag{background:var(--sunk);color:var(--ink2);border-radius:99px;padding:1px 9px;font-weight:600}
+.tag.pyq{background:var(--accent-bg);color:var(--accent)}
+.bm{margin-left:auto;background:none;border:0;cursor:pointer;color:var(--ink2);font-size:20px;line-height:1;padding:4px}
+.bm[aria-pressed="true"]{color:var(--accent)}
+.qt{font-weight:600;font-size:16px}
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:start;text-align:left;width:100%;border:1.5px solid var(--rule);background:var(--paper);border-radius:9px;padding:10px 12px;cursor:pointer;min-height:44px}
+.opt .k{font-family:var(--f-num);font-weight:600;color:var(--ink2);font-size:14px;padding-top:1px}
+.opt.sel{border-color:var(--blue);background:var(--blue-bg)}
+.opt.ok{border-color:var(--good);background:var(--good-bg)}
+.opt.no{border-color:var(--bad);background:var(--bad-bg)}
+.opt.ok .k{color:var(--good)} .opt.no .k{color:var(--bad)}
+.opt:disabled{cursor:default;color:inherit}
+.exp{font-size:15px;border-left:3px solid var(--blue);padding:4px 0 4px 12px;color:var(--ink)}
+.exp b.okl{color:var(--good)} .exp b.nol{color:var(--bad)}
+
+/* chips */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 13px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.seg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--rule)}
+.seg::-webkit-scrollbar{display:none}
+.seg button{flex:none;background:none;border:0;border-bottom:2px solid transparent;padding:10px 8px;font-weight:600;color:var(--ink2);cursor:pointer}
+.seg button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+
+/* score panel */
+.scorebig{display:flex;align-items:baseline;gap:8px}
+.scorebig .num{font-size:44px;font-weight:600;line-height:1;color:var(--blue)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.kpi{background:var(--sunk);border-radius:8px;padding:8px;text-align:center}
+.kpi .num{display:block;font-size:20px;font-weight:600}
+.kpi span{font-size:12px;color:var(--ink2)}
+.kpi.g .num{color:var(--good)} .kpi.b .num{color:var(--bad)}
+
+/* mock */
+.mbar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 57px);z-index:10;background:var(--paper);padding:10px 0;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--rule)}
+.timer{font-family:var(--f-num);font-weight:600;font-size:18px;padding:4px 10px;border-radius:8px;background:var(--sunk)}
+.timer.low{background:var(--bad-bg);color:var(--bad)}
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px}
+.pal button{height:40px;border-radius:8px;border:1px solid var(--rule);background:var(--sheet);font-family:var(--f-num);font-weight:600;font-size:13px;cursor:pointer}
+.pal button.a{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.pal button.m{box-shadow:inset 0 -4px 0 var(--accent)}
+.pal button.cur{outline:2px solid var(--ink);outline-offset:1px}
+.pal button.ok{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.pal button.no{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.confirm{background:var(--warn-bg);border-radius:var(--r);padding:12px 14px;display:grid;gap:10px}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}
+legend{font-weight:700;margin-bottom:6px;padding:0}
+.radios{display:flex;gap:8px;flex-wrap:wrap}
+.radios label{border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 14px;font-weight:600;cursor:pointer;font-size:14px}
+.radios input{position:absolute;opacity:0;pointer-events:none}
+.radios input:checked + span{color:var(--blue)}
+.radios label:has(input:checked){border-color:var(--blue);background:var(--blue-bg)}
+.radios label:has(input:focus-visible){outline:2px solid var(--blue);outline-offset:2px}
+select{font:inherit;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:8px;padding:8px 10px;max-width:100%}
+.hist{display:grid;gap:0}
+.hist div{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:14px}
+
+/* revise */
+.search{width:100%;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:10px;padding:10px 12px;font:inherit}
+.rk{display:grid;gap:0}
+.rk div{display:grid;grid-template-columns:minmax(0,48%) 1fr;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:15px}
+.rk div:first-child{border-top:0}
+.rk dt{font-size:13px;color:var(--ink2);margin:0}
+.rk dt.up{color:var(--good)} .rk dt.dn{color:var(--bad)}
+.rk dd{margin:0;font-weight:600;min-width:0}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px}
+.tile .num{display:block;font-size:24px;font-weight:600;color:var(--accent);line-height:1.2}
+.tile span{font-size:13px;color:var(--ink2)}
+.gbar{display:grid;grid-template-columns:78px 1fr 52px;gap:8px;align-items:center;font-size:13px;padding:3px 0}
+.gbar .tr{height:12px;background:var(--sunk);border-radius:3px;position:relative;overflow:hidden}
+.gbar .tr i{position:absolute;left:0;top:0;bottom:0;background:var(--blue);border-radius:3px}
+.gbar .tr i.neg{background:var(--bad)}
+.gbar .v{font-family:var(--f-num);text-align:right}
+.flash{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;min-height:240px;padding:20px 18px;display:grid;align-content:center;gap:12px;cursor:pointer;text-align:left;width:100%}
+.flash .side{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.flash .front{font-size:18px;font-weight:600}
+.flash .ans{font-size:20px;font-weight:700;color:var(--good)}
+.empty{padding:24px 4px;color:var(--ink2);text-align:center}
+.foot{font-size:13px;color:var(--ink2);padding-top:10px}
+@media (prefers-reduced-motion: no-preference){ .opt,.chip,.btn{transition:background-color .15s, border-color .15s} }
+.link{background:var(--blue-bg);border-radius:var(--r);padding:12px 14px}
+.link .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;color:var(--blue)}
+.icheck{background:var(--sheet);border:1.5px dashed var(--blue);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px}
+.icheck .lab{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue)}
+.cat{font-size:12px;font-weight:700;border-radius:99px;padding:1px 8px;white-space:nowrap}
+.cat.CS{background:var(--blue-bg);color:var(--blue)} .cat.CSS{background:var(--accent-bg);color:var(--accent)} .cat.ST{background:var(--sunk);color:var(--ink)} .cat.OT{background:var(--sunk);color:var(--ink2)}
+
+/* ---- workbook additions ---- */
+table.cover td:nth-child(4){min-width:180px}
+.plist .dl{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.plist .dl em{font-style:normal;font-weight:700;color:var(--blue);text-align:right}
+.ladder{list-style:none;margin:0;padding:0;display:grid;gap:0;border-top:1px solid var(--rule)}
+.ladder li{display:grid;grid-template-columns:62px 1fr auto;gap:12px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--rule)}
+.ladder .rk-n{font-size:22px;font-weight:600;color:var(--blue);text-align:right}
+.ladder .rk-t{min-width:0}
+.ladder .rk-t b{display:block;line-height:1.3}
+.ladder .rk-t span{font-size:13px;color:var(--ink2)}
+.ladder .rk-d{font-weight:700;font-size:14px;white-space:nowrap}
+.ladder li.up .rk-d{color:var(--good)} .ladder li.dn .rk-d{color:var(--bad)}
+.ladder small{font-weight:600;color:var(--ink2)}
+table.cover td{min-width:90px}
+.peek{border:1.5px dashed var(--blue);background:var(--blue-bg);color:var(--blue);border-radius:8px;padding:6px 10px;font-weight:600;cursor:pointer;min-height:36px;width:100%}
+.pubs{display:grid;gap:12px}
+.plist{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.plist li{padding:7px 0;border-top:1px dashed var(--rule);display:grid;gap:1px}
+.plist li:first-child{border-top:0}
+.plist li span{font-size:13px;color:var(--ink2)}
+.seg{scroll-snap-type:x proximity}
+@media (max-width: 700px){
+  table.cover thead{display:none}
+  table.cover tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 10px;padding:10px 0;border-bottom:1px solid var(--rule)}
+  table.cover td{border:0;padding:0;min-width:0;font-size:14px}
+  table.cover td:first-child{grid-column:1/-1;font-size:15px}
+  table.cover td:nth-child(4){grid-column:1/-1;min-width:0}
+  table.cover td[data-l]::before{content:attr(data-l);display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-bottom:2px}
+}
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">Physics<small>भौतिकी · SSC CGL workbook</small></div>
+    <div class="stat" id="topstat"></div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<nav class="nav" aria-label="Sections">
+  <div class="nav-in">
+    <button type="button" id="nav-learn" data-tab="learn"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg><span>Learn</span></button>
+    <button type="button" id="nav-practice" data-tab="practice"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span>Practice</span></button>
+    <button type="button" id="nav-mock" data-tab="mock"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6M12 2v3"/></svg><span>Mock test</span></button>
+    <button type="button" id="nav-revise" data-tab="revise"><svg viewBox="0 0 24 24"><path d="M12 3 2 8l10 5 10-5z"/><path d="m2 13 10 5 10-5"/></svg><span>Revise</span></button>
+  </div>
+</nav>
+
+<script>
+"use strict";
+const LESSONS = [
+{ id:"L1", heat:3, title:"Units, dimensions & measurement", hi:"मात्रक, विमा और मापन", blocks:[
+ {k:"hot", h:"<b>Unit questions are the easiest marks in physics</b> and the 100-question PYQ session opened with them: ‘joule is the unit of…’, ‘Pascal is the SI unit of…’, ‘which is not a system of units’, light-year/AU/parsec, steradian, candela, nit. Dimension formulas of force, work and power appear about once a year."},
+ {k:"table", title:"7 SI base units", head:["Quantity","Unit","Symbol"], rows:[["Length","metre","m"],["Mass","kilogram","kg"],["Time","second","s"],["Electric current","ampere","A"],["Temperature","kelvin","K"],["Amount of substance","mole","mol"],["Luminous intensity","candela","cd"]]},
+ {k:"trick", h:"<b>“Main Kab Se Aam Khaa Meetha Chaahta”</b> — metre, kg, second, ampere, kelvin, mole, candela. Supplementary units: <b>radian</b> (plane angle) and <b>steradian</b> (solid angle)."},
+ {k:"table", title:"Derived units named after scientists", head:["Unit","Quantity","Equals"], rows:[["Newton (N)","Force","kg m s⁻²; 1 N = 10⁵ dyne"],["Joule (J)","Work, energy","N m; 1 J = 10⁷ erg"],["Watt (W)","Power","J s⁻¹; 1 HP = 746 W"],["Pascal (Pa)","Pressure","N m⁻²"],["Coulomb (C)","Charge","A s"],["Volt (V)","Potential difference","J C⁻¹"],["Ohm (Ω)","Resistance","V A⁻¹"],["Siemens (S, mho)","Conductance","Ω⁻¹"],["Tesla (T)","Magnetic field","N A⁻¹ m⁻¹"],["Weber (Wb)","Magnetic flux","T m²"],["Hertz (Hz)","Frequency","s⁻¹"],["Dioptre (D)","Power of lens","m⁻¹"],["Decibel (dB)","Loudness","—"]]},
+ {k:"table", title:"Big distances", head:["Unit","Value","Use"], rows:[["Astronomical unit (AU)","Mean Earth–Sun distance ≈ 1.496 × 10⁸ km","Solar-system distances"],["Light-year","Distance light travels in one year ≈ <b>9.46 × 10¹² km</b>","Stars — a unit of <b>distance</b>, not time"],["Parsec","≈ 3.26 light-years","Largest of the three"],["Parallax method","—","Measures distance of stars/planets"]]},
+ {k:"table", title:"Dimension formulas", head:["Quantity","Formula"], rows:[["Force","[M L T⁻²]"],["Work / energy","[M L² T⁻²]"],["Power","[M L² T⁻³]"],["Pressure","[M L⁻¹ T⁻²]"],["Momentum","[M L T⁻¹]"],["Angular momentum, Planck's constant (J s)","[M L² T⁻¹]"],["Strain, relative density, refractive index","Dimensionless — no unit"]]},
+ {k:"facts", title:"Systems & tools", rows:[["Systems of units","FPS (foot–pound–second), CGS, MKS, SI (adopted 1960)"],["Spring balance","Measures <b>weight</b> (force), not mass"],["Luminous intensity","Candela; brightness of screens = <b>nit</b> (cd/m², luminance)"],["Light from Sun to Earth","~8 min 20 s"],["Speed of light","3 × 10⁸ m/s in vacuum"]]},
+ {k:"trap", h:"‘SMS’ in a ‘which is a system of units’ question is the planted wrong option. And the lecture called nit the unit of luminous intensity — nit (cd/m²) measures <b>luminance</b>; luminous intensity is the <b>candela</b>."},
+ {k:"link", h:"Every named unit returns later: newton (L3), joule & watt (L4), pascal (L6), hertz & decibel (L8), dioptre (L10), ohm & volt (L13), tesla & weber (L15)."},
+ {k:"q", q:"Light-year is a unit of…", o:["Distance","Time","Speed","Intensity of light"], e:"Distance light travels in one year."},
+ {k:"q", q:"Dimensional formula of work is…", o:["[M L² T⁻²]","[M L T⁻²]","[M L² T⁻³]","[M L⁻¹ T⁻²]"], e:"Force × distance."}
+], sum:["7 base units: m, kg, s, A, K, mol, cd.","Radian & steradian supplementary.","1 N = 10⁵ dyne; 1 J = 10⁷ erg; 1 HP = 746 W.","Light-year = distance (9.46 × 10¹² km); parsec biggest.","Force MLT⁻², work ML²T⁻², power ML²T⁻³."]},
+
+{ id:"L2", heat:2, title:"Motion: distance, velocity & acceleration", hi:"गति", blocks:[
+ {k:"hot", h:"Distance vs displacement on a circular track (a CGL Mains favourite), scalar vs vector sorting, centripetal acceleration v²/r, and ‘angle for maximum range = 45°’."},
+ {k:"table", title:"Scalar vs vector", head:["Scalar (magnitude only)","Vector (magnitude + direction)"], rows:[["Distance","Displacement"],["Speed","Velocity"],["Mass, time, work, energy, power","Acceleration, force, momentum, weight"],["<b>Pressure</b> (scalar!)","Torque, electric & magnetic field"]]},
+ {k:"facts", title:"Key ideas", rows:[["Displacement","Shortest distance between start and end; zero after a full round trip"],["Uniform motion","Equal distance in equal time"],["Uniform circular motion","Speed constant but <b>velocity changes</b> (direction) → it is accelerated"],["Centripetal acceleration","a = <b>v²/r</b>, towards the centre; force = mv²/r"],["Acceleration unit","m s⁻²"],["Projectile — maximum range","Throw at <b>45°</b>"],["Linear velocity","Velocity along a straight line"]]},
+ {k:"table", title:"Equations of motion", head:["General","Under gravity (g)"], rows:[["v = u + at","v = u ± gt"],["s = ut + ½at²","h = ut ± ½gt²"],["v² = u² + 2as","v² = u² ± 2gh"],["Free fall","u = 0; + when falling, − when thrown up"]]},
+ {k:"trick", h:"<b>Circular-track drill:</b> find laps done (displacement 0), then the leftover fraction. Half a lap left → displacement = <b>diameter</b>. Quarter lap → r√2."},
+ {k:"link", h:"Centripetal force mv²/r keeps planets and satellites in orbit (L5). Momentum = mv starts in L3."},
+ {k:"q", q:"A runner completes one lap of a circular track. His displacement is…", o:["Zero","2πr","πr","2r"], e:"Back at the start."},
+ {k:"q", q:"In uniform circular motion, which stays constant?", o:["Speed","Velocity","Acceleration vector","Direction of motion"], e:"Direction keeps changing, so velocity changes."}
+], sum:["Distance scalar, displacement vector.","Pressure is a scalar.","UCM: speed constant, velocity changes; a = v²/r.","v = u + at; s = ut + ½at²; v² = u² + 2as.","Max range at 45°."]},
+
+{ id:"L3", heat:3, title:"Newton's laws, inertia & momentum", hi:"न्यूटन के गति नियम", blocks:[
+ {k:"hot", h:"<b>Inertia of rest vs inertia of motion</b> examples, ‘first law = law of inertia’, F = ma, action–reaction examples (rocket, rowing, gun recoil), momentum p = mv, conservation of momentum, contact vs non-contact force."},
+ {k:"table", title:"Three laws", head:["Law","Says","Examples"], rows:[["1st — law of <b>inertia</b>","A body stays at rest or in uniform motion unless an external force acts","Leaning back when bus starts; forward when it brakes; dust from a beaten carpet; leaves fall when a branch is shaken"],["2nd","<b>F = ma</b> (rate of change of momentum)","Unit: newton = kg m s⁻²"],["3rd","Every action has an equal and opposite reaction","Rocket, swimming, rowing, walking, gun recoil, jumping off a boat"]]},
+ {k:"table", title:"Inertia sorter", head:["Situation","Type"], rows:[["Bus <b>starts</b> suddenly — you fall back","Inertia of <b>rest</b>"],["Carpet beaten — dust falls","Inertia of rest"],["Branch shaken — fruits/leaves fall","Inertia of rest"],["Bus <b>brakes</b> — you fall forward","Inertia of <b>motion</b>"],["Athlete runs before a long jump","Inertia of motion"]]},
+ {k:"trick", h:"<b>Bus Starts → Back → Rest</b> (S-B-R). Brakes → forward → motion. Inertia depends only on <b>mass</b> — a truck is harder to stop than a cycle at the same speed."},
+ {k:"facts", title:"Momentum & forces", rows:[["Momentum","p = mv (vector; kg m s⁻¹)"],["Conservation of momentum","Total momentum unchanged without external force — rocket, gun recoil, boy jumping into a cart: m₁v₁ + m₂v₂ = (m₁+m₂)v"],["Impulse","Force × time = change in momentum; a fielder pulls hands back to lengthen time and reduce force"],["Balanced forces","Equal and opposite; net force zero; no change in motion"],["Contact forces","Friction, tension, normal force, air resistance"],["Non-contact forces","Gravitational, magnetic, electrostatic"],["Friction","Opposes motion; rough surface → more friction, less slipping; lets us walk"],["Net force (tug)","100 N east, 150 N west → <b>50 N west</b>"]]},
+ {k:"link", h:"Third law + momentum explain how a rocket rises (L16). Gravitational force is a non-contact force (L5)."},
+ {k:"q", q:"Newton's first law is also called the law of…", o:["Inertia","Momentum","Acceleration","Gravitation"], e:"Bodies resist change in state."},
+ {k:"q", q:"A rocket works on…", o:["Newton's third law / conservation of momentum","Newton's first law","Bernoulli's principle","Pascal's law"], e:"Gases pushed down, rocket pushed up."},
+ {k:"q", q:"Falling backward when a bus starts suddenly is an example of…", o:["Inertia of rest","Inertia of motion","Inertia of direction","Third law"], e:"Upper body was at rest."}
+], sum:["1st law = inertia; 2nd F = ma; 3rd action–reaction.","Bus starts → back (inertia of rest); brakes → forward (motion).","Inertia ∝ mass.","p = mv, conserved; rocket, recoil.","Contact: friction, tension; non-contact: gravity, magnetic, electrostatic."]},
+
+{ id:"L4", heat:3, title:"Work, energy & power", hi:"कार्य, ऊर्जा और शक्ति", blocks:[
+ {k:"hot", h:"The Hindi PYQ session counted <b>‘double the velocity → KE becomes 4×’ at least four times</b>. Also: zero work (coolie, pushing a wall), units (joule, watt, kWh, HP), PE = KE midway in a fall, conservative forces."},
+ {k:"facts", title:"Work", rows:[["W = F·s cos θ","Unit joule (N m); scalar"],["Positive work","Force and displacement in same direction"],["Negative work","Opposite directions — friction, braking"],["Zero work","No displacement (pushing a wall, sitting still) or force ⟂ displacement (coolie carrying load on head walking flat; satellite in circular orbit)"]]},
+ {k:"table", title:"Energy", head:["Form","Formula","Note"], rows:[["Kinetic","KE = ½mv² = <b>p²/2m</b>","Double v or p → <b>4×</b> KE; halve mass (same p) → 2× KE"],["Potential","PE = mgh","Stretched bow, water in a dam, yo-yo before release"],["Mechanical","KE + PE","Constant in free fall: at half height <b>PE = KE</b> (ratio 1:1)"],["Conservation","Energy is neither created nor destroyed — only changes form",""]]},
+ {k:"table", title:"Energy converters", head:["Device","Converts"], rows:[["Electric motor","Electrical → mechanical"],["Generator / dynamo","Mechanical → electrical"],["Battery / cell","Chemical → electrical"],["Photosynthesis","Light → chemical"],["Solar cell","Light → electrical"],["Bulb","Electrical → light + heat"],["Microphone / speaker","Sound → electrical / electrical → sound"]]},
+ {k:"facts", title:"Power & units", rows:[["Power","Work ÷ time; watt = J s⁻¹"],["1 horsepower","<b>746 W</b>"],["Commercial unit","<b>1 kWh = 3.6 × 10⁶ J</b> (= 1 ‘unit’ of electricity)"],["1 kW in kJ/h","3600 kJ/h"],["Conservative force","Work independent of path; zero over a round trip — gravity, spring, electrostatic"],["Non-conservative","Path-dependent — friction"]]},
+ {k:"trick", h:"<b>Units bill</b>: watts ÷ 1000 × hours × days. A 60 W bulb for 6 h a day for 30 days = 0.06 × 6 × 30 = <b>10.8 units</b>. Convert minutes to hours first — the class's most common slip."},
+ {k:"link", h:"Electrical energy and kWh return with the heating effect (L14). Dam water: PE → KE → turbine → generator (L15)."},
+ {k:"q", q:"If the velocity of a body is doubled, its kinetic energy becomes…", o:["Four times","Double","Half","Same"], e:"KE ∝ v²."},
+ {k:"q", q:"1 kWh equals…", o:["3.6 × 10⁶ J","3.6 × 10³ J","1000 J","746 J"], e:"1000 W × 3600 s."},
+ {k:"q", q:"Work done by a coolie carrying a load on his head while walking on level ground is…", o:["Zero","Positive","Negative","Maximum"], e:"Force (up) is perpendicular to displacement (horizontal)."}
+], sum:["W = Fs cos θ; zero if no displacement or 90°.","KE = ½mv² = p²/2m — double v → 4×.","PE = mgh; mid-fall PE = KE.","1 HP = 746 W; 1 kWh = 3.6 × 10⁶ J.","Motor elec→mech; generator mech→elec."]},
+
+{ id:"L5", heat:3, title:"Gravitation & planetary motion", hi:"गुरुत्वाकर्षण", blocks:[
+ {k:"hot", h:"<b>g is maximum at the poles</b>, weight on the Moon = 1/6, mass never changes, objects of any mass fall together, geostationary satellite period 24 h, Cavendish 1798, Kepler's three laws."},
+ {k:"facts", title:"Newton's law of gravitation", rows:[["F = G m₁m₂ / r²","∝ product of masses, ∝ 1/r² · non-contact force"],["Double both masses","4× force"],["Double the distance","¼ force"],["G","6.67 × 10⁻¹¹ N m² kg⁻² — measured by <b>Henry Cavendish, 1798</b>"],["g on Earth","≈ 9.8 m s⁻² (take 10 in sums)"]]},
+ {k:"table", title:"Where is g bigger?", head:["Place","g","Why"], rows:[["<b>Poles</b>","<b>Maximum</b>","Smallest radius (Earth is an oblate spheroid)"],["Equator","Minimum on surface","Largest radius + spin"],["Going up (height)","Decreases",""],["Going down (depth)","Decreases; zero at the centre",""],["Moon","≈ 1/6 of Earth",""]]},
+ {k:"table", title:"Mass vs weight", head:["","Mass","Weight"], rows:[["Meaning","Amount of matter","Gravitational pull = mg"],["Unit","kg","newton"],["Changes?","<b>Never</b>","With g"],["60 kg person on the Moon","60 kg","1/6 of Earth weight"],["Measured by","Beam balance","Spring balance"]]},
+ {k:"trap", h:"‘Weight 120 kg on Earth → 20 kg on Moon’ (the lecture's shortcut) mixes units. <b>Mass stays 120 kg</b>; it is the <b>weight</b> (in newtons) that becomes 1/6."},
+ {k:"facts", title:"Orbits & Kepler", rows:[["1st law — orbits","Planets move in <b>ellipses</b> with the Sun at one focus"],["2nd law — areas","Line Sun–planet sweeps equal areas in equal times (faster when nearer)"],["3rd law — periods","T² ∝ a³ (a = semi-major axis)"],["Geostationary satellite","Period <b>24 h</b>; ~36,000 km up; over the equator"],["Free fall","A truck and a tennis ball dropped together land together (ignoring air)"],["Galileo","Pendulum motion 1602; inclined-plane experiments → idea of inertia"],["Neptune","Predicted from Uranus's wobble by <b>Le Verrier</b> (1846)"],["Torque","Turning effect of force (opening a bottle cap); moment of inertia = mr²"]]},
+ {k:"trick", h:"<b>Kepler = E-A-T</b>: <b>E</b>llipse, <b>A</b>rea, <b>T</b>ime-period (T² ∝ a³)."},
+ {k:"link", h:"Centripetal force (L2) is supplied by gravity in orbits. Pole–equator difference ties to Earth's shape in geography."},
+ {k:"q", q:"Value of g is maximum at…", o:["The poles","The equator","The centre of Earth","A mountain top"], e:"Radius is least at the poles."},
+ {k:"q", q:"A body's mass is 60 kg on Earth. On the Moon its mass is…", o:["60 kg","10 kg","360 kg","Zero"], e:"Mass doesn't change; weight does."},
+ {k:"q", q:"The gravitational constant G was first measured by…", o:["Henry Cavendish","Newton","Kepler","Galileo"], e:"1798."}
+], sum:["F = Gm₁m₂/r²; 2× masses → 4×; 2× distance → ¼.","G by Cavendish 1798; g ≈ 9.8.","g max at poles, min at equator, zero at centre.","Mass constant; Moon weight 1/6.","Kepler: ellipse, equal areas, T² ∝ a³.","Geostationary period 24 h."]},
+
+{ id:"L6", heat:2, title:"Pressure, fluids & gas laws", hi:"दाब, तरल और गैस नियम", blocks:[
+ {k:"hot", h:"Pressure = force/area applications (sharp knife, wide straps), Pascal's law (hydraulic lift), Archimedes & buoyancy, ice melting in water, surface tension examples, Boyle/Charles, Bernoulli, barometer."},
+ {k:"facts", title:"Pressure", rows:[["P = F / A","Unit <b>pascal</b> (N m⁻²); <b>scalar</b>"],["Thrust","Force applied perpendicular to a surface (newton)"],["Less area → more pressure","Sharp knife, nails, needle"],["More area → less pressure","Wide bag straps, wide truck tyres, lying on sand"],["Barometer","Atmospheric pressure — <b>Torricelli</b> (1643)"],["Pascal's law","Pressure on an enclosed liquid is transmitted equally everywhere → hydraulic lift, hydraulic brakes"]]},
+ {k:"facts", title:"Floating & sinking", rows:[["Buoyancy (upthrust)","Upward force by a fluid"],["Archimedes' principle","Upthrust = <b>weight of fluid displaced</b>"],["Denser liquid","More upthrust — easier to float (sea water, Dead Sea)"],["Ice melting in a glass of water","Water level <b>stays the same</b>"],["Relative density","Density of a substance ÷ density of water — <b>no unit</b>"],["Bernoulli's theorem","P + ½ρv² + ρgh = constant along a flow"]]},
+ {k:"facts", title:"Surface tension & viscosity", rows:[["Surface tension","Liquid surface behaves like a stretched membrane (cohesive force) — drops are spherical, insects walk on water"],["Hot water","Lower surface tension → cleans clothes better"],["Kerosene on ponds","Lowers surface tension → mosquito larvae drown"],["Alcohol vs water","Alcohol has <b>lower</b> surface tension"],["Capillary action","Liquid rises/falls in a thin tube"],["Viscosity","Internal friction of a fluid (honey > water)"],["Cohesion / adhesion","Same-substance attraction / different-substance attraction (glue)"]]},
+ {k:"table", title:"Gas laws", head:["Law","Statement","Year"], rows:[["Boyle","P ∝ 1/V at constant T (PV = constant)","1662"],["Charles","V ∝ T at constant P","~1787"],["Gay-Lussac","P ∝ T at constant V; combining volumes","1802–08"],["Dalton","Total pressure = sum of partial pressures","1801"]]},
+ {k:"trick", h:"<b>Boyle = ‘Bo-ulta’</b> (inverse); <b>Charles = ‘Chal-te saath’</b> (direct with temperature)."},
+ {k:"link", h:"Buoyancy uses weight = mg (L5). Salt in ice lowering the melting point is in L7."},
+ {k:"q", q:"Hydraulic lift works on…", o:["Pascal's law","Archimedes' principle","Bernoulli's theorem","Boyle's law"], e:"Pressure is transmitted equally."},
+ {k:"q", q:"An ice cube floating in a glass of water melts. The water level…", o:["Remains the same","Rises","Falls","First rises then falls"], e:"Floating ice already displaces its own weight of water."},
+ {k:"q", q:"SI unit of pressure is…", o:["Pascal","Newton","Joule","Bar"], e:"N m⁻²."}
+], sum:["P = F/A, pascal, scalar.","Pascal's law → hydraulic lift.","Archimedes: upthrust = weight of fluid displaced.","Melting ice: level unchanged.","Relative density no unit.","Boyle P ∝ 1/V; Charles V ∝ T."]}
+];
+
+LESSONS.push(
+{ id:"L7", heat:1, title:"States of matter, heat & elasticity", hi:"पदार्थ की अवस्थाएँ, ऊष्मा, प्रत्यास्थता", blocks:[
+ {k:"hot", h:"The <b>Bose–Einstein condensate Nobel (2001)</b> was asked twice in these PYQs; also salt lowering the melting point, kelvin as the SI unit of temperature, and strain being dimensionless."},
+ {k:"table", title:"Five states", head:["State","How you get it"], rows:[["Solid, liquid, gas","Everyday states"],["<b>Plasma</b> (4th)","Heat a gas strongly → ionised (Sun, lightning, neon signs)"],["<b>Bose–Einstein condensate</b> (5th)","Cool atoms to near <b>absolute zero</b>"]]},
+ {k:"tl", title:"BEC story", rows:[["1924–25","Satyendra Nath <b>Bose</b> & Albert <b>Einstein</b> predict it"],["1995","<b>Eric Cornell & Carl Wieman</b> make it with rubidium atoms; Wolfgang <b>Ketterle</b> with sodium"],["2001","All three share the <b>Nobel Prize</b> in Physics"]]},
+ {k:"facts", title:"Heat & elasticity", rows:[["SI unit of temperature","Kelvin"],["Impurity (salt) in ice","<b>Lowers the melting point</b> — kulfi-wallahs add salt to ice so it stays cold longer"],["Elasticity","Body regains shape after the force is removed"],["Strain","Change in length ÷ length — <b>no unit</b>"],["Stress","Force per unit area (Pa)"],["Kinetic energy of particles","Gas > liquid > solid"]]},
+ {k:"link", h:"Bose's name gives ‘bosons’; this is the same BEC asked in chemistry. Melting point matters again for fuse wire and tungsten filament (L14)."},
+ {k:"q", q:"Bose–Einstein condensate is obtained by…", o:["Cooling atoms close to absolute zero","Heating a gas strongly","Compressing a liquid","Ionising a solid"], e:"Fifth state of matter."},
+ {k:"q", q:"Adding salt to ice…", o:["Lowers its melting point","Raises its melting point","Has no effect","Turns it into plasma"], e:"Impurities lower the melting point."}
+], sum:["Plasma = 4th state (ionised gas); BEC = 5th (near absolute zero).","BEC: Bose & Einstein 1924; made 1995; Nobel 2001 (Cornell, Wieman, Ketterle).","Salt lowers melting point.","Strain has no unit."]},
+
+{ id:"L8", heat:3, title:"Sound", hi:"ध्वनि", blocks:[
+ {k:"hot", h:"Pitch ↔ frequency vs loudness ↔ amplitude (mosquito vs lion), audible range, echo distance 17 m, reverberation, sound can't travel in vacuum, fastest in solids, decibel."},
+ {k:"facts", title:"Nature of sound", rows:[["Produced by","A <b>vibrating</b> object"],["Wave type","<b>Longitudinal</b> — compressions & rarefactions"],["Needs a medium","Cannot travel in vacuum; cannot be polarised"],["Speed","Air ≈ 343 m/s; faster in liquids, fastest in solids (aluminium, steel ~5000–6400 m/s)"],["Wavelength","Distance between two crests or two troughs (or compressions)"],["Frequency","Vibrations per second — <b>hertz</b>"]]},
+ {k:"table", title:"Frequency bands", head:["Band","Range","Example"], rows:[["Infrasonic","< 20 Hz","Earthquakes, elephants, whales"],["<b>Audible</b>","<b>20 Hz – 20 kHz</b>","Human hearing"],["Ultrasonic","> 20 kHz","Bats, dolphins, sonar, ultrasound scans"]]},
+ {k:"table", title:"Characteristics", head:["Feature","Depends on","Example"], rows:[["<b>Pitch</b> (shrillness)","<b>Frequency</b>","Mosquito & female voice — high pitch"],["<b>Loudness</b>","<b>Amplitude</b>; unit decibel","Lion & male voice — louder"],["Quality (timbre)","Waveform","Tell two singers apart"]]},
+ {k:"trick", h:"<b>P–F, L–A</b>: <b>P</b>itch–<b>F</b>requency, <b>L</b>oudness–<b>A</b>mplitude. Mosquito = high pitch, lion = high loudness."},
+ {k:"facts", title:"Reflection of sound", rows:[["Echo","Reflected sound heard separately — needs <b>≥ 17 m</b> (17.2 m) to the wall"],["Reverberation","Repeated reflections that persist (big halls)"],["Intensity","Sound energy per second per unit area"],["Resonance","One vibrating body makes another vibrate at its natural frequency — jet noise cracking windows"]]},
+ {k:"link", h:"Light waves are transverse and travel in vacuum — the opposite of sound (L12). P-waves of earthquakes are longitudinal like sound."},
+ {k:"q", q:"Pitch of sound depends on its…", o:["Frequency","Amplitude","Speed","Wavelength only"], e:"Higher frequency, higher pitch."},
+ {k:"q", q:"Minimum distance for a distinct echo is about…", o:["17 m","1.7 m","170 m","34 m"], e:"Sound must take ≥ 0.1 s for the round trip."},
+ {k:"q", q:"Sound cannot travel through…", o:["Vacuum","Water","Steel","Air"], e:"It needs a medium."}
+], sum:["Longitudinal, needs medium, can't be polarised.","Air 343 m/s; solids fastest.","Audible 20 Hz–20 kHz; infra below, ultra above.","Pitch–frequency; loudness–amplitude (dB).","Echo ≥ 17 m; reverberation = repeated reflections."]},
+
+{ id:"L9", heat:2, title:"Reflection & mirrors", hi:"परावर्तन और दर्पण", blocks:[
+ {k:"hot", h:"Uses of concave vs convex mirrors (rear-view, shaving, headlight, solar furnace), plane-mirror image, and ‘which mirror never forms a real image’."},
+ {k:"facts", title:"Laws & plane mirror", rows:[["1st law","Angle of incidence = angle of reflection"],["2nd law","Incident ray, reflected ray and normal lie in one plane"],["Plane-mirror image","Virtual, erect, same size, as far behind as object is in front, <b>laterally inverted</b>"],["Plane-mirror focal length","Infinity (power zero)"],["Rule","Real image ⇒ always inverted; virtual ⇒ always erect"]]},
+ {k:"table", title:"Concave mirror (converging, f negative)", head:["Object at","Image at","Nature"], rows:[["Infinity","Focus F","Real, inverted, point-sized"],["Beyond C","Between F and C","Real, inverted, diminished"],["At C","At C","Real, inverted, same size"],["Between C and F","Beyond C","Real, inverted, enlarged"],["At F","Infinity","Real, inverted, highly enlarged"],["Between P and F","Behind mirror","<b>Virtual, erect, enlarged</b> (the only exception)"]]},
+ {k:"trick", h:"<b>Object comes closer → image runs away</b> (∞→F, beyond C→F–C, C→C, F–C→beyond C, F→∞). Convex mirror: <b>always virtual, erect, smaller</b> — it can never form a real image."},
+ {k:"table", title:"Uses", head:["Concave (‘cave’ = gather)","Convex (spread view)"], rows:[["Shaving & make-up mirror, dentist's mirror","Rear-view mirror of vehicles"],["Headlights, torches, searchlights","Blind turns on hills, ATM & shop security"],["Solar furnace/cooker","Railway stations, airports, metro security"]]},
+ {k:"facts", title:"Formulas (sign convention)", rows:[["Mirror formula","1/v + 1/u = 1/f"],["R and f","R = 2f"],["Magnification","m = h′/h = −v/u (negative ⇒ real, inverted)"],["Signs","Object distance u negative; concave f −, convex f +"]]},
+ {k:"link", h:"Concave mirror ≈ convex lens and convex mirror ≈ concave lens in behaviour (L10)."},
+ {k:"q", q:"Rear-view mirrors of vehicles are…", o:["Convex","Concave","Plane","Cylindrical"], e:"Wide field, erect diminished image."},
+ {k:"q", q:"A concave mirror forms a virtual image when the object is…", o:["Between pole and focus","At infinity","At the centre of curvature","Beyond C"], e:"The single exception."}
+], sum:["i = r; plane mirror virtual, erect, laterally inverted.","Concave: real inverted except object between P and F.","Convex: always virtual, erect, smaller.","Concave for shaving, headlights, solar furnace; convex for rear view.","1/v + 1/u = 1/f; R = 2f."]},
+
+{ id:"L10", heat:2, title:"Refraction & lenses", hi:"अपवर्तन और लेंस", blocks:[
+ {k:"hot", h:"<b>Refractive index of diamond (2.42)</b> asked in CHSL; ‘pencil looks bent in water’, apparent depth, power of lens in dioptre, sign of power for convex/concave."},
+ {k:"facts", title:"Refraction", rows:[["What","Bending of light when it passes from one medium to another"],["Laws","Incident ray, refracted ray, normal in one plane; <b>sin i / sin r = constant (Snell's law)</b>"],["Rarer → denser","Bends <b>towards</b> normal; speed falls"],["Denser → rarer","Bends <b>away</b> from normal"],["Refractive index","n = c / v (speed in vacuum ÷ speed in medium) — no unit"],["Effects","Pencil looks bent in water; coin/pool looks raised; letters under glass slab look raised"]]},
+ {k:"table", title:"Refractive indices", head:["Medium","n"], rows:[["Air","1.0003 ≈ 1"],["Water","1.33"],["Crown glass","1.5"],["Dense flint glass","~1.65"],["<b>Diamond</b>","<b>2.42</b> (highest)"]]},
+ {k:"table", title:"Lenses", head:["","Convex","Concave"], rows:[["Shape","Thick in middle","Thin in middle"],["Action","Converging","Diverging"],["Focal length / power","<b>Positive</b>","<b>Negative</b>"],["Behaves like","Concave mirror","Convex mirror"],["Corrects","Hypermetropia","Myopia"]]},
+ {k:"facts", title:"Formulas", rows:[["Lens formula","1/v − 1/u = 1/f"],["Magnification","m = v/u"],["Power","P = 1/f (f in metres); unit <b>dioptre</b>"],["Lenses in contact","P = P₁ + P₂ + P₃ (add powers)"]]},
+ {k:"trick", h:"<b>“Cave = negative”</b>: con<b>cave</b> mirror and con<b>cave</b> lens both have negative focal length. Convex anything = positive. Mirror formula has <b>plus</b>, lens formula has <b>minus</b>."},
+ {k:"link", h:"Refraction changes the apparent position of stars and the Sun — twinkling and advance sunrise (L11)."},
+ {k:"q", q:"Refractive index of diamond is about…", o:["2.42","1.33","1.5","1.0"], e:"Highest of common media."},
+ {k:"q", q:"Unit of power of a lens is…", o:["Dioptre","Watt","Metre","Candela"], e:"P = 1/f (m)."},
+ {k:"q", q:"Light going from air into glass bends…", o:["Towards the normal","Away from the normal","Does not bend","Along the surface"], e:"Rarer to denser."}
+], sum:["Snell: sin i/sin r constant.","n = c/v; water 1.33, glass 1.5, diamond 2.42.","Rarer→denser bends towards normal.","Convex lens +, concave −.","P = 1/f, dioptre; add powers in contact."]},
+
+{ id:"L11", heat:3, title:"Human eye & light in nature", hi:"मानव नेत्र व प्रकाशीय घटनाएँ", blocks:[
+ {k:"hot", h:"<b>Blue sky = scattering; red sunrise = scattering; twinkling stars = refraction; diamond/mirage/optical fibre = TIR</b>. Eye: pupil vs iris, myopia correction, near point 25 cm, rainbow = 2 refractions + 1 TIR (asked in CDS)."},
+ {k:"table", title:"Eye parts", head:["Part","Job"], rows:[["Cornea","Front transparent layer; most refraction; donated in eye donation"],["Iris","Coloured muscle; <b>controls the pupil</b>; eye colour"],["Pupil","Hole that controls <b>amount of light</b> (small in bright light, large in dark)"],["Lens","Focuses image on retina; changes shape (<b>accommodation</b>)"],["Retina","Screen — real, <b>inverted</b> image"],["Optic nerve","Carries signal to brain — damage is permanent"],["Blind spot","Where the optic nerve leaves — no image"]]},
+ {k:"table", title:"Defects", head:["Defect","Can see","Image falls","Correction"], rows:[["<b>Myopia</b> (near-sightedness)","Near only","In front of retina","<b>Concave</b> lens (negative power)"],["<b>Hypermetropia</b> (far-sightedness)","Far only","Behind retina","<b>Convex</b> lens"],["Presbyopia (age 40+)","Neither well","—","<b>Bifocal</b> — upper concave (far), lower convex (near)"],["Cataract","Cloudy lens","—","Surgery"]]},
+ {k:"facts", title:"Eye numbers", rows:[["Least distance of distinct vision","<b>25 cm</b>"],["Far point (normal)","Infinity"],["Glaucoma","High fluid pressure damages optic nerve — irreversible"]]},
+ {k:"table", title:"Phenomenon → reason", head:["Phenomenon","Reason"], rows:[["Blue sky","<b>Scattering</b> (blue, short wavelength, scatters most)"],["Red/orange sunrise & sunset","Scattering — light travels a longer path, blue is lost, red reaches us"],["Sky black for astronauts","No atmosphere → no scattering"],["Twinkling of stars","<b>Atmospheric refraction</b>"],["Sun seen ~2 min before sunrise & after sunset","Atmospheric refraction"],["Pencil bent in water","Refraction"],["Rainbow","Dispersion + <b>2 refractions + 1 TIR</b> in drops; always opposite the Sun"],["Sparkle of diamond, mirage, optical fibre","<b>Total internal reflection</b>"],["Red danger signals","Red has the <b>longest wavelength</b>, scatters least, seen from far"]]},
+ {k:"facts", title:"Dispersion", rows:[["Who","<b>Newton</b> split white light with a prism"],["VIBGYOR","Violet → red: wavelength increases"],["Least deviation / scattering","Red"],["Most deviation / scattering","Violet (blue in the sky because our eyes are more sensitive to blue)"],["Visible wavelength","0.4–0.7 µm (400–700 nm)"]]},
+ {k:"trick", h:"<b>“S-R-T”</b>: <b>S</b>ky & sunset = <b>S</b>cattering, sta<b>R</b>s & early sunrise = <b>R</b>efraction, diamond/mirage/fibre = <b>T</b>IR."},
+ {k:"trap", h:"The lecture grouped trachoma with glaucoma as optic-nerve damage. <b>Trachoma</b> is a bacterial (Chlamydia) eye infection that scars the <b>cornea and eyelids</b>; <b>glaucoma</b> is the pressure disease that damages the optic nerve."},
+ {k:"link", h:"Lens defects use the convex/concave lenses of L10. Wavelength order VIBGYOR sits inside the EM spectrum of L12."},
+ {k:"q", q:"Blue colour of the sky is due to…", o:["Scattering of light","Refraction","Total internal reflection","Dispersion"], e:"Short wavelengths scatter most."},
+ {k:"q", q:"Twinkling of stars is due to…", o:["Atmospheric refraction","Scattering","Reflection","Diffraction"], e:"Changing air layers bend starlight."},
+ {k:"q", q:"Myopia is corrected by a…", o:["Concave lens","Convex lens","Bifocal lens","Cylindrical lens"], e:"Image forms in front of retina."}
+], sum:["Iris controls pupil; pupil controls light; lens accommodates.","Near point 25 cm.","Myopia concave; hypermetropia convex; presbyopia bifocal.","Blue sky & red sunset = scattering.","Twinkling & 2-min early sunrise = refraction.","Diamond, mirage, optical fibre = TIR.","Rainbow: 2 refractions + 1 TIR."]},
+
+{ id:"L12", heat:3, title:"EM spectrum & nature of light", hi:"विद्युत-चुंबकीय स्पेक्ट्रम", blocks:[
+ {k:"hot", h:"The PYQ session opened with <b>‘which radiation did Ritter discover in 1801?’ (UV)</b>. Order of the spectrum, who discovered each band, Hertz confirming Maxwell, photoelectric effect (Hertz found, Einstein explained), wave theory (Huygens)."},
+ {k:"table", title:"Spectrum — wavelength falls, frequency & energy rise →", head:["Band","Discovered by","Use / hook"], rows:[["Radio waves","<b>Heinrich Hertz</b> (1886–87), confirming Maxwell","Radio, TV; Marconi's long-distance radio (1890s)"],["Microwaves","—; cosmic microwave background found by <b>Penzias & Wilson</b> (1965)","Ovens, radar, satellites"],["Infrared","<b>William Herschel</b> (1800)","TV remote, night vision, heat"],["Visible","<b>Newton</b> (prism)","0.4–0.7 µm"],["Ultraviolet","<b>Johann Ritter</b> (1801)","Vitamin D, sterilisation; ozone absorbs it"],["X-rays","<b>Wilhelm Röntgen</b> (1895)","Bone imaging"],["Gamma rays","<b>Paul Villard</b> (1900)","Cancer therapy; most energetic"]]},
+ {k:"trick", h:"<b>“Rich Man In Victoria Uses eXtra Gold Coins”</b> — Radio, Micro, IR, Visible, UV, X-ray, Gamma. Left to right wavelength ↓, frequency ↑, energy ↑ (E = hν)."},
+ {k:"facts", title:"Nature of light", rows:[["Dual nature","Wave and particle"],["Wave theory","<b>Christiaan Huygens</b> — light as waves"],["EM theory","<b>James Clerk Maxwell</b> — light is an electromagnetic wave"],["Photoelectric effect","Discovered by <b>Hertz (1887)</b>; explained by <b>Einstein (1905)</b> — Einstein's 1921 Nobel was for this, not relativity"],["Light vs sound","Light: transverse, travels in vacuum, can be polarised; sound: none of these"],["E and B fields in light","Perpendicular to each other and to the direction of travel"],["Speed of light","3 × 10⁸ m/s"]]},
+ {k:"trap", h:"‘Marconi discovered radio waves’ is a frequent wrong pick. <b>Hertz</b> produced and detected them (1886–87); <b>Marconi</b> used them for long-distance radio communication."},
+ {k:"link", h:"Visible band = VIBGYOR of L11. UV-B and vitamin D link to biology."},
+ {k:"q", q:"Ultraviolet rays were discovered by…", o:["Johann Ritter","William Herschel","Röntgen","Paul Villard"], e:"1801."},
+ {k:"q", q:"Which has the longest wavelength?", o:["Radio waves","X-rays","Gamma rays","Ultraviolet"], e:"Start of the RMIVUXG chain."},
+ {k:"q", q:"Einstein received the 1921 Nobel Prize for…", o:["Explaining the photoelectric effect","Theory of relativity","Mass–energy equation","Brownian motion"], e:"A favourite trick question."}
+], sum:["Order: radio, micro, IR, visible, UV, X, gamma.","Hertz radio; Herschel IR; Ritter UV; Röntgen X; Villard gamma.","Huygens wave theory; Maxwell EM theory.","Photoelectric: Hertz found, Einstein explained (Nobel 1921).","Light transverse, vacuum, polarisable."]}
+);
+
+LESSONS.push(
+{ id:"L13", heat:3, title:"Electric current & circuits", hi:"विद्युत धारा और परिपथ", blocks:[
+ {k:"hot", h:"Ohm's law (1827), what resistance depends on (ρL/A), effect of doubling length, series/parallel sums, ammeter vs galvanometer, rheostat, unit of resistivity, Volta's pile."},
+ {k:"facts", title:"Basics", rows:[["Current","Flow of charge: <b>I = Q/t</b>; ampere = coulomb per second"],["Electron charge","1.6 × 10⁻¹⁹ C; 1 C ≈ 6.25 × 10¹⁸ electrons"],["Potential difference","V = W/Q; volt; needed to push electrons (like a slope for water)"],["Ohm's law (G.S. Ohm, 1827)","<b>V = IR</b> at constant temperature"],["Conductance","1/R; unit <b>siemens</b> (mho)"],["Battery","Volta's pile (Alessandro Volta, 1800) — first battery"]]},
+ {k:"table", title:"Resistance R = ρL/A", head:["Change","Effect on R"], rows:[["Length doubled","R doubles (current halves)"],["Area doubled (thicker wire)","R halves"],["Temperature rises (metals)","R rises"],["Length halved & area doubled","R becomes ¼"],["ρ (resistivity)","Property of the material; unit <b>ohm-metre</b>"],["Alloys (nichrome, brass)","Higher resistivity than their metals — used in heaters"],["Best conductors","Silver > copper > gold > aluminium"]]},
+ {k:"table", title:"Combining resistors", head:["","Series","Parallel"], rows:[["Same in each","Current","Potential difference"],["Equivalent","R = R₁ + R₂ + R₃","1/R = 1/R₁ + 1/R₂ + 1/R₃"],["Result","Bigger than the largest","Smaller than the smallest"],["Home wiring","—","Parallel (each appliance gets 220 V)"]]},
+ {k:"trick", h:"Parallel 1, 2, 3 Ω: 1/R = 1 + ½ + ⅓ = 11/6 → <b>R = 6/11 Ω</b>. Balanced Wheatstone bridge: <b>R₁/R₂ = R₃/R₄</b>, no current in the middle arm."},
+ {k:"table", title:"Instruments", head:["Instrument","Measures / does"], rows:[["Ammeter","Current (series)"],["Galvanometer","Small current <b>and its direction</b>"],["Voltmeter","Potential difference (parallel)"],["Rheostat","<b>Variable resistance</b> to change current"],["Cyclotron","Accelerates charged particles"]]},
+ {k:"link", h:"P = VI and heating I²Rt build on V = IR (L14). Current's magnetic field is L15."},
+ {k:"q", q:"If the length of a wire is doubled, its resistance…", o:["Doubles","Halves","Becomes four times","Remains same"], e:"R ∝ L."},
+ {k:"q", q:"SI unit of resistivity is…", o:["Ohm-metre","Ohm","Ohm per metre","Siemens"], e:"ρ = RA/L."},
+ {k:"q", q:"Device used to change resistance in a circuit is…", o:["Rheostat","Ammeter","Galvanometer","Voltmeter"], e:"Variable resistor."}
+], sum:["I = Q/t; e = 1.6 × 10⁻¹⁹ C.","V = IR (Ohm 1827).","R = ρL/A; ρ in Ω m; alloys high ρ.","Series add; parallel reciprocals.","Galvanometer shows direction; rheostat varies R.","Volta's pile 1800."]},
+
+{ id:"L14", heat:2, title:"Heating effect, power & home wiring", hi:"धारा का ऊष्मीय प्रभाव", blocks:[
+ {k:"hot", h:"Fuse (low melting point), filament (tungsten, high melting point), gas inside bulbs, Joule's law, P = VI = I²R = V²/R, electricity-bill units."},
+ {k:"facts", title:"Joule heating", rows:[["Discovered by","James Prescott <b>Joule</b> (also related mechanical work and heat)"],["H = VIt = I²Rt","Heat produced"],["Uses","Heater, iron, kettle, geyser, immersion rod, bulb, fuse"],["Filament","<b>Tungsten (W)</b> — very high melting point (~3400 °C)"],["Gas in bulb","<b>Argon/nitrogen</b> — inert, protect the filament"],["Fuse wire","<b>Low melting point</b> alloy (tin–lead); melts on overload/short circuit, connected in series"],["Short circuit","Live touches neutral → huge current"]]},
+ {k:"facts", title:"Electric power", rows:[["P = VI","= I²R = V²/R (watt)"],["P = I²/R","<b>Wrong</b> — the planted option"],["220 V, 0.5 A bulb","110 W"],["Energy","Power × time; bill unit kWh"]]},
+ {k:"table", title:"Wiring colours (old Indian/NCERT · new IS)", head:["Wire","NCERT","New code"], rows:[["Live","<b>Red</b>","Brown"],["Neutral","<b>Black</b>","Blue"],["Earth","<b>Green</b>","Green-yellow"]]},
+ {k:"trap", h:"The PYQ lecture's wiring colours were muddled (black live, white neutral). For SSC go with NCERT: <b>live red, neutral black, earth green</b>. And never touch switches with wet hands — water + body conduct."},
+ {k:"trick", h:"<b>Filament High, Fuse Low</b> melting point. A filament must survive heat; a fuse must sacrifice itself."},
+ {k:"link", h:"kWh bills use the power ideas of L4. The heating effect sits beside the magnetic effect of current (L15)."},
+ {k:"q", q:"Filament of an electric bulb is made of…", o:["Tungsten","Nichrome","Copper","Iron"], e:"Very high melting point."},
+ {k:"q", q:"A fuse wire should have…", o:["Low melting point","High melting point","Very low resistance and high melting point","No resistance"], e:"It must melt quickly on overload."},
+ {k:"q", q:"Which relation for power is NOT correct?", o:["P = I²/R","P = VI","P = I²R","P = V²/R"], e:"The rest follow from V = IR."}
+], sum:["Joule: H = I²Rt.","Filament tungsten (high MP); fuse low MP.","Bulb filled with argon/nitrogen.","P = VI = I²R = V²/R.","Live red, neutral black, earth green (NCERT)."]},
+
+{ id:"L15", heat:3, title:"Magnetism & electromagnetic induction", hi:"चुंबकत्व व विद्युत-चुंबकीय प्रेरण", blocks:[
+ {k:"hot", h:"<b>Oersted 1820</b>, field lines never intersect, right-hand thumb rule vs Fleming's left (force, motor) vs Fleming's right (induced current, generator), Faraday 1831, Ampère's parallel wires, motor vs generator energy change, tesla & weber."},
+ {k:"tl", title:"Discoveries", rows:[["1820","Hans Christian <b>Oersted</b> — current deflects a compass needle (magnetic effect of current)"],["1820s","André-Marie <b>Ampère</b> — parallel wires attract (same direction) or repel (opposite)"],["1831","Michael <b>Faraday</b> — electromagnetic induction"],["1833","<b>Gauss & Weber</b> — first electromagnetic telegraph"]]},
+ {k:"facts", title:"Field lines", rows:[["Shape","Closed loops; outside a magnet N → S"],["Never intersect","Two directions at one point is impossible"],["Crowded lines","Stronger field"],["Straight wire","Circular field; weaker with distance; reverse current → reverse field"],["Coil of n turns","n times the field of one turn"],["Solenoid","<b>Uniform</b> strong field inside; soft-iron core → <b>electromagnet</b> (temporary)"],["Permanent magnets","Steel, or ferromagnetic Fe, Co, Ni alloys"],["Eddy currents","Loops of induced current inside a conductor in a changing field"]]},
+ {k:"table", title:"Which rule?", head:["Rule","Gives","Used in"], rows:[["Right-hand thumb rule","Direction of magnetic field around a straight current","Field of a wire"],["<b>Fleming's left-hand</b>","<b>Force</b> on a current-carrying conductor","<b>Motor</b>"],["<b>Fleming's right-hand</b>","<b>Induced current</b>","<b>Generator</b>"]]},
+ {k:"trick", h:"<b>Left = Load / force (motor), Right = Current induced (generator)</b>. Fingers: thumb Motion/force, first finger Field, middle finger Current — ‘<b>Mother Father Child</b>’. Force on a conductor is maximum when it is <b>90°</b> to the field, zero when parallel."},
+ {k:"table", title:"Machines", head:["Machine","Converts","Works on"], rows:[["Electric motor","Electrical → mechanical","Force on a conductor (Fleming's left)"],["Generator / dynamo","Mechanical → electrical","Electromagnetic induction (Fleming's right)"],["Transformer","Changes AC voltage","Mutual induction"]]},
+ {k:"facts", title:"Units", rows:[["Magnetic field","<b>Tesla</b> — 1 N force on 1 m of wire carrying 1 A"],["Magnetic flux","<b>Weber</b> (CGS: maxwell)"]]},
+ {k:"link", h:"Dam water's KE turns turbines → generator (L4). Motors and fans also heat up (L14)."},
+ {k:"q", q:"The magnetic effect of electric current was discovered by…", o:["Hans Christian Oersted","Michael Faraday","Ampère","Fleming"], e:"1820, compass needle deflected."},
+ {k:"q", q:"Electric motor converts…", o:["Electrical energy into mechanical energy","Mechanical into electrical","Chemical into electrical","Heat into electrical"], e:"Fan, mixer."},
+ {k:"q", q:"Direction of induced current is given by…", o:["Fleming's right-hand rule","Fleming's left-hand rule","Right-hand thumb rule","Lenz's palm rule"], e:"Generator rule."}
+], sum:["Oersted 1820; Faraday EMI 1831; Ampère parallel wires.","Field lines closed, never cross.","Solenoid uniform field; soft iron → electromagnet.","Left-hand → force/motor; right-hand → induced current/generator.","Motor elec→mech; generator mech→elec.","Tesla field, weber flux."]},
+
+{ id:"L16", heat:2, title:"Modern physics & who discovered what", hi:"आधुनिक भौतिकी व खोजें", blocks:[
+ {k:"hot", h:"‘Who discovered…/Nobel for…’ one-liners fill the second half of the PYQ session: radioactivity (Becquerel), cosmic rays (Hess), cloud chamber (Wilson), transistor (Shockley–Bardeen–Brattain), electron microscope (Ruska–Knoll), holography (Gabor), barometer (Torricelli), air pump (Guericke)."},
+ {k:"facts", title:"Nuclear & radioactivity", rows:[["Radioactivity","<b>Henri Becquerel</b> (1896, uranium); Nobel 1903 with Pierre & <b>Marie Curie</b> — first woman Nobel laureate"],["Curies","Discovered polonium and radium"],["Nuclear fission","Heavy nucleus splits — U-235 + neutron → barium + krypton + energy (reactors, atom bomb)"],["Nuclear fusion","Light nuclei join — energy of the Sun and stars"],["India's fast breeder reactor","PFBR at <b>Kalpakkam</b>, Tamil Nadu (core loading witnessed by PM Modi, March 2024)"]]},
+ {k:"table", title:"Semiconductors", head:["Type","Doped with","Majority carriers"], rows:[["n-type","Pentavalent — phosphorus, arsenic, antimony","Electrons"],["p-type","Trivalent — boron, aluminium, gallium, indium","Holes"],["Pure semiconductors","Silicon, germanium",""],["Transistor","Shockley, Bardeen & Brattain — Nobel <b>1956</b>",""]]},
+ {k:"table", title:"Discovery one-liners", head:["Discovery","By · year"], rows:[["Cosmic rays","<b>Victor Hess</b> (1912; Nobel 1936)"],["Cloud chamber (track charged particles)","<b>C.T.R. Wilson</b> (Nobel 1927 with Compton)"],["Cathode-ray research (glass tube with low-pressure gas)","<b>Philipp Lenard</b> (Nobel 1905)"],["Electron microscope","<b>Ernst Ruska & Max Knoll</b> (1931)"],["Holography","<b>Dennis Gabor</b>"],["Dirac equation (quantum + relativity, electron & antiparticles)","<b>Paul Dirac</b> (1928)"],["Electrolysis of water","<b>William Nicholson</b> & Carlisle (1800)"],["Air pump","<b>Otto von Guericke</b> (17th c.)"],["Barometer","<b>Evangelista Torricelli</b> (1643)"],["Vacuum tube (triode)","<b>Lee de Forest</b> (Fleming made the diode)"],["Helium (in the Sun's spectrum)","<b>Janssen & Lockyer</b> (1868) — coolant for LHC & MRI magnets"],["Seismograph","Measures earthquakes"],["Surface-tension science","Agnes Pockels"]]},
+ {k:"facts", title:"Year tags", rows:[["2023","International Year of Millets"],["2024","International Year of Camelids"],["2025","International Year of <b>Quantum</b> Science & Technology"]]},
+ {k:"trap", h:"Don't confuse <b>Victor Hess</b> (cosmic rays) with <b>Harry Hess</b> (sea-floor spreading, geography). And Le Verrier predicted Neptune; it was spotted by Johann Galle at the <b>Berlin</b> observatory (not Birmingham)."},
+ {k:"link", h:"Electron microscope's Ruska & Knoll also appear in biology (cell). Helium and BEC overlap with chemistry (L7)."},
+ {k:"q", q:"Radioactivity was discovered by…", o:["Henri Becquerel","Marie Curie","Rutherford","Röntgen"], e:"1896, with uranium salts."},
+ {k:"q", q:"Cosmic rays were discovered by…", o:["Victor Hess","Harry Hess","C.T.R. Wilson","Dirac"], e:"1912 balloon flights."},
+ {k:"q", q:"Majority charge carriers in n-type semiconductors are…", o:["Electrons","Holes","Protons","Ions"], e:"Pentavalent dopant gives extra electrons."}
+], sum:["Becquerel radioactivity; Curies Nobel 1903.","Fission U-235; fusion powers the Sun; PFBR Kalpakkam.","n-type: P/As/Sb, electrons; p-type: B/Al/Ga/In, holes.","Hess cosmic rays; Wilson cloud chamber; Ruska–Knoll electron microscope; Gabor holography; Torricelli barometer.","2025 = Year of Quantum."]}
+);
+
+const QB = [
+/* L1 units */
+["L1","Joule is the SI unit of…",["Work/energy","Power","Force","Pressure"],"N m.","p"],
+["L1","Pascal is the SI unit of…",["Pressure","Force","Power","Energy"],"N m⁻².","p"],
+["L1","Watt is the unit of…",["Power","Energy","Work","Force"],"J s⁻¹.","p"],
+["L1","Which of these is NOT a system of units?",["SMS","MKS","FPS","CGS"],"Planted wrong option.","p"],
+["L1","Which is not an SI base unit?",["Newton","Kelvin","Candela","Mole"],"Newton is derived (kg m s⁻²)."],
+["L1","SI unit of temperature is…",["Kelvin","Celsius","Fahrenheit","Joule"],"Base unit.","p"],
+["L1","SI unit of luminous intensity is…",["Candela","Lux","Lumen","Nit"],"Base unit.","p"],
+["L1","SI unit of solid angle is…",["Steradian","Radian","Degree","Candela"],"Supplementary unit.","p"],
+["L1","Light-year is a unit of…",["Distance","Time","Speed","Light intensity"],"9.46 × 10¹² km.","p"],
+["L1","1 light-year is about…",["9.46 × 10¹² km","3 × 10⁸ km","1.5 × 10⁸ km","9.46 × 10⁸ km"],"Speed × seconds in a year.","p"],
+["L1","AU (astronomical unit) is the mean distance between…",["Earth and Sun","Earth and Moon","Sun and Pluto","Earth and nearest star"],"≈ 1.496 × 10⁸ km.","p"],
+["L1","Which is the largest unit of distance?",["Parsec","Light-year","Astronomical unit","Kilometre"],"1 pc ≈ 3.26 ly."],
+["L1","Distance of stars is measured by the…",["Parallax method","Sonar","Radar","Spectroscopy only"],"Shift against background."],
+["L1","1 newton equals…",["10⁵ dyne","10⁷ dyne","10³ dyne","10 dyne"],"CGS force unit dyne."],
+["L1","1 joule equals…",["10⁷ erg","10⁵ erg","10³ erg","10⁹ erg"],"CGS energy unit erg.","p"],
+["L1","1 horsepower equals…",["746 W","1000 W","500 W","74.6 W"],"Old engine unit.","p"],
+["L1","Dimensional formula of force is…",["[M L T⁻²]","[M L² T⁻²]","[M L T⁻¹]","[M L² T⁻³]"],"mass × acceleration.","p"],
+["L1","Dimensional formula of power is…",["[M L² T⁻³]","[M L² T⁻²]","[M L T⁻²]","[M L⁻¹ T⁻²]"],"Work ÷ time.","p"],
+["L1","Joule-second is the unit of…",["Angular momentum (Planck's constant)","Power","Energy","Force"],"[M L² T⁻¹]."],
+["L1","Which quantity has no unit?",["Strain","Stress","Pressure","Force"],"Ratio of lengths."],
+["L1","A spring balance measures…",["Weight","Mass","Pressure","Speed"],"It measures force.","p"],
+["L1","Nit is a unit used for the brightness (luminance) of screens and equals…",["Candela per square metre","Lumen per second","Watt per metre","Lux per metre"],"cd/m²."],
+["L1","Unit of electric charge is…",["Coulomb","Ampere","Volt","Ohm"],"A s.","p"],
+["L1","Unit of conductance is…",["Siemens (mho)","Ohm","Weber","Tesla"],"Reciprocal of ohm.","p"],
+["L1","Decibel is the unit of…",["Loudness/intensity level of sound","Frequency","Pitch","Wavelength"],"dB.","p"],
+["L1","How many metres in 1 nanometre?",["10⁻⁹ m","10⁻⁶ m","10⁻³ m","10⁻¹² m"],"Micro is 10⁻⁶."],
+/* L2 motion */
+["L2","Which is a vector quantity?",["Velocity","Speed","Distance","Mass"],"Has direction.","p"],
+["L2","Which is NOT a vector quantity?",["Mass","Force","Acceleration","Velocity"],"Scalar.","p"],
+["L2","Pressure is a…",["Scalar quantity","Vector quantity","Tensor only","Dimensionless quantity"],"Direction doesn't matter.","p"],
+["L2","Displacement after one complete round of a circular track is…",["Zero","2πr","πr","2r"],"Back at start."],
+["L2","A car takes 20 s per lap on a track of diameter 10 m. Its displacement after 70 s is…",["10 m","0 m","20 m","5 m"],"3 full laps + half lap → diameter.","p"],
+["L2","In uniform circular motion, the body has…",["Constant speed but changing velocity","Constant velocity","Zero acceleration","Changing speed"],"Direction changes."],
+["L2","Centripetal acceleration equals…",["v²/r","v/r","vr","v²r"],"Towards the centre.","p"],
+["L2","SI unit of acceleration is…",["m s⁻²","m s⁻¹","m² s⁻¹","N"],"Change in velocity per second."],
+["L2","For maximum horizontal range, a projectile is thrown at…",["45°","30°","60°","90°"],"Javelin throw.","p"],
+["L2","For a freely falling body, initial velocity is…",["Zero","g","Maximum","Infinite"],"Simply released."],
+["L2","Two bodies of different masses dropped from the same height (no air) reach the ground…",["At the same time","Heavier first","Lighter first","Depends on shape only"],"g is the same for all."],
+["L2","Equation v² − u² = 2as is the…",["Third equation of motion","First","Second","Fourth"],"Position–velocity relation."],
+["L2","Equal distances covered in equal time intervals means…",["Uniform motion","Non-uniform motion","Accelerated motion","Circular motion"],"Constant speed."],
+["L2","Speed is…",["A scalar quantity","A vector quantity","Same as displacement","Always equal to velocity"],"Magnitude only."],
+/* L3 Newton */
+["L3","Newton's first law is also called the law of…",["Inertia","Acceleration","Action–reaction","Gravitation"],"Bodies resist change.","p"],
+["L3","Inertia of a body depends on its…",["Mass","Velocity","Shape","Colour"],"More mass, more inertia.","p"],
+["L3","Falling backward when a bus starts suddenly is…",["Inertia of rest","Inertia of motion","Inertia of direction","Newton's third law"],"Upper body was at rest.","p"],
+["L3","Falling forward when a moving bus brakes is…",["Inertia of motion","Inertia of rest","Third law","Friction"],"Upper body keeps moving.","p"],
+["L3","Which is NOT an example of inertia of rest?",["Falling forward when brakes are applied","Dust falling from a beaten carpet","Leaves falling when a branch is shaken","Falling back when bus starts"],"That is inertia of motion.","p"],
+["L3","Newton's second law gives…",["F = ma","F = mv","F = m/a","F = Gm₁m₂/r²"],"Force = mass × acceleration.","p"],
+["L3","SI unit of force is…",["Newton","Joule","Dyne","Watt"],"kg m s⁻².","p"],
+["L3","Rocket propulsion is based on…",["Newton's third law","Newton's first law","Archimedes' principle","Bernoulli's principle"],"Action–reaction.","p"],
+["L3","Swimming and rowing a boat are examples of…",["Newton's third law","Newton's first law","Newton's second law","Pascal's law"],"Push back to go forward."],
+["L3","Recoil of a gun is explained by…",["Conservation of momentum","Conservation of mass","Pascal's law","Hooke's law"],"Bullet forward, gun back."],
+["L3","Momentum is defined as…",["Mass × velocity","Mass × acceleration","Force × time","Mass ÷ velocity"],"p = mv.","p"],
+["L3","Momentum is a…",["Vector quantity","Scalar quantity","Dimensionless quantity","Unitless constant"],"Has direction of velocity."],
+["L3","SI unit of momentum is…",["kg m s⁻¹","kg m s⁻²","N m","J s"],"Mass × velocity."],
+["L3","Which force is a contact force?",["Friction","Gravitational force","Magnetic force","Electrostatic force"],"Needs touching surfaces.","p"],
+["L3","Which is a non-contact force?",["Magnetic force","Friction","Tension","Normal force"],"Acts at a distance."],
+["L3","Friction always acts…",["Opposite to the direction of motion","Along the motion","Perpendicular to motion","Upwards"],"Opposes relative motion."],
+["L3","An object slips less on a rough surface because…",["Friction is more","Friction is less","Gravity is more","Mass increases"],"Rough → more friction."],
+["L3","Wife pulls 100 N east, mother pulls 150 N west. The net force is…",["50 N west","50 N east","250 N west","Zero"],"Bigger force wins.","p"],
+["L3","Balanced forces acting on a body…",["Produce no change in its motion","Always accelerate it","Change its mass","Change its direction"],"Net force zero."],
+["L3","A cricketer pulls his hands back while catching a ball to…",["Increase time and reduce force","Increase force","Reduce mass of ball","Increase momentum"],"Impulse = F × t."],
+["L3","Force can change all EXCEPT…",["The mass of an object","Shape","Speed","Direction"],"Mass doesn't change.","p"],
+["L3","Galileo's inclined-plane experiments showed that…",["An object keeps moving with constant speed if no force acts","Heavier bodies fall faster","Force is needed for constant velocity","Earth is the centre"],"Idea behind inertia.","p"],
+/* L4 work energy */
+["L4","If the velocity of a body is doubled, its kinetic energy becomes…",["Four times","Two times","Half","Eight times"],"KE ∝ v².","p"],
+["L4","If the momentum of a body is doubled, its kinetic energy becomes…",["Four times","Two times","Same","Half"],"KE = p²/2m.","p"],
+["L4","Relation between kinetic energy and momentum is…",["KE = p²/2m","KE = 2p/m","KE = p/2m","KE = mp²"],"Derived from ½mv²."],
+["L4","Work done is zero when the angle between force and displacement is…",["90°","0°","180°","45°"],"cos 90° = 0.","p"],
+["L4","Work done by a coolie carrying a load on his head on a level road is…",["Zero","Positive","Negative","Infinite"],"Force ⟂ displacement.","p"],
+["L4","Work done by friction is generally…",["Negative","Positive","Zero","Infinite"],"Opposes displacement."],
+["L4","A man pushes a wall but it does not move. Work done is…",["Zero","Positive","Negative","Equal to force"],"No displacement.","p"],
+["L4","Potential energy of a body of mass m at height h is…",["mgh","½mv²","mg/h","m/gh"],"Gravitational PE.","p"],
+["L4","A 2 kg body is dropped from 10 m. At 5 m height, PE : KE is…",["1 : 1","2 : 1","1 : 2","4 : 1"],"Halfway down they are equal.","p"],
+["L4","Energy stored in a stretched bow is…",["Potential energy","Kinetic energy","Heat energy","Sound energy"],"Due to state/position."],
+["L4","A yo-yo held still before release has…",["Potential energy","Kinetic energy","No energy","Sound energy"],"Turns into KE when released.","p"],
+["L4","Mechanical energy is the sum of…",["Kinetic and potential energy","Heat and light energy","Chemical and nuclear energy","Electrical and magnetic energy"],"KE + PE."],
+["L4","1 kWh is equal to…",["3.6 × 10⁶ J","3.6 × 10³ J","10³ J","746 J"],"Commercial unit.","p"],
+["L4","1 kW expressed in kJ/h is…",["3600 kJ/h","1000 kJ/h","60 kJ/h","3.6 kJ/h"],"1 kJ/s × 3600 s/h."],
+["L4","A 60 W bulb glows 6 h a day. Energy used in one day is…",["0.36 kWh","3.6 kWh","36 kWh","0.036 kWh"],"0.06 kW × 6 h.","p"],
+["L4","A 20 W appliance runs 30 min daily for 30 days. Units consumed…",["0.3","3","300","30"],"0.02 × 0.5 × 30.","p"],
+["L4","A 50 W TV runs 4 h daily for 30 days. Units consumed…",["6","60","0.6","20"],"0.05 × 4 × 30."],
+["L4","An electric motor converts…",["Electrical energy into mechanical","Mechanical into electrical","Chemical into electrical","Heat into mechanical"],"Fan, mixer.","p"],
+["L4","A dynamo/generator converts…",["Mechanical energy into electrical","Electrical into mechanical","Light into electrical","Chemical into mechanical"],"Electromagnetic induction.","p"],
+["L4","A battery converts…",["Chemical energy into electrical","Electrical into chemical only","Mechanical into electrical","Light into chemical"],"While discharging."],
+["L4","Rate of doing work is called…",["Power","Energy","Force","Momentum"],"W/t.","p"],
+["L4","Which force is conservative?",["Gravitational force","Friction","Air resistance","Viscous force"],"Work is path-independent."],
+["L4","Work done by a conservative force in a round trip is…",["Zero","Positive","Negative","Maximum"],"Path-independent."],
+["L4","James Joule related which two quantities?",["Mechanical work and heat","Current and voltage","Pressure and volume","Mass and energy"],"Mechanical equivalent of heat.","p"],
+["L4","Energy can neither be created nor destroyed — this is the law of…",["Conservation of energy","Inertia","Momentum","Gravitation"],"Only changes form."]
+];
+
+QB.push(
+/* L5 gravitation */
+["L5","Value of acceleration due to gravity is maximum at…",["The poles","The equator","The centre of the Earth","The tropics"],"Radius least at poles.","p"],
+["L5","Value of g at the centre of the Earth is…",["Zero","Maximum","9.8 m/s²","Infinite"],"Decreases with depth."],
+["L5","g decreases as we move from…",["Poles to equator","Equator to poles","Centre to surface","Sea level to depth only"],"Radius increases towards equator.","p"],
+["L5","Shape of the Earth (flattened at poles) is called…",["Oblate spheroid","Perfect sphere","Prolate spheroid","Cylinder"],"Also geoid."],
+["L5","If the masses of two bodies are both doubled, the gravitational force becomes…",["Four times","Double","Half","Same"],"F ∝ m₁m₂."],
+["L5","If the distance between two masses is doubled, the gravitational force becomes…",["One-fourth","Half","Double","Four times"],"F ∝ 1/r².","p"],
+["L5","Gravitational constant G was measured by…",["Henry Cavendish","Isaac Newton","Kepler","Galileo"],"1798.","p"],
+["L5","Value of G is…",["6.67 × 10⁻¹¹ N m² kg⁻²","9.8 N m² kg⁻²","6.67 × 10¹¹ N m² kg⁻²","3 × 10⁸ N m² kg⁻²"],"Universal constant."],
+["L5","Gravitational force is a…",["Non-contact force","Contact force","Frictional force","Magnetic force"],"Acts at a distance.","p"],
+["L5","A body's mass on Earth is 60 kg. On the Moon it will be…",["60 kg","10 kg","360 kg","0 kg"],"Mass doesn't change.","p"],
+["L5","Weight of a body on the Moon is about … of its weight on Earth.",["One-sixth","One-half","Six times","Same"],"Moon's g ≈ g/6.","p"],
+["L5","SI unit of weight is…",["Newton","Kilogram","Joule","Pascal"],"Weight is a force.","p"],
+["L5","Which never changes from place to place?",["Mass","Weight","g","Pressure"],"Amount of matter."],
+["L5","According to Kepler's first law, planets move in…",["Elliptical orbits with the Sun at a focus","Circular orbits with the Sun at centre","Parabolic paths","Straight lines"],"Law of orbits.","p"],
+["L5","Kepler's second law is about…",["Equal areas swept in equal times","Elliptical orbits","T² ∝ a³","Gravitational constant"],"Law of areas."],
+["L5","According to Kepler's third law…",["T² ∝ a³","T ∝ a","T³ ∝ a²","T ∝ 1/a"],"Law of periods.","p"],
+["L5","Time period of a geostationary satellite is…",["24 hours","12 hours","1 hour","365 days"],"Moves with Earth's rotation.","p"],
+["L5","Galileo described the regular swinging of a pendulum in…",["1602","1687","1798","1543"],"Gravity + momentum.","p"],
+["L5","Neptune's position was predicted from irregularities in the motion of Uranus by…",["Urbain Le Verrier","Galileo","Herschel","Kepler"],"1846.","p"],
+["L5","A truck and a tennis ball are dropped together from a roof (no air). They…",["Land together","Truck lands first","Ball lands first","Never land"],"Fall does not depend on mass."],
+["L5","Turning effect of a force about an axis is called…",["Torque","Momentum","Impulse","Pressure"],"Opening a bottle cap."],
+["L5","Moment of inertia of a point mass m at distance r is…",["mr²","mr","m/r²","m²r"],"Rotational inertia."],
+["L5","The force that keeps a planet in orbit is…",["Gravitational force","Magnetic force","Friction","Buoyant force"],"Provides centripetal force."],
+["L5","Value of g commonly used in sums is…",["9.8 m/s² (≈ 10)","98 m/s²","1.6 m/s²","6.67 m/s²"],"On Earth's surface."],
+/* L6 pressure fluids */
+["L6","Pressure is defined as…",["Force per unit area","Force × area","Area per unit force","Mass per unit volume"],"P = F/A.","p"],
+["L6","SI unit of pressure is…",["Pascal","Newton","Joule","Atmosphere"],"N m⁻².","p"],
+["L6","A sharp knife cuts better because…",["Less area gives more pressure","More area gives more pressure","It has more mass","It has less friction"],"P = F/A.","p"],
+["L6","A heavy bag with thin handles hurts; with a thick cloth on the handles it feels easier because…",["Area increases, pressure decreases","Weight decreases","Force increases","Mass changes"],"Spread the force.","p"],
+["L6","Thrust is…",["Force acting perpendicular to a surface","Pressure per area","Weight per volume","Energy per second"],"Unit newton."],
+["L6","Hydraulic lift and hydraulic brakes work on…",["Pascal's law","Archimedes' principle","Bernoulli's theorem","Boyle's law"],"Pressure transmitted equally.","p"],
+["L6","Archimedes' principle states that upthrust equals…",["Weight of fluid displaced","Volume of the body","Mass of the body","Density of the liquid"],"Buoyant force.","p"],
+["L6","The upward force exerted by a fluid is called…",["Buoyant force","Gravitational force","Frictional force","Tension"],"Upthrust.","p"],
+["L6","It is easier to float in sea water than in river water because sea water…",["Is denser","Is lighter","Has lower pressure","Is warmer"],"More upthrust."],
+["L6","When ice floating in a glass of water melts, the water level…",["Remains the same","Rises","Falls","Overflows"],"Displaced water equals ice weight.","p"],
+["L6","Unit of relative density is…",["It has no unit","kg m⁻³","g cm⁻³","N m⁻²"],"Ratio of densities.","p"],
+["L6","Bernoulli's theorem deals with…",["Sum of pressure, kinetic and potential energy per unit volume of a flowing fluid","Pressure in a closed liquid","Upthrust","Gas volume and temperature"],"Constant along a streamline.","p"],
+["L6","Barometer was invented by…",["Evangelista Torricelli","Pascal","Galileo","Boyle"],"1643.","p"],
+["L6","Spherical shape of a water drop is due to…",["Surface tension","Viscosity","Gravity","Buoyancy"],"Minimises surface area.","p"],
+["L6","Insects can walk on water because of…",["Surface tension","Buoyancy","Viscosity","Capillarity"],"Stretched surface film."],
+["L6","Hot water cleans clothes better than cold water because it has…",["Lower surface tension","Higher surface tension","Higher density","Higher viscosity"],"Penetrates fabric.","p"],
+["L6","Which statement about surface tension is INCORRECT?",["Surface tension of water is less than that of ethyl alcohol","Water drops are spherical due to it","Hot water has lower surface tension","It arises from cohesive forces"],"Alcohol's is lower.","p"],
+["L6","Kerosene sprayed on ponds kills mosquito larvae because it…",["Lowers surface tension","Raises surface tension","Raises density","Poisons only"],"Larvae can't stay at surface."],
+["L6","Surface tension is caused by…",["Cohesive forces","Adhesive forces","Gravity","Friction"],"Like-molecule attraction."],
+["L6","Rise of water in a thin tube is called…",["Capillary action","Surface tension","Viscosity","Diffusion"],"Thin tubes, wicks."],
+["L6","Boyle's law states that at constant temperature…",["Pressure is inversely proportional to volume","Pressure is directly proportional to volume","Volume ∝ temperature","Pressure ∝ temperature"],"PV = constant.","p"],
+["L6","Charles's law states that at constant pressure…",["Volume ∝ absolute temperature","Volume ∝ 1/temperature","Pressure ∝ volume","Pressure ∝ 1/temperature"],"V/T constant.","p"],
+["L6","Total pressure of a gas mixture equals the sum of partial pressures — this is…",["Dalton's law","Boyle's law","Charles's law","Avogadro's law"],"1801."],
+["L6","Boyle's law was given in…",["1662","1787","1801","1808"],"Robert Boyle."],
+/* L7 */
+["L7","Bose–Einstein condensate is formed by cooling particles to…",["Near absolute zero","0 °C","100 °C","Room temperature"],"Fifth state.","p"],
+["L7","Nobel Prize for making Bose–Einstein condensates was awarded in…",["2001","1995","1924","2010"],"Cornell, Wieman, Ketterle.","p"],
+["L7","Cornell and Wieman first made BEC in 1995 using atoms of…",["Rubidium","Sodium","Helium","Hydrogen"],"Ketterle used sodium."],
+["L7","Plasma is obtained when a gas is…",["Heated to very high temperature (ionised)","Cooled to absolute zero","Compressed","Dissolved"],"Fourth state."],
+["L7","Adding salt to ice…",["Lowers its melting point","Raises its melting point","Makes it melt slower at 0 °C","Has no effect"],"Kulfi-wallahs use it."],
+["L7","Strain is…",["Dimensionless","Measured in newton","Measured in pascal","Measured in joule"],"Ratio of lengths."],
+["L7","The property by which a body regains its shape after the deforming force is removed is…",["Elasticity","Plasticity","Viscosity","Ductility"],"Rubber band, spring."],
+["L7","Kinetic energy of particles is highest in…",["Gases","Liquids","Solids","Same in all"],"Free movement."]
+);
+
+QB.push(
+/* L8 sound */
+["L8","Sound is produced by…",["Vibrating objects","Moving electrons only","Light","Magnets"],"Any vibrating body.","p"],
+["L8","Sound waves are…",["Longitudinal","Transverse","Electromagnetic","Polarised"],"Compressions & rarefactions.","p"],
+["L8","Sound cannot travel through…",["Vacuum","Water","Air","Iron"],"Needs a medium.","p"],
+["L8","Speed of sound in air at room temperature is about…",["343 m/s","3 × 10⁸ m/s","1500 m/s","34 m/s"],"Around 340 m/s.","p"],
+["L8","Sound travels fastest in…",["Solids","Liquids","Gases","Vacuum"],"Particles closely packed.","p"],
+["L8","Human audible range is…",["20 Hz to 20 kHz","2 Hz to 2 kHz","20 kHz to 200 kHz","200 Hz to 2000 kHz"],"Audible band.","p"],
+["L8","Sound of frequency below 20 Hz is called…",["Infrasonic","Ultrasonic","Supersonic","Audible"],"Earthquakes, elephants.","p"],
+["L8","Bats navigate using…",["Ultrasonic waves","Infrasonic waves","Infrared","Radio waves"],"Echolocation."],
+["L8","Pitch of sound depends on…",["Frequency","Amplitude","Loudness","Speed"],"Higher frequency, shriller.","p"],
+["L8","Loudness of sound depends on…",["Amplitude","Frequency","Wavelength","Pitch"],"Bigger vibration, louder.","p"],
+["L8","Loudness is measured in…",["Decibel","Hertz","Newton","Watt"],"dB.","p"],
+["L8","Pitch of a mosquito's sound is … than a lion's roar.",["Higher","Lower","Same","Cannot be compared"],"Higher frequency.","p"],
+["L8","Unit of frequency is…",["Hertz","Metre","Second","Decibel"],"s⁻¹.","p"],
+["L8","Distance between two consecutive crests is the…",["Wavelength","Amplitude","Frequency","Time period"],"λ."],
+["L8","Reflection of sound is called…",["Echo","Resonance","Refraction","Diffraction"],"Heard after reflection.","p"],
+["L8","Minimum distance from a reflector to hear a distinct echo is about…",["17 m","1.7 m","170 m","34 m"],"17.2 m.","p"],
+["L8","Persistence of sound due to repeated reflections is called…",["Reverberation","Echo","Resonance","Refraction"],"Big halls.","p"],
+["L8","Glass windows cracking when a jet flies low is due to…",["Resonance","Echo","Refraction","Diffraction"],"Forced vibration at natural frequency."],
+["L8","Sound energy passing per second per unit area is the…",["Intensity","Pitch","Frequency","Wavelength"],"Linked to loudness."],
+["L8","Sound waves cannot be…",["Polarised","Reflected","Refracted","Diffracted"],"Only transverse waves can be polarised."],
+/* L9 mirrors */
+["L9","Angle of incidence equals angle of reflection is the…",["First law of reflection","Snell's law","Law of refraction","Law of dispersion"],"Laws of reflection.","p"],
+["L9","Image in a plane mirror is…",["Virtual, erect and laterally inverted","Real and inverted","Virtual and inverted","Real and erect"],"Same size, same distance.","p"],
+["L9","Focal length of a plane mirror is…",["Infinity","Zero","1 m","Negative"],"Power zero."],
+["L9","Where is the image formed when the object is at the centre of curvature of a concave mirror?",["At the centre of curvature","At focus","At infinity","Behind the mirror"],"Same size, inverted.","p"],
+["L9","A concave mirror forms a virtual, erect, enlarged image when the object is…",["Between pole and focus","At focus","At C","Beyond C"],"Shaving mirror use.","p"],
+["L9","Object at infinity in front of a concave mirror — image is at…",["Focus","Centre of curvature","Infinity","Pole"],"Point-sized."],
+["L9","A convex mirror always forms…",["Virtual, erect, diminished image","Real, inverted image","Magnified real image","Image at C"],"Never real.","p"],
+["L9","Rear-view mirror in vehicles is a…",["Convex mirror","Concave mirror","Plane mirror","Convex lens"],"Wide view.","p"],
+["L9","Shaving mirror and dentist's mirror are…",["Concave mirrors","Convex mirrors","Plane mirrors","Concave lenses"],"Magnify.","p"],
+["L9","Mirror used in a solar furnace is…",["Concave","Convex","Plane","Cylindrical convex"],"Concentrates sunlight.","p"],
+["L9","Mirrors used for security at ATMs and blind turns are…",["Convex","Concave","Plane","Parabolic concave"],"Wide field."],
+["L9","Radius of curvature R and focal length f are related as…",["R = 2f","f = 2R","R = f","R = f/2"],"For spherical mirrors."],
+["L9","Mirror formula is…",["1/v + 1/u = 1/f","1/v − 1/u = 1/f","v + u = f","v − u = f"],"Lens formula has minus.","p"],
+["L9","A real image is always…",["Inverted","Erect","Virtual","Behind the mirror"],"Real ⇔ inverted."],
+["L9","Headlights of vehicles use…",["Concave mirrors","Convex mirrors","Plane mirrors","Concave lenses"],"Bulb at focus gives parallel beam."],
+/* L10 refraction */
+["L10","Bending of light when it passes from one medium to another is…",["Refraction","Reflection","Dispersion","Scattering"],"Change of speed.","p"],
+["L10","Snell's law relates…",["sin i / sin r = constant","i = r","v = fλ","P = 1/f"],"Refractive index.","p"],
+["L10","Refractive index of a medium equals…",["Speed of light in vacuum ÷ speed in medium","Speed in medium ÷ speed in vacuum","Wavelength × frequency","sin r / sin i"],"n = c/v."],
+["L10","Refractive index of diamond is about…",["2.42","1.33","1.5","1.0"],"CHSL question.","p"],
+["L10","Refractive index of water is…",["1.33","1.5","2.42","1.0"],"Glass 1.5."],
+["L10","When light goes from a rarer to a denser medium it bends…",["Towards the normal","Away from the normal","Back","Not at all"],"Speed decreases.","p"],
+["L10","If the angle of incidence is 0° (along the normal), the light…",["Passes straight without bending","Bends towards normal","Bends away","Is totally reflected"],"No deviation."],
+["L10","A pencil partly in water looks bent due to…",["Refraction","Reflection","Dispersion","Scattering"],"Apparent position changes.","p"],
+["L10","A coin in a bucket of water appears raised due to…",["Refraction","Reflection","Total internal reflection","Diffraction"],"Apparent depth."],
+["L10","Unit of power of a lens is…",["Dioptre","Watt","Metre","Newton"],"1/f in metres.","p"],
+["L10","Power of a lens of focal length 0.5 m is…",["2 D","0.5 D","5 D","−2 D"],"1/0.5."],
+["L10","Focal length of a concave lens is…",["Negative","Positive","Zero","Infinite"],"'Cave = negative'."],
+["L10","A convex lens is a…",["Converging lens","Diverging lens","Plane lens","Cylindrical lens"],"Positive power."],
+["L10","Lens formula is…",["1/v − 1/u = 1/f","1/v + 1/u = 1/f","v = u + f","f = uv"],"Minus sign.","p"],
+["L10","Powers of lenses in contact…",["Add up","Multiply","Cancel","Average"],"P = P₁ + P₂."],
+/* L11 eye & phenomena */
+["L11","The part of the eye that controls the size of the pupil is the…",["Iris","Cornea","Retina","Lens"],"Muscular, coloured.","p"],
+["L11","The amount of light entering the eye is controlled by the…",["Pupil","Cornea","Retina","Optic nerve"],"Regulated by iris.","p"],
+["L11","The part donated in eye donation is the…",["Cornea","Retina","Iris","Lens"],"Transparent front layer."],
+["L11","Image formed on the retina is…",["Real and inverted","Virtual and erect","Real and erect","Virtual and inverted"],"Brain corrects it."],
+["L11","Least distance of distinct vision for a normal eye is…",["25 cm","25 m","2.5 cm","250 cm"],"Near point.","p"],
+["L11","Ability of the eye lens to change its focal length is called…",["Power of accommodation","Persistence of vision","Dispersion","Refraction"],"Ciliary muscles."],
+["L11","Myopia (near-sightedness) is corrected using…",["Concave lens","Convex lens","Bifocal lens","Plane glass"],"Image forms before retina.","p"],
+["L11","Hypermetropia is corrected using…",["Convex lens","Concave lens","Cylindrical lens","Prism"],"Image forms behind retina.","p"],
+["L11","In a bifocal lens, the part that helps near vision is…",["Lower convex part","Upper concave part","Upper convex part","Lower concave part"],"Presbyopia.","p"],
+["L11","Presbyopia is usually seen in…",["Middle-aged and older people","Infants","Teenagers","Only in myopic people"],"Age 40+."],
+["L11","Glaucoma damages the…",["Optic nerve","Cornea only","Iris","Eyelid"],"Raised eye pressure."],
+["L11","Colour of the eye is determined by pigment in the…",["Iris","Retina","Cornea","Pupil"],"Melanin."],
+["L11","The sky appears blue because of…",["Scattering of light","Refraction","Reflection","Total internal reflection"],"Short wavelengths scatter.","p"],
+["L11","The Sun looks reddish at sunrise and sunset because of…",["Scattering","Refraction","Total internal reflection","Diffraction"],"Longer path loses blue.","p"],
+["L11","Twinkling of stars is due to…",["Atmospheric refraction","Scattering","Reflection","Dispersion"],"Shifting air layers.","p"],
+["L11","The Sun is visible about 2 minutes before actual sunrise because of…",["Atmospheric refraction","Scattering","Reflection","Dispersion"],"Apparent position shifts."],
+["L11","Sparkling of diamond is due to…",["Total internal reflection","Scattering","Dispersion only","Refraction only"],"High refractive index.","p"],
+["L11","Mirage in deserts is due to…",["Total internal reflection","Scattering","Dispersion","Diffraction"],"Hot air layers.","p"],
+["L11","Optical fibres work on…",["Total internal reflection","Scattering","Refraction only","Diffraction"],"Internet cables.","p"],
+["L11","In a raindrop forming a rainbow, light undergoes…",["Two refractions and one total internal reflection","One refraction only","Two reflections only","Diffraction only"],"Asked in CDS.","p"],
+["L11","A rainbow is always seen…",["In the direction opposite the Sun","Towards the Sun","At noon only","Overhead"],"Sun behind you."],
+["L11","Splitting of white light into seven colours is…",["Dispersion","Scattering","Diffraction","Polarisation"],"Newton's prism.","p"],
+["L11","In VIBGYOR, the colour with the longest wavelength is…",["Red","Violet","Blue","Green"],"Least deviation.","p"],
+["L11","Danger signals are red because red light…",["Is scattered least","Is scattered most","Has highest frequency","Travels fastest"],"Longest wavelength."],
+["L11","To an astronaut in space, the sky appears…",["Black","Blue","Red","White"],"No atmosphere to scatter."],
+["L11","White light was first split into colours by…",["Newton","Huygens","Maxwell","Raman"],"Glass prism."],
+/* L12 EM */
+["L12","Which radiation was discovered by Johann Wilhelm Ritter in 1801?",["Ultraviolet","Infrared","X-rays","Gamma rays"],"Opening PYQ.","p"],
+["L12","Infrared radiation was discovered by…",["William Herschel","Ritter","Röntgen","Villard"],"1800.","p"],
+["L12","X-rays were discovered by…",["Wilhelm Röntgen","Becquerel","Herschel","Curie"],"1895.","p"],
+["L12","Gamma rays were discovered by…",["Paul Villard","Röntgen","Ritter","Hertz"],"1900."],
+["L12","Who confirmed Maxwell's theory by producing and detecting radio waves in 1886–87?",["Heinrich Hertz","Marconi","Faraday","Röntgen"],"Hertz.","p"],
+["L12","Correct order of increasing wavelength is…",["Gamma, X-ray, UV, visible, IR, micro, radio","Radio, micro, IR, visible, UV, X, gamma","UV, visible, gamma, X, radio","X, gamma, UV, IR, visible"],"Reverse of RMIVUXG."],
+["L12","Which has the highest energy?",["Gamma rays","Radio waves","Infrared","Visible light"],"Highest frequency."],
+["L12","TV remote controls use…",["Infrared","Ultraviolet","X-rays","Microwaves"],"Seen through a phone camera."],
+["L12","Wavelength range of visible light is…",["0.4 to 0.7 µm","4 to 7 m","0.4 to 0.7 mm","400 to 700 µm"],"400–700 nm.","p"],
+["L12","Wave theory of light was proposed by…",["Christiaan Huygens","Newton","Einstein","Planck"],"Light as waves.","p"],
+["L12","Photoelectric effect was first observed by…",["Heinrich Hertz","Einstein","Planck","Millikan"],"1887.","p"],
+["L12","Einstein got the Nobel Prize (1921) for…",["Photoelectric effect","Theory of relativity","E = mc²","Brownian motion"],"Not relativity.","p"],
+["L12","Light waves differ from sound waves because light…",["Can travel in vacuum and be polarised","Needs a medium","Is longitudinal","Is slower"],"Transverse EM wave.","p"],
+["L12","Speed of light in vacuum is…",["3 × 10⁸ m/s","3 × 10⁶ m/s","343 m/s","3 × 10¹⁰ m/s"],"c."],
+["L12","Light behaves both as a wave and as a particle — this is called…",["Dual nature","Dispersion","Interference","Polarisation"],"Wave–particle duality."],
+["L12","In an electromagnetic wave, electric and magnetic fields are…",["Perpendicular to each other","Parallel","Opposite","Absent"],"And to the direction of travel."],
+["L12","Long-distance radio transmission is credited to…",["Guglielmo Marconi","Heinrich Hertz","Maxwell","J.C. Bose only"],"1890s."]
+);
+
+QB.push(
+/* L13 current */
+["L13","Electric current is the rate of flow of…",["Charge","Voltage","Resistance","Energy"],"I = Q/t.","p"],
+["L13","SI unit of electric current is…",["Ampere","Volt","Ohm","Coulomb"],"C s⁻¹.","p"],
+["L13","1 ampere means…",["1 coulomb of charge flowing per second","1 volt per ohm only","1 joule per second","1 electron per second"],"I = Q/t.","p"],
+["L13","Charge on an electron is…",["1.6 × 10⁻¹⁹ C","1.6 × 10¹⁹ C","9.1 × 10⁻³¹ C","6.25 × 10¹⁸ C"],"Elementary charge."],
+["L13","SI unit of potential difference is…",["Volt","Ampere","Ohm","Watt"],"J C⁻¹.","p"],
+["L13","Ohm's law was given in…",["1827","1800","1831","1820"],"Georg Simon Ohm.","p"],
+["L13","Ohm's law is…",["V = IR","V = I/R","P = VI","Q = It"],"At constant temperature.","p"],
+["L13","If the length of a wire is doubled, its resistance becomes…",["Double","Half","Four times","Same"],"R ∝ L.","p"],
+["L13","In a circuit, doubling the wire's length makes the ammeter reading…",["Half","Double","Same","Four times"],"R doubles, I halves.","p"],
+["L13","Resistance of a wire is inversely proportional to its…",["Area of cross-section","Length","Resistivity","Temperature"],"Thicker wire, less R."],
+["L13","A wire of 4 Ω has its length halved and area doubled. New resistance…",["1 Ω","2 Ω","8 Ω","16 Ω"],"R × ½ × ½."],
+["L13","SI unit of resistivity is…",["Ohm-metre","Ohm","Ohm/metre","Siemens"],"ρ = RA/L.","p"],
+["L13","Resistivity of alloys compared with their constituent metals is…",["Higher","Lower","Same","Zero"],"Used in heaters."],
+["L13","The best conductor of electricity among metals is…",["Silver","Copper","Gold","Aluminium"],"Copper is cheaper."],
+["L13","Resistors 2, 3, 4 and 5 Ω in series give…",["14 Ω","1.2 Ω","7 Ω","120 Ω"],"Add them."],
+["L13","Resistors 1, 2 and 3 Ω in parallel give…",["6/11 Ω","6 Ω","11/6 Ω","1 Ω"],"1/R = 11/6.","p"],
+["L13","In a parallel combination, the quantity same across each resistor is…",["Potential difference","Current","Resistance","Power"],"Series has same current."],
+["L13","Household appliances are connected in…",["Parallel","Series","Mixed series","No circuit"],"Each gets full voltage."],
+["L13","Balanced Wheatstone bridge condition is…",["R₁/R₂ = R₃/R₄","R₁ + R₂ = R₃ + R₄","R₁R₂ = 1","R₅ = 0 always"],"No current in the galvanometer arm."],
+["L13","An instrument that detects small current and its direction is the…",["Galvanometer","Ammeter","Voltmeter","Rheostat"],"Needle deflects either way.","p"],
+["L13","Device used to change resistance in a circuit is a…",["Rheostat","Ammeter","Galvanometer","Fuse"],"Variable resistor.","p"],
+["L13","An ammeter is connected in…",["Series","Parallel","Either","Neither"],"Measures current."],
+["L13","The voltaic pile, forerunner of the battery, was invented by…",["Alessandro Volta","Ampère","Ohm","Oersted"],"1800.","p"],
+["L13","Electrolysis of water was first done in 1800 by…",["William Nicholson","Faraday","Volta","Davy"],"With Anthony Carlisle.","p"],
+["L13","Which device accelerates charged particles to high velocity?",["Cyclotron","Rheostat","Galvanometer","Transformer"],"Magnetic + electric fields.","p"],
+["L13","Milliampere means…",["10⁻³ A","10⁻⁶ A","10³ A","10⁻² A"],"0.001 A.","p"],
+["L13","Unit named after Charles-Augustin de Coulomb measures…",["Electric charge","Current","Resistance","Force"],"Coulomb."],
+/* L14 heating */
+["L14","Heating effect of electric current was explained by…",["James Prescott Joule","Ohm","Faraday","Volta"],"H = I²Rt.","p"],
+["L14","Heat produced in a resistor is…",["I²Rt","IR²t","V²It","IRt²"],"Joule's law."],
+["L14","Filament of a bulb is made of…",["Tungsten","Nichrome","Copper","Aluminium"],"Very high melting point.","p"],
+["L14","Bulbs are filled with…",["Argon or nitrogen","Oxygen","Hydrogen","Carbon dioxide"],"Inert, protects filament.","p"],
+["L14","A fuse wire must have…",["Low melting point","High melting point","Zero resistance","High conductivity only"],"Melts on overload.","p"],
+["L14","A fuse is connected in…",["Series with the appliance","Parallel","The earth wire","The neutral only"],"Breaks the circuit."],
+["L14","Which relation for electric power is NOT correct?",["P = I²/R","P = VI","P = I²R","P = V²/R"],"From V = IR.","p"],
+["L14","Power of a bulb drawing 0.5 A at 220 V is…",["110 W","440 W","220 W","55 W"],"P = VI.","p"],
+["L14","Heater coils are made of…",["Nichrome","Copper","Silver","Tungsten"],"High resistivity alloy."],
+["L14","In old Indian (NCERT) wiring, the live wire is…",["Red","Black","Green","Blue"],"Neutral black, earth green."],
+["L14","The earth wire is…",["Green","Red","Black","Brown"],"Safety wire."],
+["L14","Short circuit occurs when…",["Live and neutral wires touch","Fuse is used","Earth wire is connected","Voltage is low"],"Huge current."],
+["L14","Why shouldn't you touch a switchboard with wet hands?",["Water and the body conduct electricity","Switches rust","Water insulates","Fuses blow"],"Shock risk.","p"],
+["L14","Commercial unit of electrical energy is…",["Kilowatt-hour","Kilowatt","Joule","Watt-second"],"'Unit' on the bill.","p"],
+/* L15 magnetism */
+["L15","Magnetic effect of electric current was discovered by…",["Hans Christian Oersted","Faraday","Ampère","Maxwell"],"1820.","p"],
+["L15","Oersted discovered that a compass needle deflects near a current-carrying wire in…",["1820","1831","1800","1827"],"Magnetic effect.","p"],
+["L15","Electromagnetic induction was discovered by…",["Michael Faraday","Oersted","Ampère","Fleming"],"1831.","p"],
+["L15","Two parallel wires carrying current in the same direction…",["Attract each other","Repel each other","Do nothing","Rotate"],"Ampère.","p"],
+["L15","Magnetic field lines…",["Never intersect each other","Intersect at poles","Are straight always","Start at south pole outside"],"Two directions impossible.","p"],
+["L15","Outside a bar magnet, field lines go from…",["North pole to south pole","South to north","East to west","Centre outwards"],"Convention."],
+["L15","Where field lines are crowded, the field is…",["Stronger","Weaker","Zero","Reversed"],"Density = strength."],
+["L15","Direction of the magnetic field around a straight current-carrying wire is given by…",["Right-hand thumb rule","Fleming's left-hand rule","Fleming's right-hand rule","Lenz's law"],"Thumb along current."],
+["L15","Force on a current-carrying conductor in a magnetic field is given by…",["Fleming's left-hand rule","Fleming's right-hand rule","Right-hand thumb rule","Snell's law"],"Motor rule.","p"],
+["L15","Direction of induced current is given by…",["Fleming's right-hand rule","Fleming's left-hand rule","Right-hand thumb rule","Ohm's law"],"Generator rule.","p"],
+["L15","Force on a current-carrying conductor is maximum when the conductor is … to the field.",["Perpendicular","Parallel","At 45°","At 30°"],"90°.","p"],
+["L15","Magnetic field inside a long solenoid is…",["Uniform","Zero","Circular","Weakest at centre"],"Parallel straight lines.","p"],
+["L15","A soft-iron rod inside a current-carrying solenoid forms…",["An electromagnet (temporary)","A permanent magnet","A capacitor","A resistor"],"Loses magnetism when current stops."],
+["L15","Best material for a permanent magnet is…",["Steel","Soft iron","Copper","Aluminium"],"Retains magnetism.","p"],
+["L15","A coil of n turns produces a field … times that of one turn.",["n","n²","1/n","2n"],"Fields add.","p"],
+["L15","An electric motor works on…",["Force on a current-carrying conductor","Electromagnetic induction","Heating effect","Photoelectric effect"],"Fleming's left."],
+["L15","A generator works on…",["Electromagnetic induction","Heating effect of current","Chemical effect","Photoelectric effect"],"Faraday's law.","p"],
+["L15","SI unit of magnetic field is…",["Tesla","Weber","Gauss","Henry"],"N A⁻¹ m⁻¹.","p"],
+["L15","SI unit of magnetic flux is…",["Weber","Tesla","Ampere","Henry"],"T m².","p"],
+["L15","Loops of current induced inside a conductor by a changing magnetic field are…",["Eddy currents","Direct currents","Displacement currents","Static charges"],"Induction heating."],
+["L15","The first electromagnetic telegraph (1833) was built by…",["Gauss and Weber","Morse","Faraday","Edison"],"Göttingen.","p"],
+/* L16 modern */
+["L16","Radioactivity was discovered by…",["Henri Becquerel","Marie Curie","Rutherford","Röntgen"],"1896.","p"],
+["L16","Becquerel shared the 1903 Nobel Prize in Physics with…",["Pierre and Marie Curie","Rutherford","Röntgen","Einstein"],"For radioactivity.","p"],
+["L16","First woman to win a Nobel Prize was…",["Marie Curie","Irène Curie","Lise Meitner","Rosalind Franklin"],"1903."],
+["L16","Energy in nuclear reactors is produced by…",["Nuclear fission","Nuclear fusion","Combustion","Chemical reaction"],"U-235 splits.","p"],
+["L16","Energy of the Sun comes from…",["Nuclear fusion","Nuclear fission","Burning gases","Radioactive decay only"],"Hydrogen → helium."],
+["L16","India's Prototype Fast Breeder Reactor is at…",["Kalpakkam","Tarapur","Kudankulam","Narora"],"Tamil Nadu.","p"],
+["L16","Majority carriers in a p-type semiconductor are…",["Holes","Electrons","Protons","Neutrons"],"Trivalent dopant."],
+["L16","n-type semiconductors are made by doping with…",["Phosphorus or antimony","Boron","Indium","Aluminium"],"Pentavalent."],
+["L16","p-type semiconductors are made by doping with…",["Boron or indium","Phosphorus","Arsenic","Antimony"],"Trivalent."],
+["L16","The 1956 Nobel Prize (Shockley, Bardeen, Brattain) was for the…",["Transistor","Laser","Integrated circuit","Electron microscope"],"Semiconductor device.","p"],
+["L16","Cosmic rays were discovered by…",["Victor Hess","Harry Hess","Robert Millikan","C.T.R. Wilson"],"1912; Nobel 1936.","p"],
+["L16","Cloud chamber for detecting charged particles was developed by…",["C.T.R. Wilson","Arthur Compton","Victor Hess","Geiger"],"Nobel 1927 with Compton.","p"],
+["L16","The scientist known for cathode-ray experiments with a low-pressure gas tube (Nobel 1905) is…",["Philipp Lenard","Victor Hess","Paul Dirac","Harry Hess"],"PYQ.","p"],
+["L16","The Dirac equation (1928) combined…",["Quantum theory and special relativity","Gravity and electricity","Heat and light","Optics and sound"],"Predicted antiparticles.","p"],
+["L16","Electron microscope was developed by…",["Ernst Ruska and Max Knoll","Leeuwenhoek","Hooke","Zeiss"],"1931."],
+["L16","Principle of holography was developed by…",["Dennis Gabor","Einstein","Bohr","Raman"],"3-D images."],
+["L16","Air pump was invented by…",["Otto von Guericke","Torricelli","Boyle","Pascal"],"17th century.","p"],
+["L16","Triode vacuum tube is credited to…",["Lee de Forest","Edison","Fleming","Tesla"],"Fleming made the diode."],
+["L16","Gas used to cool superconducting magnets of the LHC and MRI scanners is…",["Helium","Nitrogen","Argon","Hydrogen"],"Liquid helium.","p"],
+["L16","Helium was discovered in the Sun's spectrum by…",["Janssen and Lockyer","Ramsay and Rayleigh","Cavendish","Priestley"],"1868."],
+["L16","A seismograph measures…",["Earthquake waves","Atmospheric pressure","Humidity","Wind speed"],"Seismic waves.","p"],
+["L16","The International Year of Quantum Science and Technology is…",["2025","2023","2024","2026"],"2023 millets, 2024 camelids."],
+["L16","Silicon and germanium are…",["Semiconductors","Good conductors","Insulators","Superconductors at room temperature"],"Used in chips."]
+);
+
+
+/* Revise data */
+const HEAT = [["Light: mirrors, lenses, eye & phenomena",16,"L11","Scattering vs refraction vs TIR, eye defects, uses of mirrors"],["Electricity & heating effect",14,"L13","Ohm, R = ρL/A, series/parallel, fuse, filament, kWh"],["Units & dimensions",12,"L1","Unit ↔ quantity, light-year, HP, joule"],["Work, energy & power",11,"L4","KE 4×, zero work, kWh"],["Discoverers & Nobel one-liners",10,"L16","Becquerel, Hess, Wilson, transistor"],["Magnetism & EMI",9,"L15","Oersted, Fleming rules, motor vs generator"],["Gravitation",8,"L5","g at poles, Moon 1/6, Kepler, Cavendish"],["Newton's laws & inertia",7,"L3","Inertia of rest/motion, third law"],["Sound",6,"L8","Pitch vs loudness, 20 Hz–20 kHz, echo"],["EM spectrum",4,"L12","Ritter UV, order, Hertz"],["Fluids & gas laws",3,"L6","Pascal, Archimedes, surface tension"]];
+
+const TILES = [["3 × 10⁸ m/s","Speed of light"],["343 m/s","Sound in air"],["20 Hz–20 kHz","Audible range"],["17 m","Distance for echo"],["9.8 m/s²","g on Earth"],["1/6","Moon's g"],["6.67 × 10⁻¹¹","G (N m² kg⁻²) — Cavendish 1798"],["746 W","1 horsepower"],["3.6 × 10⁶ J","1 kWh"],["10⁷ erg","1 joule"],["10⁵ dyne","1 newton"],["1.6 × 10⁻¹⁹ C","Electron charge"],["9.46 × 10¹² km","1 light-year"],["3.26 ly","1 parsec"],["25 cm","Near point of eye"],["0.4–0.7 µm","Visible light"],["2.42 · 1.5 · 1.33","n of diamond · glass · water"],["45°","Angle for max range"],["24 h","Geostationary period"],["120/80 mm Hg","Normal BP (sphygmomanometer)"],["1820 · 1827 · 1831","Oersted · Ohm · Faraday"],["2001","BEC Nobel"],["1921","Einstein Nobel (photoelectric)"],["220 V","Household supply"]];
+
+const PAIRS = [["Mass vs weight","kg, constant vs newton, changes with g"],["Distance vs displacement","Scalar path length vs vector shortest gap"],["Speed vs velocity","Scalar vs vector"],["Inertia of rest vs motion","Bus starts (fall back) vs bus brakes (fall forward)"],["Pitch vs loudness","Frequency vs amplitude"],["Infrasonic vs ultrasonic","< 20 Hz vs > 20 kHz"],["Echo vs reverberation","Single reflection vs repeated reflections"],["Concave vs convex mirror","Shaving/headlight/solar furnace vs rear view/security"],["Myopia vs hypermetropia","Concave lens vs convex lens"],["Scattering vs refraction","Blue sky, red sunset vs twinkling, early sunrise"],["Fleming left vs right","Force/motor vs induced current/generator"],["Motor vs generator","Electrical→mechanical vs mechanical→electrical"],["Filament vs fuse","High MP tungsten vs low MP alloy"],["Ammeter vs galvanometer","Current vs small current + direction"],["Series vs parallel","Same current vs same voltage"],["Tesla vs weber","Magnetic field vs magnetic flux"],["Boyle vs Charles","P ∝ 1/V vs V ∝ T"],["Fission vs fusion","Reactors vs Sun"],["n-type vs p-type","P/As/Sb, electrons vs B/In, holes"],["Victor Hess vs Harry Hess","Cosmic rays vs sea-floor spreading"],["Hertz vs Marconi","Discovered radio waves vs long-distance radio"],["Hertz vs Einstein (photoelectric)","Observed 1887 vs explained 1905"]];
+
+const COVERS = {
+ unit:{tab:"Unit drill", hideLabel:"Hide unit", note:"Quantity → SI unit → other units. The most reliable marks in physics.", head:["Quantity","SI unit","Also / hook"], hide:1, rows:[
+  ["Force","Newton","dyne (CGS); kg m s⁻²"],["Work, energy","Joule","erg (CGS); kWh commercial"],["Power","Watt","horsepower = 746 W"],["Pressure","Pascal","bar, atm"],["Frequency","Hertz","s⁻¹"],["Charge","Coulomb","A s"],["Current","Ampere","base unit"],["Potential difference","Volt","J/C"],["Resistance","Ohm","V/A"],["Resistivity","Ohm-metre","—"],["Conductance","Siemens","mho"],["Magnetic field","Tesla","gauss"],["Magnetic flux","Weber","maxwell"],["Power of lens","Dioptre","m⁻¹"],["Loudness","Decibel","—"],["Temperature","Kelvin","base unit"],["Luminous intensity","Candela","base unit"],["Luminance (screens)","Nit","cd/m²"],["Plane angle / solid angle","Radian / steradian","supplementary"],["Momentum","kg m s⁻¹","vector"],["Angular momentum","J s","Planck's constant too"],["Acceleration","m s⁻²","—"],["Astronomical distance","Light-year, parsec, AU","distance, not time"],["Relative density, strain, refractive index","No unit","ratios"]]},
+ law:{tab:"Laws & rules", hideLabel:"Hide statement", note:"Law → what it says → where it is used.", head:["Law / rule","Statement","Used in / by"], hide:1, rows:[
+  ["Newton's 1st law","Body keeps its state unless a force acts (inertia)","Seat belts, dusting carpet"],["Newton's 2nd law","F = ma","Unit newton"],["Newton's 3rd law","Equal & opposite reaction","Rocket, swimming, recoil"],["Law of gravitation","F = Gm₁m₂/r²","Orbits"],["Kepler 1","Elliptical orbits, Sun at a focus","Planets"],["Kepler 2","Equal areas in equal times","Faster near the Sun"],["Kepler 3","T² ∝ a³","Periods"],["Pascal's law","Pressure transmitted equally in a confined liquid","Hydraulic lift & brakes"],["Archimedes' principle","Upthrust = weight of fluid displaced","Ships, floating"],["Bernoulli's theorem","P + ½ρv² + ρgh = constant","Aeroplane lift"],["Boyle's law","P ∝ 1/V (T constant)","1662"],["Charles's law","V ∝ T (P constant)","Balloons"],["Dalton's law","Total P = sum of partial pressures","1801"],["Ohm's law","V = IR","1827"],["Joule's law","H = I²Rt","Heater, fuse"],["Snell's law","sin i / sin r = constant","Refraction"],["Laws of reflection","i = r; rays & normal in one plane","Mirrors"],["Right-hand thumb rule","Field around a straight current","Wire"],["Fleming's left-hand rule","Force on current in a field","Motor"],["Fleming's right-hand rule","Induced current direction","Generator"],["Conservation of momentum","Total momentum constant","Rocket, gun recoil"],["Conservation of energy","Energy only changes form","All machines"]]},
+ mir:{tab:"Mirror & lens cases", hideLabel:"Hide image", note:"Concave mirror and convex lens behave alike. Cover the image column and trace: object comes closer → image runs away.", head:["Object at","Image at (concave mirror)","Nature"], hide:1, rows:[
+  ["Infinity","Focus","Real, inverted, point-sized"],["Beyond C (2F)","Between F and C","Real, inverted, diminished"],["At C (2F)","At C","Real, inverted, same size"],["Between C and F","Beyond C","Real, inverted, enlarged"],["At F","Infinity","Real, inverted, highly enlarged"],["Between P and F","Behind the mirror","Virtual, erect, enlarged"],["Anywhere (convex mirror)","Behind, between P and F","Virtual, erect, diminished"],["Anywhere (concave lens)","Same side, between O and F","Virtual, erect, diminished"]]},
+ phen:{tab:"Why does it happen?", hideLabel:"Hide reason", note:"Light phenomena: the reason is one of scattering, refraction, dispersion or total internal reflection.", head:["Phenomenon","Reason","Hook"], hide:1, rows:[
+  ["Blue sky","Scattering","Blue scattered most"],["Red sunrise & sunset","Scattering","Longer path"],["Black sky in space","No scattering","No atmosphere"],["Red danger signals","Least scattering of red","Longest wavelength"],["Twinkling of stars","Atmospheric refraction","Shifting layers"],["Sun visible 2 min early / late","Atmospheric refraction","Apparent position"],["Bent pencil, raised coin","Refraction","Apparent depth"],["Rainbow","Dispersion + 2 refractions + 1 TIR","Opposite the Sun"],["White light into 7 colours","Dispersion","Newton's prism"],["Diamond sparkle","Total internal reflection","n = 2.42"],["Mirage","Total internal reflection","Hot air layers"],["Optical fibre","Total internal reflection","Internet"],["Echo","Reflection of sound","≥ 17 m"],["Cracked windows from jets","Resonance","Natural frequency"],["Water drops spherical","Surface tension","Minimum area"],["Hot water cleans better","Lower surface tension","Penetrates"],["Hydraulic lift","Pascal's law","Equal pressure"],["Ice melting keeps level","Archimedes","Displaced weight"]]},
+ em:{tab:"EM spectrum", hideLabel:"Hide discoverer", note:"Order RMIVUXG — wavelength falls, frequency and energy rise. Cover the discoverer.", head:["Band","Discovered by","Use"], hide:1, rows:[
+  ["Radio waves","Heinrich Hertz (1886–87)","Radio, TV; Marconi transmitted"],["Microwaves","(CMB: Penzias & Wilson, 1965)","Ovens, radar"],["Infrared","William Herschel (1800)","Remote, night vision"],["Visible","Newton (prism)","Sight, 0.4–0.7 µm"],["Ultraviolet","Johann Ritter (1801)","Sterilisation, vitamin D"],["X-rays","Wilhelm Röntgen (1895)","Bone imaging"],["Gamma rays","Paul Villard (1900)","Cancer treatment"]]},
+ who:{tab:"Discoverers", hideLabel:"Hide discovery", note:"Person → discovery → year. Many PYQs are just this table.", head:["Person","Discovery","Year"], hide:1, rows:[
+  ["Galileo","Pendulum motion; inertia (inclined plane)","1602"],["Newton","Laws of motion, gravitation, dispersion","1687"],["Henry Cavendish","Measured G","1798"],["Le Verrier","Predicted Neptune","1846"],["Huygens","Wave theory of light","1678"],["Maxwell","Electromagnetic theory","1860s"],["Alessandro Volta","Voltaic pile (battery)","1800"],["William Nicholson","Electrolysis of water","1800"],["Oersted","Magnetic effect of current","1820"],["Ampère","Force between current-carrying wires","1820s"],["G.S. Ohm","Ohm's law","1827"],["Michael Faraday","Electromagnetic induction","1831"],["Gauss & Weber","Electromagnetic telegraph","1833"],["James Joule","Heating effect; work–heat relation","1840s"],["Heinrich Hertz","Radio waves; photoelectric effect","1886–87"],["Röntgen","X-rays","1895"],["Henri Becquerel","Radioactivity","1896"],["Philipp Lenard","Cathode rays (Nobel 1905)","1890s"],["Albert Einstein","Explained photoelectric effect (Nobel 1921)","1905"],["Victor Hess","Cosmic rays (Nobel 1936)","1912"],["C.T.R. Wilson","Cloud chamber (Nobel 1927)","1911"],["Paul Dirac","Dirac equation","1928"],["Ruska & Knoll","Electron microscope","1931"],["Shockley, Bardeen, Brattain","Transistor (Nobel 1956)","1947"],["Bose & Einstein","Bose–Einstein condensate predicted","1924"],["Cornell, Wieman, Ketterle","BEC made (Nobel 2001)","1995"],["Torricelli","Barometer","1643"],["Otto von Guericke","Air pump","1650"],["Lee de Forest","Triode vacuum tube","1906"],["Dennis Gabor","Holography","1947"],["Janssen & Lockyer","Helium","1868"]]}
+};
+
+/* Instrument finder: [instrument / device, measures or does, type, hook] */
+const FIND = { tab:"Instrument finder", ph:"Search an instrument or device (e.g. pressure, current, earthquake, motor)", head:["Instrument / device","Measures or does","Type","Hook"], rows:[
+ ["Ammeter","Electric current","Electrical","Connected in series"],
+ ["Galvanometer","Small current and its direction","Electrical","Needle deflects both ways"],
+ ["Voltmeter","Potential difference","Electrical","Connected in parallel"],
+ ["Rheostat","Changes resistance / current","Electrical","Variable resistor"],
+ ["Fuse","Breaks circuit on overload","Electrical","Low melting point"],
+ ["Electric motor","Electrical → mechanical energy","Electrical","Fleming's left-hand"],
+ ["Generator / dynamo","Mechanical → electrical energy","Electrical","Electromagnetic induction"],
+ ["Transformer","Steps AC voltage up or down","Electrical","Mutual induction"],
+ ["Battery / cell","Chemical → electrical energy","Electrical","Volta's pile 1800"],
+ ["Cyclotron","Accelerates charged particles","Particle physics","Magnetic + electric fields"],
+ ["Cloud chamber","Tracks of charged particles","Particle physics","C.T.R. Wilson"],
+ ["Spring balance","Weight (force)","Mechanics","Not mass"],
+ ["Beam balance","Mass","Mechanics","Compares masses"],
+ ["Barometer","Atmospheric pressure","Fluids","Torricelli 1643"],
+ ["Hydraulic lift","Lifts heavy loads","Fluids","Pascal's law"],
+ ["Hydrometer","Relative density of liquids","Fluids","Milk, battery acid"],
+ ["Air pump","Removes/pumps air","Fluids","Otto von Guericke"],
+ ["Seismograph","Earthquake waves","Earth","Records P, S, surface waves"],
+ ["Sphygmomanometer","Blood pressure","Medical","120/80 mm Hg"],
+ ["Stethoscope","Heartbeat sounds","Medical","Laennec"],
+ ["Thermometer","Temperature","Heat","Kelvin SI"],
+ ["Decibel meter","Loudness of sound","Sound","dB"],
+ ["SONAR","Depth/objects underwater using ultrasound","Sound","Like bats"],
+ ["Convex mirror","Wide rear view","Optics","Vehicles, ATMs"],
+ ["Concave mirror","Magnified image / concentrated light","Optics","Shaving, headlights, solar furnace"],
+ ["Prism","Disperses white light","Optics","Newton"],
+ ["Optical fibre","Carries light signals","Optics","Total internal reflection"],
+ ["Bifocal lens","Corrects presbyopia","Optics","Lower convex, upper concave"],
+ ["Electron microscope","Very high magnification","Optics","Ruska & Knoll"],
+ ["Telescope","Distant objects","Optics","Galileo used one"],
+ ["Transistor","Amplifies/switches signals","Electronics","Nobel 1956"],
+ ["Vacuum tube (triode)","Amplifies signals","Electronics","Lee de Forest"],
+ ["Solar cell","Light → electrical energy","Energy","Semiconductor"],
+ ["Nuclear reactor","Fission energy","Energy","PFBR Kalpakkam"]
+]};
+
+const APP = { key:"physics_pyq_workbook_v1", brand:"Physics PYQ Workbook", sub:"भौतिकी · SSC CGL workbook",
+  eyebrow:"Physics · one-shot + 170 PYQs · CGL Mains focus",
+  intro:"16 lessons from your three physics lectures — the English one-shot, the 70-question PYQ walkthrough and the 100-question Hindi PYQ session. Units and dimensions, motion, Newton's laws, work–energy–power, gravitation, fluids, states of matter, sound, mirrors, lenses, the eye and sky colours, the EM spectrum, electricity, heating effect, magnetism, and the ‘who discovered what’ one-liners. Lecture tricks are kept (Rich Man In Victoria, Mother-Father-Child for Fleming, Cave = negative). Questions tagged PYQ follow the past-paper questions the lecturers solved.",
+  foot:"Facts checked to NCERT level. Where a lecture slipped (nit as luminous intensity, trachoma as optic-nerve damage, wiring colours, mass ‘becoming’ 20 kg on the Moon, Victor vs Harry Hess, Marconi for discovering radio waves), the lesson flags it in a red “Trap” box. Short on time? Practice → 🔥 Hot topics, then Revise → Unit drill and Why does it happen?",
+  craft:"Physics options are often ‘correct-sounding’ formulas with one symbol moved (P = I²/R, 1/v − 1/u for a mirror). Re-derive the formula from one you are sure of (V = IR, KE = ½mv²). For ‘double this, what happens’ questions, write the proportionality first: KE ∝ v², F ∝ 1/r², R ∝ L/A. Scalars vs vectors: anything with ‘displacement’, ‘velocity’, ‘force’ or ‘momentum’ is a vector; pressure is a scalar.",
+  heatNote:"Rough share of SSC physics questions by topic, based on the PYQs the lecturers solved in these sessions and what they called repeat favourites. Treat it as a guide, not an official count. Tap a row to open its lesson." };
+
+/* ============================================================
+   HELPERS & STATE
+   ============================================================ */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const hash = s => { let h = 5381; for (let i=0;i<s.length;i++) h = ((h<<5)+h + s.charCodeAt(i))|0; return "q"+(h>>>0).toString(36); };
+const shuffle = a => { const b=a.slice(); for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]];} return b; };
+const L = id => LESSONS.find(l => l.id === id);
+const LNUM = id => LESSONS.findIndex(l => l.id === id) + 1;
+
+const QS = QB.map(r => {
+  const fixed = !!r[6];
+  return { t:r[0], q:r[1], o:r[2], e:r[3], p:(r[4]||"").includes("p"), a: fixed ? (r[5]||0) : 0, fixed, id:hash(r[1]) };
+});
+const byLesson = id => QS.filter(q => q.t === id);
+// order of options to show: array of original indexes
+const makePerm = q => q.fixed ? q.o.map((_,i)=>i) : shuffle(q.o.map((_,i)=>i));
+
+const KEY = APP.key;
+let S = { ans:{}, bm:{}, les:{}, mocks:[] };
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch(e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
+const record = (q, ok) => { S.ans[q.id] = ok ? 1 : 0; save(); renderTop(); };
+
+function renderTop(){
+  const ids = Object.keys(S.ans).filter(k => QS.some(q => q.id === k));
+  const right = ids.filter(k => S.ans[k] === 1).length;
+  const pct = ids.length ? Math.round(right*100/ids.length) : 0;
+  $("#topstat").innerHTML = `<b>${ids.length}</b>/${QS.length} tried<br><b>${pct}%</b> right now`;
+}
+
+/* ============================================================
+   ROUTING
+   ============================================================ */
+let TAB = "learn";
+let timerId = null;
+function go(tab){
+  TAB = tab;
+  document.querySelectorAll(".nav button").forEach(b => b.setAttribute("aria-current", b.dataset.tab===tab ? "page" : "false"));
+  if (tab === "learn") renderLearn();
+  if (tab === "practice") renderPractice();
+  if (tab === "mock") renderMock();
+  if (tab === "revise") renderRevise();
+  window.scrollTo(0,0);
+  try { history.replaceState(null, "", "#"+tab); } catch(e) {}
+}
+document.querySelectorAll(".nav button").forEach(b => b.addEventListener("click", () => {
+  if (TAB === "mock" && M && M.running && b.dataset.tab !== "mock") { go("mock"); showMockLeave(b.dataset.tab); return; }
+  go(b.dataset.tab);
+}));
+
+/* ============================================================
+   LEARN
+   ============================================================ */
+function renderLearn(){
+  const done = LESSONS.filter(l => S.les[l.id] && S.les[l.id].done).length;
+  const nextIdx = LESSONS.findIndex(l => !(S.les[l.id] && S.les[l.id].done));
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="hero">
+      <span class="eyebrow">${APP.eyebrow}</span>
+      <h1>Learn it, test it, revise it</h1>
+      <p>${APP.intro} ${QS.length} exam-style questions in all.</p>
+      <div class="meter" aria-label="Lessons done"><i style="width:${done/LESSONS.length*100}%"></i></div>
+      <div class="row between"><span class="muted num" style="font-size:13px">${done}/${LESSONS.length} lessons done</span>
+      ${nextIdx>=0 ? `<button class="btn pri sm" type="button" data-open="${LESSONS[nextIdx].id}">${done? "Continue" : "Start"}: Lesson ${nextIdx+1}</button>` : `<span class="muted" style="font-size:13px">All lessons done. Try a mock test.</span>`}</div>
+    </div>
+    <div class="lessons">${LESSONS.map((l,i) => {
+      const st = S.les[l.id] || {}; const n = byLesson(l.id).length;
+      return `<button type="button" class="les ${st.done?"done":""} ${i===nextIdx?"next":""}" data-open="${l.id}">
+        <span class="no">${st.done ? "✓" : i+1}</span>
+        <span class="t"><b>${esc(l.title)}<span class="heatb" title="Exam frequency">${"🔥".repeat(l.heat||1)}</span></b><span>${l.hi} · ${n} questions</span></span>
+        <span class="sc">${st.best!=null ? `best<br>${st.best}/${n}` : ""}</span></button>`;}).join("")}
+    </div>
+    <p class="foot">${APP.foot}</p>
+  </section>`;
+  $("#app").querySelectorAll("[data-open]").forEach(b => b.addEventListener("click", () => openLesson(b.dataset.open, "learn")));
+}
+
+function blockHTML(b){
+  if (b.k==="p") return `<div class="plain"><p>${b.h}</p></div>`;
+  if (b.k==="trick") return `<div class="trick"><span class="lab">Trick</span>${b.h}</div>`;
+  if (b.k==="link") return `<div class="link"><span class="lab">Link · connect the dots</span>${b.h}</div>`;
+  if (b.k==="q") { const perm = shuffle(b.o.map((_,i)=>i)); return `<div class="icheck" data-ic><span class="lab">Quick check</span><p class="qt">${esc(b.q)}</p><div class="opts">${perm.map((oi,k)=>`<button type="button" class="opt" data-ioi="${oi}"><span class="k">${"ABCD"[k]}</span><span>${esc(b.o[oi])}</span></button>`).join("")}</div><div class="exp" hidden><b class="okl"></b> ${esc(b.e)}</div></div>`; }
+  if (b.k==="hot") return `<div class="hot"><span class="lab">🔥 Exam radar · how often it's asked</span>${b.h}</div>`;
+  if (b.k==="trap") return `<div class="trap"><span class="lab">Trap · correction</span>${b.h}</div>`;
+  if (b.k==="facts") return `<div class="block"><h3>${b.title}</h3><dl class="facts">${b.rows.map(r=>`<div><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join("")}</dl></div>`;
+  if (b.k==="tl") return `<div class="block"><h3>${b.title}</h3><ul class="tl">${b.rows.map(r=>`<li><span class="y">${r[0]}</span><span>${r[1]}</span></li>`).join("")}</ul></div>`;
+  if (b.k==="table") {
+    const isNum = (ci) => b.numcol==="all" ? ci>0 : (b.numcol===1 && ci===1) || (typeof b.numcol==="string" && b.numcol.includes(String(ci)));
+    return `<div class="block"><h3>${b.title}</h3><div class="tbl"><table><thead><tr>${b.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${b.rows.map(r=>`<tr>${r.map((c,ci)=>`<td class="${isNum(ci)?"n":""}">${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+  }
+  if (b.k==="fig") return `<div class="block"><h3>${b.title}</h3><figure class="fig">${b.svg}<figcaption>${b.cap}</figcaption></figure></div>`;
+  if (b.k==="pyr") return `<div class="block"><h3>${b.title}</h3><div class="pyr">${b.items.map(it=>`<div>${PYR(it.rows)}<b>${it.name}</b><span class="muted">${it.note}</span></div>`).join("")}</div><p class="muted" style="font-size:13px;margin-top:8px"><span style="color:var(--blue)">■</span> males · <span style="color:var(--accent)">■</span> females · top = old, base = young</p></div>`;
+  return "";
+}
+
+let LQ = null;
+function openLesson(id, step){
+  const l = L(id), i = LNUM(id);
+  if (step === "quiz") { LQ = { id, list: shuffle(byLesson(id)).map(q => ({q, perm:makePerm(q)})), i:0, score:0, picked:null }; }
+  const head = `<div class="lhead"><button class="back" type="button" id="lback">‹ Lessons</button></div>
+    <span class="eyebrow">Lesson ${i} of ${LESSONS.length} · ${l.hi}</span><h1>${esc(l.title)}</h1>
+    <div class="steps" role="tablist">
+      <button type="button" data-step="learn" aria-current="${step==="learn"?"step":"false"}">1 · Learn</button>
+      <button type="button" data-step="quiz" aria-current="${step==="quiz"?"step":"false"}">2 · Quiz</button>
+      <button type="button" data-step="sum" aria-current="${step==="sum"?"step":"false"}">3 · Summary</button>
+    </div>`;
+  let body = "";
+  if (step === "learn") {
+    body = `<div class="stack">${l.blocks.map(blockHTML).join("")}
+      <div class="row end"><button class="btn pri" type="button" id="toquiz">Take the lesson quiz · ${byLesson(id).length} questions</button></div></div>`;
+  } else if (step === "quiz") {
+    body = `<div id="lq"></div>`;
+  } else {
+    const nxt = LESSONS[i];
+    body = `<div class="stack"><div class="block"><h3>Remember these</h3><ul class="sum">${l.sum.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>
+      <div class="row between"><button class="btn" type="button" id="relearn">Read again</button>
+      ${nxt ? `<button class="btn pri" type="button" id="nextles">Next: ${esc(nxt.title)}</button>` : `<button class="btn pri" type="button" id="tomock">Take a mock test</button>`}</div></div>`;
+    S.les[id] = Object.assign(S.les[id]||{}, {done:1}); save();
+  }
+  $("#app").innerHTML = `<section class="view stack">${head}${body}</section>`;
+  $("#lback").onclick = () => renderLearn();
+  $("#app").querySelectorAll("[data-step]").forEach(b => b.onclick = () => openLesson(id, b.dataset.step));
+  if (step==="learn") { $("#toquiz").onclick = () => openLesson(id,"quiz");
+    const ics = l.blocks.filter(b=>b.k==="q");
+    $("#app").querySelectorAll("[data-ic]").forEach((box,n) => { const b = ics[n];
+      box.querySelectorAll("[data-ioi]").forEach(btn => btn.onclick = () => {
+        if (box.dataset.done) return; box.dataset.done = 1; const pick = +btn.dataset.ioi;
+        box.querySelectorAll("[data-ioi]").forEach(x => { const oi=+x.dataset.ioi; x.disabled = true; if (oi===0) x.classList.add("ok"); else if (oi===pick) x.classList.add("no"); });
+        const ex = box.querySelector(".exp"); ex.hidden = false; const lab = ex.querySelector("b");
+        if (pick===0) { lab.textContent = "Correct."; } else { lab.className = "nol"; lab.textContent = "Answer: " + b.o[0] + "."; }
+      }); }); }
+  if (step==="quiz") renderLQ();
+  if (step==="sum") {
+    $("#relearn").onclick = () => openLesson(id,"learn");
+    const n = $("#nextles"); if (n) n.onclick = () => openLesson(LESSONS[i].id,"learn");
+    const m = $("#tomock"); if (m) m.onclick = () => go("mock");
+  }
+  window.scrollTo(0,0);
+}
+
+function optsHTML(q, perm, state){
+  // state: {picked: originalIndex|null, reveal: bool, sel: originalIndex|null}
+  return perm.map((oi, k) => {
+    let cls = "opt";
+    if (state.reveal) { if (oi === q.a) cls += " ok"; else if (oi === state.picked) cls += " no"; }
+    else if (state.sel === oi) cls += " sel";
+    return `<button type="button" class="${cls}" data-oi="${oi}" ${state.reveal?"disabled":""}><span class="k">${"ABCD"[k]}</span><span>${esc(q.o[oi])}</span></button>`;
+  }).join("");
+}
+function expHTML(q, picked){
+  const ok = picked === q.a;
+  return `<div class="exp">${ok ? `<b class="okl">Correct.</b>` : `<b class="nol">Answer: ${esc(q.o[q.a])}.</b>`} ${esc(q.e)}</div>`;
+}
+function metaHTML(q, no){
+  return `<div class="qmeta"><span class="qno">${no}</span><span class="tag">L${LNUM(q.t)} · ${esc(L(q.t).title)}</span>${q.p?`<span class="tag pyq">High-yield</span>`:""}
+  <button type="button" class="bm" data-bm="${q.id}" aria-pressed="${S.bm[q.id]?"true":"false"}" aria-label="Bookmark">${S.bm[q.id]?"★":"☆"}</button></div>`;
+}
+
+function renderLQ(){
+  const box = $("#lq");
+  if (LQ.i >= LQ.list.length) {
+    const n = LQ.list.length, l = L(LQ.id);
+    const st = S.les[LQ.id] || {}; st.best = Math.max(st.best||0, LQ.score); S.les[LQ.id] = st; save();
+    box.innerHTML = `<div class="stack"><div class="block stack"><span class="eyebrow">Quiz done</span>
+      <div class="scorebig"><span class="num">${LQ.score}</span><span class="muted">/ ${n} correct</span></div>
+      <p class="muted">${LQ.score===n ? "Full marks." : LQ.score >= n*0.8 ? "Strong. Review the ones you missed in Practice → Mistakes." : "Read the lesson once more, then retry. Missed questions are saved under Practice → Mistakes."}</p></div>
+      <div class="row between"><button class="btn" type="button" id="retry">Retry quiz</button><button class="btn pri" type="button" id="tosum">See summary</button></div></div>`;
+    $("#retry").onclick = () => openLesson(LQ.id,"quiz");
+    $("#tosum").onclick = () => openLesson(LQ.id,"sum");
+    return;
+  }
+  const it = LQ.list[LQ.i], q = it.q;
+  const reveal = LQ.picked !== null;
+  box.innerHTML = `<div class="stack"><div class="meter"><i style="width:${LQ.i/LQ.list.length*100}%"></i></div>
+    <article class="qcard">${metaHTML(q, `Q${LQ.i+1}/${LQ.list.length}`)}
+    <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {picked:LQ.picked, reveal})}</div>
+    ${reveal ? expHTML(q, LQ.picked) : ""}</article>
+    ${reveal ? `<div class="row end"><button class="btn pri" type="button" id="lqnext">${LQ.i+1 < LQ.list.length ? "Next question" : "Finish"}</button></div>` : `<p class="muted" style="font-size:13px">Score so far: <span class="num">${LQ.score}</span></p>`}</div>`;
+  box.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    if (LQ.picked !== null) return;
+    LQ.picked = +b.dataset.oi; const ok = LQ.picked === q.a; if (ok) LQ.score++; record(q, ok); renderLQ();
+  });
+  bindBM(box);
+  const nx = $("#lqnext"); if (nx) nx.onclick = () => { LQ.i++; LQ.picked = null; renderLQ(); window.scrollTo(0,0); };
+}
+
+function bindBM(root){
+  root.querySelectorAll("[data-bm]").forEach(b => b.onclick = (ev) => {
+    ev.stopPropagation();
+    const id = b.dataset.bm; if (S.bm[id]) delete S.bm[id]; else S.bm[id] = 1; save();
+    b.setAttribute("aria-pressed", S.bm[id] ? "true":"false"); b.textContent = S.bm[id] ? "★" : "☆";
+  });
+}
+
+/* ============================================================
+   PRACTICE
+   ============================================================ */
+let PF = "all", PSHOW = 20, PORDER = null, PPERM = {}, PPICK = {};
+function practiceList(){
+  let list = QS;
+  if (PF === "pyq") list = QS.filter(q => q.p);
+  else if (PF === "hot") list = QS.filter(q => (L(q.t).heat||1) === 3);
+  else if (PF === "wrong") list = QS.filter(q => S.ans[q.id] === 0);
+  else if (PF === "new") list = QS.filter(q => S.ans[q.id] === undefined);
+  else if (PF === "bm") list = QS.filter(q => S.bm[q.id]);
+  else if (PF !== "all") list = QS.filter(q => q.t === PF);
+  if (PORDER) { const pos = new Map(PORDER.map((id,i)=>[id,i])); list = list.slice().sort((a,b)=>(pos.get(a.id)??0)-(pos.get(b.id)??0)); }
+  return list;
+}
+function renderPractice(){
+  const wrongN = QS.filter(q => S.ans[q.id] === 0).length, bmN = QS.filter(q=>S.bm[q.id]).length, pyqN = QS.filter(q=>q.p).length;
+  const chips = [["all",`All ${QS.length}`],["new","Not tried"],["wrong",`Mistakes ${wrongN}`],["hot",`🔥 Hot topics ${QS.filter(q=>(L(q.t).heat||1)===3).length}`],["pyq",`PYQ ${pyqN}`],["bm",`Starred ${bmN}`]].concat(LESSONS.map((l,i)=>[l.id,`L${i+1} ${l.title}`]));
+  const list = practiceList();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Question bank</span><h1>Practice</h1>
+    <p class="muted">Tap an option to check it. Wrong answers go to <b>Mistakes</b> until you get them right.</p></div>
+    <div class="chips" role="group" aria-label="Filter">${chips.map(c=>`<button type="button" class="chip" data-f="${c[0]}" aria-pressed="${PF===c[0]}">${esc(c[1])}</button>`).join("")}</div>
+    <div class="row between"><span class="muted num" style="font-size:13px">${list.length} questions</span>
+      <div class="row"><button class="btn sm ghost" type="button" id="pshuf">${PORDER?"In order":"Shuffle"}</button></div></div>
+    <div class="stack" id="plist"></div>
+  </section>`;
+  $("#app").querySelectorAll("[data-f]").forEach(b => b.onclick = () => { PF = b.dataset.f; PSHOW = 20; PPICK = {}; renderPractice(); });
+  $("#pshuf").onclick = () => { PORDER = PORDER ? null : shuffle(QS.map(q=>q.id)); PSHOW = 20; renderPractice(); };
+  const chipOn = $(`.chip[aria-pressed="true"]`); if (chipOn) chipOn.scrollIntoView({block:"nearest", inline:"center"});
+  drawPList();
+}
+function pCard(q, idx){
+  if (!PPERM[q.id]) PPERM[q.id] = makePerm(q);
+  const picked = PPICK[q.id]; const reveal = picked !== undefined;
+  return `<article class="qcard" data-q="${q.id}">${metaHTML(q, "Q"+(idx+1))}<p class="qt">${esc(q.q)}</p>
+    <div class="opts">${optsHTML(q, PPERM[q.id], {picked: reveal?picked:null, reveal})}</div>${reveal?expHTML(q,picked):""}</article>`;
+}
+function drawPList(){
+  const list = practiceList(), box = $("#plist");
+  if (!list.length) { box.innerHTML = `<p class="empty">${PF==="wrong"?"No mistakes saved. Answer some questions first, or you've cleared them all.":PF==="bm"?"Nothing starred yet. Tap ☆ on any question.":"Nothing here."}</p>`; return; }
+  box.innerHTML = list.slice(0, PSHOW).map((q,i)=>pCard(q,i)).join("") + (list.length > PSHOW ? `<button class="btn" type="button" id="pmore">Show 20 more (${list.length-PSHOW} left)</button>` : "");
+  bindP(box);
+  const more = $("#pmore"); if (more) more.onclick = () => { PSHOW += 20; drawPList(); };
+}
+function bindP(box){ box.querySelectorAll(".qcard").forEach(bindCard); }
+function bindCard(card){
+  card.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    const q = QS.find(x => x.id === card.dataset.q); if (PPICK[q.id] !== undefined) return;
+    PPICK[q.id] = +b.dataset.oi; record(q, PPICK[q.id] === q.a);
+    const idx = +card.querySelector(".qno").textContent.slice(1) - 1;
+    const tmp = document.createElement("div"); tmp.innerHTML = pCard(q, idx); const nc = tmp.firstElementChild;
+    card.replaceWith(nc); bindCard(nc);
+  });
+  bindBM(card);
+}
+
+/* ============================================================
+   MOCK TEST
+   ============================================================ */
+let M = null, MCFG = {n:25, scope:"all", neg:1}, LEAVE_TO = null;
+function renderMock(){
+  if (M && M.running) return drawMockRun();
+  if (M && M.done) return drawMockResult();
+  const hist = (S.mocks||[]).slice(-6).reverse();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Timed, SSC pattern</span><h1>Mock test</h1>
+    <p class="muted">+2 for a right answer, −0.5 for a wrong one, 36 seconds per question (CGL Tier-1 pace). Answers show only after you submit.</p></div>
+    <div class="block stack">
+      <fieldset><legend>Questions</legend><div class="radios">${[10,25,50,100].map(n=>`<label><input type="radio" name="mn" id="mn${n}" value="${n}" ${MCFG.n===n?"checked":""}><span>${n} · ${Math.round(n*36/60)} min</span></label>`).join("")}</div></fieldset>
+      <fieldset><legend>From</legend><select id="mscope" aria-label="Lessons to draw from"><option value="all">All lessons</option><option value="hot">🔥 Hot topics only</option><option value="pyq">PYQs only</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}" ${MCFG.scope===l.id?"selected":""}>L${i+1} · ${esc(l.title)}</option>`).join("")}</select></fieldset>
+      <label class="row" style="gap:8px;font-weight:600"><input type="checkbox" id="mneg" ${MCFG.neg?"checked":""}> Negative marking (−0.5)</label>
+      <div id="merr" class="muted" style="font-size:14px"></div>
+      <div class="row end"><button class="btn pri" type="button" id="mstart">Start test</button></div>
+    </div>
+    ${hist.length ? `<div class="block"><h3>Recent attempts</h3><div class="hist">${hist.map(h=>`<div><span>${esc(h.d)} · ${h.n} Q</span><span class="num">${h.score}/${h.max} · ${h.acc}%</span></div>`).join("")}</div></div>` : ""}
+  </section>`;
+  $("#mscope").value = MCFG.scope;
+  $("#mstart").onclick = () => {
+    MCFG.n = +(document.querySelector('input[name="mn"]:checked')||{value:25}).value;
+    MCFG.scope = $("#mscope").value; MCFG.neg = $("#mneg").checked ? 1 : 0;
+    let pool = MCFG.scope==="all" ? QS : MCFG.scope==="pyq" ? QS.filter(q=>q.p) : MCFG.scope==="hot" ? QS.filter(q=>(L(q.t).heat||1)===3) : MCFG.scope==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===MCFG.scope);
+    if (!pool.length) { $("#merr").textContent = "No questions in that set yet. Pick another source."; return; }
+    const qs = shuffle(pool).slice(0, MCFG.n);
+    M = { running:true, list: qs.map(q=>({q, perm:makePerm(q)})), ans: qs.map(()=>null), mark: qs.map(()=>false), i:0, neg:MCFG.neg, secs: qs.length*36, start: Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000;
+    startTimer(); drawMockRun();
+  };
+}
+function startTimer(){
+  clearInterval(timerId);
+  timerId = setInterval(() => {
+    if (!M || !M.running) { clearInterval(timerId); return; }
+    const left = Math.max(0, Math.round((M.end - Date.now())/1000));
+    const el = $("#mtime"); if (el) { el.textContent = fmt(left); el.classList.toggle("low", left <= 60); }
+    if (left <= 0) submitMock();
+  }, 1000);
+}
+const fmt = s => `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+function drawMockRun(){
+  const it = M.list[M.i], q = it.q, left = Math.max(0, Math.round((M.end-Date.now())/1000));
+  const answered = M.ans.filter(a=>a!==null).length;
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="mbar"><span class="timer num ${left<=60?"low":""}" id="mtime">${fmt(left)}</span>
+      <span class="muted num" style="font-size:13px;flex:1">Q ${M.i+1}/${M.list.length} · ${answered} answered</span>
+      <button class="btn sm" type="button" id="mpal">${M.showPal?"Hide":"All Qs"}</button></div>
+    ${LEAVE_TO ? `<div class="confirm"><b>Leave the test?</b><span>Your answers so far will be scored now.</span><div class="row"><button class="btn sm pri" type="button" id="lvy">Submit and leave</button><button class="btn sm" type="button" id="lvn">Stay</button></div></div>` : ""}
+    ${M.showPal ? `<div class="block"><div class="pal">${M.list.map((_,k)=>`<button type="button" data-j="${k}" class="${M.ans[k]!==null?"a":""} ${M.mark[k]?"m":""} ${k===M.i?"cur":""}" aria-label="Question ${k+1}">${k+1}</button>`).join("")}</div>
+      <p class="muted" style="font-size:12px;margin-top:8px">Filled = answered · orange line = marked for review</p></div>` : ""}
+    <article class="qcard"><div class="qmeta"><span class="qno">Q${M.i+1}</span><span class="tag">L${LNUM(q.t)}</span>${M.mark[M.i]?`<span class="tag pyq">Marked</span>`:""}</div>
+      <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {sel:M.ans[M.i], reveal:false})}</div></article>
+    <div class="row between"><button class="btn" type="button" id="mprev" ${M.i===0?"disabled":""}>‹ Prev</button>
+      <button class="btn ghost" type="button" id="mmark">${M.mark[M.i]?"Unmark":"Mark"}</button>
+      <button class="btn ghost" type="button" id="mclr" ${M.ans[M.i]===null?"disabled":""}>Clear</button>
+      <button class="btn ${M.i<M.list.length-1?"pri":""}" type="button" id="mnext" ${M.i===M.list.length-1?"disabled":""}>Next ›</button></div>
+    ${M.confirm ? `<div class="confirm"><b>Submit the test?</b><span>${M.list.length-answered} unanswered${M.mark.filter(Boolean).length?`, ${M.mark.filter(Boolean).length} marked for review`:""}.</span><div class="row"><button class="btn sm pri" type="button" id="msubY">Submit</button><button class="btn sm" type="button" id="msubN">Keep going</button></div></div>`
+      : `<button class="btn pri" type="button" id="msub">Submit test</button>`}
+  </section>`;
+  $("#app").querySelectorAll(".opt").forEach(b => b.onclick = () => { M.ans[M.i] = +b.dataset.oi; drawMockRun(); });
+  $("#mprev").onclick = () => { if (M.i>0){M.i--; drawMockRun();} };
+  $("#mnext").onclick = () => { if (M.i<M.list.length-1){M.i++; drawMockRun(); window.scrollTo(0,0);} };
+  $("#mmark").onclick = () => { M.mark[M.i] = !M.mark[M.i]; drawMockRun(); };
+  $("#mclr").onclick = () => { M.ans[M.i] = null; drawMockRun(); };
+  $("#mpal").onclick = () => { M.showPal = !M.showPal; drawMockRun(); };
+  $("#app").querySelectorAll("[data-j]").forEach(b => b.onclick = () => { M.i = +b.dataset.j; drawMockRun(); });
+  const s = $("#msub"); if (s) s.onclick = () => { M.confirm = true; drawMockRun(); };
+  const y = $("#msubY"); if (y) y.onclick = submitMock;
+  const n = $("#msubN"); if (n) n.onclick = () => { M.confirm = false; drawMockRun(); };
+  const lvy = $("#lvy"); if (lvy) lvy.onclick = () => { const t = LEAVE_TO; LEAVE_TO = null; submitMock(); go(t); };
+  const lvn = $("#lvn"); if (lvn) lvn.onclick = () => { LEAVE_TO = null; drawMockRun(); };
+}
+function showMockLeave(tab){ LEAVE_TO = tab; drawMockRun(); }
+function submitMock(){
+  if (!M || !M.running) return;
+  clearInterval(timerId);
+  M.running = false; M.done = true; M.confirm = false;
+  let c=0,w=0,sk=0; const per = {};
+  M.list.forEach((it,k) => {
+    const a = M.ans[k]; const t = it.q.t; per[t] = per[t] || {c:0,n:0}; per[t].n++;
+    if (a===null) sk++; else if (a===it.q.a) { c++; per[t].c++; S.ans[it.q.id]=1; } else { w++; S.ans[it.q.id]=0; }
+  });
+  const max = M.list.length*2, score = +(c*2 - (M.neg? w*0.5 : 0)).toFixed(1);
+  const used = Math.min(M.secs, Math.round((Date.now()-M.start)/1000));
+  M.res = {c,w,sk,score,max,used,per, acc: (c+w) ? Math.round(c*100/(c+w)) : 0};
+  const d = new Date(); const ds = d.toLocaleDateString("en-IN",{day:"numeric",month:"short"})+" "+d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
+  S.mocks = (S.mocks||[]).concat([{d:ds, n:M.list.length, score, max, acc:M.res.acc}]).slice(-20); save(); renderTop();
+  M.filter = "wrong";
+  if (TAB==="mock") drawMockResult();
+}
+function drawMockResult(){
+  const r = M.res;
+  const per = Object.keys(r.per).sort((a,b)=>LNUM(a)-LNUM(b)).map(t => `<div><span>L${LNUM(t)} · ${esc(L(t).title)}</span><span class="num">${r.per[t].c}/${r.per[t].n}</span></div>`).join("");
+  const rows = M.list.map((it,k)=>({it,k})).filter(({it,k}) => M.filter==="all" ? true : M.filter==="wrong" ? (M.ans[k]!==null && M.ans[k]!==it.q.a) : M.ans[k]===null);
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Result</span>
+    <div class="scorebig"><span class="num">${r.score}</span><span class="muted">/ ${r.max} marks</span></div></div>
+    <div class="kpis"><div class="kpi g"><span class="num">${r.c}</span><span>right</span></div><div class="kpi b"><span class="num">${r.w}</span><span>wrong</span></div><div class="kpi"><span class="num">${r.sk}</span><span>skipped</span></div><div class="kpi"><span class="num">${r.acc}%</span><span>accuracy</span></div></div>
+    <p class="muted num" style="font-size:13px">Time used ${fmt(r.used)} of ${fmt(M.secs)}</p>
+    <div class="block"><h3>By lesson</h3><div class="hist">${per}</div></div>
+    <div class="row between"><button class="btn" type="button" id="mnew">New test</button><button class="btn pri" type="button" id="mretry">Retake same questions</button></div>
+    <h2>Review</h2>
+    <div class="chips">${[["wrong",`Wrong ${r.w}`],["skip",`Skipped ${r.sk}`],["all",`All ${M.list.length}`]].map(c=>`<button class="chip" type="button" data-rf="${c[0]}" aria-pressed="${M.filter===c[0]}">${c[1]}</button>`).join("")}</div>
+    <div class="stack">${rows.length ? rows.map(({it,k}) => `<article class="qcard">${metaHTML(it.q, "Q"+(k+1))}<p class="qt">${esc(it.q.q)}</p><div class="opts">${optsHTML(it.q, it.perm, {picked:M.ans[k], reveal:true})}</div>${M.ans[k]===null?`<div class="exp"><b class="nol">Skipped. Answer: ${esc(it.q.o[it.q.a])}.</b> ${esc(it.q.e)}</div>`:expHTML(it.q, M.ans[k])}</article>`).join("") : `<p class="empty">Nothing in this list.</p>`}</div>
+  </section>`;
+  bindBM($("#app"));
+  $("#app").querySelectorAll("[data-rf]").forEach(b => b.onclick = () => { M.filter = b.dataset.rf; drawMockResult(); });
+  $("#mnew").onclick = () => { M = null; renderMock(); };
+  $("#mretry").onclick = () => {
+    const list = M.list.map(it=>({q:it.q, perm:makePerm(it.q)}));
+    M = { running:true, list, ans:list.map(()=>null), mark:list.map(()=>false), i:0, neg:MCFG.neg, secs:list.length*36, start:Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000; startTimer(); drawMockRun();
+  };
+}
+
+/* ============================================================
+   REVISE
+   ============================================================ */
+let RV = "heat", FC = null, FCSCOPE = "all";
+const HID = {}, REV = {};
+Object.keys(COVERS).forEach(k => { HID[k] = 1; REV[k] = {}; });
+function renderRevise(){
+  const tabs = [["heat","🔥 PYQ heat map"]].concat(Object.keys(COVERS).map(k=>[k, COVERS[k].tab]), [["dis",FIND.tab],["nums","Numbers & pairs"],["links","Connections"],["tricks","Tricks"],["traps","Traps"],["flash","Flashcards"]]);
+  if (!tabs.some(t=>t[0]===RV)) RV = "heat";
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Last-day revision</span><h1>Revise</h1></div>
+    <div class="seg" role="tablist">${tabs.map(t=>`<button type="button" role="tab" data-rv="${t[0]}" aria-selected="${RV===t[0]}">${t[1]}</button>`).join("")}</div>
+    <div id="rv" class="stack"></div></section>`;
+  $("#app").querySelectorAll("[data-rv]").forEach(b => b.onclick = () => { RV = b.dataset.rv; renderRevise(); });
+  const on = $(`.seg [aria-selected="true"]`); if (on) on.scrollIntoView({block:"nearest", inline:"center"});
+  const box = $("#rv");
+  const pk = (key, i, val) => (HID[key] && !REV[key][i]) ? `<button type="button" class="peek" data-pk="${key}:${i}">tap</button>` : val;
+  const coverChips = (key, label) => `<div class="chips"><button type="button" class="chip" data-hide="${key}" aria-pressed="${!!HID[key]}">${label}</button><button type="button" class="chip" data-cover="${key}">Cover all again</button></div>`;
+  const bindCover = () => {
+    box.querySelectorAll("[data-hide]").forEach(b => b.onclick = () => { const k=b.dataset.hide; HID[k] = HID[k]?0:1; renderRevise(); });
+    box.querySelectorAll("[data-cover]").forEach(b => b.onclick = () => { REV[b.dataset.cover] = {}; renderRevise(); });
+    box.querySelectorAll("[data-pk]").forEach(b => b.onclick = () => { const [k,i] = b.dataset.pk.split(":"); REV[k][i]=1; renderRevise(); });
+  };
+  if (RV === "heat") {
+    const max = Math.max(...HEAT.map(h=>h[1]));
+    box.innerHTML = `<p class="muted">${APP.heatNote}</p>
+      <div class="block"><div class="heat">${HEAT.map(h=>`<button type="button" class="hrow" data-open="${h[2]}"><span class="ht"><b>${esc(h[0])}</b><span class="muted">${esc(h[3])}</span></span><span class="hbar"><i style="width:${h[1]/max*100}%"></i></span><span class="num hp">${h[1]}%</span></button>`).join("")}</div></div>
+      <div class="block"><h3>Lessons by exam heat</h3><dl class="rk">${[3,2,1].map(n=>`<div><dt>${"🔥".repeat(n)} ${n===3?"Very frequent":n===2?"Regular":"Occasional"}</dt><dd>${LESSONS.map((l,i)=>[l,i]).filter(x=>(x[0].heat||1)===n).map(x=>`L${x[1]+1} ${esc(x[0].title)}`).join(" · ")}</dd></div>`).join("")}</dl></div>`;
+    box.querySelectorAll("[data-open]").forEach(b => b.onclick = () => openLesson(b.dataset.open, "learn"));
+  }
+  if (COVERS[RV]) {
+    const c = COVERS[RV];
+    box.innerHTML = `<p class="muted">${c.note}</p>${coverChips(RV, c.hideLabel)}
+      <div class="block"><div class="tbl"><table class="cover"><thead><tr>${c.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${c.rows.map((r,i)=>`<tr>${r.map((v,ci)=>`<td ${ci?`data-l="${c.head[ci]}"`:""}>${ci===0?`<b>${esc(v)}</b>`:ci===c.hide?pk(RV,i,esc(v)):esc(v)}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+    bindCover();
+  }
+  if (RV === "dis") {
+    box.innerHTML = `<input class="search" id="fs" type="search" placeholder="${FIND.ph}" aria-label="${FIND.tab}">
+      <div class="chips" id="dtype"></div>
+      <div class="block"><div class="tbl"><table class="cover"><thead><tr>${FIND.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody id="fb"></tbody></table></div></div>`;
+    const types = ["All"].concat([...new Set(FIND.rows.map(d=>d[2]))]);
+    let T = "All";
+    const draw = () => { const q = $("#fs").value.trim().toLowerCase();
+      $("#dtype").innerHTML = types.map(t=>`<button type="button" class="chip" data-t="${esc(t)}" aria-pressed="${T===t}">${esc(t)}</button>`).join("");
+      $("#dtype").querySelectorAll("[data-t]").forEach(b => b.onclick = () => { T = b.dataset.t; draw(); });
+      const rows = FIND.rows.filter(x => (T==="All"||x[2]===T) && (!q || x.join(" ").toLowerCase().includes(q)));
+      $("#fb").innerHTML = rows.length ? rows.map(a=>`<tr><td><b>${esc(a[0])}</b></td><td data-l="${FIND.head[1]}">${esc(a[1])}</td><td data-l="${FIND.head[2]}">${esc(a[2])}</td><td data-l="${FIND.head[3]}" class="muted">${esc(a[3])}</td></tr>`).join("") : `<tr><td colspan="4" class="muted">No match.</td></tr>`; };
+    $("#fs").oninput = draw; draw();
+  }
+  if (RV === "links") {
+    const items = LESSONS.flatMap((l,i) => l.blocks.filter(b=>b.k==="link").map(b=>({l:i+1, t:l.title, h:b.h})));
+    box.innerHTML = items.map(x => `<div class="link"><span class="lab">L${x.l} · ${esc(x.t)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "nums") {
+    box.innerHTML = `<div class="tiles">${TILES.map(t=>`<div class="tile"><span class="num">${t[0]}</span><span>${t[1]}</span></div>`).join("")}</div>
+    <div class="block"><h3>Look-alike pairs</h3><dl class="rk">${PAIRS.map(p=>`<div><dt>${esc(p[0])}</dt><dd>${esc(p[1])}</dd></div>`).join("")}</dl></div>`;
+  }
+  if (RV === "tricks" || RV === "traps") {
+    const kind = RV==="tricks" ? "trick" : "trap";
+    const items = LESSONS.flatMap((l,i) => l.blocks.filter(b=>b.k===kind).map(b=>({l:i+1, t:l.title, h:b.h})));
+    const extra = kind==="trick" ? `<div class="trick"><span class="lab">Exam craft</span>${APP.craft}</div>` : "";
+    box.innerHTML = extra + items.map(x => `<div class="${kind}"><span class="lab">L${x.l} · ${esc(x.t)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "flash") drawFlash(box);
+}
+
+
+function drawFlash(box){
+  if (!FC) { const pool = FCSCOPE==="all" ? QS : FCSCOPE==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===FCSCOPE); FC = {list: shuffle(pool), i:0, flip:false, known:0}; }
+  const sel = `<select id="fcs" aria-label="Flashcard set"><option value="all">All questions</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}">L${i+1} · ${esc(l.title)}</option>`).join("")}</select>`;
+  if (!FC.list.length || FC.i >= FC.list.length) {
+    box.innerHTML = `<div class="row">${sel}</div><div class="block stack"><h3>${FC.list.length ? "Deck finished" : "No cards in this set"}</h3>${FC.list.length?`<p class="muted">You knew ${FC.known} of ${FC.list.length} on first look.</p>`:""}<div class="row"><button class="btn pri" type="button" id="fcr">Shuffle and restart</button></div></div>`;
+    $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+    $("#fcr").onclick = () => { FC = null; drawFlash(box); }; return;
+  }
+  const q = FC.list[FC.i];
+  box.innerHTML = `<div class="row between">${sel}<span class="muted num" style="font-size:13px">${FC.i+1}/${FC.list.length}</span></div>
+    <button type="button" class="flash" id="fcard" aria-label="Flip card">
+      <span class="side">${FC.flip?"Answer":"Question · tap to flip"}</span>
+      <span class="front">${esc(q.q)}</span>
+      ${FC.flip ? `<span class="ans">${esc(q.o[q.a])}</span><span class="muted">${esc(q.e)}</span>` : ""}
+    </button>
+    <div class="row between"><button class="btn" type="button" id="fca" ${FC.flip?"":"disabled"}>Again later</button><button class="btn pri" type="button" id="fck" ${FC.flip?"":"disabled"}>Got it</button></div>`;
+  $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+  $("#fcard").onclick = () => { FC.flip = !FC.flip; drawFlash(box); };
+  $("#fca").onclick = () => { FC.list.push(q); FC.list.splice(FC.i,1); FC.flip=false; drawFlash(box); };
+  $("#fck").onclick = () => { FC.known++; FC.i++; FC.flip=false; drawFlash(box); };
+}
+
+/* boot */
+renderTop();
+const start = (location.hash||"").replace("#","");
+go(["learn","practice","mock","revise"].includes(start) ? start : "learn");
+</script>
+
+
+<style id="shabd-skin">
+/* ===== शब्दRegister skin: app colours + fonts (only when opened from the app) ===== */
+:root[data-skin="paper"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(150,128,90,.10) 31px, rgba(150,128,90,.10) 32px);--app-psize:auto;--app-card:#FFFCF6;--app-rule:#DCCFB2;--app-pri:#2F6F63;--app-ink:#221E17;--app-soft:#5E5547;--app-faint:#857B6A;--app-bg:#F3EEE3;--app-deep:#E9E1CF;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#F3EEE3;--sheet:#FFFCF6;--sunk:#E9E1CF;--ink:#221E17;--ink2:#5E5547;--rule:#DCCFB2;--blue:#2F6F63;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--accent:#A87E1F;--accent-bg:color-mix(in srgb, #A87E1F 16%, #FFFCF6);--good:#2F6F63;--good-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--bad:#8C2F39;--bad-bg:color-mix(in srgb, #8C2F39 14%, #FFFCF6);--warn-bg:color-mix(in srgb, #C99A2E 18%, #FFFCF6);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="paper"][data-theme="dark"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--sheet:#26211A;--sunk:#25201A;--ink:#EFE6D2;--ink2:#BDB195;--rule:#3B3429;--blue:#3F9A86;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3F9A86 22%, #26211A);--accent:#D9AE4B;--accent-bg:color-mix(in srgb, #D9AE4B 24%, #26211A);--good:#5FB9A3;--good-bg:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-bg:color-mix(in srgb, #D06B74 22%, #26211A);--warn-bg:color-mix(in srgb, #D9AE4B 26%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="paper"]:not([data-theme="light"]){--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--sheet:#26211A;--sunk:#25201A;--ink:#EFE6D2;--ink2:#BDB195;--rule:#3B3429;--blue:#3F9A86;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3F9A86 22%, #26211A);--accent:#D9AE4B;--accent-bg:color-mix(in srgb, #D9AE4B 24%, #26211A);--good:#5FB9A3;--good-bg:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-bg:color-mix(in srgb, #D06B74 22%, #26211A);--warn-bg:color-mix(in srgb, #D9AE4B 26%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin="indigo"]{--app-pattern:radial-gradient(rgba(61,92,240,.10) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#FFFFFF;--app-rule:#CBD3EC;--app-pri:#3D5CF0;--app-ink:#0F1B3D;--app-soft:#4A5680;--app-faint:#67739C;--app-bg:#EEF1FA;--app-deep:#E1E6F5;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#EEF1FA;--sheet:#FFFFFF;--sunk:#E1E6F5;--ink:#0F1B3D;--ink2:#4A5680;--rule:#CBD3EC;--blue:#3D5CF0;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3D5CF0 14%, #FFFFFF);--accent:#D9831A;--accent-bg:color-mix(in srgb, #D9831A 16%, #FFFFFF);--good:#147D53;--good-bg:color-mix(in srgb, #147D53 14%, #FFFFFF);--bad:#C8402F;--bad-bg:color-mix(in srgb, #C8402F 14%, #FFFFFF);--warn-bg:color-mix(in srgb, #F7C548 18%, #FFFFFF);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="indigo"][data-theme="dark"]{--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--sheet:#121D47;--sunk:#0E1839;--ink:#EEF2FF;--ink2:#A7B3DA;--rule:#22306A;--blue:#6F86FF;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #6F86FF 22%, #121D47);--accent:#F7B24D;--accent-bg:color-mix(in srgb, #F7B24D 24%, #121D47);--good:#45C08A;--good-bg:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-bg:color-mix(in srgb, #F07B6E 22%, #121D47);--warn-bg:color-mix(in srgb, #F7C548 26%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="indigo"]:not([data-theme="light"]){--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--sheet:#121D47;--sunk:#0E1839;--ink:#EEF2FF;--ink2:#A7B3DA;--rule:#22306A;--blue:#6F86FF;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #6F86FF 22%, #121D47);--accent:#F7B24D;--accent-bg:color-mix(in srgb, #F7B24D 24%, #121D47);--good:#45C08A;--good-bg:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-bg:color-mix(in srgb, #F07B6E 22%, #121D47);--warn-bg:color-mix(in srgb, #F7C548 26%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin] body{background-color:var(--app-bg);background-image:var(--app-pattern);background-size:var(--app-psize);background-attachment:fixed}
+:root[data-skin] h1,:root[data-skin] h2{letter-spacing:-.01em}
+
+/* ===== Desktop layout (PC / tablet landscape) ===== */
+@media (min-width: 1024px){
+  :root{--side:236px}
+  body{padding-left:var(--side);font-size:16.5px}
+  .top{border-bottom:1px solid var(--rule)}
+  .top-in{max-width:1320px;padding:16px 36px}
+  .brand{font-size:21px}
+  .brand small{font-size:13px}
+  .stat{font-size:13px}
+  .wrap{max-width:1320px;padding:0 36px 56px}
+  .view{padding-top:28px}
+  h1{font-size:34px} h2{font-size:22px} h3{font-size:17px}
+
+  /* bottom tab bar becomes a left sidebar */
+  .nav{top:0;bottom:0;left:0;right:auto;width:var(--side);height:auto;border-top:0;border-right:1px solid var(--rule);padding:84px 14px 20px;display:block;overflow:auto}
+  .nav-in{display:flex;flex-direction:column;gap:4px;height:auto;max-width:none;margin:0}
+  .nav-in::before{content:"Sections";display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);padding:0 14px 8px}
+  .nav button{flex-direction:row;justify-content:flex-start;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;font-size:15px;min-height:0;height:auto;width:100%;text-align:left}
+  .nav button svg{width:20px;height:20px;flex-shrink:0}
+  .nav button:hover{background:var(--sunk)}
+  .nav button[aria-current="page"]{background:var(--blue-bg)}
+  .nav button[aria-current="page"] span{border-bottom:0!important}
+
+  /* home: intro beside progress, lessons as a card grid */
+  .hero{grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);column-gap:48px;align-items:end;padding-bottom:10px}
+  .hero > .eyebrow,.hero > h1,.hero > p{grid-column:1}
+  .hero > .meter{grid-column:2;grid-row:3;align-self:center}
+  .hero > .row{grid-column:2;grid-row:2;align-self:end}
+  .lessons{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;border-top:0}
+  .les{background:var(--sheet);border:1px solid var(--rule);border-radius:16px;padding:16px 18px;transition:transform .15s ease,box-shadow .15s ease,border-color .15s}
+  .les:hover{transform:translateY(-2px);border-color:var(--blue);box-shadow:0 14px 30px -22px rgba(0,0,0,.45)}
+  .les.next{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
+
+  /* lesson reader: facts, timelines, tricks sit side by side */
+  .lhead{margin-bottom:0}
+  .steps{max-width:640px}
+  .steps + .stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+  .steps + .stack > .plain,.steps + .stack > .row,.steps + .stack > p,.steps + .stack > .fig,.steps + .stack > h2,.steps + .stack > .tbl{grid-column:1/-1}
+  .steps + .stack > .plain{max-width:86ch;font-size:17px}
+  .steps + .stack:not(:has(> .block ~ .block)) > .block{grid-column:1/-1}
+  .block,.qcard{padding:18px 20px;border-radius:14px}
+
+  /* quizzes and question bank */
+  #lq > .stack{display:grid;grid-template-columns:minmax(0,1fr);max-width:980px;gap:16px}
+  .opts{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .qt{font-size:18px}
+  #plist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #plist .opts{grid-template-columns:minmax(0,1fr)}
+  .chips{flex-wrap:wrap;overflow:visible}
+
+  /* mock test: question with the answer grid alongside */
+  .mbar{top:calc(env(safe-area-inset-top,0px) + 67px)}
+  .view > .qcard{max-width:1000px}
+  .view > .row.between{max-width:1000px}
+  .view > #msub{max-width:1000px;width:100%}
+  .view > .block.stack{max-width:760px}
+  .pal{grid-template-columns:repeat(auto-fill,minmax(46px,1fr))}
+  .kpis{max-width:760px}
+
+  /* revise: cards in columns */
+  #rkl,#rv > .stack:not(#rkl){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #rv > .search{max-width:520px}
+  .tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .flash{min-height:300px;max-width:760px;margin:0 auto;padding:32px 36px}
+  .flash .front{font-size:22px}
+}
+@media (min-width: 1500px){
+  #plist,#rkl{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+</style>
+</body></html>
