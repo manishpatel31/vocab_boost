@@ -830,7 +830,16 @@
   .home-exam small{ color:var(--ink-faint); font-size:12.5px; align-self:start; }
   .home-exam.past{ display:block; }
   .home-row1{ display:grid; grid-template-columns:minmax(0, 1.25fr) minmax(0, 1fr); gap:14px; }
-  .home-row2{ display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:14px; margin-top:14px; }
+  header.top #presentBtn, header.top #aodBtn, header.top #panicBtn{ display:none !important; }
+  .home-row2{ display:grid; grid-template-columns:1fr; gap:14px; margin-top:14px; }
+  .home-due-rows{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:4px 10px; }
+  @media (max-width: 860px){ .home-due-rows{ grid-template-columns:1fr; } }
+  /* Vocab section: word of the day + tools above the word list */
+  .vocab-dash{ display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1.6fr); gap:14px; margin:0 0 22px; }
+  .vocab-dash .home-tools{ grid-template-columns:repeat(3, minmax(0, 1fr)); align-content:start; }
+  .vocab-dash .home-wotd{ min-height:100%; }
+  @media (max-width: 1060px){ .vocab-dash{ grid-template-columns:1fr; } .vocab-dash .home-tools{ grid-template-columns:repeat(6, minmax(0, 1fr)); } }
+  @media (max-width: 700px){ .vocab-dash .home-tools{ grid-template-columns:repeat(3, minmax(0, 1fr)); } }
   .home-card{ position:relative; overflow:hidden; text-align:left; display:flex; flex-direction:column; gap:10px; padding:18px; background:var(--card); color:var(--ink); border:1px solid var(--rule); border-radius:var(--radius-lg); box-shadow:var(--shadow); font:inherit; min-width:0; }
   button.home-card{ cursor:pointer; transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease; }
   button.home-card:hover{ transform:translateY(-2px); box-shadow:var(--shadow-lg); }
@@ -1091,6 +1100,7 @@
     <section class="view active" id="view-home"><div class="home" id="homeBody"></div></section>
 
     <section class="view" id="view-library">
+      <div class="vocab-dash" id="vocabDash"></div>
       <div class="toolbar">
         <input type="search" id="searchBox" placeholder="Search term…">
         <select id="filterType">
@@ -1547,7 +1557,10 @@
     festivals:{ title: 'Festivals of India',           file: 'study-festivals.html',    key: 'festivals_workbook_v1' },
     iprplans: { title: 'IPR & Five Year Plans',        file: 'study-ipr-plans.html',    key: 'economy_ipr_plans_v1' },
     folkdances:{ title: 'Folk Dances of India',        file: 'study-folk-dances.html',  key: 'folk_dances_workbook_v1' },
-    appointments:{ title: 'Appointments 2026',          file: 'study-appointments.html', key: 'appointments_workbook_v1' }
+    appointments:{ title: 'Appointments 2026',          file: 'study-appointments.html', key: 'appointments_workbook_v1' },
+    polity:   { title: 'Indian Polity',                file: 'study-polity.html',       key: 'polity_pyq_workbook_v1' },
+    economics:{ title: 'Indian Economy',               file: 'study-economics.html',    key: 'economics_pyq_workbook_v1' },
+    space:    { title: 'Space & ISRO Missions',              file: 'study-space.html',        key: 'space_missions_workbook_v1' }
   };
   STUDY.grammar.subj = 'english'; STUDY.grammar.ico = '✍️'; STUDY.grammar.hi = 'व्याकरण · error spotting'; STUDY.grammar.desc = '100 rules with logic, tricks and examples; unit tests after every 10 rules; revise and mistakes lists.'; STUDY.grammar.meta = '100 rules · unit tests'; STUDY.grammar.color = '#C8402F';
   STUDY.bns.subj = 'gs'; STUDY.bns.ico = '⚖️'; STUDY.bns.hi = 'नए आपराधिक क़ानून · Polity'; STUDY.bns.desc = 'The three new criminal laws — what replaced what, key offences, police & court procedure, evidence.'; STUDY.bns.meta = '12 lessons · mock test'; STUDY.bns.color = '#3D5CF0';
@@ -1560,6 +1573,9 @@
   STUDY.iprplans.subj = 'gs'; STUDY.iprplans.ico = '🏭'; STUDY.iprplans.hi = 'औद्योगिक नीति · पंचवर्षीय योजनाएँ'; STUDY.iprplans.desc = 'Industrial Policy Resolutions (1948, 1956, 1991 …) and the Five Year Plans — aims, models, highlights and NITI Aayog.'; STUDY.iprplans.meta = '12 lessons · 252 questions'; STUDY.iprplans.color = '#8C5A2B';
   STUDY.folkdances.subj = 'gs'; STUDY.folkdances.ico = '💃'; STUDY.folkdances.hi = 'भारत के लोक नृत्य'; STUDY.folkdances.desc = 'Folk and tribal dances state by state — who performs them, when, and the tricks to tell look-alikes apart.'; STUDY.folkdances.meta = '16 lessons · 444 questions'; STUDY.folkdances.color = '#B0306A';
   STUDY.appointments.subj = 'gs'; STUDY.appointments.ico = '🎖️'; STUDY.appointments.hi = 'नियुक्तियाँ · कौन कहाँ'; STUDY.appointments.desc = 'Who heads what in 2026 — constitutional posts, forces, RBI & regulators, international bodies and recent appointments.'; STUDY.appointments.meta = '13 lessons · 269 questions'; STUDY.appointments.color = '#2E6DA4';
+  STUDY.polity.subj = 'gs'; STUDY.polity.ico = '📜'; STUDY.polity.hi = 'भारतीय राजव्यवस्था · PYQ'; STUDY.polity.desc = 'The whole Constitution the SSC way — Parts, Schedules, key Articles, President to Parliament, emergencies and amendments.'; STUDY.polity.meta = '20 lessons · 481 questions'; STUDY.polity.color = '#3A4F9A';
+  STUDY.economics.subj = 'gs'; STUDY.economics.ico = '💹'; STUDY.economics.hi = 'भारतीय अर्थव्यवस्था · PYQ'; STUDY.economics.desc = 'Demand to GDP, inflation, RBI & banking, budget, GST, 1991 reforms and trade — built from past SSC questions.'; STUDY.economics.meta = '20 lessons · 530 questions'; STUDY.economics.color = '#1E7A8C';
+  STUDY.space.subj = 'gs'; STUDY.space.ico = '🚀'; STUDY.space.hi = 'अंतरिक्ष मिशन · Science & Tech'; STUDY.space.desc = 'Orbits, rockets and ISRO centres; Chandrayaan, Aditya-L1, Gaganyaan, NISAR and the 2024–26 launches.'; STUDY.space.meta = '16 lessons · 374 questions'; STUDY.space.color = '#5B45B0';
   // General Studies is split by subject in पाठShala
   var GS_SUBJECTS = [
     ['history', 'History', 'इतिहास'], ['culture', 'Art & Culture', 'कला एवं संस्कृति'], ['polity', 'Polity', 'राजव्यवस्था'],
@@ -1569,6 +1585,8 @@
   STUDY.bns.gsub = 'polity'; STUDY.schemes.gsub = 'economy'; STUDY.iprplans.gsub = 'economy'; STUDY.census.gsub = 'geography';
   STUDY.festivals.gsub = 'culture'; STUDY.folkdances.gsub = 'culture'; STUDY.sports.gsub = 'staticgk'; STUDY.intlorgs.gsub = 'staticgk';
   STUDY.reports.gsub = 'current'; STUDY.appointments.gsub = 'current';
+  STUDY.polity.core = STUDY.economics.core = 1;
+  STUDY.polity.gsub = 'polity'; STUDY.economics.gsub = 'economy'; STUDY.space.gsub = 'science';
   var studyOpen = null, studyWatch = null, studyPushTimer = null, studyLast = null;
   function agoText(ms){
     if(!ms) return 'Not started yet';
@@ -1668,10 +1686,10 @@
     var due = currentUser ? dueRevisions().length : 0, mist = totalMistakes();
     var ve = viewEntries(), mem = ve.filter(function(e){ return e.confidence >= 5; }).length, left = ve.length - mem;
     var row = function(act, ico, n, label, sub, cls){ return '<button class="home-due-row ' + (cls || '') + '" data-home-act="' + act + '"><span class="ic">' + ico + '</span><span class="tx"><b>' + label + '</b><small>' + sub + '</small></span><span class="n">' + n + '</span></button>'; };
-    return '<div class="home-card home-due"><div class="home-card-h">Waiting for you</div>' +
+    return '<div class="home-card home-due"><div class="home-card-h">Waiting for you</div><div class="home-due-rows">' +
       row('revision', '🔁', due, 'Revision rounds', due ? 'Memorized words due back today' : 'Nothing due today', due ? 'hot' : '') +
       row('mistakes', '📕', mist, 'Mistakes book', mist ? 'Wrong answers from every subject' : 'No mistakes waiting', mist ? 'hot' : '') +
-      row('library', '📖', left, 'Words to master', mem + ' of ' + ve.length + ' memorized', '') + '</div>';
+      row('library', '📖', left, 'Words to master', mem + ' of ' + ve.length + ' memorized', '') + '</div></div>';
   }
   function homeWordCard(){
     var w = wordOfDay();
@@ -1679,13 +1697,13 @@
     return '<button class="home-card home-wotd" data-home-act="word" data-id="' + escapeAttr(w.id) + '"><div class="home-card-h">Word of the day <span class="lvl">Level ' + (w.confidence || 0) + '</span></div>' +
       '<div class="home-wotd-term">' + escapeHtml(w.term) + '</div>' + (w.type ? '<div class="hi">' + escapeHtml(w.type) + '</div>' : '') +
       (w.english_meaning ? '<p>' + escapeHtml(w.english_meaning) + '</p>' : '') + (w.hindi_meaning ? '<p class="home-hi">' + escapeHtml(w.hindi_meaning) + '</p>' : '') +
-      '<div class="hub-meta"><span>शब्दRegister</span><b>Open card ›</b></div></button>';
+      '<div class="hub-meta"><span>New one every day</span><b>Open card ›</b></div></button>';
   }
   function homeTools(){
     var t = [['present', '🖥️', 'Present', 'Flash cards'], ['aod', '🌙', 'AOD mode', 'Always-on revision'], ['audio', '🎧', 'Audio', 'Hands-free'],
-      ['quiz', '🧩', 'Vocab quiz', 'Blanks · spellings'], ['add', '➕', 'Add words', 'From any AI'], ['panic', '⚡', 'Exam tomorrow', '30 weakest words']];
-    return '<section class="hub-sec"><div class="hub-sec-h"><h2>Vocab tools</h2><span>शब्दावली अभ्यास</span></div><div class="home-tools">' +
-      t.map(function(x){ return '<button data-home-act="' + x[0] + '"><span class="ic">' + x[1] + '</span><b>' + x[2] + '</b><small>' + x[3] + '</small></button>'; }).join('') + '</div></section>';
+      ['quiz', '🧩', 'Vocab quiz', 'Blanks · spellings'], ['revision', '🔁', 'Revision', '7 · 14 · 30 days'], ['panic', '⚡', 'Exam tomorrow', '30 weakest words']];
+    return '<div class="home-tools" aria-label="Vocab tools">' +
+      t.map(function(x){ return '<button data-home-act="' + x[0] + '"><span class="ic">' + x[1] + '</span><b>' + x[2] + '</b><small>' + x[3] + '</small></button>'; }).join('') + '</div>';
   }
   function homeVocabCard(){
     var ve = viewEntries(), mem = ve.filter(function(e){ return e.confidence >= 5; }).length, pct = ve.length ? Math.round(mem * 100 / ve.length) : 0;
@@ -1703,8 +1721,7 @@
     var ids = Object.keys(STUDY);
     box.innerHTML = homeHero() +
       '<div class="home-row1">' + homeTodayCard() + homeContinueCard() + '</div>' +
-      '<div class="home-row2">' + homeDueCard() + homeWordCard() + '</div>' +
-      homeTools() +
+      '<div class="home-row2">' + homeDueCard() + '</div>' +
       hubPracticeSection() +
       '<section class="hub-sec"><div class="hub-sec-h"><h2>English</h2><span>अंग्रेज़ी</span></div><div class="hub-grid">' + homeVocabCard() + ids.filter(function(id){ return STUDY[id].subj === 'english'; }).map(hubCard).join('') + '</div></section>' +
       '<section class="hub-sec" id="homeGs"><div class="hub-sec-h"><h2>General Studies</h2><span>सामान्य अध्ययन · ' + gsIds().length + ' mini apps</span></div>' +
@@ -1713,17 +1730,23 @@
           return '<button data-hub-jump="' + g[0] + '">' + g[1] + ' <small>' + n + '</small></button>';
         }).join('') + '</div><div class="hub-subs">' +
         GS_SUBJECTS.concat([['other', 'More', 'अन्य']]).map(function(g){
-          var list = gsIds().filter(function(id){ return (STUDY[id].gsub || 'other') === g[0]; });
+          var list = gsIds().filter(function(id){ return (STUDY[id].gsub || 'other') === g[0]; }).sort(function(a, b){ return (STUDY[b].core ? 1 : 0) - (STUDY[a].core ? 1 : 0); });
           if(!list.length) return '';
           return '<div class="hub-sub" id="hubsub-' + g[0] + '" style="--n:' + Math.min(3, list.length) + ';"><div class="hub-sub-h"><h3>' + g[1] + '</h3><span>' + g[2] + '</span></div><div class="hub-grid">' + list.map(hubCard).join('') + '</div></div>';
         }).join('') +
       '</div></section>';
   }
+  function renderVocabDash(){
+    var box = document.getElementById('vocabDash');
+    if(box) box.innerHTML = homeWordCard() + homeTools();
+  }
+  document.getElementById('vocabDash').addEventListener('click', studyClick);
   var renderHome = renderHub, homeTimer = null;
   function renderHomeSoon(){
     clearTimeout(homeTimer);
     homeTimer = setTimeout(function(){
       if(isActive('home') && !drillOpen) renderHub();
+      if(isActive('library')) renderVocabDash();
       if(isActive('stats')) renderStudyStats();
     }, 250);
   }
@@ -1930,6 +1953,9 @@
   STUDY.iprplans.lessons = 12; STUDY.iprplans.unit = 'lessons';
   STUDY.folkdances.lessons = 16; STUDY.folkdances.unit = 'lessons';
   STUDY.appointments.lessons = 13; STUDY.appointments.unit = 'lessons';
+  STUDY.polity.lessons = 20; STUDY.polity.unit = 'lessons';
+  STUDY.economics.lessons = 20; STUDY.economics.unit = 'lessons';
+  STUDY.space.lessons = 16; STUDY.space.unit = 'lessons';
   function gsIds(){ return Object.keys(STUDY).filter(function(id){ return STUDY[id].subj === 'gs'; }); }
   var STUDY_EXTRA = { mocks: { key: 'shabdMockHistory', title: 'Mixed mock history' } };
   function studyMod(id){ return STUDY[id] || STUDY_EXTRA[id]; }
@@ -2016,7 +2042,7 @@
 
   // ---- the practice / mock screen ----
   var drill = null, drillOpen = false, drillTimer = null;
-  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments' };
+  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments', polity: 'Polity', economics: 'Economy', space: 'Space' };
   function openDrill(title){
     closeAllMenus();
     drillOpen = true;
@@ -2859,7 +2885,7 @@
     document.body.classList.toggle('on-home', name === 'home');
     if(name === 'library') libraryAnimate = true;
     window.scrollTo(0, 0);
-    if(name === 'library') renderLibrary();
+    if(name === 'library'){ renderVocabDash(); renderLibrary(); }
     if(name === 'home'){ renderHub(); refreshHubProgressSoon(); }
     if(name === 'stats'){ renderStreakPanel(); renderStudyStats(); renderStats(); renderLeaderboard(); renderAllUsers(); refreshHubProgressSoon(); }
     if(name === 'review'){ renderReview(); renderSpellReview(); }
