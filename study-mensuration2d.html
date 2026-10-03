@@ -1,0 +1,1406 @@
+<!doctype html><html><head><meta charset=utf8>
+<script>
+/* शब्दRegister bridge: follows the app's look (Paper / Indigo) and Light / Dark / Auto choice. */
+(function(){
+  var root = document.documentElement;
+  function theme(t){ if(t === 'dark' || t === 'light') root.setAttribute('data-theme', t); else root.removeAttribute('data-theme'); }
+  function skin(s){ if(s === 'paper' || s === 'indigo') root.setAttribute('data-skin', s); }
+  try{
+    var q = new URLSearchParams(location.search);
+    theme(q.get('theme'));
+    skin(q.get('skin') || (q.get('embed') ? 'paper' : ''));
+    if(q.get('embed')) root.classList.add('in-shabd');
+  }catch(e){}
+  window.addEventListener('message', function(e){
+    if(e.origin !== location.origin || !e.data || e.data.type !== 'shabd-theme') return;
+    theme(e.data.theme);
+    if(e.data.skin) skin(e.data.skin);
+  });
+})();
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap">
+<meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Mensuration 2D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<style>
+/* Layout: Physics PYQ Workbook — follows the शब्दRegister Paper / Indigo look; one column + bottom tabs on phones, sidebar on PC. */
+:root{
+  --paper:#f6f3ea; --sheet:#fffdf7; --sunk:#ebe6d8;
+  --ink:#1d2a22; --ink2:#56625a; --rule:#dcd5c3;
+  --blue:#1f5c3d; --on-blue:#ffffff; --blue-bg:#dcebdf;
+  --accent:#b4530f; --accent-bg:#fbe7d3;
+  --good:#1b7547; --good-bg:#dff1e6; --bad:#b0271f; --bad-bg:#f8e1de;
+  --warn-bg:#fff2d2;
+  --f-display:"Fraunces", "Tiro Devanagari Hindi", Georgia, serif;
+  --f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-num:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r:10px; --nav-h:64px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#111612; --sheet:#1a211c; --sunk:#222b25;
+  --ink:#e8eee9; --ink2:#a3b0a7; --rule:#2f3a33;
+  --blue:#86cfa2; --on-blue:#111612; --blue-bg:#1d3a29;
+  --accent:#f3a764; --accent-bg:#3b2614;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#111612; --sheet:#1a211c; --sunk:#222b25;
+  --ink:#e8eee9; --ink2:#a3b0a7; --rule:#2f3a33;
+  --blue:#86cfa2; --on-blue:#111612; --blue-bg:#1d3a29;
+  --accent:#f3a764; --accent-bg:#3b2614;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
+.wrap{max-width:640px;margin:0 auto;padding-inline:16px;padding-block:0 calc(var(--nav-h) + 28px + env(safe-area-inset-bottom,0px))}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);border-bottom:1px solid var(--rule)}
+.top-in{max-width:640px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px}
+.brand{font-family:var(--f-display);font-weight:800;font-size:17px;line-height:1.2;flex:1;min-width:0}
+.brand small{display:block;font-family:var(--f-body);font-weight:500;font-size:12px;color:var(--ink2);letter-spacing:.02em}
+.stat{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right;white-space:nowrap}
+.stat b{color:var(--ink);font-weight:600}
+
+/* bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--sheet);border-top:1px solid var(--rule);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);height:var(--nav-h)}
+.nav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer}
+.nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav button[aria-current="page"]{color:var(--blue)}
+.nav button[aria-current="page"] span{border-bottom:2px solid var(--blue)}
+
+/* type */
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.25;margin:0}
+h1{font-size:24px;font-weight:800}
+h2{font-size:19px;font-weight:800}
+h3{font-size:16px;font-weight:700}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--ink2)}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+p{margin:0}
+.stack{display:flex;flex-direction:column;gap:14px}
+.view{padding-top:18px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--rule);background:var(--sheet);font-weight:600;cursor:pointer;text-decoration:none}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:var(--on-blue)}
+.btn.ghost{background:transparent}
+.btn.sm{min-height:36px;padding:0 14px;font-size:14px}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.end{justify-content:flex-end}
+.row.between{justify-content:space-between}
+
+/* hero */
+.hero{display:grid;gap:10px;padding:4px 0 6px}
+.hero p{color:var(--ink2)}
+.meter{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--blue);border-radius:99px}
+
+/* lesson list */
+.lessons{display:flex;flex-direction:column;border-top:1px solid var(--rule)}
+.les{display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;padding:14px 2px;border-bottom:1px solid var(--rule);background:none;border-left:0;border-right:0;border-top:0;text-align:left;cursor:pointer;width:100%}
+.les .no{font-family:var(--f-num);font-weight:600;font-size:15px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--rule);color:var(--ink2)}
+.les.done .no{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.les .t{min-width:0}
+.les .t b{display:block;font-weight:700;font-size:16px;line-height:1.3}
+.les .t span{font-size:13px;color:var(--ink2)}
+.les .sc{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right}
+.les.next .no{border-color:var(--blue);color:var(--blue)}
+
+/* lesson reader */
+.lhead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.back{background:none;border:0;padding:8px 8px 8px 0;cursor:pointer;color:var(--blue);font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0 4px}
+.steps button{border:1px solid var(--rule);background:var(--sheet);border-radius:8px;padding:8px 4px;font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer}
+.steps button[aria-current="step"]{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.block{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;min-width:0}
+.block h3{margin-bottom:8px}
+.block p + p{margin-top:8px}
+.plain{padding:0 2px}
+.facts{display:grid;gap:0}
+.facts div{display:grid;grid-template-columns:minmax(0,42%) minmax(0,1fr);gap:10px;padding:7px 0;border-top:1px dashed var(--rule)}
+.facts div:first-child{border-top:0}
+.facts dt{font-size:14px;color:var(--ink2);margin:0}
+.facts dd{margin:0;font-weight:600;min-width:0}
+.tl{display:grid;gap:0;margin:0;padding:0;list-style:none}
+.tl li{display:grid;grid-template-columns:92px 1fr;gap:10px;padding:8px 0;border-top:1px dashed var(--rule)}
+.tl li:first-child{border-top:0}
+.tl .y{font-family:var(--f-num);font-weight:600;font-size:13px;color:var(--accent);padding-top:2px}
+.trick,.trap{border-radius:var(--r);padding:12px 14px 12px 14px;border:1px solid var(--rule)}
+.trick{background:var(--accent-bg);border-color:transparent}
+.trap{background:var(--bad-bg);border-color:transparent}
+.trick .lab,.trap .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.trick .lab{color:var(--accent)}
+.trap .lab{color:var(--bad)}
+.rk div{grid-template-columns:minmax(0,48%) minmax(0,1fr)}
+.rk dd{min-width:0;overflow-wrap:anywhere}
+.hot{border-radius:var(--r);padding:12px 14px;background:var(--warn-bg,var(--accent-bg));border-left:4px solid var(--warn,var(--accent))}
+.hot .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;color:var(--warn,var(--accent))}
+.heatb{display:inline-block;font-size:11px;letter-spacing:-.1em;margin-left:6px;vertical-align:1px}
+.heat{display:flex;flex-direction:column;gap:2px}
+.hrow{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(60px,1fr) 44px;gap:10px;align-items:center;text-align:left;background:none;border:0;border-bottom:1px solid var(--rule);padding:9px 2px;color:inherit;font:inherit;cursor:pointer}
+.hrow:last-child{border-bottom:0}
+.hrow .ht{display:flex;flex-direction:column;min-width:0}
+.hrow .ht .muted{font-size:12px}
+.hbar{height:10px;border-radius:5px;background:var(--rule);overflow:hidden}
+.hbar i{display:block;height:100%;background:var(--accent);border-radius:5px}
+.hp{text-align:right;font-weight:700}
+
+.tbl{overflow-x:auto;margin:0 -2px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);font-weight:700}
+td.n{font-family:var(--f-num);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fig{margin:0}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-size:13px;color:var(--ink2);margin-top:6px}
+.pyr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pyr div{text-align:center;font-size:13px}
+.pyr b{display:block;font-size:14px}
+.pm{fill:var(--blue)} .pf{fill:var(--accent)}
+.sum{margin:0;padding-left:20px;display:grid;gap:6px}
+
+/* questions */
+.qcard{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px;min-width:0}
+.qmeta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}
+.qno{font-family:var(--f-num);font-weight:600;color:var(--ink2)}
+.tag{background:var(--sunk);color:var(--ink2);border-radius:99px;padding:1px 9px;font-weight:600}
+.tag.pyq{background:var(--accent-bg);color:var(--accent)}
+.bm{margin-left:auto;background:none;border:0;cursor:pointer;color:var(--ink2);font-size:20px;line-height:1;padding:4px}
+.bm[aria-pressed="true"]{color:var(--accent)}
+.qt{font-weight:600;font-size:16px}
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:start;text-align:left;width:100%;border:1.5px solid var(--rule);background:var(--paper);border-radius:9px;padding:10px 12px;cursor:pointer;min-height:44px}
+.opt .k{font-family:var(--f-num);font-weight:600;color:var(--ink2);font-size:14px;padding-top:1px}
+.opt.sel{border-color:var(--blue);background:var(--blue-bg)}
+.opt.ok{border-color:var(--good);background:var(--good-bg)}
+.opt.no{border-color:var(--bad);background:var(--bad-bg)}
+.opt.ok .k{color:var(--good)} .opt.no .k{color:var(--bad)}
+.opt:disabled{cursor:default;color:inherit}
+.exp{font-size:15px;border-left:3px solid var(--blue);padding:4px 0 4px 12px;color:var(--ink)}
+.exp b.okl{color:var(--good)} .exp b.nol{color:var(--bad)}
+
+/* chips */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 13px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.seg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--rule)}
+.seg::-webkit-scrollbar{display:none}
+.seg button{flex:none;background:none;border:0;border-bottom:2px solid transparent;padding:10px 8px;font-weight:600;color:var(--ink2);cursor:pointer}
+.seg button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+
+/* score panel */
+.scorebig{display:flex;align-items:baseline;gap:8px}
+.scorebig .num{font-size:44px;font-weight:600;line-height:1;color:var(--blue)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.kpi{background:var(--sunk);border-radius:8px;padding:8px;text-align:center}
+.kpi .num{display:block;font-size:20px;font-weight:600}
+.kpi span{font-size:12px;color:var(--ink2)}
+.kpi.g .num{color:var(--good)} .kpi.b .num{color:var(--bad)}
+
+/* mock */
+.mbar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 57px);z-index:10;background:var(--paper);padding:10px 0;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--rule)}
+.timer{font-family:var(--f-num);font-weight:600;font-size:18px;padding:4px 10px;border-radius:8px;background:var(--sunk)}
+.timer.low{background:var(--bad-bg);color:var(--bad)}
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px}
+.pal button{height:40px;border-radius:8px;border:1px solid var(--rule);background:var(--sheet);font-family:var(--f-num);font-weight:600;font-size:13px;cursor:pointer}
+.pal button.a{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.pal button.m{box-shadow:inset 0 -4px 0 var(--accent)}
+.pal button.cur{outline:2px solid var(--ink);outline-offset:1px}
+.pal button.ok{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.pal button.no{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.confirm{background:var(--warn-bg);border-radius:var(--r);padding:12px 14px;display:grid;gap:10px}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}
+legend{font-weight:700;margin-bottom:6px;padding:0}
+.radios{display:flex;gap:8px;flex-wrap:wrap}
+.radios label{border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 14px;font-weight:600;cursor:pointer;font-size:14px}
+.radios input{position:absolute;opacity:0;pointer-events:none}
+.radios input:checked + span{color:var(--blue)}
+.radios label:has(input:checked){border-color:var(--blue);background:var(--blue-bg)}
+.radios label:has(input:focus-visible){outline:2px solid var(--blue);outline-offset:2px}
+select{font:inherit;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:8px;padding:8px 10px;max-width:100%}
+.hist{display:grid;gap:0}
+.hist div{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:14px}
+
+/* revise */
+.search{width:100%;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:10px;padding:10px 12px;font:inherit}
+.rk{display:grid;gap:0}
+.rk div{display:grid;grid-template-columns:minmax(0,48%) 1fr;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:15px}
+.rk div:first-child{border-top:0}
+.rk dt{font-size:13px;color:var(--ink2);margin:0}
+.rk dt.up{color:var(--good)} .rk dt.dn{color:var(--bad)}
+.rk dd{margin:0;font-weight:600;min-width:0}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px}
+.tile .num{display:block;font-size:24px;font-weight:600;color:var(--accent);line-height:1.2}
+.tile span{font-size:13px;color:var(--ink2)}
+.gbar{display:grid;grid-template-columns:78px 1fr 52px;gap:8px;align-items:center;font-size:13px;padding:3px 0}
+.gbar .tr{height:12px;background:var(--sunk);border-radius:3px;position:relative;overflow:hidden}
+.gbar .tr i{position:absolute;left:0;top:0;bottom:0;background:var(--blue);border-radius:3px}
+.gbar .tr i.neg{background:var(--bad)}
+.gbar .v{font-family:var(--f-num);text-align:right}
+.flash{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;min-height:240px;padding:20px 18px;display:grid;align-content:center;gap:12px;cursor:pointer;text-align:left;width:100%}
+.flash .side{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.flash .front{font-size:18px;font-weight:600}
+.flash .ans{font-size:20px;font-weight:700;color:var(--good)}
+.empty{padding:24px 4px;color:var(--ink2);text-align:center}
+.foot{font-size:13px;color:var(--ink2);padding-top:10px}
+@media (prefers-reduced-motion: no-preference){ .opt,.chip,.btn{transition:background-color .15s, border-color .15s} }
+.link{background:var(--blue-bg);border-radius:var(--r);padding:12px 14px}
+.link .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;color:var(--blue)}
+.icheck{background:var(--sheet);border:1.5px dashed var(--blue);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px}
+.icheck .lab{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue)}
+.cat{font-size:12px;font-weight:700;border-radius:99px;padding:1px 8px;white-space:nowrap}
+.cat.CS{background:var(--blue-bg);color:var(--blue)} .cat.CSS{background:var(--accent-bg);color:var(--accent)} .cat.ST{background:var(--sunk);color:var(--ink)} .cat.OT{background:var(--sunk);color:var(--ink2)}
+
+/* ---- workbook additions ---- */
+table.cover td:nth-child(4){min-width:180px}
+.plist .dl{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.plist .dl em{font-style:normal;font-weight:700;color:var(--blue);text-align:right}
+.ladder{list-style:none;margin:0;padding:0;display:grid;gap:0;border-top:1px solid var(--rule)}
+.ladder li{display:grid;grid-template-columns:62px 1fr auto;gap:12px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--rule)}
+.ladder .rk-n{font-size:22px;font-weight:600;color:var(--blue);text-align:right}
+.ladder .rk-t{min-width:0}
+.ladder .rk-t b{display:block;line-height:1.3}
+.ladder .rk-t span{font-size:13px;color:var(--ink2)}
+.ladder .rk-d{font-weight:700;font-size:14px;white-space:nowrap}
+.ladder li.up .rk-d{color:var(--good)} .ladder li.dn .rk-d{color:var(--bad)}
+.ladder small{font-weight:600;color:var(--ink2)}
+table.cover td{min-width:90px}
+.peek{border:1.5px dashed var(--blue);background:var(--blue-bg);color:var(--blue);border-radius:8px;padding:6px 10px;font-weight:600;cursor:pointer;min-height:36px;width:100%}
+.pubs{display:grid;gap:12px}
+.plist{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.plist li{padding:7px 0;border-top:1px dashed var(--rule);display:grid;gap:1px}
+.plist li:first-child{border-top:0}
+.plist li span{font-size:13px;color:var(--ink2)}
+.seg{scroll-snap-type:x proximity}
+@media (max-width: 700px){
+  table.cover thead{display:none}
+  table.cover tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 10px;padding:10px 0;border-bottom:1px solid var(--rule)}
+  table.cover td{border:0;padding:0;min-width:0;font-size:14px}
+  table.cover td:first-child{grid-column:1/-1;font-size:15px}
+  table.cover td:nth-child(4){grid-column:1/-1;min-width:0}
+  table.cover td[data-l]::before{content:attr(data-l);display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-bottom:2px}
+}
+/* ---- maths blocks ---- */
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(250px,100%),1fr));gap:10px}
+.fcard{background:var(--sheet);border:1px solid var(--rule);border-left:4px solid var(--blue);border-radius:var(--r);padding:10px 12px;display:grid;gap:4px;min-width:0}
+.fcard .fn{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);font-weight:700}
+.fcard .fx{font-family:var(--f-num);font-size:16px;color:var(--ink);overflow-wrap:anywhere;line-height:1.45}
+.fcard .fnote{font-size:13px;color:var(--ink2)}
+.ex{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px 14px;display:grid;gap:8px}
+.ex .exhead .lab{display:inline;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);font-weight:700}
+.ex .src{display:inline-block;margin-left:6px;font-size:11.5px;font-weight:700;color:var(--accent);border:1px solid currentColor;border-radius:999px;padding:0 8px}
+.ex .exq{font-weight:600}
+.ex details summary{cursor:pointer;font-weight:700;color:var(--blue);list-style:none}
+.ex details summary::-webkit-details-marker{display:none}
+.ex details summary::before{content:'▸ '}
+.ex details[open] summary::before{content:'▾ '}
+.ex ol{margin:8px 0 0;padding-left:20px;display:grid;gap:4px}
+.ex .exans{margin-top:8px;padding:8px 10px;border-radius:8px;background:var(--good-bg);color:var(--good);font-weight:700}
+.figwrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(260px,100%),1fr));gap:12px}
+.figwrap figure{margin:0;display:grid;gap:6px;justify-items:center;text-align:center}
+.fig svg,.figwrap svg{width:100%;max-width:340px;height:auto;color:var(--ink)}
+.fig figcaption,.figwrap figcaption{font-size:13px;color:var(--ink2)}
+sup,sub{font-size:.72em;line-height:0}
+
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">Mensuration 2D<small>क्षेत्रमिति (2D) · SSC maths workbook</small></div>
+    <div class="stat" id="topstat"></div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<nav class="nav" aria-label="Sections">
+  <div class="nav-in">
+    <button type="button" id="nav-learn" data-tab="learn"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg><span>Learn</span></button>
+    <button type="button" id="nav-practice" data-tab="practice"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span>Practice</span></button>
+    <button type="button" id="nav-mock" data-tab="mock"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6M12 2v3"/></svg><span>Mock test</span></button>
+    <button type="button" id="nav-revise" data-tab="revise"><svg viewBox="0 0 24 24"><path d="M12 3 2 8l10 5 10-5z"/><path d="m2 13 10 5 10-5"/></svg><span>Revise</span></button>
+  </div>
+</nav>
+
+<script>
+"use strict";
+const LESSONS = [
+{ id:"L1", heat:2, title:"Basics: perimeter, area, units & π", hi:"परिमाप, क्षेत्रफल, इकाइयाँ और π", blocks:[
+ {k:"hot", h:"<b>Hidden inside every 2D question.</b> Tier 1 rarely asks a pure conversion, but CHSL/MTS and CGL often hide a <b>hectare → m²</b> step inside a fencing or cultivation cost question. Tier 2 expects you to pick the right π in one glance."},
+ {k:"p", h:"<b>Perimeter</b> is the length of the boundary (unit: m, cm). <b>Area</b> is the surface enclosed (unit: m², cm²). Fencing, wire, rope, border, boundary → perimeter. Painting, carpeting, tiling, ploughing, levelling → area."},
+ {k:"formula", title:"Unit ladder (learn the squares!)", rows:[["Length","1 m = 100 cm, 1 km = 1000 m","Square the factor for area"],["Area: m² → cm²","1 m² = 100 × 100 = 10,000 cm²","Not 100!"],["Area: cm² → mm²","1 cm² = 100 mm²","10 mm × 10 mm"],["Are","1 are = 100 m²","A 10 m × 10 m plot"],["Hectare","1 ha = 100 are = 10,000 m²","A 100 m × 100 m plot"],["Square km","1 km² = 100 ha = 10<sup>6</sup> m²","1000 m × 1000 m"],["Cost","Cost = (area or perimeter) × rate","Rate per m² → area; rate per m → perimeter"]]},
+ {k:"figs", title:"Perimeter vs area", items:[
+  {svg:'<svg viewBox="0 0 240 150" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><rect x="40" y="25" width="150" height="90" style="fill:var(--accent-bg)"/><text x="115" y="75" text-anchor="middle" fill="currentColor" stroke="none">Area = l × b</text><text x="115" y="134" text-anchor="middle" fill="currentColor" stroke="none">l</text><text x="26" y="74" text-anchor="middle" fill="currentColor" stroke="none">b</text></svg>', cap:"Area: the surface inside (m²)."},
+  {svg:'<svg viewBox="0 0 240 150" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><rect x="40" y="25" width="150" height="90" style="stroke:var(--accent)" stroke-width="3"/><text x="115" y="75" text-anchor="middle" fill="currentColor" stroke="none">P = 2(l + b)</text><text x="115" y="134" text-anchor="middle" fill="currentColor" stroke="none">l</text><text x="26" y="74" text-anchor="middle" fill="currentColor" stroke="none">b</text></svg>', cap:"Perimeter: the boundary length (m)."}]},
+ {k:"fig", title:"Why 1 m² = 10,000 cm²", svg:'<svg viewBox="0 0 260 180" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><g stroke-width="0.5" opacity="0.6"><path d="M70 20 V160 M84 20 V160 M98 20 V160 M112 20 V160 M126 20 V160 M140 20 V160 M154 20 V160 M168 20 V160 M182 20 V160"/><path d="M56 34 H196 M56 48 H196 M56 62 H196 M56 76 H196 M56 90 H196 M56 104 H196 M56 118 H196 M56 132 H196 M56 146 H196"/></g><rect x="56" y="20" width="140" height="140"/><rect x="56" y="20" width="14" height="14" style="fill:var(--accent)" stroke="none"/><text x="126" y="175" text-anchor="middle" fill="currentColor" stroke="none">1 m = 100 cm</text><text x="210" y="94" fill="currentColor" stroke="none">1 m</text></svg>', cap:"Each small square drawn is 10 cm × 10 cm = 100 cm². There are 100 of them → 10,000 cm²."},
+ {k:"formula", title:"Which π to use?", rows:[["π = 22/7","When r, d or the answer is a multiple of 7","r = 7, 14, 21, 3.5, 10.5 …"],["π = 3.14","When r is 10, 5, 20 … or the question says 3.14","Area of r = 10 → 314"],["Leave as π","When options contain π","Never convert if options have π"],["Useful numbers","2π × 7 = 44, π × 7² = 154","2π × 21 = 132, π × 21² = 1386"]]},
+ {k:"ex", src:"SSC CHSL 2018 · 7 Mar S1", q:"The area of a circular cricket ground is 24.64 hectares. Find the cost of making a rope boundary at ₹5.40 per metre.", steps:["24.64 ha = 24.64 × 10,000 = 2,46,400 m²","πr² = 2,46,400 → r² = 2,46,400 × 7/22 = 78,400 → r = 280 m","Boundary = 2πr = 2 × 22/7 × 280 = 1760 m","Cost = 1760 × 5.40 = ₹9,504"], ans:"₹9,504", tip:"Rope/boundary → perimeter; cost per metre. Convert hectare first."},
+ {k:"ex", q:"A lawn is a rectangle with breadth : length = 3 : 4 and area 1/12 hectare. Find the breadth.", steps:["Area = 10,000/12 m²","3x × 4x = 12x² = 10,000/12 → x² = 10,000/144 → x = 100/12","Breadth = 3x = 300/12 = 25 m"], ans:"25 m", tip:"12x² = 10,000/12 → x = 100/12: square roots are easy when you keep it as a fraction."},
+ {k:"trick", h:"<b>Square the scale.</b> If every length is multiplied by k, the perimeter becomes k times and the area k² times. Doubling the side of a square → 4 × area. Use this before any formula."},
+ {k:"trick", h:"<b>Remember the 7-family:</b> r = 7 → C = 44, A = 154; r = 14 → C = 88, A = 616; r = 21 → C = 132, A = 1386; r = 3.5 → C = 22, A = 38.5."},
+ {k:"trap", h:"<b>1 m² is NOT 100 cm².</b> Area units convert by the square of the length factor: 1 m² = 10,000 cm², 1 hectare = 10,000 m² (not 1,000)."},
+ {k:"link", h:"Scaling (k → k²) is the base of L11 (percentage change in area). The 22/7 habits are used in every circle lesson (L5–L7, L10)."},
+ {k:"q", q:"2.5 hectares = ? m²", o:["25,000 m²","2,500 m²","2,50,000 m²","250 m²"], e:"1 ha = 10,000 m² → 2.5 × 10,000."},
+ {k:"q", q:"Painting a wall is paid per…", o:["m² (area)","m (perimeter)","m³ (volume)","per corner"], e:"Painting covers a surface → area."}
+], sum:["Perimeter = boundary (m); area = surface (m²)","1 m² = 10,000 cm²; 1 are = 100 m²; 1 ha = 10,000 m²; 1 km² = 100 ha","Lengths × k → area × k²","π = 22/7 for multiples of 7; keep π if options have π"]},
+{ id:"L2", heat:3, title:"Triangles", hi:"त्रिभुज का क्षेत्रफल", blocks:[
+ {k:"hot", h:"<b>Most-asked 2D shape.</b> Tier 1: equilateral area from side/perimeter/height, Heron on a 'nice' triple, isosceles area. Tier 2: medians (4/3 rule), ½ab sinC, and triangle area equated to a square/rectangle."},
+ {k:"formula", title:"Area of a triangle", rows:[["Base–height","A = ½ × b × h","h ⊥ to the chosen base"],["Heron","A = √[s(s−a)(s−b)(s−c)], s = (a+b+c)/2","All three sides known"],["Two sides + angle","A = ½ ab sin C","C = angle between a and b"],["Right triangle","A = ½ × leg₁ × leg₂","Legs are base and height"],["Equilateral","A = (√3/4) a², h = (√3/2) a","Perimeter 3a"],["Isosceles (a, a, b)","A = (b/4)√(4a² − b²)","h = √(a² − b²/4)"],["From medians","A = (4/3) × area of triangle with sides m₁, m₂, m₃","Not 3/4!"],["Inradius link","A = r × s","r = A/s (see L9)"]]},
+ {k:"figs", title:"Heights to remember", items:[
+  {svg:'<svg viewBox="0 0 240 160" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M90 20 L20 130 L220 130 Z"/><path d="M90 20 V130" style="stroke:var(--accent)" stroke-dasharray="4 3"/><path d="M90 120 H100 V130"/><text x="86" y="14" fill="currentColor" stroke="none">A</text><text x="8" y="140" fill="currentColor" stroke="none">B</text><text x="224" y="140" fill="currentColor" stroke="none">C</text><text x="95" y="82" fill="currentColor" stroke="none">h</text><text x="150" y="148" fill="currentColor" stroke="none">b</text></svg>', cap:"A = ½ b h — h is the perpendicular height."},
+  {svg:'<svg viewBox="0 0 240 160" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M120 14 L50 135 L190 135 Z"/><path d="M120 14 V135" style="stroke:var(--accent)" stroke-dasharray="4 3"/><path d="M120 125 H130 V135"/><text x="72" y="62" fill="currentColor" stroke="none">a</text><text x="164" y="70" fill="currentColor" stroke="none">a</text><text x="82" y="152" fill="currentColor" stroke="none">a</text><text x="125" y="100" fill="currentColor" stroke="none">h</text><text x="236" y="30" text-anchor="end" fill="currentColor" stroke="none" font-size="11">h = (√3/2)a</text></svg>', cap:"Equilateral: h = (√3/2)a, A = (√3/4)a²."},
+  {svg:'<svg viewBox="0 0 240 160" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M120 20 L60 135 L180 135 Z"/><path d="M120 20 V135" style="stroke:var(--accent)" stroke-dasharray="4 3"/><path d="M120 125 H130 V135"/><path d="M86 74 l8 4 M154 74 l-8 4"/><text x="70" y="70" fill="currentColor" stroke="none">a</text><text x="160" y="70" fill="currentColor" stroke="none">a</text><text x="86" y="152" fill="currentColor" stroke="none">b/2</text><text x="140" y="152" fill="currentColor" stroke="none">b/2</text><text x="125" y="96" fill="currentColor" stroke="none">h</text></svg>', cap:"Isosceles: the altitude bisects the base, h = √(a² − b²/4)."}]},
+ {k:"ex", src:"SSC CGL 2023 · 26 Jul S3", q:"Find the area of an equilateral triangle whose sides are 16 cm each.", steps:["A = (√3/4) a²","= (√3/4) × 256 = 64√3 cm²"], ans:"64√3 cm²", tip:"a²/4 then attach √3: 16² / 4 = 64 → 64√3."},
+ {k:"ex", src:"SSC CHSL 2021 · 19 Apr (Morning)", q:"The area of a triangular field with sides 65 m, 72 m and 97 m equals the area of a rectangular park whose sides are in the ratio 5 : 13. Find the perimeter of the park.", steps:["65² + 72² = 4225 + 5184 = 9409 = 97² → right triangle!","Area = ½ × 65 × 72 = 2340 m²","5x × 13x = 65x² = 2340 → x² = 36 → x = 6","Park 30 m × 78 m → perimeter 2(30 + 78) = 216 m"], ans:"216 m", tip:"Check for a Pythagorean triple before using Heron — it saves a minute."},
+ {k:"ex", q:"The medians of a triangle are 28 cm, 45 cm and 53 cm. Find its area.", steps:["28² + 45² = 784 + 2025 = 2809 = 53² → the median-triangle is right-angled","Median-triangle area = ½ × 28 × 45 = 630","Triangle area = (4/3) × 630 = 840 cm²"], ans:"840 cm²"},
+ {k:"trick", h:"<b>Triples first, Heron last.</b> Test a² + b² = c² (3-4-5, 5-12-13, 7-24-25, 8-15-17, 20-21-29, 65-72-97). Also learn <b>13-14-15 → 84</b> and <b>25-39-56 → 420</b>: these Heron sets repeat in SSC."},
+ {k:"trick", h:"<b>Heron for isosceles in one line:</b> sides a, a, b → A = (b/4)√(4a² − b²). For 10, 10, 12: (12/4)√(400 − 144) = 3 × 16 = 48."},
+ {k:"trap", h:"<b>Medians → multiply by 4/3</b>, not 3/4. The triangle is bigger than the triangle made of its medians."},
+ {k:"trap", h:"In ½ab sin C, C must be the angle <b>between</b> sides a and b. Using any other angle gives a wrong area."},
+ {k:"link", h:"Area = r × s and R = abc/(4A) connect this lesson to incircle/circumcircle questions in L9. Triangles inside hexagons appear in L8."},
+ {k:"q", q:"Sides 13, 14, 15 cm. Area = ?", o:["84 cm²","42 cm²","168 cm²","91 cm²"], e:"s = 21 → √(21 × 8 × 7 × 6) = √7056 = 84."}
+], sum:["A = ½bh; Heron for three sides; ½ab sinC for two sides + included angle","Equilateral: (√3/4)a², h = (√3/2)a","Isosceles: (b/4)√(4a² − b²)","Medians: 4/3 × area of median-triangle","Check Pythagorean triples before Heron"]},
+{ id:"L3", heat:3, title:"Rectangle & square", hi:"आयत और वर्ग", blocks:[
+ {k:"hot", h:"<b>1–2 questions in most CGL/CHSL shifts.</b> Favourites: path/border around or inside a field, two cross-roads, diagonal from area + perimeter, fencing/carpeting cost. Tier 2 mixes them with ratio and algebra."},
+ {k:"formula", title:"Rectangle (l × b)", rows:[["Area","A = l × b",""],["Perimeter","P = 2(l + b)",""],["Diagonal","d = √(l² + b²)","Pythagoras"],["Key identity","(l + b)² = d² + 2A","Get l + b from d and A"],["Carpet length","Area of floor ÷ width of carpet","Convert cm to m first"]]},
+ {k:"formula", title:"Square (side a)", rows:[["Area","A = a² = d²/2","Area straight from the diagonal"],["Perimeter","P = 4a",""],["Diagonal","d = a√2",""]]},
+ {k:"formula", title:"Paths and roads (width w)", rows:[["Path outside","2w(l + b + 2w)","= (l+2w)(b+2w) − lb"],["Path inside","2w(l + b − 2w)","= lb − (l−2w)(b−2w)"],["Two cross-roads","w(l + b) − w²","Centre square counted twice"],["Lawn left after cross-roads","(l − w)(b − w)","Slide roads to the edges"]]},
+ {k:"figs", title:"Path and cross-roads", items:[
+  {svg:'<svg viewBox="0 0 260 170" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><rect x="20" y="15" width="220" height="140" style="fill:var(--accent-bg)"/><rect x="45" y="40" width="170" height="90" style="fill:var(--sheet)"/><text x="130" y="90" text-anchor="middle" fill="currentColor" stroke="none">field l × b</text><path d="M130 15 V40" style="stroke:var(--accent)"/><text x="136" y="32" fill="currentColor" stroke="none">w</text><text x="130" y="148" text-anchor="middle" fill="currentColor" stroke="none">path</text></svg>', cap:"Path outside: outer (l+2w)(b+2w) minus field lb."},
+  {svg:'<svg viewBox="0 0 260 170" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><rect x="20" y="15" width="220" height="140"/><rect x="20" y="75" width="220" height="20" style="fill:var(--accent-bg)"/><rect x="120" y="15" width="20" height="140" style="fill:var(--accent-bg)"/><rect x="120" y="75" width="20" height="20" style="fill:var(--accent)" stroke="none" opacity="0.6"/><text x="70" y="50" text-anchor="middle" fill="currentColor" stroke="none">lawn</text><text x="190" y="130" text-anchor="middle" fill="currentColor" stroke="none">lawn</text><text x="146" y="35" fill="currentColor" stroke="none">w</text><text x="60" y="90" fill="currentColor" stroke="none">w</text></svg>', cap:"Cross-roads: w·l + w·b − w² (the dark square is shared)."}]},
+ {k:"ex", src:"SSC CGL Tier 2 2016 · 1 Dec", q:"A rectangular park 60 m long and 40 m wide has two concrete cross-roads running in the middle; the rest is a lawn of area 2109 m². Find the width of the road.", steps:["Slide the roads to the edges: lawn = (60 − w)(40 − w)","Try options: w = 3 → 57 × 37 = 2109 ✓"], ans:"3 m", tip:"2109 = 57 × 37 → both factors differ from 60 and 40 by the same 3."},
+ {k:"ex", src:"SSC MTS 2023 · 8 Sep S2", q:"A path of uniform width 2.5 m runs around the outside of a rectangular field 45 m × 35 m. Find the area of the path.", steps:["Outer rectangle = 50 × 40 = 2000 m²","Field = 45 × 35 = 1575 m²","Path = 2000 − 1575 = 425 m²"], ans:"425 m²", tip:"2w(l + b + 2w) = 5 × 85 = 425."},
+ {k:"ex", src:"SSC Selection Post 2020 · 9 Nov S2", q:"The diagonal of a rectangular field is 18 m and its area is 126 m². Find the cost of fencing it at ₹9 per metre.", steps:["(l + b)² = d² + 2A = 324 + 252 = 576 → l + b = 24","Perimeter = 48 m","Cost = 48 × 9 = ₹432"], ans:"₹432", tip:"Never find l and b separately — the identity gives l + b directly."},
+ {k:"trick", h:"<b>Slide the roads.</b> The lawn left after cross-roads of width w is always (l − w)(b − w), wherever the roads run. For a path outside, add 2w to each side; inside, subtract 2w."},
+ {k:"trick", h:"<b>Square from diagonal:</b> A = d²/2. Diagonal 10 → area 50; diagonal 8√2 → area 64. No need to find the side."},
+ {k:"trap", h:"<b>Cross-roads:</b> w·l + w·b counts the centre w × w square twice — subtract w² once. <b>Path outside</b> adds 2w, not w, to each dimension."},
+ {k:"trap", h:"<b>Carpet width</b> is usually in cm (e.g. 75 cm). Length of carpet = floor area ÷ 0.75 m, not ÷ 75."},
+ {k:"link", h:"Equal perimeter → the square has the largest area of all rectangles (L11). Square in a circle / circle in a square is in L9."},
+ {k:"q", q:"Diagonal of a square is 10 cm. Its area is:", o:["50 cm²","100 cm²","25 cm²","50√2 cm²"], e:"d²/2 = 100/2."}
+], sum:["Rectangle: A = lb, P = 2(l+b), d = √(l²+b²), (l+b)² = d² + 2A","Square: A = a² = d²/2, d = a√2","Path outside 2w(l+b+2w); inside 2w(l+b−2w)","Cross-roads w(l+b) − w²; lawn (l−w)(b−w)"]},
+{ id:"L4", heat:2, title:"Parallelogram, rhombus, trapezium & kite", hi:"समांतर चतुर्भुज, समचतुर्भुज, समलंब", blocks:[
+ {k:"hot", h:"<b>About one question per CGL shift.</b> Rhombus side + one diagonal → area (Pythagoras on half-diagonals) is the favourite; trapezium 'find the height / other side' is the common CHSL/CPO form. Tier 2 adds parallelogram from sides + diagonal (Heron)."},
+ {k:"formula", title:"Parallelogram & rhombus", rows:[["Parallelogram","A = base × height = ab sin θ","θ = angle between sides a, b"],["Parallelogram diagonals","d₁² + d₂² = 2(a² + b²)",""],["Parallelogram from a, b, diagonal d","A = 2 × Heron(a, b, d)","A diagonal splits it into two equal triangles"],["Rhombus area","A = ½ d₁ d₂ = a² sin θ = a × h","Diagonals ⊥ and bisect each other"],["Rhombus side","a = ½√(d₁² + d₂²)","Half-diagonals are the legs"],["Rhombus perimeter","4a = 2√(d₁² + d₂²)",""],["Sum of diagonals L, side a","A = ¼[L² − 4a²]","(d₁+d₂)² − (d₁²+d₂²) = 2d₁d₂"]]},
+ {k:"formula", title:"Trapezium, kite, any quadrilateral", rows:[["Trapezium","A = ½ (a + b) h","a ∥ b, h = gap between them"],["Isosceles trapezium height","h = √(c² − ((b − a)/2)²)","c = slant side"],["Kite","A = ½ d₁ d₂","Diagonals ⊥"],["Any quadrilateral","A = ½ × d × (h₁ + h₂)","h₁, h₂ = offsets (perpendiculars) on diagonal d"]]},
+ {k:"figs", title:"Where the right angles are", items:[
+  {svg:'<svg viewBox="0 0 240 160" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M30 80 L120 20 L210 80 L120 140 Z"/><path d="M30 80 H210 M120 20 V140" style="stroke:var(--accent)" stroke-dasharray="4 3"/><path d="M120 72 H128 V80"/><text x="62" y="96" fill="currentColor" stroke="none">d₁/2</text><text x="126" y="116" fill="currentColor" stroke="none">d₂/2</text><text x="62" y="44" fill="currentColor" stroke="none">a</text></svg>', cap:"Rhombus: half-diagonals and the side form a right triangle."},
+  {svg:'<svg viewBox="0 0 240 160" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M70 30 H190 L230 130 H20 Z"/><path d="M70 30 V130" style="stroke:var(--accent)" stroke-dasharray="4 3"/><path d="M70 120 H80 V130"/><text x="127" y="22" fill="currentColor" stroke="none">a</text><text x="125" y="148" fill="currentColor" stroke="none">b</text><text x="76" y="84" fill="currentColor" stroke="none">h</text></svg>', cap:"Trapezium: ½ × (sum of parallel sides) × gap."},
+  {svg:'<svg viewBox="0 0 240 160" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M60 30 H230 L180 130 H10 Z"/><path d="M60 30 V130" style="stroke:var(--accent)" stroke-dasharray="4 3"/><path d="M60 120 H70 V130"/><text x="90" y="148" fill="currentColor" stroke="none">base b</text><text x="66" y="84" fill="currentColor" stroke="none">h</text><text x="212" y="86" fill="currentColor" stroke="none">a</text></svg>', cap:"Parallelogram: base × height (not base × slant side)."}]},
+ {k:"ex", src:"SSC CGL Tier 2 2017 · 12 Jan", q:"The area of a rhombus having one side 10 cm and one diagonal 12 cm is:", steps:["Half-diagonal = 6; side = 10 → other half = √(100 − 36) = 8","Other diagonal = 16","Area = ½ × 12 × 16 = 96 cm²"], ans:"96 cm²", tip:"Spot the triple 6-8-10 at once."},
+ {k:"ex", src:"SSC CHSL 2022 · 17 Mar 2023 S3", q:"Parallel sides of a trapezium are 21 cm and 14 cm and its area is 875 cm². Find the distance between the parallel sides.", steps:["875 = ½ × (21 + 14) × h","h = 1750 ÷ 35 = 50 cm"], ans:"50 cm"},
+ {k:"ex", src:"SSC CPO 2022 · 11 Nov (Morning)", q:"The sum of the diagonals of a rhombus is L and its perimeter is 4P. Find its area.", steps:["Side = P → d₁² + d₂² = 4P²","(d₁ + d₂)² = L² → 2d₁d₂ = L² − 4P²","Area = ½ d₁d₂ = ¼(L² − 4P²)"], ans:"¼(L² − 4P²)", tip:"Value-put: d₁ = 6, d₂ = 8 → L = 14, P = 5, area 24 → ¼(196 − 100) = 24 ✓."},
+ {k:"trick", h:"<b>Rhombus = four right triangles.</b> Halve both diagonals; side² = (d₁/2)² + (d₂/2)². Triples: (5, 12, 13), (6, 8, 10), (9, 12, 15), (12, 16, 20)."},
+ {k:"trick", h:"<b>Parallelogram from two sides + a diagonal:</b> the diagonal cuts it into two congruent triangles → area = 2 × Heron. Sides 15, 7, diagonal 20 → Heron = 42 → area 84."},
+ {k:"trap", h:"<b>Height, not slant side.</b> Parallelogram area is base × perpendicular height; base × slant side only works for a rectangle. And trapezium uses the <b>sum</b> of the parallel sides, halved."},
+ {k:"trap", h:"Rhombus area is ½ d₁ d₂ — forgetting the ½ (or using side × diagonal) is the classic wrong option."},
+ {k:"link", h:"Square vs rhombus on the same base: area ratio = 1 : sin θ (L11). The regular hexagon in L8 is six equilateral triangles — or two trapeziums."},
+ {k:"q", q:"Diagonals of a rhombus are 10 cm and 24 cm. Its side is:", o:["13 cm","17 cm","26 cm","12 cm"], e:"√(5² + 12²) = 13."}
+], sum:["Parallelogram A = bh = ab sinθ","Rhombus A = ½d₁d₂, side = ½√(d₁²+d₂²)","Trapezium A = ½(a+b)h","Kite ½d₁d₂; any quadrilateral ½ × d × (h₁+h₂)"]},
+{ id:"L5", heat:3, title:"Circle, semicircle & quadrant", hi:"वृत्त, अर्धवृत्त और चतुर्थांश", blocks:[
+ {k:"hot", h:"<b>Asked in almost every shift (often inside another shape).</b> Tier 1: circumference ↔ area, semicircle perimeter (πr + 2r), wire bent from square to circle. Tier 2: circle combined with a square/triangle and answers in π."},
+ {k:"formula", title:"Circle (radius r, diameter d = 2r)", rows:[["Circumference","C = 2πr = πd","With π = 22/7: C = 44r/7"],["Area","A = πr² = πd²/4",""],["Area from C","A = C²/(4π)","No need to find r"],["A and C link","A = ½ × C × r","Like ½ × base × height of an unrolled triangle"],["C − d","(π − 1)d = (15/7)d","'Circumference exceeds diameter by…'"]]},
+ {k:"formula", title:"Semicircle & quadrant", rows:[["Semicircle perimeter","πr + 2r = (36/7) r","Arc + diameter"],["Semicircle area","πr²/2",""],["Quadrant perimeter","πr/2 + 2r = (25/7) r","Arc + two radii"],["Quadrant area","πr²/4",""]]},
+ {k:"figs", title:"Circle family", items:[
+  {svg:'<svg viewBox="0 0 200 160" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><circle cx="100" cy="80" r="64" style="fill:var(--accent-bg)"/><path d="M36 80 H100" stroke-dasharray="4 3"/><path d="M100 80 H164" style="stroke:var(--accent)" stroke-width="2.2"/><circle cx="100" cy="80" r="2.5" fill="currentColor"/><text x="96" y="96" fill="currentColor" stroke="none">O</text><text x="128" y="74" fill="currentColor" stroke="none">r</text><text x="62" y="74" fill="currentColor" stroke="none">r</text></svg>', cap:"C = 2πr, A = πr²."},
+  {svg:'<svg viewBox="0 0 240 140" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M20 115 A100 100 0 0 1 220 115 Z" style="fill:var(--accent-bg)"/><path d="M20 115 A100 100 0 0 1 220 115" style="stroke:var(--accent)" stroke-width="2.2"/><circle cx="120" cy="115" r="2.5" fill="currentColor"/><text x="116" y="132" fill="currentColor" stroke="none">2r</text><text x="112" y="34" fill="currentColor" stroke="none">πr</text></svg>', cap:"Semicircle: perimeter = πr + 2r (don't forget the diameter)."},
+  {svg:'<svg viewBox="0 0 200 160" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M40 140 V30 A110 110 0 0 1 150 140 Z" style="fill:var(--accent-bg)"/><path d="M40 30 A110 110 0 0 1 150 140" style="stroke:var(--accent)" stroke-width="2.2"/><path d="M40 130 H50 V140"/><text x="26" y="90" fill="currentColor" stroke="none">r</text><text x="92" y="155" fill="currentColor" stroke="none">r</text><text x="124" y="62" fill="currentColor" stroke="none">πr/2</text></svg>', cap:"Quadrant: perimeter = πr/2 + 2r, area = πr²/4."}]},
+ {k:"ex", src:"SSC CHSL 2018 · 17 Mar S2", q:"If the perimeter of a semicircle is 72 cm, find its area.", steps:["πr + 2r = (36/7) r = 72 → r = 14","Area = ½ × 22/7 × 14 × 14 = 308 cm²"], ans:"308 cm²", tip:"Semicircle perimeter = 36r/7: 36 in the numerator means r is a multiple of 7 when the perimeter is a multiple of 36."},
+ {k:"ex", src:"SSC CHSL 2021 · 13 Apr (Afternoon)", q:"A wire is bent to form a square of area 169 m². If the same wire is bent into a circle, what is its area (to the nearest m²)?", steps:["Side = 13 → wire = 52 m","2πr = 52 → r = 52 × 7/44 = 91/11 m","Area = C²/(4π) = 52² × 7/88 = 215.09 ≈ 215 m²"], ans:"215 m²", tip:"Use A = C²/4π directly — no need to find r."},
+ {k:"ex", src:"SSC CHSL 2024 · 8 Jul S2", q:"Find the perimeter of a square whose area equals the area of a semicircle of radius 2√2 cm.", steps:["Semicircle area = ½ × π × 8 = 4π","Square side = √(4π) = 2√π","Perimeter = 8√π cm"], ans:"8√π cm"},
+ {k:"trick", h:"<b>Ratios ignore π.</b> Circumference ∝ r, area ∝ r². If circumferences are 3 : 4, areas are 9 : 16. If areas are 4 : 9, radii are 2 : 3."},
+ {k:"trick", h:"<b>The 7-multipliers:</b> C = 44r/7, semicircle perimeter = 36r/7, quadrant perimeter = 25r/7, C − d = 15d/7, C − r = 37r/7, C + d = 29d/7. Divide the given number by the multiplier → r at once."},
+ {k:"trap", h:"<b>Semicircle perimeter ≠ πr.</b> 'Perimeter' includes the straight diameter: πr + 2r. Only 'length of the arc / curved part' is πr."},
+ {k:"trap", h:"Read radius vs diameter carefully — using d in πr² makes the answer 4 times too big (a favourite wrong option)."},
+ {k:"link", h:"Fixed wire → circle has the largest area of all shapes (L11). Sectors (L6) are just θ/360 of these formulas."},
+ {k:"q", q:"Circumference of a circle is 88 cm. Its area is:", o:["616 cm²","154 cm²","1232 cm²","308 cm²"], e:"r = 88 × 7/44 = 14 → 22/7 × 196 = 616."}
+], sum:["C = 2πr, A = πr² = C²/4π","Semicircle P = πr + 2r = 36r/7, A = πr²/2","Quadrant P = πr/2 + 2r = 25r/7, A = πr²/4","Areas scale as r²; ratios ignore π"]},
+{ id:"L6", heat:3, title:"Sector, arc & segment", hi:"त्रिज्यखंड, चाप और वृत्तखंड", blocks:[
+ {k:"hot", h:"<b>Rising fast: three different CGL 2023 shifts asked a sector question.</b> Forms: radius from sector area + angle, sector perimeter (arc + 2r), area from arc length, clock-hand area. Tier 2: segment = sector − triangle and overlapping circles (L10)."},
+ {k:"formula", title:"Sector of angle θ (in degrees)", rows:[["Arc length","l = (θ/360) × 2πr",""],["Sector area","A = (θ/360) × πr²",""],["Area from arc","A = ½ × l × r","No θ needed!"],["Sector perimeter","l + 2r","Arc plus both radii"],["Angle from fraction","Sector = 1/n of circle → θ = 360/n",""]]},
+ {k:"formula", title:"Segment & clock", rows:[["Segment area","Sector − △ = (θ/360)πr² − ½r² sin θ","Region between chord and arc"],["θ = 90°","(π/4 − ½) r² = (2/7) r² (π = 22/7)","r = 14 → 56"],["θ = 60°","(π/6 − √3/4) r²",""],["Minute hand","6° per minute","15 min → 90°, 45 min → 270°"],["Hour hand","30° per hour = ½° per minute",""]]},
+ {k:"figs", title:"Sector vs segment", items:[
+  {svg:'<svg viewBox="0 0 240 170" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M60 140 L190 140 A130 130 0 0 0 125 27.4 Z" style="fill:var(--accent-bg)"/><path d="M190 140 A130 130 0 0 0 125 27.4" style="stroke:var(--accent)" stroke-width="2.2"/><path d="M84 140 A24 24 0 0 0 72 119.2"/><circle cx="60" cy="140" r="2.5" fill="currentColor"/><text x="46" y="156" fill="currentColor" stroke="none">O</text><text x="90" y="133" fill="currentColor" stroke="none">θ</text><text x="122" y="158" fill="currentColor" stroke="none">r</text><text x="80" y="82" fill="currentColor" stroke="none">r</text><text x="178" y="70" fill="currentColor" stroke="none">l</text></svg>', cap:"Sector: (θ/360) of the circle. Perimeter = l + 2r."},
+  {svg:'<svg viewBox="0 0 240 170" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><circle cx="120" cy="100" r="66"/><path d="M73.3 53.3 A66 66 0 0 1 166.7 53.3 Z" style="fill:var(--accent)" opacity="0.45" stroke="none"/><path d="M73.3 53.3 L120 100 L166.7 53.3" stroke-dasharray="4 3"/><path d="M73.3 53.3 H166.7"/><path d="M113 93 L120 86 L127 93"/><circle cx="120" cy="100" r="2.5" fill="currentColor"/><text x="115" y="117" fill="currentColor" stroke="none">O</text><text x="58" y="50" fill="currentColor" stroke="none">A</text><text x="172" y="50" fill="currentColor" stroke="none">B</text></svg>', cap:"Segment (shaded) = sector OAB − △OAB. Here ∠AOB = 90°."}]},
+ {k:"ex", src:"SSC CGL 2023 · 26 Jul S2", q:"The area of a sector of a circle is 110 cm² and its central angle is 56°. Find the radius (π = 22/7).", steps:["(56/360) × 22/7 × r² = 110","r² = 110 × 360 × 7 / (56 × 22) = 225","r = 15 cm"], ans:"15 cm"},
+ {k:"ex", src:"SSC CGL 2022 · 12 Dec S1", q:"The minute hand of a clock is 20 cm long. Find the area swept by it between 8:00 a.m. and 8:45 a.m.", steps:["45 minutes → 45 × 6° = 270° = ¾ of a circle","Area = ¾ × 22/7 × 400 = 6600/7 cm²"], ans:"6600/7 cm²", tip:"Convert minutes to a fraction of the circle: 45/60 = ¾."},
+ {k:"ex", src:"SSC CGL 2023 · 27 Jul S1", q:"The length of arc AB equals five times the radius r. Find the area of sector AOB.", steps:["Area = ½ × l × r","= ½ × 5r × r = 5r²/2"], ans:"5r²/2", tip:"Arc given → use ½ lr, never find θ."},
+ {k:"trick", h:"<b>Fractions, not degrees.</b> 60° = ⅙, 90° = ¼, 120° = ⅓, 45° = ⅛, 72° = ⅕, 36° = 1/10. Multiply the full-circle value (C or A) by that fraction."},
+ {k:"trick", h:"<b>Quarter-circle segment = (2/7) r²</b> with π = 22/7: (11/14 − 1/2) r² = (4/14) r². r = 7 → 14, r = 14 → 56, r = 21 → 126."},
+ {k:"trap", h:"<b>Sector perimeter</b> = arc + 2r, not just the arc. <b>Segment</b> = sector − triangle; the triangle is ½r² sin θ, not ½r²(θ)."},
+ {k:"trap", h:"Clock: the <b>minute</b> hand turns 6° per minute; the <b>hour</b> hand only 30° per hour. 'Area swept by the minute hand in 20 minutes' = ⅓ of the circle."},
+ {k:"link", h:"Overlapping circles, leaves and rangoli shapes in L10 are built from sectors and segments. Arcs of wheels and tracks link to L7."},
+ {k:"q", q:"Arc length of a sector of radius 21 cm with angle 60° is:", o:["22 cm","44 cm","11 cm","231 cm"], e:"⅙ × 2 × 22/7 × 21 = 22."}
+], sum:["Arc l = (θ/360)2πr; sector A = (θ/360)πr² = ½lr","Sector perimeter = l + 2r","Segment = sector − ½r² sinθ; 90° segment = (2/7)r²","Minute hand 6°/min; hour hand 0.5°/min"]},
+{ id:"L7", heat:2, title:"Rings, paths & wheels", hi:"वलय, पथ और पहिए", blocks:[
+ {k:"hot", h:"<b>Steady 1 question every few shifts.</b> Circular path around/inside a park, width from two circumferences, wheel revolutions/speed. Tier 2: running tracks (rectangle + semicircles) and two wheels of different radii."},
+ {k:"formula", title:"Ring (annulus)", rows:[["Ring area","π(R² − r²) = π(R + r)(R − r)","R outer, r inner"],["Path of width w outside circle r","π[(r + w)² − r²] = πw(2r + w)","R = r + w"],["Path of width w inside circle R","π[R² − (R − w)²]","r = R − w"],["Width from circumferences","w = (C<sub>out</sub> − C<sub>in</sub>)/(2π)","Difference of C = 2πw"]]},
+ {k:"formula", title:"Wheels & tracks", rows:[["One revolution","Distance = circumference = 2πr",""],["n revolutions","Distance = n × 2πr","Revolutions = distance ÷ 2πr"],["Speed","Speed = (rev per unit time) × 2πr","Then convert cm/min → km/h"],["Two wheels, same distance","n₁ r₁ = n₂ r₂","Bigger wheel turns fewer times"],["Track (rectangle + 2 semicircles)","Perimeter = 2l + 2πr; area = 2rl + πr²","Two semicircles = one circle"]]},
+ {k:"figs", title:"Ring and running track", items:[
+  {svg:'<svg viewBox="0 0 220 170" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M35 85 a75 75 0 1 0 150 0 a75 75 0 1 0 -150 0 Z M60 85 a50 50 0 1 0 100 0 a50 50 0 1 0 -100 0 Z" fill-rule="evenodd" style="fill:var(--accent-bg)" stroke="none"/><circle cx="110" cy="85" r="75"/><circle cx="110" cy="85" r="50"/><path d="M110 85 H160" style="stroke:var(--accent)"/><path d="M110 85 L57 138" stroke-dasharray="4 3"/><circle cx="110" cy="85" r="2.5" fill="currentColor"/><text x="130" y="79" fill="currentColor" stroke="none">r</text><text x="86" y="130" fill="currentColor" stroke="none">R</text><text x="166" y="80" fill="currentColor" stroke="none">w</text></svg>', cap:"Ring = πR² − πr²; width w = R − r."},
+  {svg:'<svg viewBox="0 0 260 150" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M75 25 H185 A50 50 0 0 1 185 125 H75 A50 50 0 0 1 75 25 Z" style="fill:var(--accent-bg)"/><path d="M75 25 V125 M185 25 V125" stroke-dasharray="4 3"/><text x="126" y="18" fill="currentColor" stroke="none">l</text><text x="126" y="142" fill="currentColor" stroke="none">l</text><text x="80" y="80" fill="currentColor" stroke="none">2r</text><path d="M75 75 H25" style="stroke:var(--accent)"/><text x="46" y="70" fill="currentColor" stroke="none">r</text></svg>', cap:"Track: 2 straights + 2 semicircles → P = 2l + 2πr."}]},
+ {k:"ex", src:"SSC CGL 2022 · 6 Dec S1", q:"A circular playground has a circular path around it. The difference between the circumferences of the outer and inner circles is 144 cm. Find the approximate width of the path (π = 22/7).", steps:["2πR − 2πr = 2π(R − r) = 144","R − r = 144 × 7/44 = 22.9","Width ≈ 23 cm"], ans:"≈ 23 cm", tip:"Difference of circumferences ÷ 2π = width directly."},
+ {k:"ex", src:"SSC MTS 2019 · 13 Aug S3", q:"Each wheel of a bus makes 7 revolutions per second. If the diameter of a wheel is 56 cm, find the speed of the bus in cm/s.", steps:["Circumference = πd = 22/7 × 56 = 176 cm","Speed = 7 × 176 = 1232 cm/s"], ans:"1232 cm/s"},
+ {k:"ex", q:"A circular park has area 1386 m². A path 7 m wide is laid along the inside of its boundary. Find the area of the path.", steps:["πR² = 1386 → R = 21","Inner radius = 21 − 7 = 14 → inner area 616","Path = 1386 − 616 = 770 m²"], ans:"770 m²", tip:"Inside path → subtract w from the radius; outside path → add w."},
+ {k:"trick", h:"<b>Ring in one product:</b> π(R + r)(R − r). With R − r = width w, ring area = π × w × (R + r) = width × mean circumference."},
+ {k:"trick", h:"<b>Wheel units:</b> 1 km = 1,00,000 cm. A wheel of radius 35 cm has circumference 220 cm → 500 revolutions per 1.1 km. Speed in km/h = (cm per minute) × 60 ÷ 1,00,000."},
+ {k:"trap", h:"<b>Inside vs outside path:</b> inside → inner radius = R − w; outside → outer radius = r + w. Mixing them gives 1078 instead of 770 for the park above — both appear in options."},
+ {k:"trap", h:"Revolutions use the <b>circumference</b> (2πr), not the area. And if the diameter is given, C = πd — don't double it again."},
+ {k:"link", h:"Same as rectangular paths in L3, just with circles. Distance/speed questions link to the Time & Distance app."},
+ {k:"q", q:"A wheel of radius 21 cm covers how much distance in 10 revolutions?", o:["1320 cm","660 cm","132 cm","13,860 cm"], e:"10 × 2 × 22/7 × 21 = 1320."}
+], sum:["Ring = π(R² − r²) = π(R+r)(R−r)","Width = (C_out − C_in)/2π","Distance = revolutions × 2πr; n₁r₁ = n₂r₂","Track: P = 2l + 2πr, A = 2rl + πr²"]},
+{ id:"L8", heat:1, title:"Regular polygons", hi:"सम बहुभुज", blocks:[
+ {k:"hot", h:"<b>Occasional but predictable.</b> Tier 1 asks hexagon area from side (CGL 2017 had it in two shifts) and simple angle/side facts. Tier 2 asks a triangle cut from a hexagon (△ABC, △ACE) or an octagon cut from a square."},
+ {k:"formula", title:"Any regular n-gon (side a)", rows:[["Exterior angle","360°/n","Sum of exterior angles = 360°"],["Interior angle","(n − 2) × 180°/n","Hexagon 120°, octagon 135°"],["Area","½ × perimeter × apothem","Apothem = inradius (centre to side)"],["Area (trig form)","(n a²/4) cot(180°/n)","Gives the special cases below"]]},
+ {k:"formula", title:"Hexagon and octagon", rows:[["Regular hexagon area","(3√3/2) a² = 6 × (√3/4) a²","Six equilateral triangles"],["Hexagon radii","Circumradius R = a, inradius = (√3/2) a",""],["Hexagon diagonals","Long = 2a, short = √3 a",""],["△ABC (adjacent vertices)","(√3/4) a² = ⅙ of hexagon","½ a² sin 120°"],["△ACE (alternate vertices)","½ of hexagon","Equilateral with side √3 a"],["Regular octagon area","2(1 + √2) a²",""],["Octagon from square of side L","a = L(√2 − 1); corner cut x = a/√2","x + a + x = L"]]},
+ {k:"figs", title:"Hexagon = 6 triangles; octagon = square − 4 corners", items:[
+  {svg:'<svg viewBox="0 0 220 175" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M180 85 L145 24.4 L75 24.4 L40 85 L75 145.6 L145 145.6 Z" style="fill:var(--accent-bg)"/><path d="M110 85 L180 85 M110 85 L145 24.4 M110 85 L75 24.4 M110 85 L40 85 M110 85 L75 145.6 M110 85 L145 145.6" stroke-dasharray="4 3"/><path d="M110 85 V145.6" style="stroke:var(--accent)"/><circle cx="110" cy="85" r="2.5" fill="currentColor"/><text x="106" y="18" fill="currentColor" stroke="none">a</text><text x="150" y="80" fill="currentColor" stroke="none">a</text><text x="120" y="80" fill="currentColor" stroke="none">O</text></svg>', cap:"Six equilateral triangles of side a; apothem (accent) = (√3/2)a."},
+  {svg:'<svg viewBox="0 0 200 190" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><rect x="30" y="30" width="140" height="140" stroke-dasharray="4 3"/><path d="M30 30 H71 L30 71 Z M129 30 H170 V71 Z M170 129 V170 H129 Z M71 170 H30 V129 Z" style="fill:var(--accent-bg)" stroke="none"/><path d="M71 30 H129 L170 71 V129 L129 170 H71 L30 129 V71 Z" style="stroke:var(--accent)" stroke-width="2"/><text x="44" y="24" fill="currentColor" stroke="none">x</text><text x="96" y="24" fill="currentColor" stroke="none">a</text><text x="146" y="24" fill="currentColor" stroke="none">x</text><text x="58" y="186" fill="currentColor" stroke="none">L = x + a + x</text></svg>', cap:"Cut four right-isosceles corners: x√2 = a, so a = L(√2 − 1)."}]},
+ {k:"ex", src:"SSC CGL 2017 · 23 Aug S3", q:"What is the area of a regular hexagon of side 9 cm?", steps:["A = (3√3/2) a²","= (3√3/2) × 81 = 243√3/2 cm²"], ans:"243√3/2 cm²", tip:"Six times the equilateral triangle: 6 × (√3/4) × 81."},
+ {k:"ex", src:"SSC CGL Tier 2 2022 · 8 Aug", q:"ABCDEF is a regular hexagon of side 36 cm. Find the area of △ABC.", steps:["AB = BC = 36, ∠ABC = 120°","Area = ½ × 36 × 36 × sin 120° = 648 × √3/2","= 324√3 cm²"], ans:"324√3 cm²", tip:"△ABC = ⅙ of the hexagon = one equilateral triangle of side a: (√3/4) × 1296 = 324√3."},
+ {k:"ex", q:"A regular octagon is cut from a square of side 18 cm by trimming its corners. Find the side and area of the octagon.", steps:["Corners are right isosceles triangles with legs x and hypotenuse a = x√2","x + a + x = 18 → a(1 + √2) = 18 → a = 18(√2 − 1)","Area = 2(1 + √2) a² = 2(1 + √2) × 324(√2 − 1)² = 648(√2 − 1) cm²"], ans:"a = 18(√2 − 1) cm, area = 648(√2 − 1) ≈ 268.4 cm²", tip:"Some websites cut equilateral corners and get 36(9 − √3) — wrong: a regular octagon needs 45° corner cuts."},
+ {k:"trick", h:"<b>Hexagon = 6 triangles.</b> Any hexagon question → work with one equilateral triangle of side a (area (√3/4)a²) and multiply. △ABC = 1 piece, △ACE = 3 pieces, quadrilateral ABCD = 3 pieces."},
+ {k:"trick", h:"<b>Angles:</b> exterior = 360/n. Interior = 180 − exterior. Exterior 30° → 12 sides; interior 140° → exterior 40° → 9 sides."},
+ {k:"trap", h:"Hexagon area is (3√3/2)a², <b>not</b> (√3/4)a² × 3 or (3√3/4)a². Write it as 6 × (√3/4)a² to avoid slips."},
+ {k:"trap", h:"An octagon trimmed from a square is <b>not</b> made by cutting equilateral triangles; the cuts are 45° right isosceles triangles."},
+ {k:"link", h:"Hexagon in a circle: circumradius = side (L9). The equilateral triangle formulas come from L2."},
+ {k:"q", q:"Each interior angle of a regular octagon is:", o:["135°","45°","120°","140°"], e:"180 − 360/8 = 135."}
+], sum:["Exterior angle 360/n; interior = 180 − 360/n","Hexagon = (3√3/2)a²; R = a; apothem (√3/2)a","△ABC = ⅙ hexagon; △ACE = ½ hexagon","Octagon = 2(1+√2)a²; from square L: a = L(√2 − 1)"]},
+{ id:"L9", heat:3, title:"Inscribed & circumscribed figures", hi:"अंतर्गत और परिगत आकृतियाँ", blocks:[
+ {k:"hot", h:"<b>A Tier 2 favourite; Tier 1 asks it every few shifts.</b> Forms: circle in a square / square in a circle, incircle and circumcircle of an equilateral triangle (1 : 4 areas), inradius of a right triangle from its sides, and chains (circle in triangle → square in that circle)."},
+ {k:"p", h:"<b>Inscribed</b> = drawn inside, touching. <b>Circumscribed</b> = drawn outside, through the corners. Every question reduces to one link: which length of the inner figure equals which length of the outer one (side = diameter, diagonal = diameter, hypotenuse = diameter …)."},
+ {k:"formula", title:"Square and circle", rows:[["Circle in a square (side a)","r = a/2, area = πa²/4","Diameter = side"],["Square in a circle (radius r)","side = r√2, area = 2r²","Diagonal = diameter"],["Rectangle in a circle","Diagonal √(l² + b²) = 2R","Any rectangle; R = d/2"],["Largest circle in a rectangle","r = b/2 (smaller side)","Not the length!"],["Outer circle : inner circle","Areas 2 : 1","Square between them"],["Outer square : inner square","Areas 2 : 1","Circle between them"]]},
+ {k:"formula", title:"Triangles and their circles", rows:[["Any triangle","r = A/s, R = abc/(4A)","s = semi-perimeter"],["Equilateral (side a)","r = a/(2√3), R = a/√3","R = 2r; h = 3r = r + R"],["Equilateral areas","Incircle : circumcircle = 1 : 4","Because R = 2r"],["Right triangle","R = c/2 (half the hypotenuse)","Hypotenuse = diameter"],["Right triangle inradius","r = (a + b − c)/2","a, b legs; c hypotenuse"],["Right triangle area","A = r × s = r(r + 2R)","s = r + 2R"],["Hexagon in a circle","side = R","Six equilateral triangles"],["Circle in a rhombus","r = (height)/2 = d₁d₂/(4a)","Rhombus area = 2ar"]]},
+ {k:"figs", title:"Square ↔ circle", items:[
+  {svg:'<svg viewBox="0 0 200 170" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><rect x="35" y="20" width="130" height="130"/><circle cx="100" cy="85" r="65" style="fill:var(--accent-bg)"/><path d="M35 85 H165" style="stroke:var(--accent)" stroke-dasharray="4 3"/><circle cx="100" cy="85" r="2.5" fill="currentColor"/><text x="66" y="80" fill="currentColor" stroke="none">2r = a</text><text x="96" y="166" fill="currentColor" stroke="none">a</text></svg>', cap:"Circle in a square: diameter = side, r = a/2."},
+  {svg:'<svg viewBox="0 0 200 170" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><circle cx="100" cy="85" r="65"/><path d="M54 39 H146 V131 H54 Z" style="fill:var(--accent-bg)"/><path d="M54 131 L146 39" style="stroke:var(--accent)" stroke-dasharray="4 3"/><circle cx="100" cy="85" r="2.5" fill="currentColor"/><text x="106" y="98" fill="currentColor" stroke="none">2r</text><text x="88" y="125" fill="currentColor" stroke="none">r√2</text></svg>', cap:"Square in a circle: diagonal = diameter, side = r√2, area = 2r²."}]},
+ {k:"figs", title:"Incircle and circumcircle", items:[
+  {svg:'<svg viewBox="0 0 240 175" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><circle cx="120" cy="95" r="70"/><path d="M120 25 L180.6 130 L59.4 130 Z"/><circle cx="120" cy="95" r="35" style="fill:var(--accent-bg)"/><path d="M120 95 V25" style="stroke:var(--accent)"/><path d="M120 95 V130" style="stroke:var(--blue)"/><circle cx="120" cy="95" r="2.5" fill="currentColor"/><text x="116" y="18" fill="currentColor" stroke="none">A</text><text x="44" y="144" fill="currentColor" stroke="none">B</text><text x="184" y="144" fill="currentColor" stroke="none">C</text><text x="104" y="99" fill="currentColor" stroke="none">O</text><text x="125" y="60" fill="currentColor" stroke="none">R</text><text x="125" y="118" fill="currentColor" stroke="none">r</text></svg>', cap:"Equilateral: R = 2r, so the circle areas are 1 : 4."},
+  {svg:'<svg viewBox="0 0 240 175" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M40 30 L40 140 L200 140 Z"/><path d="M40 130 H50 V140"/><circle cx="77.9" cy="102.1" r="37.9" style="fill:var(--accent-bg)"/><path d="M77.9 102.1 V140" style="stroke:var(--accent)"/><path d="M77.9 102.1 H40" style="stroke:var(--accent)" stroke-dasharray="4 3"/><circle cx="77.9" cy="102.1" r="2.5" fill="currentColor"/><text x="82" y="126" fill="currentColor" stroke="none">r</text><text x="56" y="98" fill="currentColor" stroke="none">r</text><text x="26" y="80" fill="currentColor" stroke="none">a</text><text x="136" y="158" fill="currentColor" stroke="none">b</text><text x="128" y="78" fill="currentColor" stroke="none">c</text><text x="28" y="156" fill="currentColor" stroke="none">C</text></svg>', cap:"Right triangle: the corner square at C has side r, so a + b − c = 2r."}]},
+ {k:"ex", src:"SSC CPO 2019 · 12 Dec S1", q:"A circle is inscribed in an equilateral triangle of side 24 cm. What is the area of a square inscribed in the circle?", steps:["Inradius r = a/(2√3) = 24/(2√3) = 4√3 cm","Square in a circle: area = 2r² = 2 × 48","= 96 cm²"], ans:"96 cm²", tip:"r² = a²/12 = 576/12 = 48 → area 2r² = 96."},
+ {k:"ex", src:"SSC CHSL 2020 · 5 Aug 2021 S3", q:"The in-radius and circumradius of a right-angled triangle are 3 cm and 12.5 cm. Find the area of the triangle.", steps:["R = c/2 → hypotenuse c = 25","s = r + 2R = 3 + 25 = 28","Area = r × s = 3 × 28 = 84 cm²"], ans:"84 cm²", tip:"It is the 7-24-25 triangle: (7 + 24 − 25)/2 = 3 ✓."},
+ {k:"ex", q:"Find the inradius and circumradius of a triangle with sides 13, 14 and 15 cm.", steps:["s = 21, Heron area = 84","r = A/s = 84/21 = 4 cm","R = abc/(4A) = 2730/336 = 65/8 cm"], ans:"r = 4 cm, R = 65/8 cm"},
+ {k:"trick", h:"<b>Equilateral ladder:</b> r : R : h = 1 : 2 : 3. Know any one → the other two. Side 6√3 → h = 9, R = 6, r = 3."},
+ {k:"trick", h:"<b>Right-triangle radii in 5 seconds:</b> 3-4-5 → r = 1, R = 2.5; 5-12-13 → r = 2, R = 6.5; 6-8-10 → r = 2, R = 5; 8-15-17 → r = 3; 7-24-25 → r = 3; 20-21-29 → r = 6."},
+ {k:"trick", h:"<b>Nesting halves the area.</b> Circle → square inside → circle inside: each step halves the area (2 : 1). Two steps → 4 : 1."},
+ {k:"trap", h:"<b>Square in a circle:</b> the <b>diagonal</b> (not the side) equals the diameter. Taking side = 2r gives area 4r², double the true 2r²."},
+ {k:"trap", h:"For a right triangle, r = (a + b − c)/2 — the <b>minus</b> goes on the hypotenuse. (a + b + c)/2 is the semi-perimeter, not r."},
+ {k:"link", h:"r = A/s and R = abc/4A use the triangle areas of L2. The hexagon (side = R) is L8. Shaded leftovers (circle minus square, triangle minus incircle) continue in L10."},
+ {k:"q", q:"A square is inscribed in a circle of radius 10 cm. Its area is:", o:["200 cm²","400 cm²","100 cm²","100π cm²"], e:"Diagonal = 20 → area = d²/2 = 200."},
+ {k:"q", q:"The legs of a right triangle are 8 cm and 15 cm. Its inradius is:", o:["3 cm","8.5 cm","20 cm","6 cm"], e:"c = 17 → (8 + 15 − 17)/2 = 3."}
+], sum:["Circle in square: r = a/2; square in circle: side r√2, area 2r²","Equilateral: r = a/(2√3), R = a/√3, r : R : h = 1 : 2 : 3","Right triangle: R = c/2, r = (a + b − c)/2","Any triangle: r = A/s, R = abc/(4A)","Hexagon in circle: side = R"]},
+{ id:"L10", heat:2, title:"Shaded regions & combined figures", hi:"छायांकित भाग और संयुक्त आकृतियाँ", blocks:[
+ {k:"hot", h:"<b>Tier 2 loves these; Tier 1 asks one every few shifts.</b> Fixed patterns: four circles at the corners of a square, three touching circles (area between them / string around them), the 'leaf' made by two quadrants, grazing animals and rangoli petals. Answers often come as (a√3 − bπ) or a multiple of 1/7."},
+ {k:"p", h:"<b>Never integrate — subtract.</b> Shaded = (whole simple figure) − (pieces you can name). The pieces are always squares, triangles, sectors, quadrants or segments from L2–L6. Corner pieces of a polygon add up: their angles sum to the polygon's angle sum."},
+ {k:"formula", title:"Standard shaded shapes (π = 22/7 values)", rows:[["Square minus inscribed circle","a²(1 − π/4) = (3/14) a²","Same as square minus 4 corner quadrants of radius a/2"],["Square minus one quadrant (radius a)","a²(1 − π/4) = (3/14) a²","Corner left outside the arc"],["Leaf (two quadrants in a square)","(π/2 − 1) a² = (4/7) a²","= 2 × (90° segment)"],["Four-petal rangoli (semicircles on 4 sides)","(π/2 − 1) a² = (4/7) a²","Same as the leaf!"],["4 touching circles (radius r)","(4 − π) r² = (6/7) r²","Square of side 2r − 4 quadrants"],["3 touching circles (radius r)","(√3 − π/2) r²","Equilateral △ of side 2r − three 60° sectors"],["Circle minus inscribed square","(π − 2) r² = (8/7) r²",""],["Circle in a quadrant (radius R)","r = R(√2 − 1)","r√2 + r = R"]]},
+ {k:"formula", title:"Belts, ropes and grazing", rows:[["Belt round n equal touching circles","Perimeter of centre-polygon + 2πr","Arcs always add up to one full circle"],["3 circles in a triangle","6r + 2πr",""],["4 circles in a square","8r + 2πr",""],["Grazing at a corner of angle θ","(θ/360) πr²","Square corner → quadrant"],["Animals at all corners of a polygon (n sides)","(n − 2) × 180/360 × πr²","Triangle → semicircle; quadrilateral → full circle"]]},
+ {k:"figs", title:"Leaf and touching circles", items:[
+  {svg:'<svg viewBox="0 0 220 180" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><rect x="40" y="20" width="140" height="140"/><path d="M40 20 A140 140 0 0 1 180 160 A140 140 0 0 1 40 20 Z" style="fill:var(--accent-bg);stroke:var(--accent)"/><path d="M40 20 L180 160" stroke-dasharray="4 3"/><circle cx="40" cy="160" r="2.5" fill="currentColor"/><circle cx="180" cy="20" r="2.5" fill="currentColor"/><text x="26" y="174" fill="currentColor" stroke="none">A</text><text x="186" y="18" fill="currentColor" stroke="none">C</text><text x="106" y="176" fill="currentColor" stroke="none">a</text><text x="190" y="94" fill="currentColor" stroke="none">a</text></svg>', cap:"Leaf: quadrants centred at A and C. Leaf = 2 × segment = (π/2 − 1)a²."},
+  {svg:'<svg viewBox="0 0 220 200" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M110 60 A40 40 0 0 0 150 100 A40 40 0 0 0 110 140 A40 40 0 0 0 70 100 A40 40 0 0 0 110 60 Z" style="fill:var(--accent)" opacity="0.45" stroke="none"/><circle cx="70" cy="60" r="40"/><circle cx="150" cy="60" r="40"/><circle cx="150" cy="140" r="40"/><circle cx="70" cy="140" r="40"/><path d="M70 60 H150 V140 H70 Z" stroke-dasharray="4 3"/><path d="M70 60 H110" style="stroke:var(--accent)"/><text x="84" y="54" fill="currentColor" stroke="none">r</text><text x="104" y="196" fill="currentColor" stroke="none">2r</text></svg>', cap:"Four touching circles: (2r)² − 4 quadrants = (4 − π)r²."},
+  {svg:'<svg viewBox="0 0 240 190" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M100 95.4 A40 40 0 0 0 140 95.4 A40 40 0 0 0 120 130 A40 40 0 0 0 100 95.4 Z" style="fill:var(--accent)" opacity="0.45" stroke="none"/><circle cx="80" cy="130" r="40"/><circle cx="160" cy="130" r="40"/><circle cx="120" cy="60.7" r="40"/><path d="M80 130 H160 L120 60.7 Z" stroke-dasharray="4 3"/><path d="M80 170 A40 40 0 0 1 45.4 110 L85.4 40.7 A40 40 0 0 1 154.6 40.7 L194.6 110 A40 40 0 0 1 160 170 Z" style="stroke:var(--blue)"/><text x="116" y="184" fill="currentColor" stroke="none">2r</text></svg>', cap:"Three touching circles: shaded = △ − 3 × 60° sectors. Belt (blue) = 3 × 2r + 2πr."}]},
+ {k:"ex", src:"SSC CGL Tier 2 2016 · 1 Dec", q:"Four circles of equal radii are drawn about the four corners of a square so that each touches two of the others. If each side of the square is 140 cm, find the area enclosed between the circles (π = 22/7).", steps:["r = 140/2 = 70 cm","Four quarter-circles = one full circle = 22/7 × 4900 = 15,400","Square − circle = 19,600 − 15,400 = 4200 cm²"], ans:"4200 cm²", tip:"(3/14) × side² = (3/14) × 19,600 = 4200."},
+ {k:"ex", src:"SSC CHSL 2022 · 10 Mar 2023 S3", q:"Three circles of radius 7 cm are placed so that each touches the other two. Find the area of the portion enclosed by the three circles.", steps:["Centres form an equilateral triangle of side 14 → area (√3/4) × 196 = 49√3","Three 60° sectors = half a circle = ½ × 22/7 × 49 = 77","Enclosed area = 49√3 − 77 cm²"], ans:"(49√3 − 77) cm²", tip:"Angles of the triangle add to 180° → the three sectors make exactly one semicircle."},
+ {k:"ex", src:"SSC CGL 2022 · 5 Dec S4", q:"Three circles of radius 4 cm are kept touching each other. A string is tied tightly around them. Find the length of the string.", steps:["Straight parts: three, each equal to 2r = 8 → 24 cm","Curved parts: each 120° → total 360° = one circumference = 2π × 4 = 8π","Length = 24 + 8π cm"], ans:"(24 + 8π) cm"},
+ {k:"ex", q:"ABCD is a square of side 14 cm. Quadrants are drawn with centres A and C and radius 14 cm. Find the area of the leaf where they overlap.", steps:["Each quadrant = ¼ × 22/7 × 196 = 154","Triangle ABD (half the square) = 98 → one segment = 154 − 98 = 56","Leaf = 2 × 56 = 112 cm²"], ans:"112 cm²", tip:"(4/7) × a² = (4/7) × 196 = 112."},
+ {k:"trick", h:"<b>The 1/7 family (π = 22/7):</b> square − circle = <b>3/14</b> a²; leaf or 4-petal rangoli = <b>4/7</b> a²; four touching circles = <b>6/7</b> r²; circle − square = <b>8/7</b> r²; 90° segment = <b>2/7</b> r². One multiplication and done."},
+ {k:"trick", h:"<b>Corner sectors add up.</b> Equal circles at the corners of a triangle → sectors total 180° = ½ circle; at the corners of any quadrilateral → 360° = 1 full circle; pentagon → 1.5 circles."},
+ {k:"trap", h:"<b>Belt length:</b> the straight parts equal the distances between centres (2r each), not the diameters around the outside, and the curved parts make <b>one</b> full circle in total — not one per circle."},
+ {k:"trap", h:"<b>Leaf vs leftover:</b> the leaf is the overlap (4/7 a²); the two corner pieces outside both quadrants are a² − 4/7 a² = 3/7 a². Read which part is shaded."},
+ {k:"link", h:"Every piece here comes from L5 (quadrants), L6 (sectors and segments) and L9 (inscribed figures). Rangoli and petals are popular in Tier 2 picture questions."},
+ {k:"q", q:"ABCD is a square of side 7 cm. Quadrants of radius 7 cm are drawn from B and D. The area of the overlapping leaf is:", o:["28 cm²","14 cm²","21 cm²","38.5 cm²"], e:"(4/7) × 49 = 28."}
+], sum:["Shaded = whole − named pieces","Square − inscribed circle = (3/14)a²; leaf = rangoli = (4/7)a²","4 touching circles (4 − π)r²; 3 touching circles (√3 − π/2)r²","Belt = centre-polygon perimeter + 2πr","Corner sectors of a polygon add to (n − 2) × 180°"]},
+{ id:"L11", heat:2, title:"Percentage change in area & ratios", hi:"क्षेत्रफल में प्रतिशत परिवर्तन और अनुपात", blocks:[
+ {k:"hot", h:"<b>About one question every two CGL/CHSL shifts</b> — and it is the fastest mark in mensuration. Forms: side/radius +x% → area?; length +x%, breadth −y% → area?; keep the area constant; similar figures; equal perimeters → which area is bigger. Tier 2 adds 'area +44% → side?'."},
+ {k:"p", h:"<b>Area is length × length</b>, so every length change is applied twice. That is why +10% on every side gives +21% area, not +20%. Perimeter and circumference are single lengths, so they change by the same % as the sides."},
+ {k:"formula", title:"Percentage change", rows:[["Two changes (rectangle)","x + y + xy/100 %","Use −x for a decrease"],["Every length +x% (square, circle, any similar figure)","2x + x²/100 %","+10% → +21%, +20% → +44%"],["+x% and −x%","Always a fall of x²/100 %","+20, −20 → −4%"],["Keep area constant","Other side falls by 100x/(100 + x) %","+25% length → −20% breadth"],["Area +k% → side","Side +[√(1 + k/100) − 1] × 100 %","+21% → 10%, +44% → 20%, +69% → 30%"],["Perimeter / circumference","Same % as the side or radius","Linear, not squared"]]},
+ {k:"formula", title:"Ratios and equal perimeters", rows:[["Similar figures","Area ratio = (side ratio)²","Perimeter ratio = side ratio"],["Circles","A₁ : A₂ = r₁² : r₂² = C₁² : C₂²",""],["Equal perimeter: circle vs square","Areas 4 : π = 14 : 11","Circle wins"],["Equal perimeter: square vs equilateral △","Areas 9 : 4√3 (≈ 1.3 : 1)",""],["Equal perimeter, all rectangles","Square has the largest area","l = b"],["Equal area","Circle has the least perimeter",""],["Square and circle of equal area","side : radius = √π : 1",""]]},
+ {k:"figs", title:"Why x + y + xy", items:[
+  {svg:'<svg viewBox="0 0 240 170" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><rect x="30" y="20" width="140" height="90" style="fill:var(--accent-bg)"/><rect x="170" y="20" width="35" height="90" style="fill:var(--accent)" opacity="0.35"/><rect x="30" y="110" width="140" height="25" style="fill:var(--blue)" opacity="0.3"/><rect x="170" y="110" width="35" height="25" style="fill:var(--accent)" opacity="0.8" stroke="none"/><rect x="30" y="20" width="175" height="115"/><text x="100" y="70" text-anchor="middle" fill="currentColor" stroke="none">lb</text><text x="187" y="70" text-anchor="middle" fill="currentColor" stroke="none">x%</text><text x="100" y="127" text-anchor="middle" fill="currentColor" stroke="none">y%</text><text x="187" y="160" text-anchor="middle" fill="currentColor" stroke="none">xy/100</text><text x="100" y="156" text-anchor="middle" fill="currentColor" stroke="none">l → l(1 + x%)</text></svg>', cap:"New area = old + x% strip + y% strip + the small corner xy/100."},
+  {svg:'<svg viewBox="0 0 320 130" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M10 100 H90 L50 30.7 Z" style="fill:var(--accent-bg)"/><rect x="120" y="40" width="60" height="60" style="fill:var(--accent-bg)"/><circle cx="260" cy="61.8" r="38.2" style="fill:var(--accent-bg);stroke:var(--accent)"/><text x="50" y="120" text-anchor="middle" fill="currentColor" stroke="none">0.77</text><text x="150" y="120" text-anchor="middle" fill="currentColor" stroke="none">1</text><text x="260" y="120" text-anchor="middle" fill="currentColor" stroke="none">1.27</text><text x="150" y="20" text-anchor="middle" fill="currentColor" stroke="none">same perimeter</text></svg>', cap:"Same perimeter: triangle 0.77 : square 1 : circle 1.27 (areas). More sides → more area."}]},
+ {k:"ex", src:"SSC CGL 2019 · 3 Mar 2020 S1", q:"If the length of a rectangle is increased by 40% and the breadth is decreased by 20%, the area increases by x%. Find x.", steps:["x + y + xy/100 with x = 40, y = −20","40 − 20 − 800/100 = 20 − 8 = 12"], ans:"12", tip:"Multiply factors: 1.4 × 0.8 = 1.12 → +12%."},
+ {k:"ex", src:"SSC MTS 2021 · 7 Jul 2022 S1", q:"The side of a square is increased by 25%. What is the percentage increase in its area?", steps:["2x + x²/100 = 50 + 625/100","= 56.25%"], ans:"56.25%", tip:"1.25² = 1.5625."},
+ {k:"ex", q:"The length of a rectangle is increased by 25%. By what percentage must the breadth be decreased to keep the area unchanged?", steps:["New length = 5/4 of old → breadth must become 4/5 of old","Decrease = 1/5 = 20%"], ans:"20%", tip:"100x/(100 + x) = 2500/125 = 20."},
+ {k:"ex", q:"A circle and a square have the same perimeter. Find the ratio of their areas (π = 22/7).", steps:["2πr = 4a → a = πr/2","Circle : square = πr² : π²r²/4 = 4 : π","= 4 : 22/7 = 28 : 22 = 14 : 11"], ans:"14 : 11"},
+ {k:"trick", h:"<b>Use fractions as factors.</b> +25% = ×5/4, −20% = ×4/5, +50% = ×3/2, −33⅓% = ×2/3, +12.5% = ×9/8. Multiply the factors; the product minus 1 is the change."},
+ {k:"trick", h:"<b>Perfect squares give the side change:</b> area ×1.21 → side ×1.1; ×1.44 → ×1.2; ×1.69 → ×1.3; ×2.25 → ×1.5; ×0.81 → ×0.9; ×0.64 → ×0.8."},
+ {k:"trap", h:"<b>+x% then −x% is never 'no change'.</b> The area always falls by x²/100 %. +20%/−20% → −4%; +50%/−50% → −25%."},
+ {k:"trap", h:"<b>'Doubled' means +100%, not +200%.</b> Radius doubled → area ×4 → increase of 300%. Radius tripled → ×9 → +800%."},
+ {k:"link", h:"This is L1's scaling rule (lengths × k → area × k²) written in percent. The same x + y + xy/100 rule is used in the Percentage app (successive change) and, cubed, in Mensuration 3D for volumes."},
+ {k:"q", q:"Each side of a rectangle is increased by 10%. Its area increases by:", o:["21%","20%","10%","11%"], e:"10 + 10 + 100/100 = 21."}
+], sum:["Two changes: x + y + xy/100 %","All lengths +x%: area 2x + x²/100 %; +x/−x: fall of x²/100 %","Constant area: other side −100x/(100+x) %","Similar figures: area ratio = (side ratio)²","Equal perimeter: circle > square > triangle (circle : square = 14 : 11)"]},
+//@@LESSONS
+];
+const QB = [
+["L1","1 hectare = ?",["10,000 m²","1,000 m²","100 m²","1,00,000 m²"],"1 ha = 100 m × 100 m = 10,000 m²."],
+["L1","1 are = ?",["100 m²","10 m²","1,000 m²","10,000 m²"],"1 are = 10 m × 10 m."],
+["L1","3.5 m² expressed in cm² is:",["35,000 cm²","350 cm²","3,500 cm²","3,50,000 cm²"],"1 m² = 10,000 cm² → 3.5 × 10,000."],
+["L1","1 km² is equal to how many hectares?",["100","10","1000","10,000"],"10⁶ m² ÷ 10⁴ m² = 100 ha."],
+["L1","A rectangular field of area 2.4 hectares is 300 m long. Its breadth is:",["80 m","8 m","800 m","40 m"],"24,000 ÷ 300 = 80 m."],
+["L1","The area of a circular cricket ground is 24.64 hectares. The cost of a rope boundary at ₹5.40 per metre is:",["₹9,504","₹4,752","₹9,600","₹19,008"],"r² = 2,46,400 × 7/22 = 78,400 → r = 280; 2πr = 1760 m × 5.40. SSC CHSL 2018 (7 Mar S1).","p"],
+["L1","Cultivating a square field at ₹450 per hectare costs ₹1,800. The cost of fencing it at ₹5 per metre is:",["₹4,000","₹1,000","₹2,000","₹8,000"],"Area 4 ha = 40,000 m² → side 200 m → perimeter 800 m × 5."],
+["L1","The perimeter of a rectangle 25 m × 16 m is:",["82 m","41 m","400 m","164 m"],"2(25 + 16) = 82 m."],
+["L1","If the side of a square is doubled, its area becomes:",["4 times","2 times","8 times","3 times"],"Area ∝ side² → 2² = 4."],
+["L1","Area of a circle of radius 21 cm (π = 22/7) is:",["1386 cm²","132 cm²","693 cm²","5544 cm²"],"22/7 × 21 × 21 = 1386. 132 is the circumference; 5544 uses the diameter."],
+["L1","Area of a circle of radius 10 cm (π = 3.14) is:",["314 cm²","31.4 cm²","62.8 cm²","628 cm²"],"3.14 × 100 = 314."],
+["L1","A room 8 m × 6 m is paved with square tiles of side 40 cm. Number of tiles needed:",["300","120","30","3000"],"(800 × 600) ÷ (40 × 40) = 300 tiles."],
+["L1","A rectangular lawn has breadth : length = 3 : 4 and area 1/12 hectare. Its breadth is:",["25 m","100/3 m","50 m","12.5 m"],"12x² = 10,000/12 → x = 100/12 → 3x = 25 m."],
+["L1","A square has the same area as a rectangle 32 m × 18 m. Side of the square:",["24 m","25 m","576 m","50 m"],"√(32 × 18) = √576 = 24 m (not the average 25)."],
+["L1","The area of a square plot is 0.5 hectare. Its diagonal is:",["100 m","50√2 m","50 m","200 m"],"Area = d²/2 → d² = 10,000 → d = 100 m."],
+["L1","The perimeter and area of a square are numerically equal. Its side is:",["4 units","2 units","8 units","16 units"],"4a = a² → a = 4."],
+["L2","A triangle has base 12 cm and height 9 cm. Its area is:",["54 cm²","108 cm²","27 cm²","21 cm²"],"½ × 12 × 9 = 54. 108 forgets the ½."],
+["L2","The area of a triangle with sides 13 cm, 14 cm and 15 cm is:",["84 cm²","42 cm²","168 cm²","91 cm²"],"s = 21 → √(21 × 8 × 7 × 6) = 84."],
+["L2","What is the area (in m²) of a triangular field whose sides measure 25 m, 39 m and 56 m?",["420","240","210","480"],"s = 60 → √(60 × 35 × 21 × 4) = 420. SSC MTS 2019 (19 Aug S3).","p"],
+["L2","Find the area of an equilateral triangle whose sides are 16 cm each.",["64√3 cm²","128√3 cm²","32√3 cm²","256√3 cm²"],"(√3/4) × 256 = 64√3. SSC CGL 2023 (26 Jul S3).","p"],
+["L2","The area of an equilateral triangle is 36√3 cm². Its perimeter is:",["36 cm","12 cm","18 cm","72 cm"],"a²/4 = 36 → a = 12 → 3a = 36."],
+["L2","The height of an equilateral triangle is 6√3 cm. Its area is:",["36√3 cm²","18√3 cm²","72√3 cm²","108 cm²"],"(√3/2)a = 6√3 → a = 12 → (√3/4) × 144."],
+["L2","An isosceles triangle has equal sides 10 cm and base 12 cm. Its area is:",["48 cm²","96 cm²","60 cm²","24 cm²"],"h = √(100 − 36) = 8 → ½ × 12 × 8."],
+["L2","A right triangle has hypotenuse 25 cm and one leg 7 cm. Its area is:",["84 cm²","87.5 cm²","168 cm²","175 cm²"],"Other leg 24 → ½ × 7 × 24 = 84 (not ½ × 7 × 25)."],
+["L2","Two sides of a triangle are 8 cm and 10 cm and the angle between them is 30°. Its area is:",["20 cm²","40 cm²","20√3 cm²","10 cm²"],"½ × 8 × 10 × sin 30° = 20."],
+["L2","Each of the two equal sides of an isosceles triangle is 10 cm and the angle between them is 45°. Its area is:",["25√2 cm²","50√2 cm²","25 cm²","50 cm²"],"½ × 10 × 10 × (1/√2) = 25√2."],
+["L2","The medians of a triangle are 28 cm, 45 cm and 53 cm. The area of the triangle is:",["840 cm²","630 cm²","472.5 cm²","720 cm²"],"Median-triangle is right: ½ × 28 × 45 = 630 → × 4/3 = 840."],
+["L2","The medians of a triangle are 12 m, 16 m and 20 m. The area of the triangle is:",["128 m²","96 m²","72 m²","192 m²"],"½ × 12 × 16 = 96 → × 4/3 = 128."],
+["L2","The area of a triangular field whose sides are 65 m, 72 m and 97 m is equal to the area of a rectangular park whose sides are in the ratio 5 : 13. The perimeter of the park is:",["216 m","108 m","180 m","144 m"],"Right triangle: ½ × 65 × 72 = 2340 = 65x² → x = 6 → 2(30 + 78). SSC CHSL 2021 (19 Apr Morning).","p"],
+["L2","A square and an equilateral triangle have equal perimeters. If the diagonal of the square is 12√2 cm, the area of the triangle is:",["64√3 cm²","48√3 cm²","36√3 cm²","144 cm²"],"Square side 12 → perimeter 48 → triangle side 16 → 64√3. SSC GD Constable 2022 (7 Feb 2023 S4).","p"],
+["L2","The perimeter of an equilateral triangle is 40 cm more than the length of each of its sides. The length of each side is:",["20 cm","10 cm","40/3 cm","30 cm"],"3a = a + 40 → a = 20. SSC MTS 2022 (22 Jul S3).","p"],
+["L2","The inradius of a triangle is 6 cm and its perimeter is 50 cm. Its area is:",["150 cm²","300 cm²","75 cm²","56 cm²"],"A = r × s = 6 × 25."],
+["L2","The sides of a triangle are in the ratio 3 : 4 : 5 and its perimeter is 48 cm. Its area is:",["96 cm²","192 cm²","48 cm²","120 cm²"],"Sides 12, 16, 20 (right) → ½ × 12 × 16."],
+["L2","A triangle of area 60 cm² has base 15 cm. Its height is:",["8 cm","4 cm","16 cm","6 cm"],"h = 2A/b = 120/15."],
+["L3","What must be the length of the diagonal of a rectangle if its area and breadth are 120 cm² and 8 cm respectively?",["17 cm","34 cm","15 cm","30 cm"],"l = 120/8 = 15 → √(225 + 64) = 17. SSC CHSL 2018 (8 Mar S1).","p"],
+["L3","The diagonal of a rectangular field is 18 m and its area is 126 m². The cost of fencing it at ₹9 per metre is:",["₹432","₹216","₹1,134","₹162"],"(l+b)² = 324 + 252 = 576 → l+b = 24 → P = 48 × 9. SSC Selection Post 2020 (9 Nov S2).","p"],
+["L3","A path of uniform width 2.5 m runs around the outside of a rectangular field of dimensions 45 m × 35 m. The area of the path is:",["425 m²","400 m²","375 m²","500 m²"],"50 × 40 − 45 × 35 = 425. SSC MTS 2023 (8 Sep S2).","p"],
+["L3","If the length of a rectangle is decreased by 4 cm and its breadth increased by 2 cm, it becomes a square of the same area. The perimeter of the original rectangle is:",["20 cm","24 cm","15 cm","10 cm"],"l − 4 = b + 2 and (b+2)² = lb → b = 2, l = 8 → P = 20. SSC CGL 2022 (6 Dec S1).","p"],
+["L3","A rectangular park 60 m × 40 m has two concrete cross-roads in the middle; the remaining lawn has area 2109 m². The width of each road is:",["3 m","5 m","6 m","2 m"],"(60 − w)(40 − w) = 2109 → w = 3. SSC CGL Tier 2 2016 (1 Dec).","p"],
+["L3","The area of a square whose diagonal is 8√2 cm is:",["64 cm²","128 cm²","32 cm²","64√2 cm²"],"d²/2 = 128/2 = 64."],
+["L3","The diagonal of a square is 20 m. Its area is:",["200 m²","400 m²","100 m²","100√2 m²"],"d²/2 = 400/2."],
+["L3","A rectangle has area 120 m² and perimeter 46 m. Its diagonal is:",["17 m","23 m","13 m","19 m"],"l + b = 23 → d² = 529 − 240 = 289."],
+["L3","A path 2 m wide runs inside along the boundary of a 30 m × 20 m garden. Area of the path:",["184 m²","200 m²","216 m²","196 m²"],"2w(l + b − 2w) = 4 × 46 = 184. (216 is the outside path.)"],
+["L3","Two roads, each 4 m wide, cross at the middle of an 80 m × 60 m park, parallel to its sides. Area of the roads:",["544 m²","560 m²","576 m²","528 m²"],"4(80 + 60) − 4² = 560 − 16 = 544."],
+["L3","A room 12 m × 9 m is carpeted with a carpet 75 cm wide at ₹40 per metre. The cost is:",["₹5,760","₹4,320","₹3,240","₹6,480"],"Length = 108 ÷ 0.75 = 144 m → 144 × 40."],
+["L3","The length of a rectangle is 3 times its breadth and its perimeter is 64 m. Its area is:",["192 m²","256 m²","96 m²","384 m²"],"8b = 64 → b = 8, l = 24."],
+["L3","The perimeter of a square is 48 cm. Its diagonal is:",["12√2 cm","12 cm","24√2 cm","6√2 cm"],"a = 12 → a√2."],
+["L3","A square field has area 1.44 hectares. The cost of fencing it at ₹15 per metre is:",["₹7,200","₹1,800","₹3,600","₹14,400"],"14,400 m² → side 120 → P = 480 × 15."],
+["L3","A rectangle has diagonal 13 cm and length 12 cm. Its area is:",["60 cm²","156 cm²","30 cm²","78 cm²"],"b = 5 → 12 × 5."],
+["L3","A field has length : breadth = 7 : 4. A 4 m wide border outside it has area 416 m². The breadth of the field is:",["16 m","28 m","12 m","20 m"],"2 × 4 × (11x + 8) = 416 → x = 4 → 4x = 16."],
+["L4","Length of each side of a rhombus is 13 cm and one of its diagonals is 24 cm. What is the area of the rhombus?",["120 cm²","60 cm²","240 cm²","156 cm²"],"Other half-diagonal = √(169 − 144) = 5 → d₂ = 10 → ½ × 24 × 10. SSC CGL 2020 (13 Aug 2021 S1).","p"],
+["L4","The area of a rhombus having one side 10 cm and one diagonal 12 cm is:",["96 cm²","48 cm²","192 cm²","144 cm²"],"Half-diagonals 6 and 8 → d₂ = 16 → ½ × 12 × 16. SSC CGL Tier 2 2017 (12 Jan).","p"],
+["L4","Parallel sides of a trapezium are 21 cm and 14 cm and its area is 875 cm². The distance between the parallel sides is:",["50 cm","25 cm","45 cm","100 cm"],"h = 2 × 875 ÷ 35. SSC CHSL 2022 (17 Mar 2023 S3).","p"],
+["L4","The area of a trapezium-shaped field is 1785 sq ft. The distance between the parallel sides is 35 ft and one parallel side is 42 ft. The other parallel side is:",["60 ft","9 ft","51 ft","40 ft"],"a + 42 = 2 × 1785 ÷ 35 = 102 → 60. SSC CPO 2022 (11 Nov Evening).","p"],
+["L4","If the sum of the diagonals of a rhombus is L and its perimeter is 4P, its area is:",["¼(L² − 4P²)","¼(L² − P²)","½(L² − 4P²)","¼(L² + 3P²)"],"d₁² + d₂² = 4P², (d₁+d₂)² = L² → ½d₁d₂ = ¼(L² − 4P²). SSC CPO 2022 (11 Nov Morning).","p"],
+["L4","A square and a rhombus stand on the same base and the rhombus is inclined at 45°. The ratio of the area of the square to that of the rhombus is:",["√2 : 1","1 : √2","√3 : 1","1 : 1"],"Square a², rhombus a² sin 45° = a²/√2. SSC MTS 2023 (14 Sep S3).","p"],
+["L4","The diagonals of a rhombus are 24 cm and 10 cm. Its perimeter is:",["52 cm","26 cm","68 cm","120 cm"],"Side = √(12² + 5²) = 13 → 4 × 13."],
+["L4","The diagonals of a rhombus are 16 cm and 12 cm. Its side is:",["10 cm","14 cm","20 cm","28 cm"],"√(8² + 6²) = 10 (not 20 — halve the diagonals)."],
+["L4","The perimeter of a rhombus is 60 cm and one diagonal is 24 cm. Its area is:",["216 cm²","108 cm²","432 cm²","360 cm²"],"Side 15, half-diagonal 12 → other half 9 → d₂ = 18 → ½ × 24 × 18."],
+["L4","A parallelogram has base 18 cm and height 7 cm. Its area is:",["126 cm²","63 cm²","50 cm²","252 cm²"],"b × h = 126 (no ½)."],
+["L4","A parallelogram has sides 15 cm and 7 cm, and one diagonal 20 cm. Its area is:",["84 cm²","42 cm²","105 cm²","140 cm²"],"Triangle 15-7-20: s = 21, Heron = √(21 × 6 × 14 × 1) = 42 → × 2."],
+["L4","The parallel sides of a trapezium are 28 cm and 40 cm and each non-parallel side is 12 cm. Its area is:",["204√3 cm²","408√3 cm²","102√3 cm²","340 cm²"],"Overhang (40 − 28)/2 = 6 → h = √(144 − 36) = 6√3 → ½ × 68 × 6√3."],
+["L4","A kite has diagonals 18 cm and 10 cm. Its area is:",["90 cm²","180 cm²","45 cm²","28 cm²"],"½ × 18 × 10."],
+["L4","In a quadrilateral, one diagonal is 20 m and the perpendiculars on it from the other two vertices are 8 m and 6 m. Its area is:",["140 m²","280 m²","70 m²","120 m²"],"½ × 20 × (8 + 6)."],
+["L4","A rhombus has side 10 cm and one angle 60°. Its area is:",["50√3 cm²","100√3 cm²","25√3 cm²","50 cm²"],"a² sin 60° = 100 × √3/2."],
+["L4","One diagonal of a rhombus is double the other and its area is 25 cm². The longer diagonal is:",["10 cm","5 cm","20 cm","5√2 cm"],"½ × d × 2d = 25 → d = 5 → 2d = 10."],
+["L4","The parallel sides of a trapezium are in the ratio 3 : 2, the distance between them is 15 cm and its area is 450 cm². The sum of the parallel sides is:",["60 cm","30 cm","120 cm","45 cm"],"½ × S × 15 = 450 → S = 60."],
+["L5","The circumference of a circle of radius 14 cm is (π = 22/7):",["88 cm","44 cm","616 cm","176 cm"],"2 × 22/7 × 14 = 88."],
+["L5","The circumference of a circle is 44 cm. Its area is:",["154 cm²","616 cm²","308 cm²","77 cm²"],"r = 7 → 22/7 × 49 = 154."],
+["L5","The area of a circle is 616 cm². Its circumference is:",["88 cm","44 cm","176 cm","154 cm"],"r² = 196 → r = 14 → 2πr = 88."],
+["L5","The area of a semicircle is 77 cm². Its perimeter is:",["36 cm","22 cm","29 cm","72 cm"],"πr²/2 = 77 → r = 7 → πr + 2r = 22 + 14 = 36. SSC CHSL 2018 (28 Mar S3).","p"],
+["L5","If the perimeter of a semicircle is 72 cm, its area is:",["308 cm²","616 cm²","154 cm²","462 cm²"],"36r/7 = 72 → r = 14 → ½ × 22/7 × 196 = 308. SSC CHSL 2018 (17 Mar S2).","p"],
+["L5","The perimeter of a square whose area is the same as the area of a semicircle of radius 2√2 cm is:",["8√π cm","16√π cm","4√π cm","8√(2π) cm"],"Semicircle area = 4π → side 2√π → 4 × 2√π. SSC CHSL 2024 (8 Jul S2).","p"],
+["L5","The circumference of a circle is aπ units and its area is bπ square units. If a : b = 4 : 5, the radius is:",["2.5 units","5 units","2 units","1.25 units"],"a = 2r, b = r² → 2/r = 4/5 → r = 2.5. SSC CHSL 2021 (6 Aug Evening).","p"],
+["L5","A wire is bent to form a square of area 169 m². If the same wire is bent into a circle, its area (to the nearest whole number) is:",["215 m²","227 m²","169 m²","532 m²"],"Wire 52 → A = C²/4π = 52² × 7/88 ≈ 215. SSC CHSL 2021 (13 Apr Afternoon).","p"],
+["L5","The perimeter of a quadrant of a circle of radius 14 cm is:",["50 cm","22 cm","72 cm","44 cm"],"πr/2 + 2r = 22 + 28 = 50."],
+["L5","The area of a quadrant of a circle of radius 14 cm is:",["154 cm²","616 cm²","308 cm²","77 cm²"],"πr²/4 = 616/4."],
+["L5","The diameter of a semicircle is 5.6 m. Its perimeter is:",["14.4 m","8.8 m","17.6 m","11.2 m"],"π × 2.8 + 5.6 = 8.8 + 5.6."],
+["L5","The circumference of a circle exceeds its diameter by 30 cm. Its radius is:",["7 cm","14 cm","3.5 cm","10.5 cm"],"(π − 1)d = 15d/7 = 30 → d = 14 → r = 7."],
+["L5","The difference between the circumference and the radius of a circle is 37 cm. Its area is:",["154 cm²","616 cm²","44 cm²","38.5 cm²"],"r(2π − 1) = 37r/7 = 37 → r = 7 → 154."],
+["L5","The circumferences of two circles are in the ratio 3 : 4. The ratio of their areas is:",["9 : 16","3 : 4","27 : 64","4 : 3"],"Area ∝ r² ∝ C²."],
+["L5","A circle and a rectangle 26 cm × 18 cm have the same perimeter. The area of the circle is:",["616 cm²","154 cm²","468 cm²","1232 cm²"],"2πr = 88 → r = 14 → 616."],
+["L5","The circumference of a circle of radius 7 cm equals the perimeter of an equilateral triangle. The side of the triangle is:",["44/3 cm","44 cm","22 cm","14 cm"],"Perimeter 44 → side 44/3."],
+["L5","A wire bent into a circle of radius 14 cm is re-bent into a square. The area of the square is:",["484 cm²","616 cm²","121 cm²","968 cm²"],"Wire 88 → side 22 → 484."],
+["L6","The area of a sector of a circle is 616 cm² with a central angle of 10°. The radius of the circle is:",["84 cm","21 cm","28 cm","48 cm"],"(10/360) × 22/7 × r² = 616 → r² = 7056 → r = 84. SSC CHSL 2023 (8 Aug S2).","p"],
+["L6","The minute hand of a clock is 20 cm long. The area on the clock face swept by it between 8 a.m. and 8:45 a.m. is:",["6600/7 cm²","6600/14 cm²","4400/7 cm²","8800/7 cm²"],"270° = ¾ of 22/7 × 400. SSC CGL 2022 (12 Dec S1).","p"],
+["L6","A circular arc of radius 4 cm makes an angle of 45° at the centre. The perimeter of the sector formed is:",["(π + 8) cm","π cm","(π + 4) cm","(2π + 8) cm"],"Arc = ⅛ × 8π = π; perimeter = π + 2 × 4. SSC CGL 2023 (27 Jul S3).","p"],
+["L6","The length of arc AB of a circle of radius r is five times the radius. The area of sector AOB is:",["5r²/2","5r²","5πr²/2","5r/2"],"½ × l × r = ½ × 5r × r. SSC CGL 2023 (27 Jul S1).","p"],
+["L6","The area of a sector of a circle is 110 cm² and its central angle is 56°. The radius is (π = 22/7):",["15 cm","7.5 cm","14 cm","30 cm"],"r² = 110 × 360 × 7/(56 × 22) = 225. SSC CGL 2023 (26 Jul S2).","p"],
+["L6","The area of a sector of radius 21 cm and central angle 120° is:",["462 cm²","924 cm²","44 cm²","231 cm²"],"⅓ × 1386 = 462 (44 is the arc length)."],
+["L6","The arc of a sector of radius 14 cm is 22 cm long. The area of the sector is:",["154 cm²","308 cm²","77 cm²","616 cm²"],"½ × l × r = ½ × 22 × 14."],
+["L6","The perimeter of a sector of radius 7 cm and angle 90° is:",["25 cm","11 cm","18 cm","38.5 cm"],"Arc 11 + 2 × 7 = 25 (38.5 is its area)."],
+["L6","A chord of a circle of radius 14 cm subtends 90° at the centre. The area of the minor segment is:",["56 cm²","154 cm²","98 cm²","112 cm²"],"Sector 154 − triangle ½ × 14 × 14 = 98 → 56."],
+["L6","A chord of a circle of radius 6 cm subtends 60° at the centre. The area of the minor segment is:",["(6π − 9√3) cm²","6π cm²","(12π − 9√3) cm²","(6π − 18√3) cm²"],"Sector ⅙ × 36π = 6π; equilateral △ = (√3/4) × 36 = 9√3."],
+["L6","The minute hand of a clock is 14 cm long. The area swept by it in 10 minutes is:",["308/3 cm²","154 cm²","616/3 cm²","44/3 cm²"],"10 min = 60° = ⅙ of 616."],
+["L6","The hour hand of a clock is 7 cm long. The area swept by it from 12 noon to 4 p.m. is:",["154/3 cm²","77 cm²","154 cm²","77/3 cm²"],"4 hours = 120° = ⅓ of 154."],
+["L6","The minute hand of a clock is 21 cm long. The distance moved by its tip in 20 minutes is:",["44 cm","132 cm","22 cm","462 cm"],"20 min = ⅓ of the circumference 132."],
+["L6","An arc subtending 72° at the centre is 22 cm long. The radius of the circle is:",["17.5 cm","35 cm","8.75 cm","7 cm"],"⅕ × 2πr = 22 → 2πr = 110 → r = 17.5."],
+["L6","A sector is 1/12 of the whole circle. Its central angle is:",["30°","12°","60°","15°"],"360/12 = 30°."],
+["L6","The perimeter of a sector of radius 7.4 cm is 20.6 cm. Its area is:",["21.46 cm²","42.92 cm²","10.73 cm²","76.22 cm²"],"Arc = 20.6 − 14.8 = 5.8 → ½ × 5.8 × 7.4."],
+["L7","A circular playground has a circular path around it. If the difference between the circumferences of the outer and inner circles is 144 cm, the approximate width of the path is (π = 22/7):",["23 cm","46 cm","11.5 cm","72 cm"],"2π(R − r) = 144 → R − r = 144 × 7/44 ≈ 22.9. SSC CGL 2022 (6 Dec S1).","p"],
+["L7","Each wheel of a bus makes 7 revolutions per second. If the diameter of a wheel is 56 cm, the speed of the bus (in cm/s) is:",["1232","616","176","2464"],"πd = 176 → 7 × 176. SSC MTS 2019 (13 Aug S3).","p"],
+["L7","A wheel of diameter 7 m makes how many revolutions in travelling 22 km?",["1000","500","2000","3142"],"Circumference 22 m → 22,000 ÷ 22."],
+["L7","A wheel makes 60 revolutions in covering 990 m. Its radius is (π = 22/7):",["2.625 m","5.25 m","16.5 m","2.75 m"],"C = 990/60 = 16.5 → r = 16.5 × 7/44. (5.25 is the diameter.)"],
+["L7","The area of a circular park is 1386 m². A path 7 m wide is laid inside along its boundary. The area of the path is:",["770 m²","616 m²","1078 m²","1386 m²"],"R = 21, inner r = 14 → 1386 − 616. (1078 would be a path outside.)"],
+["L7","A path 3.5 m wide runs around the outside of a circular park of radius 14 m. The area of the path is:",["346.5 m²","308 m²","385 m²","693 m²"],"22/7 × (17.5² − 14²) = 22/7 × 110.25."],
+["L7","The area of the ring between two concentric circles of radii 10 cm and 4 cm is:",["84π cm²","36π cm²","116π cm²","12π cm²"],"π(100 − 16) = 84π."],
+["L7","The inner and outer circumferences of a circular path are 330 m and 352 m. The width of the path is:",["3.5 m","7 m","22 m","1.75 m"],"22 ÷ (2 × 22/7) = 3.5."],
+["L7","Two wheels have radii 21 cm and 28 cm. If the smaller makes 120 revolutions over a certain distance, the larger makes:",["90","160","96","105"],"n₁r₁ = n₂r₂ → 120 × 21/28 = 90."],
+["L7","Each wheel of a car has diameter 70 cm and makes 400 revolutions per minute. The speed of the car is:",["52.8 km/h","26.4 km/h","88 km/h","105.6 km/h"],"220 cm × 400 = 88,000 cm/min = 0.88 km/min × 60."],
+["L7","A running track has two straight parts of 100 m each joined by two semicircles of radius 35 m. The length of the track is:",["420 m","310 m","530 m","640 m"],"200 + 2π × 35 = 200 + 220."],
+["L7","The circumferences of two concentric circles are 88 cm and 132 cm. The area of the ring between them is:",["770 cm²","616 cm²","1078 cm²","44 cm²"],"r = 14, R = 21 → 22/7 × (441 − 196)."],
+["L7","A cow is tied with a 14 m rope. If the rope is lengthened to 21 m, the additional grazing area is:",["770 m²","1386 m²","616 m²","154 m²"],"22/7 × (21² − 14²) = 770."],
+["L7","A bicycle wheel has radius 35 cm. The number of revolutions it makes in covering 1.1 km is:",["500","250","1000","5000"],"C = 220 cm → 1,10,000 ÷ 220."],
+["L7","The area of a circular ring is 286 cm² and its width is 1 cm. The outer radius is (π = 22/7):",["46 cm","45 cm","91 cm","47 cm"],"π(R + r)(R − r) = 286 → R + r = 91, R − r = 1 → R = 46."],
+["L8","What is the area of a regular hexagon of side 9 cm?",["243√3/2 cm²","243√3 cm²","81√3/4 cm²","243√3/4 cm²"],"(3√3/2) × 81. SSC CGL 2017 (23 Aug S3).","p"],
+["L8","What is the area of a regular hexagon of side 14 cm?",["294√3 cm²","147√3 cm²","441√3 cm²","196√3 cm²"],"(3√3/2) × 196 = 294√3. SSC CGL 2017 (19 Aug S3).","p"],
+["L8","If the perimeter of a regular octagon is 80 cm, its side is:",["10 cm","8 cm","12 cm","6 cm"],"80 ÷ 8. SSC CGL 2025 (15 Sep S2).","p"],
+["L8","ABCDEF is a regular hexagon of side 36 cm. The area of △ABC is:",["324√3 cm²","1944√3 cm²","648√3 cm²","972√3 cm²"],"½ × 36² × sin 120° = 324√3 (⅙ of the hexagon). SSC CGL Tier 2 2022 (8 Aug).","p"],
+["L8","The area of a regular hexagon of side 6 cm is:",["54√3 cm²","36√3 cm²","108√3 cm²","9√3 cm²"],"(3√3/2) × 36."],
+["L8","A regular hexagon has perimeter 36 cm. Its longest diagonal is:",["12 cm","6 cm","6√3 cm","18 cm"],"Side 6 → long diagonal 2a."],
+["L8","The area of a regular hexagon is 24√3 cm². Its side is:",["4 cm","2 cm","8 cm","4√2 cm"],"(3√3/2)a² = 24√3 → a² = 16."],
+["L8","The area of a regular octagon of side 10 cm is:",["200(1 + √2) cm²","100(1 + √2) cm²","400(1 + √2) cm²","200√2 cm²"],"2(1 + √2) × 100."],
+["L8","A regular octagon is made by cutting equal corners off a square of side 18 cm. The side of the octagon is:",["18(√2 − 1) cm","6 cm","9 cm","9√2 cm"],"x + a + x = 18 with a = x√2 → a = 18/(1 + √2) = 18(√2 − 1)."],
+["L8","A regular octagon is obtained from a square of side 18 cm by trimming its four corners. The area of the octagon is:",["648(√2 − 1) cm²","36(9 − √3) cm²","324 cm²","162(√2 − 1) cm²"],"a = 18(√2 − 1) → 2(1 + √2)a² = 648(√2 − 1). (36(9 − √3) wrongly cuts equilateral corners.)"],
+["L8","Each interior angle of a regular hexagon is:",["120°","60°","108°","135°"],"180 − 360/6."],
+["L8","Each exterior angle of a regular polygon is 30°. The number of sides is:",["12","6","10","8"],"360 ÷ 30."],
+["L8","The inradius (apothem) of a regular hexagon of side 8 cm is:",["4√3 cm","8 cm","8√3 cm","4 cm"],"(√3/2) × 8."],
+["L8","The ratio of the area of a regular hexagon to that of an equilateral triangle with the same side is:",["6 : 1","3 : 1","2 : 1","4 : 1"],"Hexagon = 6 such triangles."],
+["L8","ABCDEF is a regular hexagon of side 10 cm. The area of △ACE is:",["75√3 cm²","150√3 cm²","25√3 cm²","50√3 cm²"],"△ACE = ½ of hexagon 150√3 (equilateral, side 10√3)."],
+["L8","A square and a regular hexagon are inscribed in the same circle. The ratio of the area of the square to that of the hexagon is:",["4 : 3√3","3√3 : 4","2 : 3","4 : 3"],"Square 2r², hexagon (3√3/2)r²."],
+["L9","A circle is inscribed in a square of side 14 cm. The area of the circle is:",["154 cm²","616 cm²","196 cm²","44 cm²"],"r = 7 → 22/7 × 49 = 154. (616 uses r = 14.)"],
+["L9","A square is inscribed in a circle of radius 8 cm. The area of the square is:",["128 cm²","64 cm²","256 cm²","64π cm²"],"Diagonal = 16 → area = 16²/2 = 128."],
+["L9","The ratio of the area of a circle inscribed in a square to the area of the square is:",["π : 4","π : 2","1 : 4","4 : π"],"π(a/2)² : a² = π : 4."],
+["L9","A square is inscribed in a circle and another square circumscribes the same circle. The ratio of their areas (inner : outer) is:",["1 : 2","1 : √2","1 : 4","2 : 3"],"Inner 2r², outer (2r)² = 4r²."],
+["L9","The inradius of an equilateral triangle of side 12 cm is:",["2√3 cm","4√3 cm","6 cm","√3 cm"],"a/(2√3) = 12/(2√3) = 2√3. (4√3 is R.)"],
+["L9","The circumradius of an equilateral triangle of side 9 cm is:",["3√3 cm","3√3/2 cm","9√3/2 cm","9 cm"],"a/√3 = 9/√3 = 3√3. (3√3/2 is r; 9√3/2 is the height.)"],
+["L9","The ratio of the area of the incircle to that of the circumcircle of an equilateral triangle is:",["1 : 4","1 : 2","1 : 3","1 : √2"],"R = 2r → areas r² : 4r²."],
+["L9","Inside a right-angled triangle with legs 5 cm and 12 cm, a circle touches all three sides. Its radius is:",["2 cm","4 cm","6.5 cm","2.5 cm"],"c = 13 → (5 + 12 − 13)/2 = 2. (6.5 is R; 4 forgets the ½.)"],
+["L9","The area of the circumcircle of a right triangle with sides 6 cm, 8 cm and 10 cm is:",["25π cm²","100π cm²","4π cm²","16π cm²"],"R = 10/2 = 5 → 25π. (4π is the incircle.)"],
+["L9","The in-radius and circumradius of a right-angled triangle are 3 cm and 12.5 cm respectively. The area of the triangle is:",["84 cm²","88 cm²","48 cm²","64 cm²"],"c = 25, s = r + 2R = 28 → A = rs = 84. SSC CHSL 2020 (5 Aug 2021 S3).","p"],
+["L9","A circle is inscribed in an equilateral triangle of side 24 cm. The area of a square inscribed in that circle is:",["96 cm²","72 cm²","48 cm²","54 cm²"],"r² = 24²/12 = 48 → square = 2r² = 96. SSC CPO 2019 (12 Dec S1).","p"],
+["L9","A = area of the largest circle in a square of side 1 cm; B, C, D = total area of 4, 9, 16 identical largest circles packed in the same square. Then:",["A = B = C = D","A > B > C > D","A < B < C < D","A > B = C > D"],"n² circles of diameter 1/n → n² × π/(4n²) = π/4 each time. SSC CGL Tier 2 (held 9 Mar 2018).","p"],
+["L9","The inradius of a triangle with sides 13 cm, 14 cm and 15 cm is:",["4 cm","8 cm","65/8 cm","6 cm"],"A = 84, s = 21 → r = 4."],
+["L9","The circumradius of a triangle with sides 13 cm, 14 cm and 15 cm is:",["65/8 cm","4 cm","65/4 cm","21/2 cm"],"R = abc/4A = 2730/336 = 65/8."],
+["L9","A rectangle 16 cm × 12 cm is inscribed in a circle. The area of the circle is:",["100π cm²","400π cm²","196π cm²","36π cm²"],"Diagonal 20 = diameter → r = 10."],
+["L9","The area of the largest circle that can be cut from a rectangle 21 cm × 14 cm is:",["154 cm²","346.5 cm²","616 cm²","1386 cm²"],"r = 14/2 = 7 (the smaller side decides) → 154."],
+["L9","A regular hexagon is inscribed in a circle of radius 7 cm. The perimeter of the hexagon is:",["42 cm","44 cm","21 cm","42√3 cm"],"Side = R = 7 → 6 × 7. (44 is the circumference.)"],
+["L9","A circle is inscribed in a rhombus whose diagonals are 30 cm and 40 cm. The radius of the circle is:",["12 cm","24 cm","25 cm","6 cm"],"Side 25, area 600 = side × height → height 24 → r = 12."],
+["L9","The inradius of an equilateral triangle is 4 cm. The area of the triangle is:",["48√3 cm²","16√3 cm²","192√3 cm²","12√3 cm²"],"a = 2√3 r = 8√3 → (√3/4) × 192 = 48√3."],
+["L9","The circumradius of an equilateral triangle is 8 cm. Its side is:",["8√3 cm","8 cm","16 cm","4√3 cm"],"a = R√3."],
+["L9","A circle circumscribes a square of side 7√2 cm. The area of the circle is:",["154 cm²","308 cm²","77 cm²","616 cm²"],"Diagonal 14 → r = 7 → 154."],
+["L9","A square has area 196 cm². The circumference of the circle inscribed in it is:",["44 cm","88 cm","154 cm","44√2 cm"],"Side 14 → r = 7 → 2πr = 44."],
+["L10","Four circles of equal radii are described about the four corners of a square so that each touches two of the others. If each side of the square is 140 cm, the area enclosed between the circumferences is (π = 22/7):",["4200 cm²","2100 cm²","7000 cm²","2800 cm²"],"r = 70: 140² − π × 70² = 19,600 − 15,400. SSC CGL Tier 2 2016 (1 Dec).","p"],
+["L10","Three circles of radius 7 cm are placed so that each touches the other two. The area of the portion enclosed by them is:",["(49√3 − 77) cm²","(40√3 − 66) cm²","(50√3 − 66) cm²","(55√3 − 77) cm²"],"(√3/4) × 14² − 3 × (60/360) × 22/7 × 49. SSC CHSL 2022 (10 Mar 2023 S3).","p"],
+["L10","Three circles of radius 4 cm are kept touching each other. A string is tied tightly around them. The length of the string is:",["(24 + 8π) cm","(24π + 16) cm","(32 + 16π) cm","(24 + 18π) cm"],"3 × 2r + 2πr = 24 + 8π. SSC CGL 2022 (5 Dec S4).","p"],
+["L10","Four equal circles are drawn about the corners of a square of side 28 cm so that each touches two others. The area of the square not covered by the circles is:",["168 cm²","616 cm²","784 cm²","84 cm²"],"(3/14) × 784 = 168 (four quadrants of r = 14 = one circle of 616)."],
+["L10","ABCD is a square of side 14 cm. Quadrants of radius 14 cm are drawn with centres A and C. The area of the leaf-shaped overlap is:",["112 cm²","154 cm²","56 cm²","84 cm²"],"2 × (154 − 98) = 112. (56 is one segment; 84 is the part outside the leaf.)"],
+["L10","A quadrant of radius 14 cm is drawn inside a square of side 14 cm with its centre at one corner. The area of the square outside the quadrant is:",["42 cm²","154 cm²","98 cm²","56 cm²"],"196 − 154 = 42."],
+["L10","Four semicircles are drawn inside a square of side 7 cm, each on one side as diameter, forming a four-petal rangoli. The total area of the petals is:",["28 cm²","14 cm²","21 cm²","38.5 cm²"],"(π/2 − 1)a² = (4/7) × 49 = 28. (21 is the unshaded part.)"],
+["L10","Four circles of radius 7 cm touch each other in pairs, their centres forming a square. The area enclosed between them is:",["42 cm²","154 cm²","196 cm²","112 cm²"],"14² − 4 quadrants (154) = 42."],
+["L10","Four circles of radius 7 cm with centres at the corners of a square touch each other in pairs. The length of a belt tightly wrapped around all four is:",["100 cm","144 cm","56 cm","88 cm"],"8r + 2πr = 56 + 44. (144 = 56 + 88 doubles the arcs.)"],
+["L10","Three circles of radius 6 cm touch each other. The length of a string tied tightly around them is:",["(36 + 12π) cm","(36 + 6π) cm","(18 + 12π) cm","36π cm"],"3 × 12 + 2π × 6."],
+["L10","A circle is inscribed in a quadrant of radius 10(√2 + 1) cm, touching both radii and the arc. Its radius is:",["10 cm","10√2 cm","5(√2 + 1) cm","20 cm"],"r√2 + r = R → r = R/(√2 + 1) = 10."],
+["L10","A circle is inscribed in a square of side 21 cm. The area of the square outside the circle is:",["94.5 cm²","346.5 cm²","441 cm²","189 cm²"],"(3/14) × 441 = 94.5."],
+["L10","A square is inscribed in a circle of radius 7 cm. The area of the circle outside the square is:",["56 cm²","98 cm²","154 cm²","28 cm²"],"(8/7) × 49 = 56 (circle 154 − square 98)."],
+["L10","A circle is inscribed in an equilateral triangle of side 24 cm. The area of the triangle outside the circle is:",["(144√3 − 48π) cm²","(144√3 − 12π) cm²","(48√3 − 48π) cm²","(144√3 − 192π) cm²"],"△ = 144√3; r² = 576/12 = 48 → 144√3 − 48π. (192π uses R.)"],
+["L10","A semicircle is drawn inside a square of side 14 cm with one side as diameter. The area of the square outside the semicircle is:",["119 cm²","42 cm²","77 cm²","154 cm²"],"196 − ½ × 154 = 119."],
+["L10","A horse is tied at a corner of a square field of side 14 m with a rope 7 m long. The area of the field it cannot graze is:",["157.5 m²","38.5 m²","154 m²","42 m²"],"Grazed quadrant = ¼ × 154 = 38.5 → 196 − 38.5."],
+["L10","Three horses are tied at the three corners of a triangular field with sides 14 m, 48 m and 50 m, each with a 7 m rope. The total area grazed is:",["77 m²","154 m²","231 m²","259 m²"],"Angles add to 180° → one semicircle = ½ × 154 = 77. (259 is the ungrazed part of 336.)"],
+["L11","If the length of a rectangle is increased by 40% and the breadth is decreased by 20%, the area increases by x%. The value of x is:",["12","16","8","20"],"40 − 20 − (40 × 20)/100 = 12. SSC CGL 2019 (3 Mar 2020 S1).","p"],
+["L11","The side of a square is increased by 25%. What is the percentage increase in its area?",["56.25%","62.5%","57.5%","50%"],"1.25² = 1.5625. SSC MTS 2021 (7 Jul 2022 S1).","p"],
+["L11","The radius of a circle is increased by 10%. The percentage increase in its area is:",["21%","20%","10%","11%"],"2 × 10 + 100/100 = 21."],
+["L11","If the radius of a circle is doubled, its area increases by:",["300%","100%","200%","400%"],"Area × 4 → increase of 3 times = 300%."],
+["L11","The length of a rectangle is increased by 20% and its breadth by 10%. Its area increases by:",["32%","30%","2%","22%"],"20 + 10 + 200/100 = 32."],
+["L11","The length of a rectangle is increased by 20% and its breadth decreased by 20%. The area:",["Decreases by 4%","Does not change","Increases by 4%","Decreases by 2%"],"Always a fall of 20²/100 = 4%."],
+["L11","The length of a rectangle is increased by 25%. To keep its area unchanged, the breadth must be decreased by:",["20%","25%","80%","15%"],"100 × 25/125 = 20%. (80% is what is left, not the cut.)"],
+["L11","The area of a square increases by 69%. Its side increases by:",["30%","34.5%","69%","13%"],"√1.69 = 1.3 → +30%."],
+["L11","The circumference of a circle increases by 15%. Its area increases by:",["32.25%","30%","15%","31.5%"],"Radius also +15% → 30 + 225/100 = 32.25%."],
+["L11","The corresponding sides of two similar triangles are in the ratio 3 : 5. The ratio of their areas is:",["9 : 25","3 : 5","27 : 125","√3 : √5"],"Area ratio = (side ratio)²."],
+["L11","The areas of two squares are in the ratio 16 : 25. The ratio of their perimeters is:",["4 : 5","16 : 25","2 : √5","5 : 4"],"Sides 4 : 5 → perimeters 4 : 5."],
+["L11","A circle and a square have equal perimeters. The ratio of the area of the circle to that of the square is (π = 22/7):",["14 : 11","11 : 14","22 : 7","1 : 1"],"4 : π = 4 : 22/7 = 14 : 11."],
+["L11","Of the following shapes with the same perimeter, which has the largest area?",["Circle","Square","Equilateral triangle","Regular hexagon"],"For a fixed perimeter the circle encloses the most area."],
+["L11","A square and an equilateral triangle have the same perimeter. The ratio of the area of the square to that of the triangle is:",["9 : 4√3","4√3 : 9","3 : 4","4 : 3"],"Perimeter 12 → square 9, triangle (√3/4) × 16 = 4√3."],
+["L11","If each side of a square is increased by 3 cm, its area increases by 44%. The original side is:",["15 cm","12 cm","18 cm","20 cm"],"Side ×1.2 → 0.2a = 3 → a = 15. (18 is the new side.)"],
+["L11","The length of a rectangle is increased by 50% and its breadth decreased by 50%. The area:",["Decreases by 25%","Does not change","Decreases by 50%","Increases by 25%"],"1.5 × 0.5 = 0.75 → 25% fall."],
+["L11","The length and breadth of a rectangle are each increased by 10%. Its perimeter increases by:",["10%","21%","20%","5%"],"Perimeter is a length → same 10%. (21% is the area.)"],
+["L11","The radius of a circle is decreased by 50%. Its area decreases by:",["75%","50%","25%","100%"],"0.5² = 0.25 → 75% fall."],
+["L11","The diagonal of a square is increased by 20%. Its area increases by:",["44%","20%","40%","22%"],"Area = d²/2 → 1.2² = 1.44."],
+["L11","A rectangle measures 10 cm × 5 cm. A square has the same perimeter. By how much does the square's area exceed the rectangle's?",["6.25 cm²","0 cm²","12.5 cm²","25 cm²"],"Square side 7.5 → 56.25 − 50 = 6.25."],
+//@@QB
+];
+const HEAT = [
+["Units, hectare & π habits",4,"L1","Hectare → m² inside a fencing/cultivation cost"],
+["Triangles",14,"L2","Equilateral area, Heron on a triple, ½ab sinC, medians (4/3)"],
+["Rectangle & square",12,"L3","Paths, cross-roads, diagonal from area + perimeter, cost"],
+["Parallelogram, rhombus, trapezium",9,"L4","Rhombus side + diagonal → area; trapezium height"],
+["Circle, semicircle, quadrant",13,"L5","C ↔ A, semicircle perimeter, wire re-bent"],
+["Sector, arc, segment",10,"L6","Radius from sector area, clock hands, ½lr"],
+["Rings, paths, wheels",7,"L7","Path width from circumferences, revolutions, speed"],
+["Regular polygons",4,"L8","Hexagon area, △ABC / △ACE in a hexagon"],
+["Inscribed & circumscribed",11,"L9","Equilateral r and R, r = (a+b−c)/2, square ↔ circle"],
+["Shaded regions",8,"L10","Four/three touching circles, leaf, string around circles"],
+["% change in area & ratios",8,"L11","x + y + xy/100, constant area, equal perimeters"]
+];
+const TILES = [
+["10,000 m²","1 hectare"],["10,000 cm²","1 m²"],["(√3/4)a²","Equilateral triangle area"],["√[s(s−a)(s−b)(s−c)]","Heron's formula"],
+["13-14-15 → 84","Heron set to remember"],["4/3","Medians → triangle area multiplier"],["(l+b)² = d² + 2A","Rectangle identity"],["d²/2","Square area from diagonal"],
+["½d₁d₂","Rhombus / kite area"],["½(a+b)h","Trapezium area"],["36r/7","Semicircle perimeter (π = 22/7)"],["C²/4π","Circle area from circumference"],
+["½lr","Sector area from arc"],["(2/7)r²","Quarter-circle segment"],["6° / min","Minute hand speed"],["π(R+r)(R−r)","Ring area"],
+["(3√3/2)a²","Regular hexagon area"],["r : R = 1 : 2","Equilateral incircle : circumcircle radii"],["(a+b−c)/2","Inradius of a right triangle"],["(3/14)a²","Square minus inscribed circle"],
+["(4/7)a²","Leaf / four-petal rangoli"],["x + y + xy/100","Successive % change in area"],["14 : 11","Circle : square, equal perimeter"]
+];
+const PAIRS = [
+["Perimeter vs area","Boundary length (m) vs surface covered (m²): fencing ↔ perimeter, painting ↔ area"],
+["1 m² vs 100 cm²","1 m² = 10,000 cm² — area units convert by the square of the length factor"],
+["Medians 4/3 vs 3/4","Triangle area = 4/3 × area of the median-triangle (bigger, not smaller)"],
+["Path outside vs path inside","Outside 2w(l + b + 2w); inside 2w(l + b − 2w)"],
+["Parallelogram vs rhombus area","base × height vs ½ d₁d₂ (rhombus is also a × h)"],
+["Semicircle perimeter vs arc","πr + 2r vs πr alone"],
+["Sector vs segment","Sector = (θ/360)πr²; segment = sector − ½r² sinθ"],
+["Sector perimeter vs arc length","l + 2r vs l"],
+["Minute hand vs hour hand","6° per minute vs 30° per hour (0.5° per minute)"],
+["Circle in square vs square in circle","Diameter = side (r = a/2) vs diagonal = diameter (area 2r²)"],
+["Inradius vs circumradius (equilateral)","a/(2√3) vs a/√3 — R = 2r"],
+["r = (a+b−c)/2 vs s = (a+b+c)/2","Right-triangle inradius vs semi-perimeter"],
+["Area +x% vs side +x%","Side +x% → area 2x + x²/100 %; perimeter changes by only x%"],
+["+x% then −x%","Not 'no change': area falls by x²/100 %"]
+];
+const COVERS = {
+ units:{tab:"Units drill", hideLabel:"Hide value", note:"Cover the value and recall it. Area units go by the square of the length factor.", head:["Unit","Equals"], hide:1, rows:[
+  ["1 m²","10,000 cm²"],["1 cm²","100 mm²"],["1 are","100 m²"],["1 hectare","10,000 m²"],["1 km²","100 hectares = 10⁶ m²"],["1 km","1,00,000 cm"],["2πr for r = 7","44"],["πr² for r = 7","154"],["πr² for r = 14","616"],["πr² for r = 21","1386"]]},
+ areas:{tab:"Area formulas", hideLabel:"Hide formula", note:"Cover the formula column, say it aloud, then check.", head:["Figure","Area","Perimeter / key length"], hide:1, rows:[
+  ["Triangle (base, height)","½ b h","—"],["Triangle (3 sides)","√[s(s−a)(s−b)(s−c)]","s = (a+b+c)/2"],["Equilateral","(√3/4)a²","h = (√3/2)a"],["Isosceles (a, a, b)","(b/4)√(4a² − b²)","2a + b"],["Rectangle","l b","2(l + b), d = √(l² + b²)"],["Square","a² = d²/2","4a, d = a√2"],["Parallelogram","b h = ab sinθ","2(a + b)"],["Rhombus","½ d₁ d₂","side = ½√(d₁² + d₂²)"],["Trapezium","½(a + b)h","—"],["Circle","πr²","2πr"],["Semicircle","πr²/2","πr + 2r"],["Sector","(θ/360)πr² = ½lr","l + 2r"],["Ring","π(R² − r²)","—"],["Regular hexagon","(3√3/2)a²","6a"]]},
+ shaded:{tab:"Shaded drill", hideLabel:"Hide answer", note:"Cover the result (π = 22/7) and recall it.", head:["Region","In terms of π","With π = 22/7"], hide:2, rows:[
+  ["Square − inscribed circle","a²(1 − π/4)","(3/14)a²"],["Leaf / four-petal rangoli","(π/2 − 1)a²","(4/7)a²"],["4 touching circles (gap)","(4 − π)r²","(6/7)r²"],["Circle − inscribed square","(π − 2)r²","(8/7)r²"],["90° segment","(π/4 − ½)r²","(2/7)r²"],["3 touching circles (gap)","(√3 − π/2)r²","r = 7 → 49√3 − 77"],["Equilateral r and R","a/(2√3), a/√3","r : R = 1 : 2"],["Circle : square (equal perimeter)","4 : π","14 : 11"]]}
+};
+const FIND = { tab:"Formula finder", ph:"Search a formula (e.g. sector, Heron, rhombus, inradius)", head:["Topic","Formula","Lesson","When to use"], rows:[
+["Hectare","1 ha = 10,000 m²; 1 are = 100 m²","L1","Land area, cultivation cost"],
+["Area units","1 m² = 10,000 cm²; 1 km² = 100 ha","L1","Converting area units"],
+["Cost","Cost = area or perimeter × rate","L1","Rate per m² → area; per m → perimeter"],
+["Scaling","Lengths × k → area × k²","L1","Any enlargement"],
+["Triangle","A = ½ b h","L2","Base and height known"],
+["Heron","A = √[s(s−a)(s−b)(s−c)]","L2","Three sides known"],
+["Triangle (2 sides + angle)","A = ½ ab sin C","L2","Included angle given"],
+["Equilateral triangle","A = (√3/4)a², h = (√3/2)a","L2","Side, height or perimeter given"],
+["Isosceles triangle","A = (b/4)√(4a² − b²)","L2","Equal sides a, base b"],
+["Medians","A = (4/3) × area(m₁, m₂, m₃)","L2","Three medians given"],
+["Rectangle","A = lb, P = 2(l+b), d = √(l²+b²)","L3","Basic rectangle"],
+["Rectangle identity","(l + b)² = d² + 2A","L3","Diagonal and area → perimeter"],
+["Square","A = a² = d²/2, d = a√2","L3","Square from side or diagonal"],
+["Path outside","2w(l + b + 2w)","L3","Border around a field"],
+["Path inside","2w(l + b − 2w)","L3","Border inside a field"],
+["Cross-roads","w(l + b) − w²; lawn (l − w)(b − w)","L3","Two roads through the middle"],
+["Carpet","Length = floor area ÷ carpet width","L3","Carpeting cost"],
+["Parallelogram","A = b h = ab sin θ","L4","Base + height or two sides + angle"],
+["Parallelogram diagonals","d₁² + d₂² = 2(a² + b²)","L4","Sides and one diagonal"],
+["Rhombus","A = ½ d₁ d₂, side = ½√(d₁² + d₂²)","L4","Diagonals or side + one diagonal"],
+["Rhombus (sum of diagonals)","A = ¼(L² − 4a²)","L4","d₁ + d₂ = L and side a"],
+["Trapezium","A = ½(a + b)h","L4","Parallel sides and gap"],
+["Quadrilateral","A = ½ d (h₁ + h₂)","L4","Diagonal and offsets"],
+["Circle","C = 2πr, A = πr²","L5","Basic circle"],
+["Circle from circumference","A = C²/(4π)","L5","Wire re-bent into a circle"],
+["Semicircle","P = πr + 2r = 36r/7, A = πr²/2","L5","Half circle with diameter"],
+["Quadrant","P = πr/2 + 2r = 25r/7, A = πr²/4","L5","Quarter circle"],
+["C − d","(π − 1)d = 15d/7","L5","Circumference exceeds diameter by …"],
+["Arc length","l = (θ/360) 2πr","L6","Sector angle known"],
+["Sector area","(θ/360)πr² = ½ l r","L6","Angle or arc known"],
+["Sector perimeter","l + 2r","L6","Boundary of a sector"],
+["Segment","(θ/360)πr² − ½r² sin θ","L6","Region between chord and arc"],
+["Clock hands","Minute 6°/min; hour 0.5°/min","L6","Area swept / distance by tip"],
+["Ring","π(R² − r²) = π(R + r)(R − r)","L7","Circular path or annulus"],
+["Path width","w = (C_out − C_in)/2π","L7","Two circumferences given"],
+["Wheel","Distance = n × 2πr; n₁r₁ = n₂r₂","L7","Revolutions and speed"],
+["Running track","P = 2l + 2πr, A = 2rl + πr²","L7","Rectangle with semicircular ends"],
+["Polygon angles","Exterior 360/n; interior 180 − 360/n","L8","Regular n-gon"],
+["Regular hexagon","A = (3√3/2)a², R = a","L8","Six equilateral triangles"],
+["Regular octagon","A = 2(1 + √2)a²; from square L: a = L(√2 − 1)","L8","Octagon questions"],
+["Circle in square","r = a/2","L9","Largest circle in a square"],
+["Square in circle","side = r√2, area = 2r²","L9","Square inside a circle"],
+["Inradius / circumradius","r = A/s, R = abc/(4A)","L9","Any triangle"],
+["Equilateral radii","r = a/(2√3), R = a/√3","L9","Incircle / circumcircle of equilateral"],
+["Right-triangle radii","R = c/2, r = (a + b − c)/2","L9","Right triangle with its circles"],
+["Square − circle","(3/14)a²","L10","Leftover corners / four corner quadrants"],
+["Leaf / rangoli","(4/7)a² = (π/2 − 1)a²","L10","Two quadrants or four semicircles in a square"],
+["Touching circles","4: (4 − π)r²; 3: (√3 − π/2)r²","L10","Gap between equal touching circles"],
+["Belt around circles","Centre-polygon perimeter + 2πr","L10","String tied around circles"],
+["Circle in quadrant","r = R(√2 − 1)","L10","Circle touching both radii and the arc"],
+["Successive % change","x + y + xy/100","L11","Length and breadth both change"],
+["Same % on all sides","2x + x²/100","L11","Square, circle, similar figures"],
+["Constant area","Cut = 100x/(100 + x) %","L11","Keep area unchanged"],
+["Equal perimeters","Circle : square = 14 : 11; square : △ = 9 : 4√3","L11","Which shape has more area"]
+]};
+const APP = { key:"mensuration2d_workbook_v1", brand:"Mensuration 2D", sub:"क्षेत्रमिति (2D) · SSC maths workbook",
+  eyebrow:"SSC CGL · Quant", intro:"Every flat-figure formula SSC asks: triangles, quadrilaterals, circles, sectors, rings, polygons, inscribed figures, shaded regions and percentage change in area. Each lesson has formula cards, labelled figures, solved real PYQs and a question bank checked answer by answer.", foot:"Read a lesson's formula cards and figures, try the solved examples before opening the solution, then do its quiz. Use Practice and Mock to mix lessons, the Revise tab for tiles, look-alike pairs and cover drills, and the Formula finder to look up anything fast.", craft:"Check the options before you calculate: if they contain π or √3, keep them symbolic; if r or the answer is a multiple of 7, use π = 22/7. Spot Pythagorean triples (3-4-5, 5-12-13, 7-24-25) before Heron. Use ratios — areas scale as the square of lengths, so ratio and percentage questions need no formula. Value-put simple numbers (a square of side 10, a circle of radius 7) in algebraic options, and eliminate options that are off by the usual slips: a missing ½, diameter used for radius, or the arc without the two radii.", heatNote:"Shares are approximate, based on the pattern of recent SSC CGL, CHSL, CPO and MTS papers; they show where questions usually come from, not exact counts." };
+
+/* ============================================================
+   HELPERS & STATE
+   ============================================================ */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const hash = s => { let h = 5381; for (let i=0;i<s.length;i++) h = ((h<<5)+h + s.charCodeAt(i))|0; return "q"+(h>>>0).toString(36); };
+const shuffle = a => { const b=a.slice(); for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]];} return b; };
+const L = id => LESSONS.find(l => l.id === id);
+const LNUM = id => LESSONS.findIndex(l => l.id === id) + 1;
+
+const QS = QB.map(r => {
+  const fixed = !!r[6];
+  return { t:r[0], q:r[1], o:r[2], e:r[3], p:(r[4]||"").includes("p"), a: fixed ? (r[5]||0) : 0, fixed, id:hash(r[1]) };
+});
+const byLesson = id => QS.filter(q => q.t === id);
+// order of options to show: array of original indexes
+const makePerm = q => q.fixed ? q.o.map((_,i)=>i) : shuffle(q.o.map((_,i)=>i));
+
+const KEY = APP.key;
+let S = { ans:{}, bm:{}, les:{}, mocks:[] };
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch(e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
+const record = (q, ok) => { S.ans[q.id] = ok ? 1 : 0; save(); renderTop(); };
+
+function renderTop(){
+  const ids = Object.keys(S.ans).filter(k => QS.some(q => q.id === k));
+  const right = ids.filter(k => S.ans[k] === 1).length;
+  const pct = ids.length ? Math.round(right*100/ids.length) : 0;
+  $("#topstat").innerHTML = `<b>${ids.length}</b>/${QS.length} tried<br><b>${pct}%</b> right now`;
+}
+
+/* ============================================================
+   ROUTING
+   ============================================================ */
+let TAB = "learn";
+let timerId = null;
+function go(tab){
+  TAB = tab;
+  document.querySelectorAll(".nav button").forEach(b => b.setAttribute("aria-current", b.dataset.tab===tab ? "page" : "false"));
+  if (tab === "learn") renderLearn();
+  if (tab === "practice") renderPractice();
+  if (tab === "mock") renderMock();
+  if (tab === "revise") renderRevise();
+  window.scrollTo(0,0);
+  try { history.replaceState(null, "", "#"+tab); } catch(e) {}
+}
+document.querySelectorAll(".nav button").forEach(b => b.addEventListener("click", () => {
+  if (TAB === "mock" && M && M.running && b.dataset.tab !== "mock") { go("mock"); showMockLeave(b.dataset.tab); return; }
+  go(b.dataset.tab);
+}));
+
+/* ============================================================
+   LEARN
+   ============================================================ */
+function renderLearn(){
+  const done = LESSONS.filter(l => S.les[l.id] && S.les[l.id].done).length;
+  const nextIdx = LESSONS.findIndex(l => !(S.les[l.id] && S.les[l.id].done));
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="hero">
+      <span class="eyebrow">${APP.eyebrow}</span>
+      <h1>Learn it, test it, revise it</h1>
+      <p>${APP.intro} ${QS.length} exam-style questions in all.</p>
+      <div class="meter" aria-label="Lessons done"><i style="width:${done/LESSONS.length*100}%"></i></div>
+      <div class="row between"><span class="muted num" style="font-size:13px">${done}/${LESSONS.length} lessons done</span>
+      ${nextIdx>=0 ? `<button class="btn pri sm" type="button" data-open="${LESSONS[nextIdx].id}">${done? "Continue" : "Start"}: Lesson ${nextIdx+1}</button>` : `<span class="muted" style="font-size:13px">All lessons done. Try a mock test.</span>`}</div>
+    </div>
+    <div class="lessons">${LESSONS.map((l,i) => {
+      const st = S.les[l.id] || {}; const n = byLesson(l.id).length;
+      return `<button type="button" class="les ${st.done?"done":""} ${i===nextIdx?"next":""}" data-open="${l.id}">
+        <span class="no">${st.done ? "✓" : i+1}</span>
+        <span class="t"><b>${esc(l.title)}<span class="heatb" title="Exam frequency">${"🔥".repeat(l.heat||1)}</span></b><span>${l.hi} · ${n} questions</span></span>
+        <span class="sc">${st.best!=null ? `best<br>${st.best}/${n}` : ""}</span></button>`;}).join("")}
+    </div>
+    <p class="foot">${APP.foot}</p>
+  </section>`;
+  $("#app").querySelectorAll("[data-open]").forEach(b => b.addEventListener("click", () => openLesson(b.dataset.open, "learn")));
+}
+
+function blockHTML(b){
+
+  if (b.k==="formula") return `<div class="block"><h3>${b.title}</h3><div class="fgrid">${b.rows.map(r=>`<div class="fcard"><span class="fn">${r[0]}</span><span class="fx">${r[1]}</span>${r[2]?`<span class="fnote">${r[2]}</span>`:""}</div>`).join("")}</div></div>`;
+  if (b.k==="ex") return `<div class="ex"><div class="exhead"><span class="lab">${b.src ? "PYQ" : "Solved example"}</span>${b.src?`<span class="src">${b.src}</span>`:""}</div><div class="exq">${b.q}</div>${b.fig?`<figure class="fig">${b.fig}</figure>`:""}<details><summary>Show solution</summary><ol>${b.steps.map(x=>`<li>${x}</li>`).join("")}</ol><div class="exans">Answer: ${b.ans}</div>${b.tip?`<div class="trick" style="margin-top:8px"><span class="lab">Shortcut</span>${b.tip}</div>`:""}</details></div>`;
+  if (b.k==="figs") return `<div class="block"><h3>${b.title}</h3><div class="figwrap">${b.items.map(it=>`<figure>${it.svg}<figcaption>${it.cap}</figcaption></figure>`).join("")}</div></div>`;
+  if (b.k==="p") return `<div class="plain"><p>${b.h}</p></div>`;
+  if (b.k==="trick") return `<div class="trick"><span class="lab">Trick</span>${b.h}</div>`;
+  if (b.k==="link") return `<div class="link"><span class="lab">Link · connect the dots</span>${b.h}</div>`;
+  if (b.k==="q") { const perm = shuffle(b.o.map((_,i)=>i)); return `<div class="icheck" data-ic><span class="lab">Quick check</span><p class="qt">${esc(b.q)}</p><div class="opts">${perm.map((oi,k)=>`<button type="button" class="opt" data-ioi="${oi}"><span class="k">${"ABCD"[k]}</span><span>${esc(b.o[oi])}</span></button>`).join("")}</div><div class="exp" hidden><b class="okl"></b> ${esc(b.e)}</div></div>`; }
+  if (b.k==="hot") return `<div class="hot"><span class="lab">🔥 Exam radar · how often it's asked</span>${b.h}</div>`;
+  if (b.k==="trap") return `<div class="trap"><span class="lab">Trap · correction</span>${b.h}</div>`;
+  if (b.k==="facts") return `<div class="block"><h3>${b.title}</h3><dl class="facts">${b.rows.map(r=>`<div><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join("")}</dl></div>`;
+  if (b.k==="tl") return `<div class="block"><h3>${b.title}</h3><ul class="tl">${b.rows.map(r=>`<li><span class="y">${r[0]}</span><span>${r[1]}</span></li>`).join("")}</ul></div>`;
+  if (b.k==="table") {
+    const isNum = (ci) => b.numcol==="all" ? ci>0 : (b.numcol===1 && ci===1) || (typeof b.numcol==="string" && b.numcol.includes(String(ci)));
+    return `<div class="block"><h3>${b.title}</h3><div class="tbl"><table><thead><tr>${b.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${b.rows.map(r=>`<tr>${r.map((c,ci)=>`<td class="${isNum(ci)?"n":""}">${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+  }
+  if (b.k==="fig") return `<div class="block"><h3>${b.title}</h3><figure class="fig">${b.svg}<figcaption>${b.cap}</figcaption></figure></div>`;
+  if (b.k==="pyr") return `<div class="block"><h3>${b.title}</h3><div class="pyr">${b.items.map(it=>`<div>${PYR(it.rows)}<b>${it.name}</b><span class="muted">${it.note}</span></div>`).join("")}</div><p class="muted" style="font-size:13px;margin-top:8px"><span style="color:var(--blue)">■</span> males · <span style="color:var(--accent)">■</span> females · top = old, base = young</p></div>`;
+  return "";
+}
+
+let LQ = null;
+function openLesson(id, step){
+  const l = L(id), i = LNUM(id);
+  if (step === "quiz") { LQ = { id, list: shuffle(byLesson(id)).map(q => ({q, perm:makePerm(q)})), i:0, score:0, picked:null }; }
+  const head = `<div class="lhead"><button class="back" type="button" id="lback">‹ Lessons</button></div>
+    <span class="eyebrow">Lesson ${i} of ${LESSONS.length} · ${l.hi}</span><h1>${esc(l.title)}</h1>
+    <div class="steps" role="tablist">
+      <button type="button" data-step="learn" aria-current="${step==="learn"?"step":"false"}">1 · Learn</button>
+      <button type="button" data-step="quiz" aria-current="${step==="quiz"?"step":"false"}">2 · Quiz</button>
+      <button type="button" data-step="sum" aria-current="${step==="sum"?"step":"false"}">3 · Summary</button>
+    </div>`;
+  let body = "";
+  if (step === "learn") {
+    body = `<div class="stack">${l.blocks.map(blockHTML).join("")}
+      <div class="row end"><button class="btn pri" type="button" id="toquiz">Take the lesson quiz · ${byLesson(id).length} questions</button></div></div>`;
+  } else if (step === "quiz") {
+    body = `<div id="lq"></div>`;
+  } else {
+    const nxt = LESSONS[i];
+    body = `<div class="stack"><div class="block"><h3>Remember these</h3><ul class="sum">${l.sum.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>
+      <div class="row between"><button class="btn" type="button" id="relearn">Read again</button>
+      ${nxt ? `<button class="btn pri" type="button" id="nextles">Next: ${esc(nxt.title)}</button>` : `<button class="btn pri" type="button" id="tomock">Take a mock test</button>`}</div></div>`;
+    S.les[id] = Object.assign(S.les[id]||{}, {done:1}); save();
+  }
+  $("#app").innerHTML = `<section class="view stack">${head}${body}</section>`;
+  $("#lback").onclick = () => renderLearn();
+  $("#app").querySelectorAll("[data-step]").forEach(b => b.onclick = () => openLesson(id, b.dataset.step));
+  if (step==="learn") { $("#toquiz").onclick = () => openLesson(id,"quiz");
+    const ics = l.blocks.filter(b=>b.k==="q");
+    $("#app").querySelectorAll("[data-ic]").forEach((box,n) => { const b = ics[n];
+      box.querySelectorAll("[data-ioi]").forEach(btn => btn.onclick = () => {
+        if (box.dataset.done) return; box.dataset.done = 1; const pick = +btn.dataset.ioi;
+        box.querySelectorAll("[data-ioi]").forEach(x => { const oi=+x.dataset.ioi; x.disabled = true; if (oi===0) x.classList.add("ok"); else if (oi===pick) x.classList.add("no"); });
+        const ex = box.querySelector(".exp"); ex.hidden = false; const lab = ex.querySelector("b");
+        if (pick===0) { lab.textContent = "Correct."; } else { lab.className = "nol"; lab.textContent = "Answer: " + b.o[0] + "."; }
+      }); }); }
+  if (step==="quiz") renderLQ();
+  if (step==="sum") {
+    $("#relearn").onclick = () => openLesson(id,"learn");
+    const n = $("#nextles"); if (n) n.onclick = () => openLesson(LESSONS[i].id,"learn");
+    const m = $("#tomock"); if (m) m.onclick = () => go("mock");
+  }
+  window.scrollTo(0,0);
+}
+
+function optsHTML(q, perm, state){
+  // state: {picked: originalIndex|null, reveal: bool, sel: originalIndex|null}
+  return perm.map((oi, k) => {
+    let cls = "opt";
+    if (state.reveal) { if (oi === q.a) cls += " ok"; else if (oi === state.picked) cls += " no"; }
+    else if (state.sel === oi) cls += " sel";
+    return `<button type="button" class="${cls}" data-oi="${oi}" ${state.reveal?"disabled":""}><span class="k">${"ABCD"[k]}</span><span>${esc(q.o[oi])}</span></button>`;
+  }).join("");
+}
+function expHTML(q, picked){
+  const ok = picked === q.a;
+  return `<div class="exp">${ok ? `<b class="okl">Correct.</b>` : `<b class="nol">Answer: ${esc(q.o[q.a])}.</b>`} ${esc(q.e)}</div>`;
+}
+function metaHTML(q, no){
+  return `<div class="qmeta"><span class="qno">${no}</span><span class="tag">L${LNUM(q.t)} · ${esc(L(q.t).title)}</span>${q.p?`<span class="tag pyq">High-yield</span>`:""}
+  <button type="button" class="bm" data-bm="${q.id}" aria-pressed="${S.bm[q.id]?"true":"false"}" aria-label="Bookmark">${S.bm[q.id]?"★":"☆"}</button></div>`;
+}
+
+function renderLQ(){
+  const box = $("#lq");
+  if (LQ.i >= LQ.list.length) {
+    const n = LQ.list.length, l = L(LQ.id);
+    const st = S.les[LQ.id] || {}; st.best = Math.max(st.best||0, LQ.score); S.les[LQ.id] = st; save();
+    box.innerHTML = `<div class="stack"><div class="block stack"><span class="eyebrow">Quiz done</span>
+      <div class="scorebig"><span class="num">${LQ.score}</span><span class="muted">/ ${n} correct</span></div>
+      <p class="muted">${LQ.score===n ? "Full marks." : LQ.score >= n*0.8 ? "Strong. Review the ones you missed in Practice → Mistakes." : "Read the lesson once more, then retry. Missed questions are saved under Practice → Mistakes."}</p></div>
+      <div class="row between"><button class="btn" type="button" id="retry">Retry quiz</button><button class="btn pri" type="button" id="tosum">See summary</button></div></div>`;
+    $("#retry").onclick = () => openLesson(LQ.id,"quiz");
+    $("#tosum").onclick = () => openLesson(LQ.id,"sum");
+    return;
+  }
+  const it = LQ.list[LQ.i], q = it.q;
+  const reveal = LQ.picked !== null;
+  box.innerHTML = `<div class="stack"><div class="meter"><i style="width:${LQ.i/LQ.list.length*100}%"></i></div>
+    <article class="qcard">${metaHTML(q, `Q${LQ.i+1}/${LQ.list.length}`)}
+    <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {picked:LQ.picked, reveal})}</div>
+    ${reveal ? expHTML(q, LQ.picked) : ""}</article>
+    ${reveal ? `<div class="row end"><button class="btn pri" type="button" id="lqnext">${LQ.i+1 < LQ.list.length ? "Next question" : "Finish"}</button></div>` : `<p class="muted" style="font-size:13px">Score so far: <span class="num">${LQ.score}</span></p>`}</div>`;
+  box.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    if (LQ.picked !== null) return;
+    LQ.picked = +b.dataset.oi; const ok = LQ.picked === q.a; if (ok) LQ.score++; record(q, ok); renderLQ();
+  });
+  bindBM(box);
+  const nx = $("#lqnext"); if (nx) nx.onclick = () => { LQ.i++; LQ.picked = null; renderLQ(); window.scrollTo(0,0); };
+}
+
+function bindBM(root){
+  root.querySelectorAll("[data-bm]").forEach(b => b.onclick = (ev) => {
+    ev.stopPropagation();
+    const id = b.dataset.bm; if (S.bm[id]) delete S.bm[id]; else S.bm[id] = 1; save();
+    b.setAttribute("aria-pressed", S.bm[id] ? "true":"false"); b.textContent = S.bm[id] ? "★" : "☆";
+  });
+}
+
+/* ============================================================
+   PRACTICE
+   ============================================================ */
+let PF = "all", PSHOW = 20, PORDER = null, PPERM = {}, PPICK = {};
+function practiceList(){
+  let list = QS;
+  if (PF === "pyq") list = QS.filter(q => q.p);
+  else if (PF === "hot") list = QS.filter(q => (L(q.t).heat||1) === 3);
+  else if (PF === "wrong") list = QS.filter(q => S.ans[q.id] === 0);
+  else if (PF === "new") list = QS.filter(q => S.ans[q.id] === undefined);
+  else if (PF === "bm") list = QS.filter(q => S.bm[q.id]);
+  else if (PF !== "all") list = QS.filter(q => q.t === PF);
+  if (PORDER) { const pos = new Map(PORDER.map((id,i)=>[id,i])); list = list.slice().sort((a,b)=>(pos.get(a.id)??0)-(pos.get(b.id)??0)); }
+  return list;
+}
+function renderPractice(){
+  const wrongN = QS.filter(q => S.ans[q.id] === 0).length, bmN = QS.filter(q=>S.bm[q.id]).length, pyqN = QS.filter(q=>q.p).length;
+  const chips = [["all",`All ${QS.length}`],["new","Not tried"],["wrong",`Mistakes ${wrongN}`],["hot",`🔥 Hot topics ${QS.filter(q=>(L(q.t).heat||1)===3).length}`],["pyq",`PYQ ${pyqN}`],["bm",`Starred ${bmN}`]].concat(LESSONS.map((l,i)=>[l.id,`L${i+1} ${l.title}`]));
+  const list = practiceList();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Question bank</span><h1>Practice</h1>
+    <p class="muted">Tap an option to check it. Wrong answers go to <b>Mistakes</b> until you get them right.</p></div>
+    <div class="chips" role="group" aria-label="Filter">${chips.map(c=>`<button type="button" class="chip" data-f="${c[0]}" aria-pressed="${PF===c[0]}">${esc(c[1])}</button>`).join("")}</div>
+    <div class="row between"><span class="muted num" style="font-size:13px">${list.length} questions</span>
+      <div class="row"><button class="btn sm ghost" type="button" id="pshuf">${PORDER?"In order":"Shuffle"}</button></div></div>
+    <div class="stack" id="plist"></div>
+  </section>`;
+  $("#app").querySelectorAll("[data-f]").forEach(b => b.onclick = () => { PF = b.dataset.f; PSHOW = 20; PPICK = {}; renderPractice(); });
+  $("#pshuf").onclick = () => { PORDER = PORDER ? null : shuffle(QS.map(q=>q.id)); PSHOW = 20; renderPractice(); };
+  const chipOn = $(`.chip[aria-pressed="true"]`); if (chipOn) chipOn.scrollIntoView({block:"nearest", inline:"center"});
+  drawPList();
+}
+function pCard(q, idx){
+  if (!PPERM[q.id]) PPERM[q.id] = makePerm(q);
+  const picked = PPICK[q.id]; const reveal = picked !== undefined;
+  return `<article class="qcard" data-q="${q.id}">${metaHTML(q, "Q"+(idx+1))}<p class="qt">${esc(q.q)}</p>
+    <div class="opts">${optsHTML(q, PPERM[q.id], {picked: reveal?picked:null, reveal})}</div>${reveal?expHTML(q,picked):""}</article>`;
+}
+function drawPList(){
+  const list = practiceList(), box = $("#plist");
+  if (!list.length) { box.innerHTML = `<p class="empty">${PF==="wrong"?"No mistakes saved. Answer some questions first, or you've cleared them all.":PF==="bm"?"Nothing starred yet. Tap ☆ on any question.":"Nothing here."}</p>`; return; }
+  box.innerHTML = list.slice(0, PSHOW).map((q,i)=>pCard(q,i)).join("") + (list.length > PSHOW ? `<button class="btn" type="button" id="pmore">Show 20 more (${list.length-PSHOW} left)</button>` : "");
+  bindP(box);
+  const more = $("#pmore"); if (more) more.onclick = () => { PSHOW += 20; drawPList(); };
+}
+function bindP(box){ box.querySelectorAll(".qcard").forEach(bindCard); }
+function bindCard(card){
+  card.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    const q = QS.find(x => x.id === card.dataset.q); if (PPICK[q.id] !== undefined) return;
+    PPICK[q.id] = +b.dataset.oi; record(q, PPICK[q.id] === q.a);
+    const idx = +card.querySelector(".qno").textContent.slice(1) - 1;
+    const tmp = document.createElement("div"); tmp.innerHTML = pCard(q, idx); const nc = tmp.firstElementChild;
+    card.replaceWith(nc); bindCard(nc);
+  });
+  bindBM(card);
+}
+
+/* ============================================================
+   MOCK TEST
+   ============================================================ */
+let M = null, MCFG = {n:25, scope:"all", neg:1}, LEAVE_TO = null;
+function renderMock(){
+  if (M && M.running) return drawMockRun();
+  if (M && M.done) return drawMockResult();
+  const hist = (S.mocks||[]).slice(-6).reverse();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Timed, SSC pattern</span><h1>Mock test</h1>
+    <p class="muted">+2 for a right answer, −0.5 for a wrong one, 36 seconds per question (CGL Tier-1 pace). Answers show only after you submit.</p></div>
+    <div class="block stack">
+      <fieldset><legend>Questions</legend><div class="radios">${[10,25,50,100].map(n=>`<label><input type="radio" name="mn" id="mn${n}" value="${n}" ${MCFG.n===n?"checked":""}><span>${n} · ${Math.round(n*36/60)} min</span></label>`).join("")}</div></fieldset>
+      <fieldset><legend>From</legend><select id="mscope" aria-label="Lessons to draw from"><option value="all">All lessons</option><option value="hot">🔥 Hot topics only</option><option value="pyq">PYQs only</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}" ${MCFG.scope===l.id?"selected":""}>L${i+1} · ${esc(l.title)}</option>`).join("")}</select></fieldset>
+      <label class="row" style="gap:8px;font-weight:600"><input type="checkbox" id="mneg" ${MCFG.neg?"checked":""}> Negative marking (−0.5)</label>
+      <div id="merr" class="muted" style="font-size:14px"></div>
+      <div class="row end"><button class="btn pri" type="button" id="mstart">Start test</button></div>
+    </div>
+    ${hist.length ? `<div class="block"><h3>Recent attempts</h3><div class="hist">${hist.map(h=>`<div><span>${esc(h.d)} · ${h.n} Q</span><span class="num">${h.score}/${h.max} · ${h.acc}%</span></div>`).join("")}</div></div>` : ""}
+  </section>`;
+  $("#mscope").value = MCFG.scope;
+  $("#mstart").onclick = () => {
+    MCFG.n = +(document.querySelector('input[name="mn"]:checked')||{value:25}).value;
+    MCFG.scope = $("#mscope").value; MCFG.neg = $("#mneg").checked ? 1 : 0;
+    let pool = MCFG.scope==="all" ? QS : MCFG.scope==="pyq" ? QS.filter(q=>q.p) : MCFG.scope==="hot" ? QS.filter(q=>(L(q.t).heat||1)===3) : MCFG.scope==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===MCFG.scope);
+    if (!pool.length) { $("#merr").textContent = "No questions in that set yet. Pick another source."; return; }
+    const qs = shuffle(pool).slice(0, MCFG.n);
+    M = { running:true, list: qs.map(q=>({q, perm:makePerm(q)})), ans: qs.map(()=>null), mark: qs.map(()=>false), i:0, neg:MCFG.neg, secs: qs.length*36, start: Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000;
+    startTimer(); drawMockRun();
+  };
+}
+function startTimer(){
+  clearInterval(timerId);
+  timerId = setInterval(() => {
+    if (!M || !M.running) { clearInterval(timerId); return; }
+    const left = Math.max(0, Math.round((M.end - Date.now())/1000));
+    const el = $("#mtime"); if (el) { el.textContent = fmt(left); el.classList.toggle("low", left <= 60); }
+    if (left <= 0) submitMock();
+  }, 1000);
+}
+const fmt = s => `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+function drawMockRun(){
+  const it = M.list[M.i], q = it.q, left = Math.max(0, Math.round((M.end-Date.now())/1000));
+  const answered = M.ans.filter(a=>a!==null).length;
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="mbar"><span class="timer num ${left<=60?"low":""}" id="mtime">${fmt(left)}</span>
+      <span class="muted num" style="font-size:13px;flex:1">Q ${M.i+1}/${M.list.length} · ${answered} answered</span>
+      <button class="btn sm" type="button" id="mpal">${M.showPal?"Hide":"All Qs"}</button></div>
+    ${LEAVE_TO ? `<div class="confirm"><b>Leave the test?</b><span>Your answers so far will be scored now.</span><div class="row"><button class="btn sm pri" type="button" id="lvy">Submit and leave</button><button class="btn sm" type="button" id="lvn">Stay</button></div></div>` : ""}
+    ${M.showPal ? `<div class="block"><div class="pal">${M.list.map((_,k)=>`<button type="button" data-j="${k}" class="${M.ans[k]!==null?"a":""} ${M.mark[k]?"m":""} ${k===M.i?"cur":""}" aria-label="Question ${k+1}">${k+1}</button>`).join("")}</div>
+      <p class="muted" style="font-size:12px;margin-top:8px">Filled = answered · orange line = marked for review</p></div>` : ""}
+    <article class="qcard"><div class="qmeta"><span class="qno">Q${M.i+1}</span><span class="tag">L${LNUM(q.t)}</span>${M.mark[M.i]?`<span class="tag pyq">Marked</span>`:""}</div>
+      <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {sel:M.ans[M.i], reveal:false})}</div></article>
+    <div class="row between"><button class="btn" type="button" id="mprev" ${M.i===0?"disabled":""}>‹ Prev</button>
+      <button class="btn ghost" type="button" id="mmark">${M.mark[M.i]?"Unmark":"Mark"}</button>
+      <button class="btn ghost" type="button" id="mclr" ${M.ans[M.i]===null?"disabled":""}>Clear</button>
+      <button class="btn ${M.i<M.list.length-1?"pri":""}" type="button" id="mnext" ${M.i===M.list.length-1?"disabled":""}>Next ›</button></div>
+    ${M.confirm ? `<div class="confirm"><b>Submit the test?</b><span>${M.list.length-answered} unanswered${M.mark.filter(Boolean).length?`, ${M.mark.filter(Boolean).length} marked for review`:""}.</span><div class="row"><button class="btn sm pri" type="button" id="msubY">Submit</button><button class="btn sm" type="button" id="msubN">Keep going</button></div></div>`
+      : `<button class="btn pri" type="button" id="msub">Submit test</button>`}
+  </section>`;
+  $("#app").querySelectorAll(".opt").forEach(b => b.onclick = () => { M.ans[M.i] = +b.dataset.oi; drawMockRun(); });
+  $("#mprev").onclick = () => { if (M.i>0){M.i--; drawMockRun();} };
+  $("#mnext").onclick = () => { if (M.i<M.list.length-1){M.i++; drawMockRun(); window.scrollTo(0,0);} };
+  $("#mmark").onclick = () => { M.mark[M.i] = !M.mark[M.i]; drawMockRun(); };
+  $("#mclr").onclick = () => { M.ans[M.i] = null; drawMockRun(); };
+  $("#mpal").onclick = () => { M.showPal = !M.showPal; drawMockRun(); };
+  $("#app").querySelectorAll("[data-j]").forEach(b => b.onclick = () => { M.i = +b.dataset.j; drawMockRun(); });
+  const s = $("#msub"); if (s) s.onclick = () => { M.confirm = true; drawMockRun(); };
+  const y = $("#msubY"); if (y) y.onclick = submitMock;
+  const n = $("#msubN"); if (n) n.onclick = () => { M.confirm = false; drawMockRun(); };
+  const lvy = $("#lvy"); if (lvy) lvy.onclick = () => { const t = LEAVE_TO; LEAVE_TO = null; submitMock(); go(t); };
+  const lvn = $("#lvn"); if (lvn) lvn.onclick = () => { LEAVE_TO = null; drawMockRun(); };
+}
+function showMockLeave(tab){ LEAVE_TO = tab; drawMockRun(); }
+function submitMock(){
+  if (!M || !M.running) return;
+  clearInterval(timerId);
+  M.running = false; M.done = true; M.confirm = false;
+  let c=0,w=0,sk=0; const per = {};
+  M.list.forEach((it,k) => {
+    const a = M.ans[k]; const t = it.q.t; per[t] = per[t] || {c:0,n:0}; per[t].n++;
+    if (a===null) sk++; else if (a===it.q.a) { c++; per[t].c++; S.ans[it.q.id]=1; } else { w++; S.ans[it.q.id]=0; }
+  });
+  const max = M.list.length*2, score = +(c*2 - (M.neg? w*0.5 : 0)).toFixed(1);
+  const used = Math.min(M.secs, Math.round((Date.now()-M.start)/1000));
+  M.res = {c,w,sk,score,max,used,per, acc: (c+w) ? Math.round(c*100/(c+w)) : 0};
+  const d = new Date(); const ds = d.toLocaleDateString("en-IN",{day:"numeric",month:"short"})+" "+d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
+  S.mocks = (S.mocks||[]).concat([{d:ds, n:M.list.length, score, max, acc:M.res.acc}]).slice(-20); save(); renderTop();
+  M.filter = "wrong";
+  if (TAB==="mock") drawMockResult();
+}
+function drawMockResult(){
+  const r = M.res;
+  const per = Object.keys(r.per).sort((a,b)=>LNUM(a)-LNUM(b)).map(t => `<div><span>L${LNUM(t)} · ${esc(L(t).title)}</span><span class="num">${r.per[t].c}/${r.per[t].n}</span></div>`).join("");
+  const rows = M.list.map((it,k)=>({it,k})).filter(({it,k}) => M.filter==="all" ? true : M.filter==="wrong" ? (M.ans[k]!==null && M.ans[k]!==it.q.a) : M.ans[k]===null);
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Result</span>
+    <div class="scorebig"><span class="num">${r.score}</span><span class="muted">/ ${r.max} marks</span></div></div>
+    <div class="kpis"><div class="kpi g"><span class="num">${r.c}</span><span>right</span></div><div class="kpi b"><span class="num">${r.w}</span><span>wrong</span></div><div class="kpi"><span class="num">${r.sk}</span><span>skipped</span></div><div class="kpi"><span class="num">${r.acc}%</span><span>accuracy</span></div></div>
+    <p class="muted num" style="font-size:13px">Time used ${fmt(r.used)} of ${fmt(M.secs)}</p>
+    <div class="block"><h3>By lesson</h3><div class="hist">${per}</div></div>
+    <div class="row between"><button class="btn" type="button" id="mnew">New test</button><button class="btn pri" type="button" id="mretry">Retake same questions</button></div>
+    <h2>Review</h2>
+    <div class="chips">${[["wrong",`Wrong ${r.w}`],["skip",`Skipped ${r.sk}`],["all",`All ${M.list.length}`]].map(c=>`<button class="chip" type="button" data-rf="${c[0]}" aria-pressed="${M.filter===c[0]}">${c[1]}</button>`).join("")}</div>
+    <div class="stack">${rows.length ? rows.map(({it,k}) => `<article class="qcard">${metaHTML(it.q, "Q"+(k+1))}<p class="qt">${esc(it.q.q)}</p><div class="opts">${optsHTML(it.q, it.perm, {picked:M.ans[k], reveal:true})}</div>${M.ans[k]===null?`<div class="exp"><b class="nol">Skipped. Answer: ${esc(it.q.o[it.q.a])}.</b> ${esc(it.q.e)}</div>`:expHTML(it.q, M.ans[k])}</article>`).join("") : `<p class="empty">Nothing in this list.</p>`}</div>
+  </section>`;
+  bindBM($("#app"));
+  $("#app").querySelectorAll("[data-rf]").forEach(b => b.onclick = () => { M.filter = b.dataset.rf; drawMockResult(); });
+  $("#mnew").onclick = () => { M = null; renderMock(); };
+  $("#mretry").onclick = () => {
+    const list = M.list.map(it=>({q:it.q, perm:makePerm(it.q)}));
+    M = { running:true, list, ans:list.map(()=>null), mark:list.map(()=>false), i:0, neg:MCFG.neg, secs:list.length*36, start:Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000; startTimer(); drawMockRun();
+  };
+}
+
+/* ============================================================
+   REVISE
+   ============================================================ */
+let RV = "heat", FC = null, FCSCOPE = "all";
+const HID = {}, REV = {};
+Object.keys(COVERS).forEach(k => { HID[k] = 1; REV[k] = {}; });
+function renderRevise(){
+  const tabs = [["heat","🔥 PYQ heat map"]].concat(Object.keys(COVERS).map(k=>[k, COVERS[k].tab]), [["dis",FIND.tab],["nums","Numbers & pairs"],["links","Connections"],["tricks","Tricks"],["traps","Traps"],["flash","Flashcards"]]);
+  if (!tabs.some(t=>t[0]===RV)) RV = "heat";
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Last-day revision</span><h1>Revise</h1></div>
+    <div class="seg" role="tablist">${tabs.map(t=>`<button type="button" role="tab" data-rv="${t[0]}" aria-selected="${RV===t[0]}">${t[1]}</button>`).join("")}</div>
+    <div id="rv" class="stack"></div></section>`;
+  $("#app").querySelectorAll("[data-rv]").forEach(b => b.onclick = () => { RV = b.dataset.rv; renderRevise(); });
+  const on = $(`.seg [aria-selected="true"]`); if (on) on.scrollIntoView({block:"nearest", inline:"center"});
+  const box = $("#rv");
+  const pk = (key, i, val) => (HID[key] && !REV[key][i]) ? `<button type="button" class="peek" data-pk="${key}:${i}">tap</button>` : val;
+  const coverChips = (key, label) => `<div class="chips"><button type="button" class="chip" data-hide="${key}" aria-pressed="${!!HID[key]}">${label}</button><button type="button" class="chip" data-cover="${key}">Cover all again</button></div>`;
+  const bindCover = () => {
+    box.querySelectorAll("[data-hide]").forEach(b => b.onclick = () => { const k=b.dataset.hide; HID[k] = HID[k]?0:1; renderRevise(); });
+    box.querySelectorAll("[data-cover]").forEach(b => b.onclick = () => { REV[b.dataset.cover] = {}; renderRevise(); });
+    box.querySelectorAll("[data-pk]").forEach(b => b.onclick = () => { const [k,i] = b.dataset.pk.split(":"); REV[k][i]=1; renderRevise(); });
+  };
+  if (RV === "heat") {
+    const max = Math.max(...HEAT.map(h=>h[1]));
+    box.innerHTML = `<p class="muted">${APP.heatNote}</p>
+      <div class="block"><div class="heat">${HEAT.map(h=>`<button type="button" class="hrow" data-open="${h[2]}"><span class="ht"><b>${esc(h[0])}</b><span class="muted">${esc(h[3])}</span></span><span class="hbar"><i style="width:${h[1]/max*100}%"></i></span><span class="num hp">${h[1]}%</span></button>`).join("")}</div></div>
+      <div class="block"><h3>Lessons by exam heat</h3><dl class="rk">${[3,2,1].map(n=>`<div><dt>${"🔥".repeat(n)} ${n===3?"Very frequent":n===2?"Regular":"Occasional"}</dt><dd>${LESSONS.map((l,i)=>[l,i]).filter(x=>(x[0].heat||1)===n).map(x=>`L${x[1]+1} ${esc(x[0].title)}`).join(" · ")}</dd></div>`).join("")}</dl></div>`;
+    box.querySelectorAll("[data-open]").forEach(b => b.onclick = () => openLesson(b.dataset.open, "learn"));
+  }
+  if (COVERS[RV]) {
+    const c = COVERS[RV];
+    box.innerHTML = `<p class="muted">${c.note}</p>${coverChips(RV, c.hideLabel)}
+      <div class="block"><div class="tbl"><table class="cover"><thead><tr>${c.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${c.rows.map((r,i)=>`<tr>${r.map((v,ci)=>`<td ${ci?`data-l="${c.head[ci]}"`:""}>${ci===0?`<b>${esc(v)}</b>`:ci===c.hide?pk(RV,i,esc(v)):esc(v)}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+    bindCover();
+  }
+  if (RV === "dis") {
+    box.innerHTML = `<input class="search" id="fs" type="search" placeholder="${FIND.ph}" aria-label="${FIND.tab}">
+      <div class="chips" id="dtype"></div>
+      <div class="block"><div class="tbl"><table class="cover"><thead><tr>${FIND.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody id="fb"></tbody></table></div></div>`;
+    const types = ["All"].concat([...new Set(FIND.rows.map(d=>d[2]))]);
+    let T = "All";
+    const draw = () => { const q = $("#fs").value.trim().toLowerCase();
+      $("#dtype").innerHTML = types.map(t=>`<button type="button" class="chip" data-t="${esc(t)}" aria-pressed="${T===t}">${esc(t)}</button>`).join("");
+      $("#dtype").querySelectorAll("[data-t]").forEach(b => b.onclick = () => { T = b.dataset.t; draw(); });
+      const rows = FIND.rows.filter(x => (T==="All"||x[2]===T) && (!q || x.join(" ").toLowerCase().includes(q)));
+      $("#fb").innerHTML = rows.length ? rows.map(a=>`<tr><td><b>${esc(a[0])}</b></td><td data-l="${FIND.head[1]}">${esc(a[1])}</td><td data-l="${FIND.head[2]}">${esc(a[2])}</td><td data-l="${FIND.head[3]}" class="muted">${esc(a[3])}</td></tr>`).join("") : `<tr><td colspan="4" class="muted">No match.</td></tr>`; };
+    $("#fs").oninput = draw; draw();
+  }
+  if (RV === "links") {
+    const items = LESSONS.flatMap((l,i) => l.blocks.filter(b=>b.k==="link").map(b=>({l:i+1, t:l.title, h:b.h})));
+    box.innerHTML = items.map(x => `<div class="link"><span class="lab">L${x.l} · ${esc(x.t)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "nums") {
+    box.innerHTML = `<div class="tiles">${TILES.map(t=>`<div class="tile"><span class="num">${t[0]}</span><span>${t[1]}</span></div>`).join("")}</div>
+    <div class="block"><h3>Look-alike pairs</h3><dl class="rk">${PAIRS.map(p=>`<div><dt>${esc(p[0])}</dt><dd>${esc(p[1])}</dd></div>`).join("")}</dl></div>`;
+  }
+  if (RV === "tricks" || RV === "traps") {
+    const kind = RV==="tricks" ? "trick" : "trap";
+    const items = LESSONS.flatMap((l,i) => l.blocks.filter(b=>b.k===kind).map(b=>({l:i+1, t:l.title, h:b.h})));
+    const extra = kind==="trick" ? `<div class="trick"><span class="lab">Exam craft</span>${APP.craft}</div>` : "";
+    box.innerHTML = extra + items.map(x => `<div class="${kind}"><span class="lab">L${x.l} · ${esc(x.t)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "flash") drawFlash(box);
+}
+
+
+function drawFlash(box){
+  if (!FC) { const pool = FCSCOPE==="all" ? QS : FCSCOPE==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===FCSCOPE); FC = {list: shuffle(pool), i:0, flip:false, known:0}; }
+  const sel = `<select id="fcs" aria-label="Flashcard set"><option value="all">All questions</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}">L${i+1} · ${esc(l.title)}</option>`).join("")}</select>`;
+  if (!FC.list.length || FC.i >= FC.list.length) {
+    box.innerHTML = `<div class="row">${sel}</div><div class="block stack"><h3>${FC.list.length ? "Deck finished" : "No cards in this set"}</h3>${FC.list.length?`<p class="muted">You knew ${FC.known} of ${FC.list.length} on first look.</p>`:""}<div class="row"><button class="btn pri" type="button" id="fcr">Shuffle and restart</button></div></div>`;
+    $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+    $("#fcr").onclick = () => { FC = null; drawFlash(box); }; return;
+  }
+  const q = FC.list[FC.i];
+  box.innerHTML = `<div class="row between">${sel}<span class="muted num" style="font-size:13px">${FC.i+1}/${FC.list.length}</span></div>
+    <button type="button" class="flash" id="fcard" aria-label="Flip card">
+      <span class="side">${FC.flip?"Answer":"Question · tap to flip"}</span>
+      <span class="front">${esc(q.q)}</span>
+      ${FC.flip ? `<span class="ans">${esc(q.o[q.a])}</span><span class="muted">${esc(q.e)}</span>` : ""}
+    </button>
+    <div class="row between"><button class="btn" type="button" id="fca" ${FC.flip?"":"disabled"}>Again later</button><button class="btn pri" type="button" id="fck" ${FC.flip?"":"disabled"}>Got it</button></div>`;
+  $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+  $("#fcard").onclick = () => { FC.flip = !FC.flip; drawFlash(box); };
+  $("#fca").onclick = () => { FC.list.push(q); FC.list.splice(FC.i,1); FC.flip=false; drawFlash(box); };
+  $("#fck").onclick = () => { FC.known++; FC.i++; FC.flip=false; drawFlash(box); };
+}
+
+/* boot */
+renderTop();
+const start = (location.hash||"").replace("#","");
+go(["learn","practice","mock","revise"].includes(start) ? start : "learn");
+</script>
+
+
+<style id="shabd-skin">
+/* ===== शब्दRegister skin: app colours + fonts (only when opened from the app) ===== */
+:root[data-skin="paper"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(150,128,90,.10) 31px, rgba(150,128,90,.10) 32px);--app-psize:auto;--app-card:#FFFCF6;--app-rule:#DCCFB2;--app-pri:#2F6F63;--app-ink:#221E17;--app-soft:#5E5547;--app-faint:#857B6A;--app-bg:#F3EEE3;--app-deep:#E9E1CF;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#F3EEE3;--sheet:#FFFCF6;--sunk:#E9E1CF;--ink:#221E17;--ink2:#5E5547;--rule:#DCCFB2;--blue:#2F6F63;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--accent:#A87E1F;--accent-bg:color-mix(in srgb, #A87E1F 16%, #FFFCF6);--good:#2F6F63;--good-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--bad:#8C2F39;--bad-bg:color-mix(in srgb, #8C2F39 14%, #FFFCF6);--warn-bg:color-mix(in srgb, #C99A2E 18%, #FFFCF6);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="paper"][data-theme="dark"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--sheet:#26211A;--sunk:#25201A;--ink:#EFE6D2;--ink2:#BDB195;--rule:#3B3429;--blue:#3F9A86;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3F9A86 22%, #26211A);--accent:#D9AE4B;--accent-bg:color-mix(in srgb, #D9AE4B 24%, #26211A);--good:#5FB9A3;--good-bg:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-bg:color-mix(in srgb, #D06B74 22%, #26211A);--warn-bg:color-mix(in srgb, #D9AE4B 26%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="paper"]:not([data-theme="light"]){--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--sheet:#26211A;--sunk:#25201A;--ink:#EFE6D2;--ink2:#BDB195;--rule:#3B3429;--blue:#3F9A86;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3F9A86 22%, #26211A);--accent:#D9AE4B;--accent-bg:color-mix(in srgb, #D9AE4B 24%, #26211A);--good:#5FB9A3;--good-bg:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-bg:color-mix(in srgb, #D06B74 22%, #26211A);--warn-bg:color-mix(in srgb, #D9AE4B 26%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin="indigo"]{--app-pattern:radial-gradient(rgba(61,92,240,.10) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#FFFFFF;--app-rule:#CBD3EC;--app-pri:#3D5CF0;--app-ink:#0F1B3D;--app-soft:#4A5680;--app-faint:#67739C;--app-bg:#EEF1FA;--app-deep:#E1E6F5;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#EEF1FA;--sheet:#FFFFFF;--sunk:#E1E6F5;--ink:#0F1B3D;--ink2:#4A5680;--rule:#CBD3EC;--blue:#3D5CF0;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3D5CF0 14%, #FFFFFF);--accent:#D9831A;--accent-bg:color-mix(in srgb, #D9831A 16%, #FFFFFF);--good:#147D53;--good-bg:color-mix(in srgb, #147D53 14%, #FFFFFF);--bad:#C8402F;--bad-bg:color-mix(in srgb, #C8402F 14%, #FFFFFF);--warn-bg:color-mix(in srgb, #F7C548 18%, #FFFFFF);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="indigo"][data-theme="dark"]{--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--sheet:#121D47;--sunk:#0E1839;--ink:#EEF2FF;--ink2:#A7B3DA;--rule:#22306A;--blue:#6F86FF;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #6F86FF 22%, #121D47);--accent:#F7B24D;--accent-bg:color-mix(in srgb, #F7B24D 24%, #121D47);--good:#45C08A;--good-bg:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-bg:color-mix(in srgb, #F07B6E 22%, #121D47);--warn-bg:color-mix(in srgb, #F7C548 26%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="indigo"]:not([data-theme="light"]){--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--sheet:#121D47;--sunk:#0E1839;--ink:#EEF2FF;--ink2:#A7B3DA;--rule:#22306A;--blue:#6F86FF;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #6F86FF 22%, #121D47);--accent:#F7B24D;--accent-bg:color-mix(in srgb, #F7B24D 24%, #121D47);--good:#45C08A;--good-bg:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-bg:color-mix(in srgb, #F07B6E 22%, #121D47);--warn-bg:color-mix(in srgb, #F7C548 26%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin] body{background-color:var(--app-bg);background-image:var(--app-pattern);background-size:var(--app-psize);background-attachment:fixed}
+:root[data-skin] h1,:root[data-skin] h2{letter-spacing:-.01em}
+
+/* ===== Desktop layout (PC / tablet landscape) ===== */
+@media (min-width: 1024px){
+  :root{--side:236px}
+  body{padding-left:var(--side);font-size:16.5px}
+  .top{border-bottom:1px solid var(--rule)}
+  .top-in{max-width:1320px;padding:16px 36px}
+  .brand{font-size:21px}
+  .brand small{font-size:13px}
+  .stat{font-size:13px}
+  .wrap{max-width:1320px;padding:0 36px 56px}
+  .view{padding-top:28px}
+  h1{font-size:34px} h2{font-size:22px} h3{font-size:17px}
+
+  /* bottom tab bar becomes a left sidebar */
+  .nav{top:0;bottom:0;left:0;right:auto;width:var(--side);height:auto;border-top:0;border-right:1px solid var(--rule);padding:84px 14px 20px;display:block;overflow:auto}
+  .nav-in{display:flex;flex-direction:column;gap:4px;height:auto;max-width:none;margin:0}
+  .nav-in::before{content:"Sections";display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);padding:0 14px 8px}
+  .nav button{flex-direction:row;justify-content:flex-start;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;font-size:15px;min-height:0;height:auto;width:100%;text-align:left}
+  .nav button svg{width:20px;height:20px;flex-shrink:0}
+  .nav button:hover{background:var(--sunk)}
+  .nav button[aria-current="page"]{background:var(--blue-bg)}
+  .nav button[aria-current="page"] span{border-bottom:0!important}
+
+  /* home: intro beside progress, lessons as a card grid */
+  .hero{grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);column-gap:48px;align-items:end;padding-bottom:10px}
+  .hero > .eyebrow,.hero > h1,.hero > p{grid-column:1}
+  .hero > .meter{grid-column:2;grid-row:3;align-self:center}
+  .hero > .row{grid-column:2;grid-row:2;align-self:end}
+  .lessons{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;border-top:0}
+  .les{background:var(--sheet);border:1px solid var(--rule);border-radius:16px;padding:16px 18px;transition:transform .15s ease,box-shadow .15s ease,border-color .15s}
+  .les:hover{transform:translateY(-2px);border-color:var(--blue);box-shadow:0 14px 30px -22px rgba(0,0,0,.45)}
+  .les.next{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
+
+  /* lesson reader: facts, timelines, tricks sit side by side */
+  .lhead{margin-bottom:0}
+  .steps{max-width:640px}
+  .steps + .stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+  .steps + .stack > .plain,.steps + .stack > .row,.steps + .stack > p,.steps + .stack > .fig,.steps + .stack > h2,.steps + .stack > .tbl{grid-column:1/-1}
+  .steps + .stack > .plain{max-width:86ch;font-size:17px}
+  .steps + .stack:not(:has(> .block ~ .block)) > .block{grid-column:1/-1}
+  .block,.qcard{padding:18px 20px;border-radius:14px}
+
+  /* quizzes and question bank */
+  #lq > .stack{display:grid;grid-template-columns:minmax(0,1fr);max-width:980px;gap:16px}
+  .opts{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .qt{font-size:18px}
+  #plist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #plist .opts{grid-template-columns:minmax(0,1fr)}
+  .chips{flex-wrap:wrap;overflow:visible}
+
+  /* mock test: question with the answer grid alongside */
+  .mbar{top:calc(env(safe-area-inset-top,0px) + 67px)}
+  .view > .qcard{max-width:1000px}
+  .view > .row.between{max-width:1000px}
+  .view > #msub{max-width:1000px;width:100%}
+  .view > .block.stack{max-width:760px}
+  .pal{grid-template-columns:repeat(auto-fill,minmax(46px,1fr))}
+  .kpis{max-width:760px}
+
+  /* revise: cards in columns */
+  #rkl,#rv > .stack:not(#rkl){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #rv > .search{max-width:520px}
+  .tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .flash{min-height:300px;max-width:760px;margin:0 auto;padding:32px 36px}
+  .flash .front{font-size:22px}
+}
+@media (min-width: 1500px){
+  #plist,#rkl{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+</style>
+<script id="shabd-deeplink">
+(function(){
+  var l; try{ l = new URLSearchParams(location.search).get('lesson'); }catch(e){}
+  if(!l) return;
+  function run(){
+    try{
+      if(typeof openLesson === 'function' && typeof LESSONS !== 'undefined'){ if(LESSONS.some(function(x){ return x.id === l; })) openLesson(l, 'learn'); }
+      else if(typeof openRule === 'function'){ var n = parseInt(String(l).replace(/\D/g, ''), 10); if(n) openRule(n, 'learn'); }
+      else if(typeof COURSE !== 'undefined' && typeof go === 'function'){ var i = COURSE.findIndex(function(c){ return c.id === l; }); if(i >= 0) go({ name: 'lesson', i: i, step: 0, ans: {}, score: 0 }); }
+    }catch(e){}
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(run, 30); }); else setTimeout(run, 30);
+})();
+</script>
+</body></html>

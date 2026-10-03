@@ -1,0 +1,1406 @@
+<!doctype html><html><head><meta charset=utf8>
+<script>
+/* शब्दRegister bridge: follows the app's look (Paper / Indigo) and Light / Dark / Auto choice. */
+(function(){
+  var root = document.documentElement;
+  function theme(t){ if(t === 'dark' || t === 'light') root.setAttribute('data-theme', t); else root.removeAttribute('data-theme'); }
+  function skin(s){ if(s === 'paper' || s === 'indigo') root.setAttribute('data-skin', s); }
+  try{
+    var q = new URLSearchParams(location.search);
+    theme(q.get('theme'));
+    skin(q.get('skin') || (q.get('embed') ? 'paper' : ''));
+    if(q.get('embed')) root.classList.add('in-shabd');
+  }catch(e){}
+  window.addEventListener('message', function(e){
+    if(e.origin !== location.origin || !e.data || e.data.type !== 'shabd-theme') return;
+    theme(e.data.theme);
+    if(e.data.skin) skin(e.data.skin);
+  });
+})();
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap">
+<meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Trigonometry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<style>
+/* Layout: Physics PYQ Workbook — follows the शब्दRegister Paper / Indigo look; one column + bottom tabs on phones, sidebar on PC. */
+:root{
+  --paper:#f6f3ea; --sheet:#fffdf7; --sunk:#ebe6d8;
+  --ink:#1d2a22; --ink2:#56625a; --rule:#dcd5c3;
+  --blue:#1f5c3d; --on-blue:#ffffff; --blue-bg:#dcebdf;
+  --accent:#b4530f; --accent-bg:#fbe7d3;
+  --good:#1b7547; --good-bg:#dff1e6; --bad:#b0271f; --bad-bg:#f8e1de;
+  --warn-bg:#fff2d2;
+  --f-display:"Fraunces", "Tiro Devanagari Hindi", Georgia, serif;
+  --f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-num:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r:10px; --nav-h:64px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#111612; --sheet:#1a211c; --sunk:#222b25;
+  --ink:#e8eee9; --ink2:#a3b0a7; --rule:#2f3a33;
+  --blue:#86cfa2; --on-blue:#111612; --blue-bg:#1d3a29;
+  --accent:#f3a764; --accent-bg:#3b2614;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#111612; --sheet:#1a211c; --sunk:#222b25;
+  --ink:#e8eee9; --ink2:#a3b0a7; --rule:#2f3a33;
+  --blue:#86cfa2; --on-blue:#111612; --blue-bg:#1d3a29;
+  --accent:#f3a764; --accent-bg:#3b2614;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
+.wrap{max-width:640px;margin:0 auto;padding-inline:16px;padding-block:0 calc(var(--nav-h) + 28px + env(safe-area-inset-bottom,0px))}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);border-bottom:1px solid var(--rule)}
+.top-in{max-width:640px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px}
+.brand{font-family:var(--f-display);font-weight:800;font-size:17px;line-height:1.2;flex:1;min-width:0}
+.brand small{display:block;font-family:var(--f-body);font-weight:500;font-size:12px;color:var(--ink2);letter-spacing:.02em}
+.stat{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right;white-space:nowrap}
+.stat b{color:var(--ink);font-weight:600}
+
+/* bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--sheet);border-top:1px solid var(--rule);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);height:var(--nav-h)}
+.nav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer}
+.nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav button[aria-current="page"]{color:var(--blue)}
+.nav button[aria-current="page"] span{border-bottom:2px solid var(--blue)}
+
+/* type */
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.25;margin:0}
+h1{font-size:24px;font-weight:800}
+h2{font-size:19px;font-weight:800}
+h3{font-size:16px;font-weight:700}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--ink2)}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+p{margin:0}
+.stack{display:flex;flex-direction:column;gap:14px}
+.view{padding-top:18px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--rule);background:var(--sheet);font-weight:600;cursor:pointer;text-decoration:none}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:var(--on-blue)}
+.btn.ghost{background:transparent}
+.btn.sm{min-height:36px;padding:0 14px;font-size:14px}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.end{justify-content:flex-end}
+.row.between{justify-content:space-between}
+
+/* hero */
+.hero{display:grid;gap:10px;padding:4px 0 6px}
+.hero p{color:var(--ink2)}
+.meter{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--blue);border-radius:99px}
+
+/* lesson list */
+.lessons{display:flex;flex-direction:column;border-top:1px solid var(--rule)}
+.les{display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;padding:14px 2px;border-bottom:1px solid var(--rule);background:none;border-left:0;border-right:0;border-top:0;text-align:left;cursor:pointer;width:100%}
+.les .no{font-family:var(--f-num);font-weight:600;font-size:15px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--rule);color:var(--ink2)}
+.les.done .no{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.les .t{min-width:0}
+.les .t b{display:block;font-weight:700;font-size:16px;line-height:1.3}
+.les .t span{font-size:13px;color:var(--ink2)}
+.les .sc{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right}
+.les.next .no{border-color:var(--blue);color:var(--blue)}
+
+/* lesson reader */
+.lhead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.back{background:none;border:0;padding:8px 8px 8px 0;cursor:pointer;color:var(--blue);font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0 4px}
+.steps button{border:1px solid var(--rule);background:var(--sheet);border-radius:8px;padding:8px 4px;font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer}
+.steps button[aria-current="step"]{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.block{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;min-width:0}
+.block h3{margin-bottom:8px}
+.block p + p{margin-top:8px}
+.plain{padding:0 2px}
+.facts{display:grid;gap:0}
+.facts div{display:grid;grid-template-columns:minmax(0,42%) minmax(0,1fr);gap:10px;padding:7px 0;border-top:1px dashed var(--rule)}
+.facts div:first-child{border-top:0}
+.facts dt{font-size:14px;color:var(--ink2);margin:0}
+.facts dd{margin:0;font-weight:600;min-width:0}
+.tl{display:grid;gap:0;margin:0;padding:0;list-style:none}
+.tl li{display:grid;grid-template-columns:92px 1fr;gap:10px;padding:8px 0;border-top:1px dashed var(--rule)}
+.tl li:first-child{border-top:0}
+.tl .y{font-family:var(--f-num);font-weight:600;font-size:13px;color:var(--accent);padding-top:2px}
+.trick,.trap{border-radius:var(--r);padding:12px 14px 12px 14px;border:1px solid var(--rule)}
+.trick{background:var(--accent-bg);border-color:transparent}
+.trap{background:var(--bad-bg);border-color:transparent}
+.trick .lab,.trap .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.trick .lab{color:var(--accent)}
+.trap .lab{color:var(--bad)}
+.rk div{grid-template-columns:minmax(0,48%) minmax(0,1fr)}
+.rk dd{min-width:0;overflow-wrap:anywhere}
+.hot{border-radius:var(--r);padding:12px 14px;background:var(--warn-bg,var(--accent-bg));border-left:4px solid var(--warn,var(--accent))}
+.hot .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;color:var(--warn,var(--accent))}
+.heatb{display:inline-block;font-size:11px;letter-spacing:-.1em;margin-left:6px;vertical-align:1px}
+.heat{display:flex;flex-direction:column;gap:2px}
+.hrow{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(60px,1fr) 44px;gap:10px;align-items:center;text-align:left;background:none;border:0;border-bottom:1px solid var(--rule);padding:9px 2px;color:inherit;font:inherit;cursor:pointer}
+.hrow:last-child{border-bottom:0}
+.hrow .ht{display:flex;flex-direction:column;min-width:0}
+.hrow .ht .muted{font-size:12px}
+.hbar{height:10px;border-radius:5px;background:var(--rule);overflow:hidden}
+.hbar i{display:block;height:100%;background:var(--accent);border-radius:5px}
+.hp{text-align:right;font-weight:700}
+
+.tbl{overflow-x:auto;margin:0 -2px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);font-weight:700}
+td.n{font-family:var(--f-num);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fig{margin:0}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-size:13px;color:var(--ink2);margin-top:6px}
+.pyr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pyr div{text-align:center;font-size:13px}
+.pyr b{display:block;font-size:14px}
+.pm{fill:var(--blue)} .pf{fill:var(--accent)}
+.sum{margin:0;padding-left:20px;display:grid;gap:6px}
+
+/* questions */
+.qcard{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px;min-width:0}
+.qmeta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}
+.qno{font-family:var(--f-num);font-weight:600;color:var(--ink2)}
+.tag{background:var(--sunk);color:var(--ink2);border-radius:99px;padding:1px 9px;font-weight:600}
+.tag.pyq{background:var(--accent-bg);color:var(--accent)}
+.bm{margin-left:auto;background:none;border:0;cursor:pointer;color:var(--ink2);font-size:20px;line-height:1;padding:4px}
+.bm[aria-pressed="true"]{color:var(--accent)}
+.qt{font-weight:600;font-size:16px}
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:start;text-align:left;width:100%;border:1.5px solid var(--rule);background:var(--paper);border-radius:9px;padding:10px 12px;cursor:pointer;min-height:44px}
+.opt .k{font-family:var(--f-num);font-weight:600;color:var(--ink2);font-size:14px;padding-top:1px}
+.opt.sel{border-color:var(--blue);background:var(--blue-bg)}
+.opt.ok{border-color:var(--good);background:var(--good-bg)}
+.opt.no{border-color:var(--bad);background:var(--bad-bg)}
+.opt.ok .k{color:var(--good)} .opt.no .k{color:var(--bad)}
+.opt:disabled{cursor:default;color:inherit}
+.exp{font-size:15px;border-left:3px solid var(--blue);padding:4px 0 4px 12px;color:var(--ink)}
+.exp b.okl{color:var(--good)} .exp b.nol{color:var(--bad)}
+
+/* chips */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 13px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.seg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--rule)}
+.seg::-webkit-scrollbar{display:none}
+.seg button{flex:none;background:none;border:0;border-bottom:2px solid transparent;padding:10px 8px;font-weight:600;color:var(--ink2);cursor:pointer}
+.seg button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+
+/* score panel */
+.scorebig{display:flex;align-items:baseline;gap:8px}
+.scorebig .num{font-size:44px;font-weight:600;line-height:1;color:var(--blue)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.kpi{background:var(--sunk);border-radius:8px;padding:8px;text-align:center}
+.kpi .num{display:block;font-size:20px;font-weight:600}
+.kpi span{font-size:12px;color:var(--ink2)}
+.kpi.g .num{color:var(--good)} .kpi.b .num{color:var(--bad)}
+
+/* mock */
+.mbar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 57px);z-index:10;background:var(--paper);padding:10px 0;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--rule)}
+.timer{font-family:var(--f-num);font-weight:600;font-size:18px;padding:4px 10px;border-radius:8px;background:var(--sunk)}
+.timer.low{background:var(--bad-bg);color:var(--bad)}
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px}
+.pal button{height:40px;border-radius:8px;border:1px solid var(--rule);background:var(--sheet);font-family:var(--f-num);font-weight:600;font-size:13px;cursor:pointer}
+.pal button.a{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.pal button.m{box-shadow:inset 0 -4px 0 var(--accent)}
+.pal button.cur{outline:2px solid var(--ink);outline-offset:1px}
+.pal button.ok{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.pal button.no{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.confirm{background:var(--warn-bg);border-radius:var(--r);padding:12px 14px;display:grid;gap:10px}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}
+legend{font-weight:700;margin-bottom:6px;padding:0}
+.radios{display:flex;gap:8px;flex-wrap:wrap}
+.radios label{border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 14px;font-weight:600;cursor:pointer;font-size:14px}
+.radios input{position:absolute;opacity:0;pointer-events:none}
+.radios input:checked + span{color:var(--blue)}
+.radios label:has(input:checked){border-color:var(--blue);background:var(--blue-bg)}
+.radios label:has(input:focus-visible){outline:2px solid var(--blue);outline-offset:2px}
+select{font:inherit;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:8px;padding:8px 10px;max-width:100%}
+.hist{display:grid;gap:0}
+.hist div{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:14px}
+
+/* revise */
+.search{width:100%;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:10px;padding:10px 12px;font:inherit}
+.rk{display:grid;gap:0}
+.rk div{display:grid;grid-template-columns:minmax(0,48%) 1fr;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:15px}
+.rk div:first-child{border-top:0}
+.rk dt{font-size:13px;color:var(--ink2);margin:0}
+.rk dt.up{color:var(--good)} .rk dt.dn{color:var(--bad)}
+.rk dd{margin:0;font-weight:600;min-width:0}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px}
+.tile .num{display:block;font-size:24px;font-weight:600;color:var(--accent);line-height:1.2}
+.tile span{font-size:13px;color:var(--ink2)}
+.gbar{display:grid;grid-template-columns:78px 1fr 52px;gap:8px;align-items:center;font-size:13px;padding:3px 0}
+.gbar .tr{height:12px;background:var(--sunk);border-radius:3px;position:relative;overflow:hidden}
+.gbar .tr i{position:absolute;left:0;top:0;bottom:0;background:var(--blue);border-radius:3px}
+.gbar .tr i.neg{background:var(--bad)}
+.gbar .v{font-family:var(--f-num);text-align:right}
+.flash{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;min-height:240px;padding:20px 18px;display:grid;align-content:center;gap:12px;cursor:pointer;text-align:left;width:100%}
+.flash .side{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.flash .front{font-size:18px;font-weight:600}
+.flash .ans{font-size:20px;font-weight:700;color:var(--good)}
+.empty{padding:24px 4px;color:var(--ink2);text-align:center}
+.foot{font-size:13px;color:var(--ink2);padding-top:10px}
+@media (prefers-reduced-motion: no-preference){ .opt,.chip,.btn{transition:background-color .15s, border-color .15s} }
+.link{background:var(--blue-bg);border-radius:var(--r);padding:12px 14px}
+.link .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;color:var(--blue)}
+.icheck{background:var(--sheet);border:1.5px dashed var(--blue);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px}
+.icheck .lab{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue)}
+.cat{font-size:12px;font-weight:700;border-radius:99px;padding:1px 8px;white-space:nowrap}
+.cat.CS{background:var(--blue-bg);color:var(--blue)} .cat.CSS{background:var(--accent-bg);color:var(--accent)} .cat.ST{background:var(--sunk);color:var(--ink)} .cat.OT{background:var(--sunk);color:var(--ink2)}
+
+/* ---- workbook additions ---- */
+table.cover td:nth-child(4){min-width:180px}
+.plist .dl{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.plist .dl em{font-style:normal;font-weight:700;color:var(--blue);text-align:right}
+.ladder{list-style:none;margin:0;padding:0;display:grid;gap:0;border-top:1px solid var(--rule)}
+.ladder li{display:grid;grid-template-columns:62px 1fr auto;gap:12px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--rule)}
+.ladder .rk-n{font-size:22px;font-weight:600;color:var(--blue);text-align:right}
+.ladder .rk-t{min-width:0}
+.ladder .rk-t b{display:block;line-height:1.3}
+.ladder .rk-t span{font-size:13px;color:var(--ink2)}
+.ladder .rk-d{font-weight:700;font-size:14px;white-space:nowrap}
+.ladder li.up .rk-d{color:var(--good)} .ladder li.dn .rk-d{color:var(--bad)}
+.ladder small{font-weight:600;color:var(--ink2)}
+table.cover td{min-width:90px}
+.peek{border:1.5px dashed var(--blue);background:var(--blue-bg);color:var(--blue);border-radius:8px;padding:6px 10px;font-weight:600;cursor:pointer;min-height:36px;width:100%}
+.pubs{display:grid;gap:12px}
+.plist{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.plist li{padding:7px 0;border-top:1px dashed var(--rule);display:grid;gap:1px}
+.plist li:first-child{border-top:0}
+.plist li span{font-size:13px;color:var(--ink2)}
+.seg{scroll-snap-type:x proximity}
+@media (max-width: 700px){
+  table.cover thead{display:none}
+  table.cover tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 10px;padding:10px 0;border-bottom:1px solid var(--rule)}
+  table.cover td{border:0;padding:0;min-width:0;font-size:14px}
+  table.cover td:first-child{grid-column:1/-1;font-size:15px}
+  table.cover td:nth-child(4){grid-column:1/-1;min-width:0}
+  table.cover td[data-l]::before{content:attr(data-l);display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-bottom:2px}
+}
+/* ---- maths blocks ---- */
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(250px,100%),1fr));gap:10px}
+.fcard{background:var(--sheet);border:1px solid var(--rule);border-left:4px solid var(--blue);border-radius:var(--r);padding:10px 12px;display:grid;gap:4px;min-width:0}
+.fcard .fn{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);font-weight:700}
+.fcard .fx{font-family:var(--f-num);font-size:16px;color:var(--ink);overflow-wrap:anywhere;line-height:1.45}
+.fcard .fnote{font-size:13px;color:var(--ink2)}
+.ex{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px 14px;display:grid;gap:8px}
+.ex .exhead .lab{display:inline;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);font-weight:700}
+.ex .src{display:inline-block;margin-left:6px;font-size:11.5px;font-weight:700;color:var(--accent);border:1px solid currentColor;border-radius:999px;padding:0 8px}
+.ex .exq{font-weight:600}
+.ex details summary{cursor:pointer;font-weight:700;color:var(--blue);list-style:none}
+.ex details summary::-webkit-details-marker{display:none}
+.ex details summary::before{content:'▸ '}
+.ex details[open] summary::before{content:'▾ '}
+.ex ol{margin:8px 0 0;padding-left:20px;display:grid;gap:4px}
+.ex .exans{margin-top:8px;padding:8px 10px;border-radius:8px;background:var(--good-bg);color:var(--good);font-weight:700}
+.figwrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(260px,100%),1fr));gap:12px}
+.figwrap figure{margin:0;display:grid;gap:6px;justify-items:center;text-align:center}
+.fig svg,.figwrap svg{width:100%;max-width:340px;height:auto;color:var(--ink)}
+.fig figcaption,.figwrap figcaption{font-size:13px;color:var(--ink2)}
+sup,sub{font-size:.72em;line-height:0}
+
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">Trigonometry<small>त्रिकोणमिति · SSC maths workbook</small></div>
+    <div class="stat" id="topstat"></div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<nav class="nav" aria-label="Sections">
+  <div class="nav-in">
+    <button type="button" id="nav-learn" data-tab="learn"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg><span>Learn</span></button>
+    <button type="button" id="nav-practice" data-tab="practice"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span>Practice</span></button>
+    <button type="button" id="nav-mock" data-tab="mock"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6M12 2v3"/></svg><span>Mock test</span></button>
+    <button type="button" id="nav-revise" data-tab="revise"><svg viewBox="0 0 24 24"><path d="M12 3 2 8l10 5 10-5z"/><path d="m2 13 10 5 10-5"/></svg><span>Revise</span></button>
+  </div>
+</nav>
+
+<script>
+"use strict";
+const LESSONS = [
+{ id:"L1", heat:3, title:"Basics: the six ratios", hi:"मूल त्रिकोणमितीय अनुपात", blocks:[
+ {k:"hot", h:"<b>Almost every CGL Tier 1 shift has 1–2 trigonometry questions, and the easiest one is usually this type:</b> one ratio is given (e.g. 7 cot P = 24) and you must find another ratio or an expression. Tier 2 asks the same idea with bigger expressions. Expect 30–60 seconds per question once the triangle is drawn."},
+ {k:"p", h:"Take a right triangle and one acute angle θ. The side opposite θ is the <b>Perpendicular (P)</b>, the side next to θ (not the hypotenuse) is the <b>Base (B)</b>, and the longest side is the <b>Hypotenuse (H)</b>. Every trigonometric ratio is just a ratio of two of these sides, so it depends only on θ, not on the size of the triangle."},
+ {k:"fig", title:"Naming the sides for angle θ", svg:'<svg viewBox="0 0 280 190" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M40 160 H240 L40 40 Z"/><path d="M40 148 H52 V160"/><path d="M210 160 A30 30 0 0 1 214.3 144.6" style="stroke:var(--accent)"/><text x="194" y="155" fill="currentColor" stroke="none" style="fill:var(--accent)">θ</text><text x="28" y="38" fill="currentColor" stroke="none">A</text><text x="26" y="174" fill="currentColor" stroke="none">B</text><text x="244" y="174" fill="currentColor" stroke="none">C</text><text x="24" y="104" fill="currentColor" stroke="none" font-weight="700">P</text><text x="136" y="176" fill="currentColor" stroke="none" font-weight="700">B</text><text x="146" y="92" fill="currentColor" stroke="none" font-weight="700">H</text><text x="160" y="30" fill="currentColor" stroke="none">sin θ = P/H</text><text x="160" y="46" fill="currentColor" stroke="none">cos θ = B/H</text><text x="160" y="62" fill="currentColor" stroke="none">tan θ = P/B</text></svg>', cap:"For θ at C: P = AB (opposite), B = BC (adjacent), H = AC (hypotenuse). If the angle moves to A, P and B swap."},
+ {k:"formula", title:"The six ratios", rows:[["sin θ","P / H","opposite ÷ hypotenuse"],["cos θ","B / H","adjacent ÷ hypotenuse"],["tan θ","P / B","opposite ÷ adjacent"],["cosec θ","H / P = 1/sin θ","reciprocal of sin"],["sec θ","H / B = 1/cos θ","reciprocal of cos"],["cot θ","B / P = 1/tan θ","reciprocal of tan"]]},
+ {k:"formula", title:"Reciprocal & quotient relations", rows:[["Reciprocal pairs","sin θ·cosec θ = 1, cos θ·sec θ = 1, tan θ·cot θ = 1","each pair multiplies to 1"],["Quotient","tan θ = sin θ / cos θ","(P/H) ÷ (B/H) = P/B"],["Quotient","cot θ = cos θ / sin θ","reciprocal of the above"],["Range (acute θ)","0 < sin θ, cos θ < 1;  sec θ, cosec θ > 1","H is the longest side"],["tan, cot","any positive value","P and B can be in any ratio"]]},
+ {k:"table", title:"Pythagorean triplets that SSC loves", head:["Triplet (P, B, H)","Typical given","Then"], rows:[["3, 4, 5","tan θ = 3/4","sin = 3/5, cos = 4/5"],["5, 12, 13","cos θ = 5/13 or sec θ = 13/5","sin = 12/13, tan = 12/5"],["8, 15, 17","sin θ = 8/17","cos = 15/17, tan = 8/15"],["7, 24, 25","cot θ = 24/7","sin = 7/25, cos = 24/25"],["20, 21, 29","tan θ = 20/21","sin = 20/29"],["9, 40, 41","sin θ = 9/41","cos = 40/41"],["12, 35, 37","cos θ = 35/37","cot = 35/12"],["11, 60, 61","tan θ = 11/60","sin = 11/61"]]},
+ {k:"figs", title:"Draw the triangle from one ratio", items:[
+  {svg:'<svg viewBox="0 0 240 170" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M40 140 H200 L40 20 Z"/><path d="M40 128 H52 V140"/><path d="M174 140 A26 26 0 0 1 179.2 124.4" style="stroke:var(--accent)"/><text x="158" y="135" fill="currentColor" stroke="none" style="fill:var(--accent)">θ</text><text x="24" y="84" fill="currentColor" stroke="none" font-weight="700">3</text><text x="116" y="157" fill="currentColor" stroke="none" font-weight="700">4</text><text x="130" y="72" fill="currentColor" stroke="none" font-weight="700" style="fill:var(--blue)">5</text><text x="28" y="18" fill="currentColor" stroke="none">A</text><text x="26" y="154" fill="currentColor" stroke="none">B</text><text x="204" y="154" fill="currentColor" stroke="none">C</text></svg>', cap:"tan θ = 3/4 → P = 3k, B = 4k, H = 5k. So sin θ = 3/5, cos θ = 4/5."},
+  {svg:'<svg viewBox="0 0 260 120" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M30 90 H234 L30 30.5 Z"/><path d="M30 80 H40 V90"/><path d="M204 90 A30 30 0 0 1 205.2 81.6" style="stroke:var(--accent)"/><text x="16" y="64" fill="currentColor" stroke="none" font-weight="700">7</text><text x="126" y="107" fill="currentColor" stroke="none" font-weight="700">24</text><text x="136" y="50" fill="currentColor" stroke="none" font-weight="700" style="fill:var(--blue)">25</text><text x="16" y="28" fill="currentColor" stroke="none">R</text><text x="16" y="104" fill="currentColor" stroke="none">Q</text><text x="238" y="104" fill="currentColor" stroke="none" style="fill:var(--accent)">P</text></svg>', cap:"7 cot P = 24 → cot P = B/P = 24/7 → H = 25, sin P = 7/25."}]},
+ {k:"ex", src:"SSC CGL 2023 · 27 Jul S3", q:"If 7 cot P = 24, then find sin P.", steps:["cot P = 24/7 = Base/Perpendicular → B = 24, P = 7","H = √(24² + 7²) = √625 = 25 (7-24-25 triplet)","sin P = P/H = 7/25"], ans:"7/25", tip:"Spot the triplet 7-24-25 at once; no need to square."},
+ {k:"ex", src:"SSC CGL Tier-I · 3 Mar 2020 S1", q:"If 6 tan A = 5, then (8 sin A − 4 cos A)/(cos A − 2 sin A) = ?", steps:["Every term has degree 1 in sin/cos, so divide top and bottom by cos A","= (8 tan A − 4)/(1 − 2 tan A), with tan A = 5/6","= (20/3 − 4)/(1 − 5/3) = (8/3)/(−2/3) = −4"], ans:"−4", tip:"Homogeneous expression → divide by cos and put tan. Never find sin and cos separately."},
+ {k:"ex", src:"SSC Selection Post · 9 Nov 2020 S2", q:"If sec θ = 13/5, then (10 tan θ + 24 cosec θ)/(39 sin θ − 10 sec θ) = ?", steps:["sec θ = H/B = 13/5 → B = 5, H = 13, P = 12","tan θ = 12/5, cosec θ = 13/12, sin θ = 12/13","Numerator = 24 + 26 = 50; Denominator = 36 − 26 = 10","Answer = 50/10 = 5"], ans:"5"},
+ {k:"trick", h:"<b>Memory hook:</b> “<b>S</b>ome <b>P</b>eople <b>H</b>ave, <b>C</b>urly <b>B</b>rown <b>H</b>air, <b>T</b>hrough <b>P</b>roper <b>B</b>rushing” → sin = P/H, cos = B/H, tan = P/B. The other three are just upside down.<br><b>Divide trick:</b> if every term of an expression has the same degree in sin and cos (like a sin θ + b cos θ over c sin θ + d cos θ), divide by cos θ (or cos²θ) and use tan θ directly."},
+ {k:"trap", h:"<b>tan θ = 3/4 does not mean the sides are 3 and 4</b> — they are 3k and 4k. Ratios never change, so this does not matter for ratio answers, but it matters if a length is asked.<br><b>sin²θ means (sin θ)²</b>, not sin(θ²). And <b>sin θ cannot exceed 1</b> (P &lt; H); an option like sin θ = 5/4 is impossible."},
+ {k:"link", h:"Once you can read any ratio from one ratio, L3 (identities) lets you do the same <i>without</i> drawing the triangle, and L10 (heights &amp; distances) is nothing but tan θ = height / distance."},
+ {k:"q", q:"If 12 sin θ = 5 cos θ (θ acute), then sin θ + cos θ = ?", o:["17/13","7/13","17/12","13/17"], e:"tan θ = 5/12 → sin = 5/13, cos = 12/13 → 17/13."}
+], sum:["sin = P/H, cos = B/H, tan = P/B; cosec, sec, cot are their reciprocals","Given one ratio → draw the triangle, use a triplet (3-4-5, 5-12-13, 8-15-17, 7-24-25) to get H","Same-degree expression in sin and cos → divide by cos θ and put tan θ","sin θ, cos θ ≤ 1 and sec θ, cosec θ ≥ 1 for every acute θ"]},
+{ id:"L2", heat:3, title:"Standard angle values", hi:"मानक कोणों के मान", blocks:[
+ {k:"hot", h:"<b>Asked in nearly every Tier 1 shift.</b> Either directly (“cosec 30° − cos 60° = ?”) or hidden inside a longer expression with squares of 30°, 45°, 60°. Tier 2 adds 15°, 75°, 18°, 36° and 22.5°. These are pure-memory marks — the table below must be automatic."},
+ {k:"table", title:"The master table", head:["θ","0°","30°","45°","60°","90°"], rows:[["sin θ","0","1/2","1/√2","√3/2","1"],["cos θ","1","√3/2","1/√2","1/2","0"],["tan θ","0","1/√3","1","√3","not defined"],["cot θ","not defined","√3","1","1/√3","0"],["sec θ","1","2/√3","√2","2","not defined"],["cosec θ","not defined","2","√2","2/√3","1"]]},
+ {k:"trick", h:"<b>Square-root method:</b> write 0, 1, 2, 3, 4 under 0°, 30°, 45°, 60°, 90°. Divide by 4 and take the square root: √(0/4), √(1/4), √(2/4), √(3/4), √(4/4) = 0, ½, 1/√2, √3/2, 1 → that is <b>sin</b>. Read the same row backwards → <b>cos</b>. tan = sin ÷ cos, and the last three rows are reciprocals."},
+ {k:"figs", title:"Where the values come from", items:[
+  {svg:'<svg viewBox="0 0 240 170" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M40 140 H199 L40 48 Z"/><path d="M40 128 H52 V140"/><path d="M175 140 A24 24 0 0 1 178.2 128" style="stroke:var(--accent)"/><path d="M40 68 A20 20 0 0 0 57.3 58" style="stroke:var(--blue)"/><text x="146" y="135" fill="currentColor" stroke="none" style="fill:var(--accent)">30°</text><text x="46" y="86" fill="currentColor" stroke="none" style="fill:var(--blue)">60°</text><text x="26" y="98" fill="currentColor" stroke="none" font-weight="700">1</text><text x="110" y="158" fill="currentColor" stroke="none" font-weight="700">√3</text><text x="124" y="84" fill="currentColor" stroke="none" font-weight="700">2</text><text x="28" y="44" fill="currentColor" stroke="none">A</text><text x="26" y="154" fill="currentColor" stroke="none">B</text><text x="203" y="154" fill="currentColor" stroke="none">C</text></svg>', cap:"Half of an equilateral triangle: sides 1 : √3 : 2. sin 30° = 1/2, tan 60° = √3/1."},
+  {svg:'<svg viewBox="0 0 200 170" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M40 140 H160 L40 20 Z"/><path d="M40 128 H52 V140"/><path d="M136 140 A24 24 0 0 1 143 123" style="stroke:var(--accent)"/><text x="108" y="135" fill="currentColor" stroke="none" style="fill:var(--accent)">45°</text><text x="26" y="84" fill="currentColor" stroke="none" font-weight="700">1</text><text x="96" y="158" fill="currentColor" stroke="none" font-weight="700">1</text><text x="106" y="70" fill="currentColor" stroke="none" font-weight="700">√2</text><text x="28" y="18" fill="currentColor" stroke="none">A</text><text x="26" y="154" fill="currentColor" stroke="none">B</text><text x="164" y="154" fill="currentColor" stroke="none">C</text></svg>', cap:"Half of a square: sides 1 : 1 : √2. sin 45° = cos 45° = 1/√2, tan 45° = 1."}]},
+ {k:"table", title:"Tier 2 special angles", head:["Angle","sin","cos","tan"], rows:[["15°","(√3 − 1)/(2√2)","(√3 + 1)/(2√2)","2 − √3"],["75°","(√3 + 1)/(2√2)","(√3 − 1)/(2√2)","2 + √3"],["18°","(√5 − 1)/4","√(10 + 2√5)/4","—"],["36°","√(10 − 2√5)/4","(√5 + 1)/4","—"],["22.5°","√(2 − √2)/2","√(2 + √2)/2","√2 − 1"],["67.5°","√(2 + √2)/2","√(2 − √2)/2","√2 + 1"]]},
+ {k:"formula", title:"Handy results built from the table", rows:[["15° and 75°","tan 15° + tan 75° = 4;  tan 15°·tan 75° = 1","(2 − √3) + (2 + √3)"],["sin 15°·cos 15°","= ¼","= ½ sin 30°"],["18° and 36°","sin 18° = (√5 − 1)/4,  cos 36° = (√5 + 1)/4","cos 36° − sin 18° = ½,  sin 18°·cos 36° = ¼"],["22.5°","tan 22.5° = √2 − 1,  cot 22.5° = √2 + 1","from tan 45° = 2t/(1 − t²)"],["sin 54°","= cos 36° = (√5 + 1)/4","complementary angles (L4)"]]},
+ {k:"ex", src:"SSC CGL 2023 · 25 Jul S3", q:"What is the value of 5√3 cos 60° tan 30° − 3 cos 0° + 3 cos²45° + 2 sin²60°?", steps:["5√3 × ½ × 1/√3 = 5/2","− 3 × 1 = −3","3 × (1/√2)² = 3/2;  2 × (√3/2)² = 3/2","5/2 − 3 + 3/2 + 3/2 = 2.5"], ans:"2.5", tip:"Square first, then multiply: cos²45° = ½, sin²60° = ¾, tan²30° = ⅓, sec²60° = 4."},
+ {k:"ex", src:"SSC CPO 2019 · 13 Mar S1", q:"The value of sin²30°·cos²45° + 2 tan²30° − sec²60° is:", steps:["sin²30° = ¼, cos²45° = ½ → ⅛","2 tan²30° = 2 × ⅓ = ⅔","sec²60° = 4","⅛ + ⅔ − 4 = (3 + 16 − 96)/24 = −77/24"], ans:"−77/24"},
+ {k:"ex", src:"SSC CHSL 2021 · 3 Jun 2022 S3", q:"What is the value of 100(sin 15° cos 15°)?", steps:["sin 15° cos 15° = ½ (2 sin 15° cos 15°) = ½ sin 30°","= ½ × ½ = ¼","100 × ¼ = 25"], ans:"25", tip:"2 sin A cos A = sin 2A (L8) — never expand the surds."},
+ {k:"trap", h:"<b>sin(30° + 60°) ≠ sin 30° + sin 60°.</b> sin 90° = 1, but ½ + √3/2 ≈ 1.37 — impossible for a sine.<br><b>sin²30° = ¼</b>, not ½. <b>tan 90° and sec 90° are not defined</b> (division by cos 90° = 0); an option like “tan 90° = 1” is wrong."},
+ {k:"link", h:"The 15°/75° values come from tan(A − B) and sin(A ± B) in L8; the 22.5° values from the double-angle formula. In L5 these values are used to <i>test</i> options by putting θ = 30°, 45°, 60°."},
+ {k:"q", q:"sin²30° + cos²60° = ?", o:["1/2","1","1/4","3/4"], e:"¼ + ¼ = ½. (sin²θ + cos²θ = 1 only for the SAME angle.)"}
+], sum:["sin: √0/2, √1/2, √2/2, √3/2, √4/2 for 0°, 30°, 45°, 60°, 90°; cos is the same row reversed","Squares to memorise: sin²30 = ¼, sin²45 = ½, sin²60 = ¾, tan²30 = ⅓, tan²60 = 3, sec²60 = 4","tan 15° = 2 − √3, tan 75° = 2 + √3, tan 22.5° = √2 − 1","sin 18° = (√5 − 1)/4, cos 36° = (√5 + 1)/4; tan 90°, sec 90°, cot 0°, cosec 0° are not defined"]},
+{ id:"L3", heat:3, title:"Fundamental identities", hi:"मूल सर्वसमिकाएँ", blocks:[
+ {k:"hot", h:"<b>The single most-asked trigonometry type in CGL.</b> Tier 1: “If sec A + tan A = 3, find cos A” or “simplify (sin⁴θ + cos⁴θ)/(1 − 2 sin²θ cos²θ)”. Tier 2: the same with a variable (sec θ + tan θ = p) or higher powers (sin⁶ + cos⁶). Every one of them is one of the three identities below in disguise."},
+ {k:"formula", title:"The three Pythagorean identities", rows:[["Identity 1","sin²θ + cos²θ = 1","sin²θ = 1 − cos²θ = (1 − cos θ)(1 + cos θ)"],["Identity 2","sec²θ − tan²θ = 1","(sec θ − tan θ)(sec θ + tan θ) = 1"],["Identity 3","cosec²θ − cot²θ = 1","(cosec θ − cot θ)(cosec θ + cot θ) = 1"],["Why","divide P² + B² = H² by H², B² or P²","one triangle gives all three"]]},
+ {k:"figs", title:"Each identity is Pythagoras on a scaled triangle", items:[
+  {svg:'<svg viewBox="0 0 230 165" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M40 140 H200 L40 40 Z"/><path d="M40 128 H52 V140"/><path d="M174 140 A26 26 0 0 1 178 126.2" style="stroke:var(--accent)"/><text x="158" y="135" fill="currentColor" stroke="none" style="fill:var(--accent)">θ</text><text x="34" y="94" text-anchor="end" fill="currentColor" stroke="none" font-weight="700">sin θ</text><text x="120" y="158" text-anchor="middle" fill="currentColor" stroke="none" font-weight="700">cos θ</text><text x="104" y="64" fill="currentColor" stroke="none" font-weight="700" style="fill:var(--blue)">1</text></svg>', cap:"Hypotenuse 1 → sides sin θ and cos θ → sin²θ + cos²θ = 1."},
+  {svg:'<svg viewBox="0 0 230 165" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M40 140 H200 L40 40 Z"/><path d="M40 128 H52 V140"/><path d="M174 140 A26 26 0 0 1 178 126.2" style="stroke:var(--accent)"/><text x="158" y="135" fill="currentColor" stroke="none" style="fill:var(--accent)">θ</text><text x="34" y="94" text-anchor="end" fill="currentColor" stroke="none" font-weight="700">tan θ</text><text x="120" y="158" text-anchor="middle" fill="currentColor" stroke="none" font-weight="700">1</text><text x="104" y="64" fill="currentColor" stroke="none" font-weight="700" style="fill:var(--blue)">sec θ</text></svg>', cap:"Base 1 → sides tan θ and sec θ → 1 + tan²θ = sec²θ."}]},
+ {k:"formula", title:"Pair results (the CGL favourites)", rows:[["sec θ + tan θ = x","sec θ − tan θ = 1/x","sec θ = (x² + 1)/(2x),  tan θ = (x² − 1)/(2x),  sin θ = (x² − 1)/(x² + 1)"],["cosec θ + cot θ = y","cosec θ − cot θ = 1/y","cosec θ = (y² + 1)/(2y),  cot θ = (y² − 1)/(2y),  cos θ = (y² − 1)/(y² + 1)"],["sin θ + cos θ = x","sin θ·cos θ = (x² − 1)/2","because (sin θ + cos θ)² = 1 + 2 sin θ cos θ"],["sin θ − cos θ = x","sin θ·cos θ = (1 − x²)/2","(sin θ + cos θ)² + (sin θ − cos θ)² = 2"],["tan θ + cot θ = x","= 1/(sin θ cos θ) = sec θ·cosec θ","tan²θ + cot²θ = x² − 2"]]},
+ {k:"formula", title:"Higher powers & standard simplifications", rows:[["sin⁴θ + cos⁴θ","= 1 − 2 sin²θ cos²θ","(a² + b²) = (a + b)² − 2ab with a + b = 1"],["sin⁶θ + cos⁶θ","= 1 − 3 sin²θ cos²θ","(a³ + b³) = (a + b)³ − 3ab(a + b)"],["sin⁴θ − cos⁴θ","= sin²θ − cos²θ","(a² − b²) = (a − b)(a + b), a + b = 1"],["tan²θ − sin²θ","= tan²θ·sin²θ","same for cot²θ − cos²θ = cot²θ·cos²θ"],["(1 + sin θ)/(1 − sin θ)","= (sec θ + tan θ)²","multiply top and bottom by (1 + sin θ)"],["cos θ/(1 − sin θ) + cos θ/(1 + sin θ)","= 2 sec θ","common denominator 1 − sin²θ = cos²θ"]]},
+ {k:"ex", src:"SSC CGL 2023 · 21 Jul S1", q:"If sec A + tan A = 3, then cos A is equal to:", steps:["(sec A + tan A)(sec A − tan A) = 1 → sec A − tan A = 1/3","Add: 2 sec A = 3 + 1/3 = 10/3 → sec A = 5/3","cos A = 3/5"], ans:"3/5", tip:"Direct formula: sec A = (x² + 1)/(2x) = 10/6 = 5/3."},
+ {k:"ex", src:"SSC CGL 2023 · 24 Jul S4", q:"Simplify (1 + sin⁴θ + cos⁴θ)/(cos²θ + sin⁴θ).", steps:["Numerator: 1 + (1 − 2 sin²θ cos²θ) = 2(1 − sin²θ cos²θ)","Denominator: cos²θ + sin²θ(1 − cos²θ) = cos²θ + sin²θ − sin²θ cos²θ = 1 − sin²θ cos²θ","Ratio = 2"], ans:"2", tip:"Answer is a constant → just put θ = 90°: (1 + 1 + 0)/(0 + 1) = 2."},
+ {k:"ex", src:"SSC CGL Tier 2 · 13 Sep 2019", q:"If sec θ + tan θ = p (p > 1), then (cosec θ + 1)/(cosec θ − 1) = ?", steps:["Divide top and bottom by cosec θ: (1 + sin θ)/(1 − sin θ)","Multiply by (1 + sin θ)/(1 + sin θ): (1 + sin θ)²/cos²θ","= ((1 + sin θ)/cos θ)² = (sec θ + tan θ)² = p²"], ans:"p²"},
+ {k:"trick", h:"<b>If the answer is a number (no θ in the options), put a convenient angle.</b> θ = 90° or 0° kills half the terms; θ = 45° makes sin = cos. Check with a second angle if two options survive.<br><b>sec + tan = x → sec − tan = 1/x</b>: “sum × difference = 1” is the fastest step in the whole chapter."},
+ {k:"trap", h:"sec θ + tan θ = x gives sec θ − tan θ = <b>1/x</b>, not −x or x − 1.<br>sin θ + cos θ = x gives sin θ cos θ = <b>(x² − 1)/2</b> — students forget the ÷2.<br>sin²θ + cos²θ = 1 needs the <b>same angle</b>: sin²30° + cos²60° = ½, not 1."},
+ {k:"link", h:"Identity 2 and 3 return in L6 (minimum of a tan²θ + b cot²θ) and in L4 when complementary angles turn sec into cosec. sin θ + cos θ = x ties to L8: (sin θ + cos θ)² = 1 + sin 2θ."},
+ {k:"q", q:"If cosec θ − cot θ = 1/3, then cosec θ + cot θ = ?", o:["3","1/3","−3","9"], e:"Product of the pair is 1 → 1 ÷ (1/3) = 3."}
+], sum:["sin² + cos² = 1, sec² − tan² = 1, cosec² − cot² = 1 (all from Pythagoras)","sec θ + tan θ = x ⇒ sec θ − tan θ = 1/x; same for cosec θ + cot θ","sin θ + cos θ = x ⇒ sin θ cos θ = (x² − 1)/2","sin⁴ + cos⁴ = 1 − 2s²c², sin⁶ + cos⁶ = 1 − 3s²c², sin⁴ − cos⁴ = sin² − cos²","Constant answer → put θ = 0°, 45° or 90°"]},
+{ id:"L4", heat:2, title:"Complementary angles & products", hi:"पूरक कोण और गुणनफल", blocks:[
+ {k:"hot", h:"<b>About one question every 2–3 Tier 1 shifts, and a regular in Tier 2.</b> Typical forms: “cot 13° cot 27° cot 60° cot 63° cot 77° = ?”, “if sin 3A = cos(30° − A) find A”, or a long fraction where every angle pairs up to 90°. If the angles look ugly (38°, 52°, 67°), the question is from this lesson."},
+ {k:"fig", title:"Why sin of one acute angle = cos of the other", svg:'<svg viewBox="0 0 290 190" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M40 160 H240 L40 40 Z"/><path d="M40 148 H52 V160"/><path d="M210 160 A30 30 0 0 1 214.3 144.6" style="stroke:var(--accent)"/><text x="196" y="155" fill="currentColor" stroke="none" style="fill:var(--accent)">θ</text><path d="M40 64 A24 24 0 0 0 60.6 52.3" style="stroke:var(--blue)"/><text x="46" y="84" fill="currentColor" stroke="none" style="fill:var(--blue)">90° − θ</text><text x="28" y="38" fill="currentColor" stroke="none">A</text><text x="26" y="174" fill="currentColor" stroke="none">B</text><text x="244" y="174" fill="currentColor" stroke="none">C</text><text x="18" y="108" fill="currentColor" stroke="none" font-weight="700">a</text><text x="136" y="176" fill="currentColor" stroke="none" font-weight="700">b</text><text x="146" y="92" fill="currentColor" stroke="none" font-weight="700">c</text><text x="112" y="24" fill="currentColor" stroke="none">sin θ = a/c = cos(90° − θ)</text><text x="112" y="40" fill="currentColor" stroke="none">tan θ = a/b = cot(90° − θ)</text></svg>', cap:"The two acute angles of a right triangle add to 90°. The side opposite θ is adjacent to (90° − θ), so the ratios swap."},
+ {k:"formula", title:"Complement rule: change the angle, add/remove “co”", rows:[["sin ↔ cos","sin(90° − θ) = cos θ,  cos(90° − θ) = sin θ","e.g. sin 27° = cos 63°"],["tan ↔ cot","tan(90° − θ) = cot θ,  cot(90° − θ) = tan θ","e.g. tan 23° = cot 67°"],["sec ↔ cosec","sec(90° − θ) = cosec θ,  cosec(90° − θ) = sec θ","e.g. sec 52° = cosec 38°"]]},
+ {k:"formula", title:"If A + B = 90° (both acute)", rows:[["Equal ratios","sin A = cos B,  tan A = cot B,  sec A = cosec B","and the reverse: sin A = cos B ⇒ A + B = 90°"],["Products = 1","tan A·tan B = 1,  sin A·sec B = 1,  cos A·cosec B = 1","cot A·cot B = 1"],["Squares","sin²A + sin²B = 1,  cos²A + cos²B = 1","sec²A − cot²B = 1"],["Equation type","sin xA = cos yA ⇒ xA + yA = 90°","also tan 2A = cot(A − 18°) ⇒ 3A − 18° = 90°"]]},
+ {k:"formula", title:"Long products and sums", rows:[["tan 1°·tan 2°·…·tan 89°","= 1","pairs (1°, 89°)… multiply to 1, middle tan 45° = 1"],["cos 1°·cos 2°·…·cos 100°","= 0","contains cos 90° = 0"],["sin²1° + sin²2° + … + sin²89°","= 44½ = 89/2","44 pairs (= 1 each) + sin²45° = ½"],["sin²5° + sin²10° + … + sin²85°","= 8½","8 pairs + sin²45°; add sin²90° = 1 if the series runs to 90°"],["Rule for n terms","sum of sin² over angles symmetric about 45° = n/2","n terms, each pair = 1"]]},
+ {k:"ex", src:"SSC CHSL 2023 · 2 Aug S2", q:"The value of cot 13° cot 27° cot 60° cot 63° cot 77° is:", steps:["13° + 77° = 90° → cot 13°·cot 77° = cot 13°·tan 13° = 1","27° + 63° = 90° → cot 27°·cot 63° = 1","Left: cot 60° = 1/√3"], ans:"1/√3", tip:"Pair first, then the leftover standard angle is the answer."},
+ {k:"ex", src:"SSC CGL Tier 2 · 15 Nov 2020", q:"If sin 3A = cos(30° − A), A acute, then 2 cosec A + tan²2A − cot²A = ?", steps:["sin 3A = cos(30° − A) ⇒ 3A + 30° − A = 90° ⇒ A = 30°","2 cosec 30° = 4, tan²60° = 3, cot²30° = 3","4 + 3 − 3 = 4"], ans:"4"},
+ {k:"ex", src:"SSC CGL Tier 2 · 15 Nov 2020", q:"(2 sin²38° sec²52° + cos 64° sin 26° + sin²64°)/(tan²23° + cot²23° − sec²67° − cosec²67°) = ?", steps:["sec 52° = cosec 38° → 2 sin²38°·cosec²38° = 2","sin 26° = cos 64° → cos²64° + sin²64° = 1 → numerator = 3","sec 67° = cosec 23°, cosec 67° = sec 23° → (tan²23° − sec²23°) + (cot²23° − cosec²23°) = −1 − 1 = −2","3/(−2) = −3/2"], ans:"−3/2", tip:"Convert every angle above 45° into its complement below 45°; then identities finish it."},
+ {k:"trick", h:"<b>Scan for pairs that add to 90°</b> before doing anything else (13 + 77, 27 + 63, 38 + 52, 23 + 67). Write the bigger angle as 90° − (smaller) and switch sin↔cos, tan↔cot, sec↔cosec.<br><b>Equation trick:</b> sin(…) = cos(…) or tan(…) = cot(…) with acute angles → the two angles add to 90°."},
+ {k:"trap", h:"<b>sin²1° + … + sin²89° is 44½, not 45</b> — the middle term sin²45° is only ½. Count the terms: 89 terms = 44 pairs + 1.<br>A product that includes <b>cos 90°</b> (or tan 0°, sin 0°) is 0; one including <b>tan 90°</b> is undefined — read the range of angles carefully."},
+ {k:"link", h:"This is the 90° case of allied angles (L7): sin(90° + θ) = cos θ too, but with sign rules. In triangles (L9), B + C = 90° when A = 90°, so the same rules apply."},
+ {k:"q", q:"sin(90° − θ)·sec θ = ?", o:["1","cos²θ","tan θ","0"], e:"sin(90° − θ) = cos θ, and cos θ·sec θ = 1."}
+], sum:["sin(90° − θ) = cos θ, tan(90° − θ) = cot θ, sec(90° − θ) = cosec θ (and vice versa)","A + B = 90° ⇒ tan A tan B = 1, sin²A + sin²B = 1, sin A sec B = 1","sin xA = cos yA (acute) ⇒ xA + yA = 90°","tan 1°…tan 89° = 1; sin²1° + … + sin²89° = 44½; product with cos 90° = 0"]},
+{ id:"L5", heat:3, title:"Simplification & value putting", hi:"सरलीकरण और मान रखना", blocks:[
+ {k:"hot", h:"<b>1 question in most Tier 1 shifts, 2–3 in Tier 2.</b> “1/(cosec θ − cot θ) − 1/sin θ is equal to?” or “(2 cos³θ − cos θ)/(sin θ − 2 sin³θ) = ?”. The options are ratios like tan θ, cot θ, sec θ — perfect for <b>value putting</b>, which solves most of them in under 30 seconds."},
+ {k:"p", h:"An identity is true for <b>every</b> angle. So if the question says “A is equal to which option”, put any convenient angle into the question and into each option — only the correct option matches. Choose an angle where all terms are defined and the options give <b>different</b> numbers."},
+ {k:"fig", title:"Which angle to put", svg:'<svg viewBox="0 0 320 200" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="10"><defs><marker id="trgAh" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L6 3 L0 6 z" stroke="none" style="fill:currentColor"/></marker></defs><rect x="96" y="6" width="128" height="30" rx="6" style="fill:var(--accent-bg)"/><text x="160" y="25" text-anchor="middle" fill="currentColor" stroke="none" font-weight="700">Look at the options</text><path d="M140 36 L60 78" marker-end="url(#trgAh)"/><path d="M160 36 V78" marker-end="url(#trgAh)"/><path d="M180 36 L260 78" marker-end="url(#trgAh)"/><rect x="4" y="80" width="100" height="46" rx="6"/><text x="54" y="99" text-anchor="middle" fill="currentColor" stroke="none" font-weight="700">Only numbers</text><text x="54" y="115" text-anchor="middle" fill="currentColor" stroke="none">put 0°, 45°, 90°</text><rect x="110" y="80" width="100" height="46" rx="6"/><text x="160" y="99" text-anchor="middle" fill="currentColor" stroke="none" font-weight="700">Ratios of θ</text><text x="160" y="115" text-anchor="middle" fill="currentColor" stroke="none">put 30° or 60°</text><rect x="216" y="80" width="100" height="46" rx="6"/><text x="266" y="99" text-anchor="middle" fill="currentColor" stroke="none" font-weight="700">Condition given</text><text x="266" y="115" text-anchor="middle" fill="currentColor" stroke="none">find θ first</text><path d="M54 126 L118 162" marker-end="url(#trgAh)"/><path d="M160 126 V162" marker-end="url(#trgAh)"/><path d="M266 126 L202 162" marker-end="url(#trgAh)"/><rect x="56" y="164" width="208" height="30" rx="6" style="stroke:var(--blue)"/><text x="160" y="183" text-anchor="middle" fill="currentColor" stroke="none">Two options tie? Try a 2nd angle</text></svg>', cap:"45° is the worst choice when options mix tan/cot or sin/cos — they become equal there."},
+ {k:"formula", title:"Algebra moves that finish most simplifications", rows:[["Convert","write everything in sin and cos","tan = s/c, sec = 1/c, cosec = 1/s"],["Conjugate","(1 − sin θ)(1 + sin θ) = cos²θ","also (sec − tan)(sec + tan) = 1"],["Rationalise","1/(cosec θ − cot θ) = cosec θ + cot θ","multiply by the conjugate"],["Factor","2 cos³θ − cos θ = cos θ(2 cos²θ − 1)","and sin θ − 2 sin³θ = sin θ(1 − 2 sin²θ) = sin θ(2 cos²θ − 1)"],["a² − b²","sec⁴θ − tan⁴θ = sec²θ + tan²θ","because sec²θ − tan²θ = 1"],["Common results","(sec θ − cos θ)(cosec θ − sin θ)(tan θ + cot θ) = 1","√(sec²θ + cosec²θ) = tan θ + cot θ"]]},
+ {k:"table", title:"Test values at 30° and 60° (to separate options)", head:["θ","sin","cos","tan","cot","sec","cosec"], rows:[["30°","1/2","√3/2","1/√3","√3","2/√3","2"],["60°","√3/2","1/2","√3","1/√3","2","2/√3"]]},
+ {k:"ex", src:"SSC CGL 2024 · 23 Sep S2", q:"The value of 1/(cosec θ − cot θ) − 1/sin θ is equal to:", steps:["Algebra: 1/(cosec θ − cot θ) = cosec θ + cot θ (product of the pair = 1)","So the expression = cosec θ + cot θ − cosec θ = cot θ","Check by θ = 60°: 1/(2/√3 − 1/√3) − 2/√3 = √3 − 2/√3 = 1/√3 = cot 60° ✓"], ans:"cot θ", tip:"At θ = 60° the options tan, cosec, cot, sec are √3, 2/√3, 1/√3, 2 — all different, so one put is enough."},
+ {k:"ex", src:"SSC CGL 2024 · 10 Sep S2", q:"If cot θ = 4/3, then evaluate: sec θ(1 + cot²θ)(cosec²θ − cot²θ)/cosec³θ.", steps:["1 + cot²θ = cosec²θ and cosec²θ − cot²θ = 1","Expression = sec θ·cosec²θ·1/cosec³θ = sec θ/cosec θ = tan θ","tan θ = 3/4"], ans:"3/4", tip:"Simplify first, substitute last."},
+ {k:"ex", src:"SSC CGL 2024 · 13 Sep S2", q:"If tan x/sec x = 1/2 (x acute), then (sin x + cos x)² = ?", steps:["tan x/sec x = (sin x/cos x)·cos x = sin x = 1/2 → x = 30°","(1/2 + √3/2)² = (1 + √3)²/4 = (4 + 2√3)/4","= (2 + √3)/2"], ans:"(2 + √3)/2"},
+ {k:"trick", h:"<b>Value putting checklist:</b> (1) Options are numbers → put θ = 0°, 45° or 90° (whichever keeps every term defined). (2) Options are tan/cot/sec… → put θ = 30° or 60°, never 45°. (3) A condition fixes θ (sin θ + cos θ = √2 ⇒ θ = 45°) → use that θ. (4) Two options still equal → test them at a second angle."},
+ {k:"trap", h:"<b>When value putting fails:</b> at θ = 45°, tan θ = cot θ = 1 and sin θ = cos θ, so several options tie; at 0° or 90°, tan, sec, cot or cosec may be undefined; and when the question has a variable condition (sec θ + tan θ = p), you must use algebra. Also, a constant answer at one angle is not proof unless the options are constants."},
+ {k:"link", h:"Value putting also kills Tier 2 questions from L8 (compound angles) and L9 (A + B + C = 180°: put A = B = C = 60°, or A = 90°, B = C = 45°)."},
+ {k:"q", q:"(1 + tan²θ)/(1 + cot²θ) = ?", o:["tan²θ","cot²θ","1","sec²θ"], e:"sec²θ/cosec²θ = tan²θ. Note: θ = 45° gives 1 for three options — θ = 60° gives 4/(4/3) = 3 = tan²60° only."}
+], sum:["Identity questions: put a convenient angle into the question and the options","Number options → θ = 0°, 45°, 90°; ratio options → θ = 30° or 60° (avoid 45°)","Algebra moves: convert to sin/cos, use conjugates, factor a² − b²","1/(cosec θ − cot θ) = cosec θ + cot θ; (1 − sin θ)(1 + sin θ) = cos²θ","Value putting fails with variable conditions or when options tie — then simplify"]},
+{ id:"L6", heat:2, title:"Maximum & minimum values", hi:"अधिकतम और न्यूनतम मान", blocks:[
+ {k:"hot", h:"<b>About one question every 2–3 Tier 1 shifts; more common in Tier 2.</b> Forms: “maximum value of 5 sin θ + 12 cos θ”, “minimum value of 9 tan²θ + 4 cot²θ”, “greatest value of sin¹²θ + cos²⁰θ”. Each is a one-line formula — the only danger is a trap where the formula’s value cannot actually be reached."},
+ {k:"p", h:"sin θ and cos θ always stay between −1 and 1, so every expression built from them has a <b>range</b>. Three tools find it: (1) combine a sin θ + b cos θ into one sine of size √(a² + b²); (2) use sin²θ + cos²θ = 1 to turn a sin²θ + b cos²θ into a + (b − a)cos²θ; (3) use AM ≥ GM when a product of two terms is constant (tan θ·cot θ = 1)."},
+ {k:"formula", title:"Range formulas", rows:[["a sin θ + b cos θ","from −√(a² + b²) to +√(a² + b²)","5 sin θ + 12 cos θ: −13 to 13"],["a sin θ ± b cos θ + c","from c − √(a² + b²) to c + √(a² + b²)","the constant just shifts the range"],["a sin²θ + b cos²θ","between a and b","= a + (b − a)cos²θ, and 0 ≤ cos²θ ≤ 1"],["a tan²θ + b cot²θ","minimum 2√(ab)","AM ≥ GM, product ab is constant; no maximum"],["a sec²θ + b cosec²θ","minimum (√a + √b)²","= (a + b) + a tan²θ + b cot²θ ≥ a + b + 2√(ab)"],["sin θ·cos θ","maximum ½, minimum −½","= ½ sin 2θ"],["sin θ + cos θ","maximum √2 (at 45°)","a = b = 1 → √(1 + 1)"],["sin⁴θ + cos⁴θ","from ½ to 1","= 1 − 2 sin²θ cos²θ = 1 − ½ sin²2θ"]]},
+ {k:"figs", title:"Why √(a² + b²)", items:[
+  {svg:'<svg viewBox="0 0 280 180" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M40 150 H220 V60 Z"/><path d="M208 150 V138 H220"/><path d="M70 150 A30 30 0 0 0 66.8 136.6" style="stroke:var(--accent)"/><text x="76" y="146" fill="currentColor" stroke="none" style="fill:var(--accent)">α</text><text x="130" y="168" text-anchor="middle" fill="currentColor" stroke="none" font-weight="700">a</text><text x="228" y="110" fill="currentColor" stroke="none" font-weight="700">b</text><text x="96" y="92" text-anchor="middle" fill="currentColor" stroke="none" font-weight="700" style="fill:var(--blue)">R = √(a² + b²)</text><text x="140" y="26" text-anchor="middle" fill="currentColor" stroke="none">cos α = a/R, sin α = b/R</text><text x="140" y="44" text-anchor="middle" fill="currentColor" stroke="none">a sin θ + b cos θ = R sin(θ + α)</text></svg>', cap:"Take out R = √(a² + b²): the bracket becomes sin θ cos α + cos θ sin α = sin(θ + α), which lies between −1 and 1."},
+  {svg:'<svg viewBox="0 0 280 180" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M40 40 H240 M40 140 H240" stroke-dasharray="4 3" style="stroke:var(--blue)"/><path d="M40 90 H240" stroke-width="1"/><path d="M40 90 Q65 -10 90 90 T140 90 T190 90 T240 90" style="stroke:var(--accent)"/><text x="244" y="44" fill="currentColor" stroke="none">+R</text><text x="244" y="144" fill="currentColor" stroke="none">−R</text><text x="244" y="94" fill="currentColor" stroke="none">0</text><text x="140" y="170" text-anchor="middle" fill="currentColor" stroke="none">θ →</text><text x="140" y="24" text-anchor="middle" fill="currentColor" stroke="none">R sin(θ + α) swings between ±R</text></svg>', cap:"The combined wave never goes above +R or below −R, so max = √(a² + b²), min = −√(a² + b²)."}]},
+ {k:"ex", src:"SSC CGL 2023 · 20 Jul S3", q:"The maximum value of (sin¹²θ + cos²⁰θ) for all real values of θ is:", steps:["0 ≤ sin²θ ≤ 1, so higher powers are never larger: sin¹²θ ≤ sin²θ and cos²⁰θ ≤ cos²θ","So sin¹²θ + cos²⁰θ ≤ sin²θ + cos²θ = 1","At θ = 0°: 0 + 1 = 1 → the bound is reached"], ans:"1", tip:"Put θ = 0° and θ = 90° — both give 1; any angle in between gives less."},
+ {k:"ex", q:"Find the maximum value of 3 sin θ + 4 cos θ + 7.", steps:["√(3² + 4²) = 5","3 sin θ + 4 cos θ lies between −5 and 5","Maximum = 7 + 5 = 12 (minimum 7 − 5 = 2)"], ans:"12", tip:"Constant stays; add/subtract √(a² + b²)."},
+ {k:"ex", q:"Find the minimum value of 9 tan²θ + 4 cot²θ.", steps:["AM ≥ GM: 9 tan²θ + 4 cot²θ ≥ 2√(9 tan²θ·4 cot²θ)","tan²θ·cot²θ = 1 → 2√36 = 12","Reached when 9 tan²θ = 4 cot²θ, i.e. tan²θ = 2/3 — possible"], ans:"12", tip:"2√(ab) — multiply the coefficients, root, double."},
+ {k:"trick", h:"<b>Three one-liners:</b> a sin + b cos → <b>±√(a² + b²)</b>; a sin² + b cos² → <b>between a and b</b>; a tan² + b cot² → <b>≥ 2√(ab)</b>.<br>Triplets save time: (3, 4) → 5, (5, 12) → 13, (8, 15) → 17, (7, 24) → 25."},
+ {k:"trap", h:"<b>AM ≥ GM needs the equality case to be possible.</b> 2 cos²θ + 8 sec²θ ≥ 2√16 = 8 would need cos⁴θ = 4 — impossible. Since 8 &gt; 2, the true minimum is at cos²θ = 1: 2 + 8 = <b>10</b>. Rule: a cos²θ + b sec²θ has minimum 2√(ab) only when b ≤ a, else a + b.<br>Same idea: sin²θ + cos²θ + tan²θ + cot²θ + sec²θ + cosec²θ is <b>7</b> (1 + 2 + 4), not 6 from a blind AM-GM on six terms.<br>Max of sin θ cos θ is <b>½</b>, not 1."},
+ {k:"link", h:"sin θ cos θ = ½ sin 2θ and R sin(θ + α) both come from L8 (compound and double angles). L3’s identities (sec² = 1 + tan²) turn a sec² + b cosec² into the tan² + cot² form."},
+ {k:"q", q:"The maximum value of 8 sin θ + 15 cos θ is:", o:["17","23","7","15"], e:"√(64 + 225) = √289 = 17. (23 adds the coefficients.)"}
+], sum:["a sin θ + b cos θ (+ c): c ± √(a² + b²)","a sin²θ + b cos²θ lies between a and b","a tan²θ + b cot²θ ≥ 2√(ab); a sec²θ + b cosec²θ ≥ (√a + √b)²","sin θ cos θ ≤ ½, sin θ + cos θ ≤ √2, sin⁴θ + cos⁴θ ≥ ½","AM–GM minimum must be reachable — check a cos²θ + b sec²θ when b > a"]},
+{ id:"L7", heat:2, title:"Allied angles & quadrants", hi:"संबद्ध कोण और चतुर्थांश", blocks:[
+ {k:"hot", h:"<b>Tier 1: an occasional direct value</b> (“cos 120° = ?”, “sin 330° = ?”). <b>Tier 2 and long expressions:</b> angles like 150°, 225°, 300°, 420° or negative angles hidden inside a sum. Every such angle reduces to 0°–90° in two steps: pick the rule, then fix the sign."},
+ {k:"p", h:"An angle beyond 90° is measured from the positive x-axis, anti-clockwise. Its ratios equal the ratios of its <b>reference angle</b> (the acute angle it makes with the x-axis) — only the <b>sign</b> changes, and the sign depends on the quadrant where the angle ends."},
+ {k:"figs", title:"Signs in the four quadrants", items:[
+  {svg:'<svg viewBox="0 0 280 220" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M20 110 H260 M140 10 V210"/><rect x="152" y="22" width="96" height="72" rx="6" style="fill:var(--accent-bg)"/><text x="200" y="52" text-anchor="middle" fill="currentColor" stroke="none" font-weight="700">I: All +</text><text x="200" y="70" text-anchor="middle" fill="currentColor" stroke="none">0° to 90°</text><text x="80" y="52" text-anchor="middle" fill="currentColor" stroke="none" font-weight="700" style="fill:var(--accent)">II: sin, cosec +</text><text x="80" y="70" text-anchor="middle" fill="currentColor" stroke="none">90° to 180°</text><text x="80" y="152" text-anchor="middle" fill="currentColor" stroke="none" font-weight="700" style="fill:var(--accent)">III: tan, cot +</text><text x="80" y="170" text-anchor="middle" fill="currentColor" stroke="none">180° to 270°</text><text x="200" y="152" text-anchor="middle" fill="currentColor" stroke="none" font-weight="700" style="fill:var(--accent)">IV: cos, sec +</text><text x="200" y="170" text-anchor="middle" fill="currentColor" stroke="none">270° to 360°</text><text x="262" y="104" text-anchor="end" fill="currentColor" stroke="none">0°</text><text x="146" y="20" fill="currentColor" stroke="none">90°</text><text x="22" y="104" fill="currentColor" stroke="none">180°</text><text x="146" y="206" fill="currentColor" stroke="none">270°</text></svg>', cap:"ASTC — “Add Sugar To Coffee”: All, Sin, Tan, Cos are positive in quadrants I, II, III, IV (with their reciprocals)."},
+  {svg:'<svg viewBox="0 0 280 200" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M20 130 H260 M140 20 V190" stroke-width="1"/><circle cx="140" cy="130" r="70" stroke-dasharray="4 3"/><path d="M140 130 L79.4 95" style="stroke:var(--accent)"/><path d="M79.4 95 V130" stroke-dasharray="4 3"/><path d="M154 130 A14 14 0 0 0 127.9 123" style="stroke:var(--blue)"/><text x="150" y="116" fill="currentColor" stroke="none" style="fill:var(--blue)">150°</text><path d="M118 130 A22 22 0 0 1 120.9 119" style="stroke:var(--accent)"/><text x="92" y="126" fill="currentColor" stroke="none" style="fill:var(--accent)">30°</text><circle cx="79.4" cy="95" r="2.5" style="fill:var(--accent)" stroke="none"/><text x="74" y="86" text-anchor="end" fill="currentColor" stroke="none">P(−√3/2, ½)</text><text x="144" y="144" fill="currentColor" stroke="none">O</text></svg>', cap:"150° = 180° − 30°. P is (cos 150°, sin 150°) = (−√3/2, ½): sin stays +½ in quadrant II, cos becomes negative."}]},
+ {k:"formula", title:"Reduction rule in two steps", rows:[["Step 1 — function","90° ± θ or 270° ± θ → change: sin↔cos, tan↔cot, sec↔cosec","180° ± θ or 360° ± θ → keep the same function"],["Step 2 — sign","sign of the ORIGINAL ratio in the quadrant where the angle lies","treat θ as acute for this"],["Negative angle","sin(−θ) = −sin θ,  cos(−θ) = cos θ,  tan(−θ) = −tan θ","only cos and sec are even"],["Beyond 360°","remove full turns: sin 420° = sin 60°","ratios repeat every 360° (tan every 180°)"]]},
+ {k:"table", title:"The standard reductions", head:["Angle","sin","cos","tan"], rows:[["90° − θ","cos θ","sin θ","cot θ"],["90° + θ","cos θ","−sin θ","−cot θ"],["180° − θ","sin θ","−cos θ","−tan θ"],["180° + θ","−sin θ","−cos θ","tan θ"],["270° − θ","−cos θ","−sin θ","cot θ"],["270° + θ","−cos θ","sin θ","−cot θ"],["360° − θ (= −θ)","−sin θ","cos θ","−tan θ"]]},
+ {k:"table", title:"Values to know beyond 90°", head:["θ","sin","cos","tan"], rows:[["120°","√3/2","−1/2","−√3"],["135°","1/√2","−1/√2","−1"],["150°","1/2","−√3/2","−1/√3"],["210°","−1/2","−√3/2","1/√3"],["225°","−1/√2","−1/√2","1"],["240°","−√3/2","−1/2","√3"],["300°","−√3/2","1/2","−√3"],["315°","−1/√2","1/√2","−1"],["330°","−1/2","√3/2","−1/√3"]]},
+ {k:"ex", src:"SSC CGL 2023 · 18 Jul S4", q:"Find the exact value of cos 120°.", steps:["120° = 180° − 60° → same function, cos","120° is in quadrant II, where cos is negative","cos 120° = −cos 60° = −½ = −0.5"], ans:"−0.5", tip:"Or 90° + 30° → cos changes to sin: −sin 30° = −½. Both routes agree."},
+ {k:"ex", src:"SSC CHSL 2017 · 22 Jan (morning)", q:"What is the value of sin 330°?", steps:["330° = 360° − 30° → keep sin","Quadrant IV: sin is negative","sin 330° = −sin 30° = −½"], ans:"−1/2"},
+ {k:"ex", q:"Evaluate sin 420°·cos 390° + cos(−300°)·sin(−330°).", steps:["sin 420° = sin 60°, cos 390° = cos 30°","cos(−300°) = cos 300° = cos 60°;  sin(−330°) = −sin 330° = sin 30°","= sin 60° cos 30° + cos 60° sin 30° = ¾ + ¼ = 1"], ans:"1", tip:"It is sin(60° + 30°) = sin 90° (L8)."},
+ {k:"trick", h:"<b>“Add Sugar To Coffee”</b> for signs (I All, II Sin, III Tan, IV Cos).<br><b>Vertical axis (90°, 270°) → change the function; horizontal axis (180°, 360°) → keep it.</b> Nod your head up-down at 90°/270° (“yes, change”), side-to-side at 180°/360° (“no change”)."},
+ {k:"trap", h:"<b>Take the sign from the ORIGINAL ratio</b>, not the new one: cos(90° + θ) is in quadrant II where cos is negative → <b>−sin θ</b> (not +sin θ).<br><b>tan(180° + θ) = +tan θ</b> (quadrant III, tan positive) — students often write −tan θ.<br><b>cos(−θ) = cos θ</b>, but sin(−θ) = −sin θ."},
+ {k:"link", h:"L4’s complementary rule is the 90° − θ row of this table. In triangles (L9), A + B = 180° − C gives sin(A + B) = sin C and cos(A + B) = −cos C — the 180° − θ row."},
+ {k:"q", q:"tan 135° = ?", o:["−1","1","0","√3"], e:"135° = 180° − 45°, quadrant II (tan negative) → −tan 45° = −1."}
+], sum:["ASTC: All, Sin, Tan, Cos positive in quadrants I–IV","90°/270° ± θ → change function; 180°/360° ± θ → same function","Sign = sign of the original ratio in that quadrant (θ acute)","sin(−θ) = −sin θ, cos(−θ) = cos θ, tan(−θ) = −tan θ; remove 360° turns first","cos 120° = −½, sin 150° = ½, tan 135° = −1, sin 330° = −½"]},
+{ id:"L8", heat:2, title:"Compound & multiple angles", hi:"संयुक्त और बहुगुण कोण", blocks:[
+ {k:"hot", h:"<b>Mainly Tier 2</b> (1–2 questions), occasionally Tier 1. Forms: “A + B = 45°, find (1 + tan A)(1 + tan B)”, “3 sin x + 4 cos x = 2, find 3 cos x − 4 sin x”, “find cos 2θ if tan θ = 3/4”, or a hidden formula like 3 sin 20° − 4 sin³20° (= sin 60°). Recognising the formula is the whole question."},
+ {k:"formula", title:"Sum and difference formulas", rows:[["sin(A ± B)","sin A cos B ± cos A sin B","sign stays the same"],["cos(A ± B)","cos A cos B ∓ sin A sin B","sign flips"],["tan(A ± B)","(tan A ± tan B)/(1 ∓ tan A tan B)","tan 15° = (1 − 1/√3)/(1 + 1/√3) = 2 − √3"],["cot(A + B)","(cot A cot B − 1)/(cot A + cot B)","reciprocal of the tan formula"],["Product forms","sin(A + B) sin(A − B) = sin²A − sin²B","cos(A + B) cos(A − B) = cos²A − sin²B"]]},
+ {k:"formula", title:"Double and triple angles", rows:[["sin 2θ","2 sin θ cos θ = 2 tan θ/(1 + tan²θ)","put B = A in sin(A + B)"],["cos 2θ","cos²θ − sin²θ = 2cos²θ − 1 = 1 − 2sin²θ = (1 − tan²θ)/(1 + tan²θ)","four forms — pick the one that matches"],["tan 2θ","2 tan θ/(1 − tan²θ)",""],["Half-angle squares","1 + cos 2θ = 2cos²θ,  1 − cos 2θ = 2sin²θ","so (1 − cos 2θ)/(1 + cos 2θ) = tan²θ"],["sin 3θ","3 sin θ − 4 sin³θ","“3 sin − 4 sin³”"],["cos 3θ","4 cos³θ − 3 cos θ","“4 cos³ − 3 cos” (order reversed)"],["tan 3θ","(3 tan θ − tan³θ)/(1 − 3 tan²θ)",""]]},
+ {k:"formula", title:"SSC special results", rows:[["A + B = 45°","(1 + tan A)(1 + tan B) = 2","also (cot A − 1)(cot B − 1) = 2"],["a sin x + b cos x = c","a cos x − b sin x = ±√(a² + b² − c²)","square both and add: sum of squares = a² + b²"],["tan A = 1/2, tan B = 1/3","A + B = 45°","(½ + ⅓)/(1 − ⅙) = 1"],["sin θ·sin(60° − θ)·sin(60° + θ)","= ¼ sin 3θ","cos version: ¼ cos 3θ;  tan version: tan 3θ"]]},
+ {k:"fig", title:"Why sin 2θ = 2 sin θ cos θ", svg:'<svg viewBox="0 0 280 190" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M140 20 L60 160 H220 Z"/><path d="M140 20 V160" stroke-dasharray="4 3"/><path d="M140 148 H152 V160"/><path d="M125.1 46.1 A30 30 0 0 0 154.9 46.1" style="stroke:var(--accent)"/><text x="144" y="70" fill="currentColor" stroke="none" style="fill:var(--accent)">2θ</text><text x="134" y="14" fill="currentColor" stroke="none">O</text><text x="86" y="88" fill="currentColor" stroke="none" font-weight="700">1</text><text x="188" y="88" fill="currentColor" stroke="none" font-weight="700">1</text><text x="100" y="176" text-anchor="middle" fill="currentColor" stroke="none" style="fill:var(--blue)">sin θ</text><text x="180" y="176" text-anchor="middle" fill="currentColor" stroke="none" style="fill:var(--blue)">sin θ</text><text x="146" y="120" fill="currentColor" stroke="none">cos θ</text></svg>', cap:"Isosceles triangle, equal sides 1, apex 2θ. Area = ½·1·1·sin 2θ. The altitude (cos θ) splits the base into 2 sin θ, so area = ½·2 sin θ·cos θ. Equate: sin 2θ = 2 sin θ cos θ."},
+ {k:"ex", src:"SSC CGL Tier 2 · 18 Nov 2020", q:"If 3 sin x + 4 cos x = 2, then the value of 3 cos x − 4 sin x is:", steps:["Let 3 cos x − 4 sin x = y","Square and add: (3 sin x + 4 cos x)² + (3 cos x − 4 sin x)² = 9 + 16 = 25 (the cross terms cancel)","4 + y² = 25 → y² = 21 → y = √21 (the options give the positive root)"], ans:"√21", tip:"Direct: √(a² + b² − c²) = √(9 + 16 − 4)."},
+ {k:"ex", q:"If A + B = 45°, show that (1 + tan A)(1 + tan B) = 2.", steps:["tan(A + B) = tan 45° = 1 → (tan A + tan B)/(1 − tan A tan B) = 1","tan A + tan B = 1 − tan A tan B → tan A + tan B + tan A tan B = 1","(1 + tan A)(1 + tan B) = 1 + (tan A + tan B + tan A tan B) = 1 + 1 = 2"], ans:"2", tip:"Check with A = 0°, B = 45°: (1 + 0)(1 + 1) = 2. So (1 + tan 20°)(1 + tan 25°) = 2 instantly."},
+ {k:"ex", q:"If tan θ = 3/4, find cos 2θ and sin 2θ.", steps:["cos 2θ = (1 − tan²θ)/(1 + tan²θ) = (1 − 9/16)/(1 + 9/16) = 7/25","sin 2θ = 2 tan θ/(1 + tan²θ) = (3/2)/(25/16) = 24/25","Check: (7/25)² + (24/25)² = 1 ✓"], ans:"cos 2θ = 7/25, sin 2θ = 24/25"},
+ {k:"trick", h:"<b>Spot a formula in disguise:</b> 2 sin x cos x → sin 2x; cos²x − sin²x → cos 2x; 3 sin x − 4 sin³x → sin 3x; 4 cos³x − 3 cos x → cos 3x; (tan A + tan B)/(1 − tan A tan B) → tan(A + B).<br><b>Value check:</b> any identity in A and B can be tested at A = 0° or A = B."},
+ {k:"trap", h:"<b>sin 2θ ≠ 2 sin θ</b> (sin 60° = √3/2, but 2 sin 30° = 1).<br><b>cos(A + B) has a MINUS</b>: cos A cos B − sin A sin B. sin keeps the sign, cos flips it.<br>sin 3θ = 3 sin θ − <b>4</b> sin³θ, but cos 3θ = <b>4</b> cos³θ − 3 cos θ — the order is reversed."},
+ {k:"link", h:"These formulas produce the L2 values (sin 75° = sin(45° + 30°), tan 22.5° from tan 2θ) and the L6 range: a sin θ + b cos θ = R sin(θ + α). In L9 they meet A + B + C = 180°."},
+ {k:"q", q:"cos²15° − sin²15° = ?", o:["√3/2","1","1/2","0"], e:"cos²θ − sin²θ = cos 2θ → cos 30° = √3/2. (1 would be cos² + sin².)"}
+], sum:["sin(A ± B) = sin A cos B ± cos A sin B; cos(A ± B) = cos A cos B ∓ sin A sin B","tan(A ± B) = (tan A ± tan B)/(1 ∓ tan A tan B)","sin 2θ = 2 sin θ cos θ; cos 2θ = 1 − 2sin²θ = 2cos²θ − 1; tan 2θ = 2t/(1 − t²)","sin 3θ = 3 sin θ − 4 sin³θ; cos 3θ = 4 cos³θ − 3 cos θ","A + B = 45° ⇒ (1 + tan A)(1 + tan B) = 2"]},
+{ id:"L9", heat:2, title:"Triangle identities & simple equations", hi:"त्रिभुज सर्वसमिकाएँ और सरल समीकरण", blocks:[
+ {k:"hot", h:"<b>Equation type: about one question every few Tier 1 shifts, regular in Tier 2.</b> “If 2 sin²θ + 3 cos θ = 3 (0° &lt; θ &lt; 90°), find sec²θ + cot²θ” — solve for θ, then evaluate. <b>Triangle type (mostly Tier 2):</b> “In △ABC, tan((A + B)/2) = ?” or “tan A + tan B + tan C = ?”. Both reward one idea: find the angle first."},
+ {k:"formula", title:"In any triangle: A + B + C = 180°", rows:[["Pair of angles","A + B = 180° − C","then use the 180° − θ row of L7"],["sin, cos, tan","sin(A + B) = sin C,  cos(A + B) = −cos C,  tan(A + B) = −tan C","sin keeps sign, cos and tan flip"],["Half angles","(A + B)/2 = 90° − C/2","sin((A + B)/2) = cos(C/2),  tan((A + B)/2) = cot(C/2)"],["Tan sum = product","tan A + tan B + tan C = tan A·tan B·tan C","from tan(A + B) = −tan C"],["Cot products","cot A cot B + cot B cot C + cot C cot A = 1","divide the tan result by tan A tan B tan C"],["Right angle at C","A + B = 90°","complementary rules of L4: sin²A + sin²B = 1"]]},
+ {k:"fig", title:"The angle sum drives every result", svg:'<svg viewBox="0 0 280 190" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M30 160 H250 L90 40 Z"/><path d="M58 160 A28 28 0 0 0 42.5 135" style="stroke:var(--accent)"/><path d="M222 160 A28 28 0 0 1 227.6 143.2" style="stroke:var(--accent)"/><path d="M82.8 54.3 A16 16 0 0 0 102.8 49.6" style="stroke:var(--blue)"/><text x="22" y="176" fill="currentColor" stroke="none">A</text><text x="252" y="176" fill="currentColor" stroke="none">B</text><text x="86" y="32" fill="currentColor" stroke="none">C</text><text x="62" y="152" fill="currentColor" stroke="none" style="fill:var(--accent)">A</text><text x="202" y="152" fill="currentColor" stroke="none" style="fill:var(--accent)">B</text><text x="86" y="74" fill="currentColor" stroke="none" style="fill:var(--blue)">C</text><text x="128" y="36" fill="currentColor" stroke="none" font-size="11">A + B = 180° − C</text><text x="128" y="54" fill="currentColor" stroke="none" font-size="11">(A + B)/2 = 90° − C/2</text></svg>', cap:"Replace A + B by 180° − C (or the half-sum by 90° − C/2) and apply the allied-angle rules."},
+ {k:"formula", title:"Solving a simple trig equation (SSC style)", rows:[["Step 1","write everything in ONE ratio","sin²θ = 1 − cos²θ, cos²θ = 1 − sin²θ"],["Step 2","solve the quadratic","2 sin²θ − 3 sin θ + 1 = 0 → (2 sin θ − 1)(sin θ − 1) = 0"],["Step 3","keep only roots in the given range","0° &lt; θ &lt; 90° rejects sin θ = 1 (θ = 90°) and any value outside −1 to 1"],["Step 4","evaluate the asked expression at that θ","usually 30°, 45° or 60°"],["a sin θ + b cos θ = c","divide by √(a² + b²) and use L8","√3 cos θ + sin θ = 1 → cos(θ − 30°) = ½"],["x + 1/x = 2","forces x = 1","sin θ + cosec θ = 2 ⇒ sin θ = 1 ⇒ any power sum = 2"]]},
+ {k:"ex", src:"SSC CGL 2021 Tier 1 · 18 Apr 2022 S3", q:"If 2 sin²θ + 3 cos θ = 3, 0° &lt; θ &lt; 90°, then sec²θ + cot²θ = ?", steps:["2(1 − cos²θ) + 3 cos θ = 3 → 2 cos²θ − 3 cos θ + 1 = 0","(2 cos θ − 1)(cos θ − 1) = 0 → cos θ = ½ (cos θ = 1 gives θ = 0°, not allowed)","θ = 60°: sec²60° + cot²60° = 4 + ⅓ = 13/3 = 4⅓"], ans:"4⅓", tip:"Try the option angles: θ = 60° gives 2(¾) + 3(½) = 3 ✓."},
+ {k:"ex", src:"SSC CGL Tier 2 · 13 Sep 2019", q:"If 2 cos²θ + 3 sin θ = 3, 0° &lt; θ &lt; 90°, find sin²2θ + cos²θ + tan²2θ + cosec²2θ.", steps:["2(1 − sin²θ) + 3 sin θ = 3 → 2 sin²θ − 3 sin θ + 1 = 0","sin θ = ½ (sin θ = 1 rejected) → θ = 30°, 2θ = 60°","¾ + ¾ + 3 + 4/3 = 35/6"], ans:"35/6"},
+ {k:"ex", q:"In △ABC, tan A = 1 and tan B = 2. Find tan C.", steps:["tan C = −tan(A + B) = −(tan A + tan B)/(1 − tan A tan B)","= −(1 + 2)/(1 − 2) = 3","Check: tan A + tan B + tan C = 6 = 1·2·3 ✓"], ans:"3", tip:"Equilateral value put for identities: A = B = C = 60° → tan A + tan B + tan C = 3√3 = tan A tan B tan C."},
+ {k:"trick", h:"<b>Equation questions: test the options.</b> Put 30°, 45°, 60° into the given equation — the one that satisfies it is θ. Then evaluate.<br><b>Triangle identities: value put</b> A = B = C = 60°, or A = 90°, B = C = 45° — then compare with the options."},
+ {k:"trap", h:"<b>Reject roots outside the range:</b> in 0° &lt; θ &lt; 90°, cos θ = 1 (θ = 0°) and sin θ = 1 (θ = 90°) are not allowed; sin θ = 2 or −2 is never possible.<br><b>In a triangle, cos(A + B) = −cos C</b>, not cos C. And tan(A + B) = <b>−</b>tan C."},
+ {k:"link", h:"The triangle results are L7’s allied angles with 180° − C; the equation step uses L3’s identities to reach one ratio. Angles of elevation in L10 are also solved by finding the angle first."},
+ {k:"q", q:"In △ABC, sin((B + C)/2) = ?", o:["cos(A/2)","sin(A/2)","−cos(A/2)","cos A"], e:"(B + C)/2 = 90° − A/2 → sin(90° − A/2) = cos(A/2)."}
+], sum:["A + B = 180° − C: sin(A + B) = sin C, cos(A + B) = −cos C, tan(A + B) = −tan C","(A + B)/2 = 90° − C/2: sin ↔ cos, tan ↔ cot","tan A + tan B + tan C = tan A tan B tan C; cot A cot B + cot B cot C + cot C cot A = 1","Equation: one ratio → quadratic → keep the root in range → evaluate","Option-testing with 30°, 45°, 60° is often fastest"]},
+{ id:"L10", heat:3, title:"Heights & distances", hi:"ऊँचाई और दूरी", blocks:[
+ {k:"hot", h:"<b>About one question in most Tier 1 shifts and 1–2 in Tier 2.</b> Forms: tower + one angle (find height/distance), observer moving towards the tower (30° → 60°), two ships seen from a lighthouse, shadow longer by x m when the sun’s altitude drops, building and tower (elevation + depression). Nearly every one uses only 30°, 45° and 60°."},
+ {k:"p", h:"The <b>angle of elevation</b> is measured UP from the horizontal to the line of sight; the <b>angle of depression</b> is measured DOWN from the horizontal. Because the two horizontals are parallel, the depression seen from the top equals the elevation seen from the bottom (alternate angles). Every problem is one or two right triangles with <b>tan θ = height ÷ horizontal distance</b>."},
+ {k:"figs", title:"The two standard pictures", items:[
+  {svg:'<svg viewBox="0 0 280 200" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M20 170 H262"/><path d="M240 170 V60" stroke-width="2.4"/><path d="M228 170 V158 H240"/><path d="M49.5 170 L240 60 M176.5 170 L240 60" style="stroke:var(--accent)"/><path d="M75.5 170 A26 26 0 0 0 72 157" style="stroke:var(--accent)"/><text x="80" y="165" fill="currentColor" stroke="none" font-size="11">30°</text><path d="M196.5 170 A20 20 0 0 0 186.5 152.7" style="stroke:var(--accent)"/><text x="196" y="160" fill="currentColor" stroke="none" font-size="11">60°</text><text x="246" y="64" fill="currentColor" stroke="none">A</text><text x="246" y="182" fill="currentColor" stroke="none">B</text><text x="246" y="120" fill="currentColor" stroke="none" font-weight="700" style="fill:var(--blue)">h</text><text x="44" y="188" fill="currentColor" stroke="none">C</text><text x="172" y="188" fill="currentColor" stroke="none">D</text><text x="113" y="188" text-anchor="middle" fill="currentColor" stroke="none" font-weight="700" style="fill:var(--blue)">x</text><text x="208" y="188" text-anchor="middle" fill="currentColor" stroke="none" font-weight="700" style="fill:var(--blue)">d</text></svg>', cap:"Observer walks from C (30°) to D (60°). BD = h/√3, BC = h√3, so x = CD = 2h/√3 = 2d. Height h = x/(cot 30° − cot 60°) = (√3/2)x."},
+  {svg:'<svg viewBox="0 0 280 200" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M20 170 H262"/><path d="M50 170 V70" stroke-width="2.4"/><path d="M50 158 H62 V170"/><path d="M50 70 H262" stroke-dasharray="4 3"/><text x="150" y="64" fill="currentColor" stroke="none" font-size="11">horizontal</text><path d="M50 70 L223 170" style="stroke:var(--accent)"/><path d="M80 70 A30 30 0 0 1 76 85" style="stroke:var(--blue)"/><text x="84" y="86" fill="currentColor" stroke="none" font-size="11" style="fill:var(--blue)">30°</text><path d="M193 170 A30 30 0 0 1 197 155" style="stroke:var(--blue)"/><text x="166" y="164" fill="currentColor" stroke="none" font-size="11" style="fill:var(--blue)">30°</text><circle cx="223" cy="170" r="3" style="fill:var(--accent)" stroke="none"/><text x="40" y="64" fill="currentColor" stroke="none">T</text><text x="40" y="184" fill="currentColor" stroke="none">O</text><text x="226" y="186" fill="currentColor" stroke="none">S</text><text x="34" y="124" fill="currentColor" stroke="none" font-weight="700">h</text><text x="136" y="188" text-anchor="middle" fill="currentColor" stroke="none" font-weight="700">d = h cot 30°</text></svg>', cap:"Depression from the top T to the ship S = elevation of T seen from S (alternate angles, horizontals parallel)."}]},
+ {k:"formula", title:"Working formulas", rows:[["One angle","h = d·tan θ,  d = h·cot θ","30°: h = d/√3;  45°: h = d;  60°: h = √3 d"],["Two angles, same side","h = x/(cot α − cot β)","x = distance between the two points, α < β"],["30° → 60° walk","distance walked = 2 × remaining distance","h = (√3/2) × distance walked"],["Two angles, opposite sides","total distance = h(cot α + cot β)","two ships on either side of a lighthouse"],["Complementary angles","α + β = 90° from distances a and b → h = √(ab)","tan α·tan β = 1 → (h/a)(h/b) = 1"],["Shadow","shadow = h·cot θ","shadow = h → 45°; shadow = √3 h → 30°;  shadow = h/√3 → 60°"],["Observer’s height","add the eye height to the tower part above the eye","h_tower = d·tan θ + eye height"]]},
+ {k:"table", title:"30-45-60 side ratios (height : distance : line of sight)", head:["Angle","h : d","h : line of sight"], rows:[["30°","1 : √3","1 : 2"],["45°","1 : 1","1 : √2"],["60°","√3 : 1","√3 : 2"]]},
+ {k:"ex", src:"SSC CGL 2021 Tier 1 · 11 Apr 2022 S1", q:"The angle of elevation of the top of an unfinished tower at a point 78 m from its base is 30°. How much higher must the tower be raised (in m) so that the angle of elevation of the top at the same point becomes 60°?", steps:["Present height = 78 tan 30° = 78/√3 = 26√3","Finished height = 78 tan 60° = 78√3","Raise by 78√3 − 26√3 = 52√3"], ans:"52√3 m", tip:"tan 60° = 3 × tan 30°, so the finished tower is 3 times as tall: raise = 2 × 26√3."},
+ {k:"ex", src:"SSC CHSL 2023 Tier 2 · 10 Jan 2024 S1", q:"The shadow of a tower is 40 m longer when the Sun’s altitude is 30° than when it is 45°. Find the height of the tower.", steps:["Shadows: h cot 30° = h√3 and h cot 45° = h","h√3 − h = 40 → h = 40/(√3 − 1)","Rationalise: h = 40(√3 + 1)/2 = 20(√3 + 1) m"], ans:"20(√3 + 1) m"},
+ {k:"ex", q:"From the top of a lighthouse 60 m high, the angles of depression of two ships on the same side are 45° and 30°. Find the distance between the ships.", steps:["Near ship (45°): distance = 60 cot 45° = 60","Far ship (30°): distance = 60 cot 30° = 60√3","Gap = 60√3 − 60 = 60(√3 − 1) ≈ 43.9 m"], ans:"60(√3 − 1) m", tip:"Same side → subtract the cot values; opposite sides → add them."},
+ {k:"trick", h:"<b>Draw first, then use only tan.</b> For 30°/45°/60°, write sides straight from the ratio table — no calculation.<br><b>30° → 60° walk:</b> the walked distance is twice the remaining distance and the height is (√3/2) × walked.<br><b>Approximation:</b> √3 ≈ 1.732, so 60(√3 − 1) ≈ 43.9 and 20(√3 + 1) ≈ 54.6 — use this to pick options quickly."},
+ {k:"trap", h:"<b>Eye height:</b> if a 1.5 m tall person sees the top at 45° from 28.5 m, the tower is 28.5 + 1.5 = <b>30 m</b>, not 28.5 m.<br><b>Depression is measured from the horizontal</b>, not from the vertical tower — the angle inside the triangle at the top is 90° − depression.<br><b>Same side vs opposite sides:</b> subtract distances for the same side, add them for opposite sides."},
+ {k:"link", h:"Uses only L2’s standard values (tan 30°, 45°, 60°) and L1’s tan = P/B. Shadow and ladder problems are the same triangle as the 30-60-90 triangle of Geometry."},
+ {k:"q", q:"A tower casts a shadow equal to its own height. The Sun’s angle of elevation is:", o:["45°","30°","60°","90°"], e:"tan θ = h/h = 1 → θ = 45°."}
+], sum:["tan θ = height ÷ horizontal distance; depression from the top = elevation from the bottom","Same side: h = x/(cot α − cot β); opposite sides: distance = h(cot α + cot β)","30° → 60°: walked = 2 × remaining, h = (√3/2) × walked","Complementary angles from a and b: h = √(ab)","Add the observer’s eye height; √3 ≈ 1.732 for approximate options"]},
+{ id:"L11", heat:1, title:"Degrees, radians & angle measure", hi:"डिग्री, रेडियन और कोण माप", blocks:[
+ {k:"hot", h:"<b>Rare as a pure question in CGL Tier 1</b>, but the ideas appear inside other topics: arc length and sector questions in CHSL/CGL mensuration (“an arc subtending 22.5° is 16.5 cm, find r”), the occasional “75° = ? radians”, and clock-hand angles (reasoning and maths). Cheap marks once the two conversions are automatic."},
+ {k:"p", h:"A <b>degree</b> is 1/360 of a full turn (1° = 60′, 1′ = 60″). A <b>radian</b> is the angle at the centre when the arc length equals the radius. A full circle has arc 2πr, so it contains 2π radians: <b>2π rad = 360°</b>, i.e. <b>π rad = 180°</b>. 1 radian ≈ 57.3° (57°16′ with π = 22/7)."},
+ {k:"figs", title:"Radian and the clock face", items:[
+  {svg:'<svg viewBox="0 0 260 200" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><circle cx="110" cy="105" r="75"/><path d="M110 105 L185 105 M110 105 L150.5 41.9"/><path d="M185 105 A75 75 0 0 0 150.5 41.9" stroke-width="3.2" style="stroke:var(--accent)"/><path d="M130 105 A20 20 0 0 0 120.8 88.2" style="stroke:var(--blue)"/><text x="136" y="96" fill="currentColor" stroke="none" style="fill:var(--blue)">1 rad</text><text x="146" y="120" text-anchor="middle" fill="currentColor" stroke="none" font-weight="700">r</text><text x="118" y="70" fill="currentColor" stroke="none" font-weight="700">r</text><text x="190" y="66" fill="currentColor" stroke="none" font-weight="700" style="fill:var(--accent)">arc = r</text><text x="98" y="118" fill="currentColor" stroke="none">O</text></svg>', cap:"Arc length equal to the radius → angle of 1 radian (≈ 57.3°). In general arc l = rθ with θ in radians."},
+  {svg:'<svg viewBox="0 0 220 200" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><circle cx="110" cy="100" r="80"/><path d="M110 24 V32 M186 100 H178 M110 176 V168 M34 100 H42"/><text x="110" y="46" text-anchor="middle" fill="currentColor" stroke="none">12</text><text x="166" y="104" text-anchor="middle" fill="currentColor" stroke="none">3</text><text x="110" y="162" text-anchor="middle" fill="currentColor" stroke="none">6</text><text x="54" y="104" text-anchor="middle" fill="currentColor" stroke="none">9</text><path d="M110 100 L155.1 116.4" stroke-width="3" style="stroke:var(--blue)"/><path d="M110 100 L53.7 132.5" stroke-width="2" style="stroke:var(--accent)"/><path d="M132.6 108.2 A24 24 0 0 1 89.2 112" stroke-dasharray="3 2"/><text x="113" y="146" text-anchor="middle" fill="currentColor" stroke="none" font-weight="700">130°</text><circle cx="110" cy="100" r="3" style="fill:currentColor" stroke="none"/></svg>', cap:"At 3:40 the hour hand (blue, short) is at 90° + 40 × 0.5° = 110° from 12; the minute hand (accent) is at 240°. Angle = 130° = |30 × 3 − 5.5 × 40|."}]},
+ {k:"formula", title:"Conversions and circle measures", rows:[["Degree → radian","multiply by π/180","75° = 75π/180 = 5π/12"],["Radian → degree","multiply by 180/π","3π/5 = 108°;  1 rad = 180/π ≈ 57.3° (57°16′ with π = 22/7)"],["Arc length","l = rθ (θ in radians) = (θ°/360)·2πr","θ must be in radians in l = rθ"],["Sector area","A = ½ r²θ = ½ l r","= (θ°/360)·πr²"],["Sub-units","1° = 60′,  1′ = 60″","40°20′ = 40⅓°"]]},
+ {k:"formula", title:"Clock hands", rows:[["Minute hand","6° per minute","360° in 60 min"],["Hour hand","0.5° per minute (30° per hour)","360° in 12 h"],["Angle at H:M","θ = |30H − 5.5M|","if θ > 180°, the smaller angle is 360° − θ"],["Relative speed","5.5° per minute","hands coincide every 65 5/11 min (11 times in 12 h)"]]},
+ {k:"table", title:"Common angles", head:["Degrees","Radians","Degrees","Radians"], rows:[["30°","π/6","135°","3π/4"],["45°","π/4","150°","5π/6"],["60°","π/3","180°","π"],["90°","π/2","270°","3π/2"],["120°","2π/3","360°","2π"]]},
+ {k:"ex", src:"SSC CHSL 2023 · 8 Aug S4", q:"The arc length of a sector of a circle that subtends a 22.5° angle at the centre is 16.5 cm. What is the radius of the circle? (Use π = 22/7)", steps:["22.5° is 1/16 of 360°","Arc = (1/16) × 2 × (22/7) × r = 11r/28","11r/28 = 16.5 → r = 16.5 × 28/11 = 42 cm"], ans:"42 cm", tip:"22.5/360 = 1/16 — spot the fraction of a full turn first."},
+ {k:"ex", q:"Find the angle between the hands of a clock at 3:40, in degrees and in radians.", steps:["θ = |30 × 3 − 5.5 × 40| = |90 − 220| = 130°","130 < 180, so it is already the smaller angle","130 × π/180 = 13π/18 rad"], ans:"130° = 13π/18"},
+ {k:"ex", q:"The angles of a triangle are in the ratio 2 : 3 : 4. Find the largest angle in radians.", steps:["Sum = 180° = π rad, parts = 2 + 3 + 4 = 9","Largest = 4/9 × π","= 4π/9 (= 80°)"], ans:"4π/9"},
+ {k:"trick", h:"<b>π = 180°</b>: replace π by 180° and simplify (5π/12 = 5 × 15° = 75°).<br><b>Clock: “30H − 5.5M”</b>, take the absolute value; if above 180°, subtract from 360°.<br>Fractions of a turn: 22.5° = 1/16, 45° = 1/8, 60° = 1/6, 72° = 1/5, 120° = 1/3 of 360°."},
+ {k:"trap", h:"<b>l = rθ needs θ in radians.</b> With θ = 60° it is r × π/3, not 60r.<br><b>1 radian ≠ 1°</b>; 1 rad ≈ 57.3°.<br><b>Clock hour hand moves</b> during the minutes: at 3:40 it is not at the 3 but 20° past it — that is where the 5.5 (not 6) comes from."},
+ {k:"link", h:"Arc length and sector area are core 2D-mensuration results; the clock formula is also asked in reasoning. Radians are just a different unit — every ratio in L1–L10 is the same: sin(π/6) = sin 30° = ½."},
+ {k:"q", q:"π/8 radians in degrees is:", o:["22.5°","45°","8°","11.25°"], e:"180°/8 = 22.5°."}
+], sum:["π rad = 180°; degree → radian ×π/180, radian → degree ×180/π","1 rad ≈ 57.3° (57°16′ with π = 22/7); 1° = 60′, 1′ = 60″","Arc l = rθ and sector area ½r²θ (θ in radians)","Clock angle = |30H − 5.5M| (use 360° − θ if above 180°)","Minute hand 6°/min, hour hand 0.5°/min"]}
+//@@L
+];
+const QB = [
+["L1","If tan θ = 3/4, then sin θ = ?",["3/5","4/5","3/4","5/3"],"Triplet 3-4-5: sin θ = P/H = 3/5."],
+["L1","If 7 cot P = 24, then find sin P.",["7/25","24/25","49/625","625/7"],"cot P = 24/7 → B = 24, P = 7, H = 25 → sin P = 7/25. SSC CGL 2023 (27 Jul S3).","p"],
+["L1","If 6 tan A = 5, then (8 sin A − 4 cos A)/(cos A − 2 sin A) = ?",["−4","4","1","−2"],"Divide by cos A: (8·5/6 − 4)/(1 − 2·5/6) = (8/3)/(−2/3) = −4. SSC CGL Tier-I (3 Mar 2020 S1).","p"],
+["L1","If sec θ = 13/5, then the value of (10 tan θ + 24 cosec θ)/(39 sin θ − 10 sec θ) is:",["5","3","2","1/5"],"B = 5, H = 13, P = 12: (24 + 26)/(36 − 26) = 50/10 = 5. SSC Selection Post (9 Nov 2020 S2).","p"],
+["L1","If cos θ = 5/13, then tan²θ + sec²θ = ?",["313/25","323/25","233/25","1"],"tan θ = 12/5, sec θ = 13/5 → 144/25 + 169/25 = 313/25. (1 is sec² − tan², not the sum.)"],
+["L1","If sin θ = 8/17 (θ acute), then tan θ + sec θ = ?",["5/3","3/5","23/15","8/15"],"cos θ = 15/17 → tan θ = 8/15, sec θ = 17/15 → 25/15 = 5/3."],
+["L1","If tan θ = 1/√7, then (cosec²θ − sec²θ)/(cosec²θ + sec²θ) = ?",["3/4","4/3","1/2","5/7"],"cosec²θ = 1 + 7 = 8, sec²θ = 1 + 1/7 = 8/7 → (48/7)/(64/7) = 3/4."],
+["L1","If sin A = 3/5 (A acute), then cosec A × sec A = ?",["25/12","12/25","5/3","15/4"],"cos A = 4/5 → (5/3)(5/4) = 25/12."],
+["L1","cosec θ × sin θ = ?",["1","0","sin²θ","tan θ"],"cosec θ is the reciprocal of sin θ."],
+["L1","If 3 cot A = 4, then (1 − tan²A)/(1 + tan²A) = ?",["7/25","25/7","9/16","1/7"],"tan A = 3/4 → (1 − 9/16)/(1 + 9/16) = (7/16)/(25/16) = 7/25."],
+["L1","In △ABC, ∠B = 90°, AB = 24 cm and BC = 7 cm. sin A = ?",["7/25","24/25","7/24","24/7"],"AC = 25. For angle A the opposite side is BC = 7 → sin A = 7/25."],
+["L1","If 5 tan θ = 4, then (5 sin θ − 3 cos θ)/(5 sin θ + 2 cos θ) = ?",["1/6","7/6","1/2","1/3"],"Divide by cos θ: (5 tan θ − 3)/(5 tan θ + 2) = (4 − 3)/(4 + 2) = 1/6."],
+["L1","If sin θ = 5/13 (θ acute), then cot θ + cosec θ = ?",["5","1/5","25/13","17/5"],"cos θ = 12/13 → cot θ = 12/5, cosec θ = 13/5 → 25/5 = 5."],
+["L1","Which of these cannot be the value of sin θ for any angle θ?",["5/4","1/2","0.9","0"],"sin θ = P/H and P can never exceed H, so sin θ ≤ 1."],
+["L1","cot θ · sec θ is equal to:",["cosec θ","sin θ","tan θ","sec θ"],"(cos θ/sin θ)(1/cos θ) = 1/sin θ = cosec θ."],
+["L1","If cos A = 4/5 (A acute), then cosec A − cot A = ?",["1/3","3","7/3","1/4"],"sin A = 3/5 → cosec A = 5/3, cot A = 4/3 → 1/3."],
+["L1","For an acute angle θ, which ratio can be greater than 1?",["tan θ","sin θ","cos θ","None of them"],"tan θ = P/B can be any positive value (e.g. tan 60° = √3); sin and cos stay below 1."],
+["L2","The value of cosec 30° − cos 60° is:",["3/2","1/2","1","(2√2 − 1)/√2"],"cosec 30° = 2, cos 60° = ½ → 3/2. SSC CGL 2023 (26 Jul S1).","p"],
+["L2","What is the value of 5√3 cos 60° tan 30° − 3 cos 0° + 3 cos²45° + 2 sin²60°?",["2.5","3.5","2√3","3√2"],"5/2 − 3 + 3/2 + 3/2 = 2.5. SSC CGL 2023 (25 Jul S3).","p"],
+["L2","If cos(40° + x) = sin 30°, then the value of x is:",["20°","22°","−10°","23°"],"sin 30° = ½ = cos 60° → 40° + x = 60° → x = 20°. SSC CGL 2023 (25 Jul S4).","p"],
+["L2","The value of sin²30°·cos²45° + 2 tan²30° − sec²60° is:",["−77/24","−13/12","−25/12","−1/12"],"⅛ + ⅔ − 4 = −77/24. SSC CPO 2019 (13 Mar S1).","p"],
+["L2","What is the value of 100(sin 15° cos 15°)?",["25","50","75","100"],"½ sin 30° = ¼ → 25. SSC CHSL 2021 (3 Jun 2022 S3).","p"],
+["L2","What is the value of tan 15°?",["2 − √3","2 + √3","√3 − 1","1 − √3"],"tan(45° − 30°) = (1 − 1/√3)/(1 + 1/√3) = (√3 − 1)/(√3 + 1) = 2 − √3."],
+["L2","sin 18° · cos 36° = ?",["1/4","1/2","1","4"],"((√5 − 1)/4)((√5 + 1)/4) = (5 − 1)/16 = ¼."],
+["L2","tan 75° + cot 75° = ?",["4","2√3","2","1"],"cot 75° = tan 15° → (2 + √3) + (2 − √3) = 4."],
+["L2","The value of sin 75° is:",["(√3 + 1)/(2√2)","(√3 − 1)/(2√2)","(√3 + 1)/2","(√6 − √2)/4"],"sin(45° + 30°) = (1/√2)(√3/2) + (1/√2)(½) = (√3 + 1)/(2√2). (√6 − √2)/4 is sin 15°."],
+["L2","tan 22.5° = ?",["√2 − 1","√2 + 1","1/√2","2 − √3"],"tan 45° = 2t/(1 − t²) = 1 → t² + 2t − 1 = 0 → t = √2 − 1. (√2 + 1 is cot 22.5°.)"],
+["L2","(tan²45° + sec²60°·sin²30° + cos²90°·sin²60°)/(cosec²90° + cot 90°·sin 60°) = ?",["2","3/2","3","0"],"Numerator = 1 + 4·¼ + 0 = 2; denominator = 1 + 0 = 1."],
+["L2","(tan 60°·cosec 30° + tan 30°·sec 60°)/(sin²60° + 2 cot²45° − sec²30°) = ?",["32√3/17","16√3/17","32√3/7","16√3/7"],"Num = 2√3 + 2/√3 = 8/√3; Den = ¾ + 2 − 4/3 = 17/12 → (8/√3)(12/17) = 32√3/17."],
+["L2","sin 60° cos 30° + cos 60° sin 30° = ?",["1","0","√3/2","1/2"],"¾ + ¼ = 1 (it is sin 90°)."],
+["L2","4 sin²60° + 3 tan²30° − 8 sin 45° cos 45° = ?",["0","1","2","−1"],"3 + 1 − 4 = 0."],
+["L2","If 2 sin θ = √3 and θ is acute, then θ = ?",["60°","30°","45°","90°"],"sin θ = √3/2 → θ = 60°."],
+["L2","The value of sin 36° is:",["√(10 − 2√5)/4","√(10 + 2√5)/4","(√5 + 1)/4","(√5 − 1)/4"],"cos 36° = (√5 + 1)/4 → sin 36° = √(1 − (6 + 2√5)/16) = √(10 − 2√5)/4."],
+["L2","cos 36° − sin 18° = ?",["1/2","√5/2","1","1/4"],"(√5 + 1)/4 − (√5 − 1)/4 = 2/4 = ½."],
+["L2","Which of the following is not defined?",["tan 90°","sin 90°","cos 90°","cot 90°"],"tan 90° = sin 90°/cos 90° = 1/0."],
+["L3","If sec A + tan A = 3, then cos A is equal to:",["3/5","4/3","3/4","5/3"],"sec A − tan A = 1/3 → sec A = 5/3 → cos A = 3/5. SSC CGL 2023 (21 Jul S1).","p"],
+["L3","If sec θ + tan θ = 5, then find the value of tan θ.",["12/5","5/12","13/5","13/3"],"sec θ − tan θ = 1/5 → 2 tan θ = 5 − 1/5 = 24/5 → 12/5. SSC CGL 2023 (18 Jul S2).","p"],
+["L3","If sec θ + tan θ = 3, then the value of sec θ is:",["5/3","3/5","3/4","4/3"],"sec θ − tan θ = 1/3 → 2 sec θ = 10/3. SSC CGL Tier 2 (18 Nov 2020).","p"],
+["L3","(sin⁴θ + cos⁴θ)/(1 − 2 sin²θ·cos²θ) = ?",["1","2","−1","0"],"sin⁴θ + cos⁴θ = 1 − 2 sin²θ cos²θ, so the ratio is 1. SSC CGL 2023 (17 Jul S4).","p"],
+["L3","Simplify (1 + sin⁴θ + cos⁴θ)/(cos²θ + sin⁴θ).",["2","1","3","4"],"Both reduce to multiples of (1 − sin²θ cos²θ); θ = 90° gives 2/1. SSC CGL 2023 (24 Jul S4).","p"],
+["L3","If sec θ + tan θ = p (p > 1), then (cosec θ + 1)/(cosec θ − 1) = ?",["p²","(p + 1)/(p − 1)","(p − 1)/(p + 1)","2p²"],"(1 + sin θ)/(1 − sin θ) = (sec θ + tan θ)² = p². SSC CGL Tier 2 (13 Sep 2019).","p"],
+["L3","If cosec θ + cot θ = 4, then cos θ = ?",["15/17","8/17","17/15","8/15"],"cosec θ − cot θ = 1/4 → cosec θ = 17/8, cot θ = 15/8 → cos θ = cot θ/cosec θ = 15/17."],
+["L3","If sin θ + cos θ = 7/5, then sin θ·cos θ = ?",["12/25","24/25","7/25","6/25"],"(49/25 − 1)/2 = 12/25. (24/25 forgets the ÷2.)"],
+["L3","If sin θ + cos θ = 7/5, then (sin θ − cos θ)² = ?",["1/25","1/5","24/25","49/25"],"(s + c)² + (s − c)² = 2 → 2 − 49/25 = 1/25."],
+["L3","sin⁶θ + cos⁶θ + 3 sin²θ·cos²θ = ?",["1","0","3","2"],"sin⁶ + cos⁶ = 1 − 3 sin²θ cos²θ, so the total is 1."],
+["L3","tan²θ − sin²θ is equal to:",["tan²θ·sin²θ","cos²θ","sin²θ·cos²θ","sec²θ"],"sin²θ/cos²θ − sin²θ = sin²θ(1 − cos²θ)/cos²θ = tan²θ·sin²θ."],
+["L3","For acute θ, √((1 + sin θ)/(1 − sin θ)) = ?",["secθ + tanθ","secθ − tanθ","cosecθ + cotθ","tanθ − secθ"],"Multiply inside by (1 + sin θ): (1 + sin θ)/cos θ = sec θ + tan θ."],
+["L3","sin²θ + 1/(1 + tan²θ) = ?",["1","0","2","sin²θ"],"1/(1 + tan²θ) = 1/sec²θ = cos²θ → sin²θ + cos²θ = 1."],
+["L3","sin A(1 + tan A) + cos A(1 + cot A) = ?",["secA + cosecA","secA − cosecA","sinA − cosA","cosecA − secA"],"= (sin A + cos A)(tan A + cot A) = (sin A + cos A)/(sin A cos A) = sec A + cosec A."],
+["L3","If tan θ + cot θ = 3, then tan²θ + cot²θ = ?",["7","9","11","5"],"(tan θ + cot θ)² − 2 tan θ cot θ = 9 − 2 = 7."],
+["L3","If x = a sec θ and y = b tan θ, then x²/a² − y²/b² = ?",["1","0","−1","2"],"sec²θ − tan²θ = 1."],
+["L3","cos θ/(1 − sin θ) + cos θ/(1 + sin θ) = ?",["2secθ","2cosecθ","2cosθ","2tanθ"],"cos θ(2)/(1 − sin²θ) = 2 cos θ/cos²θ = 2 sec θ."],
+["L3","If sec θ − cos θ = 14 and 14 sec θ = x, then x = ?",["tan²θ","sec²θ","2secθ","2tanθ"],"sec θ − cos θ = sin²θ/cos θ = 14 → 14 sec θ = sin²θ/cos²θ = tan²θ."],
+["L4","The value of cot 13° cot 27° cot 60° cot 63° cot 77° is:",["1/√3","0","√3","1"],"cot 13°·cot 77° = 1, cot 27°·cot 63° = 1, left cot 60° = 1/√3. SSC CHSL 2023 (2 Aug S2).","p"],
+["L4","If sin 3A = cos(30° − A), where A is acute, then 2 cosec A + tan²2A − cot²A = ?",["4","5","17/2","7/4"],"3A + 30° − A = 90° → A = 30° → 4 + 3 − 3 = 4. SSC CGL Tier 2 (15 Nov 2020).","p"],
+["L4","(2 sin²38° sec²52° + cos 64° sin 26° + sin²64°)/(tan²23° + cot²23° − sec²67° − cosec²67°) = ?",["−3/2","3/2","2","−2"],"Numerator 2 + 1 = 3; denominator −1 − 1 = −2. SSC CGL Tier 2 (15 Nov 2020).","p"],
+["L4","[3(cot²47° − sec²43°) − 2(tan²23° − cosec²67°)] / [cosec²(68° + θ) − tan(θ + 61°) − tan²(22° − θ) + cot(29° − θ)] = ?",["−1","0","5","1"],"Num: 3(−1) − 2(−1) = −1. Den: cosec²(68° + θ) − cot²(68° + θ) = 1 and cot(29° − θ) = tan(61° + θ) cancel → 1. SSC CGL Tier 2 (29 Jan 2022).","p"],
+["L4","The value of tan 1°·tan 2°·tan 3° … tan 89° is:",["1","0","√3","45"],"Pairs (θ, 90° − θ) give tan θ·cot θ = 1; middle tan 45° = 1."],
+["L4","sin²1° + sin²2° + sin²3° + … + sin²89° = ?",["89/2","45","44","89"],"44 pairs of (sin² + cos²) = 44, plus sin²45° = ½ → 44½."],
+["L4","cos 1° × cos 2° × cos 3° × … × cos 100° = ?",["0","1","−1","1/2"],"The product contains cos 90° = 0."],
+["L4","If tan 2A = cot(A − 18°), where 2A is acute, then A = ?",["36°","27°","54°","18°"],"2A + A − 18° = 90° → 3A = 108° → A = 36°."],
+["L4","If sec 4A = cosec(A − 20°), where 4A is acute, then A = ?",["22°","20°","24°","18°"],"4A + A − 20° = 90° → 5A = 110° → A = 22°."],
+["L4","If A + B = 90° and sin A = 3/5, then tan B = ?",["4/3","3/4","3/5","4/5"],"tan B = cot A = 4/3 (3-4-5 triangle)."],
+["L4","sin 25° sec 65° + cos 25° cosec 65° = ?",["2","1","0","√2"],"sec 65° = cosec 25° and cosec 65° = sec 25° → 1 + 1 = 2."],
+["L4","cos 70°/sin 20° + cos 59°·cosec 31° − 8 sin²30° = ?",["0","2","1","−2"],"1 + 1 − 8 × ¼ = 0."],
+["L4","sin²20° + sin²70° + tan 30°·tan 60° = ?",["2","1","3","√3 + 1"],"sin²20° + cos²20° = 1; tan 30° tan 60° = 1 → 2."],
+["L4","tan 10° tan 15° tan 75° tan 80° = ?",["1","0","√3","1/√3"],"(tan 10° tan 80°)(tan 15° tan 75°) = 1 × 1."],
+["L4","If sin 2A = cos 3A and both angles are acute, then A = ?",["18°","36°","22.5°","30°"],"2A + 3A = 90° → A = 18°."],
+["L4","sin²5° + sin²10° + sin²15° + … + sin²85° = ?",["17/2","9","8","19/2"],"17 terms: 8 pairs (= 8) + sin²45° = ½ → 8½. (19/2 would include sin²90°.)"],
+["L4","If tan A·tan B = 1 (A, B acute), then sin(A + B) = ?",["1","0","1/2","√3/2"],"tan A = cot B → A + B = 90° → sin 90° = 1."],
+["L5","The value of 1/(cosec θ − cot θ) − 1/sin θ is equal to:",["cotθ","tanθ","cosecθ","secθ"],"1/(cosec θ − cot θ) = cosec θ + cot θ → minus cosec θ leaves cot θ. SSC CGL 2024 (23 Sep S2).","p"],
+["L5","If cot θ = 4/3, then evaluate: sec θ(1 + cot²θ)(cosec²θ − cot²θ)/cosec³θ.",["3/4","4/3","4/5","3/5"],"= sec θ·cosec²θ/cosec³θ = tan θ = 3/4. SSC CGL 2024 (10 Sep S2).","p"],
+["L5","If tan x/sec x = 1/2 (x acute), then the value of (sin x + cos x)² is:",["(2 + √3)/2","(2 + √3)/3","(2 − √3)/2","(2 − √3)/3"],"sin x = 1/2 → x = 30° → (1 + √3)²/4 = (2 + √3)/2. SSC CGL 2024 (13 Sep S2).","p"],
+["L5","cot²θ − cosec²θ equals:",["−1","0","1","tanθ"],"cosec²θ − cot²θ = 1, so the reverse is −1. SSC CHSL 2023 (17 Aug S1).","p"],
+["L5","The value of (2 cos³θ − cos θ)/(sin θ − 2 sin³θ) is:",["cotθ","tanθ","secθ","sinθ"],"cos θ(2cos²θ − 1)/[sin θ(1 − 2 sin²θ)] and 1 − 2 sin²θ = 2 cos²θ − 1 → cot θ. SSC CPO 2022 (10 Nov S1).","p"],
+["L5","(sec θ − cos θ)(cosec θ − sin θ)(tan θ + cot θ) = ?",["1","0","2","secθ·cosecθ"],"(sin²θ/cos θ)(cos²θ/sin θ)(1/(sin θ cos θ)) = 1."],
+["L5","(1 + tan θ + sec θ)(1 + cot θ − cosec θ) = ?",["2","1","0","−1"],"Put θ = 45°: (2 + √2)(2 − √2) = 4 − 2 = 2. (Algebra gives the same for every θ.)"],
+["L5","cos A/(1 + tan A) − sin A/(1 + cot A) = ?",["cosA − sinA","cosA + sinA","sinA − cosA","1"],"= cos²A/(sin A + cos A) − sin²A/(sin A + cos A) = cos A − sin A."],
+["L5","√(sec²θ + cosec²θ) = ?",["tanθ + cotθ","secθ + cosecθ","sinθ + cosθ","tanθ − cotθ"],"sec²θ + cosec²θ = 1/(sin²θ cos²θ) = (tan θ + cot θ)²."],
+["L5","cos θ/(1 + sin θ) = ?",["secθ − tanθ","secθ + tanθ","cosecθ − cotθ","tanθ − secθ"],"Multiply by (1 − sin θ): cos θ(1 − sin θ)/cos²θ = sec θ − tan θ."],
+["L5","(1 − cos²θ)(1 + cot²θ) = ?",["1","0","sin²θ","cos²θ"],"sin²θ × cosec²θ = 1."],
+["L5","sin θ/(1 − cot θ) + cos θ/(1 − tan θ) = ?",["sinθ + cosθ","sinθ − cosθ","1","0"],"= sin²θ/(sin θ − cos θ) − cos²θ/(sin θ − cos θ) = sin θ + cos θ."],
+["L5","tan θ/(1 − cot θ) + cot θ/(1 − tan θ) = ?",["1 + secθ·cosecθ","1 − secθ·cosecθ","secθ + cosecθ","1 + tanθ"],"Put t = tan θ: (t³ − 1)/(t(t − 1)) = (t² + t + 1)/t = 1 + tan θ + cot θ = 1 + sec θ cosec θ."],
+["L5","If sin θ + cos θ = √2 (θ acute), then tan θ + cot θ = ?",["2","1","√2","2√2"],"Square: 1 + 2 sin θ cos θ = 2 → sin θ cos θ = ½ → tan θ + cot θ = 1/(sin θ cos θ) = 2 (θ = 45°)."],
+["L5","(sin θ + cos θ)² + (sin θ − cos θ)² = ?",["2","1","0","4"],"The 2 sin θ cos θ terms cancel: 2(sin²θ + cos²θ) = 2."],
+["L5","sec⁴θ − tan⁴θ = ?",["sec²θ + tan²θ","1","2tan²θ","2sec²θ"],"(sec²θ − tan²θ)(sec²θ + tan²θ) = 1 × (sec²θ + tan²θ)."],
+["L5","Value putting with θ = 45° cannot tell apart which pair of options?",["tan θ and cot θ","sin θ and tan θ","sec θ and tan θ","cos θ and cot θ"],"At 45°, tan θ = cot θ = 1. Use 30° or 60° instead."],
+["L6","The maximum value of (sin¹²θ + cos²⁰θ) for all real values of θ is:",["1","2","3","0"],"sin¹²θ ≤ sin²θ and cos²⁰θ ≤ cos²θ, so the sum ≤ 1; θ = 0° gives 1. SSC CGL 2023 (20 Jul S3).","p"],
+["L6","The maximum value of 5 sin θ + 12 cos θ is:",["13","17","12","7"],"√(25 + 144) = 13. (17 adds the coefficients.)"],
+["L6","The minimum value of 3 sin θ − 4 cos θ is:",["−5","−1","−7","5"],"Range is ±√(9 + 16) = ±5 → minimum −5."],
+["L6","The maximum value of 3 sin θ + 4 cos θ + 7 is:",["12","14","7","10"],"7 + √(9 + 16) = 7 + 5 = 12."],
+["L6","The maximum value of 2 sin θ + 3 cos θ is:",["√13","5","13","1"],"√(4 + 9) = √13."],
+["L6","The maximum value of sin θ·cos θ is:",["1/2","1","1/4","√2"],"sin θ cos θ = ½ sin 2θ ≤ ½."],
+["L6","The maximum value of 24 sin θ cos θ is:",["12","24","6","48"],"12 sin 2θ ≤ 12."],
+["L6","The minimum value of 9 tan²θ + 4 cot²θ is:",["12","13","6","36"],"2√(9 × 4) = 12."],
+["L6","The minimum value of tan²θ + cot²θ is:",["2","0","1","4"],"2√(1 × 1) = 2, at θ = 45°."],
+["L6","The minimum value of 7 sin²θ + 17 cos²θ is:",["7","17","24","10"],"= 7 + 10 cos²θ and cos²θ ≥ 0 → 7 (maximum 17)."],
+["L6","The minimum value of 4 sec²θ + 9 cosec²θ is:",["25","13","12","36"],"= 13 + 4 tan²θ + 9 cot²θ ≥ 13 + 2√36 = 25 = (√4 + √9)²."],
+["L6","The maximum value of sin θ + cos θ is:",["√2","2","1","1/√2"],"√(1² + 1²) = √2, at θ = 45°."],
+["L6","The minimum value of sin⁴θ + cos⁴θ is:",["1/2","0","1","1/4"],"= 1 − 2 sin²θ cos²θ = 1 − ½ sin²2θ ≥ 1 − ½ = ½."],
+["L6","The minimum value of 2 cos²θ + 8 sec²θ is:",["10","8","16","4"],"AM-GM gives 8 but needs cos⁴θ = 4 (impossible). 2c + 8/c falls on 0 < c ≤ 1, so minimum at cos²θ = 1: 2 + 8 = 10."],
+["L6","The minimum value of 16 cos²θ + 4 sec²θ is:",["16","20","8","32"],"2√(16 × 4) = 16, reached at cos²θ = 1/2 (possible since 4 ≤ 16)."],
+["L6","The minimum value of sin²θ + cos²θ + tan²θ + cot²θ + sec²θ + cosec²θ is:",["7","6","5","9"],"1 + (tan²θ + cot²θ) + (sec²θ + cosec²θ) ≥ 1 + 2 + 4 = 7, all at θ = 45°. (6 from blind AM-GM is never reached.)"],
+["L6","The maximum value of 1/(5 + 3 sin θ) is:",["1/2","1/8","1/5","1/3"],"Smallest denominator 5 − 3 = 2 → maximum ½. (1/8 is the minimum.)"],
+["L6","The maximum value of (sin θ + cos θ)² is:",["2","1","4","√2"],"= 1 + sin 2θ ≤ 2."],
+["L7","Find the exact value of cos 120°.",["−1/2","0","1/2","1"],"120° = 180° − 60°, quadrant II (cos negative) → −cos 60° = −0.5. SSC CGL 2023 (18 Jul S4).","p"],
+["L7","What is the value of sin 330°?",["−1/2","1/2","−√3/2","√3/2"],"330° = 360° − 30°, quadrant IV (sin negative) → −½. SSC CHSL 2017 (22 Jan, morning shift).","p"],
+["L7","The value of tan 225° is:",["1","−1","√3","−√3"],"225° = 180° + 45°, quadrant III (tan positive) → tan 45° = 1."],
+["L7","sin 120° + cos 150° = ?",["0","√3","1","−√3"],"√3/2 + (−√3/2) = 0."],
+["L7","The value of cos 210° is:",["−√3/2","√3/2","−1/2","1/2"],"210° = 180° + 30°, quadrant III (cos negative) → −cos 30°."],
+["L7","The value of sec 300° is:",["2","−2","2/√3","−2/√3"],"300° = 360° − 60°, quadrant IV (cos, sec positive) → sec 60° = 2."],
+["L7","Evaluate: sin 420°·cos 390° + cos(−300°)·sin(−330°).",["1","0","1/2","√3/2"],"= sin 60° cos 30° + cos 60° sin 30° = ¾ + ¼ = 1."],
+["L7","cos(90° + θ) is equal to:",["−sinθ","sinθ","cosθ","−cosθ"],"90° → change to sin; quadrant II, cos negative → −sin θ."],
+["L7","tan(180° + θ) is equal to:",["tanθ","−tanθ","cotθ","−cotθ"],"180° → keep tan; quadrant III, tan positive → tan θ."],
+["L7","sin(270° − θ) is equal to:",["−cosθ","cosθ","−sinθ","sinθ"],"270° → change to cos; quadrant III, sin negative → −cos θ."],
+["L7","The value of cos 315° is:",["1/√2","−1/√2","√3/2","−√3/2"],"315° = 360° − 45°, quadrant IV (cos positive) → 1/√2."],
+["L7","The value of tan(−60°) is:",["−√3","√3","−1/√3","1/√3"],"tan(−θ) = −tan θ → −√3."],
+["L7","sin 150° + cos 300° + tan 225° = ?",["2","1","0","−1"],"½ + ½ + 1 = 2."],
+["L7","The value of sin 765° is:",["1/√2","−1/√2","1/2","√3/2"],"765° − 720° = 45° → sin 45°."],
+["L7","cos 1° + cos 2° + cos 3° + … + cos 180° = ?",["−1","0","1","90"],"cos(180° − θ) = −cos θ, so 1°…89° cancel with 179°…91°; cos 90° = 0; left cos 180° = −1."],
+["L7","If sin θ = 3/5 and θ lies in the second quadrant, then tan θ = ?",["−3/4","3/4","−4/3","4/3"],"cos θ = −4/5 in quadrant II → tan θ = (3/5)/(−4/5) = −3/4."],
+["L7","sin 135° − cos 135° = ?",["√2","0","1","−√2"],"1/√2 − (−1/√2) = 2/√2 = √2."],
+["L7","cos 240° + sin 210° = ?",["−1","0","1","−√3"],"−½ + (−½) = −1."],
+["L7","In which quadrant is sin θ negative but tan θ positive?",["Third","Second","Fourth","First"],"ASTC: only tan and cot are positive in quadrant III."],
+["L8","If 3 sin x + 4 cos x = 2, then the value of 3 cos x − 4 sin x is equal to:",["√21","21","√23","√29"],"Square and add: 2² + y² = 3² + 4² → y² = 21 → √21. SSC CGL Tier 2 (18 Nov 2020).","p"],
+["L8","If tan A = 1/2 and tan B = 1/3 (A, B acute), then A + B = ?",["45°","60°","30°","90°"],"tan(A + B) = (½ + ⅓)/(1 − ⅙) = (5/6)/(5/6) = 1 → 45°."],
+["L8","If A + B = 45°, then (1 + tan A)(1 + tan B) = ?",["2","1","0","4"],"tan A + tan B = 1 − tan A tan B → product = 1 + 1 = 2."],
+["L8","If A + B = 45°, then (cot A − 1)(cot B − 1) = ?",["2","1","−1","0"],"cot(A + B) = 1 → cot A cot B − 1 = cot A + cot B → expression = 2."],
+["L8","(1 + tan 20°)(1 + tan 25°) = ?",["2","1","√2","3"],"20° + 25° = 45° → 2."],
+["L8","If sin θ = 3/5 (θ acute), then sin 2θ = ?",["24/25","6/5","12/25","7/25"],"cos θ = 4/5 → 2 × 3/5 × 4/5 = 24/25. (6/5 is 2 sin θ.)"],
+["L8","If tan θ = 3/4, then cos 2θ = ?",["7/25","24/25","−7/25","9/16"],"(1 − 9/16)/(1 + 9/16) = 7/25."],
+["L8","If tan θ = 1/2, then tan 2θ = ?",["4/3","1","3/4","1/4"],"2(½)/(1 − ¼) = 1/(3/4) = 4/3."],
+["L8","If tan θ = 1/2, then tan 3θ = ?",["11/2","3/2","11/8","2"],"(3/2 − 1/8)/(1 − 3/4) = (11/8)/(1/4) = 11/2."],
+["L8","If sin θ = 1/3, then sin 3θ = ?",["23/27","1","5/27","13/27"],"3(1/3) − 4(1/27) = 1 − 4/27 = 23/27."],
+["L8","If cos θ = 1/3, then cos 3θ = ?",["−23/27","23/27","−1/27","1/27"],"4(1/27) − 3(1/3) = 4/27 − 1 = −23/27."],
+["L8","3 sin 20° − 4 sin³20° = ?",["√3/2","1/2","1","√3"],"= sin 3(20°) = sin 60°."],
+["L8","4 cos³20° − 3 cos 20° = ?",["1/2","√3/2","1","0"],"= cos 3(20°) = cos 60°."],
+["L8","2 sin 22.5° cos 22.5° = ?",["1/√2","1","1/2","√2"],"= sin 45°."],
+["L8","2 tan 15°/(1 − tan²15°) = ?",["1/√3","√3","1","2 − √3"],"= tan 30°. (2 − √3 is tan 15° itself.)"],
+["L8","(1 − tan²15°)/(1 + tan²15°) = ?",["√3/2","1/2","1","√3"],"= cos 30°."],
+["L8","(1 − cos 2θ)/(1 + cos 2θ) = ?",["tan²θ","cot²θ","tanθ","sec²θ"],"2 sin²θ/2 cos²θ = tan²θ."],
+["L8","The value of cos 105° is:",["(1 − √3)/(2√2)","(√3 − 1)/(2√2)","(√3 + 1)/(2√2)","−(√3 + 1)/(2√2)"],"cos(60° + 45°) = ½·1/√2 − (√3/2)(1/√2) = (1 − √3)/(2√2)."],
+["L8","sin(A + B)·sin(A − B) is equal to:",["sin²A − sin²B","sin²A + sin²B","cos²A − cos²B","sin²A·cos²B"],"(sin A cos B)² − (cos A sin B)² = sin²A(1 − sin²B) − (1 − sin²A)sin²B = sin²A − sin²B."],
+["L9","If 2 sin²θ + 3 cos θ = 3, 0° < θ < 90°, then the value of (sec²θ + cot²θ) is:",["13/3","11/3","10/3","9/2"],"2 cos²θ − 3 cos θ + 1 = 0 → cos θ = ½ → θ = 60° → 4 + ⅓ = 13/3 (= 4⅓). SSC CGL 2021 Tier 1 (18 Apr 2022 S3).","p"],
+["L9","If 2 cos²θ + 3 sin θ = 3, 0° < θ < 90°, then sin²2θ + cos²θ + tan²2θ + cosec²2θ = ?",["35/6","35/12","29/6","29/3"],"sin θ = ½ → θ = 30° → ¾ + ¾ + 3 + 4/3 = 35/6. SSC CGL Tier 2 (13 Sep 2019).","p"],
+["L9","If 2 cos²θ = 3 sin θ, 0° < θ < 90°, then the value of (½ cosec²θ − cot²θ) is:",["−1","1/4","1/2","0"],"2 sin²θ + 3 sin θ − 2 = 0 → sin θ = ½ → θ = 30° → 2 − 3 = −1. SSC CHSL 2020 (9 Nov 2020 S1).","p"],
+["L9","The value of θ, when √3 cos θ + sin θ = 1 (0° ≤ θ ≤ 90°), is:",["90°","60°","30°","0°"],"Divide by 2: cos(θ − 30°) = ½ → θ − 30° = 60° → θ = 90°. Check: 0 + 1 = 1. SSC CGL 2019 (4 Jun S3).","p"],
+["L9","If 2 sin²θ − 3 sin θ + 1 = 0 and 0° < θ < 90°, then θ = ?",["30°","90°","60°","45°"],"(2 sin θ − 1)(sin θ − 1) = 0 → sin θ = ½ (sin θ = 1 gives 90°, outside the range)."],
+["L9","If 4 cos²θ − 3 = 0 and θ is acute, then θ = ?",["30°","60°","45°","15°"],"cos²θ = ¾ → cos θ = √3/2 → θ = 30°."],
+["L9","If sin(2θ + 10°) = 1/2 and (2θ + 10°) is acute, then θ = ?",["10°","20°","25°","15°"],"2θ + 10° = 30° → θ = 10°. (Without “2θ + 10° acute”, 2θ + 10° = 150° would also give θ = 70°.)"],
+["L9","If sin θ + cosec θ = 2, then sin⁵θ + cosec⁵θ = ?",["2","32","1","10"],"x + 1/x = 2 forces x = 1 → sin θ = 1 → 1 + 1 = 2."],
+["L9","If √3 tan θ = 3 sin θ (θ acute), then sin²θ − cos²θ = ?",["1/3","2/3","1","−1/3"],"tan θ = √3 sin θ → cos θ = 1/√3 → sin²θ = 2/3, cos²θ = 1/3 → 1/3."],
+["L9","In △ABC, sin(A + B) is equal to:",["sinC","−sinC","cosC","−cosC"],"A + B = 180° − C → sin(180° − C) = sin C."],
+["L9","In △ABC, cos(A + B) + cos C = ?",["0","2cosC","1","−1"],"cos(A + B) = −cos C → sum 0."],
+["L9","In △ABC, cos((B + C)/2) is equal to:",["sin(A/2)","cos(A/2)","−sin(A/2)","tan(A/2)"],"(B + C)/2 = 90° − A/2 → cos(90° − A/2) = sin(A/2)."],
+["L9","In △ABC, tan((A + B)/2) is equal to:",["cot(C/2)","tan(C/2)","−cot(C/2)","−tan(C/2)"],"(A + B)/2 = 90° − C/2 → tan becomes cot."],
+["L9","In △ABC, if tan A = 1 and tan B = 2, then tan C = ?",["3","−3","1/3","−1/3"],"tan C = −(1 + 2)/(1 − 2) = 3."],
+["L9","In △ABC, tan A + tan B + tan C − tan A·tan B·tan C = ?",["0","1","3","3√3"],"tan A + tan B + tan C = tan A tan B tan C in every triangle (not right-angled)."],
+["L9","In △ABC, cot A cot B + cot B cot C + cot C cot A = ?",["1","0","3","−1"],"Equilateral check: 3 × (1/√3)² = 1."],
+["L9","In △ABC, ∠C = 90°. Then sin²A + sin²B = ?",["1","2","0","1/2"],"A + B = 90° → sin B = cos A → sin²A + cos²A = 1."],
+["L9","In △ABC, if ∠A = 60°, then sin((B + C)/2) = ?",["√3/2","1/2","1","1/√2"],"(B + C)/2 = 60° → sin 60°. (= cos(A/2) = cos 30°.)"],
+["L10","The angle of elevation of the top of an unfinished tower at a point distant 78 m from its base is 30°. How much higher must the tower be raised (in m) so that the angle of elevation of the top of the finished tower at the same point will be 60°?",["52√3","26√3","80","78√3"],"Now 78/√3 = 26√3; finished 78√3; raise 52√3. SSC CGL 2021 Tier 1 (11 Apr 2022 S1).","p"],
+["L10","The shadow of a tower standing on level ground is found to be 40 m longer when the Sun's altitude is 30° than when it was 45°. Find the height (in m) of the tower.",["20(√3 + 1)","10(√3 − 1)","20(√3 − 1)","10(√3 + 1)"],"h√3 − h = 40 → h = 40/(√3 − 1) = 20(√3 + 1). SSC CHSL 2023 Tier 2 (10 Jan 2024 S1).","p"],
+["L10","From a point P on level ground, the angle of elevation of the top of a tower is 30°. If the tower is 270 m high, the distance of P from the foot of the tower is:",["467.65 m","476.65 m","376.65 m","367.65 m"],"d = 270 cot 30° = 270√3 ≈ 467.65 m. SSC CPO 2019 (16 Mar S3).","p"],
+["L10","A man standing 30 m away from the base of a tower sees its top at an angle of elevation of 60°. The height of the tower is:",["30√3 m","10√3 m","30 m","60 m"],"h = 30 tan 60° = 30√3. (10√3 uses tan 30°.)"],
+["L10","From the top of a lighthouse 60 m high, the angles of depression of two ships on the same side are 45° and 30°. The distance between the ships is:",["60(√3 − 1) m","60(√3 + 1) m","60√3 m","30(√3 − 1) m"],"60√3 − 60 = 60(√3 − 1)."],
+["L10","From the top of a 100 m tower, the angles of depression of two cars on opposite sides of the tower are 30° and 45°. The distance between the cars is:",["100(√3 + 1) m","100(√3 − 1) m","100√3 m","200 m"],"Opposite sides → add: 100√3 + 100."],
+["L10","A pole 6 m high casts a shadow 2√3 m long on the ground. The Sun's angle of elevation is:",["60°","30°","45°","90°"],"tan θ = 6/(2√3) = √3 → 60°."],
+["L10","The length of the shadow of a pole is √3 times its height. The angle of elevation of the Sun is:",["30°","60°","45°","15°"],"tan θ = h/(√3 h) = 1/√3 → 30°."],
+["L10","The angle of elevation of the top of a tower changes from 30° to 60° when an observer walks 20 m towards it. The height of the tower is:",["10√3 m","20√3 m","10 m","20 m"],"h = 20/(cot 30° − cot 60°) = 20/(2/√3) = 10√3."],
+["L10","The angles of elevation of the top of a tower from two points 4 m and 9 m from its base, on the same straight line, are complementary. The height of the tower is:",["6 m","6.5 m","13 m","36 m"],"h = √(4 × 9) = 6. (6.5 is the AM, not the GM.)"],
+["L10","A 10 m long ladder leans against a wall and makes 60° with the ground. How high up the wall does it reach?",["5√3 m","5 m","10√3 m","10/√3 m"],"h = 10 sin 60° = 5√3. (5 m uses cos 60°.)"],
+["L10","A kite is flying on a 100 m string that makes 30° with the ground. The height of the kite is:",["50 m","50√3 m","100√3 m","100/√3 m"],"h = 100 sin 30° = 50."],
+["L10","From the top of a 20 m building, the angle of elevation of the top of a tower is 45° and the angle of depression of its foot is 30°. The height of the tower is:",["20(√3 + 1) m","20√3 m","40 m","20(√3 − 1) m"],"Distance = 20 cot 30° = 20√3; part above the roof = 20√3 tan 45° = 20√3; tower = 20 + 20√3."],
+["L10","A tower is 50√3 m high. The angle of elevation of its top from a point 50 m from its foot is:",["60°","30°","45°","75°"],"tan θ = 50√3/50 = √3 → 60°."],
+["L10","A statue 1.6 m tall stands on a pedestal. From a point on the ground, the elevation of the top of the statue is 60° and of the top of the pedestal is 45°. The height of the pedestal is:",["0.8(√3 + 1) m","1.6(√3 + 1) m","0.8(√3 − 1) m","1.6√3 m"],"Distance = h (45°) → √3 h = h + 1.6 → h = 1.6/(√3 − 1) = 0.8(√3 + 1)."],
+["L10","An observer 1.5 m tall is 28.5 m away from a tower. The angle of elevation of the top of the tower from his eyes is 45°. The height of the tower is:",["30 m","28.5 m","27 m","31.5 m"],"Part above the eye = 28.5 tan 45° = 28.5; add eye height 1.5 → 30 m."],
+["L10","An aeroplane flying horizontally at a height of 1500√3 m is seen at an elevation of 60°; after 15 seconds the elevation is 30°. The speed of the plane is:",["720 km/h","360 km/h","200 km/h","540 km/h"],"Distance = 1500√3(cot 30° − cot 60°) = 3000 m in 15 s = 200 m/s = 720 km/h."],
+["L11","The arc length of a sector of a circle that subtends a 22.5° angle at the centre is given as 16.5 cm. What will be the radius (in cm) of the circle? [Use π = 22/7]",["42","35","49","48"],"(22.5/360) × 2 × (22/7) × r = 16.5 → 11r/28 = 16.5 → r = 42. SSC CHSL 2023 (8 Aug S4).","p"],
+["L11","75° is equal to how many radians?",["5π/12","3π/4","5π/6","π/3"],"75 × π/180 = 5π/12."],
+["L11","3π/5 radians is equal to:",["108°","120°","72°","54°"],"3 × 180°/5 = 108°."],
+["L11","π/12 radians in degrees is:",["15°","12°","30°","7.5°"],"180°/12 = 15°."],
+["L11","1 radian is approximately equal to (π = 22/7):",["57°16′","1°","3.14°","90°"],"180/π = 180 × 7/22 = 57.27° ≈ 57°16′."],
+["L11","The length of an arc that subtends 60° at the centre of a circle of radius 21 cm is (π = 22/7):",["22 cm","44 cm","11 cm","66 cm"],"21 × π/3 = 7 × 22/7 = 22."],
+["L11","A pendulum 35 cm long swings through an angle of 72°. The length of the arc described by its tip is (π = 22/7):",["44 cm","22 cm","88 cm","70 cm"],"72° = 2π/5 → 35 × 2π/5 = 14π = 44."],
+["L11","In a circle of radius 14 cm, an arc subtends 1.5 radians at the centre. The arc length is:",["21 cm","9.33 cm","28 cm","10.5 cm"],"l = rθ = 14 × 1.5 = 21. (9.33 divides instead of multiplying.)"],
+["L11","The area (in cm²) of a sector of radius 6 cm with central angle π/3 radians is:",["6π","12π","3π","2π"],"½ r²θ = ½ × 36 × π/3 = 6π."],
+["L11","The angles of a triangle are in the ratio 2 : 3 : 4. The largest angle in radians is:",["4π/9","4π/3","2π/9","π/2"],"(4/9) × π."],
+["L11","40°20′ expressed in radians is:",["121π/540","121π/180","41π/180","2π/9"],"40⅓° = 121/3 ° → (121/3) × π/180 = 121π/540."],
+["L11","The angle between the hands of a clock at 3:40 is:",["130°","140°","120°","150°"],"|30 × 3 − 5.5 × 40| = |90 − 220| = 130°."],
+["L11","The circular measure of the angle formed by the hour hand and the minute hand of a clock at 3 p.m. is:",["π/2","π/3","π/4","3π/4"],"90° = π/2."],
+["L11","The angle between the hands of a clock at 7:20 is:",["100°","90°","110°","120°"],"|210 − 110| = 100°."],
+["L11","The angle between the hands of a clock at 12:30 is:",["165°","180°","150°","175°"],"|0 − 5.5 × 30| = 165°. (180° forgets that the hour hand has moved 15°.)"],
+["L11","The angle (in radians) through which the minute hand turns in 20 minutes is:",["2π/3","π/3","π/6","4π/3"],"20 × 6° = 120° = 2π/3."],
+["L11","The angle through which the hour hand of a clock turns in 2 hours 30 minutes is:",["75°","150°","60°","90°"],"150 min × 0.5° = 75°. (150° uses the minute-hand rate wrongly.)"],
+["L11","The difference between the two acute angles of a right triangle is π/10 radians. The larger acute angle is:",["54°","63°","72°","45°"],"Sum 90°, difference 18° → larger = (90 + 18)/2 = 54°."]
+//@@Q
+];
+const HEAT = [
+["Ratios from one ratio",10,"L1","Given 7 cot P = 24 or 6 tan A = 5, find another ratio or a same-degree expression"],
+["Standard angle values",14,"L2","Evaluate expressions with 30°, 45°, 60° (Tier 2: 15°, 18°, 22.5°, 75°)"],
+["Fundamental identities",20,"L3","sec θ + tan θ = x type; sin⁴ + cos⁴, sin⁶ + cos⁶ simplifications"],
+["Complementary angles",9,"L4","cot 13°·cot 77° type products, sin 3A = cos(30° − A), long fractions"],
+["Simplification by value putting",14,"L5","“Expression is equal to?” with ratio options"],
+["Maximum & minimum",6,"L6","a sin θ + b cos θ, a tan²θ + b cot²θ, sin¹²θ + cos²⁰θ"],
+["Allied angles",3,"L7","cos 120°, sin 330°, tan 225°, negative angles"],
+["Compound & multiple angles",5,"L8","A + B = 45°, sin 2θ / cos 2θ from tan θ, 3 sin x + 4 cos x = c"],
+["Triangle identities & equations",6,"L9","Solve 2 sin²θ + 3 cos θ = 3 then evaluate; tan((A + B)/2)"],
+["Heights & distances",11,"L10","Tower with 30°/60°, moving observer, shadow longer by x m, two ships"],
+["Degrees, radians, clocks",2,"L11","Arc length with θ, degree↔radian, clock-hand angle"]
+];
+const TILES = [
+["P/H, B/H, P/B","sin, cos, tan"],
+["√0/2 … √4/2","sin 0°, 30°, 45°, 60°, 90°"],
+["sin²30° = ¼","sin²45° = ½, sin²60° = ¾"],
+["tan²60° = 3","tan²30° = ⅓, sec²60° = 4"],
+["2 − √3","tan 15° (tan 75° = 2 + √3)"],
+["√2 − 1","tan 22.5°"],
+["(√5 − 1)/4","sin 18° (cos 36° = (√5 + 1)/4)"],
+["sec² − tan² = 1","→ sec θ − tan θ = 1/(sec θ + tan θ)"],
+["(x² − 1)/2","sin θ cos θ if sin θ + cos θ = x"],
+["1 − 2s²c²","sin⁴θ + cos⁴θ (sin⁶ + cos⁶ = 1 − 3s²c²)"],
+["44½","sin²1° + sin²2° + … + sin²89°"],
+["1","tan 1°·tan 2°·…·tan 89°"],
+["±√(a² + b²)","range of a sin θ + b cos θ"],
+["2√(ab)","minimum of a tan²θ + b cot²θ"],
+["ASTC","All, Sin, Tan, Cos positive in quadrants I–IV"],
+["2 sin θ cos θ","sin 2θ"],
+["1 − 2 sin²θ","cos 2θ (= 2cos²θ − 1)"],
+["3 sin θ − 4 sin³θ","sin 3θ (cos 3θ = 4cos³θ − 3cos θ)"],
+["2","(1 + tan A)(1 + tan B) when A + B = 45°"],
+["tan A + tan B + tan C","= tan A·tan B·tan C in a triangle"],
+["x/(cot α − cot β)","tower height, two angles, same side"],
+["√(ab)","tower height from complementary angles at a and b"],
+["π rad = 180°","1 rad ≈ 57.3° (57°16′ with π = 22/7)"],
+["|30H − 5.5M|","angle between clock hands"]
+];
+const PAIRS = [
+["sin²30° + cos²60° vs sin²30° + cos²30°","½ (different angles) vs 1 (same angle — identity applies)"],
+["sec θ + tan θ = x: sec θ − tan θ","= 1/x, not −x or x − 1"],
+["sin θ + cos θ = x: sin θ cos θ","= (x² − 1)/2 — don't forget the ÷2"],
+["sin²1° + … + sin²89° vs sin²1° + … + sin²90°","44½ vs 45½ — sin²90° = 1 adds a full 1"],
+["cos 1°·…·cos 89° vs cos 1°·…·cos 90°","a tiny positive number vs exactly 0"],
+["sin 2θ vs 2 sin θ","2 sin θ cos θ vs twice sin θ — never equal for acute θ"],
+["sin(A + B) vs cos(A + B)","sin keeps the sign (sAcB + cAsB); cos flips it (cAcB − sAsB)"],
+["sin 3θ vs cos 3θ","3 sin θ − 4 sin³θ vs 4 cos³θ − 3 cos θ (order reversed)"],
+["cos(90° − θ) vs cos(90° + θ)","sin θ vs −sin θ — sign from quadrant II"],
+["tan(180° − θ) vs tan(180° + θ)","−tan θ vs +tan θ (quadrant II vs III)"],
+["Max of a sin θ + b cos θ vs a + b","√(a² + b²) (13 for 5, 12) — a + b is never reached"],
+["a cos²θ + b sec²θ: 2√(ab) vs a + b","2√(ab) only if b ≤ a; if b > a the minimum is a + b"],
+["Elevation vs depression","up from the horizontal vs down from the horizontal — equal by alternate angles"],
+["Same side vs opposite sides (two ships)","subtract the distances vs add them"],
+["Value putting: 45° vs 30°/60°","45° makes tan = cot and sin = cos (options tie); use 30° or 60°"],
+["l = rθ vs l = (θ/360)·2πr","θ in radians vs θ in degrees — same arc"]
+];
+const COVERS = {
+ vals:{tab:"Value table drill", hideLabel:"Hide values", note:"Cover the value column and recall each ratio of the standard angles. Check, then move to the next row.", head:["Ratio","Angle","Value"], hide:2, rows:[
+  ["sin","30°","1/2"],["sin","45°","1/√2"],["sin","60°","√3/2"],["cos","30°","√3/2"],["cos","60°","1/2"],["tan","30°","1/√3"],["tan","60°","√3"],["sec","30°","2/√3"],["cosec","60°","2/√3"],["sec","60°","2"],["tan","15°","2 − √3"],["tan","75°","2 + √3"],["sin","18°","(√5 − 1)/4"],["cos","36°","(√5 + 1)/4"],["tan","22.5°","√2 − 1"],["cos","120°","−1/2"],["sin","330°","−1/2"],["tan","135°","−1"]]},
+ ids:{tab:"Identity drill", hideLabel:"Hide results", note:"Cover the result and say it aloud: the left side must turn into the right in your head.", head:["Given / expression","Result"], hide:1, rows:[
+  ["sin²θ + cos²θ","1"],["sec²θ − tan²θ","1"],["cosec²θ − cot²θ","1"],["sec θ + tan θ = x","sec θ − tan θ = 1/x"],["sin θ + cos θ = x","sin θ cos θ = (x² − 1)/2"],["sin⁴θ + cos⁴θ","1 − 2 sin²θ cos²θ"],["sin⁶θ + cos⁶θ","1 − 3 sin²θ cos²θ"],["(1 + sin θ)/(1 − sin θ)","(sec θ + tan θ)²"],["1/(cosec θ − cot θ)","cosec θ + cot θ"],["sin 2θ","2 sin θ cos θ"],["cos 2θ","1 − 2 sin²θ = 2 cos²θ − 1"],["sin 3θ","3 sin θ − 4 sin³θ"],["cos 3θ","4 cos³θ − 3 cos θ"],["A + B = 45°","(1 + tan A)(1 + tan B) = 2"],["In △ABC: sin(A + B)","sin C"]]},
+ maxmin:{tab:"Max–min & heights drill", hideLabel:"Hide answers", note:"Cover the answer column: range formulas and the 30-60 tower shortcuts.", head:["Expression / situation","Answer"], hide:1, rows:[
+  ["Max of a sin θ + b cos θ","√(a² + b²)"],["Range of a sin²θ + b cos²θ","between a and b"],["Min of a tan²θ + b cot²θ","2√(ab)"],["Min of a sec²θ + b cosec²θ","(√a + √b)²"],["Max of sin θ cos θ","1/2"],["Min of sin⁴θ + cos⁴θ","1/2"],["Tower, 30° → 60° walking x","h = (√3/2)x"],["Complementary angles from a, b","h = √(ab)"],["Shadow = height","Sun at 45°"],["Shadow = √3 × height","Sun at 30°"],["Lighthouse h, ships 45° & 30° same side","h(√3 − 1)"]]}
+};
+const FIND = { tab:"Formula finder", ph:"Search a formula (e.g. sec, tower, 2θ, clock)", head:["Topic","Formula","Lesson","When to use"], rows:[
+["sin, cos, tan","sin θ = P/H, cos θ = B/H, tan θ = P/B","L1","Reading ratios from a right triangle"],
+["Reciprocals","cosec θ = 1/sin θ, sec θ = 1/cos θ, cot θ = 1/tan θ","L1","Converting between ratios"],
+["Quotient","tan θ = sin θ/cos θ, cot θ = cos θ/sin θ","L1","Writing everything in sin and cos"],
+["Same-degree expression","divide by cos θ and use tan θ","L1","(a sin θ + b cos θ)/(c sin θ + d cos θ) with tan θ given"],
+["Triplets","3-4-5, 5-12-13, 8-15-17, 7-24-25, 20-21-29","L1","One ratio given → third side instantly"],
+["Standard table","sin 0°, 30°, 45°, 60°, 90° = √0/2, √1/2, √2/2, √3/2, √4/2","L2","Any value expression"],
+["tan 15°, tan 75°","2 − √3, 2 + √3","L2","Tier 2 special angles"],
+["sin 15°, cos 15°","(√3 − 1)/(2√2), (√3 + 1)/(2√2)","L2","Tier 2 special angles"],
+["sin 18°, cos 36°","(√5 − 1)/4, (√5 + 1)/4","L2","cos 36° − sin 18° = ½"],
+["tan 22.5°","√2 − 1 (cot 22.5° = √2 + 1)","L2","Half of 45°"],
+["Pythagorean identities","sin² + cos² = 1, sec² − tan² = 1, cosec² − cot² = 1","L3","Every identity question"],
+["sec + tan pair","sec θ + tan θ = x ⇒ sec θ − tan θ = 1/x","L3","Find sec, tan, sin from x"],
+["cosec + cot pair","cosec θ + cot θ = y ⇒ cosec θ − cot θ = 1/y","L3","Find cos θ = (y² − 1)/(y² + 1)"],
+["sin + cos = x","sin θ cos θ = (x² − 1)/2","L3","Square the given sum"],
+["tan + cot = x","tan²θ + cot²θ = x² − 2; tan θ + cot θ = sec θ cosec θ","L3","Sum of reciprocals"],
+["Fourth powers","sin⁴θ + cos⁴θ = 1 − 2 sin²θ cos²θ; sin⁴θ − cos⁴θ = sin²θ − cos²θ","L3","Higher powers"],
+["Sixth powers","sin⁶θ + cos⁶θ = 1 − 3 sin²θ cos²θ","L3","a³ + b³ with a + b = 1"],
+["Root form","√((1 + sin θ)/(1 − sin θ)) = sec θ + tan θ","L3","Rationalise with 1 + sin θ"],
+["Complement","sin(90° − θ) = cos θ, tan(90° − θ) = cot θ, sec(90° − θ) = cosec θ","L4","Angles adding to 90°"],
+["A + B = 90°","tan A tan B = 1, sin²A + sin²B = 1","L4","Pairs in long products"],
+["Equation by complement","sin xA = cos yA ⇒ xA + yA = 90°","L4","Find A"],
+["Long sums","sin²1° + … + sin²89° = 89/2;  tan 1°…tan 89° = 1","L4","Series questions"],
+["Value putting","numbers → 0°/45°/90°; ratios → 30°/60°","L5","“Expression equals?” questions"],
+["Conjugate","1/(cosec θ − cot θ) = cosec θ + cot θ","L5","Simplify a fraction"],
+["a sin θ + b cos θ","range −√(a² + b²) to √(a² + b²)","L6","Max/min of a linear combination"],
+["a sin²θ + b cos²θ","between a and b","L6","Max/min with squares"],
+["a tan²θ + b cot²θ","minimum 2√(ab)","L6","AM ≥ GM"],
+["a sec²θ + b cosec²θ","minimum (√a + √b)²","L6","AM ≥ GM after sec² = 1 + tan²"],
+["sin θ cos θ","maximum ½","L6","= ½ sin 2θ"],
+["ASTC","All, Sin, Tan, Cos positive in quadrants I, II, III, IV","L7","Sign of any ratio"],
+["Reduction","90°/270° ± θ change function; 180°/360° ± θ keep it","L7","Angles beyond 90°"],
+["Negative angle","sin(−θ) = −sin θ, cos(−θ) = cos θ, tan(−θ) = −tan θ","L7","cos(−300°) etc."],
+["sin(A ± B)","sin A cos B ± cos A sin B","L8","sin 75°, sin 15°"],
+["cos(A ± B)","cos A cos B ∓ sin A sin B","L8","cos 105°, cos 15°"],
+["tan(A ± B)","(tan A ± tan B)/(1 ∓ tan A tan B)","L8","tan A = 1/2, tan B = 1/3 → A + B = 45°"],
+["sin 2θ","2 sin θ cos θ = 2 tan θ/(1 + tan²θ)","L8","Double angle"],
+["cos 2θ","cos²θ − sin²θ = 1 − 2 sin²θ = 2 cos²θ − 1 = (1 − tan²θ)/(1 + tan²θ)","L8","Double angle"],
+["tan 2θ","2 tan θ/(1 − tan²θ)","L8","Double angle"],
+["Triple angles","sin 3θ = 3 sin θ − 4 sin³θ, cos 3θ = 4 cos³θ − 3 cos θ","L8","3 sin 20° − 4 sin³20° = sin 60°"],
+["tan 3θ","(3 tan θ − tan³θ)/(1 − 3 tan²θ)","L8","Triple angle"],
+["A + B = 45°","(1 + tan A)(1 + tan B) = 2","L8","(1 + tan 20°)(1 + tan 25°)"],
+["a sin x + b cos x = c","a cos x − b sin x = ±√(a² + b² − c²)","L8","Square and add"],
+["Products","sin(A + B) sin(A − B) = sin²A − sin²B","L8","Factor forms"],
+["Triangle sum","sin(A + B) = sin C, cos(A + B) = −cos C, tan(A + B) = −tan C","L9","A + B + C = 180°"],
+["Half angles in a triangle","sin((A + B)/2) = cos(C/2), tan((A + B)/2) = cot(C/2)","L9","Half-sum questions"],
+["Tan identity","tan A + tan B + tan C = tan A tan B tan C","L9","Any triangle"],
+["Simple equation","one ratio → quadratic → root in range","L9","2 sin²θ + 3 cos θ = 3"],
+["Elevation","h = d tan θ, d = h cot θ","L10","Tower and one angle"],
+["Two angles same side","h = x/(cot α − cot β)","L10","Observer moves towards the tower"],
+["Two angles opposite sides","distance = h(cot α + cot β)","L10","Ships on both sides"],
+["30° → 60°","walked = 2 × remaining; h = (√3/2) × walked","L10","Fast tower shortcut"],
+["Complementary elevations","h = √(ab)","L10","Angles from a and b add to 90°"],
+["Shadow","shadow = h cot θ","L10","Sun’s altitude"],
+["Degree ↔ radian","π rad = 180°","L11","Unit conversion"],
+["Arc and sector","l = rθ, area = ½ r²θ (θ in radians)","L11","Arc subtending an angle"],
+["Clock angle","|30H − 5.5M|","L11","Angle between the hands"]
+]};
+const APP = { key:"trigonometry_workbook_v1", brand:"Trigonometry", sub:"त्रिकोणमिति · SSC maths workbook",
+  eyebrow:"SSC CGL Maths",
+  intro:"Eleven lessons that cover every trigonometry type SSC asks: the six ratios and standard values, identities and complementary angles, value putting, maximum–minimum, allied and compound angles, triangle results and simple equations, heights and distances, and radian/clock measure. Each lesson has formula cards, figures, solved past questions and a practice bank checked by computer.",
+  foot:"Read a lesson’s formula cards and examples, then try its quick check and question bank. Use the drills to cover a column and recall it, and the formula finder to look anything up in seconds. Revisit the traps before a mock test.",
+  craft:"Most trig questions fall to three moves. (1) Value putting: when options are numbers put θ = 0°, 45° or 90°; when options are ratios put 30° or 60° (never 45°, where tan = cot). (2) Pair recognition: sec + tan, cosec + cot and sin + cos pairs, angles adding to 90° or 45°. (3) Draw the triangle: one ratio gives all six via a triplet, and every height-distance question is tan θ = height ÷ distance. For surds, approximate √3 ≈ 1.732 and √2 ≈ 1.414 and eliminate options by size.",
+  heatNote:"Shares are approximate, estimated from recent SSC CGL Tier 1 and Tier 2 papers; they show where trigonometry questions usually come from, not exact counts." };
+
+/* ============================================================
+   HELPERS & STATE
+   ============================================================ */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const hash = s => { let h = 5381; for (let i=0;i<s.length;i++) h = ((h<<5)+h + s.charCodeAt(i))|0; return "q"+(h>>>0).toString(36); };
+const shuffle = a => { const b=a.slice(); for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]];} return b; };
+const L = id => LESSONS.find(l => l.id === id);
+const LNUM = id => LESSONS.findIndex(l => l.id === id) + 1;
+
+const QS = QB.map(r => {
+  const fixed = !!r[6];
+  return { t:r[0], q:r[1], o:r[2], e:r[3], p:(r[4]||"").includes("p"), a: fixed ? (r[5]||0) : 0, fixed, id:hash(r[1]) };
+});
+const byLesson = id => QS.filter(q => q.t === id);
+// order of options to show: array of original indexes
+const makePerm = q => q.fixed ? q.o.map((_,i)=>i) : shuffle(q.o.map((_,i)=>i));
+
+const KEY = APP.key;
+let S = { ans:{}, bm:{}, les:{}, mocks:[] };
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch(e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
+const record = (q, ok) => { S.ans[q.id] = ok ? 1 : 0; save(); renderTop(); };
+
+function renderTop(){
+  const ids = Object.keys(S.ans).filter(k => QS.some(q => q.id === k));
+  const right = ids.filter(k => S.ans[k] === 1).length;
+  const pct = ids.length ? Math.round(right*100/ids.length) : 0;
+  $("#topstat").innerHTML = `<b>${ids.length}</b>/${QS.length} tried<br><b>${pct}%</b> right now`;
+}
+
+/* ============================================================
+   ROUTING
+   ============================================================ */
+let TAB = "learn";
+let timerId = null;
+function go(tab){
+  TAB = tab;
+  document.querySelectorAll(".nav button").forEach(b => b.setAttribute("aria-current", b.dataset.tab===tab ? "page" : "false"));
+  if (tab === "learn") renderLearn();
+  if (tab === "practice") renderPractice();
+  if (tab === "mock") renderMock();
+  if (tab === "revise") renderRevise();
+  window.scrollTo(0,0);
+  try { history.replaceState(null, "", "#"+tab); } catch(e) {}
+}
+document.querySelectorAll(".nav button").forEach(b => b.addEventListener("click", () => {
+  if (TAB === "mock" && M && M.running && b.dataset.tab !== "mock") { go("mock"); showMockLeave(b.dataset.tab); return; }
+  go(b.dataset.tab);
+}));
+
+/* ============================================================
+   LEARN
+   ============================================================ */
+function renderLearn(){
+  const done = LESSONS.filter(l => S.les[l.id] && S.les[l.id].done).length;
+  const nextIdx = LESSONS.findIndex(l => !(S.les[l.id] && S.les[l.id].done));
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="hero">
+      <span class="eyebrow">${APP.eyebrow}</span>
+      <h1>Learn it, test it, revise it</h1>
+      <p>${APP.intro} ${QS.length} exam-style questions in all.</p>
+      <div class="meter" aria-label="Lessons done"><i style="width:${done/LESSONS.length*100}%"></i></div>
+      <div class="row between"><span class="muted num" style="font-size:13px">${done}/${LESSONS.length} lessons done</span>
+      ${nextIdx>=0 ? `<button class="btn pri sm" type="button" data-open="${LESSONS[nextIdx].id}">${done? "Continue" : "Start"}: Lesson ${nextIdx+1}</button>` : `<span class="muted" style="font-size:13px">All lessons done. Try a mock test.</span>`}</div>
+    </div>
+    <div class="lessons">${LESSONS.map((l,i) => {
+      const st = S.les[l.id] || {}; const n = byLesson(l.id).length;
+      return `<button type="button" class="les ${st.done?"done":""} ${i===nextIdx?"next":""}" data-open="${l.id}">
+        <span class="no">${st.done ? "✓" : i+1}</span>
+        <span class="t"><b>${esc(l.title)}<span class="heatb" title="Exam frequency">${"🔥".repeat(l.heat||1)}</span></b><span>${l.hi} · ${n} questions</span></span>
+        <span class="sc">${st.best!=null ? `best<br>${st.best}/${n}` : ""}</span></button>`;}).join("")}
+    </div>
+    <p class="foot">${APP.foot}</p>
+  </section>`;
+  $("#app").querySelectorAll("[data-open]").forEach(b => b.addEventListener("click", () => openLesson(b.dataset.open, "learn")));
+}
+
+function blockHTML(b){
+
+  if (b.k==="formula") return `<div class="block"><h3>${b.title}</h3><div class="fgrid">${b.rows.map(r=>`<div class="fcard"><span class="fn">${r[0]}</span><span class="fx">${r[1]}</span>${r[2]?`<span class="fnote">${r[2]}</span>`:""}</div>`).join("")}</div></div>`;
+  if (b.k==="ex") return `<div class="ex"><div class="exhead"><span class="lab">${b.src ? "PYQ" : "Solved example"}</span>${b.src?`<span class="src">${b.src}</span>`:""}</div><div class="exq">${b.q}</div>${b.fig?`<figure class="fig">${b.fig}</figure>`:""}<details><summary>Show solution</summary><ol>${b.steps.map(x=>`<li>${x}</li>`).join("")}</ol><div class="exans">Answer: ${b.ans}</div>${b.tip?`<div class="trick" style="margin-top:8px"><span class="lab">Shortcut</span>${b.tip}</div>`:""}</details></div>`;
+  if (b.k==="figs") return `<div class="block"><h3>${b.title}</h3><div class="figwrap">${b.items.map(it=>`<figure>${it.svg}<figcaption>${it.cap}</figcaption></figure>`).join("")}</div></div>`;
+  if (b.k==="p") return `<div class="plain"><p>${b.h}</p></div>`;
+  if (b.k==="trick") return `<div class="trick"><span class="lab">Trick</span>${b.h}</div>`;
+  if (b.k==="link") return `<div class="link"><span class="lab">Link · connect the dots</span>${b.h}</div>`;
+  if (b.k==="q") { const perm = shuffle(b.o.map((_,i)=>i)); return `<div class="icheck" data-ic><span class="lab">Quick check</span><p class="qt">${esc(b.q)}</p><div class="opts">${perm.map((oi,k)=>`<button type="button" class="opt" data-ioi="${oi}"><span class="k">${"ABCD"[k]}</span><span>${esc(b.o[oi])}</span></button>`).join("")}</div><div class="exp" hidden><b class="okl"></b> ${esc(b.e)}</div></div>`; }
+  if (b.k==="hot") return `<div class="hot"><span class="lab">🔥 Exam radar · how often it's asked</span>${b.h}</div>`;
+  if (b.k==="trap") return `<div class="trap"><span class="lab">Trap · correction</span>${b.h}</div>`;
+  if (b.k==="facts") return `<div class="block"><h3>${b.title}</h3><dl class="facts">${b.rows.map(r=>`<div><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join("")}</dl></div>`;
+  if (b.k==="tl") return `<div class="block"><h3>${b.title}</h3><ul class="tl">${b.rows.map(r=>`<li><span class="y">${r[0]}</span><span>${r[1]}</span></li>`).join("")}</ul></div>`;
+  if (b.k==="table") {
+    const isNum = (ci) => b.numcol==="all" ? ci>0 : (b.numcol===1 && ci===1) || (typeof b.numcol==="string" && b.numcol.includes(String(ci)));
+    return `<div class="block"><h3>${b.title}</h3><div class="tbl"><table><thead><tr>${b.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${b.rows.map(r=>`<tr>${r.map((c,ci)=>`<td class="${isNum(ci)?"n":""}">${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+  }
+  if (b.k==="fig") return `<div class="block"><h3>${b.title}</h3><figure class="fig">${b.svg}<figcaption>${b.cap}</figcaption></figure></div>`;
+  if (b.k==="pyr") return `<div class="block"><h3>${b.title}</h3><div class="pyr">${b.items.map(it=>`<div>${PYR(it.rows)}<b>${it.name}</b><span class="muted">${it.note}</span></div>`).join("")}</div><p class="muted" style="font-size:13px;margin-top:8px"><span style="color:var(--blue)">■</span> males · <span style="color:var(--accent)">■</span> females · top = old, base = young</p></div>`;
+  return "";
+}
+
+let LQ = null;
+function openLesson(id, step){
+  const l = L(id), i = LNUM(id);
+  if (step === "quiz") { LQ = { id, list: shuffle(byLesson(id)).map(q => ({q, perm:makePerm(q)})), i:0, score:0, picked:null }; }
+  const head = `<div class="lhead"><button class="back" type="button" id="lback">‹ Lessons</button></div>
+    <span class="eyebrow">Lesson ${i} of ${LESSONS.length} · ${l.hi}</span><h1>${esc(l.title)}</h1>
+    <div class="steps" role="tablist">
+      <button type="button" data-step="learn" aria-current="${step==="learn"?"step":"false"}">1 · Learn</button>
+      <button type="button" data-step="quiz" aria-current="${step==="quiz"?"step":"false"}">2 · Quiz</button>
+      <button type="button" data-step="sum" aria-current="${step==="sum"?"step":"false"}">3 · Summary</button>
+    </div>`;
+  let body = "";
+  if (step === "learn") {
+    body = `<div class="stack">${l.blocks.map(blockHTML).join("")}
+      <div class="row end"><button class="btn pri" type="button" id="toquiz">Take the lesson quiz · ${byLesson(id).length} questions</button></div></div>`;
+  } else if (step === "quiz") {
+    body = `<div id="lq"></div>`;
+  } else {
+    const nxt = LESSONS[i];
+    body = `<div class="stack"><div class="block"><h3>Remember these</h3><ul class="sum">${l.sum.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>
+      <div class="row between"><button class="btn" type="button" id="relearn">Read again</button>
+      ${nxt ? `<button class="btn pri" type="button" id="nextles">Next: ${esc(nxt.title)}</button>` : `<button class="btn pri" type="button" id="tomock">Take a mock test</button>`}</div></div>`;
+    S.les[id] = Object.assign(S.les[id]||{}, {done:1}); save();
+  }
+  $("#app").innerHTML = `<section class="view stack">${head}${body}</section>`;
+  $("#lback").onclick = () => renderLearn();
+  $("#app").querySelectorAll("[data-step]").forEach(b => b.onclick = () => openLesson(id, b.dataset.step));
+  if (step==="learn") { $("#toquiz").onclick = () => openLesson(id,"quiz");
+    const ics = l.blocks.filter(b=>b.k==="q");
+    $("#app").querySelectorAll("[data-ic]").forEach((box,n) => { const b = ics[n];
+      box.querySelectorAll("[data-ioi]").forEach(btn => btn.onclick = () => {
+        if (box.dataset.done) return; box.dataset.done = 1; const pick = +btn.dataset.ioi;
+        box.querySelectorAll("[data-ioi]").forEach(x => { const oi=+x.dataset.ioi; x.disabled = true; if (oi===0) x.classList.add("ok"); else if (oi===pick) x.classList.add("no"); });
+        const ex = box.querySelector(".exp"); ex.hidden = false; const lab = ex.querySelector("b");
+        if (pick===0) { lab.textContent = "Correct."; } else { lab.className = "nol"; lab.textContent = "Answer: " + b.o[0] + "."; }
+      }); }); }
+  if (step==="quiz") renderLQ();
+  if (step==="sum") {
+    $("#relearn").onclick = () => openLesson(id,"learn");
+    const n = $("#nextles"); if (n) n.onclick = () => openLesson(LESSONS[i].id,"learn");
+    const m = $("#tomock"); if (m) m.onclick = () => go("mock");
+  }
+  window.scrollTo(0,0);
+}
+
+function optsHTML(q, perm, state){
+  // state: {picked: originalIndex|null, reveal: bool, sel: originalIndex|null}
+  return perm.map((oi, k) => {
+    let cls = "opt";
+    if (state.reveal) { if (oi === q.a) cls += " ok"; else if (oi === state.picked) cls += " no"; }
+    else if (state.sel === oi) cls += " sel";
+    return `<button type="button" class="${cls}" data-oi="${oi}" ${state.reveal?"disabled":""}><span class="k">${"ABCD"[k]}</span><span>${esc(q.o[oi])}</span></button>`;
+  }).join("");
+}
+function expHTML(q, picked){
+  const ok = picked === q.a;
+  return `<div class="exp">${ok ? `<b class="okl">Correct.</b>` : `<b class="nol">Answer: ${esc(q.o[q.a])}.</b>`} ${esc(q.e)}</div>`;
+}
+function metaHTML(q, no){
+  return `<div class="qmeta"><span class="qno">${no}</span><span class="tag">L${LNUM(q.t)} · ${esc(L(q.t).title)}</span>${q.p?`<span class="tag pyq">High-yield</span>`:""}
+  <button type="button" class="bm" data-bm="${q.id}" aria-pressed="${S.bm[q.id]?"true":"false"}" aria-label="Bookmark">${S.bm[q.id]?"★":"☆"}</button></div>`;
+}
+
+function renderLQ(){
+  const box = $("#lq");
+  if (LQ.i >= LQ.list.length) {
+    const n = LQ.list.length, l = L(LQ.id);
+    const st = S.les[LQ.id] || {}; st.best = Math.max(st.best||0, LQ.score); S.les[LQ.id] = st; save();
+    box.innerHTML = `<div class="stack"><div class="block stack"><span class="eyebrow">Quiz done</span>
+      <div class="scorebig"><span class="num">${LQ.score}</span><span class="muted">/ ${n} correct</span></div>
+      <p class="muted">${LQ.score===n ? "Full marks." : LQ.score >= n*0.8 ? "Strong. Review the ones you missed in Practice → Mistakes." : "Read the lesson once more, then retry. Missed questions are saved under Practice → Mistakes."}</p></div>
+      <div class="row between"><button class="btn" type="button" id="retry">Retry quiz</button><button class="btn pri" type="button" id="tosum">See summary</button></div></div>`;
+    $("#retry").onclick = () => openLesson(LQ.id,"quiz");
+    $("#tosum").onclick = () => openLesson(LQ.id,"sum");
+    return;
+  }
+  const it = LQ.list[LQ.i], q = it.q;
+  const reveal = LQ.picked !== null;
+  box.innerHTML = `<div class="stack"><div class="meter"><i style="width:${LQ.i/LQ.list.length*100}%"></i></div>
+    <article class="qcard">${metaHTML(q, `Q${LQ.i+1}/${LQ.list.length}`)}
+    <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {picked:LQ.picked, reveal})}</div>
+    ${reveal ? expHTML(q, LQ.picked) : ""}</article>
+    ${reveal ? `<div class="row end"><button class="btn pri" type="button" id="lqnext">${LQ.i+1 < LQ.list.length ? "Next question" : "Finish"}</button></div>` : `<p class="muted" style="font-size:13px">Score so far: <span class="num">${LQ.score}</span></p>`}</div>`;
+  box.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    if (LQ.picked !== null) return;
+    LQ.picked = +b.dataset.oi; const ok = LQ.picked === q.a; if (ok) LQ.score++; record(q, ok); renderLQ();
+  });
+  bindBM(box);
+  const nx = $("#lqnext"); if (nx) nx.onclick = () => { LQ.i++; LQ.picked = null; renderLQ(); window.scrollTo(0,0); };
+}
+
+function bindBM(root){
+  root.querySelectorAll("[data-bm]").forEach(b => b.onclick = (ev) => {
+    ev.stopPropagation();
+    const id = b.dataset.bm; if (S.bm[id]) delete S.bm[id]; else S.bm[id] = 1; save();
+    b.setAttribute("aria-pressed", S.bm[id] ? "true":"false"); b.textContent = S.bm[id] ? "★" : "☆";
+  });
+}
+
+/* ============================================================
+   PRACTICE
+   ============================================================ */
+let PF = "all", PSHOW = 20, PORDER = null, PPERM = {}, PPICK = {};
+function practiceList(){
+  let list = QS;
+  if (PF === "pyq") list = QS.filter(q => q.p);
+  else if (PF === "hot") list = QS.filter(q => (L(q.t).heat||1) === 3);
+  else if (PF === "wrong") list = QS.filter(q => S.ans[q.id] === 0);
+  else if (PF === "new") list = QS.filter(q => S.ans[q.id] === undefined);
+  else if (PF === "bm") list = QS.filter(q => S.bm[q.id]);
+  else if (PF !== "all") list = QS.filter(q => q.t === PF);
+  if (PORDER) { const pos = new Map(PORDER.map((id,i)=>[id,i])); list = list.slice().sort((a,b)=>(pos.get(a.id)??0)-(pos.get(b.id)??0)); }
+  return list;
+}
+function renderPractice(){
+  const wrongN = QS.filter(q => S.ans[q.id] === 0).length, bmN = QS.filter(q=>S.bm[q.id]).length, pyqN = QS.filter(q=>q.p).length;
+  const chips = [["all",`All ${QS.length}`],["new","Not tried"],["wrong",`Mistakes ${wrongN}`],["hot",`🔥 Hot topics ${QS.filter(q=>(L(q.t).heat||1)===3).length}`],["pyq",`PYQ ${pyqN}`],["bm",`Starred ${bmN}`]].concat(LESSONS.map((l,i)=>[l.id,`L${i+1} ${l.title}`]));
+  const list = practiceList();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Question bank</span><h1>Practice</h1>
+    <p class="muted">Tap an option to check it. Wrong answers go to <b>Mistakes</b> until you get them right.</p></div>
+    <div class="chips" role="group" aria-label="Filter">${chips.map(c=>`<button type="button" class="chip" data-f="${c[0]}" aria-pressed="${PF===c[0]}">${esc(c[1])}</button>`).join("")}</div>
+    <div class="row between"><span class="muted num" style="font-size:13px">${list.length} questions</span>
+      <div class="row"><button class="btn sm ghost" type="button" id="pshuf">${PORDER?"In order":"Shuffle"}</button></div></div>
+    <div class="stack" id="plist"></div>
+  </section>`;
+  $("#app").querySelectorAll("[data-f]").forEach(b => b.onclick = () => { PF = b.dataset.f; PSHOW = 20; PPICK = {}; renderPractice(); });
+  $("#pshuf").onclick = () => { PORDER = PORDER ? null : shuffle(QS.map(q=>q.id)); PSHOW = 20; renderPractice(); };
+  const chipOn = $(`.chip[aria-pressed="true"]`); if (chipOn) chipOn.scrollIntoView({block:"nearest", inline:"center"});
+  drawPList();
+}
+function pCard(q, idx){
+  if (!PPERM[q.id]) PPERM[q.id] = makePerm(q);
+  const picked = PPICK[q.id]; const reveal = picked !== undefined;
+  return `<article class="qcard" data-q="${q.id}">${metaHTML(q, "Q"+(idx+1))}<p class="qt">${esc(q.q)}</p>
+    <div class="opts">${optsHTML(q, PPERM[q.id], {picked: reveal?picked:null, reveal})}</div>${reveal?expHTML(q,picked):""}</article>`;
+}
+function drawPList(){
+  const list = practiceList(), box = $("#plist");
+  if (!list.length) { box.innerHTML = `<p class="empty">${PF==="wrong"?"No mistakes saved. Answer some questions first, or you've cleared them all.":PF==="bm"?"Nothing starred yet. Tap ☆ on any question.":"Nothing here."}</p>`; return; }
+  box.innerHTML = list.slice(0, PSHOW).map((q,i)=>pCard(q,i)).join("") + (list.length > PSHOW ? `<button class="btn" type="button" id="pmore">Show 20 more (${list.length-PSHOW} left)</button>` : "");
+  bindP(box);
+  const more = $("#pmore"); if (more) more.onclick = () => { PSHOW += 20; drawPList(); };
+}
+function bindP(box){ box.querySelectorAll(".qcard").forEach(bindCard); }
+function bindCard(card){
+  card.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    const q = QS.find(x => x.id === card.dataset.q); if (PPICK[q.id] !== undefined) return;
+    PPICK[q.id] = +b.dataset.oi; record(q, PPICK[q.id] === q.a);
+    const idx = +card.querySelector(".qno").textContent.slice(1) - 1;
+    const tmp = document.createElement("div"); tmp.innerHTML = pCard(q, idx); const nc = tmp.firstElementChild;
+    card.replaceWith(nc); bindCard(nc);
+  });
+  bindBM(card);
+}
+
+/* ============================================================
+   MOCK TEST
+   ============================================================ */
+let M = null, MCFG = {n:25, scope:"all", neg:1}, LEAVE_TO = null;
+function renderMock(){
+  if (M && M.running) return drawMockRun();
+  if (M && M.done) return drawMockResult();
+  const hist = (S.mocks||[]).slice(-6).reverse();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Timed, SSC pattern</span><h1>Mock test</h1>
+    <p class="muted">+2 for a right answer, −0.5 for a wrong one, 36 seconds per question (CGL Tier-1 pace). Answers show only after you submit.</p></div>
+    <div class="block stack">
+      <fieldset><legend>Questions</legend><div class="radios">${[10,25,50,100].map(n=>`<label><input type="radio" name="mn" id="mn${n}" value="${n}" ${MCFG.n===n?"checked":""}><span>${n} · ${Math.round(n*36/60)} min</span></label>`).join("")}</div></fieldset>
+      <fieldset><legend>From</legend><select id="mscope" aria-label="Lessons to draw from"><option value="all">All lessons</option><option value="hot">🔥 Hot topics only</option><option value="pyq">PYQs only</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}" ${MCFG.scope===l.id?"selected":""}>L${i+1} · ${esc(l.title)}</option>`).join("")}</select></fieldset>
+      <label class="row" style="gap:8px;font-weight:600"><input type="checkbox" id="mneg" ${MCFG.neg?"checked":""}> Negative marking (−0.5)</label>
+      <div id="merr" class="muted" style="font-size:14px"></div>
+      <div class="row end"><button class="btn pri" type="button" id="mstart">Start test</button></div>
+    </div>
+    ${hist.length ? `<div class="block"><h3>Recent attempts</h3><div class="hist">${hist.map(h=>`<div><span>${esc(h.d)} · ${h.n} Q</span><span class="num">${h.score}/${h.max} · ${h.acc}%</span></div>`).join("")}</div></div>` : ""}
+  </section>`;
+  $("#mscope").value = MCFG.scope;
+  $("#mstart").onclick = () => {
+    MCFG.n = +(document.querySelector('input[name="mn"]:checked')||{value:25}).value;
+    MCFG.scope = $("#mscope").value; MCFG.neg = $("#mneg").checked ? 1 : 0;
+    let pool = MCFG.scope==="all" ? QS : MCFG.scope==="pyq" ? QS.filter(q=>q.p) : MCFG.scope==="hot" ? QS.filter(q=>(L(q.t).heat||1)===3) : MCFG.scope==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===MCFG.scope);
+    if (!pool.length) { $("#merr").textContent = "No questions in that set yet. Pick another source."; return; }
+    const qs = shuffle(pool).slice(0, MCFG.n);
+    M = { running:true, list: qs.map(q=>({q, perm:makePerm(q)})), ans: qs.map(()=>null), mark: qs.map(()=>false), i:0, neg:MCFG.neg, secs: qs.length*36, start: Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000;
+    startTimer(); drawMockRun();
+  };
+}
+function startTimer(){
+  clearInterval(timerId);
+  timerId = setInterval(() => {
+    if (!M || !M.running) { clearInterval(timerId); return; }
+    const left = Math.max(0, Math.round((M.end - Date.now())/1000));
+    const el = $("#mtime"); if (el) { el.textContent = fmt(left); el.classList.toggle("low", left <= 60); }
+    if (left <= 0) submitMock();
+  }, 1000);
+}
+const fmt = s => `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+function drawMockRun(){
+  const it = M.list[M.i], q = it.q, left = Math.max(0, Math.round((M.end-Date.now())/1000));
+  const answered = M.ans.filter(a=>a!==null).length;
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="mbar"><span class="timer num ${left<=60?"low":""}" id="mtime">${fmt(left)}</span>
+      <span class="muted num" style="font-size:13px;flex:1">Q ${M.i+1}/${M.list.length} · ${answered} answered</span>
+      <button class="btn sm" type="button" id="mpal">${M.showPal?"Hide":"All Qs"}</button></div>
+    ${LEAVE_TO ? `<div class="confirm"><b>Leave the test?</b><span>Your answers so far will be scored now.</span><div class="row"><button class="btn sm pri" type="button" id="lvy">Submit and leave</button><button class="btn sm" type="button" id="lvn">Stay</button></div></div>` : ""}
+    ${M.showPal ? `<div class="block"><div class="pal">${M.list.map((_,k)=>`<button type="button" data-j="${k}" class="${M.ans[k]!==null?"a":""} ${M.mark[k]?"m":""} ${k===M.i?"cur":""}" aria-label="Question ${k+1}">${k+1}</button>`).join("")}</div>
+      <p class="muted" style="font-size:12px;margin-top:8px">Filled = answered · orange line = marked for review</p></div>` : ""}
+    <article class="qcard"><div class="qmeta"><span class="qno">Q${M.i+1}</span><span class="tag">L${LNUM(q.t)}</span>${M.mark[M.i]?`<span class="tag pyq">Marked</span>`:""}</div>
+      <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {sel:M.ans[M.i], reveal:false})}</div></article>
+    <div class="row between"><button class="btn" type="button" id="mprev" ${M.i===0?"disabled":""}>‹ Prev</button>
+      <button class="btn ghost" type="button" id="mmark">${M.mark[M.i]?"Unmark":"Mark"}</button>
+      <button class="btn ghost" type="button" id="mclr" ${M.ans[M.i]===null?"disabled":""}>Clear</button>
+      <button class="btn ${M.i<M.list.length-1?"pri":""}" type="button" id="mnext" ${M.i===M.list.length-1?"disabled":""}>Next ›</button></div>
+    ${M.confirm ? `<div class="confirm"><b>Submit the test?</b><span>${M.list.length-answered} unanswered${M.mark.filter(Boolean).length?`, ${M.mark.filter(Boolean).length} marked for review`:""}.</span><div class="row"><button class="btn sm pri" type="button" id="msubY">Submit</button><button class="btn sm" type="button" id="msubN">Keep going</button></div></div>`
+      : `<button class="btn pri" type="button" id="msub">Submit test</button>`}
+  </section>`;
+  $("#app").querySelectorAll(".opt").forEach(b => b.onclick = () => { M.ans[M.i] = +b.dataset.oi; drawMockRun(); });
+  $("#mprev").onclick = () => { if (M.i>0){M.i--; drawMockRun();} };
+  $("#mnext").onclick = () => { if (M.i<M.list.length-1){M.i++; drawMockRun(); window.scrollTo(0,0);} };
+  $("#mmark").onclick = () => { M.mark[M.i] = !M.mark[M.i]; drawMockRun(); };
+  $("#mclr").onclick = () => { M.ans[M.i] = null; drawMockRun(); };
+  $("#mpal").onclick = () => { M.showPal = !M.showPal; drawMockRun(); };
+  $("#app").querySelectorAll("[data-j]").forEach(b => b.onclick = () => { M.i = +b.dataset.j; drawMockRun(); });
+  const s = $("#msub"); if (s) s.onclick = () => { M.confirm = true; drawMockRun(); };
+  const y = $("#msubY"); if (y) y.onclick = submitMock;
+  const n = $("#msubN"); if (n) n.onclick = () => { M.confirm = false; drawMockRun(); };
+  const lvy = $("#lvy"); if (lvy) lvy.onclick = () => { const t = LEAVE_TO; LEAVE_TO = null; submitMock(); go(t); };
+  const lvn = $("#lvn"); if (lvn) lvn.onclick = () => { LEAVE_TO = null; drawMockRun(); };
+}
+function showMockLeave(tab){ LEAVE_TO = tab; drawMockRun(); }
+function submitMock(){
+  if (!M || !M.running) return;
+  clearInterval(timerId);
+  M.running = false; M.done = true; M.confirm = false;
+  let c=0,w=0,sk=0; const per = {};
+  M.list.forEach((it,k) => {
+    const a = M.ans[k]; const t = it.q.t; per[t] = per[t] || {c:0,n:0}; per[t].n++;
+    if (a===null) sk++; else if (a===it.q.a) { c++; per[t].c++; S.ans[it.q.id]=1; } else { w++; S.ans[it.q.id]=0; }
+  });
+  const max = M.list.length*2, score = +(c*2 - (M.neg? w*0.5 : 0)).toFixed(1);
+  const used = Math.min(M.secs, Math.round((Date.now()-M.start)/1000));
+  M.res = {c,w,sk,score,max,used,per, acc: (c+w) ? Math.round(c*100/(c+w)) : 0};
+  const d = new Date(); const ds = d.toLocaleDateString("en-IN",{day:"numeric",month:"short"})+" "+d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
+  S.mocks = (S.mocks||[]).concat([{d:ds, n:M.list.length, score, max, acc:M.res.acc}]).slice(-20); save(); renderTop();
+  M.filter = "wrong";
+  if (TAB==="mock") drawMockResult();
+}
+function drawMockResult(){
+  const r = M.res;
+  const per = Object.keys(r.per).sort((a,b)=>LNUM(a)-LNUM(b)).map(t => `<div><span>L${LNUM(t)} · ${esc(L(t).title)}</span><span class="num">${r.per[t].c}/${r.per[t].n}</span></div>`).join("");
+  const rows = M.list.map((it,k)=>({it,k})).filter(({it,k}) => M.filter==="all" ? true : M.filter==="wrong" ? (M.ans[k]!==null && M.ans[k]!==it.q.a) : M.ans[k]===null);
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Result</span>
+    <div class="scorebig"><span class="num">${r.score}</span><span class="muted">/ ${r.max} marks</span></div></div>
+    <div class="kpis"><div class="kpi g"><span class="num">${r.c}</span><span>right</span></div><div class="kpi b"><span class="num">${r.w}</span><span>wrong</span></div><div class="kpi"><span class="num">${r.sk}</span><span>skipped</span></div><div class="kpi"><span class="num">${r.acc}%</span><span>accuracy</span></div></div>
+    <p class="muted num" style="font-size:13px">Time used ${fmt(r.used)} of ${fmt(M.secs)}</p>
+    <div class="block"><h3>By lesson</h3><div class="hist">${per}</div></div>
+    <div class="row between"><button class="btn" type="button" id="mnew">New test</button><button class="btn pri" type="button" id="mretry">Retake same questions</button></div>
+    <h2>Review</h2>
+    <div class="chips">${[["wrong",`Wrong ${r.w}`],["skip",`Skipped ${r.sk}`],["all",`All ${M.list.length}`]].map(c=>`<button class="chip" type="button" data-rf="${c[0]}" aria-pressed="${M.filter===c[0]}">${c[1]}</button>`).join("")}</div>
+    <div class="stack">${rows.length ? rows.map(({it,k}) => `<article class="qcard">${metaHTML(it.q, "Q"+(k+1))}<p class="qt">${esc(it.q.q)}</p><div class="opts">${optsHTML(it.q, it.perm, {picked:M.ans[k], reveal:true})}</div>${M.ans[k]===null?`<div class="exp"><b class="nol">Skipped. Answer: ${esc(it.q.o[it.q.a])}.</b> ${esc(it.q.e)}</div>`:expHTML(it.q, M.ans[k])}</article>`).join("") : `<p class="empty">Nothing in this list.</p>`}</div>
+  </section>`;
+  bindBM($("#app"));
+  $("#app").querySelectorAll("[data-rf]").forEach(b => b.onclick = () => { M.filter = b.dataset.rf; drawMockResult(); });
+  $("#mnew").onclick = () => { M = null; renderMock(); };
+  $("#mretry").onclick = () => {
+    const list = M.list.map(it=>({q:it.q, perm:makePerm(it.q)}));
+    M = { running:true, list, ans:list.map(()=>null), mark:list.map(()=>false), i:0, neg:MCFG.neg, secs:list.length*36, start:Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000; startTimer(); drawMockRun();
+  };
+}
+
+/* ============================================================
+   REVISE
+   ============================================================ */
+let RV = "heat", FC = null, FCSCOPE = "all";
+const HID = {}, REV = {};
+Object.keys(COVERS).forEach(k => { HID[k] = 1; REV[k] = {}; });
+function renderRevise(){
+  const tabs = [["heat","🔥 PYQ heat map"]].concat(Object.keys(COVERS).map(k=>[k, COVERS[k].tab]), [["dis",FIND.tab],["nums","Numbers & pairs"],["links","Connections"],["tricks","Tricks"],["traps","Traps"],["flash","Flashcards"]]);
+  if (!tabs.some(t=>t[0]===RV)) RV = "heat";
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Last-day revision</span><h1>Revise</h1></div>
+    <div class="seg" role="tablist">${tabs.map(t=>`<button type="button" role="tab" data-rv="${t[0]}" aria-selected="${RV===t[0]}">${t[1]}</button>`).join("")}</div>
+    <div id="rv" class="stack"></div></section>`;
+  $("#app").querySelectorAll("[data-rv]").forEach(b => b.onclick = () => { RV = b.dataset.rv; renderRevise(); });
+  const on = $(`.seg [aria-selected="true"]`); if (on) on.scrollIntoView({block:"nearest", inline:"center"});
+  const box = $("#rv");
+  const pk = (key, i, val) => (HID[key] && !REV[key][i]) ? `<button type="button" class="peek" data-pk="${key}:${i}">tap</button>` : val;
+  const coverChips = (key, label) => `<div class="chips"><button type="button" class="chip" data-hide="${key}" aria-pressed="${!!HID[key]}">${label}</button><button type="button" class="chip" data-cover="${key}">Cover all again</button></div>`;
+  const bindCover = () => {
+    box.querySelectorAll("[data-hide]").forEach(b => b.onclick = () => { const k=b.dataset.hide; HID[k] = HID[k]?0:1; renderRevise(); });
+    box.querySelectorAll("[data-cover]").forEach(b => b.onclick = () => { REV[b.dataset.cover] = {}; renderRevise(); });
+    box.querySelectorAll("[data-pk]").forEach(b => b.onclick = () => { const [k,i] = b.dataset.pk.split(":"); REV[k][i]=1; renderRevise(); });
+  };
+  if (RV === "heat") {
+    const max = Math.max(...HEAT.map(h=>h[1]));
+    box.innerHTML = `<p class="muted">${APP.heatNote}</p>
+      <div class="block"><div class="heat">${HEAT.map(h=>`<button type="button" class="hrow" data-open="${h[2]}"><span class="ht"><b>${esc(h[0])}</b><span class="muted">${esc(h[3])}</span></span><span class="hbar"><i style="width:${h[1]/max*100}%"></i></span><span class="num hp">${h[1]}%</span></button>`).join("")}</div></div>
+      <div class="block"><h3>Lessons by exam heat</h3><dl class="rk">${[3,2,1].map(n=>`<div><dt>${"🔥".repeat(n)} ${n===3?"Very frequent":n===2?"Regular":"Occasional"}</dt><dd>${LESSONS.map((l,i)=>[l,i]).filter(x=>(x[0].heat||1)===n).map(x=>`L${x[1]+1} ${esc(x[0].title)}`).join(" · ")}</dd></div>`).join("")}</dl></div>`;
+    box.querySelectorAll("[data-open]").forEach(b => b.onclick = () => openLesson(b.dataset.open, "learn"));
+  }
+  if (COVERS[RV]) {
+    const c = COVERS[RV];
+    box.innerHTML = `<p class="muted">${c.note}</p>${coverChips(RV, c.hideLabel)}
+      <div class="block"><div class="tbl"><table class="cover"><thead><tr>${c.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${c.rows.map((r,i)=>`<tr>${r.map((v,ci)=>`<td ${ci?`data-l="${c.head[ci]}"`:""}>${ci===0?`<b>${esc(v)}</b>`:ci===c.hide?pk(RV,i,esc(v)):esc(v)}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+    bindCover();
+  }
+  if (RV === "dis") {
+    box.innerHTML = `<input class="search" id="fs" type="search" placeholder="${FIND.ph}" aria-label="${FIND.tab}">
+      <div class="chips" id="dtype"></div>
+      <div class="block"><div class="tbl"><table class="cover"><thead><tr>${FIND.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody id="fb"></tbody></table></div></div>`;
+    const types = ["All"].concat([...new Set(FIND.rows.map(d=>d[2]))]);
+    let T = "All";
+    const draw = () => { const q = $("#fs").value.trim().toLowerCase();
+      $("#dtype").innerHTML = types.map(t=>`<button type="button" class="chip" data-t="${esc(t)}" aria-pressed="${T===t}">${esc(t)}</button>`).join("");
+      $("#dtype").querySelectorAll("[data-t]").forEach(b => b.onclick = () => { T = b.dataset.t; draw(); });
+      const rows = FIND.rows.filter(x => (T==="All"||x[2]===T) && (!q || x.join(" ").toLowerCase().includes(q)));
+      $("#fb").innerHTML = rows.length ? rows.map(a=>`<tr><td><b>${esc(a[0])}</b></td><td data-l="${FIND.head[1]}">${esc(a[1])}</td><td data-l="${FIND.head[2]}">${esc(a[2])}</td><td data-l="${FIND.head[3]}" class="muted">${esc(a[3])}</td></tr>`).join("") : `<tr><td colspan="4" class="muted">No match.</td></tr>`; };
+    $("#fs").oninput = draw; draw();
+  }
+  if (RV === "links") {
+    const items = LESSONS.flatMap((l,i) => l.blocks.filter(b=>b.k==="link").map(b=>({l:i+1, t:l.title, h:b.h})));
+    box.innerHTML = items.map(x => `<div class="link"><span class="lab">L${x.l} · ${esc(x.t)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "nums") {
+    box.innerHTML = `<div class="tiles">${TILES.map(t=>`<div class="tile"><span class="num">${t[0]}</span><span>${t[1]}</span></div>`).join("")}</div>
+    <div class="block"><h3>Look-alike pairs</h3><dl class="rk">${PAIRS.map(p=>`<div><dt>${esc(p[0])}</dt><dd>${esc(p[1])}</dd></div>`).join("")}</dl></div>`;
+  }
+  if (RV === "tricks" || RV === "traps") {
+    const kind = RV==="tricks" ? "trick" : "trap";
+    const items = LESSONS.flatMap((l,i) => l.blocks.filter(b=>b.k===kind).map(b=>({l:i+1, t:l.title, h:b.h})));
+    const extra = kind==="trick" ? `<div class="trick"><span class="lab">Exam craft</span>${APP.craft}</div>` : "";
+    box.innerHTML = extra + items.map(x => `<div class="${kind}"><span class="lab">L${x.l} · ${esc(x.t)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "flash") drawFlash(box);
+}
+
+
+function drawFlash(box){
+  if (!FC) { const pool = FCSCOPE==="all" ? QS : FCSCOPE==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===FCSCOPE); FC = {list: shuffle(pool), i:0, flip:false, known:0}; }
+  const sel = `<select id="fcs" aria-label="Flashcard set"><option value="all">All questions</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}">L${i+1} · ${esc(l.title)}</option>`).join("")}</select>`;
+  if (!FC.list.length || FC.i >= FC.list.length) {
+    box.innerHTML = `<div class="row">${sel}</div><div class="block stack"><h3>${FC.list.length ? "Deck finished" : "No cards in this set"}</h3>${FC.list.length?`<p class="muted">You knew ${FC.known} of ${FC.list.length} on first look.</p>`:""}<div class="row"><button class="btn pri" type="button" id="fcr">Shuffle and restart</button></div></div>`;
+    $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+    $("#fcr").onclick = () => { FC = null; drawFlash(box); }; return;
+  }
+  const q = FC.list[FC.i];
+  box.innerHTML = `<div class="row between">${sel}<span class="muted num" style="font-size:13px">${FC.i+1}/${FC.list.length}</span></div>
+    <button type="button" class="flash" id="fcard" aria-label="Flip card">
+      <span class="side">${FC.flip?"Answer":"Question · tap to flip"}</span>
+      <span class="front">${esc(q.q)}</span>
+      ${FC.flip ? `<span class="ans">${esc(q.o[q.a])}</span><span class="muted">${esc(q.e)}</span>` : ""}
+    </button>
+    <div class="row between"><button class="btn" type="button" id="fca" ${FC.flip?"":"disabled"}>Again later</button><button class="btn pri" type="button" id="fck" ${FC.flip?"":"disabled"}>Got it</button></div>`;
+  $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+  $("#fcard").onclick = () => { FC.flip = !FC.flip; drawFlash(box); };
+  $("#fca").onclick = () => { FC.list.push(q); FC.list.splice(FC.i,1); FC.flip=false; drawFlash(box); };
+  $("#fck").onclick = () => { FC.known++; FC.i++; FC.flip=false; drawFlash(box); };
+}
+
+/* boot */
+renderTop();
+const start = (location.hash||"").replace("#","");
+go(["learn","practice","mock","revise"].includes(start) ? start : "learn");
+</script>
+
+
+<style id="shabd-skin">
+/* ===== शब्दRegister skin: app colours + fonts (only when opened from the app) ===== */
+:root[data-skin="paper"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(150,128,90,.10) 31px, rgba(150,128,90,.10) 32px);--app-psize:auto;--app-card:#FFFCF6;--app-rule:#DCCFB2;--app-pri:#2F6F63;--app-ink:#221E17;--app-soft:#5E5547;--app-faint:#857B6A;--app-bg:#F3EEE3;--app-deep:#E9E1CF;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#F3EEE3;--sheet:#FFFCF6;--sunk:#E9E1CF;--ink:#221E17;--ink2:#5E5547;--rule:#DCCFB2;--blue:#2F6F63;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--accent:#A87E1F;--accent-bg:color-mix(in srgb, #A87E1F 16%, #FFFCF6);--good:#2F6F63;--good-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--bad:#8C2F39;--bad-bg:color-mix(in srgb, #8C2F39 14%, #FFFCF6);--warn-bg:color-mix(in srgb, #C99A2E 18%, #FFFCF6);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="paper"][data-theme="dark"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--sheet:#26211A;--sunk:#25201A;--ink:#EFE6D2;--ink2:#BDB195;--rule:#3B3429;--blue:#3F9A86;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3F9A86 22%, #26211A);--accent:#D9AE4B;--accent-bg:color-mix(in srgb, #D9AE4B 24%, #26211A);--good:#5FB9A3;--good-bg:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-bg:color-mix(in srgb, #D06B74 22%, #26211A);--warn-bg:color-mix(in srgb, #D9AE4B 26%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="paper"]:not([data-theme="light"]){--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--sheet:#26211A;--sunk:#25201A;--ink:#EFE6D2;--ink2:#BDB195;--rule:#3B3429;--blue:#3F9A86;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3F9A86 22%, #26211A);--accent:#D9AE4B;--accent-bg:color-mix(in srgb, #D9AE4B 24%, #26211A);--good:#5FB9A3;--good-bg:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-bg:color-mix(in srgb, #D06B74 22%, #26211A);--warn-bg:color-mix(in srgb, #D9AE4B 26%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin="indigo"]{--app-pattern:radial-gradient(rgba(61,92,240,.10) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#FFFFFF;--app-rule:#CBD3EC;--app-pri:#3D5CF0;--app-ink:#0F1B3D;--app-soft:#4A5680;--app-faint:#67739C;--app-bg:#EEF1FA;--app-deep:#E1E6F5;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#EEF1FA;--sheet:#FFFFFF;--sunk:#E1E6F5;--ink:#0F1B3D;--ink2:#4A5680;--rule:#CBD3EC;--blue:#3D5CF0;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3D5CF0 14%, #FFFFFF);--accent:#D9831A;--accent-bg:color-mix(in srgb, #D9831A 16%, #FFFFFF);--good:#147D53;--good-bg:color-mix(in srgb, #147D53 14%, #FFFFFF);--bad:#C8402F;--bad-bg:color-mix(in srgb, #C8402F 14%, #FFFFFF);--warn-bg:color-mix(in srgb, #F7C548 18%, #FFFFFF);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="indigo"][data-theme="dark"]{--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--sheet:#121D47;--sunk:#0E1839;--ink:#EEF2FF;--ink2:#A7B3DA;--rule:#22306A;--blue:#6F86FF;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #6F86FF 22%, #121D47);--accent:#F7B24D;--accent-bg:color-mix(in srgb, #F7B24D 24%, #121D47);--good:#45C08A;--good-bg:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-bg:color-mix(in srgb, #F07B6E 22%, #121D47);--warn-bg:color-mix(in srgb, #F7C548 26%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="indigo"]:not([data-theme="light"]){--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--sheet:#121D47;--sunk:#0E1839;--ink:#EEF2FF;--ink2:#A7B3DA;--rule:#22306A;--blue:#6F86FF;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #6F86FF 22%, #121D47);--accent:#F7B24D;--accent-bg:color-mix(in srgb, #F7B24D 24%, #121D47);--good:#45C08A;--good-bg:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-bg:color-mix(in srgb, #F07B6E 22%, #121D47);--warn-bg:color-mix(in srgb, #F7C548 26%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin] body{background-color:var(--app-bg);background-image:var(--app-pattern);background-size:var(--app-psize);background-attachment:fixed}
+:root[data-skin] h1,:root[data-skin] h2{letter-spacing:-.01em}
+
+/* ===== Desktop layout (PC / tablet landscape) ===== */
+@media (min-width: 1024px){
+  :root{--side:236px}
+  body{padding-left:var(--side);font-size:16.5px}
+  .top{border-bottom:1px solid var(--rule)}
+  .top-in{max-width:1320px;padding:16px 36px}
+  .brand{font-size:21px}
+  .brand small{font-size:13px}
+  .stat{font-size:13px}
+  .wrap{max-width:1320px;padding:0 36px 56px}
+  .view{padding-top:28px}
+  h1{font-size:34px} h2{font-size:22px} h3{font-size:17px}
+
+  /* bottom tab bar becomes a left sidebar */
+  .nav{top:0;bottom:0;left:0;right:auto;width:var(--side);height:auto;border-top:0;border-right:1px solid var(--rule);padding:84px 14px 20px;display:block;overflow:auto}
+  .nav-in{display:flex;flex-direction:column;gap:4px;height:auto;max-width:none;margin:0}
+  .nav-in::before{content:"Sections";display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);padding:0 14px 8px}
+  .nav button{flex-direction:row;justify-content:flex-start;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;font-size:15px;min-height:0;height:auto;width:100%;text-align:left}
+  .nav button svg{width:20px;height:20px;flex-shrink:0}
+  .nav button:hover{background:var(--sunk)}
+  .nav button[aria-current="page"]{background:var(--blue-bg)}
+  .nav button[aria-current="page"] span{border-bottom:0!important}
+
+  /* home: intro beside progress, lessons as a card grid */
+  .hero{grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);column-gap:48px;align-items:end;padding-bottom:10px}
+  .hero > .eyebrow,.hero > h1,.hero > p{grid-column:1}
+  .hero > .meter{grid-column:2;grid-row:3;align-self:center}
+  .hero > .row{grid-column:2;grid-row:2;align-self:end}
+  .lessons{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;border-top:0}
+  .les{background:var(--sheet);border:1px solid var(--rule);border-radius:16px;padding:16px 18px;transition:transform .15s ease,box-shadow .15s ease,border-color .15s}
+  .les:hover{transform:translateY(-2px);border-color:var(--blue);box-shadow:0 14px 30px -22px rgba(0,0,0,.45)}
+  .les.next{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
+
+  /* lesson reader: facts, timelines, tricks sit side by side */
+  .lhead{margin-bottom:0}
+  .steps{max-width:640px}
+  .steps + .stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+  .steps + .stack > .plain,.steps + .stack > .row,.steps + .stack > p,.steps + .stack > .fig,.steps + .stack > h2,.steps + .stack > .tbl{grid-column:1/-1}
+  .steps + .stack > .plain{max-width:86ch;font-size:17px}
+  .steps + .stack:not(:has(> .block ~ .block)) > .block{grid-column:1/-1}
+  .block,.qcard{padding:18px 20px;border-radius:14px}
+
+  /* quizzes and question bank */
+  #lq > .stack{display:grid;grid-template-columns:minmax(0,1fr);max-width:980px;gap:16px}
+  .opts{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .qt{font-size:18px}
+  #plist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #plist .opts{grid-template-columns:minmax(0,1fr)}
+  .chips{flex-wrap:wrap;overflow:visible}
+
+  /* mock test: question with the answer grid alongside */
+  .mbar{top:calc(env(safe-area-inset-top,0px) + 67px)}
+  .view > .qcard{max-width:1000px}
+  .view > .row.between{max-width:1000px}
+  .view > #msub{max-width:1000px;width:100%}
+  .view > .block.stack{max-width:760px}
+  .pal{grid-template-columns:repeat(auto-fill,minmax(46px,1fr))}
+  .kpis{max-width:760px}
+
+  /* revise: cards in columns */
+  #rkl,#rv > .stack:not(#rkl){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #rv > .search{max-width:520px}
+  .tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .flash{min-height:300px;max-width:760px;margin:0 auto;padding:32px 36px}
+  .flash .front{font-size:22px}
+}
+@media (min-width: 1500px){
+  #plist,#rkl{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+</style>
+<script id="shabd-deeplink">
+(function(){
+  var l; try{ l = new URLSearchParams(location.search).get('lesson'); }catch(e){}
+  if(!l) return;
+  function run(){
+    try{
+      if(typeof openLesson === 'function' && typeof LESSONS !== 'undefined'){ if(LESSONS.some(function(x){ return x.id === l; })) openLesson(l, 'learn'); }
+      else if(typeof openRule === 'function'){ var n = parseInt(String(l).replace(/\D/g, ''), 10); if(n) openRule(n, 'learn'); }
+      else if(typeof COURSE !== 'undefined' && typeof go === 'function'){ var i = COURSE.findIndex(function(c){ return c.id === l; }); if(i >= 0) go({ name: 'lesson', i: i, step: 0, ans: {}, score: 0 }); }
+    }catch(e){}
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(run, 30); }); else setTimeout(run, 30);
+})();
+</script>
+</body></html>

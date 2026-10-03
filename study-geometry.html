@@ -1,0 +1,1499 @@
+<!doctype html><html><head><meta charset=utf8>
+<script>
+/* शब्दRegister bridge: follows the app's look (Paper / Indigo) and Light / Dark / Auto choice. */
+(function(){
+  var root = document.documentElement;
+  function theme(t){ if(t === 'dark' || t === 'light') root.setAttribute('data-theme', t); else root.removeAttribute('data-theme'); }
+  function skin(s){ if(s === 'paper' || s === 'indigo') root.setAttribute('data-skin', s); }
+  try{
+    var q = new URLSearchParams(location.search);
+    theme(q.get('theme'));
+    skin(q.get('skin') || (q.get('embed') ? 'paper' : ''));
+    if(q.get('embed')) root.classList.add('in-shabd');
+  }catch(e){}
+  window.addEventListener('message', function(e){
+    if(e.origin !== location.origin || !e.data || e.data.type !== 'shabd-theme') return;
+    theme(e.data.theme);
+    if(e.data.skin) skin(e.data.skin);
+  });
+})();
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap">
+<meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Geometry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<style>
+/* Layout: Physics PYQ Workbook — follows the शब्दRegister Paper / Indigo look; one column + bottom tabs on phones, sidebar on PC. */
+:root{
+  --paper:#f6f3ea; --sheet:#fffdf7; --sunk:#ebe6d8;
+  --ink:#1d2a22; --ink2:#56625a; --rule:#dcd5c3;
+  --blue:#1f5c3d; --on-blue:#ffffff; --blue-bg:#dcebdf;
+  --accent:#b4530f; --accent-bg:#fbe7d3;
+  --good:#1b7547; --good-bg:#dff1e6; --bad:#b0271f; --bad-bg:#f8e1de;
+  --warn-bg:#fff2d2;
+  --f-display:"Fraunces", "Tiro Devanagari Hindi", Georgia, serif;
+  --f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-num:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r:10px; --nav-h:64px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#111612; --sheet:#1a211c; --sunk:#222b25;
+  --ink:#e8eee9; --ink2:#a3b0a7; --rule:#2f3a33;
+  --blue:#86cfa2; --on-blue:#111612; --blue-bg:#1d3a29;
+  --accent:#f3a764; --accent-bg:#3b2614;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#111612; --sheet:#1a211c; --sunk:#222b25;
+  --ink:#e8eee9; --ink2:#a3b0a7; --rule:#2f3a33;
+  --blue:#86cfa2; --on-blue:#111612; --blue-bg:#1d3a29;
+  --accent:#f3a764; --accent-bg:#3b2614;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
+.wrap{max-width:640px;margin:0 auto;padding-inline:16px;padding-block:0 calc(var(--nav-h) + 28px + env(safe-area-inset-bottom,0px))}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);border-bottom:1px solid var(--rule)}
+.top-in{max-width:640px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px}
+.brand{font-family:var(--f-display);font-weight:800;font-size:17px;line-height:1.2;flex:1;min-width:0}
+.brand small{display:block;font-family:var(--f-body);font-weight:500;font-size:12px;color:var(--ink2);letter-spacing:.02em}
+.stat{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right;white-space:nowrap}
+.stat b{color:var(--ink);font-weight:600}
+
+/* bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--sheet);border-top:1px solid var(--rule);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);height:var(--nav-h)}
+.nav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer}
+.nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav button[aria-current="page"]{color:var(--blue)}
+.nav button[aria-current="page"] span{border-bottom:2px solid var(--blue)}
+
+/* type */
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.25;margin:0}
+h1{font-size:24px;font-weight:800}
+h2{font-size:19px;font-weight:800}
+h3{font-size:16px;font-weight:700}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--ink2)}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+p{margin:0}
+.stack{display:flex;flex-direction:column;gap:14px}
+.view{padding-top:18px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--rule);background:var(--sheet);font-weight:600;cursor:pointer;text-decoration:none}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:var(--on-blue)}
+.btn.ghost{background:transparent}
+.btn.sm{min-height:36px;padding:0 14px;font-size:14px}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.end{justify-content:flex-end}
+.row.between{justify-content:space-between}
+
+/* hero */
+.hero{display:grid;gap:10px;padding:4px 0 6px}
+.hero p{color:var(--ink2)}
+.meter{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--blue);border-radius:99px}
+
+/* lesson list */
+.lessons{display:flex;flex-direction:column;border-top:1px solid var(--rule)}
+.les{display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;padding:14px 2px;border-bottom:1px solid var(--rule);background:none;border-left:0;border-right:0;border-top:0;text-align:left;cursor:pointer;width:100%}
+.les .no{font-family:var(--f-num);font-weight:600;font-size:15px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--rule);color:var(--ink2)}
+.les.done .no{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.les .t{min-width:0}
+.les .t b{display:block;font-weight:700;font-size:16px;line-height:1.3}
+.les .t span{font-size:13px;color:var(--ink2)}
+.les .sc{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right}
+.les.next .no{border-color:var(--blue);color:var(--blue)}
+
+/* lesson reader */
+.lhead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.back{background:none;border:0;padding:8px 8px 8px 0;cursor:pointer;color:var(--blue);font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0 4px}
+.steps button{border:1px solid var(--rule);background:var(--sheet);border-radius:8px;padding:8px 4px;font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer}
+.steps button[aria-current="step"]{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.block{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;min-width:0}
+.block h3{margin-bottom:8px}
+.block p + p{margin-top:8px}
+.plain{padding:0 2px}
+.facts{display:grid;gap:0}
+.facts div{display:grid;grid-template-columns:minmax(0,42%) minmax(0,1fr);gap:10px;padding:7px 0;border-top:1px dashed var(--rule)}
+.facts div:first-child{border-top:0}
+.facts dt{font-size:14px;color:var(--ink2);margin:0}
+.facts dd{margin:0;font-weight:600;min-width:0}
+.tl{display:grid;gap:0;margin:0;padding:0;list-style:none}
+.tl li{display:grid;grid-template-columns:92px 1fr;gap:10px;padding:8px 0;border-top:1px dashed var(--rule)}
+.tl li:first-child{border-top:0}
+.tl .y{font-family:var(--f-num);font-weight:600;font-size:13px;color:var(--accent);padding-top:2px}
+.trick,.trap{border-radius:var(--r);padding:12px 14px 12px 14px;border:1px solid var(--rule)}
+.trick{background:var(--accent-bg);border-color:transparent}
+.trap{background:var(--bad-bg);border-color:transparent}
+.trick .lab,.trap .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.trick .lab{color:var(--accent)}
+.trap .lab{color:var(--bad)}
+.rk div{grid-template-columns:minmax(0,48%) minmax(0,1fr)}
+.rk dd{min-width:0;overflow-wrap:anywhere}
+.hot{border-radius:var(--r);padding:12px 14px;background:var(--warn-bg,var(--accent-bg));border-left:4px solid var(--warn,var(--accent))}
+.hot .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;color:var(--warn,var(--accent))}
+.heatb{display:inline-block;font-size:11px;letter-spacing:-.1em;margin-left:6px;vertical-align:1px}
+.heat{display:flex;flex-direction:column;gap:2px}
+.hrow{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(60px,1fr) 44px;gap:10px;align-items:center;text-align:left;background:none;border:0;border-bottom:1px solid var(--rule);padding:9px 2px;color:inherit;font:inherit;cursor:pointer}
+.hrow:last-child{border-bottom:0}
+.hrow .ht{display:flex;flex-direction:column;min-width:0}
+.hrow .ht .muted{font-size:12px}
+.hbar{height:10px;border-radius:5px;background:var(--rule);overflow:hidden}
+.hbar i{display:block;height:100%;background:var(--accent);border-radius:5px}
+.hp{text-align:right;font-weight:700}
+
+.tbl{overflow-x:auto;margin:0 -2px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);font-weight:700}
+td.n{font-family:var(--f-num);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fig{margin:0}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-size:13px;color:var(--ink2);margin-top:6px}
+.pyr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pyr div{text-align:center;font-size:13px}
+.pyr b{display:block;font-size:14px}
+.pm{fill:var(--blue)} .pf{fill:var(--accent)}
+.sum{margin:0;padding-left:20px;display:grid;gap:6px}
+
+/* questions */
+.qcard{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px;min-width:0}
+.qmeta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}
+.qno{font-family:var(--f-num);font-weight:600;color:var(--ink2)}
+.tag{background:var(--sunk);color:var(--ink2);border-radius:99px;padding:1px 9px;font-weight:600}
+.tag.pyq{background:var(--accent-bg);color:var(--accent)}
+.bm{margin-left:auto;background:none;border:0;cursor:pointer;color:var(--ink2);font-size:20px;line-height:1;padding:4px}
+.bm[aria-pressed="true"]{color:var(--accent)}
+.qt{font-weight:600;font-size:16px}
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:start;text-align:left;width:100%;border:1.5px solid var(--rule);background:var(--paper);border-radius:9px;padding:10px 12px;cursor:pointer;min-height:44px}
+.opt .k{font-family:var(--f-num);font-weight:600;color:var(--ink2);font-size:14px;padding-top:1px}
+.opt.sel{border-color:var(--blue);background:var(--blue-bg)}
+.opt.ok{border-color:var(--good);background:var(--good-bg)}
+.opt.no{border-color:var(--bad);background:var(--bad-bg)}
+.opt.ok .k{color:var(--good)} .opt.no .k{color:var(--bad)}
+.opt:disabled{cursor:default;color:inherit}
+.exp{font-size:15px;border-left:3px solid var(--blue);padding:4px 0 4px 12px;color:var(--ink)}
+.exp b.okl{color:var(--good)} .exp b.nol{color:var(--bad)}
+
+/* chips */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 13px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.seg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--rule)}
+.seg::-webkit-scrollbar{display:none}
+.seg button{flex:none;background:none;border:0;border-bottom:2px solid transparent;padding:10px 8px;font-weight:600;color:var(--ink2);cursor:pointer}
+.seg button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+
+/* score panel */
+.scorebig{display:flex;align-items:baseline;gap:8px}
+.scorebig .num{font-size:44px;font-weight:600;line-height:1;color:var(--blue)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.kpi{background:var(--sunk);border-radius:8px;padding:8px;text-align:center}
+.kpi .num{display:block;font-size:20px;font-weight:600}
+.kpi span{font-size:12px;color:var(--ink2)}
+.kpi.g .num{color:var(--good)} .kpi.b .num{color:var(--bad)}
+
+/* mock */
+.mbar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 57px);z-index:10;background:var(--paper);padding:10px 0;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--rule)}
+.timer{font-family:var(--f-num);font-weight:600;font-size:18px;padding:4px 10px;border-radius:8px;background:var(--sunk)}
+.timer.low{background:var(--bad-bg);color:var(--bad)}
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px}
+.pal button{height:40px;border-radius:8px;border:1px solid var(--rule);background:var(--sheet);font-family:var(--f-num);font-weight:600;font-size:13px;cursor:pointer}
+.pal button.a{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.pal button.m{box-shadow:inset 0 -4px 0 var(--accent)}
+.pal button.cur{outline:2px solid var(--ink);outline-offset:1px}
+.pal button.ok{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.pal button.no{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.confirm{background:var(--warn-bg);border-radius:var(--r);padding:12px 14px;display:grid;gap:10px}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}
+legend{font-weight:700;margin-bottom:6px;padding:0}
+.radios{display:flex;gap:8px;flex-wrap:wrap}
+.radios label{border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 14px;font-weight:600;cursor:pointer;font-size:14px}
+.radios input{position:absolute;opacity:0;pointer-events:none}
+.radios input:checked + span{color:var(--blue)}
+.radios label:has(input:checked){border-color:var(--blue);background:var(--blue-bg)}
+.radios label:has(input:focus-visible){outline:2px solid var(--blue);outline-offset:2px}
+select{font:inherit;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:8px;padding:8px 10px;max-width:100%}
+.hist{display:grid;gap:0}
+.hist div{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:14px}
+
+/* revise */
+.search{width:100%;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:10px;padding:10px 12px;font:inherit}
+.rk{display:grid;gap:0}
+.rk div{display:grid;grid-template-columns:minmax(0,48%) 1fr;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:15px}
+.rk div:first-child{border-top:0}
+.rk dt{font-size:13px;color:var(--ink2);margin:0}
+.rk dt.up{color:var(--good)} .rk dt.dn{color:var(--bad)}
+.rk dd{margin:0;font-weight:600;min-width:0}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px}
+.tile .num{display:block;font-size:24px;font-weight:600;color:var(--accent);line-height:1.2}
+.tile span{font-size:13px;color:var(--ink2)}
+.gbar{display:grid;grid-template-columns:78px 1fr 52px;gap:8px;align-items:center;font-size:13px;padding:3px 0}
+.gbar .tr{height:12px;background:var(--sunk);border-radius:3px;position:relative;overflow:hidden}
+.gbar .tr i{position:absolute;left:0;top:0;bottom:0;background:var(--blue);border-radius:3px}
+.gbar .tr i.neg{background:var(--bad)}
+.gbar .v{font-family:var(--f-num);text-align:right}
+.flash{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;min-height:240px;padding:20px 18px;display:grid;align-content:center;gap:12px;cursor:pointer;text-align:left;width:100%}
+.flash .side{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.flash .front{font-size:18px;font-weight:600}
+.flash .ans{font-size:20px;font-weight:700;color:var(--good)}
+.empty{padding:24px 4px;color:var(--ink2);text-align:center}
+.foot{font-size:13px;color:var(--ink2);padding-top:10px}
+@media (prefers-reduced-motion: no-preference){ .opt,.chip,.btn{transition:background-color .15s, border-color .15s} }
+.link{background:var(--blue-bg);border-radius:var(--r);padding:12px 14px}
+.link .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;color:var(--blue)}
+.icheck{background:var(--sheet);border:1.5px dashed var(--blue);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px}
+.icheck .lab{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue)}
+.cat{font-size:12px;font-weight:700;border-radius:99px;padding:1px 8px;white-space:nowrap}
+.cat.CS{background:var(--blue-bg);color:var(--blue)} .cat.CSS{background:var(--accent-bg);color:var(--accent)} .cat.ST{background:var(--sunk);color:var(--ink)} .cat.OT{background:var(--sunk);color:var(--ink2)}
+
+/* ---- workbook additions ---- */
+table.cover td:nth-child(4){min-width:180px}
+.plist .dl{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.plist .dl em{font-style:normal;font-weight:700;color:var(--blue);text-align:right}
+.ladder{list-style:none;margin:0;padding:0;display:grid;gap:0;border-top:1px solid var(--rule)}
+.ladder li{display:grid;grid-template-columns:62px 1fr auto;gap:12px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--rule)}
+.ladder .rk-n{font-size:22px;font-weight:600;color:var(--blue);text-align:right}
+.ladder .rk-t{min-width:0}
+.ladder .rk-t b{display:block;line-height:1.3}
+.ladder .rk-t span{font-size:13px;color:var(--ink2)}
+.ladder .rk-d{font-weight:700;font-size:14px;white-space:nowrap}
+.ladder li.up .rk-d{color:var(--good)} .ladder li.dn .rk-d{color:var(--bad)}
+.ladder small{font-weight:600;color:var(--ink2)}
+table.cover td{min-width:90px}
+.peek{border:1.5px dashed var(--blue);background:var(--blue-bg);color:var(--blue);border-radius:8px;padding:6px 10px;font-weight:600;cursor:pointer;min-height:36px;width:100%}
+.pubs{display:grid;gap:12px}
+.plist{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.plist li{padding:7px 0;border-top:1px dashed var(--rule);display:grid;gap:1px}
+.plist li:first-child{border-top:0}
+.plist li span{font-size:13px;color:var(--ink2)}
+.seg{scroll-snap-type:x proximity}
+@media (max-width: 700px){
+  table.cover thead{display:none}
+  table.cover tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 10px;padding:10px 0;border-bottom:1px solid var(--rule)}
+  table.cover td{border:0;padding:0;min-width:0;font-size:14px}
+  table.cover td:first-child{grid-column:1/-1;font-size:15px}
+  table.cover td:nth-child(4){grid-column:1/-1;min-width:0}
+  table.cover td[data-l]::before{content:attr(data-l);display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-bottom:2px}
+}
+/* ---- maths blocks ---- */
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(250px,100%),1fr));gap:10px}
+.fcard{background:var(--sheet);border:1px solid var(--rule);border-left:4px solid var(--blue);border-radius:var(--r);padding:10px 12px;display:grid;gap:4px;min-width:0}
+.fcard .fn{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);font-weight:700}
+.fcard .fx{font-family:var(--f-num);font-size:16px;color:var(--ink);overflow-wrap:anywhere;line-height:1.45}
+.fcard .fnote{font-size:13px;color:var(--ink2)}
+.ex{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px 14px;display:grid;gap:8px}
+.ex .exhead .lab{display:inline;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);font-weight:700}
+.ex .src{display:inline-block;margin-left:6px;font-size:11.5px;font-weight:700;color:var(--accent);border:1px solid currentColor;border-radius:999px;padding:0 8px}
+.ex .exq{font-weight:600}
+.ex details summary{cursor:pointer;font-weight:700;color:var(--blue);list-style:none}
+.ex details summary::-webkit-details-marker{display:none}
+.ex details summary::before{content:'▸ '}
+.ex details[open] summary::before{content:'▾ '}
+.ex ol{margin:8px 0 0;padding-left:20px;display:grid;gap:4px}
+.ex .exans{margin-top:8px;padding:8px 10px;border-radius:8px;background:var(--good-bg);color:var(--good);font-weight:700}
+.figwrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(260px,100%),1fr));gap:12px}
+.figwrap figure{margin:0;display:grid;gap:6px;justify-items:center;text-align:center}
+.fig svg,.figwrap svg{width:100%;max-width:340px;height:auto;color:var(--ink)}
+.fig figcaption,.figwrap figcaption{font-size:13px;color:var(--ink2)}
+sup,sub{font-size:.72em;line-height:0}
+
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">Geometry<small>ज्यामिति · SSC maths workbook</small></div>
+    <div class="stat" id="topstat"></div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<nav class="nav" aria-label="Sections">
+  <div class="nav-in">
+    <button type="button" id="nav-learn" data-tab="learn"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg><span>Learn</span></button>
+    <button type="button" id="nav-practice" data-tab="practice"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span>Practice</span></button>
+    <button type="button" id="nav-mock" data-tab="mock"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6M12 2v3"/></svg><span>Mock test</span></button>
+    <button type="button" id="nav-revise" data-tab="revise"><svg viewBox="0 0 24 24"><path d="M12 3 2 8l10 5 10-5z"/><path d="m2 13 10 5 10-5"/></svg><span>Revise</span></button>
+  </div>
+</nav>
+
+<script>
+"use strict";
+const LESSONS = [
+{ id:"L1", heat:1, title:"Lines, angles & parallel lines", hi:"रेखाएँ, कोण और समांतर रेखाएँ", blocks:[
+ {k:"hot", h:"<b>Tier 1:</b> rarely a stand-alone question (0–1 per shift) — usually a one-liner on complement/supplement or corresponding angles. <b>Tier 2:</b> appears inside triangle, polygon and circle figures, where you must spot the alternate or co-interior pair to start the chain."},
+ {k:"p", h:"Two angles are <b>complementary</b> if they add to 90°, <b>supplementary</b> if they add to 180°. Angles on a straight line (linear pair) add to 180°; angles round a point add to 360°; vertically opposite angles are equal."},
+ {k:"formula", title:"Angle pairs", rows:[["Complement of θ","90° − θ","Only for θ < 90°"],["Supplement of θ","180° − θ","Linear pair"],["Reflex of θ","360° − θ","The 'outside' angle"],["Vertically opposite","equal","Two straight lines crossing"],["Bisectors of a linear pair","meet at 90°","½(180°) = 90°"]]},
+ {k:"formula", title:"Parallel lines cut by a transversal", rows:[["Corresponding (F)","∠1 = ∠5","Same position at each crossing"],["Alternate interior (Z)","∠3 = ∠5, ∠4 = ∠6","Opposite sides, inside"],["Co-interior (C / U)","∠4 + ∠5 = 180°","Same side, inside — supplementary"],["Alternate exterior","∠1 = ∠7","Opposite sides, outside"],["Bend rule","x = a + b","Point between two parallel lines, angles opening towards it"],["Bisectors of co-interior angles","meet at 90°","½(180°) = 90°"]]},
+ {k:"fig", title:"Transversal on two parallel lines", svg:'<svg viewBox="0 0 300 180" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M20 50 H270 M20 130 H270"/><path d="M90 170 L230 10"/><path d="M209 50 A14 14 0 0 0 204.2 39.5" style="stroke:var(--accent)" stroke-width="2.2"/><path d="M139 130 A14 14 0 0 0 134.2 119.5" style="stroke:var(--accent)" stroke-width="2.2"/><g fill="currentColor" stroke="none"><text x="216" y="44">1</text><text x="184" y="36">2</text><text x="172" y="64">3</text><text x="199" y="72">4</text><text x="146" y="124">5</text><text x="114" y="116">6</text><text x="102" y="144">7</text><text x="129" y="152">8</text><text x="276" y="54">l</text><text x="276" y="134">m</text><text x="236" y="16">t</text></g><text x="20" y="40" fill="currentColor" stroke="none" font-size="11">l ∥ m</text></svg>', cap:"Corresponding: 1=5, 2=6, 3=7, 4=8. Alternate interior: 3=5, 4=6. Co-interior: 4+5 = 3+6 = 180°."},
+ {k:"fig", title:"Bend rule (point between parallels)", svg:'<svg viewBox="0 0 300 180" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M30 40 H270 M30 140 H270"/><path d="M60 40 L160 90 L60 140"/><path d="M40 90 H270" stroke-dasharray="4 3" stroke-width="1.1"/><path d="M76 40 A16 16 0 0 1 74.3 47.2" style="stroke:var(--accent)" stroke-width="2"/><path d="M76 140 A16 16 0 0 0 74.3 132.8" style="stroke:var(--blue)" stroke-width="2"/><path d="M145.7 82.8 A16 16 0 0 0 144 90" style="stroke:var(--accent)" stroke-width="2"/><path d="M144 90 A16 16 0 0 0 145.7 97.2" style="stroke:var(--blue)" stroke-width="2"/><g fill="currentColor" stroke="none"><text x="54" y="32">B</text><text x="260" y="32">A</text><text x="54" y="158">D</text><text x="260" y="158">C</text><text x="166" y="86">E</text><text x="86" y="52">a</text><text x="86" y="136">b</text><text x="124" y="86">a</text><text x="124" y="104">b</text></g></svg>', cap:"Draw a dashed line through E parallel to AB. Alternate angles give ∠BED = a + b."},
+ {k:"ex", src:"SSC CGL 2025 · 20 Sep S3", q:"Two parallel lines are intersected by a transversal. If a pair of corresponding angles is formed and one of the angles measures 130°, what is the measure of the other angle?", steps:["Corresponding angles on parallel lines are equal.","So the other angle = 130°."], ans:"130°", tip:"F-shape → equal. Only the C/U-shape (co-interior) adds to 180°."},
+ {k:"ex", q:"The complement of an angle is one-fourth of its supplement. Find the angle.", steps:["Let the angle be x. Complement = 90 − x, supplement = 180 − x.","90 − x = (180 − x)/4 ⇒ 360 − 4x = 180 − x","3x = 180 ⇒ x = 60°"], ans:"60°", tip:"Supplement − complement is always 90°. Here S − S/4 = 90 ⇒ S = 120 ⇒ angle = 60°."},
+ {k:"ex", q:"AB ∥ CD and E is a point between them. ∠ABE = 45° and ∠CDE = 30°, both opening towards E. Find ∠BED.", fig:'<svg viewBox="0 0 260 140" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M20 30 H240 M20 110 H240"/><path d="M50 30 L101 81 L50 110"/><path d="M20 81 H240" stroke-dasharray="4 3" stroke-width="1.1"/><g fill="currentColor" stroke="none"><text x="44" y="22">B</text><text x="228" y="22">A</text><text x="44" y="128">D</text><text x="228" y="128">C</text><text x="106" y="75">E</text><text x="72" y="46">45°</text><text x="84" y="107">30°</text></g></svg>', steps:["Draw EF ∥ AB through E (so EF ∥ CD too).","Upper part of ∠BED = ∠ABE = 45° (alternate).","Lower part = ∠CDE = 30° (alternate).","∠BED = 45° + 30° = 75°."], ans:"75°", tip:"Bend rule: angle at the bend = sum of the angles at the two parallels (when they open towards the bend)."},
+ {k:"trick", h:"<b>Letters:</b> F = corresponding (equal), Z = alternate (equal), C/U = co-interior (sum 180°). <b>Supplement − complement = 90°</b> for every acute angle — many 'ratio of supplement to complement' questions die in one line."},
+ {k:"trap", h:"Co-interior angles are <b>supplementary, not equal</b>. Equating (2x + 10) and (3x − 5) gives the wrong x; use (2x + 10) + (3x − 5) = 180."},
+ {k:"link", h:"The bend rule and alternate angles prove the triangle angle sum (L2) and the exterior-angle rule. Co-interior angles reappear in parallelograms and trapeziums (L7)."},
+ {k:"q", q:"Two co-interior angles are (2x + 10)° and (3x − 5)°. Find x.", o:["35","15","17","70"], e:"2x + 10 + 3x − 5 = 180 ⇒ 5x = 175 ⇒ x = 35."},
+ {k:"q", q:"The bisectors of two angles forming a linear pair meet at…", o:["90°","180°","45°","60°"], e:"½ × 180° = 90°."}
+], sum:["Complement 90 − θ, supplement 180 − θ; supplement − complement = 90°","Corresponding and alternate angles are equal; co-interior angles add to 180°","Bend rule: angle at a point between parallels = sum of the two angles at the lines"]},
+{ id:"L2", heat:2, title:"Triangle basics", hi:"त्रिभुज की मूल बातें", blocks:[
+ {k:"hot", h:"<b>Tier 1:</b> about one question in every 2–3 shifts — angles in a ratio, exterior angles, or 'how many integer triangles'. <b>Tier 2:</b> the altitude–bisector angle ∠DAE = ½(B − C) and exterior-angle chains are favourites."},
+ {k:"formula", title:"Angle rules", rows:[["Angle sum","A + B + C = 180°","Every triangle"],["Exterior angle","∠ACD = A + B","= sum of the two interior OPPOSITE angles"],["Sum of exterior angles","360°","One at each vertex"],["Altitude vs bisector from A","∠DAE = ½|B − C|","AD bisects ∠A, AE ⊥ BC"],["Angles in ratio p : q : r","angle = p × 180/(p+q+r)","Divide 180 in the ratio"]]},
+ {k:"formula", title:"Side rules", rows:[["Triangle inequality","|b − c| < a < b + c","Strict: equal means a straight line"],["Sides vs angles","bigger side ↔ bigger opposite angle","Smallest side faces the smallest angle"],["Type by sides (c largest)","c² &lt; a² + b² acute, = right, &gt; obtuse","Pythagoras test"],["Integer triangles, perimeter p","nearest integer to p²/48 (p even), (p+3)²/48 (p odd)","Tier-1 counting shortcut; check by listing"]]},
+ {k:"figs", title:"Two key pictures", items:[
+  {svg:'<svg viewBox="0 0 300 175" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M30 140 L190 140 L90 30 Z"/><path d="M190 140 H275" stroke-dasharray="4 3"/><path d="M82.3 44 A16 16 0 0 0 100.8 41.8" style="stroke:var(--accent)" stroke-width="2"/><path d="M48 140 A18 18 0 0 0 38.6 124.2" style="stroke:var(--blue)" stroke-width="2"/><path d="M208 140 A18 18 0 0 0 177.9 126.7" style="stroke:var(--accent)" stroke-width="2"/><g fill="currentColor" stroke="none"><text x="86" y="22">A</text><text x="16" y="154">B</text><text x="184" y="158">C</text><text x="270" y="158">D</text><text x="87" y="64">x</text><text x="52" y="134">y</text><text x="204" y="122">x + y</text></g></svg>', cap:"Exterior angle ∠ACD = x + y (the two interior opposite angles)."},
+  {svg:'<svg viewBox="0 0 300 175" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M20 150 L280 150 L110 30 Z"/><path d="M110 30 V150" style="stroke:var(--blue)"/><path d="M110 30 L128.9 150" style="stroke:var(--accent)"/><path d="M101 150 v-9 h9" stroke-width="1.2"/><g fill="currentColor" stroke="none"><text x="106" y="22">A</text><text x="8" y="164">B</text><text x="280" y="164">C</text><text x="100" y="166">E</text><text x="126" y="166">D</text></g></svg>', cap:"AE ⊥ BC, AD bisects ∠A. ∠DAE = ½(∠B − ∠C)."}]},
+ {k:"ex", src:"SSC CGL 2024 · 12 Sep S1", q:"The measures of the three angles of a triangle are in the ratio 17 : 13 : 15. Find the positive difference between the greatest and the smallest of these angles.", steps:["17 + 13 + 15 = 45 parts = 180° ⇒ 1 part = 4°.","Greatest − smallest = (17 − 13) parts = 4 × 4°."], ans:"16°", tip:"Work only with the difference of parts: (17 − 13) × 180/45."},
+ {k:"ex", src:"SSC CGL Tier 2 · 29 Jan 2022", q:"In △ABC, ∠B = 78°, AD bisects ∠A meeting BC at D, and AE ⊥ BC at E. If ∠DAE = 24°, find ∠ACB.", steps:["∠DAE = ½(∠B − ∠C).","24 = ½(78 − C) ⇒ 78 − C = 48.","C = 30°."], ans:"30°", tip:"Double ∠DAE and subtract from the bigger base angle."},
+ {k:"ex", src:"SSC CGL 2022 · 05 Dec S3", q:"The perimeter of a triangle with integer sides is 13. How many such triangles are possible?", steps:["Largest side c < 13/2 ⇒ c ≤ 6.","c = 6: (1,6,6), (2,5,6), (3,4,6); c = 5: (3,5,5), (4,4,5).","c = 4 would need a + b = 9 with a, b ≤ 4 — impossible."], ans:"5", tip:"Odd p: (p + 3)²/48 = 256/48 ≈ 5.3 → 5."},
+ {k:"ex", src:"SSC CGL Tier 2 · 18 Nov 2020", q:"The exterior angles obtained on producing the base of a triangle both ways are 121° and 104°. What is the largest angle of the triangle?", steps:["Base angles = 180 − 121 = 59° and 180 − 104 = 76°.","Third angle = 180 − 59 − 76 = 45°.","Largest = 76°."], ans:"76°", tip:"Third angle = (sum of the two exterior angles) − 180 = 45°."},
+ {k:"trick", h:"<b>Ratio angles:</b> one part = 180 ÷ (sum of ratio). <b>Two exterior angles at the base:</b> apex angle = (e₁ + e₂) − 180°. <b>Integer sides:</b> largest side must be less than half the perimeter."},
+ {k:"trap", h:"The exterior angle equals the sum of the two interior <b>opposite</b> angles — not the adjacent one (they are supplementary). And the triangle inequality is strict: 3, 4, 7 is <b>not</b> a triangle."},
+ {k:"link", h:"∠DAE and the exterior-angle rule feed straight into incentre / excentre angles (L5) and polygon exterior angles (L8)."},
+ {k:"q", q:"The base BC of △ABC is produced both ways. The exterior angles at B and C are 110° and 125°. ∠A = ?", o:["55°","70°","125°","45°"], e:"Interior B = 70°, C = 55° ⇒ A = 55°. Or 110 + 125 − 180."},
+ {k:"q", q:"Which set can be the sides of a triangle?", o:["5, 7, 11","3, 4, 7","2, 5, 8","4, 6, 11"], e:"5 + 7 = 12 > 11. Others fail a + b > c."}
+], sum:["A + B + C = 180°; exterior angle = sum of interior opposite angles","|b − c| < a < b + c; bigger side faces bigger angle","∠ between altitude and bisector from A = ½(B − C)"]},
+{ id:"L3", heat:3, title:"Congruence & similarity", hi:"सर्वांगसमता और समरूपता", blocks:[
+ {k:"hot", h:"<b>Tier 1:</b> roughly one question per shift — BPT (DE ∥ BC) lengths, or 'ratio of areas of similar triangles'. <b>Tier 2:</b> 2–3 step chains: BPT → area of trapezium, common-angle similarity (AC² = CD·CB), a line that halves the area."},
+ {k:"formula", title:"Tests", rows:[["Congruence (≅)","SSS, SAS, ASA, AAS, RHS","Same shape AND size"],["Not tests","SSA, AAA","AAA proves only similarity"],["Similarity (∼)","AA, SSS (in proportion), SAS (ratio + included angle)","Same shape, any size"],["Common-angle similarity","∠ADC = ∠BAC ⇒ △ADC ∼ △BAC ⇒ AC² = CD × CB","D on BC; angle C is shared"]]},
+ {k:"formula", title:"Ratios in similar triangles (k = side ratio)", rows:[["BPT / Thales","DE ∥ BC ⇒ AD/DB = AE/EC","Line parallel to a side cuts the other two in the same ratio"],["Full-side form","AD/AB = AE/AC = DE/BC","Use AB, not DB, when DE is asked"],["Sides, heights, medians, perimeters","all in ratio k","Every length scales by k"],["Areas","k²","Area ratio = (side ratio)²"],["Trapezium cut off by DE ∥ BC","ar(ADE) : ar(BCED) = AD² : (AB² − AD²)","Subtract the small square"],["Mid-point theorem","DE ∥ BC, DE = ½BC","D, E midpoints of AB, AC"],["Medial triangle","area ¼, perimeter ½","Join all three midpoints"]]},
+ {k:"figs", title:"BPT and the mid-point theorem", items:[
+  {svg:'<svg viewBox="0 0 280 170" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M120 20 L30 150 L250 150 Z"/><path d="M84 72 L172 72" style="stroke:var(--accent)" stroke-width="2.2"/><g fill="currentColor" stroke="none"><text x="116" y="14">A</text><text x="18" y="164">B</text><text x="250" y="164">C</text><text x="68" y="74">D</text><text x="178" y="74">E</text></g></svg>', cap:"DE ∥ BC ⇒ AD/DB = AE/EC and DE/BC = AD/AB."},
+  {svg:'<svg viewBox="0 0 280 170" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M85 85 L205 85 L150 150 Z" style="fill:var(--accent-bg);stroke:var(--accent)"/><path d="M140 20 L30 150 L270 150 Z"/><path d="M54 117 l6 5 M110 50 l6 5 M167 48 l6 -5 M171 52 l6 -5 M232 115 l6 -5 M236 119 l6 -5 M86 146 v8 M90 146 v8 M94 146 v8 M206 146 v8 M210 146 v8 M214 146 v8" stroke-width="1.3"/><g fill="currentColor" stroke="none"><text x="136" y="14">A</text><text x="18" y="164">B</text><text x="270" y="164">C</text><text x="70" y="86">D</text><text x="210" y="86">E</text><text x="146" y="166">F</text></g></svg>', cap:"D, E, F are midpoints: DE = ½BC and △DEF has ¼ of the area."}]},
+ {k:"ex", src:"SSC CGL 2023 · 26 Jul S1", q:"In △ABC, DE ∥ BC and AD/DB = 4/5. If DE = 12 cm, find BC.", steps:["AD/AB = 4/(4 + 5) = 4/9.","DE/BC = AD/AB ⇒ 12/BC = 4/9.","BC = 12 × 9/4 = 27 cm."], ans:"27 cm", tip:"Convert AD : DB into AD : AB before using DE/BC. (Some websites print 48 here — re-solve: it is 27.)"},
+ {k:"ex", src:"SSC CGL 2023 · 27 Jul S2", q:"D is a point on side BC of △ABC. BC = 16 cm, BD = 11 cm and ∠ADC = ∠BAC. Find AC.", fig:'<svg viewBox="0 0 280 150" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M20 130 L260 130 L165.1 35.1 Z"/><path d="M165.1 35.1 L185 130"/><path d="M199 130 A14 14 0 0 0 182.1 116.3" style="stroke:var(--accent)" stroke-width="2"/><path d="M151.7 43.9 A16 16 0 0 0 176.4 46.4" style="stroke:var(--accent)" stroke-width="2"/><g fill="currentColor" stroke="none"><text x="160" y="28">A</text><text x="8" y="144">B</text><text x="258" y="144">C</text><text x="180" y="144">D</text></g></svg>', steps:["△ADC and △BAC share ∠C and ∠ADC = ∠BAC ⇒ similar (AA).","AC/BC = DC/AC ⇒ AC² = DC × BC.","DC = 16 − 11 = 5 ⇒ AC² = 5 × 16 = 80 ⇒ AC = 4√5 cm."], ans:"4√5 cm", tip:"Shared-angle pattern: (common side)² = (part) × (whole) — always the segment touching the shared vertex."},
+ {k:"ex", src:"SSC CGL Tier 2 · 16 Nov 2020", q:"In △ABC, DE ∥ BC with D on AB and E on AC. AD = 5 cm, DB = 9 cm, AE = 4 cm and BC = 15.4 cm. Find DE + EC.", steps:["DE = BC × AD/AB = 15.4 × 5/14 = 5.5 cm.","AD/DB = AE/EC ⇒ EC = 4 × 9/5 = 7.2 cm.","DE + EC = 12.7 cm."], ans:"12.7 cm", tip:"Two different ratios: DE uses AD/AB; EC uses AD/DB."},
+ {k:"ex", src:"SSC CGL 2025 · 17 Sep S3", q:"The perimeters of two similar triangles are in the ratio 3 : 5 and their areas total 34 cm². Find the area of the larger triangle.", steps:["Area ratio = 3² : 5² = 9 : 25 (34 parts).","34 parts = 34 cm² ⇒ 1 part = 1 cm².","Larger = 25 cm²."], ans:"25 cm²"},
+ {k:"trick", h:"<b>Square to go to area, root to come back.</b> Sides 2 : 3 → areas 4 : 9. A line ∥ base that halves the area sits at AD/AB = 1/√2. A line ∥ base at AD : DB = m : n leaves ar(ADE) : ar(BCED) = m² : (m + n)² − m²."},
+ {k:"trap", h:"In BPT, DE/BC equals <b>AD/AB</b>, not AD/DB. And area ratios need the side ratio <b>squared</b> — perimeters, medians and altitudes stay in the plain ratio."},
+ {k:"link", h:"Similarity powers Pythagoras proofs and the altitude-on-hypotenuse results (L4), the angle-bisector theorem (L4) and the chord / secant results PA·PB = PC·PD (L10)."},
+ {k:"q", q:"D and E are midpoints of AB and AC of △ABC. ar(△ADE) : ar(trapezium BCED) = ?", o:["1 : 3","1 : 4","1 : 2","1 : 1"], e:"ADE is ¼ of ABC, so the trapezium is ¾: 1 : 3."},
+ {k:"q", q:"Two similar triangles have sides in the ratio 3 : 5. Their areas are in the ratio…", o:["9 : 25","3 : 5","27 : 125","√3 : √5"], e:"Square the side ratio."}
+], sum:["Congruence: SSS, SAS, ASA, AAS, RHS; similarity: AA, SSS, SAS","DE ∥ BC ⇒ AD/DB = AE/EC and DE/BC = AD/AB","Area ratio = (side ratio)²; mid-point triangle has ¼ area"]},
+{ id:"L4", heat:3, title:"Pythagoras & right triangles", hi:"पाइथागोरस और समकोण त्रिभुज", blocks:[
+ {k:"hot", h:"<b>Tier 1:</b> almost every shift has a right triangle hidden somewhere — triplets, altitude on the hypotenuse, median = half hypotenuse. <b>Tier 2:</b> Apollonius / medians, angle-bisector theorem (internal and external) and 'altitude to hypotenuse' combos (AB² + BD² type)."},
+ {k:"formula", title:"Right triangle (∠A = 90°, AD ⊥ BC)", rows:[["Pythagoras","BC² = AB² + AC²","Hypotenuse faces the right angle"],["Altitude on hypotenuse","AD² = BD × DC","Geometric mean of the two pieces"],["Legs","AB² = BD × BC,  AC² = CD × CB","Each leg² = its own piece × whole"],["Altitude length","AD = AB × AC / BC","Two ways to write the area"],["Reciprocal form","1/AD² = 1/AB² + 1/AC²","Altitude from legs, no BC needed"],["Median to hypotenuse","= ½ BC = circumradius","Mid-point of hypotenuse is equidistant from A, B, C"]]},
+ {k:"formula", title:"Medians & bisectors (any triangle)", rows:[["Apollonius","AB² + AC² = 2(AD² + BD²)","D = midpoint of BC"],["Median length","mₐ = ½√(2b² + 2c² − a²)","Same theorem, solved for AD"],["Sum of median squares","mₐ² + m_b² + m_c² = ¾(a² + b² + c²)","Tier-2 favourite"],["Right triangle, medians from acute vertices","m₁² + m₂² = (5/4) × hypotenuse²","Add the two Pythagoras equations"],["Internal bisector of ∠A","BD/DC = AB/AC","D on BC"],["External bisector of ∠A","BE/EC = AB/AC","E on BC produced (AB ≠ AC)"]]},
+ {k:"table", title:"Triplets to know by heart", head:["Triplet","Multiples seen in SSC","Pattern"], rows:[["3, 4, 5","6-8-10, 9-12-15, 15-20-25","—"],["5, 12, 13","10-24-26","odd a: (a²−1)/2, (a²+1)/2"],["8, 15, 17","16-30-34","(m²−n², 2mn, m²+n²) with m=4, n=1"],["7, 24, 25","14-48-50","odd a = 7"],["20, 21, 29","—","legs differ by 1"],["9, 40, 41 · 11, 60, 61 · 12, 35, 37","—","less common"]]},
+ {k:"figs", title:"Three key pictures", items:[
+  {svg:'<svg viewBox="0 0 300 175" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M20 150 L280 150 L95 32.2 Z"/><path d="M95 32.2 V150" style="stroke:var(--accent)"/><path d="M89.6 40.6 L98.1 46 L103.4 37.6" stroke-width="1.2"/><path d="M85 150 v-10 h10" stroke-width="1.2"/><g fill="currentColor" stroke="none"><text x="90" y="24">A</text><text x="8" y="164">B</text><text x="280" y="164">C</text><text x="91" y="166">D</text></g></svg>', cap:"∠A = 90°, AD ⊥ BC: AD² = BD·DC, AB² = BD·BC, AC² = CD·CB."},
+  {svg:'<svg viewBox="0 48 310 118" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M20 140 L110 140 L101 68.6 Z"/><path d="M110 140 H290" stroke-dasharray="4 3"/><path d="M101 68.6 L74 140" style="stroke:var(--accent)"/><path d="M101 68.6 L290 140" style="stroke:var(--blue)" stroke-dasharray="5 3"/><g fill="currentColor" stroke="none"><text x="96" y="60">A</text><text x="8" y="154">B</text><text x="108" y="156">C</text><text x="70" y="156">D</text><text x="286" y="156">E</text></g></svg>', cap:"AD bisects ∠A, AE bisects the exterior angle: BD/DC = BE/EC = AB/AC."},
+  {svg:'<svg viewBox="0 0 260 175" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M20 140 L220 140 L80 30 Z"/><path d="M80 30 L120 140" style="stroke:var(--accent)"/><path d="M70 136 v8 M170 136 v8" stroke-width="1.3"/><g fill="currentColor" stroke="none"><text x="76" y="22">A</text><text x="8" y="154">B</text><text x="220" y="154">C</text><text x="116" y="156">D</text><text x="104" y="92">m</text></g></svg>', cap:"Apollonius: AB² + AC² = 2(AD² + BD²), BD = DC."}]},
+ {k:"ex", src:"SSC CGL 2021 Tier 1 · 20 Apr 2022 S1", q:"In right △ABC, right-angled at B, altitude BD is drawn to the hypotenuse AC. If AD = 6 cm and CD = 5 cm, find AB² + BD².", steps:["BD² = AD × DC = 6 × 5 = 30.","AB² = AD × AC = 6 × 11 = 66.","AB² + BD² = 96."], ans:"96", tip:"Or: AB² + BD² = (AD² + BD²) + BD² = 36 + 60 = 96."},
+ {k:"ex", src:"SSC CGL 2021 Tier 1 · 19 Apr 2022 S3", q:"In a right-angled triangle, the medians from the vertices of the acute angles are 7 cm and 4√6 cm. Find the hypotenuse.", steps:["Legs p, q. Medians: p² + q²/4 = 49 and q² + p²/4 = 96.","Add: (5/4)(p² + q²) = 145 ⇒ p² + q² = 116.","Hypotenuse = √116 = 2√29 cm."], ans:"2√29 cm", tip:"Hypotenuse² = (4/5)(m₁² + m₂²)."},
+ {k:"ex", q:"In △ABC, AB = 6 cm, AC = 4 cm, BC = 5 cm. The bisector of the exterior angle at A meets BC produced at E. Find CE.", steps:["External bisector: BE/CE = AB/AC = 3/2.","BE = BC + CE ⇒ (5 + CE)/CE = 3/2.","10 + 2CE = 3CE ⇒ CE = 10 cm."], ans:"10 cm", tip:"E falls beyond the shorter side's end (C, since AC < AB)."},
+ {k:"ex", q:"A 25 m ladder stands with its foot 7 m from a wall. If its top slides down 4 m, how far does the foot slide out?", steps:["Top height = √(25² − 7²) = 24 m.","New height = 20 m ⇒ new foot distance = √(25² − 20²) = 15 m.","Foot slides 15 − 7 = 8 m."], ans:"8 m", tip:"Spot 7-24-25 and 15-20-25 (3-4-5 × 5)."},
+ {k:"trick", h:"<b>Triplet first, Pythagoras later.</b> 6-8-10, 9-12-15, 7-24-25, 20-21-29 cover most SSC numbers. For an odd leg a, the triplet is a, (a² − 1)/2, (a² + 1)/2 (e.g. 13, 84, 85)."},
+ {k:"trap", h:"Altitude on the hypotenuse uses the <b>two pieces</b> (AD² = BD·DC), but a leg uses <b>piece × whole</b> (AB² = BD·BC). Mixing these up is the commonest slip. Also, the median to the hypotenuse is half the hypotenuse — the altitude is not."},
+ {k:"link", h:"Median = half hypotenuse is the circumradius of a right triangle (L5). Pythagoras gives every chord / tangent length in circles (L9–L10) and the distance formula (L12)."},
+ {k:"q", q:"In right △ABC (∠B = 90°), BD ⊥ AC. If AD = 4 cm and DC = 9 cm, BD = ?", o:["6 cm","6.5 cm","5 cm","13 cm"], e:"BD² = 4 × 9 = 36."},
+ {k:"q", q:"The legs of a right triangle are 9 cm and 12 cm. The median to the hypotenuse is…", o:["7.5 cm","15 cm","10.5 cm","7.2 cm"], e:"Hypotenuse 15; median = ½ × 15."}
+], sum:["Altitude on hypotenuse: AD² = BD·DC; leg² = piece × whole","Apollonius: AB² + AC² = 2(AD² + BD²); median to hypotenuse = ½ hypotenuse","Bisector theorem: BD/DC = AB/AC (internal and external)"]},
+{ id:"L5", heat:3, title:"Triangle centres", hi:"त्रिभुज के केंद्र", blocks:[
+ {k:"hot", h:"<b>Tier 1:</b> one question in most shifts — ∠BIC, ∠BHC, ∠BOC, or AG = ⅔AD. <b>Tier 2:</b> combinations (∠BIC − ∠BHC = 90°), r = Δ/s and R = abc/4Δ with Heron, centroid area splits, and angles at excentres."},
+ {k:"table", title:"The four centres", head:["Centre","Meeting point of","Key fact","Where"], rows:[["Centroid G","Medians","Divides each median 2 : 1 from the vertex","Always inside"],["Incentre I","Angle bisectors","Equidistant from the 3 sides (r)","Always inside"],["Circumcentre O","Perpendicular bisectors of sides","Equidistant from the 3 vertices (R)","Inside / on hypotenuse midpoint / outside"],["Orthocentre H","Altitudes","Reflection tricks, ∠BHC","Inside / at right-angle vertex / outside"]]},
+ {k:"formula", title:"Angles at the centres", rows:[["Incentre","∠BIC = 90° + A/2","Half-angles: 180 − (B + C)/2"],["Orthocentre","∠BHC = 180° − A","Quadrilateral with two right angles"],["Circumcentre","∠BOC = 2A (A acute); 360° − 2A (A obtuse)","Angle at centre = 2 × angle at circumference"],["Excentre (external bisectors of B, C)","∠BEC = 90° − A/2","Sum with ∠BIC is 180°"],["Internal bisector of B, external of C","∠BDC = A/2","Exterior-angle rule on the halves"]]},
+ {k:"formula", title:"Lengths and areas", rows:[["Centroid","AG = ⅔ AD, GD = ⅓ AD","Medians make 6 triangles of equal area"],["Inradius","r = Δ / s","s = (a + b + c)/2"],["Circumradius","R = abc / (4Δ) = a / (2 sin A)","Heron gives Δ"],["Right triangle","r = (a + b − c)/2, R = c/2","c = hypotenuse"],["Euler line","O, G, H collinear; HG : GO = 2 : 1","I lies on it only if isosceles"]]},
+ {k:"figs", title:"Where each centre sits", items:[{svg:'<svg viewBox="0 0 280 180" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M110 25 L25 160 L255 160 Z"/><path d="M110 25 L140 160 M25 160 L182.5 92.5 M255 160 L67.5 92.5" style="stroke:var(--accent)" stroke-width="1.3"/><circle cx="130" cy="115" r="3" style="fill:var(--accent)" stroke="none"/><g fill="currentColor" stroke="none"><text x="106" y="17">A</text><text x="11" y="172">B</text><text x="258" y="172">C</text><text x="136" y="111">G</text><text x="136" y="173">D</text></g></svg>', cap:"Centroid G: medians, AG : GD = 2 : 1."},{svg:'<svg viewBox="0 0 280 180" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M110 25 L25 160 L255 160 Z"/><circle cx="120.7" cy="107.2" r="52.8" style="stroke:var(--accent)"/><path d="M110 25 L120.7 107.2 M25 160 L120.7 107.2 M255 160 L120.7 107.2" stroke-width="1" stroke-dasharray="3 3"/><path d="M120.7 107.2 V160" style="stroke:var(--blue)" stroke-width="1.3"/><circle cx="120.7" cy="107.2" r="2.5" style="fill:var(--accent)" stroke="none"/><g fill="currentColor" stroke="none"><text x="106" y="17">A</text><text x="11" y="172">B</text><text x="258" y="172">C</text><text x="125.7" y="102.2">I</text><text x="124.7" y="141.6">r</text></g></svg>', cap:"Incentre I: angle bisectors; incircle radius r."},{svg:'<svg viewBox="0 0 280 180" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><circle cx="140" cy="92" r="72" style="stroke:var(--accent)"/><path d="M121.4 22.5 L81 133.3 L199 133.3 Z"/><path d="M140 92 L121.4 22.5 M140 92 L81 133.3 M140 92 L199 133.3" stroke-width="1" stroke-dasharray="3 3"/><circle cx="140" cy="92" r="2.5" style="fill:var(--accent)" stroke="none"/><g fill="currentColor" stroke="none"><text x="117.4" y="16.5">A</text><text x="67" y="141.3">B</text><text x="203" y="141.3">C</text><text x="147" y="88">O</text><text x="171.5" y="108.6">R</text></g></svg>', cap:"Circumcentre O: OA = OB = OC = R."},{svg:'<svg viewBox="0 0 280 180" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M110 25 L25 160 L255 160 Z"/><path d="M110 25 L110 160 M25 160 L131.8 45.3 M255 160 L90.3 56.3" style="stroke:var(--blue)" stroke-width="1.3"/><path d="M102 160 v-8 h8" stroke-width="1.1"/><circle cx="110" cy="68.7" r="2.5" style="fill:var(--accent)" stroke="none"/><g fill="currentColor" stroke="none"><text x="106" y="17">A</text><text x="11" y="172">B</text><text x="258" y="172">C</text><text x="117" y="84">H</text></g></svg>', cap:"Orthocentre H: the three altitudes meet."}]},
+ {k:"ex", src:"SSC CGL 2022 · 02 Dec S1", q:"In △ABC, H is the orthocentre and I is the incentre. If ∠BIC − ∠BHC = 90°, find ∠A.", steps:["∠BIC = 90° + A/2 and ∠BHC = 180° − A.","(90 + A/2) − (180 − A) = 90 ⇒ 3A/2 = 180.","A = 120°."], ans:"120°", tip:"Write both formulas in terms of A and solve one linear equation."},
+ {k:"ex", src:"SSC CGL Tier 2 · 29 Jan 2022", q:"G is the centroid of △ABC with AB = 35 cm, BC = 12 cm and AC = 37 cm. Find BG (to one decimal).", steps:["35² + 12² = 1369 = 37² ⇒ right angle at B.","Median from B to hypotenuse AC = 37/2 = 18.5 cm.","BG = ⅔ × 18.5 = 12.33 ≈ 12.3 cm."], ans:"12.3 cm", tip:"Spot the 12-35-37 triplet first — no Apollonius needed."},
+ {k:"ex", src:"SSC CGL Tier 2 · 12 Sep 2019", q:"In △ABC the medians AD, BE and CF meet at O. Find ar(△ABD) : ar(△AOE).", steps:["The three medians cut △ABC into 6 triangles of equal area.","△ABD is half the triangle = 3 small parts.","△AOE is 1 small part ⇒ 3 : 1."], ans:"3 : 1"},
+ {k:"ex", q:"A triangle has sides 13, 14 and 15 cm. Find its inradius and circumradius.", steps:["s = 21, Δ = √(21 × 8 × 7 × 6) = 84 cm².","r = Δ/s = 84/21 = 4 cm.","R = abc/(4Δ) = (13 × 14 × 15)/336 = 8.125 cm."], ans:"r = 4 cm, R = 8.125 cm (65/8)", tip:"13-14-15 has area 84 — memorise it, SSC loves it."},
+ {k:"trick", h:"<b>I → In → plus:</b> ∠BIC = 90 + A/2. <b>H → minus:</b> ∠BHC = 180 − A. <b>O → double:</b> ∠BOC = 2A. Excentre is the mirror of incentre: 90 − A/2."},
+ {k:"trap", h:"∠BOC = 2A only when A is acute. If A = 110°, ∠BOC = 360 − 220 = 140°, not 220°. Also: the centroid divides a median 2 : 1 from the <b>vertex</b> — GD is the short part."},
+ {k:"link", h:"Equilateral-triangle values r = a/(2√3), R = a/√3 (L6); incircle tangent lengths s − a (L11); the centroid formula ((x₁+x₂+x₃)/3, …) in coordinates (L12)."},
+ {k:"q", q:"In △ABC, ∠A = 56° and I is the incentre. ∠BIC = ?", o:["118°","124°","112°","28°"], e:"90 + 28 = 118°."},
+ {k:"q", q:"AD is a median of △ABC with AD = 15 cm and G the centroid. GD = ?", o:["5 cm","10 cm","7.5 cm","3 cm"], e:"GD = ⅓ × 15."}
+], sum:["Centroid 2 : 1; incentre ∠BIC = 90 + A/2; orthocentre ∠BHC = 180 − A; circumcentre ∠BOC = 2A","r = Δ/s, R = abc/4Δ; right triangle R = c/2, r = (a + b − c)/2","Medians make 6 equal-area triangles; O, G, H on the Euler line with HG = 2GO"]},
+{ id:"L6", heat:2, title:"Special triangles", hi:"विशेष त्रिभुज", blocks:[
+ {k:"hot", h:"<b>Tier 1 / CHSL:</b> about one question in every 2 shifts — equilateral inradius ↔ side ↔ circumradius, height ↔ area, or an isosceles median. <b>Tier 2:</b> the same values hide inside circle and mensuration questions (triangle inscribed in a circle, 30-60-90 pieces of a figure)."},
+ {k:"formula", title:"Equilateral triangle (side a)", rows:[["Height","h = (√3/2) a","Half of it is a 30-60-90 triangle"],["Area","(√3/4) a² = h²/√3","Both forms are asked"],["Inradius","r = a/(2√3) = h/3","Centroid sits ⅓ of the way up"],["Circumradius","R = a/√3 = 2h/3 = 2r","Centroid = circumcentre, AG = ⅔ median"],["r : R : h","1 : 2 : 3","Incircle : circumcircle area = 1 : 4"],["Any interior point (Viviani)","sum of ⊥ distances to the sides = h","Split into three triangles of base a"]]},
+ {k:"formula", title:"30-60-90, 45-45-90 and isosceles", rows:[["30° : 60° : 90°","sides x : x√3 : 2x","Shortest side faces 30°; hypotenuse = 2 × shortest"],["45° : 45° : 90°","sides a : a : a√2","Half a square cut on its diagonal"],["Isosceles right, leg a","area a²/2, hypotenuse a√2","Hypotenuse h ⇒ area h²/4"],["Isosceles (equal sides b, base a)","height = √(b² − a²/4)","Altitude from apex bisects the base and the apex angle"],["Isosceles area","(a/4)√(4b² − a²)","Same as ½ × base × height"],["Isosceles angles","base angles equal; apex = 180° − 2 × base","Equal sides face equal angles"]]},
+ {k:"fig", title:"Equilateral triangle: h, r, R", svg:'<svg viewBox="0 0 280 215" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><circle cx="140" cy="110" r="92.4" style="stroke:var(--blue)" stroke-width="1.3"/><path d="M140 17.6 L60.0 156.2 L220.0 156.2 Z"/><circle cx="140" cy="110" r="46.2" style="stroke:var(--accent)"/><path d="M140 17.6 V156.2" stroke-dasharray="4 3" stroke-width="1.1"/><path d="M140 110 L60 156.2" style="stroke:var(--blue)" stroke-width="1.3"/><path d="M131 156.2 v-9 h9" stroke-width="1.1"/><circle cx="140" cy="110" r="2.5" style="fill:var(--accent)" stroke="none"/><g fill="currentColor" stroke="none"><text x="146" y="14">A</text><text x="42" y="168">B</text><text x="226" y="168">C</text><text x="136" y="171">D</text><text x="146" y="106">O</text><text x="144" y="138">r</text><text x="96" y="128">R</text></g></svg>', cap:"O is centroid, incentre and circumcentre. OD = r = h/3, OA = OB = R = 2h/3, AD = h."},
+ {k:"figs", title:"Set-square triangles and the isosceles triangle", items:[
+  {svg:'<svg viewBox="0 0 180 160" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M30 60 L30 130 L151.2 130 Z"/><path d="M30 120 h10 v10" stroke-width="1.1"/><path d="M131.2 130 A20 20 0 0 0 133.9 120" style="stroke:var(--accent)" stroke-width="2"/><path d="M30 76 A16 16 0 0 0 43.9 68" style="stroke:var(--blue)" stroke-width="2"/><g fill="currentColor" stroke="none"><text x="14" y="99">x</text><text x="76" y="148">x√3</text><text x="96" y="86">2x</text><text x="104" y="125">30°</text><text x="36" y="92">60°</text></g></svg>', cap:"30-60-90: x : x√3 : 2x."},
+  {svg:'<svg viewBox="0 0 160 160" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M30 40 L30 130 L120 130 Z"/><path d="M30 120 h10 v10" stroke-width="1.1"/><path d="M28 85 h4 M73 128 v4" stroke-width="1.3"/><g fill="currentColor" stroke="none"><text x="16" y="89">a</text><text x="72" y="148">a</text><text x="80" y="80">a√2</text><text x="90" y="125">45°</text><text x="33" y="76">45°</text></g></svg>', cap:"45-45-90: a : a : a√2."},
+  {svg:'<svg viewBox="0 0 160 160" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M80 20 L20 140 L140 140 Z"/><path d="M80 20 V140" style="stroke:var(--accent)" stroke-dasharray="4 3"/><path d="M71 140 v-9 h9" stroke-width="1.1"/><path d="M47 78 l6 3 M107 81 l6 -3 M50 136 v8 M110 136 v8" stroke-width="1.3"/><g fill="currentColor" stroke="none"><text x="76" y="14">A</text><text x="8" y="152">B</text><text x="142" y="152">C</text><text x="76" y="154">D</text><text x="36" y="74">b</text><text x="118" y="74">b</text><text x="84" y="96">h</text></g></svg>', cap:"AB = AC: AD ⊥ BC bisects BC and ∠A; h = √(b² − (a/2)²)."}]},
+ {k:"ex", src:"SSC CHSL 2022 · 16 Mar 2023 S2", q:"In an equilateral triangle STU, the inradius is 5√3 cm. What is the length of the side of this triangle?", steps:["r = a/(2√3) ⇒ a = 2√3 × r.","a = 2√3 × 5√3 = 2 × 15 = 30 cm."], ans:"30 cm", tip:"a = 2√3 r and a = √3 R — the √3 always pairs with the radius."},
+ {k:"ex", src:"SSC CHSL 2022 · 17 Mar 2023 S4", q:"In an equilateral triangle the inradius is 4 cm. What is the circumradius?", steps:["In an equilateral triangle R = 2r (r : R : h = 1 : 2 : 3).","R = 8 cm."], ans:"8 cm", tip:"No side needed: R = 2r, h = 3r."},
+ {k:"ex", src:"SSC CHSL 2022 · 15 Mar 2023 S3", q:"In isosceles △ABC, BC is the unequal side and AD is the median from A. If AC = 5 cm and AD = 4 cm, find BC.", steps:["In an isosceles triangle the median to the base is also the altitude.","DC = √(5² − 4²) = 3 cm (3-4-5).","BC = 2 × 3 = 6 cm."], ans:"6 cm", tip:"Spot 3-4-5 and double the half-base."},
+ {k:"ex", q:"P is a point inside an equilateral triangle. Its distances from the three sides are 3 cm, 4 cm and 5 cm. Find the side and the area of the triangle.", steps:["Sum of the distances = height ⇒ h = 12 cm.","a = 2h/√3 = 24/√3 = 8√3 cm.","Area = h²/√3 = 144/√3 = 48√3 cm²."], ans:"Side 8√3 cm, area 48√3 cm²", tip:"Area = ½ × a × (sum of distances) — three triangles with the same base."},
+ {k:"trick", h:"<b>Equilateral ladder:</b> r : R : h = 1 : 2 : 3, and a = 2√3 r = √3 R = 2h/√3. Memorise <b>side 6 → h = 3√3, r = √3, R = 2√3</b> and scale. <b>Set squares:</b> 30-60-90 is half an equilateral triangle (x, x√3, 2x); 45-45-90 is half a square (a, a, a√2)."},
+ {k:"trap", h:"Inradius is a/(2√3), <b>not</b> a/√3 (that is R). And r = h/3 (not h/2): the centre is ⅓ of the way up from the base. In 30-60-90 the side opposite 60° is x√3 — the hypotenuse is 2x, not x√3."},
+ {k:"link", h:"These values give the trig ratios of 30°, 45°, 60° (Trigonometry app), the area of a hexagon = 6 equilateral triangles (L8, Mensuration 2D), and the incentre = centroid coincidence of L5."},
+ {k:"q", q:"The side of an equilateral triangle is 10 cm. Its inradius is…", o:["5/√3 cm","10/√3 cm","5√3 cm","5 cm"], e:"r = a/(2√3) = 10/(2√3) = 5/√3 ≈ 2.89 cm."},
+ {k:"q", q:"The hypotenuse of a 45-45-90 triangle is 8 cm. Each leg is…", o:["4√2 cm","4 cm","8√2 cm","2√2 cm"], e:"Leg = hypotenuse/√2 = 8/√2 = 4√2."}
+], sum:["Equilateral: h = (√3/2)a, area (√3/4)a², r = a/(2√3), R = a/√3; r : R : h = 1 : 2 : 3","30-60-90 → x : x√3 : 2x; 45-45-90 → a : a : a√2","Isosceles: altitude to the base bisects it; height = √(b² − a²/4)"]},
+{ id:"L7", heat:2, title:"Quadrilaterals", hi:"चतुर्भुज", blocks:[
+ {k:"hot", h:"<b>Tier 1 / CHSL / MTS:</b> about one question in every 2 shifts — mostly the rhombus (side from diagonals, area from perimeter + diagonal) and parallelogram angles. <b>Tier 2:</b> trapezium diagonal-area ratios, the parallelogram law of diagonals and mid-point quadrilaterals."},
+ {k:"table", title:"Which property belongs to which shape", head:["Shape","Sides","Diagonals","Angles"], rows:[["Parallelogram","Opposite sides equal and ∥","Bisect each other","Opposite equal; adjacent add to 180°"],["Rectangle","Opposite sides equal","Equal, bisect each other","All 90°"],["Rhombus","All four equal","Bisect each other at 90°; bisect the angles","Opposite equal"],["Square","All four equal","Equal, ⊥, bisect each other and the angles","All 90°"],["Trapezium","One pair ∥","Cut each other in the ratio of the ∥ sides","Co-interior pairs on each leg add to 180°"],["Kite","Two pairs of adjacent sides equal","⊥; the main one bisects the other","One pair of opposite angles equal"]]},
+ {k:"formula", title:"Lengths and areas", rows:[["Angle sum","360°","Two triangles"],["Rhombus side","a² = (d₁/2)² + (d₂/2)²","Half-diagonals and a side form a right triangle"],["Rhombus / kite area","½ d₁ d₂","Also base × height for a rhombus"],["Parallelogram law","AC² + BD² = 2(AB² + BC²)","Apollonius twice"],["Rectangle / square diagonal","√(l² + b²); a√2","Square area = d²/2"],["Trapezium mid-line","(a + b)/2","Joins the midpoints of the legs; ∥ to both bases"],["Trapezium, diagonals meet at O","AO/OC = BO/OD = AB/CD","△AOB ∼ △COD"],["Trapezium areas","AOB : COD = a² : b²; AOD = BOC; ar(AOD)² = ar(AOB)·ar(COD)","a = AB, b = CD"],["Mid-point quadrilateral","parallelogram with ½ the area","Any quadrilateral (mid-point theorem)"]]},
+ {k:"figs", title:"Parallelogram, rhombus, trapezium, mid-points", items:[
+  {svg:'<svg viewBox="0 0 290 160" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M40 130 L200 130 L250 40 L90 40 Z"/><path d="M40 130 L250 40 M200 130 L90 40" style="stroke:var(--accent)" stroke-width="1.3"/><path d="M92 103 l4 8 M188 59 l4 8 M163 105 l6 -5 M167 109 l6 -5 M123 61 l6 -5 M127 65 l6 -5" stroke-width="1.2"/><g fill="currentColor" stroke="none"><text x="26" y="146">A</text><text x="204" y="146">B</text><text x="254" y="36">C</text><text x="76" y="36">D</text><text x="141" y="104">O</text></g></svg>', cap:"Parallelogram: diagonals bisect each other (AO = OC, BO = OD); AC² + BD² = 2(AB² + BC²)."},
+  {svg:'<svg viewBox="0 0 280 165" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M50 85 L140 140 L230 85 L140 30 Z"/><path d="M50 85 H230 M140 30 V140" style="stroke:var(--accent)" stroke-width="1.3"/><path d="M140 77 h8 v8" stroke-width="1.1"/><g fill="currentColor" stroke="none"><text x="36" y="89">A</text><text x="136" y="156">B</text><text x="234" y="89">C</text><text x="136" y="24">D</text><text x="124" y="100">O</text><text x="78" y="80">d₁/2</text><text x="146" y="62">d₂/2</text><text x="80" y="52">a</text></g></svg>', cap:"Rhombus: diagonals ⊥ bisectors; a² = (d₁/2)² + (d₂/2)², area = ½d₁d₂."},
+  {svg:'<svg viewBox="0 0 280 160" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M30 140 L140 78.1 L90 50 Z M250 140 L140 78.1 L190 50 Z" style="fill:var(--accent-bg)" stroke="none"/><path d="M30 140 L250 140 L190 50 L90 50 Z"/><path d="M30 140 L190 50 M250 140 L90 50" style="stroke:var(--accent)" stroke-width="1.3"/><g fill="currentColor" stroke="none"><text x="16" y="154">A</text><text x="252" y="154">B</text><text x="194" y="44">C</text><text x="78" y="44">D</text><text x="135" y="100">O</text><text x="136" y="154">a</text><text x="136" y="44">b</text></g></svg>', cap:"Trapezium AB ∥ DC: shaded △AOD = △BOC; AOB : COD = a² : b²."},
+  {svg:'<svg viewBox="0 0 280 160" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M115 130 L225 90 L165 32.5 L55 72.5 Z" style="fill:var(--accent-bg);stroke:var(--accent)"/><path d="M30 120 L200 140 L250 40 L80 25 Z"/><path d="M30 120 L250 40" stroke-dasharray="4 3" stroke-width="1.1"/><g fill="currentColor" stroke="none"><text x="16" y="128">A</text><text x="202" y="154">B</text><text x="254" y="36">C</text><text x="72" y="20">D</text><text x="111" y="148">P</text><text x="231" y="94">Q</text><text x="161" y="24">R</text><text x="41" y="76">S</text></g></svg>', cap:"P, Q, R, S are midpoints: PQRS is a parallelogram (PQ ∥ AC ∥ SR) with half the area."}]},
+ {k:"ex", src:"SSC CHSL 2020 · 13 Apr 2021 S1", q:"The perimeter of a rhombus is 148 cm and one of its diagonals is 24 cm. Find the area of the rhombus.", steps:["Side = 148/4 = 37 cm; half-diagonal = 12 cm.","Other half-diagonal = √(37² − 12²) = √1225 = 35 ⇒ d₂ = 70 cm.","Area = ½ × 24 × 70 = 840 cm²."], ans:"840 cm²", tip:"12-35-37 is a triplet — no square roots needed."},
+ {k:"ex", src:"SSC CHSL 2025 · 19 Nov 2025 S3", q:"A rhombus has diagonals in the ratio 7 : 24 and side 25 cm. Find the diagonals and the area.", steps:["Half-diagonals 3.5x and 12x: (3.5x)² + (12x)² = 25² ⇒ 12.5²x² = 625 ⇒ x = 2.","Diagonals 14 cm and 48 cm.","Area = ½ × 14 × 48 = 336 cm²."], ans:"14 cm and 48 cm; 336 cm²", tip:"7-24-25: the half-diagonals are 7 and 24 straight away, so the diagonals are 14 and 48."},
+ {k:"ex", q:"The sides of a parallelogram are 5 cm and 7 cm and one diagonal is 8 cm. Find the other diagonal.", steps:["Parallelogram law: d₁² + d₂² = 2(5² + 7²) = 148.","d₂² = 148 − 64 = 84.","d₂ = 2√21 cm."], ans:"2√21 cm"},
+ {k:"ex", q:"In trapezium ABCD, AB ∥ CD and AB = 2CD. The diagonals meet at O and ar(△COD) = 4 cm². Find ar(ABCD).", steps:["△AOB ∼ △COD with ratio 2 ⇒ ar(AOB) = 4 × 4 = 16.","ar(AOD) = ar(BOC) = √(16 × 4) = 8 each.","Total = 16 + 4 + 8 + 8 = 36 cm²."], ans:"36 cm²", tip:"Parts are a² : ab : ab : b² = 4 : 2 : 2 : 1 ⇒ total (a + b)² = 9 parts."},
+ {k:"trick", h:"<b>Rhombus = four right triangles.</b> Half the diagonals and the side are a triplet: 10 & 24 → 13; 16 & 30 → 17; 14 & 48 → 25; 24 & 70 → 37. <b>Trapezium:</b> the four diagonal triangles are a² : ab : b² : ab, total (a + b)²."},
+ {k:"trap", h:"Use <b>half</b> diagonals for the rhombus side, and <b>½</b>d₁d₂ for its area. The mid-point figure of ANY quadrilateral is a parallelogram; it becomes a rectangle only when the diagonals are ⊥ (e.g. rhombus), a rhombus when they are equal (e.g. rectangle)."},
+ {k:"link", h:"Parallelogram law = Apollonius (L4) used twice. Polygon angle sums (L8) start from 360° for a quadrilateral. Cyclic quadrilaterals (L11) add the 'opposite angles = 180°' rule. Areas move on to Mensuration 2D."},
+ {k:"q", q:"In parallelogram ABCD, ∠A = 65°. ∠C = ?", o:["65°","115°","25°","130°"], e:"Opposite angles of a parallelogram are equal."},
+ {k:"q", q:"The diagonals of a rhombus are 10 cm and 24 cm. Its side is…", o:["13 cm","17 cm","26 cm","12 cm"], e:"√(5² + 12²) = 13."}
+], sum:["Parallelogram: diagonals bisect; rectangle: equal; rhombus: ⊥ bisectors; square: all","Rhombus a² = (d₁/2)² + (d₂/2)², area ½d₁d₂; parallelogram d₁² + d₂² = 2(a² + b²)","Trapezium diagonal triangles a² : ab : b² : ab; mid-point quadrilateral = parallelogram, ½ area"]},
+{ id:"L8", heat:2, title:"Polygons", hi:"बहुभुज", blocks:[
+ {k:"hot", h:"<b>Tier 1:</b> about one question in every 2–3 shifts — sides from an interior/exterior angle, or number of diagonals. <b>Tier 2:</b> two-step versions (angle sum → n → diagonals, interior − exterior = k, ratio of two polygons) and the regular hexagon in mensuration."},
+ {k:"p", h:"An n-sided polygon splits into <b>n − 2 triangles</b> from one vertex, so its angles add to (n − 2) × 180°. Walking round any convex polygon you turn once completely, so the <b>exterior angles always add to 360°</b> — this is the fastest route to n."},
+ {k:"formula", title:"Angle and diagonal formulas", rows:[["Sum of interior angles","(n − 2) × 180°","n − 2 triangles"],["Sum of exterior angles","360°","Any convex polygon"],["Each exterior (regular)","360°/n","n = 360 ÷ exterior"],["Each interior (regular)","180° − 360°/n = (n − 2)180°/n","Interior + exterior = 180°"],["Interior = k × exterior","n = 2(k + 1)","180 = (k + 1) × ext"],["Diagonals","n(n − 3)/2","Each vertex joins n − 3 others; ÷ 2 for double count"],["From one vertex","n − 3 diagonals, n − 2 triangles",""],["Triangles using the vertices","ⁿC₃ = n(n − 1)(n − 2)/6","Choose any 3 vertices"],["Regular hexagon, side a","area 6 × (√3/4)a² = (3√3/2)a²; longest diagonal 2a; short diagonal a√3","Six equilateral triangles"],["Regular octagon, side a","area 2(1 + √2)a²","Less common"]]},
+ {k:"table", title:"Regular polygons to know", head:["n","Name","Angle sum","Each interior","Each exterior","Diagonals"], rows:[["3","Triangle","180°","60°","120°","0"],["4","Square","360°","90°","90°","2"],["5","Pentagon","540°","108°","72°","5"],["6","Hexagon","720°","120°","60°","9"],["8","Octagon","1080°","135°","45°","20"],["9","Nonagon","1260°","140°","40°","27"],["10","Decagon","1440°","144°","36°","35"],["12","Dodecagon","1800°","150°","30°","54"]]},
+ {k:"figs", title:"Why the formulas work", items:[
+  {svg:'<svg viewBox="0 0 280 175" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M140 25 L181.1 151.6 L98.9 151.6 Z" style="fill:var(--accent-bg)" stroke="none"/><path d="M140 25 L206.6 73.4 L181.1 151.6 L98.9 151.6 L73.4 73.4 Z"/><path d="M140 25 L181.1 151.6 M140 25 L98.9 151.6" style="stroke:var(--accent)" stroke-width="1.3"/><path d="M181.1 151.6 L230 151.6" stroke-dasharray="4 3"/><path d="M201.1 151.6 A20 20 0 0 0 187.3 132.6" style="stroke:var(--blue)" stroke-width="2"/><g fill="currentColor" stroke="none"><text x="136" y="18">A</text><text x="211" y="72">B</text><text x="180" y="167">C</text><text x="90" y="167">D</text><text x="60" y="72">E</text><text x="204" y="144">72°</text><text x="92" y="108">1</text><text x="136" y="120">2</text><text x="178" y="108">3</text></g></svg>', cap:"Pentagon: 2 diagonals from A make 3 triangles ⇒ 540°. Each exterior angle = 360/5 = 72°."},
+  {svg:'<svg viewBox="0 0 280 180" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M140 90 L175 29.4 L105 29.4 Z" style="fill:var(--accent-bg)" stroke="none"/><path d="M210 90 L175 29.4 L105 29.4 L70 90 L105 150.6 L175 150.6 Z"/><path d="M140 90 L175 29.4 M140 90 L105 29.4 M140 90 L105 150.6 M140 90 L175 150.6" stroke-width="1"/><path d="M70 90 H210" style="stroke:var(--accent)" stroke-dasharray="5 3"/><path d="M105 29.4 L105 150.6" style="stroke:var(--blue)" stroke-dasharray="5 3" stroke-width="1.3"/><g fill="currentColor" stroke="none"><text x="136" y="22">a</text><text x="180" y="86">2a</text><text x="62" y="142">a√3</text><text x="134" y="56">60°</text></g></svg>', cap:"Regular hexagon = 6 equilateral triangles: area (3√3/2)a², long diagonal 2a, short diagonal a√3."}]},
+ {k:"ex", src:"SSC CGL 2025 · 19 Sep S3", q:"A regular polygon has each interior angle 150°. Find the number of its sides.", steps:["Exterior = 180 − 150 = 30°.","n = 360/30 = 12."], ans:"12", tip:"Always go through the exterior angle: n = 360 ÷ (180 − interior)."},
+ {k:"ex", src:"SSC CGL Tier 2 · 18 Nov 2020", q:"The interior angle of a regular polygon exceeds its exterior angle by 90°. Find the number of sides.", steps:["I + E = 180 and I − E = 90 ⇒ E = 45°.","n = 360/45 = 8."], ans:"8", tip:"E = (180 − difference)/2."},
+ {k:"ex", src:"SSC CGL 2022 Tier 2 · 06 Mar 2023", q:"Find the number of diagonals of a polygon whose interior angles add up to 2700°.", steps:["(n − 2) × 180 = 2700 ⇒ n − 2 = 15 ⇒ n = 17.","Diagonals = 17 × 14/2 = 119."], ans:"119"},
+ {k:"ex", q:"The numbers of sides of two regular polygons are in the ratio 1 : 2 and their interior angles are in the ratio 3 : 4. Find the sides of the smaller polygon.", steps:["Sides n and 2n. Interior angles 180 − 360/n and 180 − 180/n.","4(180 − 360/n) = 3(180 − 180/n) ⇒ 180 = 900/n.","n = 5 (pentagon and decagon: 108° : 144° = 3 : 4)."], ans:"5", tip:"Option test: try the table — 5 & 10, 4 & 8, 6 & 12 — and check the angle ratio."},
+ {k:"trick", h:"<b>Exterior first.</b> Interior 140 → exterior 40 → n = 9. Interior = k × exterior → n = 2(k + 1). A valid exterior angle must <b>divide 360 exactly</b>, so interior 130° (exterior 50°) is impossible for a regular polygon."},
+ {k:"trap", h:"Diagonals = n(n − 3)/2 — not n(n − 1)/2 (that counts sides too) and do not forget the ÷ 2. Sum of exterior angles is 360° for <b>every</b> polygon; do not use (n − 2) × 180 for it."},
+ {k:"link", h:"Exterior angle of a triangle (L2) is the n = 3 case. The regular hexagon is six equilateral triangles (L6) and appears in Mensuration 2D (area) and 3D (hexagonal prism)."},
+ {k:"q", q:"Each exterior angle of a regular polygon is 40°. How many sides does it have?", o:["9","8","10","40"], e:"360 ÷ 40 = 9."},
+ {k:"q", q:"How many diagonals does a hexagon have?", o:["9","15","6","12"], e:"6 × 3/2 = 9."}
+], sum:["Interior sum (n − 2)180°; exterior sum always 360°","Regular: exterior = 360/n, interior = 180 − 360/n; n = 360 ÷ exterior","Diagonals n(n − 3)/2; regular hexagon = 6 equilateral triangles"]},
+{ id:"L9", heat:3, title:"Circles: chords & arcs", hi:"वृत्त: जीवा और चाप", blocks:[
+ {k:"hot", h:"<b>Tier 1:</b> about one question per shift — chord length from radius and distance, angle at centre vs circumference, parallel chords. <b>Tier 2:</b> two-step angle chases (isosceles △OAB + inscribed angle), common chord of two circles."},
+ {k:"formula", title:"Chord rules", rows:[["Perpendicular from centre","bisects the chord","OM ⊥ AB ⇒ AM = MB"],["Chord length","AB = 2√(r² − d²)","d = distance from centre"],["Radius from chord","r² = (AB/2)² + d²","Right triangle OMB"],["Equal chords","equidistant from centre, equal angles at centre","Converse also true"],["Nearer the centre","longer chord","Diameter = longest chord (2r)"],["Two parallel chords","gap = d₁ − d₂ (same side) or d₁ + d₂ (opposite sides)","Find each d first"],["Chord subtending θ at centre","2r sin(θ/2)","60° → r, 90° → r√2, 120° → r√3"],["Common chord of two circles","⊥ bisected by the line of centres","Two right triangles share the half-chord"]]},
+ {k:"formula", title:"Angle rules", rows:[["Centre vs circumference","∠AOB = 2∠ACB","C on the remaining (major) arc"],["Point on the minor arc","∠ADB = 180° − ½∠AOB","D and C are opposite: they add to 180°"],["Same segment","∠ACB = ∠ADB","C, D on the same side of AB"],["Semicircle","angle = 90°","AB a diameter ⇒ ∠ACB = 90°"],["Isosceles △OAB","∠OAB = 90° − ∠ACB","OA = OB = r"]]},
+ {k:"figs", title:"Three pictures to remember", items:[
+  {svg:'<svg viewBox="0 0 280 175" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><circle cx="140" cy="90" r="70"/><path d="M84 132 L196 132"/><path d="M140 90 V132" style="stroke:var(--accent)"/><path d="M140 90 L196 132" style="stroke:var(--blue)"/><path d="M140 124 h8 v8" stroke-width="1.1"/><circle cx="140" cy="90" r="2.5" style="fill:currentColor" stroke="none"/><g fill="currentColor" stroke="none"><text x="124" y="86">O</text><text x="70" y="146">A</text><text x="200" y="146">B</text><text x="136" y="148">M</text><text x="128" y="115">d</text><text x="170" y="104">r</text><text x="164" y="146">AB/2</text></g></svg>', cap:"OM ⊥ AB bisects it: (AB/2)² + d² = r²."},
+  {svg:'<svg viewBox="0 0 280 175" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><circle cx="140" cy="95" r="70"/><path d="M79.4 130 L140 25 L200.6 130 M79.4 130 L140 95 L200.6 130"/><path d="M79.4 130 L193.6 50 L200.6 130" style="stroke:var(--blue)" stroke-dasharray="4 3" stroke-width="1.2"/><path d="M127.5 102.2 A14 14 0 0 0 152.5 102.2" style="stroke:var(--accent)" stroke-width="2"/><path d="M134 35.4 A12 12 0 0 0 146 35.4" style="stroke:var(--accent)" stroke-width="2"/><g fill="currentColor" stroke="none"><text x="136" y="18">C</text><text x="198" y="46">D</text><text x="64" y="144">A</text><text x="204" y="144">B</text><text x="122" y="86">O</text><text x="132" y="124">2θ</text><text x="136" y="52">θ</text></g></svg>', cap:"∠AOB = 2∠ACB; C and D in the same segment ⇒ ∠ACB = ∠ADB."},
+  {svg:'<svg viewBox="0 0 280 180" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><circle cx="140" cy="100" r="70"/><path d="M70 100 H210" style="stroke:var(--accent)"/><path d="M70 100 L105 39.4 L210 100"/><path d="M100 48.1 L108.7 53.1 L113.7 44.4" stroke-width="1.1"/><circle cx="140" cy="100" r="2.5" style="fill:currentColor" stroke="none"/><g fill="currentColor" stroke="none"><text x="56" y="104">A</text><text x="214" y="104">B</text><text x="98" y="32">C</text><text x="136" y="116">O</text></g></svg>', cap:"Angle in a semicircle: AB diameter ⇒ ∠ACB = 90°."}]},
+ {k:"ex", src:"SSC CGL 2024 · 10 Sep S2", q:"In a circle of radius 5√13 cm, a chord is at a distance of 10 cm from the centre. Find the length of the chord.", steps:["Half-chord = √(r² − d²) = √(325 − 100) = √225 = 15 cm.","Chord = 2 × 15 = 30 cm."], ans:"30 cm", tip:"Never forget to double the half-chord."},
+ {k:"ex", src:"SSC CHSL 2024 · 05 Jul S3", q:"Two parallel chords are drawn in a circle of radius 25 cm. The distance between them is 27 cm. If one chord is 48 cm, find the other.", steps:["48 cm chord: d₁ = √(625 − 576) = 7 cm.","27 > 25, so the chords lie on opposite sides: d₂ = 27 − 7 = 20 cm.","Other chord = 2√(625 − 400) = 2 × 15 = 30 cm."], ans:"30 cm", tip:"7-24-25 and 15-20-25 — both triplets of 25."},
+ {k:"ex", src:"SSC CGL 2025 · 23 Sep S1", q:"In a circle, chord AB subtends 80° at the centre. Find ∠ACB, where C lies on the circle (on the major arc).", steps:["Angle at the circumference = ½ × angle at the centre.","∠ACB = 40°."], ans:"40°", tip:"If C were on the minor arc, the answer would be 180 − 40 = 140°."},
+ {k:"ex", q:"AB is a chord of a circle with centre O and ∠OAB = 25°. Find ∠ACB, where C is on the major arc.", steps:["OA = OB ⇒ ∠OBA = 25° ⇒ ∠AOB = 180 − 50 = 130°.","∠ACB = ½ × 130 = 65°."], ans:"65°", tip:"∠OAB + ∠ACB = 90° — one line."},
+ {k:"trick", h:"<b>Triplets of the radius:</b> r = 25 → chords 48 (d = 7), 40 (d = 15), 30 (d = 20), 14 (d = 24). r = 13 → 24 (d = 5), 10 (d = 12). r = 17 → 30 (d = 8), 16 (d = 15). <b>∠OAB + ∠ACB = 90°</b> for any chord AB and C on the major arc."},
+ {k:"trap", h:"The inscribed angle is half the central angle only when the point is on the <b>major</b> arc (the other side from the centre angle). On the minor arc use 180° − half. For parallel chords, check whether they are on the same side (subtract distances) or opposite sides (add)."},
+ {k:"link", h:"The perpendicular-from-centre right triangle is Pythagoras (L4). Inscribed angles lead to the alternate segment theorem (L10) and cyclic quadrilaterals (L11). Arc length and sector area are in Mensuration 2D."},
+ {k:"q", q:"AB is a diameter of a circle and C is any other point on the circle. ∠ACB = ?", o:["90°","180°","60°","45°"], e:"Angle in a semicircle."},
+ {k:"q", q:"Chord AB subtends 140° at the centre. The angle it subtends at a point on the major arc is…", o:["70°","140°","110°","40°"], e:"½ × 140 = 70°."}
+], sum:["Perpendicular from centre bisects a chord: chord = 2√(r² − d²)","Angle at centre = 2 × angle at circumference; same segment angles equal; semicircle 90°","Equal chords ↔ equal distances ↔ equal central angles; parallel chords: add or subtract distances"]},
+{ id:"L10", heat:3, title:"Circles: tangents", hi:"वृत्त: स्पर्श रेखाएँ", blocks:[
+ {k:"hot", h:"<b>Tier 1 / CHSL:</b> about one question per shift — tangent length from an external point, direct / transverse common tangent, PT² = PA·PB. <b>Tier 2:</b> alternate-segment angle chases, 4r₁r₂ = DCT² − TCT², circles touching each other, circumscribed quadrilaterals."},
+ {k:"formula", title:"One circle", rows:[["Tangent ⊥ radius","OT ⊥ PT","At the point of contact"],["Tangent length","PT² = OP² − r²","Right triangle OTP"],["Two tangents from P","PA = PB; OP bisects ∠APB","Congruent right triangles"],["Angle between tangents","∠APB + ∠AOB = 180°","Quadrilateral with two 90° angles"],["Tangent–secant","PT² = PA × PB","PA = outside part, PB = whole secant"],["Two secants from P","PA × PB = PC × PD","outside × whole"],["Chords crossing inside","AE × EB = CE × ED","part × part"],["Alternate segment","∠(tangent, chord) = angle in the alternate segment","Angle on the OTHER side of the chord"],["Circumscribed quadrilateral","AB + CD = AD + BC","Equal tangents from each corner"]]},
+ {k:"formula", title:"Two circles (radii r₁, r₂, centres d apart)", rows:[["Direct common tangent","√(d² − (r₁ − r₂)²)","Both circles on the same side"],["Transverse common tangent","√(d² − (r₁ + r₂)²)","Crosses between the circles"],["DCT² − TCT²","4 r₁ r₂","Tier-1 favourite"],["Touching externally","d = r₁ + r₂, DCT = 2√(r₁ r₂)","TCT = 0"],["Touching internally","d = r₁ − r₂",""],["Number of common tangents","4 apart · 3 touch outside · 2 cut · 1 touch inside · 0 one inside","Apart → all four exist"]]},
+ {k:"figs", title:"Tangent pictures", items:[
+  {svg:'<svg viewBox="0 0 280 180" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><circle cx="90" cy="90" r="50"/><path d="M240 90 L106.7 42.9 M240 90 L106.7 137.1" style="stroke:var(--accent)"/><path d="M90 90 L106.7 42.9 M90 90 L106.7 137.1" stroke-width="1.2"/><path d="M90 90 H240" stroke-dasharray="4 3" stroke-width="1.1"/><path d="M104 50.4 L111.6 53.1 L114.2 45.6 M104 129.6 L111.6 126.9 L114.2 134.4" stroke-width="1"/><circle cx="90" cy="90" r="2.5" style="fill:currentColor" stroke="none"/><g fill="currentColor" stroke="none"><text x="74" y="94">O</text><text x="246" y="94">P</text><text x="98" y="36">A</text><text x="98" y="156">B</text><text x="86" y="66">r</text><text x="170" y="60">PA = PB</text></g></svg>', cap:"Tangents from P are equal; OA ⊥ PA; PA² = OP² − r²."},
+  {svg:'<svg viewBox="0 0 280 160" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><circle cx="100" cy="90" r="55"/><path d="M255 90 L45 90" style="stroke:var(--blue)"/><path d="M255 90 L119.5 38.6" style="stroke:var(--accent)"/><circle cx="155" cy="90" r="2.5" style="fill:currentColor" stroke="none"/><circle cx="45" cy="90" r="2.5" style="fill:currentColor" stroke="none"/><g fill="currentColor" stroke="none"><text x="258" y="94">P</text><text x="158" y="106">A</text><text x="30" y="106">B</text><text x="112" y="30">T</text><text x="186" y="56">tangent</text></g></svg>', cap:"PT² = PA × PB (outside part × whole secant)."},
+  {svg:'<svg viewBox="0 0 280 160" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><circle cx="140" cy="80" r="55"/><path d="M50 135 H230" style="stroke:var(--accent)"/><path d="M140 135 L187.6 52.5 L88.3 61.2 Z"/><path d="M156 135 A16 16 0 0 0 148 121.1" style="stroke:var(--blue)" stroke-width="2"/><path d="M102.2 60 A14 14 0 0 1 96.3 72.7" style="stroke:var(--blue)" stroke-width="2"/><g fill="currentColor" stroke="none"><text x="136" y="152">T</text><text x="192" y="48">A</text><text x="74" y="58">C</text><text x="226" y="128">Q</text><text x="160" y="128">x</text><text x="104" y="76">x</text></g></svg>', cap:"Alternate segment: ∠ATQ (tangent–chord) = ∠ACT on the other side of TA."},
+  {svg:'<svg viewBox="0 0 280 140" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><circle cx="60" cy="90" r="40"/><circle cx="215" cy="90" r="18"/><path d="M50.8 48.3 L232.4 74.3" style="stroke:var(--accent)"/><path d="M61 47.3 L222.2 112.3" style="stroke:var(--blue)"/><path d="M60 90 H215" stroke-dasharray="4 3" stroke-width="1"/><g fill="currentColor" stroke="none" font-size="11"><text x="48" y="104">O₁</text><text x="208" y="122">O₂</text><text x="132" y="54">direct</text><text x="146" y="120">transverse</text><text x="128" y="86">d</text></g></svg>', cap:"DCT = √(d² − (r₁ − r₂)²), TCT = √(d² − (r₁ + r₂)²)."}]},
+ {k:"ex", src:"SSC CHSL 2023 · 04 Aug S1", q:"Find the length of a tangent drawn to a circle of radius 6 cm from a point 10 cm from its centre.", steps:["Radius ⊥ tangent ⇒ PT² = OP² − r² = 100 − 36 = 64.","PT = 8 cm."], ans:"8 cm", tip:"6-8-10 triplet."},
+ {k:"ex", src:"SSC CHSL 2022 · 10 Mar 2023 S3", q:"The direct common tangent of two circles of radii 16 cm and 6 cm is 24 cm. Find the distance between their centres.", steps:["d² = DCT² + (r₁ − r₂)² = 576 + 100 = 676.","d = 26 cm."], ans:"26 cm", tip:"Direct → difference of radii; transverse → sum."},
+ {k:"ex", src:"SSC CGL 2024 · 10 Sep S3", q:"The direct common tangent of two circles is 9 and the transverse common tangent is 5. Find the product of the radii.", steps:["DCT² = d² − (r₁ − r₂)², TCT² = d² − (r₁ + r₂)².","DCT² − TCT² = (r₁ + r₂)² − (r₁ − r₂)² = 4r₁r₂.","81 − 25 = 56 ⇒ r₁r₂ = 14."], ans:"14"},
+ {k:"ex", q:"PA and PB are tangents from P to a circle with centre O, and ∠APB = 50°. C is a point on the major arc AB. Find ∠ACB.", steps:["∠AOB = 180 − 50 = 130° (OAPB has two right angles).","∠ACB = ½ × 130 = 65°."], ans:"65°", tip:"∠ACB = 90° − ½∠APB."},
+ {k:"ex", q:"Chords AB and CD of a circle intersect at E. AE = 5 cm, EB = 6 cm and CE = 3 cm. Find ED.", steps:["AE × EB = CE × ED.","30 = 3 × ED ⇒ ED = 10 cm."], ans:"10 cm"},
+ {k:"trick", h:"<b>Outside × whole</b> for secants (PA·PB) and <b>part × part</b> for chords crossing inside. Tangents from P: ∠AOB = 180° − ∠APB and the angle in the major arc = 90° − ½∠APB. Common tangents: <b>D</b>irect ↔ <b>D</b>ifference of radii."},
+ {k:"trap", h:"Tangent–secant uses the <b>whole</b> secant PB, not the chord AB. In the alternate segment theorem the equal angle lies in the segment on the <b>other side</b> of the chord from the tangent angle. Direct tangent uses r₁ − r₂; using r₁ + r₂ gives the transverse one."},
+ {k:"link", h:"PT² = PA·PB comes from similar triangles (L3). Equal tangent lengths give the incircle lengths s − a (L11) and BP = PC in an isosceles triangle (L6)."},
+ {k:"q", q:"The angle between a tangent to a circle and the radius at the point of contact is…", o:["90°","60°","45°","180°"], e:"Tangent ⊥ radius."},
+ {k:"q", q:"Two circles touch externally. Their radii are 9 cm and 4 cm. The direct common tangent is…", o:["12 cm","13 cm","5 cm","6 cm"], e:"2√(9 × 4) = 12."}
+], sum:["Tangent ⊥ radius; PT² = OP² − r²; tangents from a point are equal","PT² = PA·PB; chords: AE·EB = CE·ED; alternate segment angle = tangent–chord angle","DCT = √(d² − (r₁ − r₂)²), TCT = √(d² − (r₁ + r₂)²), DCT² − TCT² = 4r₁r₂"]},
+{ id:"L11", heat:2, title:"Cyclic quadrilaterals & circle–triangle combos", hi:"चक्रीय चतुर्भुज और वृत्त–त्रिभुज", blocks:[
+ {k:"hot", h:"<b>Tier 1:</b> about one question in every 2 shifts — opposite angles add to 180°, a diameter inside a cyclic quadrilateral, incircle tangent lengths. <b>Tier 2:</b> sides produced to meet at E and F (angle chases), tangents at two vertices, cyclic quadrilateral + alternate segment."},
+ {k:"formula", title:"Cyclic quadrilateral ABCD", rows:[["Opposite angles","∠A + ∠C = ∠B + ∠D = 180°","Each pair stands on the whole circle"],["Exterior angle","= interior opposite angle","∠DCE = ∠A (BC produced to E)"],["Angles on one side","∠ADB = ∠ACB","Same segment (L9)"],["Converse","opposite angles add to 180° ⇒ concyclic","Proves points lie on a circle"],["Special cases","cyclic parallelogram = rectangle; cyclic trapezium is isosceles",""],["Sides produced","AB∩DC = E, AD∩BC = F ⇒ ∠E + ∠F = 180° − 2∠A","From triangles AED and AFB"],["Ptolemy (rare)","AC·BD = AB·CD + AD·BC","Tier-2 only"],["Brahmagupta area (rare)","√((s − a)(s − b)(s − c)(s − d))","s = half the perimeter"]]},
+ {k:"formula", title:"Incircle and excircle lengths (a = BC, b = CA, c = AB, s = (a + b + c)/2)", rows:[["Tangent from A","AF = AE = s − a","Equal tangents from each vertex"],["Tangent from B","BF = BD = s − b",""],["Tangent from C","CD = CE = s − c",""],["Sum of one length per vertex","AF + BD + CE = s","Half the perimeter"],["Right triangle (C = 90°)","r = s − c = (a + b − c)/2","Tangent square at C has side r"],["Excircle opposite A","AQ = AR = s","Touches AB, AC produced"]]},
+ {k:"figs", title:"Cyclic quadrilateral and incircle", items:[
+  {svg:'<svg viewBox="0 0 280 175" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><circle cx="140" cy="90" r="65"/><path d="M76 78.7 L151.3 26 L201.1 112.2 L107.5 146.3 Z"/><path d="M201.1 112.2 L221.1 146.9" stroke-dasharray="4 3"/><path d="M89.1 69.5 A16 16 0 0 1 82.7 93.2" style="stroke:var(--accent)" stroke-width="2"/><path d="M209.1 126.1 A16 16 0 0 1 186 117.7" style="stroke:var(--accent)" stroke-width="2"/><path d="M187.9 117 A14 14 0 0 1 194.1 100.1" style="stroke:var(--blue)" stroke-width="2"/><g fill="currentColor" stroke="none"><text x="62" y="80">A</text><text x="148" y="18">B</text><text x="206" y="108">C</text><text x="98" y="162">D</text><text x="226" y="160">E</text><text x="92" y="88">x</text><text x="198" y="146">x</text><text x="152" y="108">180−x</text></g></svg>', cap:"∠A + ∠C = 180°, so the exterior angle ∠DCE = ∠A."},
+  {svg:'<svg viewBox="0 0 280 185" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M110 25 L25 160 L255 160 Z"/><circle cx="120.7" cy="107.2" r="52.8" style="stroke:var(--accent)"/><g style="fill:var(--accent)" stroke="none"><circle cx="120.7" cy="160" r="2.5"/><circle cx="156.7" cy="68.5" r="2.5"/><circle cx="76" cy="79" r="2.5"/></g><g fill="currentColor" stroke="none"><text x="106" y="17">A</text><text x="11" y="172">B</text><text x="258" y="172">C</text><text x="116" y="176">D</text><text x="162" y="64">E</text><text x="62" y="78">F</text></g><g style="fill:var(--blue)" stroke="none" font-size="11"><text x="58" y="48">s − a</text><text x="140" y="40">s − a</text><text x="8" y="124">s − b</text><text x="56" y="176">s − b</text><text x="176" y="176">s − c</text><text x="212" y="110">s − c</text></g></svg>', cap:"Equal tangents: AE = AF = s − a, BD = BF = s − b, CD = CE = s − c."}]},
+ {k:"ex", src:"SSC CPO 2020 · 24 Nov S1", q:"ABCD is a cyclic quadrilateral with AB a diameter of its circumcircle and ∠ADC = 118°. Find ∠BAC.", steps:["∠ABC = 180 − 118 = 62° (opposite angles).","∠ACB = 90° (angle in a semicircle).","∠BAC = 180 − 90 − 62 = 28°."], ans:"28°", tip:"With a diameter: ∠BAC = ∠ADC − 90°."},
+ {k:"ex", src:"SSC CGL 2020 Tier 1 · 18 Aug 2021 S2", q:"ABCD is a cyclic quadrilateral. AB and DC produced meet at F; AD and BC produced meet at E. ∠BAD = 68° and ∠AEB = 27°. Find ∠BFC.", steps:["△ABE: ∠ABC = 180 − 68 − 27 = 85°.","∠ADC = 180 − 85 = 95° (opposite angles).","△AFD: ∠F = 180 − 68 − 95 = 17°."], ans:"17°", tip:"∠E + ∠F = 180 − 2A = 44 ⇒ F = 44 − 27 = 17°."},
+ {k:"ex", src:"SSC CGL Tier 2 · 03 Feb 2022", q:"ABCD is a cyclic quadrilateral. AB and DC produced meet at E; AD and BC produced meet at F. ∠ADC = 76° and ∠AED = 55°. Find ∠AFB.", steps:["△AED: ∠A = 180 − 76 − 55 = 49°.","∠B = 180 − 76 = 104°.","△AFB: ∠F = 180 − 49 − 104 = 27°."], ans:"27°"},
+ {k:"ex", src:"SSC CHSL 2020 · 26 Oct S3", q:"The incircle of △ABC touches AB, BC and AC at D, E and F. AB = 18 cm, BC = 15 cm and AC = 13 cm. Find AD + BE + CF.", steps:["AD = AF, BE = BD, CF = CE (equal tangents).","Perimeter = 2(AD + BE + CF) = 46.","AD + BE + CF = 23 cm."], ans:"23 cm", tip:"One tangent from each vertex always adds to s."},
+ {k:"trick", h:"<b>Cyclic = 180 opposite.</b> Every chase starts by writing the opposite angle as 180 − x. <b>Sides produced:</b> ∠E + ∠F = 180° − 2∠A. <b>Incircle:</b> the tangent from a vertex = s − (opposite side)."},
+ {k:"trap", h:"The exterior angle of a cyclic quadrilateral equals the <b>interior opposite</b> angle, not the adjacent one. In tangent lengths, the length from A is s − a (the side <b>opposite</b> A), not s − b or s − c."},
+ {k:"link", h:"Uses inscribed angles and the semicircle (L9) and equal tangents (L10). The incircle radius r = Δ/s is in L5; Heron's formula is in Mensuration 2D."},
+ {k:"q", q:"ABCD is a cyclic quadrilateral and ∠B = 104°. ∠D = ?", o:["76°","104°","86°","52°"], e:"180 − 104 = 76°."},
+ {k:"q", q:"In △ABC, BC = 7 cm, CA = 8 cm, AB = 9 cm. The incircle touches BC at D. BD = ?", o:["4 cm","5 cm","3 cm","3.5 cm"], e:"s = 12; BD = s − CA = 4."}
+], sum:["Cyclic quadrilateral: opposite angles add to 180°; exterior angle = interior opposite","Sides produced meet at E, F: ∠E + ∠F = 180° − 2∠A","Incircle tangent from A = s − a; one tangent per vertex adds to s; excircle tangent from A = s"]},
+{ id:"L12", heat:2, title:"Coordinate geometry for SSC", hi:"निर्देशांक ज्यामिति", blocks:[
+ {k:"hot", h:"<b>Tier 1:</b> rare (0–1 per shift) — a reflection, mid-point, slope or the area made by a line with the axes. <b>Tier 2:</b> about one question per paper, almost always 'area of the triangle formed by two lines and an axis', plus reflections in y = k and section ratios."},
+ {k:"formula", title:"Points", rows:[["Distance","√((x₂ − x₁)² + (y₂ − y₁)²)","Pythagoras on the grid"],["Mid-point","((x₁ + x₂)/2, (y₁ + y₂)/2)",""],["Section, internal m : n","((mx₂ + nx₁)/(m + n), (my₂ + ny₁)/(m + n))","m goes with the FAR point"],["Section, external m : n","((mx₂ − nx₁)/(m − n), (my₂ − ny₁)/(m − n))","Point outside the segment"],["x-axis cuts the join in ratio","−y₁ : y₂","y-axis: −x₁ : x₂"],["Centroid","((x₁ + x₂ + x₃)/3, (y₁ + y₂ + y₃)/3)","2 : 1 point of each median"],["Area of triangle","½|x₁(y₂ − y₃) + x₂(y₃ − y₁) + x₃(y₁ − y₂)|","= 0 ⇒ collinear"]]},
+ {k:"formula", title:"Lines", rows:[["Slope","m = (y₂ − y₁)/(x₂ − x₁) = tan θ","θ with the +x axis"],["Slope of ax + by + c = 0","−a/b","Intercepts −c/a and −c/b"],["Parallel / perpendicular","m₁ = m₂;  m₁ m₂ = −1",""],["Slope–intercept / point–slope","y = mx + c;  y − y₁ = m(x − x₁)",""],["Intercept form","x/a + y/b = 1","Cuts the axes at (a, 0), (0, b)"],["Area with the axes","½|a·b|; for ax + by = c it is c²/(2|ab|)","Right triangle at O"],["Point to line","|ax₁ + by₁ + c| / √(a² + b²)",""],["Two parallel lines","|c₁ − c₂| / √(a² + b²)","Same a, b first"]]},
+ {k:"table", title:"Reflections of P(x, y)", head:["Mirror","Image","Memory hook"], rows:[["x-axis","(x, −y)","y changes sign"],["y-axis","(−x, y)","x changes sign"],["Origin","(−x, −y)","both change"],["Line y = x","(y, x)","swap"],["Line y = −x","(−y, −x)","swap and change both"],["Line y = k","(x, 2k − y)","k is the mid-point of y and its image"],["Line x = h","(2h − x, y)",""]]},
+ {k:"figs", title:"Intercepts and reflections", items:[
+  {svg:'<svg viewBox="0 0 280 175" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M40 150 L220 150 L40 30 Z" style="fill:var(--accent-bg)" stroke="none"/><path d="M20 150 H265 M40 165 V10" stroke-width="1.2"/><path d="M262 147 l5 3 l-5 3 M37 13 l3 -5 l3 5" stroke-width="1.2"/><path d="M20 16.7 L250 170" style="stroke:var(--accent)"/><circle cx="220" cy="150" r="2.5" style="fill:currentColor" stroke="none"/><circle cx="40" cy="30" r="2.5" style="fill:currentColor" stroke="none"/><g fill="currentColor" stroke="none"><text x="26" y="164">O</text><text x="174" y="166">A(a, 0)</text><text x="50" y="22">B(0, b)</text><text x="132" y="74">x/a + y/b = 1</text><text x="70" y="128">area ½ab</text><text x="256" y="142">x</text><text x="26" y="16">y</text></g></svg>', cap:"Intercept form: the line cuts the axes at a and b; triangle OAB has area ½|ab|."},
+  {svg:'<svg viewBox="0 0 280 180" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M20 90 H262 M140 172 V8" stroke-width="1.2"/><path d="M60 170 L225 5" stroke-dasharray="4 3" stroke-width="1.1"/><path d="M200 50 L200 130 M200 50 L80 50 M200 50 L180 30" style="stroke:var(--blue)" stroke-dasharray="3 3" stroke-width="1"/><g style="fill:var(--accent)" stroke="none"><circle cx="200" cy="50" r="3.5"/></g><g fill="currentColor" stroke="none"><circle cx="200" cy="130" r="3"/><circle cx="80" cy="50" r="3"/><circle cx="80" cy="130" r="3"/><circle cx="180" cy="30" r="3"/><text x="206" y="54">P(3, 2)</text><text x="206" y="134">(3, −2)</text><text x="32" y="44">(−3, 2)</text><text x="30" y="144">(−3, −2)</text><text x="148" y="26">(2, 3)</text><text x="226" y="20">y = x</text><text x="145" y="104">O</text></g></svg>', cap:"P(3, 2) reflected in the x-axis, y-axis, origin and the line y = x."}]},
+ {k:"ex", src:"SSC CGL Tier 2 · 18 Nov 2020", q:"What is the reflection of the point (5, −3) in the line y = 3?", steps:["Image in y = k is (x, 2k − y).","(5, 2 × 3 − (−3)) = (5, 9)."], ans:"(5, 9)", tip:"The mirror line is the mid-point: (−3 + 9)/2 = 3 ✓."},
+ {k:"ex", src:"SSC CGL Tier 2 · 15 Nov 2020", q:"Find the area of the triangle formed by the graphs of 8x + 3y = 24, 2x + 8 = y and the x-axis.", steps:["x-axis cuts: 8x = 24 ⇒ (3, 0); 2x + 8 = 0 ⇒ (−4, 0). Base = 7.","Lines meet: 8x + 3(2x + 8) = 24 ⇒ x = 0, y = 8 ⇒ height 8.","Area = ½ × 7 × 8 = 28 sq units."], ans:"28 sq units", tip:"Two lines + x-axis: base = gap between x-intercepts, height = |y| of their meeting point."},
+ {k:"ex", src:"SSC CGL Tier 2 · 03 Feb 2022", q:"Find the area of the triangle enclosed by 2x + 5y = 12, x + y = 3 and the x-axis.", steps:["x-intercepts: 6 and 3 ⇒ base 3.","Meeting point: x = 3 − y ⇒ 6 − 2y + 5y = 12 ⇒ y = 2.","Area = ½ × 3 × 2 = 3 sq units."], ans:"3 sq units"},
+ {k:"ex", q:"In what ratio does the x-axis divide the join of (2, −3) and (5, 6)? Find the point.", steps:["Ratio = −y₁ : y₂ = 3 : 6 = 1 : 2.","Point = ((1 × 5 + 2 × 2)/3, 0) = (3, 0)."], ans:"1 : 2 at (3, 0)", tip:"Check: y = (1 × 6 + 2 × (−3))/3 = 0 ✓."},
+ {k:"trick", h:"<b>Value-check every option:</b> put the option point into the line or distance condition — faster than solving. <b>Area with axes:</b> for ax + by = c, area = c²/(2|ab|) (3x + 4y = 12 → 144/24 = 6). <b>y = k mirror:</b> 2k − y."},
+ {k:"trap", h:"In the section formula, m multiplies the <b>second</b> point (x₂, y₂). Slope of ax + by + c = 0 is <b>−a/b</b>, not a/b or −b/a. Reflection in y = x swaps the coordinates; in y = −x it swaps <b>and</b> changes both signs."},
+ {k:"link", h:"Distance formula = Pythagoras (L4); centroid = 2 : 1 point (L5); the right triangle at the origin uses L4 and L6 values; slope = tan θ links to the Trigonometry app."},
+ {k:"q", q:"The mid-point of (2, 7) and (6, −1) is…", o:["(4, 3)","(2, −4)","(8, 6)","(4, 4)"], e:"((2 + 6)/2, (7 − 1)/2)."},
+ {k:"q", q:"The slope of the line through (1, 2) and (3, 8) is…", o:["3","1/3","5","−3"], e:"(8 − 2)/(3 − 1) = 3."}
+], sum:["Distance, mid-point, section (m with the far point), centroid = average of vertices","Slope −a/b; parallel equal slopes, perpendicular product −1; area with axes ½|ab|","Reflections: x-axis (x, −y), y-axis (−x, y), y = x (y, x), y = k (x, 2k − y)"]}
+];
+const QB = [
+["L1","Two parallel lines are intersected by a transversal. One of a pair of corresponding angles measures 130°. What is the other angle?",["130°","50°","90°","180°"],"Corresponding angles are equal. SSC CGL 2025 (20 Sep S3).","p"],
+["L1","Find the complement of 35°.",["55°","145°","35°","65°"],"90° − 35° = 55°."],
+["L1","Find the supplement of 72°.",["108°","18°","72°","288°"],"180° − 72° = 108°."],
+["L1","An angle is twice its complement. Find the angle.",["60°","30°","120°","45°"],"x = 2(90 − x) ⇒ 3x = 180 ⇒ x = 60°."],
+["L1","The ratio of the supplement to the complement of an angle is 3 : 1. What is the supplement of the angle?",["135°","45°","60°","120°"],"S − C = 90 and S = 3C ⇒ C = 45, S = 135°."],
+["L1","Find the complement of the supplement of 130°.",["40°","50°","140°","130°"],"Supplement = 50°; its complement = 40°."],
+["L1","Two parallel lines are cut by a transversal. One interior angle on the same side of the transversal is 35°. The other is…",["145°","35°","55°","125°"],"Co-interior angles add to 180°."],
+["L1","Two parallel lines are cut by a transversal. Two alternate interior angles are (3x + 20)° and (5x − 30)°. Find the angle.",["95°","25°","85°","91.25°"],"Equal: 3x + 20 = 5x − 30 ⇒ x = 25 ⇒ angle = 95°."],
+["L1","Two vertically opposite angles are (5x − 20)° and (3x + 30)°. Find the angle.",["105°","75°","25°","85°"],"5x − 20 = 3x + 30 ⇒ x = 25 ⇒ 105°."],
+["L1","AB ∥ CD and E lies between them. ∠ABE = 45° and ∠CDE = 30°, both opening towards E. Find ∠BED.",["75°","105°","15°","285°"],"Bend rule: 45° + 30° = 75°."],
+["L1","AB ∥ CD and E lies between them. ∠ABE = 38° and ∠CDE = 57°, both opening towards E. Find the reflex angle BED.",["265°","95°","85°","275°"],"∠BED = 38 + 57 = 95°; reflex = 360 − 95 = 265°."],
+["L1","Two parallel lines are cut by a transversal. One co-interior angle is 4/5 of the other. The larger angle is…",["100°","80°","90°","144°"],"x + 4x/5 = 180 ⇒ x = 100°."],
+["L1","Four angles round a point are x, 2x, 3x and 4x. The largest angle is…",["144°","72°","36°","160°"],"10x = 360 ⇒ x = 36 ⇒ 4x = 144°."],
+["L1","Two angles of a linear pair are in the ratio 2 : 3. The larger angle is…",["108°","54°","72°","120°"],"5 parts = 180° ⇒ 1 part = 36° ⇒ 3 × 36 = 108°."],
+["L1","Two complementary angles are in the ratio 4 : 5. The smaller angle is…",["40°","80°","50°","100°"],"9 parts = 90° ⇒ 4 × 10 = 40°."],
+["L1","The angle between the bisectors of two adjacent complementary angles is…",["45°","90°","30°","60°"],"½ × 90° = 45°."],
+["L1","AB ∥ CD and a transversal cuts them at P and Q. The bisectors of ∠BPQ and ∠DQP meet at R. ∠PRQ = ?",["90°","60°","180°","45°"],"∠BPQ + ∠DQP = 180° (co-interior); halves add to 90°, so ∠PRQ = 90°."],
+["L1","If two parallel lines are cut by a transversal, which statement is NOT necessarily true?",["Co-interior angles are equal","Corresponding angles are equal","Alternate interior angles are equal","Vertically opposite angles are equal"],"Co-interior angles are supplementary; equal only if the transversal is perpendicular."],
+["L1","Find the reflex angle of 125°.",["235°","55°","145°","305°"],"360° − 125° = 235°."],
+["L2","The three angles of a triangle are in the ratio 17 : 13 : 15. Find the positive difference between the greatest and the smallest angle.",["16°","24°","20°","12°"],"45 parts = 180° ⇒ 4° each; (17 − 13) × 4 = 16°. SSC CGL 2024 (12 Sep S1).","p"],
+["L2","The exterior angles obtained on producing the base of a triangle both ways are 121° and 104°. The largest angle of the triangle is…",["76°","59°","45°","104°"],"Base angles 59° and 76°, third 45°. SSC CGL Tier 2 2020 (18 Nov).","p"],
+["L2","The perimeter of a triangle with integer sides is 13. How many such triangles are possible?",["5","8","7","6"],"(1,6,6) (2,5,6) (3,4,6) (3,5,5) (4,4,5). SSC CGL 2022 (05 Dec S3).","p"],
+["L2","In △ABC, ∠B = 78°, AD bisects ∠A and AE ⊥ BC. If ∠DAE = 24°, find ∠ACB.",["30°","54°","42°","126°"],"24 = ½(78 − C) ⇒ C = 30°. SSC CGL Tier 2 2022 (29 Jan).","p"],
+["L2","An exterior angle of a triangle is twice one of the interior opposite angles, and the other interior opposite angle is 60°. The triangle is…",["Equilateral","Right-angled","Scalene","Obtuse-angled"],"x + 60 = 2x ⇒ x = 60°, so all angles are 60°. SSC CHSL 2020 (19 Mar S3).","p"],
+["L2","The angles of a triangle are in the ratio 2 : 3 : 4. The largest angle is…",["80°","60°","90°","40°"],"9 parts = 180° ⇒ 4 × 20 = 80°."],
+["L2","An exterior angle of a triangle is 110° and one interior opposite angle is 45°. The other interior opposite angle is…",["65°","70°","25°","135°"],"110 − 45 = 65°."],
+["L2","Two sides of a triangle are 5 cm and 9 cm. How many integer values can the third side take?",["9","8","10","13"],"4 < x < 14 ⇒ x = 5, 6, …, 13 → 9 values."],
+["L2","A triangle has sides 7, 8 and 12. It is…",["Obtuse-angled","Acute-angled","Right-angled","Not possible"],"12² = 144 > 7² + 8² = 113 ⇒ obtuse."],
+["L2","A triangle has sides 8, 15 and 17. It is…",["Right-angled","Acute-angled","Obtuse-angled","Equilateral"],"8² + 15² = 289 = 17²."],
+["L2","In △ABC, ∠A − ∠B = 15° and ∠B − ∠C = 30°. Find ∠A.",["80°","65°","35°","75°"],"B = x, A = x + 15, C = x − 30 ⇒ 3x − 15 = 180 ⇒ x = 65 ⇒ A = 80°."],
+["L2","The sum of the exterior angles of a triangle (one at each vertex) is…",["360°","180°","540°","270°"],"Each exterior + interior = 180; 3 × 180 − 180 = 360°."],
+["L2","In △ABC, 2∠A = 3∠B = 6∠C. Find ∠A.",["90°","60°","30°","45°"],"A : B : C = 3 : 2 : 1 ⇒ A = 90°."],
+["L2","In △ABC, ∠B = 30° and ∠C = 70°. AD is the bisector of ∠A and AE ⊥ BC. ∠DAE = ?",["20°","40°","10°","30°"],"½(70 − 30) = 20°."],
+["L2","In △PQR, PQ = 6 cm, QR = 8 cm and PR = 10 cm. The largest angle is…",["∠Q","∠P","∠R","All are equal"],"Largest side PR faces ∠Q."],
+["L2","How many triangles with integer sides have perimeter 12?",["3","4","2","5"],"(2,5,5), (3,4,5), (4,4,4). Check: 12²/48 = 3."],
+["L2","In △ABC, AB = AC and the exterior angle at A is 100°. Find ∠B.",["50°","80°","40°","100°"],"Exterior at A = B + C = 2B ⇒ B = 50°."],
+["L2","The base BC of △ABC is produced both ways. The exterior angles at B and C are 130° and 115°. Find ∠A.",["65°","50°","115°","75°"],"130 + 115 − 180 = 65°."],
+["L2","In △ABC, ∠A = 50° and ∠B = 60°. The side opposite which angle is the longest?",["∠C","∠A","∠B","Cannot be found"],"C = 70° is the largest angle."],
+["L3","In △ABC, DE ∥ BC and AD/DB = 4/5. If DE = 12 cm, find the length of BC.",["27 cm","15 cm","21.6 cm","9.6 cm"],"AD/AB = 4/9 ⇒ BC = 12 × 9/4 = 27. SSC CGL 2023 (26 Jul S1).","p"],
+["L3","In △ABC, DE ∥ BC with D on AB, E on AC. AD = 5 cm, DB = 9 cm, AE = 4 cm and BC = 15.4 cm. DE + EC = ?",["12.7 cm","10.8 cm","13.4 cm","11.6 cm"],"DE = 15.4 × 5/14 = 5.5; EC = 4 × 9/5 = 7.2. SSC CGL Tier 2 2020 (16 Nov).","p"],
+["L3","D is a point on BC of △ABC with BC = 16 cm, BD = 11 cm and ∠ADC = ∠BAC. Find AC.",["4√5 cm","4√11 cm","√55 cm","8√5 cm"],"△ADC ∼ △BAC ⇒ AC² = DC·BC = 5 × 16 = 80. SSC CGL 2023 (27 Jul S2).","p"],
+["L3","The perimeters of two similar triangles are in the ratio 3 : 5 and their areas add up to 34 cm². Area of the larger triangle?",["25 cm²","9 cm²","21.25 cm²","15 cm²"],"Areas 9 : 25 ⇒ 25/34 × 34 = 25. SSC CGL 2025 (17 Sep S3).","p"],
+["L3","The areas of two similar triangles are in the ratio 49 : 121. The ratio of their perimeters is…",["7 : 11","49 : 121","√7 : √11","14 : 11"],"Perimeter ratio = √(area ratio)."],
+["L3","△ABC ∼ △PQR with areas 64 cm² and 144 cm². If AB = 10 cm, find PQ.",["15 cm","22.5 cm","20 cm","12.5 cm"],"Side ratio = 8 : 12 = 2 : 3 ⇒ PQ = 15."],
+["L3","In △ABC, DE ∥ BC and AD : DB = 2 : 3. ar(△ADE) : ar(trapezium BCED) = ?",["4 : 21","4 : 25","2 : 3","4 : 9"],"AD : AB = 2 : 5 ⇒ areas 4 : 25 ⇒ trapezium 21."],
+["L3","In △ABC, DE ∥ BC and DE : BC = 6 : 7. ar(△ADE) : ar(trapezium BCED) = ?",["36 : 13","36 : 49","6 : 1","13 : 36"],"Areas 36 : 49 ⇒ trapezium = 49 − 36 = 13."],
+["L3","A triangle has area 48 cm². The triangle formed by joining the midpoints of its sides has area…",["12 cm²","24 cm²","16 cm²","6 cm²"],"Medial triangle = ¼ of the area."],
+["L3","The perimeter of △ABC is 30 cm. D, E, F are the midpoints of its sides. Perimeter of △DEF = ?",["15 cm","7.5 cm","10 cm","60 cm"],"Each side of DEF is half a side of ABC."],
+["L3","Which of these is NOT a test of congruence of triangles?",["SSA","SAS","ASA","RHS"],"Two sides and a non-included angle can give two different triangles."],
+["L3","Two triangles with all three angles equal (AAA) are always…",["Similar","Congruent","Similar and congruent","Neither similar nor congruent"],"AAA fixes the shape, not the size."],
+["L3","In △ABC, DE ∥ BC with AD = x, DB = x − 3, AE = x + 3 and EC = x − 2 (cm). Find x.",["4.5","3","3.5","4"],"x/(x − 3) = (x + 3)/(x − 2) ⇒ x² − 2x = x² − 9 ⇒ x = 4.5."],
+["L3","△XYZ ∼ △PQR and their perimeters are in the ratio 4 : 9. If PQ = 27 cm, find XY.",["12 cm","18 cm","60.75 cm","16 cm"],"Sides follow the perimeter ratio: 27 × 4/9 = 12."],
+["L3","D is a point on BC of △ABC such that ∠BAD = ∠BCA. If AB = 6 cm and BC = 9 cm, find BD.",["4 cm","5 cm","3 cm","13.5 cm"],"△BAD ∼ △BCA ⇒ AB² = BD·BC ⇒ BD = 36/9 = 4."],
+["L3","Two similar triangles have areas 25 cm² and 36 cm². The altitude of the smaller one is 3.5 cm. The corresponding altitude of the larger is…",["4.2 cm","5.04 cm","2.92 cm","4.9 cm"],"Altitudes in ratio 5 : 6 ⇒ 3.5 × 6/5 = 4.2."],
+["L3","A line DE ∥ BC divides △ABC into two parts of equal area (D on AB). AD : DB = ?",["1 : (√2 − 1)","1 : 1","1 : √2","√2 : 1"],"AD/AB = 1/√2 ⇒ AD : DB = 1 : (√2 − 1)."],
+["L3","The line segment joining the midpoints of two sides of a triangle is…",["Parallel to the third side and half of it","Perpendicular to the third side","Equal to the third side","Parallel to the third side and twice it"],"Mid-point theorem."],
+["L3","In △ABC, DE ∥ BC, AD = 3 cm, DB = 2 cm and AE = 4.5 cm. Find AC.",["7.5 cm","3 cm","6.75 cm","7 cm"],"AE/EC = 3/2 ⇒ EC = 3 ⇒ AC = 7.5."],
+["L4","In right △ABC, right-angled at B, altitude BD is drawn to the hypotenuse AC. If AD = 6 cm and CD = 5 cm, find AB² + BD².",["96","36","66","30"],"BD² = 30, AB² = 6 × 11 = 66. SSC CGL 2021 Tier 1 (20 Apr 2022 S1).","p"],
+["L4","In a right-angled triangle, the medians from the vertices of the acute angles are 7 cm and 4√6 cm. The hypotenuse is…",["2√29 cm","(5/2)√29 cm","3.5 + 2√6 cm","√29 cm"],"(5/4)h² = 49 + 96 ⇒ h² = 116. SSC CGL 2021 Tier 1 (19 Apr 2022 S3).","p"],
+["L4","In a right triangle, one angle is 30° more than the smallest angle. The smallest angle is…",["30°","60°","45°","20°"],"s + (s + 30) = 90 ⇒ s = 30°. SSC CGL 2023 (27 Jul S3).","p"],
+["L4","△ABC is right-angled at A and AD ⊥ BC. If BD = 7.5 cm and DC = 10 cm, AD = ?",["5√3 cm","5√2 cm","5 cm","8.75 cm"],"AD² = 7.5 × 10 = 75."],
+["L4","The legs of a right triangle are 20 cm and 21 cm. Its hypotenuse is…",["29 cm","41 cm","31 cm","25 cm"],"20-21-29 triplet."],
+["L4","The hypotenuse of a right triangle is 61 cm and one leg is 11 cm. The other leg is…",["60 cm","50 cm","72 cm","62 cm"],"√(3721 − 121) = 60."],
+["L4","In △ABC, AD bisects ∠A meeting BC at D. AC = 20 cm, BD = 6 cm, DC = 8 cm. Find AB.",["15 cm","80/3 cm","24 cm","12.5 cm"],"AB/AC = BD/DC ⇒ AB = 20 × 6/8 = 15."],
+["L4","In △ABC, AD is the median to BC. AB = 8 cm, BC = 10 cm, AC = 6 cm. AD = ?",["5 cm","7 cm","6 cm","4 cm"],"64 + 36 = 2(AD² + 25) ⇒ AD = 5 (also: right triangle, median = half hypotenuse)."],
+["L4","In △ABC, AB = 7 cm, AC = 9 cm and BC = 8 cm. The median from A to BC is…",["7 cm","√65 cm","8 cm","14 cm"],"½√(2·49 + 2·81 − 64) = ½√196 = 7."],
+["L4","In △ABC, AB = 6 cm, AC = 4 cm, BC = 5 cm. The bisector of the exterior angle at A meets BC produced at E. CE = ?",["10 cm","2 cm","15 cm","7.5 cm"],"(5 + CE)/CE = 6/4 ⇒ CE = 10."],
+["L4","△ABC is right-angled at A with AB = 6 cm and AC = 8 cm. The altitude from A to BC is…",["4.8 cm","5 cm","7 cm","4 cm"],"AD = 6 × 8/10 = 4.8."],
+["L4","In △ABC, ∠BAC = 90° and AD ⊥ BC. If AD = 6 cm and BD = 4 cm, BC = ?",["13 cm","10 cm","9 cm","12 cm"],"DC = 36/4 = 9 ⇒ BC = 4 + 9 = 13."],
+["L4","△ABC is right-angled at A with AB = 15 cm and AC = 20 cm. AD ⊥ BC. AD = ?",["12 cm","12.5 cm","25 cm","17.5 cm"],"BC = 25; AD = 15 × 20/25 = 12."],
+["L4","The sides of a triangle are 6 cm, 8 cm and 10 cm. The sum of the squares of its medians is…",["150 cm²","200 cm²","100 cm²","75 cm²"],"¾(36 + 64 + 100) = 150."],
+["L4","In △ABC, AD is a median. AB² + AC² = 260 and BC = 18 cm. Find AD.",["7 cm","13 cm","√130 cm","9 cm"],"260 = 2(AD² + 81) ⇒ AD² = 49."],
+["L4","A 25 m ladder has its foot 7 m from a wall. If the top slides down by 4 m, the foot slides out by…",["8 m","4 m","15 m","7 m"],"Height 24 → 20; foot 7 → 15."],
+["L4","Which of these is a Pythagorean triplet?",["12, 35, 37","12, 36, 37","10, 24, 25","8, 16, 17"],"144 + 1225 = 1369 = 37²."],
+["L4","The smallest side of a right triangle with integer sides is 13 and the other two sides differ by 1. The hypotenuse is…",["85","84","65","91"],"(169 + 1)/2 = 85; triplet 13, 84, 85."],
+["L4","In △ABC, the bisector of ∠BAC meets BC at D. If AB = 10 cm and AC = 14 cm, BD : BC = ?",["5 : 12","5 : 7","7 : 12","12 : 5"],"BD : DC = 10 : 14 = 5 : 7 ⇒ BD : BC = 5 : 12."],
+["L5","In △ABC, ∠A = 70°, ∠B = 80° and O is the incentre. If ∠ACB = 2x° and ∠BOC = y°, then x and y are…",["15, 125","15, 130","35, 40","30, 150"],"C = 30 ⇒ x = 15; ∠BOC = 90 + 35 = 125. SSC CGL Tier 2 2017 (12 Jan).","p"],
+["L5","In △ABC, H is the orthocentre and I the incentre. If ∠BIC − ∠BHC = 90°, find ∠A.",["120°","140°","90°","60°"],"(90 + A/2) − (180 − A) = 90 ⇒ A = 120°. SSC CGL 2022 (02 Dec S1).","p"],
+["L5","G is the centroid of △ABC with AB = 35 cm, BC = 12 cm, AC = 37 cm. BG (to one decimal) is…",["12.3 cm","11.7 cm","17.5 cm","12.9 cm"],"Right angle at B; median = 18.5; BG = ⅔ × 18.5. SSC CGL Tier 2 2022 (29 Jan).","p"],
+["L5","In △ABC, medians AD and BE meet at G. If AD = 12 cm, AG = ?",["8 cm","4 cm","6 cm","9 cm"],"AG = ⅔ × 12. SSC CGL 2025 (16 Sep S1).","p"],
+["L5","In △ABC the medians AD, BE and CF meet at O. ar(△ABD) : ar(△AOE) = ?",["3 : 1","2 : 1","3 : 2","5 : 2"],"Six equal parts: ABD = 3, AOE = 1. SSC CGL Tier 2 2019 (12 Sep).","p"],
+["L5","AL, BM and CN are the altitudes of an acute-angled △ABC. Which statement is true?",["AL + BM + CN < AB + BC + CA","AL + BM + CN = AB + BC + CA","AL + BM + CN > AB + BC + CA","AL + BM = AB + BC"],"Each altitude is shorter than the two sides at its vertex. SSC CGL 2023 (27 Jul S2).","p"],
+["L5","In △ABC, ∠A = 64° and I is the incentre. ∠BIC = ?",["122°","128°","116°","58°"],"90 + 32 = 122°."],
+["L5","In △ABC, ∠A = 72° and H is the orthocentre. ∠BHC = ?",["108°","144°","126°","72°"],"180 − 72 = 108°."],
+["L5","In △ABC, ∠A = 65° and O is the circumcentre. ∠BOC = ?",["130°","115°","122.5°","50°"],"2 × 65 = 130°."],
+["L5","O is the circumcentre of △ABC with ∠BAC = 75° and ∠BCA = 80°. ∠OAC = ?",["65°","25°","50°","40°"],"B = 25 ⇒ ∠AOC = 50 ⇒ ∠OAC = (180 − 50)/2 = 65°."],
+["L5","In △ABC, the bisectors of the internal ∠B and the external ∠C meet at D. If ∠BDC = 48°, ∠A = ?",["96°","48°","24°","114°"],"∠BDC = A/2 ⇒ A = 96°."],
+["L5","In △ABC, ∠A = 70°. The external bisectors of ∠B and ∠C meet at E. ∠BEC = ?",["55°","125°","35°","110°"],"90 − 35 = 55°."],
+["L5","A triangle has sides 13 cm, 14 cm and 15 cm. Its inradius is…",["4 cm","8.125 cm","6 cm","3.5 cm"],"Δ = 84, s = 21 ⇒ r = 4."],
+["L5","A triangle has sides 13 cm, 14 cm and 15 cm. Its circumradius is…",["8.125 cm","4 cm","7.5 cm","6.5 cm"],"R = 2730/(4 × 84) = 65/8."],
+["L5","The inradius of a right triangle with sides 5 cm, 12 cm, 13 cm is…",["2 cm","2.5 cm","4 cm","6.5 cm"],"r = (5 + 12 − 13)/2 = 2."],
+["L5","The circumradius of a right triangle with sides 8 cm, 15 cm and 17 cm is…",["8.5 cm","3 cm","7.5 cm","17 cm"],"R = hypotenuse/2."],
+["L5","The sides of a triangle are in the ratio 4 : 5 : 6 and its inradius is 3 cm. The altitude to the largest side is…",["7.5 cm","6 cm","10 cm","8 cm"],"Δ = r·s and Δ = ½ × 6k × h ⇒ h = r(a + b + c)/c = 3 × 15/6."],
+["L5","G is the centroid of △ABC whose area is 54 cm². ar(△BGC) = ?",["18 cm²","27 cm²","9 cm²","13.5 cm²"],"G makes three equal triangles BGC, CGA, AGB."],
+["L5","In △ABC, ∠A = 110° and O is the circumcentre. ∠BOC = ?",["140°","220°","70°","125°"],"A obtuse ⇒ ∠BOC = 360 − 220 = 140°."],
+["L5","On the Euler line, the centroid G divides the segment from orthocentre H to circumcentre O in the ratio HG : GO = …",["2 : 1","1 : 2","1 : 1","3 : 1"],"HG = 2 GO."],
+["L5","△ABC is right-angled at B. Its orthocentre lies…",["At B","At the midpoint of AC","Inside the triangle","Outside the triangle"],"The legs AB and BC are themselves altitudes."],
+["L5","In which triangle do the incentre, circumcentre, orthocentre and centroid all coincide?",["Equilateral","Isosceles right","Scalene acute","Obtuse isosceles"],"Every median is also a bisector and an altitude."],
+["L6","In an equilateral triangle STU, the inradius is 5√3 cm. What is the length of the side of this triangle?",["30 cm","15 cm","10√3 cm","20√3 cm"],"a = 2√3 × r = 2√3 × 5√3 = 30. SSC CHSL 2022 (16 Mar 2023 S2).","p"],
+["L6","In an equilateral triangle the inradius is 4 cm. What is the circumradius?",["8 cm","6 cm","12 cm","2 cm"],"R = 2r = 8. SSC CHSL 2022 (17 Mar 2023 S4).","p"],
+["L6","In isosceles △ABC, BC is the unequal side and AD is the median from A to BC. If AC = 5 cm and AD = 4 cm, find BC.",["6 cm","3 cm","4 cm","5 cm"],"AD ⊥ BC ⇒ DC = √(25 − 16) = 3 ⇒ BC = 6. SSC CHSL 2022 (15 Mar 2023 S3).","p"],
+["L6","ABC is an isosceles triangle with AB = AC, circumscribed about a circle. The circle touches BC at P. Which is true?",["BP = PC","BP > PC","BP < PC","BP = PC/2"],"Equal tangents from B and C and AB = AC give BP = PC. SSC CGL Tier 2 2016 (1 Dec).","p"],
+["L6","The side of an equilateral triangle is 12 cm. Its height is…",["6√3 cm","12√3 cm","3√3 cm","6√2 cm"],"h = (√3/2) × 12 = 6√3."],
+["L6","The height of an equilateral triangle is 18 cm. Its area is…",["108√3 cm²","81√3 cm²","162√3 cm²","54√3 cm²"],"Area = h²/√3 = 324/√3 = 108√3."],
+["L6","The side of an equilateral triangle is 6√3 cm. Its circumradius is…",["6 cm","3 cm","6√3 cm","9 cm"],"R = a/√3 = 6 (height is 9, inradius 3)."],
+["L6","The ratio of the areas of the incircle and the circumcircle of an equilateral triangle is…",["1 : 4","1 : 2","1 : 3","1 : √2"],"r : R = 1 : 2 ⇒ areas 1 : 4."],
+["L6","A point inside an equilateral triangle is at distances 3 cm, 4 cm and 5 cm from its sides. The side of the triangle is…",["8√3 cm","12 cm","4√3 cm","24 cm"],"h = 3 + 4 + 5 = 12 ⇒ a = 2h/√3 = 8√3."],
+["L6","In a 30-60-90 triangle the hypotenuse is 20 cm. The side opposite the 60° angle is…",["10√3 cm","10 cm","20√3 cm","5√3 cm"],"x = 10 (opposite 30°), x√3 = 10√3."],
+["L6","In a 30-60-90 triangle the shortest side is 7 cm. The hypotenuse is…",["14 cm","7√3 cm","7√2 cm","21 cm"],"Hypotenuse = 2 × shortest side."],
+["L6","The hypotenuse of an isosceles right triangle is 10√2 cm. Its area is…",["50 cm²","100 cm²","25 cm²","50√2 cm²"],"Legs 10 ⇒ area ½ × 10 × 10 = 50."],
+["L6","An isosceles triangle has equal sides 13 cm and base 10 cm. Its area is…",["60 cm²","65 cm²","120 cm²","30 cm²"],"Height = √(169 − 25) = 12 ⇒ ½ × 10 × 12 = 60."],
+["L6","The vertex angle of an isosceles triangle is 40°. Each base angle is…",["70°","40°","140°","50°"],"(180 − 40)/2 = 70°."],
+["L6","Each base angle of an isosceles triangle is twice the vertex angle. The vertex angle is…",["36°","72°","45°","60°"],"v + 2v + 2v = 180 ⇒ v = 36°."],
+["L6","The perimeter of an isosceles right triangle with legs 6 cm is…",["12 + 6√2 cm","18 cm","12 + 6√3 cm","6 + 6√2 cm"],"Hypotenuse 6√2 ⇒ 6 + 6 + 6√2."],
+["L6","The area of an equilateral triangle is 36√3 cm². Its perimeter is…",["36 cm","12 cm","18 cm","24 cm"],"(√3/4)a² = 36√3 ⇒ a² = 144 ⇒ a = 12 ⇒ perimeter 36."],
+["L6","In an equilateral triangle of side 24 cm, the distance of the centroid from a vertex is…",["8√3 cm","4√3 cm","12√3 cm","16 cm"],"= R = 24/√3 = 8√3."],
+["L6","In △ABC, AB = AC = 10 cm and BC = 12 cm. AD ⊥ BC. AD = ?",["8 cm","6 cm","2√34 cm","4 cm"],"D is the midpoint ⇒ AD = √(100 − 36) = 8."],
+["L6","An equilateral triangle is inscribed in a circle of radius 6 cm. Its side is…",["6√3 cm","12 cm","3√3 cm","6√2 cm"],"a = √3 R = 6√3."],
+["L7","The perimeter of a rhombus is 148 cm and one of its diagonals is 24 cm. The area of the rhombus is…",["840 cm²","1680 cm²","875 cm²","420 cm²"],"Side 37, half-diagonals 12 and 35 ⇒ ½ × 24 × 70 = 840. SSC CHSL 2020 (13 Apr 2021 S1).","p"],
+["L7","A rhombus has diagonals in the ratio 7 : 24 and side 25 cm. Its area is…",["336 cm²","672 cm²","168 cm²","600 cm²"],"Diagonals 14 and 48 ⇒ ½ × 14 × 48 = 336. SSC CHSL 2025 (19 Nov 2025 S3).","p"],
+["L7","The diagonals of a rhombus are 16 cm and 30 cm. What is its perimeter?",["68 cm","92 cm","136 cm","34 cm"],"Side √(8² + 15²) = 17 ⇒ 4 × 17 = 68. SSC MTS 2022 (19 Jul S2).","p"],
+["L7","In parallelogram ABCD, ∠A = 3∠B. Find ∠A.",["135°","45°","90°","120°"],"A + B = 180 ⇒ 4B = 180 ⇒ B = 45, A = 135°."],
+["L7","A rectangle is 24 cm long and 7 cm wide. Its diagonal is…",["25 cm","31 cm","15.5 cm","24 cm"],"√(576 + 49) = 25."],
+["L7","The diagonal of a square is 12√2 cm. Its perimeter is…",["48 cm","48√2 cm","24 cm","96 cm"],"Side = 12 ⇒ perimeter 48."],
+["L7","The diagonal of a square is 10 cm. Its area is…",["50 cm²","100 cm²","25 cm²","200 cm²"],"Area = d²/2."],
+["L7","The sides of a parallelogram are 5 cm and 7 cm and one diagonal is 8 cm. The other diagonal is…",["2√21 cm","2√11 cm","6 cm","√74 cm"],"d₂² = 2(25 + 49) − 64 = 84."],
+["L7","A rhombus has side 10 cm and one diagonal 12 cm. Its area is…",["96 cm²","120 cm²","48 cm²","192 cm²"],"Half-diagonals 6 and 8 ⇒ diagonals 12, 16 ⇒ ½ × 12 × 16 = 96."],
+["L7","The area of a rhombus is 24 cm² and one diagonal is 6 cm. Its side is…",["5 cm","8 cm","7 cm","10 cm"],"Other diagonal 8 ⇒ side √(3² + 4²) = 5."],
+["L7","In trapezium ABCD, AB ∥ CD and AB = 2CD. The diagonals meet at O and ar(△COD) = 4 cm². ar(ABCD) = ?",["36 cm²","28 cm²","20 cm²","48 cm²"],"Parts 16, 8, 8, 4 ⇒ 36."],
+["L7","In trapezium ABCD, AB ∥ CD and AB = 3CD. The diagonals meet at O. ar(△AOB) : ar(△COD) = ?",["9 : 1","3 : 1","1 : 9","6 : 1"],"Similar triangles with ratio 3 ⇒ areas 9 : 1."],
+["L7","The midpoints of the sides of a quadrilateral of area 60 cm² are joined in order. The area of the new figure is…",["30 cm²","15 cm²","60 cm²","20 cm²"],"Mid-point parallelogram has half the area."],
+["L7","The figure formed by joining the midpoints of the sides of a rhombus in order is a…",["Rectangle","Rhombus","Square","Kite"],"Rhombus diagonals are ⊥, so the mid-point parallelogram has right angles."],
+["L7","The bisectors of two adjacent angles of a parallelogram meet at an angle of…",["90°","180°","60°","45°"],"Adjacent angles add to 180°; halves add to 90°."],
+["L7","In parallelogram ABCD, ∠DAB = 70° and ∠DBC = 60°. Find ∠CDB.",["50°","60°","70°","110°"],"∠ADB = ∠DBC = 60 ⇒ ∠ABD = 50 ⇒ ∠CDB = ∠ABD = 50° (alternate)."],
+["L7","A rhombus has side 10 cm and ∠ABC = 120°. Its shorter diagonal is…",["10 cm","10√3 cm","5 cm","20 cm"],"∠A = 60° ⇒ △ABD is equilateral ⇒ BD = 10."],
+["L7","The parallel sides of a trapezium are 10 cm and 18 cm. The segment joining the midpoints of its legs is…",["14 cm","8 cm","28 cm","4 cm"],"(10 + 18)/2 = 14."],
+["L7","The diagonals of a rectangle are always…",["Equal and bisect each other","Perpendicular to each other","Equal and perpendicular","Bisectors of the angles"],"⊥ only for a square."],
+["L7","The angles of a quadrilateral are in the ratio 3 : 4 : 5 : 6. The largest angle is…",["120°","100°","90°","135°"],"18 parts = 360° ⇒ 6 × 20 = 120°."],
+["L7","The diagonals of a kite are 10 cm and 16 cm. Its area is…",["80 cm²","160 cm²","40 cm²","26 cm²"],"½ × 10 × 16 = 80."],
+["L8","A regular polygon has each interior angle measuring 150°. Find the number of its sides.",["12","10","15","18"],"Exterior 30° ⇒ 360/30 = 12. SSC CGL 2025 (19 Sep S3).","p"],
+["L8","The interior angle of a regular polygon exceeds its exterior angle by 90°. The number of sides is…",["8","6","10","12"],"E = (180 − 90)/2 = 45 ⇒ n = 8. SSC CGL Tier 2 2020 (18 Nov).","p"],
+["L8","Find the number of diagonals of a polygon, the sum of whose interior angles is 2700°.",["119","136","104","14"],"n − 2 = 15 ⇒ n = 17 ⇒ 17 × 14/2 = 119. SSC CGL 2022 Tier 2 (06 Mar 2023).","p"],
+["L8","Each exterior angle of a regular polygon is 20°. The number of sides is…",["18","20","16","9"],"360/20 = 18."],
+["L8","The sum of the interior angles of a decagon is…",["1440°","1800°","1260°","1620°"],"(10 − 2) × 180 = 1440°."],
+["L8","Each interior angle of a regular nonagon is…",["140°","144°","40°","135°"],"180 − 360/9 = 140°."],
+["L8","The number of diagonals of a 12-sided polygon is…",["54","66","60","108"],"12 × 9/2 = 54."],
+["L8","A polygon has 20 diagonals. How many sides does it have?",["8","10","7","20"],"n(n − 3)/2 = 20 ⇒ n = 8."],
+["L8","The interior angle of a regular polygon is 5 times its exterior angle. The number of sides is…",["12","10","6","5"],"n = 2(5 + 1) = 12."],
+["L8","The numbers of sides of two regular polygons are in the ratio 1 : 2 and their interior angles in the ratio 3 : 4. The smaller polygon has how many sides?",["5","4","6","8"],"Pentagon 108° and decagon 144°: 108 : 144 = 3 : 4."],
+["L8","Each interior angle of a regular polygon is 156°. The number of sides is…",["15","12","24","18"],"Exterior 24° ⇒ 360/24 = 15."],
+["L8","The sum of the interior angles of a polygon is three times the sum of its exterior angles. The number of sides is…",["8","6","10","12"],"(n − 2)180 = 1080 ⇒ n = 8."],
+["L8","The side of a regular hexagon is 6 cm. Its area is…",["54√3 cm²","36√3 cm²","9√3 cm²","108√3 cm²"],"6 × (√3/4) × 36 = 54√3."],
+["L8","The side of a regular hexagon is 8 cm. Its longest diagonal is…",["16 cm","8√3 cm","8 cm","24 cm"],"Longest diagonal = 2a."],
+["L8","How many triangles can be formed by joining the vertices of an octagon?",["56","20","336","48"],"⁸C₃ = 8 × 7 × 6/6 = 56."],
+["L8","Which of these cannot be the exterior angle of a regular polygon?",["50°","40°","45°","72°"],"360/50 = 7.2 is not a whole number."],
+["L8","The interior angles of a polygon add up to 1080°. If it is regular, each interior angle is…",["135°","120°","144°","108°"],"n = 8 ⇒ 1080/8 = 135°."],
+["L8","How many diagonals can be drawn from one vertex of a decagon?",["7","8","35","10"],"n − 3 = 7."],
+["L8","The interior angle of a regular polygon exceeds its exterior angle by 132°. The number of sides is…",["15","12","18","24"],"E = (180 − 132)/2 = 24 ⇒ n = 15."],
+["L9","In a circle of radius 5√13 cm, a chord is at a distance of 10 cm from the centre. Find the length of the chord.",["30 cm","15 cm","36 cm","28 cm"],"2√(325 − 100) = 30. SSC CGL 2024 (10 Sep S2).","p"],
+["L9","Two parallel chords are drawn in a circle of radius 25 cm, 27 cm apart. If one chord is 48 cm, the other chord is…",["30 cm","48 cm","42 cm","36 cm"],"d₁ = 7, d₂ = 20 (opposite sides) ⇒ 2√(625 − 400) = 30. SSC CHSL 2024 (05 Jul S3).","p"],
+["L9","Two parallel chords on opposite sides of the centre of a circle of diameter 50 cm are 22 cm apart. One chord is 40 cm. The other chord is…",["48 cm","44 cm","46 cm","50 cm"],"d₁ = 15 ⇒ d₂ = 7 ⇒ 2√(625 − 49) = 48. SSC CHSL 2020 (11 Aug 2021 S3).","p"],
+["L9","In a circle, chord AB subtends 80° at the centre. What is ∠ACB, where C lies on the major arc?",["40°","80°","140°","160°"],"½ × 80 = 40°. SSC CGL 2025 (23 Sep S1).","p"],
+["L9","A chord of a circle subtends 60° at the centre. What angle does it subtend at a point on the circle in the same (major) segment?",["30°","60°","120°","150°"],"½ × 60 = 30°. SSC CGL 2025 (21 Sep S2).","p"],
+["L9","A chord of length 16 cm is drawn in a circle of radius 10 cm. Its distance from the centre is…",["6 cm","8 cm","2√41 cm","2 cm"],"√(100 − 64) = 6."],
+["L9","A chord 24 cm long is 5 cm from the centre of a circle. The radius is…",["13 cm","12 cm","√601 cm","26 cm"],"√(12² + 5²) = 13."],
+["L9","AB is a chord of a circle with centre O and ∠OAB = 25°. ∠ACB, where C is on the major arc, is…",["65°","130°","50°","115°"],"∠AOB = 130° ⇒ ∠ACB = 65°."],
+["L9","Chord AB subtends 100° at the centre O. D is a point on the minor arc AB. ∠ADB = ?",["130°","50°","100°","260°"],"180 − 50 = 130°."],
+["L9","AB is a diameter of a circle and C is a point on the circle with ∠CAB = 35°. ∠CBA = ?",["55°","35°","90°","145°"],"∠ACB = 90° ⇒ ∠CBA = 55°."],
+["L9","A, B, C lie on a circle with centre O and ∠ABC = 50° (B on the major arc AC). ∠OAC = ?",["40°","50°","25°","80°"],"∠AOC = 100° ⇒ ∠OAC = (180 − 100)/2 = 40°."],
+["L9","A chord equal to the radius of a circle subtends what angle at the centre?",["60°","90°","30°","120°"],"△OAB is equilateral."],
+["L9","A chord equal to the radius subtends what angle at a point on the minor arc?",["150°","30°","120°","60°"],"Major-arc angle 30° ⇒ minor-arc angle 180 − 30 = 150°."],
+["L9","A chord subtends 90° at the centre of a circle of radius 7 cm. The chord is…",["7√2 cm","7 cm","14 cm","7√3 cm"],"2r sin 45° = r√2."],
+["L9","In a circle of radius 13 cm, parallel chords of 10 cm and 24 cm lie on the same side of the centre. The distance between them is…",["7 cm","17 cm","12 cm","5 cm"],"d = 12 and 5 ⇒ 12 − 5 = 7."],
+["L9","Two circles of radii 10 cm and 17 cm intersect and their centres are 21 cm apart. The length of the common chord is…",["16 cm","8 cm","12 cm","20 cm"],"a² + h² = 100, (21 − a)² + h² = 289 ⇒ a = 6, h = 8 ⇒ chord 16."],
+["L9","A, B, C, D lie on a circle with C and D on the same side of AB. ∠ACB = 42° and ∠DAB = 70°. ∠ABD = ?",["68°","42°","70°","48°"],"∠ADB = ∠ACB = 42 (same segment) ⇒ ∠ABD = 180 − 70 − 42 = 68°."],
+["L9","The longest chord of a circle of radius 9 cm is…",["18 cm","9 cm","81 cm","9π cm"],"The diameter."],
+["L9","A chord of 30 cm is 8 cm from the centre of a circle. Another chord is 15 cm from the centre. Its length is…",["16 cm","30 cm","8 cm","24 cm"],"r = √(15² + 8²) = 17 ⇒ 2√(289 − 225) = 16."],
+["L10","Find the length of a tangent drawn to a circle of radius 6 cm from a point 10 cm from the centre.",["8 cm","12 cm","4 cm","2√34 cm"],"√(100 − 36) = 8. SSC CHSL 2023 (04 Aug S1).","p"],
+["L10","The direct common tangent of two circles of radii 16 cm and 6 cm is 24 cm. The distance between their centres is…",["26 cm","23 cm","28 cm","32 cm"],"√(24² + 10²) = 26. SSC CHSL 2022 (10 Mar 2023 S3).","p"],
+["L10","The common external (direct) tangent of two circles is 9 and the common internal (transverse) tangent is 5. The product of the radii is…",["14","56","12","10"],"4r₁r₂ = 81 − 25 = 56 ⇒ 14. SSC CGL 2024 (10 Sep S3).","p"],
+["L10","Two circles of radii 8 cm and 3 cm have centres 13 cm apart. The direct common tangent is…",["12 cm","4√3 cm","5 cm","√194 cm"],"√(169 − 25) = 12."],
+["L10","Two circles of radii 6 cm and 3 cm have a transverse common tangent of 8 cm. The distance between their centres is…",["√145 cm","√73 cm","17 cm","11 cm"],"d² = 64 + 9² = 145."],
+["L10","Two circles of radii 9 cm and 4 cm touch each other externally. The direct common tangent is…",["12 cm","13 cm","5 cm","6 cm"],"√(13² − 5²) = 12 = 2√(9 × 4)."],
+["L10","Chords AB and CD of a circle intersect at E. AE = 5 cm, EB = 6 cm and CE = 3 cm. ED = ?",["10 cm","2.5 cm","3.6 cm","8 cm"],"5 × 6 = 3 × ED ⇒ 10."],
+["L10","A secant from P meets a circle at A and B with PA = 4 cm and PB = 9 cm. The tangent from P is…",["6 cm","6.5 cm","5 cm","13 cm"],"PT² = 4 × 9 = 36."],
+["L10","From P, a tangent PT = 12 cm and a secant PAB are drawn with PA = 8 cm. Chord AB = ?",["10 cm","18 cm","4 cm","26 cm"],"PB = 144/8 = 18 ⇒ AB = 18 − 8 = 10."],
+["L10","PA and PB are tangents to a circle with centre O and ∠APB = 70°. ∠AOB = ?",["110°","70°","140°","35°"],"180 − 70 = 110°."],
+["L10","PA and PB are tangents to a circle with centre O and ∠APB = 50°. C is on the major arc AB. ∠ACB = ?",["65°","130°","50°","25°"],"∠AOB = 130 ⇒ ∠ACB = 65°."],
+["L10","A tangent at T makes an angle of 58° with chord TA. The angle subtended by TA in the alternate segment is…",["58°","32°","122°","116°"],"Alternate segment theorem."],
+["L10","PT is a tangent at T to a circle with centre O and chord TA makes ∠PTA = 40°. ∠TOA = ?",["80°","40°","140°","100°"],"Alternate segment angle 40° ⇒ central angle 80°."],
+["L10","Quadrilateral ABCD circumscribes a circle. AB = 6 cm, BC = 7 cm and CD = 8 cm. AD = ?",["7 cm","9 cm","6 cm","8 cm"],"AB + CD = AD + BC ⇒ 14 = AD + 7."],
+["L10","How many common tangents can be drawn to two circles that touch each other externally?",["3","4","2","1"],"Two direct + one at the point of contact."],
+["L10","Two circles of radii 7 cm and 3 cm touch internally. The distance between their centres is…",["4 cm","10 cm","21 cm","2 cm"],"d = 7 − 3."],
+["L10","The tangent from a point 13 cm from the centre of a circle is 12 cm. The radius is…",["5 cm","√313 cm","1 cm","25 cm"],"√(169 − 144) = 5."],
+["L10","PA and PB are tangents to a circle of radius 5 cm with centre O and ∠APB = 60°. OP = ?",["10 cm","5√3 cm","5√2 cm","5 cm"],"∠APO = 30° ⇒ OP = r/sin 30° = 10."],
+["L10","Two circles of radii 10 cm and 6 cm have centres 20 cm apart. The transverse common tangent is…",["12 cm","8√6 cm","16 cm","4 cm"],"√(400 − 256) = 12 (direct one is 8√6)."],
+["L11","ABCD is a cyclic quadrilateral, AB is a diameter of the circle and ∠ADC = 118°. ∠BAC = ?",["28°","62°","32°","30°"],"∠ABC = 62°, ∠ACB = 90° ⇒ 28°. SSC CPO 2020 (24 Nov S1).","p"],
+["L11","ABCD is a cyclic quadrilateral. AB and DC produced meet at F; AD and BC produced meet at E. If ∠BAD = 68° and ∠AEB = 27°, find ∠BFC.",["17°","27°","22°","15°"],"∠B = 85, ∠D = 95 ⇒ ∠F = 180 − 68 − 95 = 17°. SSC CGL 2020 Tier 1 (18 Aug 2021 S2).","p"],
+["L11","ABCD is a cyclic quadrilateral. AB and DC produced meet at E; AD and BC produced meet at F. If ∠ADC = 76° and ∠AED = 55°, find ∠AFB.",["27°","34°","26°","29°"],"∠A = 49, ∠B = 104 ⇒ ∠F = 27°. SSC CGL Tier 2 2022 (03 Feb).","p"],
+["L11","The incircle of △ABC touches AB, BC and AC at D, E and F. If AB = 18 cm, BC = 15 cm and AC = 13 cm, then AD + BE + CF = ?",["23 cm","46 cm","25 cm","33 cm"],"Half the perimeter. SSC CHSL 2020 (26 Oct S3).","p"],
+["L11","In cyclic quadrilateral ABCD, ∠A = 70°. ∠C = ?",["110°","70°","20°","290°"],"180 − 70."],
+["L11","In cyclic quadrilateral ABCD, ∠A : ∠C = 2 : 3. ∠A = ?",["72°","108°","36°","144°"],"5 parts = 180° ⇒ 2 × 36 = 72°."],
+["L11","In cyclic quadrilateral ABCD, BC is produced to E and ∠DCE = 85°. ∠BAD = ?",["85°","95°","170°","42.5°"],"Exterior angle = interior opposite angle."],
+["L11","In cyclic quadrilateral ABCD, ∠A = (2x + 10)° and ∠C = (3x + 20)°. ∠A = ?",["70°","110°","30°","50°"],"5x + 30 = 180 ⇒ x = 30 ⇒ ∠A = 70°."],
+["L11","ABCD is a cyclic quadrilateral with ∠BAC = 40° and ∠BCA = 60°. ∠ADC = ?",["100°","80°","40°","120°"],"∠ABC = 80° ⇒ ∠ADC = 100°."],
+["L11","ABCD is a cyclic quadrilateral with ∠ADB = 35° and ∠BDC = 45°. ∠ABC = ?",["100°","80°","45°","35°"],"∠ADC = 80° ⇒ ∠ABC = 100°."],
+["L11","In △ABC, AB = 13 cm, BC = 14 cm and CA = 15 cm. The incircle touches BC at D. BD = ?",["6 cm","8 cm","7 cm","7.5 cm"],"s = 21; BD = s − CA = 6."],
+["L11","A right triangle has legs 6 cm and 8 cm. Its incircle divides the hypotenuse into two parts. The larger part is…",["6 cm","4 cm","5 cm","8 cm"],"s = 12; parts s − 6 = 6 and s − 8 = 4."],
+["L11","The incircle of △ABC touches AB at D, BC at E and CA at F. AD = 4 cm, BE = 6 cm and CF = 5 cm. The perimeter of △ABC is…",["30 cm","15 cm","60 cm","20 cm"],"2(4 + 6 + 5) = 30."],
+["L11","The inradius of a right triangle with legs 9 cm and 12 cm is…",["3 cm","6 cm","4.5 cm","7.5 cm"],"(9 + 12 − 15)/2 = 3."],
+["L11","A parallelogram that can be inscribed in a circle must be a…",["Rectangle","Rhombus","Trapezium","Kite"],"Opposite angles equal and add to 180° ⇒ 90° each."],
+["L11","ABCD is a cyclic trapezium with AB ∥ DC and ∠A = 75°. ∠C = ?",["105°","75°","15°","150°"],"Opposite angles: ∠C = 180 − 75."],
+["L11","ABCD is cyclic. AB and DC produced meet at E; AD and BC produced meet at F. ∠A = 50° and ∠E = 30°. ∠F = ?",["50°","30°","80°","100°"],"∠E + ∠F = 180 − 2 × 50 = 80 ⇒ ∠F = 50°."],
+["L11","A circle touches side BC of △ABC at P and AB, AC produced at Q and R. The perimeter of △ABC is 30 cm. AQ = ?",["15 cm","30 cm","10 cm","7.5 cm"],"AQ = s = half the perimeter."],
+["L11","ABCD is cyclic with AB a diameter and ∠ABD = 35°. ∠BCD = ?",["125°","55°","35°","145°"],"∠ADB = 90 ⇒ ∠DAB = 55 ⇒ ∠BCD = 125°."],
+["L12","What is the reflection of the point (5, −3) in the line y = 3?",["(5, 9)","(5, 3)","(5, −6)","(−5, 3)"],"(x, 2k − y) = (5, 6 + 3). SSC CGL Tier 2 2020 (18 Nov).","p"],
+["L12","The area (in sq units) of the triangle formed by the graphs of 8x + 3y = 24, 2x + 8 = y and the x-axis is…",["28","14","24","15"],"Vertices (3, 0), (−4, 0), (0, 8) ⇒ ½ × 7 × 8. SSC CGL Tier 2 2020 (15 Nov).","p"],
+["L12","The area (in sq units) of the triangle enclosed by 2x + 5y = 12, x + y = 3 and the x-axis is…",["3","2.5","3.5","4"],"Vertices (6, 0), (3, 0), (1, 2) ⇒ ½ × 3 × 2. SSC CGL Tier 2 2022 (03 Feb).","p"],
+["L12","The distance between (3, −4) and (−5, 2) is…",["10","√28","14","8"],"√(8² + 6²) = 10."],
+["L12","The mid-point of the join of (−4, 6) and (8, −2) is…",["(2, 2)","(6, −4)","(4, 4)","(2, −2)"],"((−4 + 8)/2, (6 − 2)/2)."],
+["L12","The point dividing the join of (2, 3) and (8, 9) internally in the ratio 1 : 2 is…",["(4, 5)","(6, 7)","(5, 6)","(3, 4)"],"((1 × 8 + 2 × 2)/3, (1 × 9 + 2 × 3)/3) = (4, 5)."],
+["L12","The centroid of the triangle with vertices (1, 2), (3, −4) and (5, 8) is…",["(3, 2)","(4.5, 3)","(9, 6)","(3, 3)"],"(9/3, 6/3)."],
+["L12","The slope of the line through (2, 5) and (6, 13) is…",["2","1/2","−2","9/4"],"8/4 = 2."],
+["L12","The slope of the line 3x − 4y + 7 = 0 is…",["3/4","−3/4","4/3","−4/3"],"−a/b = −3/(−4)."],
+["L12","The slope of a line perpendicular to 2x + 3y = 6 is…",["3/2","−2/3","2/3","−3/2"],"Given slope −2/3 ⇒ perpendicular 3/2."],
+["L12","The area of the triangle formed by 3x + 4y = 12 and the coordinate axes is…",["6","12","7","24"],"Intercepts 4 and 3 ⇒ ½ × 4 × 3."],
+["L12","The area of the triangle with vertices (1, 1), (4, 5) and (7, 1) is…",["12","24","6","18"],"½|1(5 − 1) + 4(1 − 1) + 7(1 − 5)| = ½ × 24."],
+["L12","The points (1, 2), (3, k) and (5, 10) are collinear. k = ?",["6","4","8","5"],"(3, k) is the mid-point of the other two."],
+["L12","The reflection of (4, −7) in the y-axis is…",["(−4, −7)","(4, 7)","(−4, 7)","(−7, 4)"],"x changes sign."],
+["L12","The reflection of (2, 5) in the line y = x is…",["(5, 2)","(−2, −5)","(−5, −2)","(2, −5)"],"Swap the coordinates."],
+["L12","The x-axis divides the join of (2, −3) and (5, 6) in the ratio…",["1 : 2","2 : 1","1 : 3","3 : 1"],"−y₁ : y₂ = 3 : 6."],
+["L12","The point on the x-axis equidistant from (2, −5) and (−2, 9) is…",["(−7, 0)","(7, 0)","(0, −7)","(−3.5, 0)"],"(x − 2)² + 25 = (x + 2)² + 81 ⇒ −8x = 56 ⇒ x = −7."],
+["L12","The distance of the point (3, 4) from the line 3x + 4y − 5 = 0 is…",["4","5","20","6"],"|9 + 16 − 5|/5 = 4."],
+["L12","The distance between the parallel lines 3x + 4y = 6 and 3x + 4y = 16 is…",["2","10","22/5","4"],"|16 − 6|/5 = 2."],
+["L12","The line with x-intercept 3 and y-intercept −4 is…",["4x − 3y = 12","3x − 4y = 12","4x + 3y = 12","3x + 4y = 12"],"x/3 + y/(−4) = 1 ⇒ 4x − 3y = 12."],
+["L12","The lines x + y = 7 and x − y = 1 meet at…",["(4, 3)","(3, 4)","(4, −3)","(8, 6)"],"Add: 2x = 8."],
+["L12","The circumcentre of the triangle with vertices (0, 0), (6, 0) and (0, 8) is…",["(3, 4)","(2, 8/3)","(0, 0)","(6, 8)"],"Right angle at O ⇒ mid-point of the hypotenuse."],
+];
+const HEAT = [
+["Lines, angles & parallel lines",4,"L1","Complement/supplement, co-interior angles, bend rule"],
+["Triangle basics",8,"L2","Angles in a ratio, exterior angles, ∠DAE = ½(B − C), integer-sided triangles"],
+["Congruence & similarity",12,"L3","BPT lengths, area ratio = k², trapezium cut by DE ∥ BC, AC² = CD·CB"],
+["Pythagoras & right triangles",10,"L4","Altitude on hypotenuse, Apollonius / medians, angle-bisector theorem, triplets"],
+["Triangle centres",14,"L5","∠BIC, ∠BHC, ∠BOC, centroid 2 : 1, r = Δ/s, R = abc/4Δ"],
+["Special triangles",7,"L6","Equilateral r, R, h, area; 30-60-90 and 45-45-90 sides; isosceles height"],
+["Quadrilaterals",7,"L7","Rhombus side/area from diagonals, parallelogram angles, trapezium diagonal areas"],
+["Polygons",6,"L8","Sides from interior/exterior angle, number of diagonals"],
+["Circles: chords & arcs",10,"L9","Chord length, parallel chords, angle at centre vs circumference"],
+["Circles: tangents",10,"L10","Tangent length, direct/transverse common tangent, PT² = PA·PB, alternate segment"],
+["Cyclic quadrilaterals & incircle lengths",7,"L11","Opposite angles 180°, sides produced (E, F), tangent lengths s − a"],
+["Coordinate geometry",5,"L12","Area of triangle made by lines and an axis, reflections, section formula"]
+];
+const TILES = [
+["90° + A/2","∠BIC (incentre)"],["180° − A","∠BHC (orthocentre)"],["2A","∠BOC (circumcentre, A acute)"],["2 : 1","Centroid divides each median"],
+["AD² = BD·DC","Altitude on the hypotenuse"],["AB² + AC² = 2(AD² + BD²)","Apollonius (median AD)"],["k²","Area ratio of similar triangles"],
+["1 : 2 : 3","r : R : h in an equilateral triangle"],["a/(2√3), a/√3","Equilateral inradius, circumradius"],["x : x√3 : 2x","30-60-90 sides"],
+["½ d₁d₂","Rhombus / kite area"],["(n − 2) × 180°","Sum of interior angles"],["360°/n","Each exterior angle (regular)"],["n(n − 3)/2","Number of diagonals"],
+["2√(r² − d²)","Chord at distance d"],["√(OP² − r²)","Tangent from P"],["√(d² − (r₁ − r₂)²)","Direct common tangent"],["√(d² − (r₁ + r₂)²)","Transverse common tangent"],
+["PT² = PA·PB","Tangent–secant"],["s − a","Incircle tangent length from A"],["180°","Opposite angles of a cyclic quadrilateral"],["(x, 2k − y)","Reflection of (x, y) in y = k"]
+];
+const PAIRS = [
+["Corresponding vs co-interior angles","Equal (F-shape) vs add to 180° (C/U-shape)"],
+["Incentre vs circumcentre","Equidistant from the sides (r) vs from the vertices (R)"],
+["∠BIC vs excentre ∠BEC","90° + A/2 vs 90° − A/2"],
+["∠BHC vs ∠BOC","180° − A vs 2A"],
+["BPT: DE/BC vs AD/DB","DE/BC = AD/AB (whole side); AD/DB = AE/EC (the two pieces)"],
+["Side ratio vs area ratio","k vs k² — perimeters, medians and altitudes stay k"],
+["AD² = BD·DC vs AB² = BD·BC","Altitude uses both pieces; a leg uses its own piece × the whole hypotenuse"],
+["Equilateral r vs R","a/(2√3) vs a/√3 — R = 2r"],
+["Direct vs transverse common tangent","r₁ − r₂ vs r₁ + r₂ inside the root"],
+["Tangent–secant vs crossing chords","PT² = PA·PB (outside × whole) vs AE·EB = CE·ED (part × part)"],
+["Point on major arc vs minor arc","½ × central angle vs 180° − ½ × central angle"],
+["n(n − 3)/2 vs ⁿC₂","Diagonals only vs diagonals + sides"],
+["Rhombus side vs rhombus area","√((d₁/2)² + (d₂/2)²) vs ½ d₁d₂"],
+["Exterior angle: triangle vs cyclic quadrilateral","Sum of the two interior opposite angles vs the one interior opposite angle"],
+["Reflection in y = x vs y = −x","(y, x) vs (−y, −x)"],
+["Section formula: internal vs external","(mx₂ + nx₁)/(m + n) vs (mx₂ − nx₁)/(m − n)"]
+];
+const COVERS = {
+ cen:{tab:"Centres drill", hideLabel:"Hide angle", note:"Cover the angle column and recall the angle each centre makes with B and C.", head:["Centre","Meeting point of","∠ at the centre","Key length"], hide:2, rows:[
+  ["Incentre I","Angle bisectors","∠BIC = 90° + A/2","r = Δ/s"],
+  ["Orthocentre H","Altitudes","∠BHC = 180° − A","—"],
+  ["Circumcentre O","Perpendicular bisectors","∠BOC = 2A (A acute)","R = abc/4Δ"],
+  ["Centroid G","Medians","—","AG = ⅔ AD"],
+  ["Excentre (opp. A)","External bisectors of B, C","∠BEC = 90° − A/2","—"],
+  ["Int. bisector B + ext. bisector C","—","∠BDC = A/2","—"]]},
+ cir:{tab:"Circle formulas drill", hideLabel:"Hide formula", note:"Cover the formula and say it aloud before revealing.", head:["Situation","Formula"], hide:1, rows:[
+  ["Chord at distance d from the centre","2√(r² − d²)"],
+  ["Tangent from P, OP known","√(OP² − r²)"],
+  ["Direct common tangent","√(d² − (r₁ − r₂)²)"],
+  ["Transverse common tangent","√(d² − (r₁ + r₂)²)"],
+  ["DCT² − TCT²","4r₁r₂"],
+  ["Tangent and secant from P","PT² = PA·PB"],
+  ["Two chords crossing at E","AE·EB = CE·ED"],
+  ["Angle at centre vs circumference","∠AOB = 2∠ACB"],
+  ["Two tangents from P","∠APB = 180° − ∠AOB"],
+  ["Cyclic quadrilateral","∠A + ∠C = 180°; exterior = interior opposite"],
+  ["Tangent–chord angle","= angle in the alternate segment"],
+  ["Incircle tangent from A","s − a"]]},
+ shp:{tab:"Shapes drill", hideLabel:"Hide value", note:"Cover the value column; recall it for side a (or n sides).", head:["Shape / quantity","Value"], hide:1, rows:[
+  ["Equilateral height","(√3/2) a"],["Equilateral area","(√3/4) a²"],["Equilateral inradius","a/(2√3)"],["Equilateral circumradius","a/√3"],
+  ["30-60-90 sides","x : x√3 : 2x"],["45-45-90 sides","a : a : a√2"],["Rhombus side from diagonals","√((d₁/2)² + (d₂/2)²)"],
+  ["Parallelogram diagonals","d₁² + d₂² = 2(a² + b²)"],["Interior angle sum","(n − 2) × 180°"],["Each exterior angle","360°/n"],
+  ["Number of diagonals","n(n − 3)/2"],["Regular hexagon area","(3√3/2) a²"]]}
+};
+const FIND = { tab:"Formula finder", ph:"Search a formula (e.g. median, tangent, incentre, rhombus)", head:["Topic","Formula","Lesson","When to use"], rows:[
+["Complement / supplement","90° − θ, 180° − θ","L1","Angle pairs; supplement − complement = 90°"],
+["Parallel lines","Corresponding = alternate; co-interior add to 180°","L1","Transversal on parallel lines"],
+["Bend rule","∠BED = ∠ABE + ∠CDE","L1","Point between two parallel lines"],
+["Triangle angle sum","A + B + C = 180°","L2","Any triangle"],
+["Exterior angle of a triangle","= sum of the two interior opposite angles","L2","Side produced"],
+["Altitude–bisector angle","∠DAE = ½|B − C|","L2","AD bisects ∠A, AE ⊥ BC"],
+["Triangle inequality","|b − c| < a < b + c","L2","Can these be sides? Integer-side counts"],
+["Integer triangles of perimeter p","≈ p²/48 (even), (p + 3)²/48 (odd)","L2","Counting triangles"],
+["BPT","DE ∥ BC ⇒ AD/DB = AE/EC, DE/BC = AD/AB","L3","Line parallel to a side"],
+["Similar areas","Area ratio = (side ratio)²","L3","Similar triangles"],
+["Mid-point theorem","DE = ½BC; medial triangle ¼ area","L3","Midpoints joined"],
+["Common-angle similarity","AC² = CD × CB","L3","∠ADC = ∠BAC with D on BC"],
+["Pythagoras","c² = a² + b²","L4","Right triangle"],
+["Altitude on hypotenuse","AD² = BD·DC; AB² = BD·BC; AD = AB·AC/BC","L4","Right angle at A, AD ⊥ BC"],
+["Apollonius","AB² + AC² = 2(AD² + BD²)","L4","Median AD"],
+["Median length","mₐ = ½√(2b² + 2c² − a²)","L4","Three sides known"],
+["Sum of median squares","¾(a² + b² + c²)","L4","All three medians"],
+["Angle bisector theorem","BD/DC = AB/AC","L4","Internal or external bisector of ∠A"],
+["Incentre angle","∠BIC = 90° + A/2","L5","Angle bisectors of B and C"],
+["Orthocentre angle","∠BHC = 180° − A","L5","Altitudes"],
+["Circumcentre angle","∠BOC = 2A (360° − 2A if A obtuse)","L5","Perpendicular bisectors"],
+["Excentre angle","∠BEC = 90° − A/2","L5","External bisectors of B and C"],
+["Centroid","AG : GD = 2 : 1; 6 equal-area parts","L5","Medians"],
+["Inradius / circumradius","r = Δ/s, R = abc/(4Δ)","L5","Three sides known (Heron)"],
+["Right-triangle radii","r = (a + b − c)/2, R = c/2","L5","c = hypotenuse"],
+["Equilateral triangle","h = (√3/2)a, area (√3/4)a², r = a/(2√3), R = a/√3","L6","Equilateral"],
+["Viviani","Sum of ⊥ distances from an inside point = h","L6","Point inside an equilateral triangle"],
+["30-60-90 / 45-45-90","x : x√3 : 2x;  a : a : a√2","L6","Set-square triangles"],
+["Isosceles height","√(b² − a²/4)","L6","Equal sides b, base a"],
+["Rhombus","a² = (d₁/2)² + (d₂/2)², area ½d₁d₂","L7","Diagonals given"],
+["Parallelogram law","d₁² + d₂² = 2(a² + b²)","L7","Sides and one diagonal"],
+["Trapezium diagonals","AOB : COD = a² : b²; AOD = BOC","L7","Diagonals of a trapezium"],
+["Trapezium mid-line","(a + b)/2","L7","Midpoints of the legs"],
+["Mid-point quadrilateral","Parallelogram, ½ area","L7","Join midpoints of any quadrilateral"],
+["Polygon angle sum","(n − 2) × 180°","L8","Interior angles"],
+["Regular polygon angles","exterior 360°/n, interior 180° − 360°/n","L8","Find n"],
+["Interior = k × exterior","n = 2(k + 1)","L8","Ratio of interior to exterior"],
+["Diagonals","n(n − 3)/2","L8","Count diagonals"],
+["Regular hexagon","area (3√3/2)a², long diagonal 2a","L8","Hexagon"],
+["Chord length","2√(r² − d²)","L9","Radius and distance from centre"],
+["Chord from central angle","2r sin(θ/2)","L9","60° → r, 90° → r√2, 120° → r√3"],
+["Inscribed angle","∠AOB = 2∠ACB; minor arc 180° − ½∠AOB","L9","Centre vs circumference"],
+["Semicircle","Angle = 90°","L9","Diameter as a side"],
+["Parallel chords","gap = d₁ ± d₂","L9","Same side (−) or opposite sides (+)"],
+["Tangent length","PT² = OP² − r²","L10","External point"],
+["Two tangents","PA = PB; ∠APB + ∠AOB = 180°","L10","Tangents from one point"],
+["Tangent–secant","PT² = PA × PB","L10","Secant through the circle"],
+["Intersecting chords","AE × EB = CE × ED","L10","Chords crossing inside"],
+["Alternate segment","Tangent–chord angle = angle in alternate segment","L10","Tangent and chord at one point"],
+["Common tangents","DCT √(d² − (r₁ − r₂)²), TCT √(d² − (r₁ + r₂)²)","L10","Two circles"],
+["DCT² − TCT²","4r₁r₂","L10","Both tangents given"],
+["Circumscribed quadrilateral","AB + CD = AD + BC","L10","Circle inside a quadrilateral"],
+["Cyclic quadrilateral","∠A + ∠C = 180°; exterior = interior opposite","L11","Four points on a circle"],
+["Sides produced","∠E + ∠F = 180° − 2∠A","L11","AB∩DC = E, AD∩BC = F"],
+["Incircle tangent lengths","s − a, s − b, s − c","L11","Points of contact"],
+["Excircle tangent","AQ = s","L11","Circle touching BC and AB, AC produced"],
+["Distance formula","√((x₂ − x₁)² + (y₂ − y₁)²)","L12","Two points"],
+["Section formula","((mx₂ + nx₁)/(m + n), (my₂ + ny₁)/(m + n))","L12","Point dividing a join"],
+["Centroid (coordinates)","((x₁ + x₂ + x₃)/3, (y₁ + y₂ + y₃)/3)","L12","Triangle vertices given"],
+["Slope","(y₂ − y₁)/(x₂ − x₁); ax + by + c = 0 → −a/b","L12","Parallel / perpendicular lines"],
+["Area of triangle (coordinates)","½|x₁(y₂ − y₃) + x₂(y₃ − y₁) + x₃(y₁ − y₂)|","L12","Vertices given; 0 ⇒ collinear"],
+["Line with the axes","x/a + y/b = 1; area ½|ab|","L12","Intercepts"],
+["Point to line","|ax₁ + by₁ + c|/√(a² + b²)","L12","Perpendicular distance"],
+["Reflections","x-axis (x, −y), y-axis (−x, y), y = x (y, x), y = k (x, 2k − y)","L12","Mirror images"]
+]};
+const APP = { key:"geometry_workbook_v1", brand:"Geometry", sub:"ज्यामिति · SSC maths workbook",
+  eyebrow:"SSC CGL Maths",
+  intro:"Twelve lessons covering the whole SSC geometry syllabus: lines and angles, triangles (similarity, Pythagoras, centres, special triangles), quadrilaterals and polygons, circles (chords, tangents, cyclic quadrilaterals) and coordinate geometry. Every lesson has formula cards, labelled figures, solved real SSC questions and a verified question bank.",
+  foot:"Read a lesson's formula cards and figures first, open the solved PYQs and try them before revealing the steps, then take the lesson quiz. Use the drills to cover a column and recall it, the formula finder to search any result, and the mock for mixed practice.",
+  craft:"Draw a rough figure for every question — most geometry answers come from spotting one hidden right triangle, one pair of similar triangles or one inscribed angle. Learn the triplets (3-4-5, 5-12-13, 8-15-17, 7-24-25) so square roots disappear. When options are numbers, eliminate ones that break a rule (an inscribed angle bigger than 90° in a semicircle, a chord longer than the diameter). Put easy values (equilateral or right triangle, A = 60° or 90°) into 'general' questions, and in coordinate questions test the options in the given condition instead of solving.",
+  heatNote:"Approximate share of SSC CGL geometry questions by lesson, based on recent Tier 1 and Tier 2 papers. Shares shift from year to year — use them only to plan revision time." };
+
+/* ============================================================
+   HELPERS & STATE
+   ============================================================ */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const hash = s => { let h = 5381; for (let i=0;i<s.length;i++) h = ((h<<5)+h + s.charCodeAt(i))|0; return "q"+(h>>>0).toString(36); };
+const shuffle = a => { const b=a.slice(); for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]];} return b; };
+const L = id => LESSONS.find(l => l.id === id);
+const LNUM = id => LESSONS.findIndex(l => l.id === id) + 1;
+
+const QS = QB.map(r => {
+  const fixed = !!r[6];
+  return { t:r[0], q:r[1], o:r[2], e:r[3], p:(r[4]||"").includes("p"), a: fixed ? (r[5]||0) : 0, fixed, id:hash(r[1]) };
+});
+const byLesson = id => QS.filter(q => q.t === id);
+// order of options to show: array of original indexes
+const makePerm = q => q.fixed ? q.o.map((_,i)=>i) : shuffle(q.o.map((_,i)=>i));
+
+const KEY = APP.key;
+let S = { ans:{}, bm:{}, les:{}, mocks:[] };
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch(e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
+const record = (q, ok) => { S.ans[q.id] = ok ? 1 : 0; save(); renderTop(); };
+
+function renderTop(){
+  const ids = Object.keys(S.ans).filter(k => QS.some(q => q.id === k));
+  const right = ids.filter(k => S.ans[k] === 1).length;
+  const pct = ids.length ? Math.round(right*100/ids.length) : 0;
+  $("#topstat").innerHTML = `<b>${ids.length}</b>/${QS.length} tried<br><b>${pct}%</b> right now`;
+}
+
+/* ============================================================
+   ROUTING
+   ============================================================ */
+let TAB = "learn";
+let timerId = null;
+function go(tab){
+  TAB = tab;
+  document.querySelectorAll(".nav button").forEach(b => b.setAttribute("aria-current", b.dataset.tab===tab ? "page" : "false"));
+  if (tab === "learn") renderLearn();
+  if (tab === "practice") renderPractice();
+  if (tab === "mock") renderMock();
+  if (tab === "revise") renderRevise();
+  window.scrollTo(0,0);
+  try { history.replaceState(null, "", "#"+tab); } catch(e) {}
+}
+document.querySelectorAll(".nav button").forEach(b => b.addEventListener("click", () => {
+  if (TAB === "mock" && M && M.running && b.dataset.tab !== "mock") { go("mock"); showMockLeave(b.dataset.tab); return; }
+  go(b.dataset.tab);
+}));
+
+/* ============================================================
+   LEARN
+   ============================================================ */
+function renderLearn(){
+  const done = LESSONS.filter(l => S.les[l.id] && S.les[l.id].done).length;
+  const nextIdx = LESSONS.findIndex(l => !(S.les[l.id] && S.les[l.id].done));
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="hero">
+      <span class="eyebrow">${APP.eyebrow}</span>
+      <h1>Learn it, test it, revise it</h1>
+      <p>${APP.intro} ${QS.length} exam-style questions in all.</p>
+      <div class="meter" aria-label="Lessons done"><i style="width:${done/LESSONS.length*100}%"></i></div>
+      <div class="row between"><span class="muted num" style="font-size:13px">${done}/${LESSONS.length} lessons done</span>
+      ${nextIdx>=0 ? `<button class="btn pri sm" type="button" data-open="${LESSONS[nextIdx].id}">${done? "Continue" : "Start"}: Lesson ${nextIdx+1}</button>` : `<span class="muted" style="font-size:13px">All lessons done. Try a mock test.</span>`}</div>
+    </div>
+    <div class="lessons">${LESSONS.map((l,i) => {
+      const st = S.les[l.id] || {}; const n = byLesson(l.id).length;
+      return `<button type="button" class="les ${st.done?"done":""} ${i===nextIdx?"next":""}" data-open="${l.id}">
+        <span class="no">${st.done ? "✓" : i+1}</span>
+        <span class="t"><b>${esc(l.title)}<span class="heatb" title="Exam frequency">${"🔥".repeat(l.heat||1)}</span></b><span>${l.hi} · ${n} questions</span></span>
+        <span class="sc">${st.best!=null ? `best<br>${st.best}/${n}` : ""}</span></button>`;}).join("")}
+    </div>
+    <p class="foot">${APP.foot}</p>
+  </section>`;
+  $("#app").querySelectorAll("[data-open]").forEach(b => b.addEventListener("click", () => openLesson(b.dataset.open, "learn")));
+}
+
+function blockHTML(b){
+
+  if (b.k==="formula") return `<div class="block"><h3>${b.title}</h3><div class="fgrid">${b.rows.map(r=>`<div class="fcard"><span class="fn">${r[0]}</span><span class="fx">${r[1]}</span>${r[2]?`<span class="fnote">${r[2]}</span>`:""}</div>`).join("")}</div></div>`;
+  if (b.k==="ex") return `<div class="ex"><div class="exhead"><span class="lab">${b.src ? "PYQ" : "Solved example"}</span>${b.src?`<span class="src">${b.src}</span>`:""}</div><div class="exq">${b.q}</div>${b.fig?`<figure class="fig">${b.fig}</figure>`:""}<details><summary>Show solution</summary><ol>${b.steps.map(x=>`<li>${x}</li>`).join("")}</ol><div class="exans">Answer: ${b.ans}</div>${b.tip?`<div class="trick" style="margin-top:8px"><span class="lab">Shortcut</span>${b.tip}</div>`:""}</details></div>`;
+  if (b.k==="figs") return `<div class="block"><h3>${b.title}</h3><div class="figwrap">${b.items.map(it=>`<figure>${it.svg}<figcaption>${it.cap}</figcaption></figure>`).join("")}</div></div>`;
+  if (b.k==="p") return `<div class="plain"><p>${b.h}</p></div>`;
+  if (b.k==="trick") return `<div class="trick"><span class="lab">Trick</span>${b.h}</div>`;
+  if (b.k==="link") return `<div class="link"><span class="lab">Link · connect the dots</span>${b.h}</div>`;
+  if (b.k==="q") { const perm = shuffle(b.o.map((_,i)=>i)); return `<div class="icheck" data-ic><span class="lab">Quick check</span><p class="qt">${esc(b.q)}</p><div class="opts">${perm.map((oi,k)=>`<button type="button" class="opt" data-ioi="${oi}"><span class="k">${"ABCD"[k]}</span><span>${esc(b.o[oi])}</span></button>`).join("")}</div><div class="exp" hidden><b class="okl"></b> ${esc(b.e)}</div></div>`; }
+  if (b.k==="hot") return `<div class="hot"><span class="lab">🔥 Exam radar · how often it's asked</span>${b.h}</div>`;
+  if (b.k==="trap") return `<div class="trap"><span class="lab">Trap · correction</span>${b.h}</div>`;
+  if (b.k==="facts") return `<div class="block"><h3>${b.title}</h3><dl class="facts">${b.rows.map(r=>`<div><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join("")}</dl></div>`;
+  if (b.k==="tl") return `<div class="block"><h3>${b.title}</h3><ul class="tl">${b.rows.map(r=>`<li><span class="y">${r[0]}</span><span>${r[1]}</span></li>`).join("")}</ul></div>`;
+  if (b.k==="table") {
+    const isNum = (ci) => b.numcol==="all" ? ci>0 : (b.numcol===1 && ci===1) || (typeof b.numcol==="string" && b.numcol.includes(String(ci)));
+    return `<div class="block"><h3>${b.title}</h3><div class="tbl"><table><thead><tr>${b.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${b.rows.map(r=>`<tr>${r.map((c,ci)=>`<td class="${isNum(ci)?"n":""}">${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+  }
+  if (b.k==="fig") return `<div class="block"><h3>${b.title}</h3><figure class="fig">${b.svg}<figcaption>${b.cap}</figcaption></figure></div>`;
+  if (b.k==="pyr") return `<div class="block"><h3>${b.title}</h3><div class="pyr">${b.items.map(it=>`<div>${PYR(it.rows)}<b>${it.name}</b><span class="muted">${it.note}</span></div>`).join("")}</div><p class="muted" style="font-size:13px;margin-top:8px"><span style="color:var(--blue)">■</span> males · <span style="color:var(--accent)">■</span> females · top = old, base = young</p></div>`;
+  return "";
+}
+
+let LQ = null;
+function openLesson(id, step){
+  const l = L(id), i = LNUM(id);
+  if (step === "quiz") { LQ = { id, list: shuffle(byLesson(id)).map(q => ({q, perm:makePerm(q)})), i:0, score:0, picked:null }; }
+  const head = `<div class="lhead"><button class="back" type="button" id="lback">‹ Lessons</button></div>
+    <span class="eyebrow">Lesson ${i} of ${LESSONS.length} · ${l.hi}</span><h1>${esc(l.title)}</h1>
+    <div class="steps" role="tablist">
+      <button type="button" data-step="learn" aria-current="${step==="learn"?"step":"false"}">1 · Learn</button>
+      <button type="button" data-step="quiz" aria-current="${step==="quiz"?"step":"false"}">2 · Quiz</button>
+      <button type="button" data-step="sum" aria-current="${step==="sum"?"step":"false"}">3 · Summary</button>
+    </div>`;
+  let body = "";
+  if (step === "learn") {
+    body = `<div class="stack">${l.blocks.map(blockHTML).join("")}
+      <div class="row end"><button class="btn pri" type="button" id="toquiz">Take the lesson quiz · ${byLesson(id).length} questions</button></div></div>`;
+  } else if (step === "quiz") {
+    body = `<div id="lq"></div>`;
+  } else {
+    const nxt = LESSONS[i];
+    body = `<div class="stack"><div class="block"><h3>Remember these</h3><ul class="sum">${l.sum.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>
+      <div class="row between"><button class="btn" type="button" id="relearn">Read again</button>
+      ${nxt ? `<button class="btn pri" type="button" id="nextles">Next: ${esc(nxt.title)}</button>` : `<button class="btn pri" type="button" id="tomock">Take a mock test</button>`}</div></div>`;
+    S.les[id] = Object.assign(S.les[id]||{}, {done:1}); save();
+  }
+  $("#app").innerHTML = `<section class="view stack">${head}${body}</section>`;
+  $("#lback").onclick = () => renderLearn();
+  $("#app").querySelectorAll("[data-step]").forEach(b => b.onclick = () => openLesson(id, b.dataset.step));
+  if (step==="learn") { $("#toquiz").onclick = () => openLesson(id,"quiz");
+    const ics = l.blocks.filter(b=>b.k==="q");
+    $("#app").querySelectorAll("[data-ic]").forEach((box,n) => { const b = ics[n];
+      box.querySelectorAll("[data-ioi]").forEach(btn => btn.onclick = () => {
+        if (box.dataset.done) return; box.dataset.done = 1; const pick = +btn.dataset.ioi;
+        box.querySelectorAll("[data-ioi]").forEach(x => { const oi=+x.dataset.ioi; x.disabled = true; if (oi===0) x.classList.add("ok"); else if (oi===pick) x.classList.add("no"); });
+        const ex = box.querySelector(".exp"); ex.hidden = false; const lab = ex.querySelector("b");
+        if (pick===0) { lab.textContent = "Correct."; } else { lab.className = "nol"; lab.textContent = "Answer: " + b.o[0] + "."; }
+      }); }); }
+  if (step==="quiz") renderLQ();
+  if (step==="sum") {
+    $("#relearn").onclick = () => openLesson(id,"learn");
+    const n = $("#nextles"); if (n) n.onclick = () => openLesson(LESSONS[i].id,"learn");
+    const m = $("#tomock"); if (m) m.onclick = () => go("mock");
+  }
+  window.scrollTo(0,0);
+}
+
+function optsHTML(q, perm, state){
+  // state: {picked: originalIndex|null, reveal: bool, sel: originalIndex|null}
+  return perm.map((oi, k) => {
+    let cls = "opt";
+    if (state.reveal) { if (oi === q.a) cls += " ok"; else if (oi === state.picked) cls += " no"; }
+    else if (state.sel === oi) cls += " sel";
+    return `<button type="button" class="${cls}" data-oi="${oi}" ${state.reveal?"disabled":""}><span class="k">${"ABCD"[k]}</span><span>${esc(q.o[oi])}</span></button>`;
+  }).join("");
+}
+function expHTML(q, picked){
+  const ok = picked === q.a;
+  return `<div class="exp">${ok ? `<b class="okl">Correct.</b>` : `<b class="nol">Answer: ${esc(q.o[q.a])}.</b>`} ${esc(q.e)}</div>`;
+}
+function metaHTML(q, no){
+  return `<div class="qmeta"><span class="qno">${no}</span><span class="tag">L${LNUM(q.t)} · ${esc(L(q.t).title)}</span>${q.p?`<span class="tag pyq">High-yield</span>`:""}
+  <button type="button" class="bm" data-bm="${q.id}" aria-pressed="${S.bm[q.id]?"true":"false"}" aria-label="Bookmark">${S.bm[q.id]?"★":"☆"}</button></div>`;
+}
+
+function renderLQ(){
+  const box = $("#lq");
+  if (LQ.i >= LQ.list.length) {
+    const n = LQ.list.length, l = L(LQ.id);
+    const st = S.les[LQ.id] || {}; st.best = Math.max(st.best||0, LQ.score); S.les[LQ.id] = st; save();
+    box.innerHTML = `<div class="stack"><div class="block stack"><span class="eyebrow">Quiz done</span>
+      <div class="scorebig"><span class="num">${LQ.score}</span><span class="muted">/ ${n} correct</span></div>
+      <p class="muted">${LQ.score===n ? "Full marks." : LQ.score >= n*0.8 ? "Strong. Review the ones you missed in Practice → Mistakes." : "Read the lesson once more, then retry. Missed questions are saved under Practice → Mistakes."}</p></div>
+      <div class="row between"><button class="btn" type="button" id="retry">Retry quiz</button><button class="btn pri" type="button" id="tosum">See summary</button></div></div>`;
+    $("#retry").onclick = () => openLesson(LQ.id,"quiz");
+    $("#tosum").onclick = () => openLesson(LQ.id,"sum");
+    return;
+  }
+  const it = LQ.list[LQ.i], q = it.q;
+  const reveal = LQ.picked !== null;
+  box.innerHTML = `<div class="stack"><div class="meter"><i style="width:${LQ.i/LQ.list.length*100}%"></i></div>
+    <article class="qcard">${metaHTML(q, `Q${LQ.i+1}/${LQ.list.length}`)}
+    <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {picked:LQ.picked, reveal})}</div>
+    ${reveal ? expHTML(q, LQ.picked) : ""}</article>
+    ${reveal ? `<div class="row end"><button class="btn pri" type="button" id="lqnext">${LQ.i+1 < LQ.list.length ? "Next question" : "Finish"}</button></div>` : `<p class="muted" style="font-size:13px">Score so far: <span class="num">${LQ.score}</span></p>`}</div>`;
+  box.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    if (LQ.picked !== null) return;
+    LQ.picked = +b.dataset.oi; const ok = LQ.picked === q.a; if (ok) LQ.score++; record(q, ok); renderLQ();
+  });
+  bindBM(box);
+  const nx = $("#lqnext"); if (nx) nx.onclick = () => { LQ.i++; LQ.picked = null; renderLQ(); window.scrollTo(0,0); };
+}
+
+function bindBM(root){
+  root.querySelectorAll("[data-bm]").forEach(b => b.onclick = (ev) => {
+    ev.stopPropagation();
+    const id = b.dataset.bm; if (S.bm[id]) delete S.bm[id]; else S.bm[id] = 1; save();
+    b.setAttribute("aria-pressed", S.bm[id] ? "true":"false"); b.textContent = S.bm[id] ? "★" : "☆";
+  });
+}
+
+/* ============================================================
+   PRACTICE
+   ============================================================ */
+let PF = "all", PSHOW = 20, PORDER = null, PPERM = {}, PPICK = {};
+function practiceList(){
+  let list = QS;
+  if (PF === "pyq") list = QS.filter(q => q.p);
+  else if (PF === "hot") list = QS.filter(q => (L(q.t).heat||1) === 3);
+  else if (PF === "wrong") list = QS.filter(q => S.ans[q.id] === 0);
+  else if (PF === "new") list = QS.filter(q => S.ans[q.id] === undefined);
+  else if (PF === "bm") list = QS.filter(q => S.bm[q.id]);
+  else if (PF !== "all") list = QS.filter(q => q.t === PF);
+  if (PORDER) { const pos = new Map(PORDER.map((id,i)=>[id,i])); list = list.slice().sort((a,b)=>(pos.get(a.id)??0)-(pos.get(b.id)??0)); }
+  return list;
+}
+function renderPractice(){
+  const wrongN = QS.filter(q => S.ans[q.id] === 0).length, bmN = QS.filter(q=>S.bm[q.id]).length, pyqN = QS.filter(q=>q.p).length;
+  const chips = [["all",`All ${QS.length}`],["new","Not tried"],["wrong",`Mistakes ${wrongN}`],["hot",`🔥 Hot topics ${QS.filter(q=>(L(q.t).heat||1)===3).length}`],["pyq",`PYQ ${pyqN}`],["bm",`Starred ${bmN}`]].concat(LESSONS.map((l,i)=>[l.id,`L${i+1} ${l.title}`]));
+  const list = practiceList();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Question bank</span><h1>Practice</h1>
+    <p class="muted">Tap an option to check it. Wrong answers go to <b>Mistakes</b> until you get them right.</p></div>
+    <div class="chips" role="group" aria-label="Filter">${chips.map(c=>`<button type="button" class="chip" data-f="${c[0]}" aria-pressed="${PF===c[0]}">${esc(c[1])}</button>`).join("")}</div>
+    <div class="row between"><span class="muted num" style="font-size:13px">${list.length} questions</span>
+      <div class="row"><button class="btn sm ghost" type="button" id="pshuf">${PORDER?"In order":"Shuffle"}</button></div></div>
+    <div class="stack" id="plist"></div>
+  </section>`;
+  $("#app").querySelectorAll("[data-f]").forEach(b => b.onclick = () => { PF = b.dataset.f; PSHOW = 20; PPICK = {}; renderPractice(); });
+  $("#pshuf").onclick = () => { PORDER = PORDER ? null : shuffle(QS.map(q=>q.id)); PSHOW = 20; renderPractice(); };
+  const chipOn = $(`.chip[aria-pressed="true"]`); if (chipOn) chipOn.scrollIntoView({block:"nearest", inline:"center"});
+  drawPList();
+}
+function pCard(q, idx){
+  if (!PPERM[q.id]) PPERM[q.id] = makePerm(q);
+  const picked = PPICK[q.id]; const reveal = picked !== undefined;
+  return `<article class="qcard" data-q="${q.id}">${metaHTML(q, "Q"+(idx+1))}<p class="qt">${esc(q.q)}</p>
+    <div class="opts">${optsHTML(q, PPERM[q.id], {picked: reveal?picked:null, reveal})}</div>${reveal?expHTML(q,picked):""}</article>`;
+}
+function drawPList(){
+  const list = practiceList(), box = $("#plist");
+  if (!list.length) { box.innerHTML = `<p class="empty">${PF==="wrong"?"No mistakes saved. Answer some questions first, or you've cleared them all.":PF==="bm"?"Nothing starred yet. Tap ☆ on any question.":"Nothing here."}</p>`; return; }
+  box.innerHTML = list.slice(0, PSHOW).map((q,i)=>pCard(q,i)).join("") + (list.length > PSHOW ? `<button class="btn" type="button" id="pmore">Show 20 more (${list.length-PSHOW} left)</button>` : "");
+  bindP(box);
+  const more = $("#pmore"); if (more) more.onclick = () => { PSHOW += 20; drawPList(); };
+}
+function bindP(box){ box.querySelectorAll(".qcard").forEach(bindCard); }
+function bindCard(card){
+  card.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    const q = QS.find(x => x.id === card.dataset.q); if (PPICK[q.id] !== undefined) return;
+    PPICK[q.id] = +b.dataset.oi; record(q, PPICK[q.id] === q.a);
+    const idx = +card.querySelector(".qno").textContent.slice(1) - 1;
+    const tmp = document.createElement("div"); tmp.innerHTML = pCard(q, idx); const nc = tmp.firstElementChild;
+    card.replaceWith(nc); bindCard(nc);
+  });
+  bindBM(card);
+}
+
+/* ============================================================
+   MOCK TEST
+   ============================================================ */
+let M = null, MCFG = {n:25, scope:"all", neg:1}, LEAVE_TO = null;
+function renderMock(){
+  if (M && M.running) return drawMockRun();
+  if (M && M.done) return drawMockResult();
+  const hist = (S.mocks||[]).slice(-6).reverse();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Timed, SSC pattern</span><h1>Mock test</h1>
+    <p class="muted">+2 for a right answer, −0.5 for a wrong one, 36 seconds per question (CGL Tier-1 pace). Answers show only after you submit.</p></div>
+    <div class="block stack">
+      <fieldset><legend>Questions</legend><div class="radios">${[10,25,50,100].map(n=>`<label><input type="radio" name="mn" id="mn${n}" value="${n}" ${MCFG.n===n?"checked":""}><span>${n} · ${Math.round(n*36/60)} min</span></label>`).join("")}</div></fieldset>
+      <fieldset><legend>From</legend><select id="mscope" aria-label="Lessons to draw from"><option value="all">All lessons</option><option value="hot">🔥 Hot topics only</option><option value="pyq">PYQs only</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}" ${MCFG.scope===l.id?"selected":""}>L${i+1} · ${esc(l.title)}</option>`).join("")}</select></fieldset>
+      <label class="row" style="gap:8px;font-weight:600"><input type="checkbox" id="mneg" ${MCFG.neg?"checked":""}> Negative marking (−0.5)</label>
+      <div id="merr" class="muted" style="font-size:14px"></div>
+      <div class="row end"><button class="btn pri" type="button" id="mstart">Start test</button></div>
+    </div>
+    ${hist.length ? `<div class="block"><h3>Recent attempts</h3><div class="hist">${hist.map(h=>`<div><span>${esc(h.d)} · ${h.n} Q</span><span class="num">${h.score}/${h.max} · ${h.acc}%</span></div>`).join("")}</div></div>` : ""}
+  </section>`;
+  $("#mscope").value = MCFG.scope;
+  $("#mstart").onclick = () => {
+    MCFG.n = +(document.querySelector('input[name="mn"]:checked')||{value:25}).value;
+    MCFG.scope = $("#mscope").value; MCFG.neg = $("#mneg").checked ? 1 : 0;
+    let pool = MCFG.scope==="all" ? QS : MCFG.scope==="pyq" ? QS.filter(q=>q.p) : MCFG.scope==="hot" ? QS.filter(q=>(L(q.t).heat||1)===3) : MCFG.scope==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===MCFG.scope);
+    if (!pool.length) { $("#merr").textContent = "No questions in that set yet. Pick another source."; return; }
+    const qs = shuffle(pool).slice(0, MCFG.n);
+    M = { running:true, list: qs.map(q=>({q, perm:makePerm(q)})), ans: qs.map(()=>null), mark: qs.map(()=>false), i:0, neg:MCFG.neg, secs: qs.length*36, start: Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000;
+    startTimer(); drawMockRun();
+  };
+}
+function startTimer(){
+  clearInterval(timerId);
+  timerId = setInterval(() => {
+    if (!M || !M.running) { clearInterval(timerId); return; }
+    const left = Math.max(0, Math.round((M.end - Date.now())/1000));
+    const el = $("#mtime"); if (el) { el.textContent = fmt(left); el.classList.toggle("low", left <= 60); }
+    if (left <= 0) submitMock();
+  }, 1000);
+}
+const fmt = s => `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+function drawMockRun(){
+  const it = M.list[M.i], q = it.q, left = Math.max(0, Math.round((M.end-Date.now())/1000));
+  const answered = M.ans.filter(a=>a!==null).length;
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="mbar"><span class="timer num ${left<=60?"low":""}" id="mtime">${fmt(left)}</span>
+      <span class="muted num" style="font-size:13px;flex:1">Q ${M.i+1}/${M.list.length} · ${answered} answered</span>
+      <button class="btn sm" type="button" id="mpal">${M.showPal?"Hide":"All Qs"}</button></div>
+    ${LEAVE_TO ? `<div class="confirm"><b>Leave the test?</b><span>Your answers so far will be scored now.</span><div class="row"><button class="btn sm pri" type="button" id="lvy">Submit and leave</button><button class="btn sm" type="button" id="lvn">Stay</button></div></div>` : ""}
+    ${M.showPal ? `<div class="block"><div class="pal">${M.list.map((_,k)=>`<button type="button" data-j="${k}" class="${M.ans[k]!==null?"a":""} ${M.mark[k]?"m":""} ${k===M.i?"cur":""}" aria-label="Question ${k+1}">${k+1}</button>`).join("")}</div>
+      <p class="muted" style="font-size:12px;margin-top:8px">Filled = answered · orange line = marked for review</p></div>` : ""}
+    <article class="qcard"><div class="qmeta"><span class="qno">Q${M.i+1}</span><span class="tag">L${LNUM(q.t)}</span>${M.mark[M.i]?`<span class="tag pyq">Marked</span>`:""}</div>
+      <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {sel:M.ans[M.i], reveal:false})}</div></article>
+    <div class="row between"><button class="btn" type="button" id="mprev" ${M.i===0?"disabled":""}>‹ Prev</button>
+      <button class="btn ghost" type="button" id="mmark">${M.mark[M.i]?"Unmark":"Mark"}</button>
+      <button class="btn ghost" type="button" id="mclr" ${M.ans[M.i]===null?"disabled":""}>Clear</button>
+      <button class="btn ${M.i<M.list.length-1?"pri":""}" type="button" id="mnext" ${M.i===M.list.length-1?"disabled":""}>Next ›</button></div>
+    ${M.confirm ? `<div class="confirm"><b>Submit the test?</b><span>${M.list.length-answered} unanswered${M.mark.filter(Boolean).length?`, ${M.mark.filter(Boolean).length} marked for review`:""}.</span><div class="row"><button class="btn sm pri" type="button" id="msubY">Submit</button><button class="btn sm" type="button" id="msubN">Keep going</button></div></div>`
+      : `<button class="btn pri" type="button" id="msub">Submit test</button>`}
+  </section>`;
+  $("#app").querySelectorAll(".opt").forEach(b => b.onclick = () => { M.ans[M.i] = +b.dataset.oi; drawMockRun(); });
+  $("#mprev").onclick = () => { if (M.i>0){M.i--; drawMockRun();} };
+  $("#mnext").onclick = () => { if (M.i<M.list.length-1){M.i++; drawMockRun(); window.scrollTo(0,0);} };
+  $("#mmark").onclick = () => { M.mark[M.i] = !M.mark[M.i]; drawMockRun(); };
+  $("#mclr").onclick = () => { M.ans[M.i] = null; drawMockRun(); };
+  $("#mpal").onclick = () => { M.showPal = !M.showPal; drawMockRun(); };
+  $("#app").querySelectorAll("[data-j]").forEach(b => b.onclick = () => { M.i = +b.dataset.j; drawMockRun(); });
+  const s = $("#msub"); if (s) s.onclick = () => { M.confirm = true; drawMockRun(); };
+  const y = $("#msubY"); if (y) y.onclick = submitMock;
+  const n = $("#msubN"); if (n) n.onclick = () => { M.confirm = false; drawMockRun(); };
+  const lvy = $("#lvy"); if (lvy) lvy.onclick = () => { const t = LEAVE_TO; LEAVE_TO = null; submitMock(); go(t); };
+  const lvn = $("#lvn"); if (lvn) lvn.onclick = () => { LEAVE_TO = null; drawMockRun(); };
+}
+function showMockLeave(tab){ LEAVE_TO = tab; drawMockRun(); }
+function submitMock(){
+  if (!M || !M.running) return;
+  clearInterval(timerId);
+  M.running = false; M.done = true; M.confirm = false;
+  let c=0,w=0,sk=0; const per = {};
+  M.list.forEach((it,k) => {
+    const a = M.ans[k]; const t = it.q.t; per[t] = per[t] || {c:0,n:0}; per[t].n++;
+    if (a===null) sk++; else if (a===it.q.a) { c++; per[t].c++; S.ans[it.q.id]=1; } else { w++; S.ans[it.q.id]=0; }
+  });
+  const max = M.list.length*2, score = +(c*2 - (M.neg? w*0.5 : 0)).toFixed(1);
+  const used = Math.min(M.secs, Math.round((Date.now()-M.start)/1000));
+  M.res = {c,w,sk,score,max,used,per, acc: (c+w) ? Math.round(c*100/(c+w)) : 0};
+  const d = new Date(); const ds = d.toLocaleDateString("en-IN",{day:"numeric",month:"short"})+" "+d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
+  S.mocks = (S.mocks||[]).concat([{d:ds, n:M.list.length, score, max, acc:M.res.acc}]).slice(-20); save(); renderTop();
+  M.filter = "wrong";
+  if (TAB==="mock") drawMockResult();
+}
+function drawMockResult(){
+  const r = M.res;
+  const per = Object.keys(r.per).sort((a,b)=>LNUM(a)-LNUM(b)).map(t => `<div><span>L${LNUM(t)} · ${esc(L(t).title)}</span><span class="num">${r.per[t].c}/${r.per[t].n}</span></div>`).join("");
+  const rows = M.list.map((it,k)=>({it,k})).filter(({it,k}) => M.filter==="all" ? true : M.filter==="wrong" ? (M.ans[k]!==null && M.ans[k]!==it.q.a) : M.ans[k]===null);
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Result</span>
+    <div class="scorebig"><span class="num">${r.score}</span><span class="muted">/ ${r.max} marks</span></div></div>
+    <div class="kpis"><div class="kpi g"><span class="num">${r.c}</span><span>right</span></div><div class="kpi b"><span class="num">${r.w}</span><span>wrong</span></div><div class="kpi"><span class="num">${r.sk}</span><span>skipped</span></div><div class="kpi"><span class="num">${r.acc}%</span><span>accuracy</span></div></div>
+    <p class="muted num" style="font-size:13px">Time used ${fmt(r.used)} of ${fmt(M.secs)}</p>
+    <div class="block"><h3>By lesson</h3><div class="hist">${per}</div></div>
+    <div class="row between"><button class="btn" type="button" id="mnew">New test</button><button class="btn pri" type="button" id="mretry">Retake same questions</button></div>
+    <h2>Review</h2>
+    <div class="chips">${[["wrong",`Wrong ${r.w}`],["skip",`Skipped ${r.sk}`],["all",`All ${M.list.length}`]].map(c=>`<button class="chip" type="button" data-rf="${c[0]}" aria-pressed="${M.filter===c[0]}">${c[1]}</button>`).join("")}</div>
+    <div class="stack">${rows.length ? rows.map(({it,k}) => `<article class="qcard">${metaHTML(it.q, "Q"+(k+1))}<p class="qt">${esc(it.q.q)}</p><div class="opts">${optsHTML(it.q, it.perm, {picked:M.ans[k], reveal:true})}</div>${M.ans[k]===null?`<div class="exp"><b class="nol">Skipped. Answer: ${esc(it.q.o[it.q.a])}.</b> ${esc(it.q.e)}</div>`:expHTML(it.q, M.ans[k])}</article>`).join("") : `<p class="empty">Nothing in this list.</p>`}</div>
+  </section>`;
+  bindBM($("#app"));
+  $("#app").querySelectorAll("[data-rf]").forEach(b => b.onclick = () => { M.filter = b.dataset.rf; drawMockResult(); });
+  $("#mnew").onclick = () => { M = null; renderMock(); };
+  $("#mretry").onclick = () => {
+    const list = M.list.map(it=>({q:it.q, perm:makePerm(it.q)}));
+    M = { running:true, list, ans:list.map(()=>null), mark:list.map(()=>false), i:0, neg:MCFG.neg, secs:list.length*36, start:Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000; startTimer(); drawMockRun();
+  };
+}
+
+/* ============================================================
+   REVISE
+   ============================================================ */
+let RV = "heat", FC = null, FCSCOPE = "all";
+const HID = {}, REV = {};
+Object.keys(COVERS).forEach(k => { HID[k] = 1; REV[k] = {}; });
+function renderRevise(){
+  const tabs = [["heat","🔥 PYQ heat map"]].concat(Object.keys(COVERS).map(k=>[k, COVERS[k].tab]), [["dis",FIND.tab],["nums","Numbers & pairs"],["links","Connections"],["tricks","Tricks"],["traps","Traps"],["flash","Flashcards"]]);
+  if (!tabs.some(t=>t[0]===RV)) RV = "heat";
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Last-day revision</span><h1>Revise</h1></div>
+    <div class="seg" role="tablist">${tabs.map(t=>`<button type="button" role="tab" data-rv="${t[0]}" aria-selected="${RV===t[0]}">${t[1]}</button>`).join("")}</div>
+    <div id="rv" class="stack"></div></section>`;
+  $("#app").querySelectorAll("[data-rv]").forEach(b => b.onclick = () => { RV = b.dataset.rv; renderRevise(); });
+  const on = $(`.seg [aria-selected="true"]`); if (on) on.scrollIntoView({block:"nearest", inline:"center"});
+  const box = $("#rv");
+  const pk = (key, i, val) => (HID[key] && !REV[key][i]) ? `<button type="button" class="peek" data-pk="${key}:${i}">tap</button>` : val;
+  const coverChips = (key, label) => `<div class="chips"><button type="button" class="chip" data-hide="${key}" aria-pressed="${!!HID[key]}">${label}</button><button type="button" class="chip" data-cover="${key}">Cover all again</button></div>`;
+  const bindCover = () => {
+    box.querySelectorAll("[data-hide]").forEach(b => b.onclick = () => { const k=b.dataset.hide; HID[k] = HID[k]?0:1; renderRevise(); });
+    box.querySelectorAll("[data-cover]").forEach(b => b.onclick = () => { REV[b.dataset.cover] = {}; renderRevise(); });
+    box.querySelectorAll("[data-pk]").forEach(b => b.onclick = () => { const [k,i] = b.dataset.pk.split(":"); REV[k][i]=1; renderRevise(); });
+  };
+  if (RV === "heat") {
+    const max = Math.max(...HEAT.map(h=>h[1]));
+    box.innerHTML = `<p class="muted">${APP.heatNote}</p>
+      <div class="block"><div class="heat">${HEAT.map(h=>`<button type="button" class="hrow" data-open="${h[2]}"><span class="ht"><b>${esc(h[0])}</b><span class="muted">${esc(h[3])}</span></span><span class="hbar"><i style="width:${h[1]/max*100}%"></i></span><span class="num hp">${h[1]}%</span></button>`).join("")}</div></div>
+      <div class="block"><h3>Lessons by exam heat</h3><dl class="rk">${[3,2,1].map(n=>`<div><dt>${"🔥".repeat(n)} ${n===3?"Very frequent":n===2?"Regular":"Occasional"}</dt><dd>${LESSONS.map((l,i)=>[l,i]).filter(x=>(x[0].heat||1)===n).map(x=>`L${x[1]+1} ${esc(x[0].title)}`).join(" · ")}</dd></div>`).join("")}</dl></div>`;
+    box.querySelectorAll("[data-open]").forEach(b => b.onclick = () => openLesson(b.dataset.open, "learn"));
+  }
+  if (COVERS[RV]) {
+    const c = COVERS[RV];
+    box.innerHTML = `<p class="muted">${c.note}</p>${coverChips(RV, c.hideLabel)}
+      <div class="block"><div class="tbl"><table class="cover"><thead><tr>${c.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${c.rows.map((r,i)=>`<tr>${r.map((v,ci)=>`<td ${ci?`data-l="${c.head[ci]}"`:""}>${ci===0?`<b>${esc(v)}</b>`:ci===c.hide?pk(RV,i,esc(v)):esc(v)}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+    bindCover();
+  }
+  if (RV === "dis") {
+    box.innerHTML = `<input class="search" id="fs" type="search" placeholder="${FIND.ph}" aria-label="${FIND.tab}">
+      <div class="chips" id="dtype"></div>
+      <div class="block"><div class="tbl"><table class="cover"><thead><tr>${FIND.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody id="fb"></tbody></table></div></div>`;
+    const types = ["All"].concat([...new Set(FIND.rows.map(d=>d[2]))]);
+    let T = "All";
+    const draw = () => { const q = $("#fs").value.trim().toLowerCase();
+      $("#dtype").innerHTML = types.map(t=>`<button type="button" class="chip" data-t="${esc(t)}" aria-pressed="${T===t}">${esc(t)}</button>`).join("");
+      $("#dtype").querySelectorAll("[data-t]").forEach(b => b.onclick = () => { T = b.dataset.t; draw(); });
+      const rows = FIND.rows.filter(x => (T==="All"||x[2]===T) && (!q || x.join(" ").toLowerCase().includes(q)));
+      $("#fb").innerHTML = rows.length ? rows.map(a=>`<tr><td><b>${esc(a[0])}</b></td><td data-l="${FIND.head[1]}">${esc(a[1])}</td><td data-l="${FIND.head[2]}">${esc(a[2])}</td><td data-l="${FIND.head[3]}" class="muted">${esc(a[3])}</td></tr>`).join("") : `<tr><td colspan="4" class="muted">No match.</td></tr>`; };
+    $("#fs").oninput = draw; draw();
+  }
+  if (RV === "links") {
+    const items = LESSONS.flatMap((l,i) => l.blocks.filter(b=>b.k==="link").map(b=>({l:i+1, t:l.title, h:b.h})));
+    box.innerHTML = items.map(x => `<div class="link"><span class="lab">L${x.l} · ${esc(x.t)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "nums") {
+    box.innerHTML = `<div class="tiles">${TILES.map(t=>`<div class="tile"><span class="num">${t[0]}</span><span>${t[1]}</span></div>`).join("")}</div>
+    <div class="block"><h3>Look-alike pairs</h3><dl class="rk">${PAIRS.map(p=>`<div><dt>${esc(p[0])}</dt><dd>${esc(p[1])}</dd></div>`).join("")}</dl></div>`;
+  }
+  if (RV === "tricks" || RV === "traps") {
+    const kind = RV==="tricks" ? "trick" : "trap";
+    const items = LESSONS.flatMap((l,i) => l.blocks.filter(b=>b.k===kind).map(b=>({l:i+1, t:l.title, h:b.h})));
+    const extra = kind==="trick" ? `<div class="trick"><span class="lab">Exam craft</span>${APP.craft}</div>` : "";
+    box.innerHTML = extra + items.map(x => `<div class="${kind}"><span class="lab">L${x.l} · ${esc(x.t)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "flash") drawFlash(box);
+}
+
+
+function drawFlash(box){
+  if (!FC) { const pool = FCSCOPE==="all" ? QS : FCSCOPE==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===FCSCOPE); FC = {list: shuffle(pool), i:0, flip:false, known:0}; }
+  const sel = `<select id="fcs" aria-label="Flashcard set"><option value="all">All questions</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}">L${i+1} · ${esc(l.title)}</option>`).join("")}</select>`;
+  if (!FC.list.length || FC.i >= FC.list.length) {
+    box.innerHTML = `<div class="row">${sel}</div><div class="block stack"><h3>${FC.list.length ? "Deck finished" : "No cards in this set"}</h3>${FC.list.length?`<p class="muted">You knew ${FC.known} of ${FC.list.length} on first look.</p>`:""}<div class="row"><button class="btn pri" type="button" id="fcr">Shuffle and restart</button></div></div>`;
+    $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+    $("#fcr").onclick = () => { FC = null; drawFlash(box); }; return;
+  }
+  const q = FC.list[FC.i];
+  box.innerHTML = `<div class="row between">${sel}<span class="muted num" style="font-size:13px">${FC.i+1}/${FC.list.length}</span></div>
+    <button type="button" class="flash" id="fcard" aria-label="Flip card">
+      <span class="side">${FC.flip?"Answer":"Question · tap to flip"}</span>
+      <span class="front">${esc(q.q)}</span>
+      ${FC.flip ? `<span class="ans">${esc(q.o[q.a])}</span><span class="muted">${esc(q.e)}</span>` : ""}
+    </button>
+    <div class="row between"><button class="btn" type="button" id="fca" ${FC.flip?"":"disabled"}>Again later</button><button class="btn pri" type="button" id="fck" ${FC.flip?"":"disabled"}>Got it</button></div>`;
+  $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+  $("#fcard").onclick = () => { FC.flip = !FC.flip; drawFlash(box); };
+  $("#fca").onclick = () => { FC.list.push(q); FC.list.splice(FC.i,1); FC.flip=false; drawFlash(box); };
+  $("#fck").onclick = () => { FC.known++; FC.i++; FC.flip=false; drawFlash(box); };
+}
+
+/* boot */
+renderTop();
+const start = (location.hash||"").replace("#","");
+go(["learn","practice","mock","revise"].includes(start) ? start : "learn");
+</script>
+
+
+<style id="shabd-skin">
+/* ===== शब्दRegister skin: app colours + fonts (only when opened from the app) ===== */
+:root[data-skin="paper"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(150,128,90,.10) 31px, rgba(150,128,90,.10) 32px);--app-psize:auto;--app-card:#FFFCF6;--app-rule:#DCCFB2;--app-pri:#2F6F63;--app-ink:#221E17;--app-soft:#5E5547;--app-faint:#857B6A;--app-bg:#F3EEE3;--app-deep:#E9E1CF;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#F3EEE3;--sheet:#FFFCF6;--sunk:#E9E1CF;--ink:#221E17;--ink2:#5E5547;--rule:#DCCFB2;--blue:#2F6F63;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--accent:#A87E1F;--accent-bg:color-mix(in srgb, #A87E1F 16%, #FFFCF6);--good:#2F6F63;--good-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--bad:#8C2F39;--bad-bg:color-mix(in srgb, #8C2F39 14%, #FFFCF6);--warn-bg:color-mix(in srgb, #C99A2E 18%, #FFFCF6);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="paper"][data-theme="dark"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--sheet:#26211A;--sunk:#25201A;--ink:#EFE6D2;--ink2:#BDB195;--rule:#3B3429;--blue:#3F9A86;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3F9A86 22%, #26211A);--accent:#D9AE4B;--accent-bg:color-mix(in srgb, #D9AE4B 24%, #26211A);--good:#5FB9A3;--good-bg:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-bg:color-mix(in srgb, #D06B74 22%, #26211A);--warn-bg:color-mix(in srgb, #D9AE4B 26%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="paper"]:not([data-theme="light"]){--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--sheet:#26211A;--sunk:#25201A;--ink:#EFE6D2;--ink2:#BDB195;--rule:#3B3429;--blue:#3F9A86;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3F9A86 22%, #26211A);--accent:#D9AE4B;--accent-bg:color-mix(in srgb, #D9AE4B 24%, #26211A);--good:#5FB9A3;--good-bg:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-bg:color-mix(in srgb, #D06B74 22%, #26211A);--warn-bg:color-mix(in srgb, #D9AE4B 26%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin="indigo"]{--app-pattern:radial-gradient(rgba(61,92,240,.10) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#FFFFFF;--app-rule:#CBD3EC;--app-pri:#3D5CF0;--app-ink:#0F1B3D;--app-soft:#4A5680;--app-faint:#67739C;--app-bg:#EEF1FA;--app-deep:#E1E6F5;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#EEF1FA;--sheet:#FFFFFF;--sunk:#E1E6F5;--ink:#0F1B3D;--ink2:#4A5680;--rule:#CBD3EC;--blue:#3D5CF0;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3D5CF0 14%, #FFFFFF);--accent:#D9831A;--accent-bg:color-mix(in srgb, #D9831A 16%, #FFFFFF);--good:#147D53;--good-bg:color-mix(in srgb, #147D53 14%, #FFFFFF);--bad:#C8402F;--bad-bg:color-mix(in srgb, #C8402F 14%, #FFFFFF);--warn-bg:color-mix(in srgb, #F7C548 18%, #FFFFFF);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="indigo"][data-theme="dark"]{--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--sheet:#121D47;--sunk:#0E1839;--ink:#EEF2FF;--ink2:#A7B3DA;--rule:#22306A;--blue:#6F86FF;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #6F86FF 22%, #121D47);--accent:#F7B24D;--accent-bg:color-mix(in srgb, #F7B24D 24%, #121D47);--good:#45C08A;--good-bg:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-bg:color-mix(in srgb, #F07B6E 22%, #121D47);--warn-bg:color-mix(in srgb, #F7C548 26%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="indigo"]:not([data-theme="light"]){--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--sheet:#121D47;--sunk:#0E1839;--ink:#EEF2FF;--ink2:#A7B3DA;--rule:#22306A;--blue:#6F86FF;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #6F86FF 22%, #121D47);--accent:#F7B24D;--accent-bg:color-mix(in srgb, #F7B24D 24%, #121D47);--good:#45C08A;--good-bg:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-bg:color-mix(in srgb, #F07B6E 22%, #121D47);--warn-bg:color-mix(in srgb, #F7C548 26%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin] body{background-color:var(--app-bg);background-image:var(--app-pattern);background-size:var(--app-psize);background-attachment:fixed}
+:root[data-skin] h1,:root[data-skin] h2{letter-spacing:-.01em}
+
+/* ===== Desktop layout (PC / tablet landscape) ===== */
+@media (min-width: 1024px){
+  :root{--side:236px}
+  body{padding-left:var(--side);font-size:16.5px}
+  .top{border-bottom:1px solid var(--rule)}
+  .top-in{max-width:1320px;padding:16px 36px}
+  .brand{font-size:21px}
+  .brand small{font-size:13px}
+  .stat{font-size:13px}
+  .wrap{max-width:1320px;padding:0 36px 56px}
+  .view{padding-top:28px}
+  h1{font-size:34px} h2{font-size:22px} h3{font-size:17px}
+
+  /* bottom tab bar becomes a left sidebar */
+  .nav{top:0;bottom:0;left:0;right:auto;width:var(--side);height:auto;border-top:0;border-right:1px solid var(--rule);padding:84px 14px 20px;display:block;overflow:auto}
+  .nav-in{display:flex;flex-direction:column;gap:4px;height:auto;max-width:none;margin:0}
+  .nav-in::before{content:"Sections";display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);padding:0 14px 8px}
+  .nav button{flex-direction:row;justify-content:flex-start;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;font-size:15px;min-height:0;height:auto;width:100%;text-align:left}
+  .nav button svg{width:20px;height:20px;flex-shrink:0}
+  .nav button:hover{background:var(--sunk)}
+  .nav button[aria-current="page"]{background:var(--blue-bg)}
+  .nav button[aria-current="page"] span{border-bottom:0!important}
+
+  /* home: intro beside progress, lessons as a card grid */
+  .hero{grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);column-gap:48px;align-items:end;padding-bottom:10px}
+  .hero > .eyebrow,.hero > h1,.hero > p{grid-column:1}
+  .hero > .meter{grid-column:2;grid-row:3;align-self:center}
+  .hero > .row{grid-column:2;grid-row:2;align-self:end}
+  .lessons{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;border-top:0}
+  .les{background:var(--sheet);border:1px solid var(--rule);border-radius:16px;padding:16px 18px;transition:transform .15s ease,box-shadow .15s ease,border-color .15s}
+  .les:hover{transform:translateY(-2px);border-color:var(--blue);box-shadow:0 14px 30px -22px rgba(0,0,0,.45)}
+  .les.next{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
+
+  /* lesson reader: facts, timelines, tricks sit side by side */
+  .lhead{margin-bottom:0}
+  .steps{max-width:640px}
+  .steps + .stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+  .steps + .stack > .plain,.steps + .stack > .row,.steps + .stack > p,.steps + .stack > .fig,.steps + .stack > h2,.steps + .stack > .tbl{grid-column:1/-1}
+  .steps + .stack > .plain{max-width:86ch;font-size:17px}
+  .steps + .stack:not(:has(> .block ~ .block)) > .block{grid-column:1/-1}
+  .block,.qcard{padding:18px 20px;border-radius:14px}
+
+  /* quizzes and question bank */
+  #lq > .stack{display:grid;grid-template-columns:minmax(0,1fr);max-width:980px;gap:16px}
+  .opts{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .qt{font-size:18px}
+  #plist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #plist .opts{grid-template-columns:minmax(0,1fr)}
+  .chips{flex-wrap:wrap;overflow:visible}
+
+  /* mock test: question with the answer grid alongside */
+  .mbar{top:calc(env(safe-area-inset-top,0px) + 67px)}
+  .view > .qcard{max-width:1000px}
+  .view > .row.between{max-width:1000px}
+  .view > #msub{max-width:1000px;width:100%}
+  .view > .block.stack{max-width:760px}
+  .pal{grid-template-columns:repeat(auto-fill,minmax(46px,1fr))}
+  .kpis{max-width:760px}
+
+  /* revise: cards in columns */
+  #rkl,#rv > .stack:not(#rkl){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #rv > .search{max-width:520px}
+  .tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .flash{min-height:300px;max-width:760px;margin:0 auto;padding:32px 36px}
+  .flash .front{font-size:22px}
+}
+@media (min-width: 1500px){
+  #plist,#rkl{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+</style>
+<script id="shabd-deeplink">
+(function(){
+  var l; try{ l = new URLSearchParams(location.search).get('lesson'); }catch(e){}
+  if(!l) return;
+  function run(){
+    try{
+      if(typeof openLesson === 'function' && typeof LESSONS !== 'undefined'){ if(LESSONS.some(function(x){ return x.id === l; })) openLesson(l, 'learn'); }
+      else if(typeof openRule === 'function'){ var n = parseInt(String(l).replace(/\D/g, ''), 10); if(n) openRule(n, 'learn'); }
+      else if(typeof COURSE !== 'undefined' && typeof go === 'function'){ var i = COURSE.findIndex(function(c){ return c.id === l; }); if(i >= 0) go({ name: 'lesson', i: i, step: 0, ans: {}, score: 0 }); }
+    }catch(e){}
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(run, 30); }); else setTimeout(run, 30);
+})();
+</script>
+</body></html>

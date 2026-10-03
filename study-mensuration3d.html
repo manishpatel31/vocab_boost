@@ -1,0 +1,1380 @@
+<!doctype html><html><head><meta charset=utf8>
+<script>
+/* शब्दRegister bridge: follows the app's look (Paper / Indigo) and Light / Dark / Auto choice. */
+(function(){
+  var root = document.documentElement;
+  function theme(t){ if(t === 'dark' || t === 'light') root.setAttribute('data-theme', t); else root.removeAttribute('data-theme'); }
+  function skin(s){ if(s === 'paper' || s === 'indigo') root.setAttribute('data-skin', s); }
+  try{
+    var q = new URLSearchParams(location.search);
+    theme(q.get('theme'));
+    skin(q.get('skin') || (q.get('embed') ? 'paper' : ''));
+    if(q.get('embed')) root.classList.add('in-shabd');
+  }catch(e){}
+  window.addEventListener('message', function(e){
+    if(e.origin !== location.origin || !e.data || e.data.type !== 'shabd-theme') return;
+    theme(e.data.theme);
+    if(e.data.skin) skin(e.data.skin);
+  });
+})();
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap">
+<meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Mensuration 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<style>
+/* Layout: Physics PYQ Workbook — follows the शब्दRegister Paper / Indigo look; one column + bottom tabs on phones, sidebar on PC. */
+:root{
+  --paper:#f6f3ea; --sheet:#fffdf7; --sunk:#ebe6d8;
+  --ink:#1d2a22; --ink2:#56625a; --rule:#dcd5c3;
+  --blue:#1f5c3d; --on-blue:#ffffff; --blue-bg:#dcebdf;
+  --accent:#b4530f; --accent-bg:#fbe7d3;
+  --good:#1b7547; --good-bg:#dff1e6; --bad:#b0271f; --bad-bg:#f8e1de;
+  --warn-bg:#fff2d2;
+  --f-display:"Fraunces", "Tiro Devanagari Hindi", Georgia, serif;
+  --f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-num:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r:10px; --nav-h:64px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#111612; --sheet:#1a211c; --sunk:#222b25;
+  --ink:#e8eee9; --ink2:#a3b0a7; --rule:#2f3a33;
+  --blue:#86cfa2; --on-blue:#111612; --blue-bg:#1d3a29;
+  --accent:#f3a764; --accent-bg:#3b2614;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#111612; --sheet:#1a211c; --sunk:#222b25;
+  --ink:#e8eee9; --ink2:#a3b0a7; --rule:#2f3a33;
+  --blue:#86cfa2; --on-blue:#111612; --blue-bg:#1d3a29;
+  --accent:#f3a764; --accent-bg:#3b2614;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
+.wrap{max-width:640px;margin:0 auto;padding-inline:16px;padding-block:0 calc(var(--nav-h) + 28px + env(safe-area-inset-bottom,0px))}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);border-bottom:1px solid var(--rule)}
+.top-in{max-width:640px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px}
+.brand{font-family:var(--f-display);font-weight:800;font-size:17px;line-height:1.2;flex:1;min-width:0}
+.brand small{display:block;font-family:var(--f-body);font-weight:500;font-size:12px;color:var(--ink2);letter-spacing:.02em}
+.stat{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right;white-space:nowrap}
+.stat b{color:var(--ink);font-weight:600}
+
+/* bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--sheet);border-top:1px solid var(--rule);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);height:var(--nav-h)}
+.nav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer}
+.nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav button[aria-current="page"]{color:var(--blue)}
+.nav button[aria-current="page"] span{border-bottom:2px solid var(--blue)}
+
+/* type */
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.25;margin:0}
+h1{font-size:24px;font-weight:800}
+h2{font-size:19px;font-weight:800}
+h3{font-size:16px;font-weight:700}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--ink2)}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+p{margin:0}
+.stack{display:flex;flex-direction:column;gap:14px}
+.view{padding-top:18px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--rule);background:var(--sheet);font-weight:600;cursor:pointer;text-decoration:none}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:var(--on-blue)}
+.btn.ghost{background:transparent}
+.btn.sm{min-height:36px;padding:0 14px;font-size:14px}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.end{justify-content:flex-end}
+.row.between{justify-content:space-between}
+
+/* hero */
+.hero{display:grid;gap:10px;padding:4px 0 6px}
+.hero p{color:var(--ink2)}
+.meter{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--blue);border-radius:99px}
+
+/* lesson list */
+.lessons{display:flex;flex-direction:column;border-top:1px solid var(--rule)}
+.les{display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;padding:14px 2px;border-bottom:1px solid var(--rule);background:none;border-left:0;border-right:0;border-top:0;text-align:left;cursor:pointer;width:100%}
+.les .no{font-family:var(--f-num);font-weight:600;font-size:15px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--rule);color:var(--ink2)}
+.les.done .no{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.les .t{min-width:0}
+.les .t b{display:block;font-weight:700;font-size:16px;line-height:1.3}
+.les .t span{font-size:13px;color:var(--ink2)}
+.les .sc{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right}
+.les.next .no{border-color:var(--blue);color:var(--blue)}
+
+/* lesson reader */
+.lhead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.back{background:none;border:0;padding:8px 8px 8px 0;cursor:pointer;color:var(--blue);font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0 4px}
+.steps button{border:1px solid var(--rule);background:var(--sheet);border-radius:8px;padding:8px 4px;font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer}
+.steps button[aria-current="step"]{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.block{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;min-width:0}
+.block h3{margin-bottom:8px}
+.block p + p{margin-top:8px}
+.plain{padding:0 2px}
+.facts{display:grid;gap:0}
+.facts div{display:grid;grid-template-columns:minmax(0,42%) minmax(0,1fr);gap:10px;padding:7px 0;border-top:1px dashed var(--rule)}
+.facts div:first-child{border-top:0}
+.facts dt{font-size:14px;color:var(--ink2);margin:0}
+.facts dd{margin:0;font-weight:600;min-width:0}
+.tl{display:grid;gap:0;margin:0;padding:0;list-style:none}
+.tl li{display:grid;grid-template-columns:92px 1fr;gap:10px;padding:8px 0;border-top:1px dashed var(--rule)}
+.tl li:first-child{border-top:0}
+.tl .y{font-family:var(--f-num);font-weight:600;font-size:13px;color:var(--accent);padding-top:2px}
+.trick,.trap{border-radius:var(--r);padding:12px 14px 12px 14px;border:1px solid var(--rule)}
+.trick{background:var(--accent-bg);border-color:transparent}
+.trap{background:var(--bad-bg);border-color:transparent}
+.trick .lab,.trap .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.trick .lab{color:var(--accent)}
+.trap .lab{color:var(--bad)}
+.rk div{grid-template-columns:minmax(0,48%) minmax(0,1fr)}
+.rk dd{min-width:0;overflow-wrap:anywhere}
+.hot{border-radius:var(--r);padding:12px 14px;background:var(--warn-bg,var(--accent-bg));border-left:4px solid var(--warn,var(--accent))}
+.hot .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;color:var(--warn,var(--accent))}
+.heatb{display:inline-block;font-size:11px;letter-spacing:-.1em;margin-left:6px;vertical-align:1px}
+.heat{display:flex;flex-direction:column;gap:2px}
+.hrow{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(60px,1fr) 44px;gap:10px;align-items:center;text-align:left;background:none;border:0;border-bottom:1px solid var(--rule);padding:9px 2px;color:inherit;font:inherit;cursor:pointer}
+.hrow:last-child{border-bottom:0}
+.hrow .ht{display:flex;flex-direction:column;min-width:0}
+.hrow .ht .muted{font-size:12px}
+.hbar{height:10px;border-radius:5px;background:var(--rule);overflow:hidden}
+.hbar i{display:block;height:100%;background:var(--accent);border-radius:5px}
+.hp{text-align:right;font-weight:700}
+
+.tbl{overflow-x:auto;margin:0 -2px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);font-weight:700}
+td.n{font-family:var(--f-num);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fig{margin:0}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-size:13px;color:var(--ink2);margin-top:6px}
+.pyr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pyr div{text-align:center;font-size:13px}
+.pyr b{display:block;font-size:14px}
+.pm{fill:var(--blue)} .pf{fill:var(--accent)}
+.sum{margin:0;padding-left:20px;display:grid;gap:6px}
+
+/* questions */
+.qcard{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px;min-width:0}
+.qmeta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}
+.qno{font-family:var(--f-num);font-weight:600;color:var(--ink2)}
+.tag{background:var(--sunk);color:var(--ink2);border-radius:99px;padding:1px 9px;font-weight:600}
+.tag.pyq{background:var(--accent-bg);color:var(--accent)}
+.bm{margin-left:auto;background:none;border:0;cursor:pointer;color:var(--ink2);font-size:20px;line-height:1;padding:4px}
+.bm[aria-pressed="true"]{color:var(--accent)}
+.qt{font-weight:600;font-size:16px}
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:start;text-align:left;width:100%;border:1.5px solid var(--rule);background:var(--paper);border-radius:9px;padding:10px 12px;cursor:pointer;min-height:44px}
+.opt .k{font-family:var(--f-num);font-weight:600;color:var(--ink2);font-size:14px;padding-top:1px}
+.opt.sel{border-color:var(--blue);background:var(--blue-bg)}
+.opt.ok{border-color:var(--good);background:var(--good-bg)}
+.opt.no{border-color:var(--bad);background:var(--bad-bg)}
+.opt.ok .k{color:var(--good)} .opt.no .k{color:var(--bad)}
+.opt:disabled{cursor:default;color:inherit}
+.exp{font-size:15px;border-left:3px solid var(--blue);padding:4px 0 4px 12px;color:var(--ink)}
+.exp b.okl{color:var(--good)} .exp b.nol{color:var(--bad)}
+
+/* chips */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 13px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.seg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--rule)}
+.seg::-webkit-scrollbar{display:none}
+.seg button{flex:none;background:none;border:0;border-bottom:2px solid transparent;padding:10px 8px;font-weight:600;color:var(--ink2);cursor:pointer}
+.seg button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+
+/* score panel */
+.scorebig{display:flex;align-items:baseline;gap:8px}
+.scorebig .num{font-size:44px;font-weight:600;line-height:1;color:var(--blue)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.kpi{background:var(--sunk);border-radius:8px;padding:8px;text-align:center}
+.kpi .num{display:block;font-size:20px;font-weight:600}
+.kpi span{font-size:12px;color:var(--ink2)}
+.kpi.g .num{color:var(--good)} .kpi.b .num{color:var(--bad)}
+
+/* mock */
+.mbar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 57px);z-index:10;background:var(--paper);padding:10px 0;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--rule)}
+.timer{font-family:var(--f-num);font-weight:600;font-size:18px;padding:4px 10px;border-radius:8px;background:var(--sunk)}
+.timer.low{background:var(--bad-bg);color:var(--bad)}
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px}
+.pal button{height:40px;border-radius:8px;border:1px solid var(--rule);background:var(--sheet);font-family:var(--f-num);font-weight:600;font-size:13px;cursor:pointer}
+.pal button.a{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.pal button.m{box-shadow:inset 0 -4px 0 var(--accent)}
+.pal button.cur{outline:2px solid var(--ink);outline-offset:1px}
+.pal button.ok{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.pal button.no{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.confirm{background:var(--warn-bg);border-radius:var(--r);padding:12px 14px;display:grid;gap:10px}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}
+legend{font-weight:700;margin-bottom:6px;padding:0}
+.radios{display:flex;gap:8px;flex-wrap:wrap}
+.radios label{border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 14px;font-weight:600;cursor:pointer;font-size:14px}
+.radios input{position:absolute;opacity:0;pointer-events:none}
+.radios input:checked + span{color:var(--blue)}
+.radios label:has(input:checked){border-color:var(--blue);background:var(--blue-bg)}
+.radios label:has(input:focus-visible){outline:2px solid var(--blue);outline-offset:2px}
+select{font:inherit;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:8px;padding:8px 10px;max-width:100%}
+.hist{display:grid;gap:0}
+.hist div{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:14px}
+
+/* revise */
+.search{width:100%;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:10px;padding:10px 12px;font:inherit}
+.rk{display:grid;gap:0}
+.rk div{display:grid;grid-template-columns:minmax(0,48%) 1fr;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:15px}
+.rk div:first-child{border-top:0}
+.rk dt{font-size:13px;color:var(--ink2);margin:0}
+.rk dt.up{color:var(--good)} .rk dt.dn{color:var(--bad)}
+.rk dd{margin:0;font-weight:600;min-width:0}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px}
+.tile .num{display:block;font-size:24px;font-weight:600;color:var(--accent);line-height:1.2}
+.tile span{font-size:13px;color:var(--ink2)}
+.gbar{display:grid;grid-template-columns:78px 1fr 52px;gap:8px;align-items:center;font-size:13px;padding:3px 0}
+.gbar .tr{height:12px;background:var(--sunk);border-radius:3px;position:relative;overflow:hidden}
+.gbar .tr i{position:absolute;left:0;top:0;bottom:0;background:var(--blue);border-radius:3px}
+.gbar .tr i.neg{background:var(--bad)}
+.gbar .v{font-family:var(--f-num);text-align:right}
+.flash{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;min-height:240px;padding:20px 18px;display:grid;align-content:center;gap:12px;cursor:pointer;text-align:left;width:100%}
+.flash .side{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.flash .front{font-size:18px;font-weight:600}
+.flash .ans{font-size:20px;font-weight:700;color:var(--good)}
+.empty{padding:24px 4px;color:var(--ink2);text-align:center}
+.foot{font-size:13px;color:var(--ink2);padding-top:10px}
+@media (prefers-reduced-motion: no-preference){ .opt,.chip,.btn{transition:background-color .15s, border-color .15s} }
+.link{background:var(--blue-bg);border-radius:var(--r);padding:12px 14px}
+.link .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;color:var(--blue)}
+.icheck{background:var(--sheet);border:1.5px dashed var(--blue);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px}
+.icheck .lab{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue)}
+.cat{font-size:12px;font-weight:700;border-radius:99px;padding:1px 8px;white-space:nowrap}
+.cat.CS{background:var(--blue-bg);color:var(--blue)} .cat.CSS{background:var(--accent-bg);color:var(--accent)} .cat.ST{background:var(--sunk);color:var(--ink)} .cat.OT{background:var(--sunk);color:var(--ink2)}
+
+/* ---- workbook additions ---- */
+table.cover td:nth-child(4){min-width:180px}
+.plist .dl{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.plist .dl em{font-style:normal;font-weight:700;color:var(--blue);text-align:right}
+.ladder{list-style:none;margin:0;padding:0;display:grid;gap:0;border-top:1px solid var(--rule)}
+.ladder li{display:grid;grid-template-columns:62px 1fr auto;gap:12px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--rule)}
+.ladder .rk-n{font-size:22px;font-weight:600;color:var(--blue);text-align:right}
+.ladder .rk-t{min-width:0}
+.ladder .rk-t b{display:block;line-height:1.3}
+.ladder .rk-t span{font-size:13px;color:var(--ink2)}
+.ladder .rk-d{font-weight:700;font-size:14px;white-space:nowrap}
+.ladder li.up .rk-d{color:var(--good)} .ladder li.dn .rk-d{color:var(--bad)}
+.ladder small{font-weight:600;color:var(--ink2)}
+table.cover td{min-width:90px}
+.peek{border:1.5px dashed var(--blue);background:var(--blue-bg);color:var(--blue);border-radius:8px;padding:6px 10px;font-weight:600;cursor:pointer;min-height:36px;width:100%}
+.pubs{display:grid;gap:12px}
+.plist{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.plist li{padding:7px 0;border-top:1px dashed var(--rule);display:grid;gap:1px}
+.plist li:first-child{border-top:0}
+.plist li span{font-size:13px;color:var(--ink2)}
+.seg{scroll-snap-type:x proximity}
+@media (max-width: 700px){
+  table.cover thead{display:none}
+  table.cover tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 10px;padding:10px 0;border-bottom:1px solid var(--rule)}
+  table.cover td{border:0;padding:0;min-width:0;font-size:14px}
+  table.cover td:first-child{grid-column:1/-1;font-size:15px}
+  table.cover td:nth-child(4){grid-column:1/-1;min-width:0}
+  table.cover td[data-l]::before{content:attr(data-l);display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-bottom:2px}
+}
+/* ---- maths blocks ---- */
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(250px,100%),1fr));gap:10px}
+.fcard{background:var(--sheet);border:1px solid var(--rule);border-left:4px solid var(--blue);border-radius:var(--r);padding:10px 12px;display:grid;gap:4px;min-width:0}
+.fcard .fn{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);font-weight:700}
+.fcard .fx{font-family:var(--f-num);font-size:16px;color:var(--ink);overflow-wrap:anywhere;line-height:1.45}
+.fcard .fnote{font-size:13px;color:var(--ink2)}
+.ex{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px 14px;display:grid;gap:8px}
+.ex .exhead .lab{display:inline;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);font-weight:700}
+.ex .src{display:inline-block;margin-left:6px;font-size:11.5px;font-weight:700;color:var(--accent);border:1px solid currentColor;border-radius:999px;padding:0 8px}
+.ex .exq{font-weight:600}
+.ex details summary{cursor:pointer;font-weight:700;color:var(--blue);list-style:none}
+.ex details summary::-webkit-details-marker{display:none}
+.ex details summary::before{content:'▸ '}
+.ex details[open] summary::before{content:'▾ '}
+.ex ol{margin:8px 0 0;padding-left:20px;display:grid;gap:4px}
+.ex .exans{margin-top:8px;padding:8px 10px;border-radius:8px;background:var(--good-bg);color:var(--good);font-weight:700}
+.figwrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(260px,100%),1fr));gap:12px}
+.figwrap figure{margin:0;display:grid;gap:6px;justify-items:center;text-align:center}
+.fig svg,.figwrap svg{width:100%;max-width:340px;height:auto;color:var(--ink)}
+.fig figcaption,.figwrap figcaption{font-size:13px;color:var(--ink2)}
+sup,sub{font-size:.72em;line-height:0}
+
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">Mensuration 3D<small>क्षेत्रमिति (3D) · SSC maths workbook</small></div>
+    <div class="stat" id="topstat"></div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<nav class="nav" aria-label="Sections">
+  <div class="nav-in">
+    <button type="button" id="nav-learn" data-tab="learn"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg><span>Learn</span></button>
+    <button type="button" id="nav-practice" data-tab="practice"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span>Practice</span></button>
+    <button type="button" id="nav-mock" data-tab="mock"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6M12 2v3"/></svg><span>Mock test</span></button>
+    <button type="button" id="nav-revise" data-tab="revise"><svg viewBox="0 0 24 24"><path d="M12 3 2 8l10 5 10-5z"/><path d="m2 13 10 5 10-5"/></svg><span>Revise</span></button>
+  </div>
+</nav>
+
+<script>
+"use strict";
+const LESSONS = [
+{ id:"L1", heat:3, title:"Cube & cuboid", hi:"घन और घनाभ", blocks:[
+ {k:"hot", h:"<b>Tier 1: almost every shift</b> has one cube/cuboid question — longest rod, volume from three face areas, TSA from (l+b+h) and diagonal, or a room/wall/brick count. <b>Tier 2:</b> the same ideas inside 2–3 step problems (painting cost, wood thickness, tank capacity in litres)."},
+ {k:"formula", title:"Cuboid l × b × h", rows:[["Volume","V = l·b·h","1 m³ = 1000 litres"],["Total surface area","TSA = 2(lb + bh + hl)","All 6 faces"],["Lateral SA (4 walls)","LSA = 2(l + b)·h","Perimeter of floor × height"],["Diagonal (longest rod)","d = √(l² + b² + h²)","Room / box diagonal"],["Volume from 3 face areas","V = √(xyz)","x = lb, y = bh, z = hl"],["(l+b+h) and d given","TSA = (l+b+h)² − d²","Because (l+b+h)² = d² + 2(lb+bh+hl)"]]},
+ {k:"formula", title:"Cube of edge a", rows:[["Volume","V = a³",""],["TSA","6a²","LSA = 4a²"],["Diagonal","a√3","Face diagonal = a√2"],["From TSA S","a = √(S/6)","then V = a³"]]},
+ {k:"fig", title:"Cuboid with its body diagonal", svg:'<svg viewBox="0 0 280 185" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M40 70 H190 V150 H40 Z" style="fill:var(--accent-bg)"/><path d="M40 70 L90 35 H240 L190 70 M240 35 V115 L190 150"/><path d="M90 35 V115 M90 115 L40 150 M90 115 H240" stroke-dasharray="4 3"/><path d="M40 150 L240 35" style="stroke:var(--accent)" stroke-width="2"/><text x="108" y="168" fill="currentColor" stroke="none">l</text><text x="222" y="146" fill="currentColor" stroke="none">b</text><text x="26" y="114" fill="currentColor" stroke="none">h</text><text x="152" y="110" fill="currentColor" stroke="none" style="fill:var(--accent)">d</text><text x="28" y="162" fill="currentColor" stroke="none">A</text><text x="246" y="34" fill="currentColor" stroke="none">G</text></svg>', cap:"AG = √(l² + b² + h²) is the longest rod that fits. Dashed edges are hidden."},
+ {k:"ex", src:"SSC CGL 2022 · 12 Dec S3", q:"Area of the floor of a cubical room is 64 m². The length of the longest rod that can be kept in the room is:", steps:["Floor = a² = 64 ⇒ a = 8 m","Longest rod = cube diagonal = a√3"], ans:"8√3 m", tip:"Cube diagonal is always edge × √3 — only find the edge."},
+ {k:"ex", src:"SSC CHSL 2024 · 9 Jul S3", q:"The areas of three adjacent faces of a cuboidal box are 120 cm², 72 cm² and 60 cm². Find the volume of the box.", steps:["(lb)(bh)(hl) = (lbh)² = V²","V = √(120 × 72 × 60) = √518400"], ans:"720 cm³", tip:"Factorise: 120·72·60 = (12·10)(12·6)(6·10) = (12·10·6)² ⇒ V = 720."},
+ {k:"ex", q:"Sum of length, breadth and height of a cuboid is 21 cm and its diagonal is 13 cm. Find its total surface area.", steps:["(l+b+h)² = l²+b²+h² + 2(lb+bh+hl)","441 = 169 + TSA"], ans:"272 cm²"},
+ {k:"trick", h:"<b>Square-then-subtract:</b> TSA = (sum of edges-of-a-corner)² − diagonal². No need to find l, b, h. <br><b>Three faces → volume:</b> multiply the three areas and take the square root; pair factors to avoid big numbers."},
+ {k:"trap", h:"<b>Walls ≠ room surface.</b> “Four walls” = 2(l+b)h only. Add the ceiling (lb) if it is painted too; the floor is almost never painted. And 1 m³ = 1000 L, not 100 L."},
+ {k:"trap", h:"<b>Inner volume of a box with thickness t:</b> subtract 2t from each outer dimension (both sides), not t. An open box (no lid) loses 2t only from l and b and t from h."},
+ {k:"q", q:"Edge of a cube is 7 cm. Its total surface area is:", o:["294 cm²","196 cm²","343 cm²","147 cm²"], e:"6 × 7² = 294. (196 = LSA 4a², 343 = volume.)"}
+], sum:["Cuboid: V = lbh, TSA = 2(lb+bh+hl), walls = 2(l+b)h","Diagonal = √(l²+b²+h²); cube diagonal = a√3","V = √(product of 3 adjacent face areas)","TSA = (l+b+h)² − d²","1 m³ = 1000 litres; box thickness t ⇒ inner = outer − 2t"]},
+{ id:"L2", heat:3, title:"Cylinder", hi:"बेलन", blocks:[
+ {k:"hot", h:"<b>Tier 1:</b> 1 question in many shifts — find r from CSA, then the volume; hollow pipe metal; ratio of two cylinders. <b>Tier 2:</b> cylinders appear inside melting, water-flow and combined-solid problems (L7–L9), so the basic formulas must be instant."},
+ {k:"formula", title:"Right circular cylinder (radius r, height h)", rows:[["Curved surface area","CSA = 2πrh","Unroll it: a rectangle 2πr × h"],["Total surface area","TSA = 2πr(r + h)","CSA + two circular ends"],["Volume","V = πr²h","Base area × height"],["Hollow cylinder (pipe)","V = π(R² − r²)h","R outer, r inner; R² − r² = (R+r)(R−r)"],["Hollow: total surface","2πRh + 2πrh + 2π(R² − r²)","Outer + inner + two rings"],["Shortcut","V ÷ CSA = r/2","So r = 2V/CSA"]]},
+ {k:"figs", title:"Solid and hollow cylinder", items:[
+  {svg:'<svg viewBox="0 0 220 190" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M50 35 V155 M170 35 V155"/><ellipse cx="110" cy="35" rx="60" ry="16" style="fill:var(--accent-bg)"/><path d="M50 155 A60 16 0 0 0 170 155"/><path d="M50 155 A60 16 0 0 1 170 155" stroke-dasharray="4 3"/><path d="M110 35 H170" style="stroke:var(--accent)"/><circle cx="110" cy="35" r="2" style="fill:var(--accent)" stroke="none"/><text x="134" y="30" fill="currentColor" stroke="none">r</text><path d="M190 35 V155" stroke-dasharray="2 3"/><text x="196" y="100" fill="currentColor" stroke="none">h</text><text x="104" y="27" fill="currentColor" stroke="none">O</text></svg>', cap:"CSA unrolls into a rectangle 2πr × h."},
+  {svg:'<svg viewBox="0 0 220 190" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M50 35 V155 M170 35 V155"/><ellipse cx="110" cy="35" rx="60" ry="16" style="fill:var(--accent-bg)"/><ellipse cx="110" cy="35" rx="40" ry="10" style="fill:var(--sheet, none)"/><path d="M70 35 V150 M150 35 V150" stroke-dasharray="4 3"/><path d="M50 155 A60 16 0 0 0 170 155"/><path d="M110 35 H170" style="stroke:var(--accent)"/><path d="M110 35 H70" style="stroke:var(--blue)"/><text x="160" y="62" fill="currentColor" stroke="none" style="fill:var(--accent)">R</text><text x="84" y="62" fill="currentColor" stroke="none" style="fill:var(--blue)">r</text><text x="186" y="100" fill="currentColor" stroke="none">h</text></svg>', cap:"Metal in a pipe = π(R² − r²)h."}]},
+ {k:"ex", src:"SSC CGL 2023 · 25 Jul S3", q:"The curved surface area of a solid circular cylinder of height 12 cm is 2640 cm². What is its volume? (π = 22/7)", steps:["2πr × 12 = 2640 ⇒ r = 2640 × 7 ÷ (2 × 22 × 12) = 35 cm","V = (22/7) × 35² × 12"], ans:"46200 cm³", tip:"V = CSA × r/2 = 2640 × 35/2 = 46200."},
+ {k:"ex", src:"SSC MTS 2024 · 16 Oct S2", q:"The external and internal diameters of a hollow cylindrical pipe are 14 cm and 12 cm. Find the volume of iron if the pipe is 21 cm long. (π = 22/7)", steps:["R = 7, r = 6","V = π(R² − r²)h = (22/7)(49 − 36)(21)","= 22 × 13 × 3"], ans:"858 cm³", tip:"R² − r² = (R + r)(R − r) = 13 × 1."},
+ {k:"ex", q:"Radii of two cylinders are in the ratio 2 : 3 and heights 5 : 3. Ratio of their volumes?", steps:["V ∝ r²h","(2² × 5) : (3² × 3) = 20 : 27"], ans:"20 : 27"},
+ {k:"trick", h:"<b>r = 2V ÷ CSA.</b> Whenever both CSA and volume are given, divide — no π needed. <br><b>Ratios:</b> V ∝ r²h, CSA ∝ rh. Write the powers, then multiply the ratio parts."},
+ {k:"trap", h:"<b>Diameter given?</b> Halve it first — using d as r makes the volume 4 times too big. <br><b>Closed vs open:</b> a tank open at the top has CSA + one base = πr(2h + r), not 2πr(r + h)."},
+ {k:"trap", h:"<b>Rolling a sheet:</b> the side that is rolled becomes the circumference 2πr, the other side becomes h. Rolling along the length and along the breadth give different volumes."},
+ {k:"link", h:"Cylinder volume is the base of <b>L7 melting</b> (wires are long thin cylinders) and <b>L8 water flow</b> (water in a pipe in 1 s = πr² × speed)."},
+ {k:"q", q:"Volume of a cylinder of radius 7 cm and height 10 cm (π = 22/7):", o:["1540 cm³","440 cm³","6160 cm³","770 cm³"], e:"(22/7) × 49 × 10 = 1540. (440 = CSA, 6160 = diameter used as radius.)"}
+], sum:["CSA = 2πrh, TSA = 2πr(r+h), V = πr²h","Pipe: V = π(R² − r²)h = π(R+r)(R−r)h","r = 2V/CSA","V ∝ r²h, CSA ∝ rh for ratios","Open tank: πr² + 2πrh"]},
+{ id:"L3", heat:3, title:"Cone", hi:"शंकु", blocks:[
+ {k:"hot", h:"<b>Tier 1:</b> regular — get l from l² = r² + h², then CSA or volume; Pythagorean triplets (3-4-5, 5-12-13, 7-24-25, 20-21-29) are planted on purpose. <b>Tier 2:</b> ratio-based cones (l : r = 29 : 20, CSA = 5 × base), % change in r and h, and sector ↔ cone conversions."},
+ {k:"formula", title:"Right circular cone (radius r, height h, slant l)", rows:[["Slant height","l = √(r² + h²)","Right triangle: h, r, l"],["Curved surface area","CSA = πrl","Uses l, never h"],["Total surface area","TSA = πr(l + r)","CSA + base πr²"],["Volume","V = ⅓πr²h","One-third of the cylinder on the same base"],["CSA ÷ base area","l / r","CSA = k × base ⇒ l = kr"]]},
+ {k:"formula", title:"Sector ↔ cone", rows:[["Sector radius","= slant height l",""],["Arc length","= base circumference 2πr","θ/360 × 2πl = 2πr"],["Angle of sector","θ = 360° × r / l",""],["Area of sector","= CSA of cone = πrl",""]]},
+ {k:"figs", title:"Cone and the sector it unrolls to", items:[
+  {svg:'<svg viewBox="0 0 220 190" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M40 160 A70 18 0 0 0 180 160" /><path d="M40 160 L110 20 L180 160" style="fill:var(--accent-bg)"/><path d="M40 160 A70 18 0 0 1 180 160" stroke-dasharray="4 3"/><path d="M110 20 V160" stroke-dasharray="4 3" style="stroke:var(--accent)"/><path d="M110 160 H180" style="stroke:var(--blue)"/><path d="M110 150 H120 V160" stroke-width="1"/><text x="114" y="96" fill="currentColor" stroke="none" style="fill:var(--accent)">h</text><text x="142" y="154" fill="currentColor" stroke="none" style="fill:var(--blue)">r</text><text x="152" y="86" fill="currentColor" stroke="none">l</text><text x="106" y="14" fill="currentColor" stroke="none">V</text></svg>', cap:"l² = r² + h². CSA uses l; volume uses h."},
+  {svg:'<svg viewBox="0 0 240 170" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M120 25 L204.3 95.7 A110 110 0 0 1 35.7 95.7 Z" style="fill:var(--accent-bg)"/><path d="M120 25 L204.3 95.7 A110 110 0 0 1 35.7 95.7" style="stroke:none"/><path d="M204.3 95.7 A110 110 0 0 1 35.7 95.7" style="stroke:var(--accent)" stroke-width="2.2"/><path d="M135.3 37.9 A20 20 0 0 1 104.7 37.9" stroke-width="1"/><text x="115" y="58" fill="currentColor" stroke="none">θ</text><text x="168" y="56" fill="currentColor" stroke="none">l</text><text x="72" y="56" fill="currentColor" stroke="none">l</text><text x="88" y="156" fill="currentColor" stroke="none" style="fill:var(--accent)">arc = 2πr</text></svg>', cap:"Fold the sector: its radius becomes l, its arc becomes the base circle."}]},
+ {k:"ex", src:"SSC CHSL 2024 · 10 Jul S2", q:"The curved surface area of a right circular cone is 20π cm². If its radius is 4 cm, find the volume of the cone.", steps:["πrl = 20π ⇒ l = 5","h = √(25 − 16) = 3","V = ⅓π × 16 × 3"], ans:"16π cm³", tip:"r = 4, l = 5 ⇒ the 3-4-5 triplet gives h = 3 instantly."},
+ {k:"ex", src:"SSC CGL 2024 Tier 2 · 18 Jan 2025", q:"The height of a right circular cone is 63 cm and its curved surface area is five times the area of its base. Find its volume. (π = 22/7)", steps:["πrl = 5πr² ⇒ l = 5r","h² = l² − r² = 24r² ⇒ r² = 63² ÷ 24 = 165.375","V = ⅓ × (22/7) × 165.375 × 63 = 22 × 165.375 × 3"], ans:"10914.75 cm³"},
+ {k:"ex", src:"SSC CGL Tier 2 · 29 Jan 2022", q:"The slant height and radius of a right circular cone are in the ratio 29 : 20. If its volume is 4838.4π cm³, its radius is:", steps:["l = 29k, r = 20k ⇒ h = 21k (20-21-29 triplet)","⅓π(400k²)(21k) = 2800πk³ = 4838.4π","k³ = 1.728 ⇒ k = 1.2 ⇒ r = 24"], ans:"24 cm"},
+ {k:"trick", h:"<b>Triplets save time:</b> (r, h, l) = (3,4,5), (5,12,13), (7,24,25), (8,15,17), (20,21,29), (9,40,41) and their multiples. If CSA = k × base, then l = kr."},
+ {k:"trap", h:"<b>πrh is not the CSA.</b> Cone CSA uses the slant height l. Many wrong options are built with h. Also do not forget the ⅓ in the volume — the option 3 × the answer is always there."},
+ {k:"link", h:"A cone is ⅓ of a cylinder with the same base and height; a hemisphere is ⅔ of it. So cone : hemisphere : cylinder = 1 : 2 : 3 when h = r (used in <b>L9</b>)."},
+ {k:"q", q:"A cone has radius 3 cm and height 4 cm. Its slant height is:", o:["5 cm","7 cm","√7 cm","25 cm"], e:"√(9 + 16) = 5."}
+], sum:["l = √(r² + h²); CSA = πrl; TSA = πr(l + r); V = ⅓πr²h","Sector → cone: sector radius = l, arc = 2πr, θ = 360r/l","CSA = k × base ⇒ l = kr","Cone = ⅓ cylinder of same base & height","Watch triplets 3-4-5, 7-24-25, 20-21-29"]},
+{ id:"L4", heat:3, title:"Sphere & hemisphere", hi:"गोला और अर्धगोला", blocks:[
+ {k:"hot", h:"<b>Tier 1:</b> frequent — hemisphere CSA vs TSA (2πr² vs 3πr²) is the favourite trap; volume ↔ surface area conversions; spherical shell. <b>Tier 2:</b> spheres are melted into cones/cylinders/wires (L7) and dropped into water (L8)."},
+ {k:"formula", title:"Sphere (radius r)", rows:[["Surface area","4πr²","= CSA of the cylinder that just encloses it"],["Volume","V = (4/3)πr³",""],["Spherical shell (hollow)","V = (4/3)π(R³ − r³)","R outer, r inner"],["V ÷ SA","= r/3","So r = 3V/SA"]]},
+ {k:"formula", title:"Hemisphere (radius r)", rows:[["Curved surface area","CSA = 2πr²","Bowl, inside or outside"],["Total surface area","TSA = 3πr²","CSA + flat circle πr²"],["Volume","V = (2/3)πr³","Half of the sphere"],["Hemispherical shell (bowl of thickness)","V = (2/3)π(R³ − r³)",""]]},
+ {k:"figs", title:"Sphere, hemisphere, shell", items:[
+  {svg:'<svg viewBox="0 0 200 180" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><circle cx="100" cy="90" r="70" style="fill:var(--accent-bg)"/><path d="M30 90 A70 18 0 0 0 170 90"/><path d="M30 90 A70 18 0 0 1 170 90" stroke-dasharray="4 3"/><path d="M100 90 L150.5 41.5" style="stroke:var(--accent)"/><circle cx="100" cy="90" r="2" style="fill:var(--accent)" stroke="none"/><text x="128" y="60" fill="currentColor" stroke="none" style="fill:var(--accent)">r</text><text x="90" y="104" fill="currentColor" stroke="none">O</text></svg>', cap:"SA = 4πr², V = (4/3)πr³."},
+  {svg:'<svg viewBox="0 0 200 180" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M30 60 A70 70 0 0 0 170 60"/><ellipse cx="100" cy="60" rx="70" ry="18" style="fill:var(--accent-bg)"/><path d="M100 60 H170" style="stroke:var(--accent)"/><circle cx="100" cy="60" r="2" style="fill:var(--accent)" stroke="none"/><text x="132" y="55" fill="currentColor" stroke="none" style="fill:var(--accent)">r</text><text x="62" y="112" fill="currentColor" stroke="none">2πr²</text><text x="80" y="72" fill="currentColor" stroke="none">πr²</text></svg>', cap:"Curved part 2πr² + flat top πr² = 3πr²."},
+  {svg:'<svg viewBox="0 0 200 180" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M30 90 a70 70 0 1 0 140 0 a70 70 0 1 0 -140 0 Z M60 90 a40 40 0 1 0 80 0 a40 40 0 1 0 -80 0 Z" fill-rule="evenodd" style="fill:var(--accent-bg)"/><path d="M100 90 H170" style="stroke:var(--accent)"/><path d="M100 90 L100 50" style="stroke:var(--blue)"/><text x="150" y="85" fill="currentColor" stroke="none" style="fill:var(--accent)">R</text><text x="104" y="72" fill="currentColor" stroke="none" style="fill:var(--blue)">r</text></svg>', cap:"Shell: (4/3)π(R³ − r³) — subtract cubes, not radii."}]},
+ {k:"ex", src:"SSC CHSL 2021 · 26 May 2022 S1", q:"The total surface area of a solid hemisphere is 16632 cm². Its volume is: (π = 22/7)", steps:["3πr² = 16632 ⇒ r² = 16632 × 7 ÷ 66 = 1764 ⇒ r = 42","V = (2/3)(22/7)(42³) = (2/3)(22/7)(74088)"], ans:"155232 cm³", tip:"16632 ÷ 3 = 5544 = 154 × 36, and 154 = π·7² ⇒ r = 7 × 6 = 42."},
+ {k:"ex", src:"SSC CGL 2025 · 17 Sep S1", q:"The volume of a hemisphere is numerically equal to four times its curved surface area. Find its radius.", steps:["(2/3)πr³ = 4 × 2πr²","r/3 = 4 ⇒ r = 12"], ans:"12 cm", tip:"V/CSA for a hemisphere = r/3 (same as sphere)."},
+ {k:"ex", src:"SSC CGL 2020 · 17 Aug 2021 S2", q:"What is the volume of a spherical shell whose inner and outer radii are 2 cm and 3 cm?", steps:["V = (4/3)π(3³ − 2³)","= (4/3)π × 19"], ans:"76π/3 cm³"},
+ {k:"trick", h:"<b>2-3-4 ladder:</b> hemisphere CSA = 2πr², hemisphere TSA = 3πr², sphere = 4πr². <br><b>Sphere : cylinder (h = 2r) :</b> volume 2 : 3 and surface (sphere vs CSA) 1 : 1 — Archimedes."},
+ {k:"trap", h:"<b>“Surface area of a hemisphere”</b> — if the solid is closed (solid hemisphere, paperweight) use 3πr²; a bowl's inside or outside is 2πr². Read the word <i>solid</i> / <i>bowl</i>."},
+ {k:"trap", h:"<b>Shell volume:</b> (4/3)π(R³ − r³), not (4/3)π(R − r)³. With R = 3, r = 2: 19 vs 1 — huge difference."},
+ {k:"q", q:"A hemispherical bowl has radius 7 cm. Its inner curved surface area is: (π = 22/7)", o:["308 cm²","462 cm²","616 cm²","154 cm²"], e:"2πr² = 2 × (22/7) × 49 = 308. (462 is TSA of a solid hemisphere.)"}
+], sum:["Sphere: 4πr², (4/3)πr³","Hemisphere: CSA 2πr², TSA 3πr², V (2/3)πr³","Shell: (4/3)π(R³ − r³)","V ÷ SA = r/3 for sphere and hemisphere (CSA)","Sphere : circumscribed cylinder volume = 2 : 3"]},
+{ id:"L5", heat:2, title:"Frustum of a cone", hi:"शंकु का छिन्नक", blocks:[
+ {k:"hot", h:"<b>Tier 1:</b> about one question in every few shifts — direct volume of a frustum or bucket, or “a cone is cut parallel to its base, find the ratio of volumes”. <b>Tier 2:</b> frustum CSA/TSA with slant height, buckets in litres, and cone cut into 3 parts."},
+ {k:"formula", title:"Frustum (radii R and r, height h)", rows:[["Slant height","l = √(h² + (R − r)²)","Right triangle with legs h and R − r"],["Volume","V = (πh/3)(R² + r² + Rr)","Big cone − small cone"],["Curved surface area","CSA = π(R + r)l",""],["Total surface area","π(R + r)l + πR² + πr²","Closed both ends"],["Bucket (open top)","π(R + r)l + πr²","Only the bottom is closed"]]},
+ {k:"formula", title:"Cone cut parallel to its base", rows:[["Small cone ∼ whole cone","r/R = h/H = l/L","Similar cones"],["Volume ratio","(h/H)³","Cut at half height ⇒ 1/8"],["CSA ratio","(h/H)²","Cut at half height ⇒ 1/4"],["Small cone : frustum","k³ : (1 − k³) where k = h/H","½ ⇒ 1 : 7; ⅓ ⇒ 1 : 26"]]},
+ {k:"figs", title:"Frustum and the cone it comes from", items:[
+  {svg:'<svg viewBox="0 0 220 180" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M70 40 L35 150 A75 18 0 0 0 185 150 L150 40" style="fill:var(--accent-bg)"/><path d="M35 150 A75 18 0 0 1 185 150" stroke-dasharray="4 3"/><ellipse cx="110" cy="40" rx="40" ry="10" style="fill:var(--accent-bg)"/><path d="M110 40 V150" stroke-dasharray="4 3"/><path d="M110 40 H150" style="stroke:var(--blue)"/><path d="M110 150 H185" style="stroke:var(--accent)"/><text x="126" y="25" fill="currentColor" stroke="none" style="fill:var(--blue)">r</text><text x="150" y="146" fill="currentColor" stroke="none" style="fill:var(--accent)">R</text><text x="114" y="100" fill="currentColor" stroke="none">h</text><text x="174" y="92" fill="currentColor" stroke="none">l</text></svg>', cap:"l² = h² + (R − r)²."},
+  {svg:'<svg viewBox="0 0 220 185" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M110 15 L35 165 A75 16 0 0 0 185 165 Z"/><path d="M35 165 A75 16 0 0 1 185 165" stroke-dasharray="4 3"/><path d="M110 15 L80 75 H140 Z" style="fill:var(--accent-bg)"/><ellipse cx="110" cy="75" rx="30" ry="7" style="stroke:var(--accent)"/><path d="M110 15 V165" stroke-dasharray="4 3"/><path d="M196 15 V165" stroke-width="1"/><path d="M24 15 V75" stroke-width="1" style="stroke:var(--accent)"/><text x="10" y="50" fill="currentColor" stroke="none" style="fill:var(--accent)">h</text><text x="200" y="95" fill="currentColor" stroke="none">H</text><text x="120" y="70" fill="currentColor" stroke="none">r</text><text x="146" y="160" fill="currentColor" stroke="none">R</text><text x="104" y="10" fill="currentColor" stroke="none">V</text></svg>', cap:"Top cone ∼ whole cone: volumes in ratio (h/H)³."}]},
+ {k:"ex", src:"SSC CGL 2022 · 12 Dec S2", q:"The radii of the ends of a frustum of a cone 7 cm high are 5 cm and 3 cm. Find its volume correct to one decimal place. (π = 22/7)", steps:["V = (πh/3)(R² + r² + Rr)","= (22/7)(7/3)(25 + 9 + 15) = (22/3)(49)"], ans:"359.3 cm³", tip:"h = 7 cancels the 7 of 22/7 — SSC chooses h = 7, 14, 21 for this."},
+ {k:"ex", src:"SSC CGL 2025 · 19 Sep S1", q:"A conical bucket is cut at one-third of its height from the top. Ratio of the volumes of the two parts (top : bottom)?", steps:["Top cone is similar with scale k = 1/3","Top : whole = 1 : 27","Top : bottom = 1 : (27 − 1)"], ans:"1 : 26"},
+ {k:"ex", q:"A cone of height 24 cm and base radius 10 cm is cut parallel to its base at half its height. Find the total surface area of the frustum.", steps:["Whole cone: l = 26. Frustum: R = 10, r = 5, slant = 13","CSA = π(10 + 5)(13) = 195π","TSA = 195π + 100π + 25π"], ans:"320π cm²"},
+ {k:"trick", h:"<b>Cube trick for cuts:</b> cuts at heights k, 2k, 3k… from the apex give cone volumes 1 : 8 : 27 : 64…, so the slices are 1 : 7 : 19 : 37 (differences of cubes). For surface areas use squares: 1 : 3 : 5 : 7."},
+ {k:"trap", h:"<b>“Cut at ⅓ of height from the top”</b> means the small cone has height H/3 — ratio 1 : 26. “Cut at ⅓ of height from the base” leaves a cone of height 2H/3 — ratio 8 : 19. Read which end."},
+ {k:"trap", h:"<b>Frustum slant ≠ h.</b> Use √(h² + (R − r)²). Using h in π(R + r)l is the planted wrong option. Diameters given? Halve both."},
+ {k:"q", q:"A cone is cut parallel to its base at half its height. The small cone's volume is what fraction of the whole cone?", o:["1/8","1/2","1/4","1/7"], e:"(½)³ = 1/8. (1/7 is small cone : frustum.)"}
+], sum:["V = (πh/3)(R² + r² + Rr)","l = √(h² + (R − r)²); CSA = π(R + r)l","Bucket metal = π(R + r)l + πr² (bottom only)","Cut cone: volumes ∝ k³, areas ∝ k²","Half-height cut ⇒ 1 : 7; one-third from top ⇒ 1 : 26"]},
+{ id:"L6", heat:1, title:"Prism, pyramid & tetrahedron", hi:"प्रिज़्म, पिरामिड और चतुष्फलक", blocks:[
+ {k:"hot", h:"<b>Tier 1:</b> occasional (a few shifts per exam) — prism with equilateral or right-triangle base, square pyramid with slant height. <b>Tier 2 / CHSL Tier 2:</b> more common — LSA and volume together, hexagonal prism, regular tetrahedron."},
+ {k:"formula", title:"Right prism (base perimeter P, base area B, height h)", rows:[["Volume","V = B × h","Like a cylinder"],["Lateral surface area","LSA = P × h","Rectangles round the side"],["Total surface area","TSA = P·h + 2B",""],["Equilateral base side a","B = (√3/4)a², P = 3a",""],["Regular hexagon base side a","B = 6 × (√3/4)a² = (3√3/2)a²",""]]},
+ {k:"formula", title:"Pyramid (base area B, height h, slant height l of faces)", rows:[["Volume","V = ⅓ × B × h","⅓ of the prism on the same base"],["Lateral surface area","= ½ × P × l","l = height of each triangular face"],["Square base side a","l² = h² + (a/2)²","Slant from apex to mid-edge"],["Regular tetrahedron edge a","V = (√2/12)a³","4 equilateral faces"],["Tetrahedron surface / height","TSA = √3 a², height = √(2/3) a",""],["Euler","F + V − E = 2","Cube 6 + 8 − 12 = 2"]]},
+ {k:"figs", title:"Triangular prism, square pyramid, tetrahedron", items:[
+  {svg:'<svg viewBox="0 0 240 180" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M30 160 H130 L80 95 Z" style="fill:var(--accent-bg)"/><path d="M80 95 L170 65 L220 130 L130 160"/><path d="M30 160 L120 130 L220 130 M120 130 L170 65" stroke-dasharray="4 3"/><text x="76" y="175" fill="currentColor" stroke="none">a</text><text x="180" y="158" fill="currentColor" stroke="none">h</text><text x="66" y="140" fill="currentColor" stroke="none">B</text></svg>', cap:"Prism: V = base area × h; LSA = perimeter × h."},
+  {svg:'<svg viewBox="0 0 240 180" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M120 25 L40 150 H150 Z" style="fill:var(--accent-bg)"/><path d="M120 25 L200 115 L150 150"/><path d="M120 25 L90 115 L40 150 M90 115 H200" stroke-dasharray="4 3"/><path d="M120 25 V132" stroke-dasharray="4 3" style="stroke:var(--accent)"/><path d="M120 25 L95 150" style="stroke:var(--blue)"/><text x="124" y="92" fill="currentColor" stroke="none" style="fill:var(--accent)">h</text><text x="92" y="96" fill="currentColor" stroke="none" style="fill:var(--blue)">l</text><text x="92" y="166" fill="currentColor" stroke="none">a</text></svg>', cap:"Square pyramid: l² = h² + (a/2)²."},
+  {svg:'<svg viewBox="0 0 220 190" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M110 20 L40 140 L115 168 L180 135 Z" style="fill:var(--accent-bg)"/><path d="M110 20 L115 168"/><path d="M40 140 L180 135" stroke-dasharray="4 3"/><text x="66" y="170" fill="currentColor" stroke="none">a</text><text x="58" y="78" fill="currentColor" stroke="none">a</text><text x="104" y="14" fill="currentColor" stroke="none">D</text><text x="28" y="144" fill="currentColor" stroke="none">A</text><text x="186" y="140" fill="currentColor" stroke="none">B</text><text x="112" y="184" fill="currentColor" stroke="none">C</text></svg>', cap:"Regular tetrahedron: V = (√2/12)a³, TSA = √3a²."}]},
+ {k:"ex", src:"SSC CHSL 2023 Tier 2 · 10 Jan 2024 S1", q:"The base of a right prism is an equilateral triangle with each side 4 cm. If the lateral surface area is 120 cm², find the volume of the prism.", steps:["LSA = 3 × 4 × h = 120 ⇒ h = 10","Base = (√3/4)(16) = 4√3","V = 4√3 × 10"], ans:"40√3 cm³"},
+ {k:"ex", src:"SSC CGL 2025 · 16 Sep S3", q:"A regular right pyramid has a square base of side 12 cm and slant height 10 cm. What is its volume?", steps:["h² = l² − (a/2)² = 100 − 36 ⇒ h = 8","V = ⅓ × 144 × 8"], ans:"384 cm³", tip:"6-8-10 triplet: half-side 6, slant 10 ⇒ height 8."},
+ {k:"ex", src:"SSC CGL Tier 2 · 29 Jan 2022", q:"The base of a right prism is a triangle with sides 16, 30 and 34 cm; its height is 32 cm. Find its LSA and volume.", steps:["16² + 30² = 34² ⇒ right triangle, area = ½ × 16 × 30 = 240","LSA = (16 + 30 + 34) × 32 = 2560","V = 240 × 32 = 7680"], ans:"2560 cm² and 7680 cm³"},
+ {k:"trick", h:"<b>Prism behaves like a cylinder, pyramid like a cone:</b> V = Bh and ⅓Bh; lateral = P·h and ½·P·l. Learn one pair, get the other free."},
+ {k:"trap", h:"<b>Height vs slant height of a pyramid:</b> volume uses the vertical height h; lateral area uses the slant height l of the faces. l² = h² + (a/2)² for a square base — use <i>half</i> the side."},
+ {k:"link", h:"Base areas come from 2D mensuration: equilateral (√3/4)a², hexagon (3√3/2)a², Heron's formula for scalene bases. Right-triangle bases (16-30-34, 5-12-13) are planted to make the area easy."},
+ {k:"q", q:"A prism and a pyramid have the same base and the same height. Ratio of their volumes (prism : pyramid):", o:["3 : 1","1 : 3","2 : 1","1 : 1"], e:"Bh : ⅓Bh = 3 : 1."}
+], sum:["Prism: V = Bh, LSA = Ph, TSA = Ph + 2B","Pyramid: V = ⅓Bh, LSA = ½Pl","Square pyramid: l² = h² + (a/2)²","Tetrahedron: V = (√2/12)a³, TSA = √3a²","Hexagon base = (3√3/2)a²"]},
+{ id:"L7", heat:3, title:"Melting & recasting", hi:"पिघलाकर पुनः ढालना", blocks:[
+ {k:"hot", h:"<b>Tier 1 favourite:</b> sphere → small balls, cylinder → sphere, sphere → wire. Almost every exam has one. <b>Tier 2:</b> hollow shells recast into cones, mixed units (wire radius in mm, length in m), and “maximum number” (floor the answer)."},
+ {k:"p", h:"<b>One law:</b> volume never changes when metal is melted and recast (no wastage unless stated). So <b>volume of old solid = n × volume of each new solid</b>. Surface area is NOT conserved — it increases when you make many small pieces."},
+ {k:"formula", title:"Set up the equation", rows:[["Number of pieces","n = V(old) ÷ V(one new piece)","Cancel π and common factors before multiplying"],["Sphere → n small spheres","n = (R/r)³","R = 6, r = 3 ⇒ 8 balls"],["Sphere → wire (cylinder)","(4/3)R³ = r²·L","Convert mm and m to cm first"],["Cylinder → sphere","r²h = (4/3)R³",""],["Cone ↔ cylinder (same r)","h(cyl) = h(cone)/3",""],["Hollow solid","use (R³ − r³) or (R² − r²)","Only the metal is recast"],["Several cubes → one cube","A³ = a³ + b³ + c³","3, 4, 5 ⇒ 6"]]},
+ {k:"fig", title:"Volume is conserved", svg:'<svg viewBox="0 0 300 150" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><circle cx="60" cy="75" r="45" style="fill:var(--accent-bg)"/><path d="M15 75 A45 11 0 0 0 105 75"/><path d="M15 75 A45 11 0 0 1 105 75" stroke-dasharray="4 3"/><path d="M60 75 L105 75" style="stroke:var(--accent)"/><text x="78" y="70" fill="currentColor" stroke="none" style="fill:var(--accent)">R</text><path d="M120 75 H160 M152 69 L160 75 L152 81" style="stroke:var(--blue)"/><text x="122" y="64" fill="currentColor" stroke="none">melt</text><path d="M180 60 H280 M180 90 H280" /><ellipse cx="180" cy="75" rx="5" ry="15" style="fill:var(--accent-bg)"/><path d="M280 60 A5 15 0 0 1 280 90"/><text x="224" y="110" fill="currentColor" stroke="none">L</text><text x="168" y="58" fill="currentColor" stroke="none">r</text><text x="60" y="140" fill="currentColor" stroke="none">(4/3)πR³ = πr²L</text></svg>', cap:"Sphere drawn into a wire: equate volumes, cancel π."},
+ {k:"ex", src:"SSC CHSL 2020 · 16 Apr 2021 S1", q:"A solid metallic cylinder has diameter 32 cm and height 9 cm. It is melted and recast into a solid sphere. Radius of the sphere?", steps:["π(16²)(9) = (4/3)πR³","R³ = 256 × 9 × 3/4 = 1728","R = 12"], ans:"12 cm"},
+ {k:"ex", src:"SSC CGL Tier 2 · 12 Sep 2019", q:"A solid metallic sphere of radius 8 cm is melted and drawn into a wire of uniform cross-section. If the wire is 24 m long, its radius (in mm) is:", steps:["L = 2400 cm","(4/3)(512) = r² × 2400 ⇒ r² = 0.2844","r = 0.533 cm = 16/3 mm"], ans:"5⅓ mm", tip:"Keep fractions: r² = 2048/7200 = 64/225 ⇒ r = 8/15 cm."},
+ {k:"ex", src:"SSC CPO 2024 · 28 Jun S2", q:"A hollow sphere of external and internal diameters 10 cm and 6 cm is melted into a cone of base diameter 10 cm. Height of the cone?", steps:["Metal = (4/3)π(5³ − 3³) = (4/3)π(98)","Cone: ⅓π(25)h","h = 4 × 98 ÷ 25 = 15.68"], ans:"15.68 cm"},
+ {k:"trick", h:"<b>Cancel first:</b> π always cancels; (4/3) against ⅓ leaves 4. Sphere → cone of the same radius: h = 4R. Sphere → cylinder of the same radius: h = (4/3)R. Many cubes → one: add the cubes of the edges."},
+ {k:"trap", h:"<b>Units:</b> wire radius in mm and length in m — convert everything to cm before equating. <b>Diameter vs radius</b> of coins and balls is the commonest planted mistake (gives an answer 4× or 8× off)."},
+ {k:"trap", h:"<b>“Maximum number”</b> of balls: take the floor (166.4 ⇒ 166), never round up."},
+ {k:"q", q:"A sphere of radius 9 cm is melted into balls of radius 3 cm. Number of balls:", o:["27","9","3","81"], e:"(9/3)³ = 27."}
+], sum:["Volume is conserved; surface area is not","n = V(old)/V(new piece); spheres: n = (R/r)³","Sphere → wire: (4/3)R³ = r²L (same units!)","Cubes melted together: A³ = a³ + b³ + c³","Hollow: use R³ − r³ (sphere) or R² − r² (pipe)"]},
+{ id:"L8", heat:2, title:"Water flow & displacement", hi:"जल प्रवाह और विस्थापन", blocks:[
+ {k:"hot", h:"<b>Tier 1:</b> about one question per few shifts — rise in water level when a ball is dropped, or time to fill a tank through a pipe. <b>Tier 2:</b> rectangular channels/canals, rain on a roof collected in a tank, mixed units (km/h, cm, hectare, litres)."},
+ {k:"formula", title:"Flow through a pipe or channel", rows:[["Water per unit time","= cross-section area × speed","A water column of length v·t"],["Circular pipe radius r","Q = πr² × v","Use radius, not diameter"],["Rectangular channel","Q = width × depth × v",""],["Time to fill","t = tank volume ÷ Q","Keep the same units everywhere"],["Canal irrigation","area = (water in time t) ÷ standing depth",""]]},
+ {k:"formula", title:"Displacement & rain", rows:[["Solid fully dropped in","rise × base area of vessel = volume of solid","Archimedes"],["Cylindrical vessel","h(rise) = V(solid) ÷ πR²",""],["n balls","n × (4/3)πr³ = πR² × rise",""],["Rain","volume = area × rainfall depth","1 hectare = 10000 m²"],["Units","1 m³ = 1000 L; 1 km/h = 1000 m per hour","5 km/h = 5000 m in 1 h"]]},
+ {k:"figs", title:"Flow column and displacement", items:[
+  {svg:'<svg viewBox="0 0 280 150" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M20 55 H200 M20 85 H200"/><path d="M60 55 H180 V85 H60 Z" style="fill:var(--accent-bg);stroke:none"/><ellipse cx="60" cy="70" rx="6" ry="15" style="stroke:var(--accent)"/><ellipse cx="180" cy="70" rx="6" ry="15" style="stroke:var(--accent)"/><path d="M60 105 H180 M60 100 V110 M180 100 V110" stroke-width="1"/><text x="104" y="124" fill="currentColor" stroke="none">v × t</text><text x="40" y="50" fill="currentColor" stroke="none">r</text><path d="M200 55 H225 V95 M200 85 H210 V95" /><path d="M217 97 V118" stroke-dasharray="2 3" style="stroke:var(--blue)"/><path d="M190 95 V140 H270 V95" stroke-width="1.4"/><path d="M191 118 H269 V139 H191 Z" style="fill:var(--accent-bg);stroke:none"/><text x="214" y="132" fill="currentColor" stroke="none">tank</text></svg>', cap:"In time t the pipe delivers a cylinder of water πr² × (v·t)."},
+  {svg:'<svg viewBox="0 0 220 180" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M45 30 V150 M175 30 V150"/><ellipse cx="110" cy="30" rx="65" ry="12"/><path d="M45 150 A65 12 0 0 0 175 150"/><path d="M45 85 A65 12 0 0 0 175 85 L175 150 A65 12 0 0 1 45 150 Z" style="fill:var(--accent-bg);stroke:none"/><ellipse cx="110" cy="85" rx="65" ry="12" stroke-dasharray="4 3"/><ellipse cx="110" cy="70" rx="65" ry="12" style="stroke:var(--accent)"/><circle cx="110" cy="120" r="24" style="fill:var(--accent-bg);stroke:var(--blue)"/><path d="M188 70 V85 M184 70 H192 M184 85 H192" stroke-width="1"/><text x="194" y="82" fill="currentColor" stroke="none" style="fill:var(--accent)">h</text><text x="104" y="124" fill="currentColor" stroke="none" style="fill:var(--blue)">r</text><path d="M110 30 H175" stroke-width="1"/><text x="140" y="26" fill="currentColor" stroke="none">R</text></svg>', cap:"πR² × h = (4/3)πr³: the rise h depends on the vessel's radius R."}]},
+ {k:"ex", src:"SSC CHSL 2020 · 14 Oct S2", q:"Water flows into a tank 180 m × 140 m through a rectangular pipe of 1.2 m × 0.75 m at 15 km/h. In what time will the water rise by 4 m?", steps:["Flow per hour = 1.2 × 0.75 × 15000 = 13500 m³","Needed = 180 × 140 × 4 = 100800 m³","t = 100800 ÷ 13500 = 7.467 h = 7 h 28 min"], ans:"7 hours 28 minutes"},
+ {k:"ex", src:"SSC CGL 2025 · 17 Sep S2", q:"A spherical ball of radius 4 cm is submerged in water in a cylindrical container of radius 5 cm and height 30 cm. What volume of water is displaced?", steps:["Displaced water = volume of the ball","(4/3)π(4³) = 256π/3"], ans:"256π/3 cm³", tip:"The container's size is extra data — only needed if they ask the rise in level."},
+ {k:"ex", q:"Rain of 2 cm falls on a flat roof 22 m × 20 m and is collected in a cylindrical tank of diameter 2 m. How high does the water rise in the tank? (π = 22/7)", steps:["Rain = 22 × 20 × 0.02 = 8.8 m³","Tank base = π × 1² = 22/7 m²","Rise = 8.8 ÷ (22/7) = 2.8 m"], ans:"2.8 m"},
+ {k:"trick", h:"<b>Rise = V(solid) ÷ base area of the vessel.</b> For a sphere in a cylinder: rise = 4r³ / (3R²). For n identical balls multiply by n. <br><b>Speed in km/h:</b> water column length in 1 hour = speed in metres × 1000."},
+ {k:"trap", h:"<b>Unit soup:</b> pipe diameter in cm, speed in km/h, tank in m, answer in minutes. Convert everything to metres (or cm) before dividing. 1 hectare = 10000 m², not 1000."},
+ {k:"trap", h:"A ball <b>floating</b> or only partly submerged does not displace its full volume — SSC always says “completely immersed/submerged” when it wants the full volume."},
+ {k:"q", q:"A cube of edge 6 cm is dropped into a cuboidal tank with base 20 cm × 15 cm containing water. The water rises by:", o:["0.72 cm","1.2 cm","0.36 cm","7.2 cm"], e:"216 ÷ 300 = 0.72 cm."}
+], sum:["Flow per unit time = cross-section × speed","Time = tank volume ÷ flow (same units)","Rise in level = volume of immersed solid ÷ base area","Rain volume = area × depth; 1 ha = 10000 m²","1 m³ = 1000 L; 1 km/h ⇒ 1000 m per hour"]}
+,{ id:"L9", heat:2, title:"Combined solids", hi:"संयुक्त ठोस", blocks:[
+ {k:"hot", h:"<b>Tier 1:</b> about one question in a few shifts — toy (cone on hemisphere), capsule, tent (cylinder + cone roof), hemispherical depressions in a cube. <b>Tier 2:</b> regular — the CGL Tier 2 paper of 18 Jan 2025 had a toy TSA. Marks are won or lost on <i>which surfaces count</i>."},
+ {k:"p", h:"<b>Two rules.</b> Volume: just add the parts (subtract a cavity). Surface area: add only the surfaces you can <b>touch from outside</b>. Where two solids are glued, the joining circle disappears from both. Where a piece is scooped out, you lose a flat circle but gain the inner curved surface."},
+ {k:"formula", title:"Common combinations (same radius r)", rows:[["Toy: cone on hemisphere","TSA = πrl + 2πr² = πr(l + 2r)","V = ⅓πr²h + ⅔πr³ = ⅓πr²(h + 2r)"],["Capsule: cylinder + 2 hemispherical ends","TSA = 2πrh + 4πr² = 2πr(h + 2r)","V = πr²h + (4/3)πr³; h = cylinder part only"],["Tent: cylinder + cone roof","Canvas = 2πrh + πrl","No floor, no joining circle"],["Ice cream: cone + hemisphere on top","V = ⅓πr²h + ⅔πr³",""],["Cylinder with cone cavity (same r, h)","V = ⅔πr²h; TSA = 2πrh + πr² + πrl","Lose one end circle, gain the cone's CSA"],["Cylinder, hemisphere scooped from each end","TSA = 2πrh + 4πr²","Each hollow adds 2πr² and removes πr²"],["Cube with a hemispherical depression on a face","SA = 6a² + πr²","−πr² (hole) + 2πr² (bowl)"],["Hemisphere placed on a cube face","SA = 6a² + πr²","Same change: −πr² + 2πr²"]]},
+ {k:"figs", title:"Toy, capsule, cylinder with a conical cavity", items:[
+  {svg:'<svg viewBox="0 0 220 175" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M60 110 L110 20 L160 110" style="fill:var(--accent-bg)"/><path d="M60 110 A50 50 0 0 0 160 110" style="fill:var(--accent-bg)"/><ellipse cx="110" cy="110" rx="50" ry="12" stroke-dasharray="4 3"/><path d="M110 20 V110" stroke-dasharray="4 3" style="stroke:var(--accent)"/><text x="114" y="72" fill="currentColor" stroke="none" style="fill:var(--accent)">h</text><path d="M110 110 H160" style="stroke:var(--blue)"/><text x="166" y="114" fill="currentColor" stroke="none" style="fill:var(--blue)">r</text><text x="142" y="58" fill="currentColor" stroke="none">l</text><path d="M44 20 V160 M40 20 H48 M40 160 H48" stroke-width="1"/><text x="6" y="94" fill="currentColor" stroke="none">h + r</text></svg>', cap:"Toy: πrl + 2πr². The dashed joining circle is inside — not counted."},
+  {svg:'<svg viewBox="0 0 260 155" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M80 40 H180 A35 35 0 0 1 180 110 H80 A35 35 0 0 1 80 40 Z" style="fill:var(--accent-bg)"/><ellipse cx="80" cy="75" rx="9" ry="35" stroke-dasharray="4 3"/><ellipse cx="180" cy="75" rx="9" ry="35" stroke-dasharray="4 3"/><path d="M80 130 H180 M80 125 V135 M180 125 V135" stroke-width="1"/><text x="126" y="148" fill="currentColor" stroke="none">h</text><path d="M180 75 H215" style="stroke:var(--accent)"/><text x="194" y="70" fill="currentColor" stroke="none" style="fill:var(--accent)">r</text></svg>', cap:"Capsule: 2πr(h + 2r). h is the cylinder part; total length = h + 2r."},
+  {svg:'<svg viewBox="0 0 220 180" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M50 35 V150 M170 35 V150"/><ellipse cx="110" cy="35" rx="60" ry="14" style="fill:var(--accent-bg)"/><path d="M50 150 A60 14 0 0 0 170 150"/><path d="M50 150 A60 14 0 0 1 170 150" stroke-dasharray="4 3"/><path d="M50 150 L110 37 L170 150" stroke-dasharray="4 3" style="stroke:var(--accent)"/><path d="M110 150 H170" style="stroke:var(--blue)"/><text x="148" y="146" fill="currentColor" stroke="none" style="fill:var(--blue)">r</text><text x="178" y="98" fill="currentColor" stroke="none">h</text><text x="86" y="104" fill="currentColor" stroke="none" style="fill:var(--accent)">l</text></svg>', cap:"Cone hollowed from below: lose the base circle, gain the inner cone surface πrl."}]},
+ {k:"ex", src:"SSC CGL 2024 Tier 2 · 18 Jan 2025", q:"A toy is in the form of a cone mounted on a hemisphere. The radius of the hemisphere and that of the cone is 36 cm and the height of the cone is 105 cm. The total surface area of the toy is:", steps:["l = √(36² + 105²) = √12321 = 111","Exposed: cone CSA + hemisphere CSA (joining circle hidden)","πr(l + 2r) = π × 36 × (111 + 72) = 36 × 183π"], ans:"6588π cm²", tip:"36 = 3 × 12, 105 = 3 × 35 and 12-35-37 is a triplet ⇒ l = 3 × 37 = 111."},
+ {k:"ex", src:"SSC CGL 2021 · 18 Apr 2022 S1", q:"A hemispherical depression of diameter 4 cm is cut out from each face of a cubical block of side 10 cm. Find the surface area of the remaining solid. (π = 22/7)", steps:["Cube: 6 × 10² = 600","Each face: lose πr² (hole), gain 2πr² (bowl) ⇒ net +πr² = 4π","Six faces: 600 + 24π = 600 + 528/7"], ans:"675 3/7 cm²"},
+ {k:"ex", q:"A cylinder is surmounted by a cone at one end and a hemisphere at the other. Common radius 7 cm, cylinder height 6 cm, total height 32 cm. Find the volume of the solid. (π = 22/7)", steps:["Hemisphere height = r = 7 ⇒ cone height = 32 − 6 − 7 = 19","Write each part as πr² × (height-equivalent): 6 + 19/3 + 2(7)/3 = 6 + 11 = 17","V = (22/7)(49)(17) = 154 × 17"], ans:"2618 cm³", tip:"Cylinder → h, cone → h/3, hemisphere → 2r/3: add, then multiply by πr² once."},
+ {k:"trick", h:"<b>Height-equivalents:</b> write every part as πr² × (something): cylinder → h, cone → h/3, hemisphere → 2r/3, sphere → 4r/3. Add the brackets, multiply once. <br><b>1 : 2 : 3:</b> a cone, a hemisphere and a cylinder with the same r and height r have volumes 1 : 2 : 3."},
+ {k:"trap", h:"<b>Never add whole TSAs.</b> Toy ≠ TSA(cone) + TSA(hemisphere): the two base circles are glued inside. Use CSAs only. A tent has no floor canvas unless the question asks for it."},
+ {k:"trap", h:"<b>Lengths of the parts:</b> if the <i>total</i> length of a capsule is given, subtract 2r to get the cylinder part. Toy total height = cone height + r (the hemisphere is r tall)."},
+ {k:"link", h:"Every piece is a formula from <b>L2 (cylinder), L3 (cone), L4 (hemisphere)</b>. Combined solids melted into something else are <b>L7</b>; dropped into water, <b>L8</b>."},
+ {k:"q", q:"A capsule is a cylinder of radius 7 cm and length 10 cm with a hemisphere at each end. Its surface area is: (π = 22/7)", o:["1056 cm²","1364 cm²","748 cm²","440 cm²"], e:"2πr(h + 2r) = 44 × 24 = 1056. (1364 adds both end circles; 748 is a closed cylinder; 440 is the cylinder CSA only.)"}
+], sum:["Volume: add the parts, subtract cavities","Surface: only exposed faces — glued circles vanish","Toy: πr(l + 2r); capsule: 2πr(h + 2r); tent: 2πrh + πrl","Scooped hemisphere or hemisphere on a face: net +πr²","Cone : hemisphere : cylinder (height r) = 1 : 2 : 3"]}
+,{ id:"L10", heat:2, title:"Percentage change & ratios in solids", hi:"ठोसों में प्रतिशत परिवर्तन और अनुपात", blocks:[
+ {k:"hot", h:"<b>Tier 1:</b> common and quick — “radius increased by x%, find the % change in volume / surface area”, or “volume kept the same, by what % must h fall”. <b>Tier 2:</b> two changes at once (r up, h down), ratios of two solids, and equal-volume comparisons (cone vs sphere, cone vs hemisphere)."},
+ {k:"p", h:"<b>Why it works:</b> every area is length × length and every volume is length × length × length. So if all lengths scale by k, every area scales by k² and every volume by k³ — whatever the shape. If only some lengths change, multiply the factors of the lengths that appear in the formula."},
+ {k:"formula", title:"Scale factors", rows:[["All lengths × k","Area × k², Volume × k³","Sphere, cube, or r and h together"],["Sphere / hemisphere","SA ∝ r², V ∝ r³",""],["Cylinder","CSA ∝ rh, V ∝ r²h","Change r and h separately"],["Cone","V ∝ r²h","CSA ∝ rl (l changes with r and h)"],["Two changes x% and y%","Net % = x + y + xy/100","Use −x for a decrease"],["Square of (1 + x%)","(1 + x/100)² − 1","r +10% ⇒ area +21%, volume +33.1%"]]},
+ {k:"formula", title:"Ratios and equal volumes", rows:[["Similar solids, length ratio a : b","Area a² : b², volume a³ : b³","Volume ratio → take cube root first"],["Equal volume, cylinder r changes","h ∝ 1/r²","r +25% ⇒ h × 16/25 (36% less)"],["Keep V same after r grows x%","h falls by 1 − 1/(1 + x/100)²",""],["Cone = cylinder (same r, V)","h(cone) = 3 h(cyl)",""],["Cone = sphere (same r, V)","h(cone) = 4r",""],["Cone = hemisphere (same r, V)","h(cone) = 2r",""]]},
+ {k:"table", title:"Ready multipliers (memorise)", head:["Change in length","Area factor","Volume factor"], rows:[["+10%","1.21 (+21%)","1.331 (+33.1%)"],["+20%","1.44 (+44%)","1.728 (+72.8%)"],["+25%","1.5625 (+56.25%)","1.953 (+95.3%)"],["+50%","2.25 (+125%)","3.375 (+237.5%)"],["+100% (doubled)","4 (+300%)","8 (+700%)"],["−10%","0.81 (−19%)","0.729 (−27.1%)"],["−20%","0.64 (−36%)","0.512 (−48.8%)"],["−50% (halved)","0.25 (−75%)","0.125 (−87.5%)"]]},
+ {k:"fig", title:"Double the edge", svg:'<svg viewBox="0 0 260 190" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M20 90 H60 V130 H20 Z" style="fill:var(--accent-bg)"/><path d="M20 90 L35 75 H75 L60 90 M75 75 V115 L60 130"/><path d="M20 130 L35 115 H75 M35 115 V75" stroke-dasharray="4 3"/><text x="36" y="146" fill="currentColor" stroke="none">a</text><path d="M120 70 H200 V150 H120 Z" style="fill:var(--accent-bg)"/><path d="M120 70 L150 40 H230 L200 70 M230 40 V120 L200 150"/><path d="M120 150 L150 120 H230 M150 120 V40" stroke-dasharray="4 3"/><text x="152" y="166" fill="currentColor" stroke="none" style="fill:var(--accent)">2a</text><path d="M84 110 H108 M101 104 L108 110 L101 116" style="stroke:var(--blue)"/><text x="40" y="184" fill="currentColor" stroke="none">k = 2 ⇒ area ×4, volume ×8</text></svg>', cap:"Scale every length by k: faces grow k², volume grows k³. Same for spheres, cones, cylinders."},
+ {k:"ex", src:"SSC CHSL 2024 · 4 Jul S2", q:"The radius of a sphere is increased by 25%. What is the increase per cent in surface area?", steps:["SA ∝ r²","Net % = 25 + 25 + (25 × 25)/100","= 50 + 6.25"], ans:"56.25%", tip:"25% = ¼ ⇒ factor 5/4 ⇒ (5/4)² = 25/16 ⇒ +9/16 = 56.25%."},
+ {k:"ex", src:"SSC MTS 2019 · 9 Aug S2", q:"If the height of a circular cone is decreased by 10% and its radius is increased by 10%, what will be the change in its volume?", steps:["V ∝ r²h","Factor = (1.1)² × 0.9 = 1.21 × 0.9 = 1.089"], ans:"Increases by 8.9%", tip:"Successive: r² gives +21%, then −10%: 21 − 10 − 2.1 = 8.9%."},
+ {k:"ex", q:"The radius of a cylinder is increased by 25%. By what percent must its height be reduced so that the volume stays the same?", steps:["r² factor = (5/4)² = 25/16","h must be × 16/25","Decrease = 9/25 = 36%"], ans:"36%"},
+ {k:"trick", h:"<b>Fraction method:</b> turn the % into a fraction and power it. 25% → 5/4 → volume 125/64 → +61/64 ≈ 95.3%. 20% → 6/5 → 216/125 → +72.8%. <br><b>Two changes:</b> x + y + xy/100, applied once per power (r² = r × r)."},
+ {k:"trap", h:"<b>Volume % ≠ 3 × radius %.</b> r +10% gives +33.1%, not +30%. And “radius halved” makes the volume 1/8 — a <i>decrease</i> of 87.5%, not 50%."},
+ {k:"trap", h:"<b>“Increased by” vs “increased to”:</b> doubled = increased <i>by</i> 100% = increased <i>to</i> 200%. Volume ×8 is an increase <i>by</i> 700%."},
+ {k:"link", h:"This is the <b>successive percentage</b> rule from the Percentage chapter (x + y + xy/100). Similar-cone ratios (k² and k³) were used in <b>L5 frustum cuts</b>; volume ratios of two solids in <b>L2–L4</b>."},
+ {k:"q", q:"The edge of a cube is increased by 10%. Its volume increases by:", o:["33.1%","30%","21%","10%"], e:"(1.1)³ = 1.331 ⇒ +33.1%. (21% is the area.)"}
+], sum:["Lengths × k ⇒ areas × k², volumes × k³","Two changes: x + y + xy/100 (decrease = negative)","Same volume, r +x% ⇒ h × 1/(1 + x/100)²","Equal volume with same r: cone h = 3h(cyl) = 4r (sphere) = 2r (hemisphere)","+10% ⇒ 21%, 33.1%; +20% ⇒ 44%, 72.8%; halved ⇒ ¼, ⅛"]}
+,{ id:"L11", heat:2, title:"Cubes: cutting, painting & counting", hi:"घन: काटना, रंगना और गिनना", blocks:[
+ {k:"hot", h:"<b>Tier 1:</b> regular — largest sphere / cone / cylinder cut from a cube, sphere inside a cube inside a sphere, and the painted-cube count (also asked in the reasoning section). <b>Tier 2:</b> combined with % or ratio — wasted volume, surface area after cutting, largest cubes from a cuboid (HCF)."},
+ {k:"formula", title:"Painted cube cut into n × n × n small cubes", rows:[["Total small cubes","n³","n = big edge ÷ small edge"],["3 faces painted","8","Always the corners (n ≥ 2)"],["2 faces painted","12(n − 2)","Along the 12 edges, corners removed"],["1 face painted","6(n − 2)²","Middle of each of the 6 faces"],["0 faces painted","(n − 2)³","The hidden inner cube"],["At least one face","n³ − (n − 2)³",""],["At least two faces","8 + 12(n − 2)","n = 5 ⇒ 44"]]},
+ {k:"formula", title:"Largest solid inside a cube of edge a (and the reverse)", rows:[["Sphere in cube","r = a/2, V = πa³/6","Touches all 6 faces"],["Cylinder in cube","r = a/2, h = a, V = πa³/4",""],["Cone in cube","r = a/2, h = a, V = πa³/12","⅓ of the cylinder"],["Sphere around cube","R = a√3/2","Diameter = space diagonal"],["Cube in a sphere of radius R","a = 2R/√3",""],["Sphere in cube in sphere","radii 1 : √3, volumes 1 : 3√3",""],["Sphere from a cuboid","r = (smallest edge)/2",""],["Largest equal cubes from a cuboid","edge = HCF(l, b, h); count = lbh ÷ edge³",""],["Cut a cube into n³ cubes","total SA becomes n × original","Each cut exposes new faces"]]},
+ {k:"figs", title:"Painted 3 × 3 × 3 cube and nested sphere–cube–sphere", items:[
+  {svg:'<svg viewBox="0 0 200 175" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><path d="M30 60 H120 V150 H30 Z" style="fill:var(--accent-bg)"/><path d="M30 60 L70 30 H160 L120 60 M160 30 V120 L120 150"/><path d="M60 60 V150 M90 60 V150 M30 90 H120 M30 120 H120" stroke-width="1"/><path d="M60 60 L100 30 M90 60 L130 30 M43.3 50 H133.3 M56.7 40 H146.7" stroke-width="1"/><path d="M133.3 50 V140 M146.7 40 V130 M120 90 L160 60 M120 120 L160 90" stroke-width="1"/><text x="101" y="80" fill="currentColor" stroke="none" style="fill:var(--accent)">3</text><text x="71" y="80" fill="currentColor" stroke="none" style="fill:var(--blue)">2</text><text x="71" y="110" fill="currentColor" stroke="none">1</text><text x="10" y="170" fill="currentColor" stroke="none">n = 3: 8 · 12 · 6 · 1 hidden</text></svg>', cap:"Corner cubes show 3 faces, edge cubes 2, face-centre cubes 1; the centre cube shows none."},
+  {svg:'<svg viewBox="0 0 240 200" fill="none" stroke="currentColor" stroke-width="1.6" font-family="inherit" font-size="12"><circle cx="110" cy="100" r="86.6"/><rect x="60" y="50" width="100" height="100" style="fill:var(--accent-bg)"/><circle cx="110" cy="100" r="50"/><path d="M110 100 V50" style="stroke:var(--blue)"/><text x="114" y="80" fill="currentColor" stroke="none" style="fill:var(--blue)">a/2</text><path d="M110 100 L171.2 161.2" style="stroke:var(--accent)"/><text x="174" y="186" fill="currentColor" stroke="none" style="fill:var(--accent)">a√3/2</text><text x="104" y="166" fill="currentColor" stroke="none">a</text></svg>', cap:"Inner sphere touches the faces (r = a/2); outer sphere passes through the 8 corners (R = a√3/2)."}]},
+ {k:"ex", src:"SSC CGL 2021 · 12 Apr 2022 S3", q:"A cube of side 125 cm is painted red on all the faces and then cut into smaller cubes of side 25 cm each. Find the number of smaller cubes having at least two faces painted.", steps:["n = 125 ÷ 25 = 5","3 faces: 8; 2 faces: 12(5 − 2) = 36","At least two = 8 + 36"], ans:"44", tip:"Check: 125 − 27 (none) − 54 (one face) = 44."},
+ {k:"ex", src:"SSC CHSL 2023 · 3 Aug S2", q:"Find the volume of the largest possible sphere that fits inside a cube of edge 7 cm. (π = 22/7)", steps:["Diameter = edge ⇒ r = 3.5","V = (4/3)(22/7)(3.5)³ = (4/3)(22/7)(42.875)"], ans:"179.67 cm³", tip:"V = πa³/6 = (22/7)(343)/6 = 1078/6 = 179.67."},
+ {k:"ex", src:"SSC GD 2021 · 13 Dec S2", q:"What is the volume of the largest right circular cone that can be cut out of a cube of edge 12 cm (correct to two decimal places)?", steps:["r = 6, h = 12","V = ⅓ × (22/7) × 36 × 12 = πa³/12 = (22/7)(1728)/12"], ans:"452.57 cm³"},
+ {k:"ex", q:"A sphere is inscribed in a cube, and the cube is inscribed in a bigger sphere. Find the ratio of the volumes of the bigger and smaller spheres.", steps:["Small r = a/2; big R = a√3/2 ⇒ R : r = √3 : 1","Volumes ∝ cube of radius: (√3)³ = 3√3"], ans:"3√3 : 1"},
+ {k:"trick", h:"<b>Painted cube in one line:</b> 8 · 12(n−2) · 6(n−2)² · (n−2)³ — powers 0, 1, 2, 3 of (n−2) with 8, 12, 6, 1 in front (the numbers of corners, edges, faces, insides). They must add to n³ — use it as a check. <br><b>Cube-fitting fractions:</b> sphere π/6, cylinder π/4, cone π/12 of the cube."},
+ {k:"trap", h:"<b>Which diagonal?</b> A sphere <i>around</i> a cube uses the space diagonal a√3 (not the face diagonal a√2). A cube <i>inside</i> a sphere: a = 2R/√3, not 2R or R√2."},
+ {k:"trap", h:"<b>n is a count, not a length:</b> 125 cm cut into 25 cm cubes gives n = 5 (125 small cubes), not n = 125. If only some faces are painted (e.g. two opposite faces), count face by face — the formulas are for all 6 faces painted."},
+ {k:"link", h:"Cube basics are in <b>L1</b>; sphere, cylinder and cone formulas in <b>L2–L4</b>. The painted-cube count also appears in the <b>Reasoning</b> section as “cube and dice”."},
+ {k:"q", q:"A cube painted on all faces is cut into 27 equal small cubes. How many have exactly two faces painted?", o:["12","8","6","24"], e:"n = 3: 12(n − 2) = 12. (8 = three faces, 6 = one face.)"}
+], sum:["n³ small cubes: 8 corners (3 faces), 12(n−2) edges (2), 6(n−2)² faces (1), (n−2)³ hidden (0)","In a cube of edge a: sphere πa³/6, cylinder πa³/4, cone πa³/12","Sphere around cube: R = a√3/2; cube in sphere: a = 2R/√3","Sphere–cube–sphere: radii 1 : √3, volumes 1 : 3√3","Largest equal cubes from a cuboid: edge = HCF of the sides"]}
+];
+const QB = [
+["L1","Area of the floor of a cubical room is 64 m². The length of the longest rod that can be kept in the room is:",["8√3 m","16√3 m","4√3 m","12√3 m"],"a = 8, diagonal = a√3 = 8√3. SSC CGL 2022 Tier 1 (12 Dec S3).","p"],
+["L1","The areas of three adjacent faces of a cuboidal box are 120 cm², 72 cm² and 60 cm². Find the volume of the box.",["720 cm³","864 cm³","650 cm³","425 cm³"],"V = √(120·72·60) = √518400 = 720. SSC CHSL 2024 (9 Jul S3).","p"],
+["L1","Find the total surface area of a cuboid whose dimensions are 18 m, 6 m and 3 m.",["360 m²","180 m²","324 m²","90 m²"],"2(108 + 18 + 54) = 360. (180 forgets the 2.) SSC MTS 2023 (4 Sep S2).","p"],
+["L1","What will be the length of the longest diagonal of a cuboid of length 13 cm, width 11 cm and height 20 cm?",["26.27 cm","23.45 cm","34.65 cm","22.65 cm"],"√(169 + 121 + 400) = √690 ≈ 26.27. SSC MTS 2022 (2 May 2023 S3).","p"],
+["L1","The total surface area of a cube is 1176 cm². Its volume is:",["2744 cm³","3375 cm³","2197 cm³","196 cm³"],"6a² = 1176 ⇒ a² = 196, a = 14, V = 2744."],
+["L1","Find the lateral surface area of a cuboid 12 cm × 8 cm × 6 cm.",["240 cm²","432 cm²","576 cm²","120 cm²"],"2(l + b)h = 2 × 20 × 6 = 240. (432 = TSA, 576 = volume.)"],
+["L1","A room is 10 m long, 8 m broad and 6 m high. The length of the longest pole that can be placed in it is:",["10√2 m","2√41 m","24 m","10√3 m"],"√(100 + 64 + 36) = √200 = 10√2 ≈ 14.14 m."],
+["L1","A room is 12 m × 9 m × 4 m. Find the cost of painting its four walls at ₹25 per m².",["₹4200","₹6900","₹9600","₹2100"],"Walls = 2(12 + 9) × 4 = 168 m²; 168 × 25 = ₹4200."],
+["L1","The length, breadth and height of a cuboid are in the ratio 8 : 5 : 3 and its total surface area is 1422 cm². Find its volume.",["3240 cm³","3780 cm³","3520 cm³","3860 cm³"],"2x²(40 + 15 + 24) = 158x² = 1422 ⇒ x = 3; V = 24 × 15 × 9 = 3240."],
+["L1","The sum of length, breadth and height of a cuboid is 21 cm and its diagonal is 13 cm. Its total surface area is:",["272 cm²","136 cm²","610 cm²","441 cm²"],"TSA = 21² − 13² = 441 − 169 = 272."],
+["L1","The volume of a cuboid is 3600 cm³. The areas of two adjacent faces are 225 cm² and 144 cm². The area of the third adjacent face is:",["400 cm²","360 cm²","320 cm²","300 cm²"],"xyz = V² ⇒ z = 3600² ÷ (225 × 144) = 400."],
+["L1","A closed wooden box made of 1 cm thick wood has outer dimensions 22 cm × 17 cm × 12 cm. It is filled with cement. Volume of cement in the box?",["3000 cm³","4488 cm³","3696 cm³","1488 cm³"],"Inner = 20 × 15 × 10 = 3000 (subtract 2 cm from each side)."],
+["L1","A wall 18 m long, 10 m high and 40 cm thick is built with bricks of 30 cm × 15 cm × 10 cm. Number of bricks needed?",["16000","1600","160000","14400"],"(1800 × 1000 × 40) ÷ (30 × 15 × 10) = 16000."],
+["L1","The volume and the total surface area of a cube are numerically equal. Its edge is:",["6 units","3 units","4 units","8 units"],"a³ = 6a² ⇒ a = 6."],
+["L1","The diagonal of a cube is 5√3 cm. Its total surface area is:",["150 cm²","125 cm²","100 cm²","75 cm²"],"a = 5, TSA = 6 × 25 = 150. (125 = volume, 100 = LSA.)"],
+["L1","A village of 4000 people needs 9 litres of water per person per day. Its full tank measures 15 m × 8 m × 6 m. For how many days will the water last?",["20 days","2 days","200 days","25 days"],"720 m³ = 720000 L; 720000 ÷ 36000 = 20 days."],
+["L2","The curved surface area of a solid circular cylinder of height 12 cm is 2640 cm². What is the volume of the cylinder? (Take π = 22/7)",["46200 cm³","37900 cm³","42000 cm³","55200 cm³"],"r = 35; V = (22/7)(35²)(12) = 46200. SSC CGL 2023 Tier 1 (25 Jul S3).","p"],
+["L2","The total surface area of a cylinder is equal to its volume. Find the relation between radius r and height h.",["h = 2r/(r − 2)","h = r/(r − 2)","h = 3r/(r − 2)","h = 4r/(r − 2)"],"2πr(r + h) = πr²h ⇒ 2r + 2h = rh ⇒ h = 2r/(r − 2). SSC CHSL 2025 (15 Nov S1).","p"],
+["L2","The external and internal diameters of a hollow cylindrical pipe are 14 cm and 12 cm. What is the volume of iron used if the height of the pipe is 21 cm? (π = 22/7)",["858 cm³","462 cm³","396 cm³","588 cm³"],"(22/7)(49 − 36)(21) = 858. SSC MTS 2024 (16 Oct S2).","p"],
+["L2","The height of a right circular cylinder is 14 cm and its curved surface is 264 cm². Its volume is:",["396 cm³","290 cm³","366 cm³","252 cm³"],"2πr·14 = 264 ⇒ r = 3; V = (22/7)(9)(14) = 396. SSC GD 2021 (30 Nov S2).","p"],
+["L2","The curved surface area of a cylinder is 594 cm² and its volume is 1336.5 cm³. What is its height?",["21 cm","114 cm","24.5 cm","10.5 cm"],"r = 2V/CSA = 4.5; h = 594 ÷ (2 × 22/7 × 4.5) = 21. SSC GD 2023 (30 Jan S1).","p"],
+["L2","Find the curved surface area of a cylinder of radius 7 cm and height 10 cm. (π = 22/7)",["440 cm²","748 cm²","1540 cm²","220 cm²"],"2 × (22/7) × 7 × 10 = 440. (748 = TSA, 220 forgets the 2.)"],
+["L2","Find the total surface area of a closed cylinder of radius 7 cm and height 13 cm. (π = 22/7)",["880 cm²","572 cm²","726 cm²","2002 cm²"],"2πr(r + h) = 44 × 20 = 880. (572 = CSA only, 726 = one base.)"],
+["L2","A cylinder has diameter 14 cm and height 20 cm. Its volume is: (π = 22/7)",["3080 cm³","12320 cm³","6160 cm³","1540 cm³"],"r = 7; (22/7)(49)(20) = 3080. (12320 uses 14 as radius.)"],
+["L2","The radii of two cylinders are in the ratio 2 : 3 and their heights in the ratio 5 : 3. The ratio of their volumes is:",["20 : 27","10 : 9","4 : 5","27 : 20"],"r²h: 4×5 : 9×3 = 20 : 27. (10 : 9 forgets to square r.)"],
+["L2","The radii of two cylinders are in the ratio 3 : 4 and heights in the ratio 5 : 6. The ratio of their curved surface areas is:",["5 : 8","15 : 32","3 : 4","8 : 5"],"CSA ∝ rh: 15 : 24 = 5 : 8. (15 : 32 squares r — that is for volume.)"],
+["L2","Two cylinders have equal volumes and their radii are in the ratio 3 : 2. The ratio of their heights is:",["4 : 9","2 : 3","9 : 4","3 : 2"],"r²h equal ⇒ h ∝ 1/r² = 1/9 : 1/4 = 4 : 9."],
+["L2","A rectangular sheet 44 cm × 18 cm is rolled along its length to form a cylinder (the 44 cm side becomes the circumference). Volume of the cylinder? (π = 22/7)",["2772 cm³","1134 cm³","11088 cm³","792 cm³"],"2πr = 44 ⇒ r = 7, h = 18; V = (22/7)(49)(18) = 2772. (1134 rolls the other way.)"],
+["L2","A hollow pipe is 14 cm long with outer radius 8 cm and inner radius 6 cm. Volume of metal? (π = 22/7)",["1232 cm³","176 cm³","2816 cm³","616 cm³"],"(22/7)(64 − 36)(14) = 1232. (176 uses (R − r)², 2816 ignores the hole.)"],
+["L2","The curved surface area and volume of a cylinder are 264 m² and 924 m³. The ratio of its diameter to its height is:",["7 : 3","7 : 6","3 : 7","6 : 7"],"r = 2V/CSA = 7; h = 264 ÷ (2π × 7) = 6; d : h = 14 : 6 = 7 : 3."],
+["L2","A cylindrical tank has radius 1.4 m and height 2 m. How many litres of water can it hold? (π = 22/7)",["12320 litres","1232 litres","6160 litres","24640 litres"],"(22/7)(1.96)(2) = 12.32 m³ = 12320 L."],
+["L2","The total surface area of a solid cylinder is 462 cm² and its curved surface area is one-third of the total. Its volume is: (π = 22/7)",["539 cm³","1078 cm³","154 cm³","269.5 cm³"],"CSA = 154, two ends = 308 ⇒ πr² = 154, r = 7; 2π·7·h = 154 ⇒ h = 3.5; V = 154 × 3.5 = 539."],
+["L3","The curved surface area of a right circular cone is 20π cm². If its radius is 4 cm, then find the volume of the cone.",["16π cm³","20π cm³","18π cm³","21π cm³"],"l = 5, h = 3, V = ⅓π(16)(3) = 16π. SSC CHSL 2024 (10 Jul S2).","p"],
+["L3","The height of a right circular cone is 63 cm and the area of its curved surface is five times the area of its base. What is the volume of the cone? (π = 22/7)",["10914.75 cm³","12589.10 cm³","11234.65 cm³","13540.25 cm³"],"l = 5r ⇒ h = √24 r ⇒ r² = 3969/24; V = ⅓(22/7)(165.375)(63) = 10914.75. SSC CGL 2024 Tier 2 (18 Jan 2025).","p"],
+["L3","The slant height and radius of a right circular cone are in the ratio 29 : 20. If its volume is 4838.4π cm³, then its radius is:",["24 cm","20 cm","25 cm","28 cm"],"h = 21k; 2800πk³ = 4838.4π ⇒ k = 1.2, r = 24. SSC CGL 2020 Tier 2 (29 Jan 2022).","p"],
+["L3","The curved surface area of a right circular cone is 2310 cm² and its radius is 21 cm. If its radius is increased by 100% and height reduced by 50%, its capacity (in litres, to one decimal place) will be: (π = 22/7)",["25.9 litres","27.8 litres","28.2 litres","26.7 litres"],"l = 35, h = 28; new r = 42, h = 14; V = ⅓(22/7)(1764)(14) = 25872 cm³ ≈ 25.9 L. SSC CGL 2020 Tier 2 (3 Feb 2022).","p"],
+["L3","The curved surface area of a right circular cone is 3185π cm². If the radius of its base is 35 cm, its height will be:",["84 cm","42 cm","98 cm","49 cm"],"l = 3185/35 = 91; h = √(91² − 35²) = 84. SSC GD 2021 (6 Dec S3).","p"],
+["L3","Find the curved surface area of a cone of radius 7 cm and height 24 cm. (π = 22/7)",["550 cm²","704 cm²","528 cm²","1100 cm²"],"l = 25; πrl = (22/7)(7)(25) = 550. (704 = TSA, 528 uses h instead of l.)"],
+["L3","Find the total surface area of a cone of radius 5 cm and height 12 cm.",["90π cm²","65π cm²","85π cm²","60π cm²"],"l = 13; πr(l + r) = 5π × 18 = 90π. (65π = CSA, 60π uses h.)"],
+["L3","Find the volume of a cone of radius 7 cm and height 24 cm. (π = 22/7)",["1232 cm³","3696 cm³","616 cm³","4928 cm³"],"⅓ × (22/7) × 49 × 24 = 1232. (3696 forgets ⅓.)"],
+["L3","A sector of radius 21 cm and central angle 120° is folded into a cone. The radius of the base of the cone is:",["7 cm","10.5 cm","14 cm","3.5 cm"],"Arc = (120/360)(2π × 21) = 14π = 2πr ⇒ r = 7."],
+["L3","A sector of radius 12 cm with central angle 270° is folded into a cone. The volume of the cone is:",["81√7π cm³","243√7π cm³","27√7π cm³","81π cm³"],"r = 12 × 270/360 = 9, h = √(144 − 81) = 3√7; V = ⅓π(81)(3√7) = 81√7π."],
+["L3","A cone of base radius 8 cm and height 6 cm is cut along a slant line and opened out into a sector. The central angle of the sector is:",["288°","216°","240°","144°"],"l = 10; θ = 360 × r/l = 360 × 8/10 = 288°."],
+["L3","The radii of two cones are in the ratio 3 : 4 and their heights in the ratio 4 : 3. The ratio of their volumes is:",["3 : 4","9 : 16","1 : 1","4 : 3"],"r²h: 9 × 4 : 16 × 3 = 36 : 48 = 3 : 4."],
+["L3","A cone and a cylinder have the same base radius and the same height. The ratio of their volumes (cone : cylinder) is:",["1 : 3","1 : 2","3 : 1","2 : 3"],"⅓πr²h : πr²h = 1 : 3."],
+["L3","A cone and a cylinder have equal radii and equal volumes. If the cylinder is 5 cm high, the height of the cone is:",["15 cm","5/3 cm","10 cm","5 cm"],"⅓πr²h = πr² × 5 ⇒ h = 15."],
+["L3","A conical tent has base radius 21 m and height 20 m. Find the cost of the canvas at ₹10 per m². (π = 22/7)",["₹19140","₹13200","₹33000","₹9570"],"l = 29; CSA = (22/7)(21)(29) = 1914 m²; × 10 = ₹19140. (₹13200 uses h; ₹33000 adds the floor.)"],
+["L3","The slant height of a cone is twice its radius. The ratio of its curved surface area to its total surface area is:",["2 : 3","1 : 2","2 : 1","3 : 4"],"πr(2r) : πr(2r + r) = 2 : 3."],
+["L3","The volume of a cone is 1232 cm³ and its radius is 7 cm. Its slant height is: (π = 22/7)",["25 cm","24 cm","31 cm","8 cm"],"h = 3 × 1232 ÷ 154 = 24; l = √(49 + 576) = 25. (8 forgets ⅓.)"],
+["L4","The curved surface area of a hemisphere is 1232 cm². Its radius will be: (Take π = 22/7)",["14 cm","12 cm","16 cm","10 cm"],"2πr² = 1232 ⇒ r² = 196 ⇒ r = 14. SSC CHSL 2021 (31 May 2022 S1).","p"],
+["L4","The total surface area of a solid hemisphere is 16632 cm². Its volume is: (Take π = 22/7)",["155232 cm³","145232 cm³","140232 cm³","150032 cm³"],"3πr² = 16632 ⇒ r = 42; (2/3)π(42³) = 155232. SSC CHSL 2021 (26 May 2022 S1).","p"],
+["L4","The volume of a hemisphere is numerically equal to four times its curved surface area. Find its radius.",["12 cm","15 cm","16 cm","17 cm"],"(2/3)πr³ = 8πr² ⇒ r = 12. SSC CGL 2025 (17 Sep S1).","p"],
+["L4","What is the volume of a spherical shell whose inner and outer radii are 2 cm and 3 cm respectively?",["76π/3 cm³","56π/3 cm³","106π/3 cm³","86π/3 cm³"],"(4/3)π(27 − 8) = 76π/3. SSC CGL 2020 Tier 1 (17 Aug 2021 S2).","p"],
+["L4","Find the surface area of a sphere of radius 7 cm. (π = 22/7)",["616 cm²","154 cm²","308 cm²","462 cm²"],"4πr² = 4 × 154 = 616."],
+["L4","Find the volume of a sphere of radius 21 cm. (π = 22/7)",["38808 cm³","29106 cm³","19404 cm³","5544 cm³"],"(4/3)(22/7)(9261) = 38808. (19404 is the hemisphere.)"],
+["L4","Find the total surface area of a solid hemisphere of radius 7 cm. (π = 22/7)",["462 cm²","308 cm²","616 cm²","154 cm²"],"3πr² = 3 × 154 = 462. (308 is only the curved part.)"],
+["L4","Find the cost of tin-plating the inside of a hemispherical bowl of inner radius 10.5 cm at ₹16 per 100 cm². (π = 22/7)",["₹110.88","₹166.32","₹221.76","₹55.44"],"2πr² = 2 × (22/7) × 110.25 = 693 cm²; 693 × 0.16 = ₹110.88."],
+["L4","The surface area of a sphere is 616 cm². Its volume is: (π = 22/7)",["4312/3 cm³","4312 cm³","1078 cm³","2156/3 cm³"],"r = 7; (4/3)(22/7)(343) = 4312/3 ≈ 1437.3."],
+["L4","The volumes of two spheres are in the ratio 8 : 27. The ratio of their surface areas is:",["4 : 9","2 : 3","8 : 27","16 : 81"],"r ratio 2 : 3 (cube root), SA ratio 4 : 9 (square)."],
+["L4","The surface areas of two spheres are in the ratio 4 : 25. The ratio of their volumes is:",["8 : 125","2 : 5","16 : 625","4 : 25"],"r ratio 2 : 5 ⇒ V ratio 8 : 125."],
+["L4","A solid sphere and a solid hemisphere have the same radius. The ratio of their total surface areas is:",["4 : 3","2 : 1","1 : 2","3 : 4"],"4πr² : 3πr² = 4 : 3. (2 : 1 forgets the flat face.)"],
+["L4","A hollow metal sphere has outer radius 6 cm and inner radius 4 cm. The volume of metal is:",["608π/3 cm³","32π/3 cm³","288π cm³","152π cm³"],"(4/3)π(216 − 64) = 608π/3. (32π/3 uses (R − r)³.)"],
+["L4","The volume of a solid hemisphere is 19404 cm³. Its total surface area is: (π = 22/7)",["4158 cm²","2772 cm²","5544 cm²","1386 cm²"],"r³ = 19404 × 21 ÷ 44 = 9261 ⇒ r = 21; 3πr² = 4158."],
+["L4","A sphere fits exactly inside a cylinder (the cylinder's height equals the sphere's diameter). The ratio of the volume of the sphere to that of the cylinder is:",["2 : 3","1 : 2","3 : 4","1 : 1"],"(4/3)πr³ : πr²(2r) = 4/3 : 2 = 2 : 3."],
+["L4","The volume of a sphere is numerically equal to its surface area. Its radius is:",["3 units","4 units","6 units","1 unit"],"(4/3)πr³ = 4πr² ⇒ r = 3."],
+["L5","The radii of the ends of a frustum of a cone 7 cm high are 5 cm and 3 cm. Find its volume correct to one decimal place. (use π = 22/7)",["359.3 cm³","345.6 cm³","379.3 cm³","369.3 cm³"],"(22/7)(7/3)(25 + 9 + 15) = 1078/3 ≈ 359.3. SSC CGL 2022 Tier 1 (12 Dec S2).","p"],
+["L5","A conical bucket is cut at one-third its height from the top. What is the ratio of the volumes of the two parts (top part to bottom part)?",["1 : 26","1 : 8","1 : 27","1 : 7"],"Top : whole = 1 : 27 ⇒ top : bottom = 1 : 26. SSC CGL 2025 (19 Sep S1).","p"],
+["L5","The radii of the circular ends of a frustum of a cone are 20 cm and 13 cm and its height is 12 cm. What is its capacity in litres (correct to one decimal place)? (π = 22/7)",["10.4 litres","11.2 litres","10.8 litres","11.4 litres"],"(22/7)(4)(400 + 169 + 260) = 10420.6 cm³ ≈ 10.4 L. SSC MTS 2020 (6 Oct 2021 S1).","p"],
+["L5","A cone of height 24 cm and base radius 10 cm is cut parallel to its base at half its height. Find the total surface area of the frustum formed.",["320π cm²","195π cm²","370π cm²","295π cm²"],"Frustum R = 10, r = 5, slant 13; 195π + 100π + 25π = 320π. (195π is only the curved part.)"],
+["L5","A frustum has end radii 16 cm and 8 cm and height 6 cm. Its total surface area is:",["560π cm²","240π cm²","320π cm²","464π cm²"],"l = √(36 + 64) = 10; π(24)(10) + 256π + 64π = 560π. (464π uses h instead of l.)"],
+["L5","A frustum has end radii 10 cm and 4 cm and height 8 cm. Its curved surface area is:",["140π cm²","112π cm²","256π cm²","70π cm²"],"l = √(64 + 36) = 10; π(14)(10) = 140π. (112π uses h; 256π adds both ends.)"],
+["L5","A bucket has top radius 20 cm, bottom radius 10 cm and depth 21 cm. Its capacity is: (π = 22/7)",["15.4 litres","46.2 litres","11 litres","19.8 litres"],"(22/7)(7)(400 + 100 + 200) = 15400 cm³ = 15.4 L. (46.2 forgets ÷3.)"],
+["L5","A cone is cut by a plane parallel to its base through the midpoint of its height. The ratio of the volume of the small cone to that of the frustum is:",["1 : 7","1 : 8","1 : 3","1 : 4"],"Small : whole = 1 : 8 ⇒ small : frustum = 1 : 7."],
+["L5","A cone of height 30 cm is cut by two planes parallel to its base at heights 10 cm and 20 cm from the base. Ratio of volumes of the top, middle and bottom parts:",["1 : 7 : 19","1 : 2 : 3","1 : 8 : 27","1 : 3 : 5"],"Cones of heights 10, 20, 30 ⇒ 1 : 8 : 27 ⇒ parts 1 : 7 : 19."],
+["L5","A cone is cut parallel to its base through the midpoint of its height. The ratio of the curved surface area of the small cone to that of the frustum is:",["1 : 3","1 : 4","1 : 7","1 : 2"],"Areas ∝ k²: 1 : 4 ⇒ small : frustum = 1 : 3."],
+["L5","A frustum has end radii 13 cm and 7 cm and height 8 cm. Its slant height is:",["10 cm","8 cm","√233 cm","20 cm"],"√(8² + (13 − 7)²) = √100 = 10."],
+["L5","A frustum has end radii 6 cm and 3 cm and height 7 cm. Its volume is: (π = 22/7)",["462 cm³","1386 cm³","330 cm³","231 cm³"],"(22/7)(7/3)(36 + 9 + 18) = (22/3)(63) = 462. (330 drops the Rr term.)"],
+["L5","A bucket open at the top has top radius 14 cm, bottom radius 7 cm and height 24 cm. Area of metal sheet used: (π = 22/7)",["1804 cm²","1650 cm²","2420 cm²","1738 cm²"],"l = 25; π(21)(25) + π(49) = 574π = 1804. (2420 also closes the top.)"],
+["L5","A cone of height 20 cm and base radius 12 cm has a small cone of height 5 cm cut off from its top by a plane parallel to the base. Volume of the remaining frustum:",["945π cm³","960π cm³","900π cm³","315π cm³"],"Small cone radius 3. ⅓π(144)(20) − ⅓π(9)(5) = 960π − 15π = 945π."],
+["L5","A cone is cut parallel to its base at one-fourth of its height from the top. Ratio of volume of the small cone to the frustum:",["1 : 63","1 : 64","1 : 15","1 : 16"],"(¼)³ = 1/64 ⇒ 1 : 63. (1 : 15 uses squares.)"],
+["L5","A frustum has end radii 10 cm and 5 cm and volume 1050π cm³. Its height is:",["18 cm","6 cm","54 cm","12 cm"],"(πh/3)(100 + 25 + 50) = 175πh/3 = 1050π ⇒ h = 18."],
+["L5","A glass tumbler (frustum) has top diameter 8 cm, bottom diameter 6 cm and height 14 cm. Its capacity is: (π = 22/7)",["1628/3 cm³","6512/3 cm³","1628 cm³","814/3 cm³"],"R = 4, r = 3: (22/7)(14/3)(16 + 9 + 12) = 1628/3 ≈ 542.7. (6512/3 uses diameters.)"],
+["L6","The base of a right prism is an equilateral triangle with each side measuring 4 cm. If the lateral surface area is 120 cm², find the volume of the prism.",["40√3 cm³","30√3 cm³","10√3 cm³","20√3 cm³"],"h = 120 ÷ 12 = 10; V = 4√3 × 10 = 40√3. SSC CHSL 2023 Tier 2 (10 Jan 2024 S1).","p"],
+["L6","The base of a right prism is a triangle with sides 16 cm, 30 cm and 34 cm. Its height is 32 cm. The lateral surface area and the volume are, respectively:",["2560 cm² and 7680 cm³","2624 cm² and 7040 cm³","2688 cm² and 7680 cm³","2560 cm² and 6400 cm³"],"LSA = 80 × 32 = 2560; area = 240, V = 7680. SSC CGL 2020 Tier 2 (29 Jan 2022).","p"],
+["L6","A regular right pyramid has a square base with a side length of 12 cm. Its slant height is 10 cm. What is its volume?",["384 cm³","480 cm³","576 cm³","640 cm³"],"h = √(100 − 36) = 8; ⅓ × 144 × 8 = 384. SSC CGL 2025 (16 Sep S3).","p"],
+["L6","A regular right pyramid has a square base with side length 16 cm and a height of 30 cm. Its slant height and total surface area are (approx.):",["31.05 cm and 1249.6 cm²","24.45 cm and 1180.8 cm²","28.12 cm and 1230.2 cm²","30.12 cm and 1530.2 cm²"],"l = √(900 + 64) ≈ 31.05; TSA = 256 + ½ × 64 × 31.05 ≈ 1249.6. SSC CHSL 2025 (15 Nov S1).","p"],
+["L6","A pyramid has a square base; its slant height is 17 cm and vertical height 15 cm. Its volume is:",["1280 cm³","3840 cm³","1445 cm³","1180 cm³"],"Half side = √(289 − 225) = 8 ⇒ side 16; ⅓ × 256 × 15 = 1280. (3840 forgets ⅓.)"],
+["L6","Find the volume of a regular tetrahedron of edge 6 cm.",["18√2 cm³","36√2 cm³","72√2 cm³","9√3 cm³"],"(√2/12) × 216 = 18√2."],
+["L6","Find the total surface area of a regular tetrahedron of edge 4 cm.",["16√3 cm²","4√3 cm²","12√3 cm²","24√3 cm²"],"4 faces × (√3/4)(16) = 16√3. (12√3 counts only 3 faces.)"],
+["L6","The height of a regular tetrahedron of edge 6 cm is:",["2√6 cm","3√3 cm","√6 cm","3√2 cm"],"h = √(2/3) × 6 = 2√6. (3√3 is the height of one face.)"],
+["L6","A right prism has a regular hexagonal base of side 4 cm and height 10 cm. Its volume is:",["240√3 cm³","40√3 cm³","480√3 cm³","120√3 cm³"],"Base = 6 × (√3/4)(16) = 24√3; × 10 = 240√3."],
+["L6","A right prism has a square base of side 5 cm and height 12 cm. Its total surface area is:",["290 cm²","240 cm²","265 cm²","300 cm²"],"LSA = 20 × 12 = 240; + 2 × 25 = 290."],
+["L6","A square pyramid has base side 10 cm and height 12 cm. Its lateral surface area is:",["260 cm²","240 cm²","360 cm²","520 cm²"],"l = √(144 + 25) = 13; ½ × 40 × 13 = 260. (240 uses h.)"],
+["L6","A pyramid on a square base of side 10 cm has volume 200 cm³. Its height is:",["6 cm","2 cm","18 cm","12 cm"],"⅓ × 100 × h = 200 ⇒ h = 6. (2 forgets ⅓.)"],
+["L6","A pyramid has an equilateral triangular base of side 6 cm and height 10 cm. Its volume is:",["30√3 cm³","90√3 cm³","15√3 cm³","60√3 cm³"],"Base = 9√3; ⅓ × 9√3 × 10 = 30√3."],
+["L6","A right prism has a right-triangle base with legs 5 cm and 12 cm and height 10 cm. Its total surface area is:",["360 cm²","300 cm²","330 cm²","420 cm²"],"Hypotenuse 13; LSA = 30 × 10 = 300; bases 2 × 30 = 60; total 360."],
+["L6","A triangular prism has how many edges?",["9","6","12","5"],"3 + 3 + 3 = 9. Check Euler: F 5 + V 6 − E 9 = 2."],
+["L6","A square pyramid has base side 12 cm and height 8 cm. Its total surface area is:",["384 cm²","240 cm²","336 cm²","528 cm²"],"l = 10; lateral = ½ × 48 × 10 = 240; + 144 = 384. (336 uses h.)"],
+["L7","A solid metallic sphere of radius 6 cm is melted and recast into spherical balls of radius 3 cm. The number of spherical balls thus obtained is:",["8","10","6","4"],"(6/3)³ = 8. SSC CHSL 2024 (11 Jul S1).","p"],
+["L7","A solid metallic right circular cylinder has diameter 32 cm and height 9 cm. It is melted and recast into a solid sphere. What is the radius of the sphere?",["12 cm","25 cm","10 cm","14 cm"],"256 × 9 = (4/3)R³ ⇒ R³ = 1728 ⇒ R = 12. SSC CHSL 2020 (16 Apr 2021 S1).","p"],
+["L7","A solid metallic sphere of radius 8 cm is melted and drawn into a wire of uniform cross-section. If the length of the wire is 24 m, then its radius (in mm) is:",["16/3 mm","20/3 mm","6 mm","5 mm"],"(4/3)(512) = r²(2400) ⇒ r = 8/15 cm = 16/3 mm = 5⅓ mm. SSC CGL 2018 Tier 2 (12 Sep 2019).","p"],
+["L7","A solid sphere of radius 11 cm is melted and recast into small solid spheres of radius 2 cm each. How many maximum number of such spheres can be made?",["166","125","100","30"],"(11/2)³ = 166.4 ⇒ 166. SSC CPO 2020 (24 Nov S1).","p"],
+["L7","A hollow sphere of external and internal diameters 10 cm and 6 cm is melted and made into a right circular cone of base diameter 10 cm. Find the height of the cone.",["15.68 cm","13.68 cm","16.68 cm","14.68 cm"],"(4/3)(125 − 27) = ⅓(25)h ⇒ h = 15.68. SSC CPO 2024 (28 Jun S2).","p"],
+["L7","Three metal cubes with edges 3 cm, 4 cm and 5 cm are melted to form a single cube. Its edge is:",["6 cm","12 cm","5 cm","√50 cm"],"27 + 64 + 125 = 216 = 6³. (12 adds edges; √50 adds squares.)"],
+["L7","A sphere of radius 6 cm is melted and drawn into a wire of diameter 0.2 cm. The length of the wire is:",["288 m","72 m","2880 m","28.8 m"],"(4/3)(216) = (0.1)²L ⇒ L = 28800 cm = 288 m. (72 m uses 0.2 as the radius.)"],
+["L7","A metal cylinder of radius 3 cm and height 8 cm is melted into coins of diameter 1.5 cm and thickness 0.2 cm. Number of coins:",["640","160","320","1280"],"9 × 8 ÷ (0.75² × 0.2) = 72 ÷ 0.1125 = 640. (160 uses 1.5 as the radius.)"],
+["L7","A solid sphere of radius 4 cm is melted and recast into a cone of base radius 4 cm. The height of the cone is:",["16 cm","4 cm","8 cm","48 cm"],"(4/3)(64) = ⅓(16)h ⇒ h = 16 (= 4R)."],
+["L7","A solid hemisphere of radius 6 cm is melted into cones of radius 3 cm and height 4 cm. How many cones are made?",["12","24","36","6"],"(2/3)(216) = 144; one cone = ⅓(9)(4) = 12; 144 ÷ 12 = 12. (24 treats the hemisphere as (4/3)πr³.)"],
+["L7","A cylinder of diameter 4 cm and height 45 cm is melted into spheres of diameter 3 cm. Number of spheres:",["40","5","10","20"],"π(4)(45) = 180π; sphere (4/3)π(1.5)³ = 4.5π; 180 ÷ 4.5 = 40. (5 uses radius 3.)"],
+["L7","A cone of radius 6 cm and height 24 cm is melted into a cylinder of the same radius. The height of the cylinder is:",["8 cm","24 cm","72 cm","12 cm"],"⅓πr²(24) = πr²h ⇒ h = 8."],
+["L7","A metal pipe of outer radius 5 cm, inner radius 3 cm and length 9 cm is melted into a solid cylinder of radius 4 cm. Its height is:",["9 cm","4.5 cm","18 cm","3 cm"],"(25 − 9)(9) = 16h ⇒ h = 9."],
+["L7","A sphere of radius 3 cm is melted into 27 equal small spheres. Ratio of the total surface area of the small spheres to that of the original sphere:",["3 : 1","9 : 1","27 : 1","1 : 3"],"Each r = 1; 27 × 4π : 36π = 108π : 36π = 3 : 1."],
+["L7","A copper sphere of diameter 18 cm is drawn into a wire of diameter 6 mm. Length of the wire:",["108 m","27 m","10.8 m","432 m"],"(4/3)(9³) = (0.3)²L ⇒ L = 10800 cm = 108 m."],
+["L7","64 identical spheres of radius 1 cm are melted into one big sphere. Its radius is:",["4 cm","8 cm","16 cm","64 cm"],"R³ = 64 ⇒ R = 4. (Not 64 or √64.)"],
+["L8","Water flows into a tank 180 m × 140 m through a rectangular pipe of 1.2 m × 0.75 m at a rate of 15 km/h. In what time will the water rise by 4 m?",["7 hours 28 minutes","6 hours 42 minutes","8 hours 12 minutes","5 hours 46 minutes"],"13500 m³ per hour; 100800 ÷ 13500 = 7.467 h = 7 h 28 min. SSC CHSL 2020 (14 Oct S2).","p"],
+["L8","A spherical ball is submerged in water in a cylindrical container of radius 5 cm and height 30 cm. What is the volume of water displaced by the ball if its radius is 4 cm?",["256π/3 cm³","640π/3 cm³","320π/3 cm³","160π/3 cm³"],"Displaced = (4/3)π(64) = 256π/3. SSC CGL 2025 (17 Sep S2).","p"],
+["L8","Water flows at 5 km/h through a pipe of diameter 14 cm into a rectangular tank 50 m long and 44 m wide. Time for the water level to rise by 7 cm: (π = 22/7)",["2 hours","0.5 hours","4 hours","1 hour"],"Flow = (22/7)(0.07²)(5000) = 77 m³/h; need 50 × 44 × 0.07 = 154 m³ ⇒ 2 h. (0.5 h uses 14 cm as radius.)"],
+["L8","A sphere of diameter 6 cm is dropped into a cylindrical vessel of radius 6 cm partly filled with water. If it is completely submerged, the water level rises by:",["1 cm","8 cm","3 cm","0.25 cm"],"(4/3)π(27) = π(36)h ⇒ h = 1. (8 uses 6 as the sphere's radius; 0.25 uses 12 as the vessel's radius.)"],
+["L8","A cylindrical vessel of radius 30 cm contains water. A spherical iron ball dropped into it raises the water level by 5 cm. The radius of the ball is:",["15 cm","17 cm","21 cm","13 cm"],"(4/3)r³ = 900 × 5 ⇒ r³ = 3375 ⇒ r = 15."],
+["L8","Marbles of diameter 1.4 cm are dropped into a cylindrical beaker of diameter 7 cm containing water. How many marbles will raise the water level by 5.6 cm?",["150","135","180","120"],"n × (4/3)(0.7)³ = (3.5)²(5.6) ⇒ n = 68.6 ÷ 0.4573 = 150."],
+["L8","In a shower, 5 cm of rain falls. The volume of water that falls on 1.5 hectares of ground is:",["750 m³","75 m³","7500 m³","75000 m³"],"15000 m² × 0.05 m = 750 m³."],
+["L8","2 cm of rain falls on a flat roof 22 m × 20 m and all of it is collected in a cylindrical tank of diameter 2 m. The water level in the tank rises by: (π = 22/7)",["2.8 m","0.7 m","1.4 m","3.5 m"],"8.8 m³ ÷ (22/7 × 1²) = 2.8 m. (0.7 uses 2 m as the radius.)"],
+["L8","A canal 6 m wide and 1.5 m deep carries water at 10 km/h. How much area can it irrigate in 30 minutes if 8 cm of standing water is needed?",["56.25 hectares","112.5 hectares","5.625 hectares","4.5 hectares"],"In 30 min: 6 × 1.5 × 5000 = 45000 m³; ÷ 0.08 = 562500 m² = 56.25 ha. (112.5 uses a full hour.)"],
+["L8","Water flows at 6 m/s through a pipe of internal diameter 2 cm into a cylindrical tank of radius 40 cm and height 3 m. Time to fill the tank:",["800 seconds","200 seconds","3200 seconds","80 seconds"],"Flow = π(1²)(600) = 600π cm³/s; tank = π(1600)(300) = 480000π ⇒ 800 s. (200 s uses 2 cm as radius.)"],
+["L8","Water flows at 3 m/s through a pipe of radius 7 cm. How many litres flow out in one minute? (π = 22/7)",["2772 litres","46.2 litres","11088 litres","924 litres"],"(22/7)(49)(300) = 46200 cm³/s = 46.2 L/s; × 60 = 2772 L. (46.2 is per second.)"],
+["L8","A cube of edge 6 cm is completely immersed in a cuboidal tank whose base is 20 cm × 15 cm. The rise in water level is:",["0.72 cm","1.2 cm","0.36 cm","7.2 cm"],"216 ÷ (20 × 15) = 0.72 cm."],
+["L8","Water from a full cylindrical vessel of radius 7 cm and height 10 cm is poured into an empty cuboidal tank with base 22 cm × 10 cm. Height of water in the tank: (π = 22/7)",["7 cm","14 cm","3.5 cm","70 cm"],"1540 ÷ 220 = 7 cm."],
+["L8","How many solid spheres of radius 3 cm must be dropped into a cylindrical vessel of radius 6 cm to raise the water level by 4 cm?",["4","3","12","16"],"π(36)(4) = 144π; each sphere 36π ⇒ 4."],
+["L8","Water flows at 9 km/h through a rectangular channel 0.5 m × 0.4 m into a tank 40 m × 30 m. Time for the level to rise by 3 m:",["2 hours","20 hours","0.2 hours","1 hour"],"Flow = 0.2 × 9000 = 1800 m³/h; need 3600 m³ ⇒ 2 h."]
+,["L9","A toy is in the form of a cone mounted on a hemisphere. The radius of the hemisphere and that of the cone is 36 cm and height of the cone is 105 cm. The total surface area of the toy is:",["6588π cm²","6025π cm²","5799π cm²","5240π cm²"],"l = 111; πr(l + 2r) = 36 × 183π = 6588π. SSC CGL 2024 Tier 2 (18 Jan 2025).","p"],
+["L9","A hemispherical depression of diameter 4 cm is cut out from each face of a cubical block of side 10 cm. Find the surface area of the remaining solid. (π = 22/7)",["675 3/7 cm²","900 4/7 cm²","112 4/7 cm²","713 1/7 cm²"],"Each face nets +πr² = 4π; 600 + 24 × 22/7 = 675 3/7. SSC CGL 2021 (18 Apr 2022 S1).","p"],
+["L9","A toy is a cone mounted on a hemisphere of common radius 7 cm. The total height of the toy is 31 cm. Its total surface area is: (π = 22/7)",["858 cm²","1012 cm²","836 cm²","1166 cm²"],"Cone h = 31 − 7 = 24, l = 25; πr(l + 2r) = 22 × 39 = 858. (1012 adds the joining circle; 836 uses h for l; 1166 adds both full TSAs.)"],
+["L9","A solid toy is a hemisphere surmounted by a cone. The cone has height 4 cm and base diameter 8 cm. The volume of the toy is:",["64π cm³","320π/3 cm³","128π/3 cm³","256π/3 cm³"],"r = 4: cone 64π/3 + hemisphere 128π/3 = 192π/3 = 64π. (320π/3 uses a full sphere.)"],
+["L9","A solid is a cylinder of radius 7 cm and length 20 cm with a hemisphere fixed at each end. Its total surface area is: (π = 22/7)",["1496 cm²","1804 cm²","1188 cm²","880 cm²"],"2πr(h + 2r) = 44 × 34 = 1496. (1804 adds the two joining circles; 1188 has one hemisphere; 880 is the cylinder only.)"],
+["L9","A capsule has a cylindrical middle and hemispherical ends. Its total length is 16 cm and its radius is 3 cm. Its volume is:",["126π cm³","108π cm³","180π cm³","90π cm³"],"Cylinder part = 16 − 6 = 10: 90π + (4/3)π(27) = 90π + 36π = 126π. (180π uses 16 as the cylinder length.)"],
+["L9","A tent is a cylinder of radius 14 m and height 3 m surmounted by a cone of the same radius and height 10.5 m. Canvas needed (no floor): (π = 22/7)",["1034 m²","1650 m²","726 m²","770 m²"],"l = √(196 + 110.25) = 17.5; 2πrh + πrl = 264 + 770 = 1034. (1650 adds the floor; 726 uses 10.5 for l.)"],
+["L9","From a solid cylinder of radius 6 cm and height 8 cm, a cone of the same radius and height is hollowed out. The total surface area of the remaining solid is:",["192π cm²","228π cm²","168π cm²","180π cm²"],"l = 10; 2πrh + πr² + πrl = 96π + 36π + 60π = 192π. (228π keeps both end circles; 168π is the plain cylinder.)"],
+["L9","A solid is a cone on a hemisphere of the same radius r, and the cone's height equals r. The ratio of the volume of the cone part to the hemisphere part is:",["1 : 2","1 : 3","2 : 1","2 : 3"],"⅓πr³ : ⅔πr³ = 1 : 2."],
+["L9","A cone, a hemisphere and a cylinder stand on equal bases and have the same height. The ratio of their volumes is:",["1 : 2 : 3","3 : 2 : 1","1 : 3 : 2","2 : 1 : 3"],"Height = r (the hemisphere's height): ⅓πr³ : ⅔πr³ : πr³ = 1 : 2 : 3."],
+["L9","An ice-cream cone of radius 3 cm and height 9 cm is filled and topped with a hemisphere of ice cream of the same radius. The total volume of ice cream is:",["45π cm³","63π cm³","99π cm³","27π cm³"],"⅓π(9)(9) + ⅔π(27) = 27π + 18π = 45π. (63π uses a full sphere; 99π forgets ⅓.)"],
+["L9","From a solid cylinder of height 10 cm and radius 3.5 cm, a hemisphere of radius 3.5 cm is scooped out of each end. The total surface area of the article is: (π = 22/7)",["374 cm²","297 cm²","451 cm²","220 cm²"],"2πrh + 2 × 2πr² = 220 + 154 = 374. (297 counts flat circles instead of bowls; 451 adds both.)"],
+["L9","A hemisphere of the largest possible size is placed on top of a cube of edge 7 cm. The total surface area of the solid is: (π = 22/7)",["332.5 cm²","371 cm²","409.5 cm²","294 cm²"],"r = 3.5; 6a² − πr² + 2πr² = 294 + 38.5 = 332.5. (371 forgets to remove the covered circle.)"],
+["L9","A solid consists of a cylinder of radius 3 cm and height 12 cm with a cone of the same radius and height 4 cm on top. Its volume is:",["120π cm³","144π cm³","108π cm³","48π cm³"],"π(9)(12) + ⅓π(9)(4) = 108π + 12π = 120π. (144π forgets ⅓.)"],
+["L9","A toy is a cone of radius 2 cm and height 2 cm on a hemisphere of radius 2 cm. A right circular cylinder just encloses the toy. The difference between the volume of the cylinder and the toy is:",["8π cm³","16π cm³","8π/3 cm³","32π/3 cm³"],"Cylinder r = 2, h = 4: 16π. Toy = 8π/3 + 16π/3 = 8π. Difference = 8π."],
+["L9","A solid cylinder of radius r and height 2r has a hemisphere of radius r scooped out of one end. What fraction of the cylinder's volume is removed?",["1/3","2/3","1/2","1/6"],"⅔πr³ ÷ 2πr³ = 1/3."]
+,["L10","The radius of a sphere is increased by 25%. What is the increase per cent in surface area?",["56.25%","15.55%","25.25%","36.45%"],"SA ∝ r²: 25 + 25 + 6.25 = 56.25%. SSC CHSL 2024 (4 Jul S2).","p"],
+["L10","If the height of a circular cone is decreased by 10% and its radius is increased by 10%, then what will be the change in its volume?",["Increases by 8.9%","Decreases by 8.9%","Increases by 3.2%","Decreases by 3.2%"],"(1.1)² × 0.9 = 1.089 ⇒ +8.9%. SSC MTS 2019 (9 Aug S2).","p"],
+["L10","The radius of a sphere is increased by 20%. The percentage increase in its volume is:",["72.8%","60%","44%","33.1%"],"(1.2)³ = 1.728 ⇒ +72.8%. (60% = 3 × 20; 44% is the surface area.)"],
+["L10","The radius of a sphere is doubled. Its volume becomes how many times the original?",["8","4","2","6"],"2³ = 8. (4 is the surface area.)"],
+["L10","Each edge of a cube is increased by 50%. The percentage increase in its surface area is:",["125%","50%","150%","237.5%"],"(1.5)² = 2.25 ⇒ +125%. (237.5% is the volume.)"],
+["L10","The radius and height of a cylinder are each increased by 10%. The percentage increase in its volume is:",["33.1%","21%","30%","20%"],"r²h: (1.1)³ = 1.331 ⇒ +33.1%."],
+["L10","The radius of a cylinder is increased by 25%. By what percent must its height be reduced so that its volume remains the same?",["36%","25%","20%","56.25%"],"h × 1/(1.25)² = 16/25 ⇒ 36% less. (20% would keep only r × h fixed.)"],
+["L10","The radius of a cylinder is decreased by 50% and its height is increased by 50%. Its volume:",["Decreases by 62.5%","Decreases by 25%","Increases by 12.5%","Decreases by 37.5%"],"(0.5)² × 1.5 = 0.375 ⇒ decreases by 62.5%. (37.5% is what remains.)"],
+["L10","The radius of a cylinder open at both ends is decreased by 25% and its height is increased by 25%. Its curved surface area:",["Decreases by 6.25%","Remains the same","Increases by 6.25%","Decreases by 12.5%"],"CSA ∝ rh: 0.75 × 1.25 = 0.9375 ⇒ −6.25%."],
+["L10","The volumes of two cubes are in the ratio 27 : 64. The ratio of their surface areas is:",["9 : 16","3 : 4","27 : 64","81 : 256"],"Edges 3 : 4 (cube root), areas 9 : 16 (square)."],
+["L10","A cone and a sphere have equal radii and equal volumes. The ratio of the cone's height to its radius is:",["4 : 1","3 : 1","2 : 1","4 : 3"],"⅓πr²h = (4/3)πr³ ⇒ h = 4r."],
+["L10","A cone and a hemisphere have equal bases and equal volumes. The ratio of their heights (cone : hemisphere) is:",["2 : 1","1 : 2","3 : 2","1 : 1"],"⅓πr²h = ⅔πr³ ⇒ h = 2r; the hemisphere's height is r."],
+["L10","A cylinder and a cone have equal radii, and their heights are in the ratio 2 : 3. The ratio of their volumes (cylinder : cone) is:",["2 : 1","2 : 3","1 : 2","2 : 9"],"r²(2) : ⅓r²(3) = 2 : 1. (2 : 3 forgets ⅓.)"],
+["L10","The radius of a sphere is decreased by 10%. Its volume decreases by:",["27.1%","30%","19%","10%"],"(0.9)³ = 0.729 ⇒ −27.1%. (19% is the surface area.)"],
+["L10","The radius of a cone is doubled and its height is halved. Its volume increases by:",["100%","50%","300%","0%"],"r²h: 4 × ½ = 2 ⇒ +100%. (0% thinks doubling and halving cancel.)"],
+["L10","The surface area of a sphere increases by 21%. Its volume increases by:",["33.1%","21%","10%","46.41%"],"r² × 1.21 ⇒ r × 1.1 ⇒ V × 1.331 ⇒ +33.1%."],
+["L10","The radius and height of a cylinder are each increased by 10%. The percentage increase in its total surface area is:",["21%","10%","33.1%","20%"],"TSA = 2πr(r + h): both factors × 1.1 ⇒ × 1.21 ⇒ +21%."]
+,["L11","A cube of side 125 cm is painted red on all the faces and then cut into smaller cubes of sides 25 cm each. Find the number of smaller cubes having at least two faces painted.",["44","48","36","52"],"n = 5: 8 + 12(3) = 44. SSC CGL 2021 (12 Apr 2022 S3).","p"],
+["L11","Find the volume of the largest possible sphere circumscribed by a cube of edge 7 cm. (π = 22/7)",["179.67 cm³","169.67 cm³","189.67 cm³","199.67 cm³"],"Sphere inside the cube: r = 3.5; (4/3)(22/7)(42.875) = 179.67. SSC CHSL 2023 (3 Aug S2).","p"],
+["L11","What is the volume of the largest right circular cone that can be cut out of a cube of edge 12 cm (correct to two decimal places)?",["452.57 cm³","282.30 cm³","395.65 cm³","290.90 cm³"],"r = 6, h = 12: πa³/12 = (22/7)(1728)/12 = 452.57. SSC GD 2021 (13 Dec S2).","p"],
+["L11","A cube is painted on all faces and cut into 64 equal small cubes. How many small cubes have no face painted?",["8","24","16","27"],"n = 4: (n − 2)³ = 8. (24 = one face, 27 uses (n − 1)³.)"],
+["L11","A painted cube is cut into 64 identical small cubes. How many of them have exactly one face painted?",["24","8","36","16"],"6(n − 2)² = 6 × 4 = 24. (36 uses (n − 1)², 8 is the corners.)"],
+["L11","A cube painted on all faces is cut into 125 equal small cubes. How many small cubes have exactly two faces painted?",["36","54","27","24"],"12(n − 2) = 12 × 3 = 36. (54 = one face, 27 = none.)"],
+["L11","A painted cube is cut into 216 equal small cubes. How many have at least one face painted?",["152","64","96","144"],"n = 6: 216 − (6 − 2)³ = 216 − 64 = 152. (96 = exactly one face.)"],
+["L11","A cube of edge 3 cm is cut into 1 cm cubes. The ratio of the total surface area of the small cubes to that of the original cube is:",["3 : 1","1 : 1","9 : 1","27 : 1"],"27 × 6 : 54 = 162 : 54 = 3 : 1 (= n : 1)."],
+["L11","The ratio of the volume of a cube to that of the largest sphere that fits inside it is:",["6 : π","π : 6","3 : π","4 : π"],"a³ : (4/3)π(a/2)³ = a³ : πa³/6 = 6 : π."],
+["L11","The volume of the largest right circular cylinder that can be cut out of a cube of edge 14 cm is: (π = 22/7)",["2156 cm³","8624 cm³","2744 cm³","718.67 cm³"],"r = 7, h = 14: (22/7)(49)(14) = 2156. (8624 uses r = 14; 718.67 is the cone.)"],
+["L11","A sphere is inscribed in a cube, and the cube is inscribed in a bigger sphere. The ratio of the volume of the bigger sphere to that of the smaller sphere is:",["3√3 : 1","3 : 1","√3 : 1","9 : 1"],"R : r = √3 : 1 ⇒ volumes (√3)³ = 3√3. (3 : 1 is the surface areas.)"],
+["L11","The largest cube that fits inside a sphere of radius 6√3 cm has edge:",["12 cm","6√6 cm","12√3 cm","6√3 cm"],"Space diagonal = diameter: a√3 = 12√3 ⇒ a = 12. (6√6 uses the face diagonal.)"],
+["L11","The surface area of the sphere that passes through all eight vertices of a cube of edge 4 cm is:",["48π cm²","16π cm²","64π cm²","32π cm²"],"R = 4√3/2 = 2√3; 4π(12) = 48π. (16π is the inscribed sphere; 32π uses the face diagonal.)"],
+["L11","A cuboid 24 cm × 18 cm × 12 cm is cut into the largest possible equal cubes with no waste. The number of cubes is:",["24","192","12","48"],"Edge = HCF = 6: 4 × 3 × 2 = 24. (192 uses edge 3.)"],
+["L11","The largest sphere that can be carved out of a cuboid 10 cm × 8 cm × 6 cm has volume:",["36π cm³","500π/3 cm³","256π/3 cm³","288π cm³"],"r = smallest edge/2 = 3: (4/3)π(27) = 36π. (500π/3 uses 10, 288π uses r = 6.)"],
+["L11","A cube of volume 216 cm³ is cut into 27 equal small cubes. The total surface area of all the small cubes is:",["648 cm²","216 cm²","5832 cm²","432 cm²"],"Small edge 2: 27 × 6 × 4 = 648 (= 3 × 216). (432 is only the increase.)"],
+["L11","The ratio of the volume of the largest cone that can be cut from a cube to the volume of the cube is:",["π : 12","π : 4","π : 6","π : 3"],"⅓π(a/2)²a = πa³/12 ⇒ π : 12. (π : 4 is the cylinder, π : 6 the sphere.)"]
+];
+const HEAT = [
+ ["Cube & cuboid",16,"L1","Longest rod, volume from 3 face areas, TSA from (l+b+h) and diagonal, bricks, painting walls"],
+ ["Cylinder",12,"L2","r from CSA then volume, hollow pipe metal, ratios of two cylinders"],
+ ["Cone",12,"L3","Slant height via triplets, CSA/volume, sector ↔ cone, ratio-based cones"],
+ ["Sphere & hemisphere",14,"L4","2πr² vs 3πr², volume ↔ surface, spherical shell"],
+ ["Frustum of a cone",6,"L5","Bucket volume, cone cut parallel to base (1 : 7, 1 : 26)"],
+ ["Prism, pyramid & tetrahedron",5,"L6","Prism LSA and volume, square pyramid with slant height"],
+ ["Melting & recasting",12,"L7","Sphere into balls/wire/cone, cylinder into sphere, number of pieces"],
+ ["Water flow & displacement",6,"L8","Rise in level when balls are dropped, time to fill through a pipe"],
+ ["Combined solids",7,"L9","Toy TSA, capsule, tent canvas, hemispherical depressions in a cube"],
+ ["Percentage change & ratios",6,"L10","r +x% ⇒ % change in volume/area; equal-volume comparisons"],
+ ["Cubes: cutting, painting & counting",4,"L11","Largest sphere/cone in a cube, painted-cube counts, sphere–cube–sphere"]
+];
+const TILES = [
+ ["a√3","Cube diagonal (longest rod)"],
+ ["√(l² + b² + h²)","Cuboid diagonal"],
+ ["√(xyz)","Cuboid volume from three face areas"],
+ ["(l+b+h)² − d²","Cuboid TSA from edge-sum and diagonal"],
+ ["2πr(r + h)","Cylinder TSA"],
+ ["r = 2V ÷ CSA","Cylinder radius without π"],
+ ["πr(l + r)","Cone TSA"],
+ ["⅓πr²h","Cone volume"],
+ ["θ = 360°·r/l","Sector angle that folds into a cone"],
+ ["2πr² · 3πr² · 4πr²","Hemisphere CSA · hemisphere TSA · sphere"],
+ ["(4/3)π(R³ − r³)","Spherical shell (hollow sphere)"],
+ ["(πh/3)(R² + r² + Rr)","Frustum volume"],
+ ["√(h² + (R − r)²)","Frustum slant height"],
+ ["1 : 7 : 19","Cone cut at equal heights: slice volumes"],
+ ["(√2/12)a³","Regular tetrahedron volume"],
+ ["(R/r)³","Small balls from one melted sphere"],
+ ["πr² × v","Water through a pipe per unit time"],
+ ["πr(l + 2r)","Toy: cone on hemisphere (surface)"],
+ ["1 : 2 : 3","Cone : hemisphere : cylinder, height = r"],
+ ["+21% · +33.1%","Area · volume when lengths grow 10%"],
+ ["(n − 2)³","Painted cube: small cubes with no paint"],
+ ["πa³/6","Largest sphere inside a cube of edge a"]
+];
+const PAIRS = [
+ ["Cone CSA vs πrh","CSA = πrl uses the slant height l; πrh is a planted wrong option"],
+ ["Hemisphere CSA vs TSA","2πr² for a bowl; 3πr² for a solid hemisphere (flat face included)"],
+ ["Shell (R³ − r³) vs (R − r)³","Hollow sphere volume subtracts the cubes; never cube the difference"],
+ ["Pipe (R² − r²) vs (R − r)²","Metal in a pipe = π(R² − r²)h = π(R + r)(R − r)h"],
+ ["Cylinder V ∝ r²h vs CSA ∝ rh","Square the radius ratio only for volume"],
+ ["Cube diagonal a√3 vs face diagonal a√2","Longest rod and the sphere around a cube use a√3"],
+ ["Pyramid height h vs slant height l","Volume uses h; lateral area uses l, with l² = h² + (a/2)²"],
+ ["Frustum slant l vs height h","l = √(h² + (R − r)²); CSA = π(R + r)l, never π(R + r)h"],
+ ["Small cone : whole vs small cone : frustum","Half-height cut: 1 : 8 vs 1 : 7"],
+ ["Toy TSA vs TSA(cone) + TSA(hemisphere)","Glued circles vanish: πrl + 2πr² only"],
+ ["Four walls vs total surface of a room","2(l + b)h vs 2(lb + bh + hl)"],
+ ["Increased by 100% vs increased to 100%","By 100% = doubled; to 100% = unchanged"],
+ ["Radius +10%: area vs volume","+21% vs +33.1% — not +20% and +30%"],
+ ["Sphere inside a cube vs sphere around a cube","r = a/2 vs R = a√3/2"],
+ ["Diameter vs radius","Using d as r makes areas ×4 and volumes ×8 — the commonest planted option"],
+ ["Volume conserved vs surface conserved","Melting keeps volume; surface area grows when you make many small pieces"]
+];
+const COVERS = {
+ solids:{tab:"Solids drill", hideLabel:"Hide volume", note:"Cover the volume column and say each formula aloud; then check.", head:["Solid","Surface area","Volume"], hide:2, rows:[
+  ["Cube (edge a)","6a²","a³"],["Cuboid","2(lb + bh + hl)","lbh"],["Cylinder","2πr(r + h)","πr²h"],["Cone","πr(l + r)","⅓πr²h"],["Sphere","4πr²","(4/3)πr³"],["Hemisphere","3πr² (curved 2πr²)","(2/3)πr³"],["Frustum","π(R + r)l + πR² + πr²","(πh/3)(R² + r² + Rr)"],["Prism","Ph + 2B","Bh"],["Pyramid","½Pl + B","⅓Bh"],["Regular tetrahedron","√3a²","(√2/12)a³"]]},
+ pct:{tab:"% change drill", hideLabel:"Hide volume change", note:"A length changes; recall how the volume changes (area given as a hint).", head:["Length change","Area change","Volume change"], hide:2, rows:[
+  ["+10%","+21%","+33.1%"],["+20%","+44%","+72.8%"],["+25%","+56.25%","+95.3%"],["+50%","+125%","+237.5%"],["Doubled","×4 (+300%)","×8 (+700%)"],["−10%","−19%","−27.1%"],["−20%","−36%","−48.8%"],["Halved","×¼ (−75%)","×⅛ (−87.5%)"]]},
+ paint:{tab:"Painted cube drill", hideLabel:"Hide formula", note:"Cover the formula; the counts for n = 3, 4, 5 let you check it.", head:["Small cubes with…","Formula","n = 3","n = 4","n = 5"], hide:1, rows:[
+  ["3 faces painted","8","8","8","8"],["2 faces painted","12(n − 2)","12","24","36"],["1 face painted","6(n − 2)²","6","24","54"],["No face painted","(n − 2)³","1","8","27"],["At least one face","n³ − (n − 2)³","26","56","98"],["At least two faces","8 + 12(n − 2)","20","32","44"]]}
+};
+const FIND = { tab:"Formula finder", ph:"Search a formula (e.g. frustum, hemisphere, diagonal)", head:["Topic","Formula","Lesson","When to use"], rows:[
+ ["Cuboid volume","V = lbh","L1","Boxes, tanks, rooms (1 m³ = 1000 L)"],
+ ["Cuboid TSA","2(lb + bh + hl)","L1","Whole outer surface of a closed box"],
+ ["Four walls","2(l + b)h","L1","Painting / papering walls of a room"],
+ ["Cuboid diagonal","√(l² + b² + h²)","L1","Longest rod in a room or box"],
+ ["Volume from face areas","V = √(xyz)","L1","Three adjacent face areas given"],
+ ["TSA from edge-sum","TSA = (l + b + h)² − d²","L1","Sum of edges and diagonal given"],
+ ["Cube","V = a³, TSA = 6a², LSA = 4a², d = a√3","L1","Any cube question"],
+ ["Box with thickness","inner = outer − 2t","L1","Wooden box, wall thickness"],
+ ["Cylinder CSA","2πrh","L2","Curved surface, label, roller"],
+ ["Cylinder TSA","2πr(r + h)","L2","Closed cylinder"],
+ ["Cylinder volume","πr²h","L2","Tanks, pipes, wires"],
+ ["Hollow cylinder","π(R² − r²)h","L2","Metal in a pipe"],
+ ["Radius shortcut","r = 2V ÷ CSA","L2","CSA and volume both given"],
+ ["Cone slant height","l = √(r² + h²)","L3","Before any cone CSA"],
+ ["Cone CSA","πrl","L3","Tent canvas, conical cap"],
+ ["Cone TSA","πr(l + r)","L3","Closed solid cone"],
+ ["Cone volume","⅓πr²h","L3","Capacity of a cone"],
+ ["Sector to cone","θ = 360°·r/l; arc = 2πr","L3","Sheet folded into a cone"],
+ ["Sphere surface","4πr²","L4","Painting a ball"],
+ ["Sphere volume","(4/3)πr³","L4","Balls, melting"],
+ ["Hemisphere","CSA 2πr², TSA 3πr², V (2/3)πr³","L4","Bowls, domes"],
+ ["Spherical shell","(4/3)π(R³ − r³)","L4","Hollow sphere metal"],
+ ["Frustum volume","(πh/3)(R² + r² + Rr)","L5","Buckets, tumblers"],
+ ["Frustum slant height","√(h² + (R − r)²)","L5","Before frustum CSA"],
+ ["Frustum CSA","π(R + r)l","L5","Side of a bucket"],
+ ["Cone cut parallel","volume ∝ k³, area ∝ k²","L5","Ratio of the two parts"],
+ ["Prism","V = Bh, LSA = Ph","L6","Any right prism"],
+ ["Pyramid","V = ⅓Bh, LSA = ½Pl","L6","Square / triangular pyramid"],
+ ["Square pyramid slant","l² = h² + (a/2)²","L6","Height ↔ slant height"],
+ ["Regular tetrahedron","V = (√2/12)a³, TSA = √3a²","L6","All edges equal"],
+ ["Hexagonal base","(3√3/2)a²","L6","Hexagonal prism"],
+ ["Euler","F + V − E = 2","L6","Counting faces, edges, vertices"],
+ ["Number of pieces","n = V(old) ÷ V(new piece)","L7","Melting and recasting"],
+ ["Sphere into balls","n = (R/r)³","L7","Same-shape recasting"],
+ ["Sphere into wire","(4/3)R³ = r²L","L7","Wire length / radius"],
+ ["Cubes into one cube","A³ = a³ + b³ + c³","L7","Several cubes melted together"],
+ ["Flow through a pipe","Q = πr² × v","L8","Time to fill a tank"],
+ ["Rectangular channel","Q = width × depth × v","L8","Canals, channels"],
+ ["Rise in water level","rise = V(solid) ÷ base area","L8","Balls / cubes dropped into water"],
+ ["Rain on an area","V = area × depth","L8","Roof water, hectares"],
+ ["Toy (cone + hemisphere)","TSA = πr(l + 2r)","L9","Exposed surface of the toy"],
+ ["Capsule","TSA = 2πr(h + 2r), V = πr²h + (4/3)πr³","L9","Cylinder with hemispherical ends"],
+ ["Tent","2πrh + πrl","L9","Canvas for cylinder + cone"],
+ ["Cylinder with cone cavity","V = ⅔πr²h; TSA = 2πrh + πr² + πrl","L9","Cone hollowed out"],
+ ["Depression / hemisphere on a face","SA = 6a² + πr² (per face)","L9","Cube with bowls cut or domes fixed"],
+ ["Two % changes","x + y + xy/100","L10","r and h change together"],
+ ["Scale factor k","area × k², volume × k³","L10","All lengths change by the same %"],
+ ["Keep volume constant","h × 1/(1 + x/100)²","L10","Cylinder/cone radius grows x%"],
+ ["Equal-volume heights","cone = 3 × cylinder = 4r (sphere) = 2r (hemisphere)","L10","Same radius, same volume"],
+ ["Painted cube","8 · 12(n−2) · 6(n−2)² · (n−2)³","L11","3, 2, 1, 0 faces painted"],
+ ["Solids inside a cube","sphere πa³/6, cylinder πa³/4, cone πa³/12","L11","Largest solid cut from a cube"],
+ ["Sphere around a cube","R = a√3/2; cube in sphere a = 2R/√3","L11","Circumscribed / inscribed"],
+ ["Largest equal cubes","edge = HCF(l, b, h)","L11","Cutting a cuboid with no waste"]
+]};
+const APP = { key:"mensuration3d_workbook_v1", brand:"Mensuration 3D", sub:"क्षेत्रमिति (3D) · SSC maths workbook",
+  eyebrow:"SSC CGL · CHSL · Quant",
+  intro:"Every solid SSC asks about — cube and cuboid, cylinder, cone, sphere and hemisphere, frustum, prism and pyramid — and the problem types built on them: melting and recasting, water flow, combined solids, percentage change and cutting or painting cubes. Each lesson gives the formulas with the reason behind them, figures, real past questions solved step by step, and the traps the wrong options are built from.",
+  foot:"Go lesson by lesson: read the formula cards, work the examples on paper before opening the steps, then take the lesson's practice set. Use the drills to cover a column and recall it, the tiles for last-day revision, and the formula finder when you forget which formula a question needs.",
+  craft:"Write every answer as π × (something) and cancel π, ⅓ and 22/7 before multiplying — SSC picks numbers (7, 14, 21, 3.5) that cancel. Spot triplets (3-4-5, 5-12-13, 7-24-25, 20-21-29) to get slant heights instantly. For ratio and % questions use powers: lengths k, areas k², volumes k³. Eliminate options that are exactly 3×, 4× or 8× another option — they come from a forgotten ⅓, or diameter used as radius. When in doubt, approximate with π ≈ 3.14 and pick the closest option.",
+  heatNote:"Shares are approximate, based on recent SSC CGL and CHSL papers; they show where questions usually come from, not an exact count." };
+
+/* ============================================================
+   HELPERS & STATE
+   ============================================================ */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const hash = s => { let h = 5381; for (let i=0;i<s.length;i++) h = ((h<<5)+h + s.charCodeAt(i))|0; return "q"+(h>>>0).toString(36); };
+const shuffle = a => { const b=a.slice(); for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]];} return b; };
+const L = id => LESSONS.find(l => l.id === id);
+const LNUM = id => LESSONS.findIndex(l => l.id === id) + 1;
+
+const QS = QB.map(r => {
+  const fixed = !!r[6];
+  return { t:r[0], q:r[1], o:r[2], e:r[3], p:(r[4]||"").includes("p"), a: fixed ? (r[5]||0) : 0, fixed, id:hash(r[1]) };
+});
+const byLesson = id => QS.filter(q => q.t === id);
+// order of options to show: array of original indexes
+const makePerm = q => q.fixed ? q.o.map((_,i)=>i) : shuffle(q.o.map((_,i)=>i));
+
+const KEY = APP.key;
+let S = { ans:{}, bm:{}, les:{}, mocks:[] };
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch(e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
+const record = (q, ok) => { S.ans[q.id] = ok ? 1 : 0; save(); renderTop(); };
+
+function renderTop(){
+  const ids = Object.keys(S.ans).filter(k => QS.some(q => q.id === k));
+  const right = ids.filter(k => S.ans[k] === 1).length;
+  const pct = ids.length ? Math.round(right*100/ids.length) : 0;
+  $("#topstat").innerHTML = `<b>${ids.length}</b>/${QS.length} tried<br><b>${pct}%</b> right now`;
+}
+
+/* ============================================================
+   ROUTING
+   ============================================================ */
+let TAB = "learn";
+let timerId = null;
+function go(tab){
+  TAB = tab;
+  document.querySelectorAll(".nav button").forEach(b => b.setAttribute("aria-current", b.dataset.tab===tab ? "page" : "false"));
+  if (tab === "learn") renderLearn();
+  if (tab === "practice") renderPractice();
+  if (tab === "mock") renderMock();
+  if (tab === "revise") renderRevise();
+  window.scrollTo(0,0);
+  try { history.replaceState(null, "", "#"+tab); } catch(e) {}
+}
+document.querySelectorAll(".nav button").forEach(b => b.addEventListener("click", () => {
+  if (TAB === "mock" && M && M.running && b.dataset.tab !== "mock") { go("mock"); showMockLeave(b.dataset.tab); return; }
+  go(b.dataset.tab);
+}));
+
+/* ============================================================
+   LEARN
+   ============================================================ */
+function renderLearn(){
+  const done = LESSONS.filter(l => S.les[l.id] && S.les[l.id].done).length;
+  const nextIdx = LESSONS.findIndex(l => !(S.les[l.id] && S.les[l.id].done));
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="hero">
+      <span class="eyebrow">${APP.eyebrow}</span>
+      <h1>Learn it, test it, revise it</h1>
+      <p>${APP.intro} ${QS.length} exam-style questions in all.</p>
+      <div class="meter" aria-label="Lessons done"><i style="width:${done/LESSONS.length*100}%"></i></div>
+      <div class="row between"><span class="muted num" style="font-size:13px">${done}/${LESSONS.length} lessons done</span>
+      ${nextIdx>=0 ? `<button class="btn pri sm" type="button" data-open="${LESSONS[nextIdx].id}">${done? "Continue" : "Start"}: Lesson ${nextIdx+1}</button>` : `<span class="muted" style="font-size:13px">All lessons done. Try a mock test.</span>`}</div>
+    </div>
+    <div class="lessons">${LESSONS.map((l,i) => {
+      const st = S.les[l.id] || {}; const n = byLesson(l.id).length;
+      return `<button type="button" class="les ${st.done?"done":""} ${i===nextIdx?"next":""}" data-open="${l.id}">
+        <span class="no">${st.done ? "✓" : i+1}</span>
+        <span class="t"><b>${esc(l.title)}<span class="heatb" title="Exam frequency">${"🔥".repeat(l.heat||1)}</span></b><span>${l.hi} · ${n} questions</span></span>
+        <span class="sc">${st.best!=null ? `best<br>${st.best}/${n}` : ""}</span></button>`;}).join("")}
+    </div>
+    <p class="foot">${APP.foot}</p>
+  </section>`;
+  $("#app").querySelectorAll("[data-open]").forEach(b => b.addEventListener("click", () => openLesson(b.dataset.open, "learn")));
+}
+
+function blockHTML(b){
+
+  if (b.k==="formula") return `<div class="block"><h3>${b.title}</h3><div class="fgrid">${b.rows.map(r=>`<div class="fcard"><span class="fn">${r[0]}</span><span class="fx">${r[1]}</span>${r[2]?`<span class="fnote">${r[2]}</span>`:""}</div>`).join("")}</div></div>`;
+  if (b.k==="ex") return `<div class="ex"><div class="exhead"><span class="lab">${b.src ? "PYQ" : "Solved example"}</span>${b.src?`<span class="src">${b.src}</span>`:""}</div><div class="exq">${b.q}</div>${b.fig?`<figure class="fig">${b.fig}</figure>`:""}<details><summary>Show solution</summary><ol>${b.steps.map(x=>`<li>${x}</li>`).join("")}</ol><div class="exans">Answer: ${b.ans}</div>${b.tip?`<div class="trick" style="margin-top:8px"><span class="lab">Shortcut</span>${b.tip}</div>`:""}</details></div>`;
+  if (b.k==="figs") return `<div class="block"><h3>${b.title}</h3><div class="figwrap">${b.items.map(it=>`<figure>${it.svg}<figcaption>${it.cap}</figcaption></figure>`).join("")}</div></div>`;
+  if (b.k==="p") return `<div class="plain"><p>${b.h}</p></div>`;
+  if (b.k==="trick") return `<div class="trick"><span class="lab">Trick</span>${b.h}</div>`;
+  if (b.k==="link") return `<div class="link"><span class="lab">Link · connect the dots</span>${b.h}</div>`;
+  if (b.k==="q") { const perm = shuffle(b.o.map((_,i)=>i)); return `<div class="icheck" data-ic><span class="lab">Quick check</span><p class="qt">${esc(b.q)}</p><div class="opts">${perm.map((oi,k)=>`<button type="button" class="opt" data-ioi="${oi}"><span class="k">${"ABCD"[k]}</span><span>${esc(b.o[oi])}</span></button>`).join("")}</div><div class="exp" hidden><b class="okl"></b> ${esc(b.e)}</div></div>`; }
+  if (b.k==="hot") return `<div class="hot"><span class="lab">🔥 Exam radar · how often it's asked</span>${b.h}</div>`;
+  if (b.k==="trap") return `<div class="trap"><span class="lab">Trap · correction</span>${b.h}</div>`;
+  if (b.k==="facts") return `<div class="block"><h3>${b.title}</h3><dl class="facts">${b.rows.map(r=>`<div><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join("")}</dl></div>`;
+  if (b.k==="tl") return `<div class="block"><h3>${b.title}</h3><ul class="tl">${b.rows.map(r=>`<li><span class="y">${r[0]}</span><span>${r[1]}</span></li>`).join("")}</ul></div>`;
+  if (b.k==="table") {
+    const isNum = (ci) => b.numcol==="all" ? ci>0 : (b.numcol===1 && ci===1) || (typeof b.numcol==="string" && b.numcol.includes(String(ci)));
+    return `<div class="block"><h3>${b.title}</h3><div class="tbl"><table><thead><tr>${b.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${b.rows.map(r=>`<tr>${r.map((c,ci)=>`<td class="${isNum(ci)?"n":""}">${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+  }
+  if (b.k==="fig") return `<div class="block"><h3>${b.title}</h3><figure class="fig">${b.svg}<figcaption>${b.cap}</figcaption></figure></div>`;
+  if (b.k==="pyr") return `<div class="block"><h3>${b.title}</h3><div class="pyr">${b.items.map(it=>`<div>${PYR(it.rows)}<b>${it.name}</b><span class="muted">${it.note}</span></div>`).join("")}</div><p class="muted" style="font-size:13px;margin-top:8px"><span style="color:var(--blue)">■</span> males · <span style="color:var(--accent)">■</span> females · top = old, base = young</p></div>`;
+  return "";
+}
+
+let LQ = null;
+function openLesson(id, step){
+  const l = L(id), i = LNUM(id);
+  if (step === "quiz") { LQ = { id, list: shuffle(byLesson(id)).map(q => ({q, perm:makePerm(q)})), i:0, score:0, picked:null }; }
+  const head = `<div class="lhead"><button class="back" type="button" id="lback">‹ Lessons</button></div>
+    <span class="eyebrow">Lesson ${i} of ${LESSONS.length} · ${l.hi}</span><h1>${esc(l.title)}</h1>
+    <div class="steps" role="tablist">
+      <button type="button" data-step="learn" aria-current="${step==="learn"?"step":"false"}">1 · Learn</button>
+      <button type="button" data-step="quiz" aria-current="${step==="quiz"?"step":"false"}">2 · Quiz</button>
+      <button type="button" data-step="sum" aria-current="${step==="sum"?"step":"false"}">3 · Summary</button>
+    </div>`;
+  let body = "";
+  if (step === "learn") {
+    body = `<div class="stack">${l.blocks.map(blockHTML).join("")}
+      <div class="row end"><button class="btn pri" type="button" id="toquiz">Take the lesson quiz · ${byLesson(id).length} questions</button></div></div>`;
+  } else if (step === "quiz") {
+    body = `<div id="lq"></div>`;
+  } else {
+    const nxt = LESSONS[i];
+    body = `<div class="stack"><div class="block"><h3>Remember these</h3><ul class="sum">${l.sum.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>
+      <div class="row between"><button class="btn" type="button" id="relearn">Read again</button>
+      ${nxt ? `<button class="btn pri" type="button" id="nextles">Next: ${esc(nxt.title)}</button>` : `<button class="btn pri" type="button" id="tomock">Take a mock test</button>`}</div></div>`;
+    S.les[id] = Object.assign(S.les[id]||{}, {done:1}); save();
+  }
+  $("#app").innerHTML = `<section class="view stack">${head}${body}</section>`;
+  $("#lback").onclick = () => renderLearn();
+  $("#app").querySelectorAll("[data-step]").forEach(b => b.onclick = () => openLesson(id, b.dataset.step));
+  if (step==="learn") { $("#toquiz").onclick = () => openLesson(id,"quiz");
+    const ics = l.blocks.filter(b=>b.k==="q");
+    $("#app").querySelectorAll("[data-ic]").forEach((box,n) => { const b = ics[n];
+      box.querySelectorAll("[data-ioi]").forEach(btn => btn.onclick = () => {
+        if (box.dataset.done) return; box.dataset.done = 1; const pick = +btn.dataset.ioi;
+        box.querySelectorAll("[data-ioi]").forEach(x => { const oi=+x.dataset.ioi; x.disabled = true; if (oi===0) x.classList.add("ok"); else if (oi===pick) x.classList.add("no"); });
+        const ex = box.querySelector(".exp"); ex.hidden = false; const lab = ex.querySelector("b");
+        if (pick===0) { lab.textContent = "Correct."; } else { lab.className = "nol"; lab.textContent = "Answer: " + b.o[0] + "."; }
+      }); }); }
+  if (step==="quiz") renderLQ();
+  if (step==="sum") {
+    $("#relearn").onclick = () => openLesson(id,"learn");
+    const n = $("#nextles"); if (n) n.onclick = () => openLesson(LESSONS[i].id,"learn");
+    const m = $("#tomock"); if (m) m.onclick = () => go("mock");
+  }
+  window.scrollTo(0,0);
+}
+
+function optsHTML(q, perm, state){
+  // state: {picked: originalIndex|null, reveal: bool, sel: originalIndex|null}
+  return perm.map((oi, k) => {
+    let cls = "opt";
+    if (state.reveal) { if (oi === q.a) cls += " ok"; else if (oi === state.picked) cls += " no"; }
+    else if (state.sel === oi) cls += " sel";
+    return `<button type="button" class="${cls}" data-oi="${oi}" ${state.reveal?"disabled":""}><span class="k">${"ABCD"[k]}</span><span>${esc(q.o[oi])}</span></button>`;
+  }).join("");
+}
+function expHTML(q, picked){
+  const ok = picked === q.a;
+  return `<div class="exp">${ok ? `<b class="okl">Correct.</b>` : `<b class="nol">Answer: ${esc(q.o[q.a])}.</b>`} ${esc(q.e)}</div>`;
+}
+function metaHTML(q, no){
+  return `<div class="qmeta"><span class="qno">${no}</span><span class="tag">L${LNUM(q.t)} · ${esc(L(q.t).title)}</span>${q.p?`<span class="tag pyq">High-yield</span>`:""}
+  <button type="button" class="bm" data-bm="${q.id}" aria-pressed="${S.bm[q.id]?"true":"false"}" aria-label="Bookmark">${S.bm[q.id]?"★":"☆"}</button></div>`;
+}
+
+function renderLQ(){
+  const box = $("#lq");
+  if (LQ.i >= LQ.list.length) {
+    const n = LQ.list.length, l = L(LQ.id);
+    const st = S.les[LQ.id] || {}; st.best = Math.max(st.best||0, LQ.score); S.les[LQ.id] = st; save();
+    box.innerHTML = `<div class="stack"><div class="block stack"><span class="eyebrow">Quiz done</span>
+      <div class="scorebig"><span class="num">${LQ.score}</span><span class="muted">/ ${n} correct</span></div>
+      <p class="muted">${LQ.score===n ? "Full marks." : LQ.score >= n*0.8 ? "Strong. Review the ones you missed in Practice → Mistakes." : "Read the lesson once more, then retry. Missed questions are saved under Practice → Mistakes."}</p></div>
+      <div class="row between"><button class="btn" type="button" id="retry">Retry quiz</button><button class="btn pri" type="button" id="tosum">See summary</button></div></div>`;
+    $("#retry").onclick = () => openLesson(LQ.id,"quiz");
+    $("#tosum").onclick = () => openLesson(LQ.id,"sum");
+    return;
+  }
+  const it = LQ.list[LQ.i], q = it.q;
+  const reveal = LQ.picked !== null;
+  box.innerHTML = `<div class="stack"><div class="meter"><i style="width:${LQ.i/LQ.list.length*100}%"></i></div>
+    <article class="qcard">${metaHTML(q, `Q${LQ.i+1}/${LQ.list.length}`)}
+    <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {picked:LQ.picked, reveal})}</div>
+    ${reveal ? expHTML(q, LQ.picked) : ""}</article>
+    ${reveal ? `<div class="row end"><button class="btn pri" type="button" id="lqnext">${LQ.i+1 < LQ.list.length ? "Next question" : "Finish"}</button></div>` : `<p class="muted" style="font-size:13px">Score so far: <span class="num">${LQ.score}</span></p>`}</div>`;
+  box.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    if (LQ.picked !== null) return;
+    LQ.picked = +b.dataset.oi; const ok = LQ.picked === q.a; if (ok) LQ.score++; record(q, ok); renderLQ();
+  });
+  bindBM(box);
+  const nx = $("#lqnext"); if (nx) nx.onclick = () => { LQ.i++; LQ.picked = null; renderLQ(); window.scrollTo(0,0); };
+}
+
+function bindBM(root){
+  root.querySelectorAll("[data-bm]").forEach(b => b.onclick = (ev) => {
+    ev.stopPropagation();
+    const id = b.dataset.bm; if (S.bm[id]) delete S.bm[id]; else S.bm[id] = 1; save();
+    b.setAttribute("aria-pressed", S.bm[id] ? "true":"false"); b.textContent = S.bm[id] ? "★" : "☆";
+  });
+}
+
+/* ============================================================
+   PRACTICE
+   ============================================================ */
+let PF = "all", PSHOW = 20, PORDER = null, PPERM = {}, PPICK = {};
+function practiceList(){
+  let list = QS;
+  if (PF === "pyq") list = QS.filter(q => q.p);
+  else if (PF === "hot") list = QS.filter(q => (L(q.t).heat||1) === 3);
+  else if (PF === "wrong") list = QS.filter(q => S.ans[q.id] === 0);
+  else if (PF === "new") list = QS.filter(q => S.ans[q.id] === undefined);
+  else if (PF === "bm") list = QS.filter(q => S.bm[q.id]);
+  else if (PF !== "all") list = QS.filter(q => q.t === PF);
+  if (PORDER) { const pos = new Map(PORDER.map((id,i)=>[id,i])); list = list.slice().sort((a,b)=>(pos.get(a.id)??0)-(pos.get(b.id)??0)); }
+  return list;
+}
+function renderPractice(){
+  const wrongN = QS.filter(q => S.ans[q.id] === 0).length, bmN = QS.filter(q=>S.bm[q.id]).length, pyqN = QS.filter(q=>q.p).length;
+  const chips = [["all",`All ${QS.length}`],["new","Not tried"],["wrong",`Mistakes ${wrongN}`],["hot",`🔥 Hot topics ${QS.filter(q=>(L(q.t).heat||1)===3).length}`],["pyq",`PYQ ${pyqN}`],["bm",`Starred ${bmN}`]].concat(LESSONS.map((l,i)=>[l.id,`L${i+1} ${l.title}`]));
+  const list = practiceList();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Question bank</span><h1>Practice</h1>
+    <p class="muted">Tap an option to check it. Wrong answers go to <b>Mistakes</b> until you get them right.</p></div>
+    <div class="chips" role="group" aria-label="Filter">${chips.map(c=>`<button type="button" class="chip" data-f="${c[0]}" aria-pressed="${PF===c[0]}">${esc(c[1])}</button>`).join("")}</div>
+    <div class="row between"><span class="muted num" style="font-size:13px">${list.length} questions</span>
+      <div class="row"><button class="btn sm ghost" type="button" id="pshuf">${PORDER?"In order":"Shuffle"}</button></div></div>
+    <div class="stack" id="plist"></div>
+  </section>`;
+  $("#app").querySelectorAll("[data-f]").forEach(b => b.onclick = () => { PF = b.dataset.f; PSHOW = 20; PPICK = {}; renderPractice(); });
+  $("#pshuf").onclick = () => { PORDER = PORDER ? null : shuffle(QS.map(q=>q.id)); PSHOW = 20; renderPractice(); };
+  const chipOn = $(`.chip[aria-pressed="true"]`); if (chipOn) chipOn.scrollIntoView({block:"nearest", inline:"center"});
+  drawPList();
+}
+function pCard(q, idx){
+  if (!PPERM[q.id]) PPERM[q.id] = makePerm(q);
+  const picked = PPICK[q.id]; const reveal = picked !== undefined;
+  return `<article class="qcard" data-q="${q.id}">${metaHTML(q, "Q"+(idx+1))}<p class="qt">${esc(q.q)}</p>
+    <div class="opts">${optsHTML(q, PPERM[q.id], {picked: reveal?picked:null, reveal})}</div>${reveal?expHTML(q,picked):""}</article>`;
+}
+function drawPList(){
+  const list = practiceList(), box = $("#plist");
+  if (!list.length) { box.innerHTML = `<p class="empty">${PF==="wrong"?"No mistakes saved. Answer some questions first, or you've cleared them all.":PF==="bm"?"Nothing starred yet. Tap ☆ on any question.":"Nothing here."}</p>`; return; }
+  box.innerHTML = list.slice(0, PSHOW).map((q,i)=>pCard(q,i)).join("") + (list.length > PSHOW ? `<button class="btn" type="button" id="pmore">Show 20 more (${list.length-PSHOW} left)</button>` : "");
+  bindP(box);
+  const more = $("#pmore"); if (more) more.onclick = () => { PSHOW += 20; drawPList(); };
+}
+function bindP(box){ box.querySelectorAll(".qcard").forEach(bindCard); }
+function bindCard(card){
+  card.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    const q = QS.find(x => x.id === card.dataset.q); if (PPICK[q.id] !== undefined) return;
+    PPICK[q.id] = +b.dataset.oi; record(q, PPICK[q.id] === q.a);
+    const idx = +card.querySelector(".qno").textContent.slice(1) - 1;
+    const tmp = document.createElement("div"); tmp.innerHTML = pCard(q, idx); const nc = tmp.firstElementChild;
+    card.replaceWith(nc); bindCard(nc);
+  });
+  bindBM(card);
+}
+
+/* ============================================================
+   MOCK TEST
+   ============================================================ */
+let M = null, MCFG = {n:25, scope:"all", neg:1}, LEAVE_TO = null;
+function renderMock(){
+  if (M && M.running) return drawMockRun();
+  if (M && M.done) return drawMockResult();
+  const hist = (S.mocks||[]).slice(-6).reverse();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Timed, SSC pattern</span><h1>Mock test</h1>
+    <p class="muted">+2 for a right answer, −0.5 for a wrong one, 36 seconds per question (CGL Tier-1 pace). Answers show only after you submit.</p></div>
+    <div class="block stack">
+      <fieldset><legend>Questions</legend><div class="radios">${[10,25,50,100].map(n=>`<label><input type="radio" name="mn" id="mn${n}" value="${n}" ${MCFG.n===n?"checked":""}><span>${n} · ${Math.round(n*36/60)} min</span></label>`).join("")}</div></fieldset>
+      <fieldset><legend>From</legend><select id="mscope" aria-label="Lessons to draw from"><option value="all">All lessons</option><option value="hot">🔥 Hot topics only</option><option value="pyq">PYQs only</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}" ${MCFG.scope===l.id?"selected":""}>L${i+1} · ${esc(l.title)}</option>`).join("")}</select></fieldset>
+      <label class="row" style="gap:8px;font-weight:600"><input type="checkbox" id="mneg" ${MCFG.neg?"checked":""}> Negative marking (−0.5)</label>
+      <div id="merr" class="muted" style="font-size:14px"></div>
+      <div class="row end"><button class="btn pri" type="button" id="mstart">Start test</button></div>
+    </div>
+    ${hist.length ? `<div class="block"><h3>Recent attempts</h3><div class="hist">${hist.map(h=>`<div><span>${esc(h.d)} · ${h.n} Q</span><span class="num">${h.score}/${h.max} · ${h.acc}%</span></div>`).join("")}</div></div>` : ""}
+  </section>`;
+  $("#mscope").value = MCFG.scope;
+  $("#mstart").onclick = () => {
+    MCFG.n = +(document.querySelector('input[name="mn"]:checked')||{value:25}).value;
+    MCFG.scope = $("#mscope").value; MCFG.neg = $("#mneg").checked ? 1 : 0;
+    let pool = MCFG.scope==="all" ? QS : MCFG.scope==="pyq" ? QS.filter(q=>q.p) : MCFG.scope==="hot" ? QS.filter(q=>(L(q.t).heat||1)===3) : MCFG.scope==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===MCFG.scope);
+    if (!pool.length) { $("#merr").textContent = "No questions in that set yet. Pick another source."; return; }
+    const qs = shuffle(pool).slice(0, MCFG.n);
+    M = { running:true, list: qs.map(q=>({q, perm:makePerm(q)})), ans: qs.map(()=>null), mark: qs.map(()=>false), i:0, neg:MCFG.neg, secs: qs.length*36, start: Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000;
+    startTimer(); drawMockRun();
+  };
+}
+function startTimer(){
+  clearInterval(timerId);
+  timerId = setInterval(() => {
+    if (!M || !M.running) { clearInterval(timerId); return; }
+    const left = Math.max(0, Math.round((M.end - Date.now())/1000));
+    const el = $("#mtime"); if (el) { el.textContent = fmt(left); el.classList.toggle("low", left <= 60); }
+    if (left <= 0) submitMock();
+  }, 1000);
+}
+const fmt = s => `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+function drawMockRun(){
+  const it = M.list[M.i], q = it.q, left = Math.max(0, Math.round((M.end-Date.now())/1000));
+  const answered = M.ans.filter(a=>a!==null).length;
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="mbar"><span class="timer num ${left<=60?"low":""}" id="mtime">${fmt(left)}</span>
+      <span class="muted num" style="font-size:13px;flex:1">Q ${M.i+1}/${M.list.length} · ${answered} answered</span>
+      <button class="btn sm" type="button" id="mpal">${M.showPal?"Hide":"All Qs"}</button></div>
+    ${LEAVE_TO ? `<div class="confirm"><b>Leave the test?</b><span>Your answers so far will be scored now.</span><div class="row"><button class="btn sm pri" type="button" id="lvy">Submit and leave</button><button class="btn sm" type="button" id="lvn">Stay</button></div></div>` : ""}
+    ${M.showPal ? `<div class="block"><div class="pal">${M.list.map((_,k)=>`<button type="button" data-j="${k}" class="${M.ans[k]!==null?"a":""} ${M.mark[k]?"m":""} ${k===M.i?"cur":""}" aria-label="Question ${k+1}">${k+1}</button>`).join("")}</div>
+      <p class="muted" style="font-size:12px;margin-top:8px">Filled = answered · orange line = marked for review</p></div>` : ""}
+    <article class="qcard"><div class="qmeta"><span class="qno">Q${M.i+1}</span><span class="tag">L${LNUM(q.t)}</span>${M.mark[M.i]?`<span class="tag pyq">Marked</span>`:""}</div>
+      <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {sel:M.ans[M.i], reveal:false})}</div></article>
+    <div class="row between"><button class="btn" type="button" id="mprev" ${M.i===0?"disabled":""}>‹ Prev</button>
+      <button class="btn ghost" type="button" id="mmark">${M.mark[M.i]?"Unmark":"Mark"}</button>
+      <button class="btn ghost" type="button" id="mclr" ${M.ans[M.i]===null?"disabled":""}>Clear</button>
+      <button class="btn ${M.i<M.list.length-1?"pri":""}" type="button" id="mnext" ${M.i===M.list.length-1?"disabled":""}>Next ›</button></div>
+    ${M.confirm ? `<div class="confirm"><b>Submit the test?</b><span>${M.list.length-answered} unanswered${M.mark.filter(Boolean).length?`, ${M.mark.filter(Boolean).length} marked for review`:""}.</span><div class="row"><button class="btn sm pri" type="button" id="msubY">Submit</button><button class="btn sm" type="button" id="msubN">Keep going</button></div></div>`
+      : `<button class="btn pri" type="button" id="msub">Submit test</button>`}
+  </section>`;
+  $("#app").querySelectorAll(".opt").forEach(b => b.onclick = () => { M.ans[M.i] = +b.dataset.oi; drawMockRun(); });
+  $("#mprev").onclick = () => { if (M.i>0){M.i--; drawMockRun();} };
+  $("#mnext").onclick = () => { if (M.i<M.list.length-1){M.i++; drawMockRun(); window.scrollTo(0,0);} };
+  $("#mmark").onclick = () => { M.mark[M.i] = !M.mark[M.i]; drawMockRun(); };
+  $("#mclr").onclick = () => { M.ans[M.i] = null; drawMockRun(); };
+  $("#mpal").onclick = () => { M.showPal = !M.showPal; drawMockRun(); };
+  $("#app").querySelectorAll("[data-j]").forEach(b => b.onclick = () => { M.i = +b.dataset.j; drawMockRun(); });
+  const s = $("#msub"); if (s) s.onclick = () => { M.confirm = true; drawMockRun(); };
+  const y = $("#msubY"); if (y) y.onclick = submitMock;
+  const n = $("#msubN"); if (n) n.onclick = () => { M.confirm = false; drawMockRun(); };
+  const lvy = $("#lvy"); if (lvy) lvy.onclick = () => { const t = LEAVE_TO; LEAVE_TO = null; submitMock(); go(t); };
+  const lvn = $("#lvn"); if (lvn) lvn.onclick = () => { LEAVE_TO = null; drawMockRun(); };
+}
+function showMockLeave(tab){ LEAVE_TO = tab; drawMockRun(); }
+function submitMock(){
+  if (!M || !M.running) return;
+  clearInterval(timerId);
+  M.running = false; M.done = true; M.confirm = false;
+  let c=0,w=0,sk=0; const per = {};
+  M.list.forEach((it,k) => {
+    const a = M.ans[k]; const t = it.q.t; per[t] = per[t] || {c:0,n:0}; per[t].n++;
+    if (a===null) sk++; else if (a===it.q.a) { c++; per[t].c++; S.ans[it.q.id]=1; } else { w++; S.ans[it.q.id]=0; }
+  });
+  const max = M.list.length*2, score = +(c*2 - (M.neg? w*0.5 : 0)).toFixed(1);
+  const used = Math.min(M.secs, Math.round((Date.now()-M.start)/1000));
+  M.res = {c,w,sk,score,max,used,per, acc: (c+w) ? Math.round(c*100/(c+w)) : 0};
+  const d = new Date(); const ds = d.toLocaleDateString("en-IN",{day:"numeric",month:"short"})+" "+d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
+  S.mocks = (S.mocks||[]).concat([{d:ds, n:M.list.length, score, max, acc:M.res.acc}]).slice(-20); save(); renderTop();
+  M.filter = "wrong";
+  if (TAB==="mock") drawMockResult();
+}
+function drawMockResult(){
+  const r = M.res;
+  const per = Object.keys(r.per).sort((a,b)=>LNUM(a)-LNUM(b)).map(t => `<div><span>L${LNUM(t)} · ${esc(L(t).title)}</span><span class="num">${r.per[t].c}/${r.per[t].n}</span></div>`).join("");
+  const rows = M.list.map((it,k)=>({it,k})).filter(({it,k}) => M.filter==="all" ? true : M.filter==="wrong" ? (M.ans[k]!==null && M.ans[k]!==it.q.a) : M.ans[k]===null);
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Result</span>
+    <div class="scorebig"><span class="num">${r.score}</span><span class="muted">/ ${r.max} marks</span></div></div>
+    <div class="kpis"><div class="kpi g"><span class="num">${r.c}</span><span>right</span></div><div class="kpi b"><span class="num">${r.w}</span><span>wrong</span></div><div class="kpi"><span class="num">${r.sk}</span><span>skipped</span></div><div class="kpi"><span class="num">${r.acc}%</span><span>accuracy</span></div></div>
+    <p class="muted num" style="font-size:13px">Time used ${fmt(r.used)} of ${fmt(M.secs)}</p>
+    <div class="block"><h3>By lesson</h3><div class="hist">${per}</div></div>
+    <div class="row between"><button class="btn" type="button" id="mnew">New test</button><button class="btn pri" type="button" id="mretry">Retake same questions</button></div>
+    <h2>Review</h2>
+    <div class="chips">${[["wrong",`Wrong ${r.w}`],["skip",`Skipped ${r.sk}`],["all",`All ${M.list.length}`]].map(c=>`<button class="chip" type="button" data-rf="${c[0]}" aria-pressed="${M.filter===c[0]}">${c[1]}</button>`).join("")}</div>
+    <div class="stack">${rows.length ? rows.map(({it,k}) => `<article class="qcard">${metaHTML(it.q, "Q"+(k+1))}<p class="qt">${esc(it.q.q)}</p><div class="opts">${optsHTML(it.q, it.perm, {picked:M.ans[k], reveal:true})}</div>${M.ans[k]===null?`<div class="exp"><b class="nol">Skipped. Answer: ${esc(it.q.o[it.q.a])}.</b> ${esc(it.q.e)}</div>`:expHTML(it.q, M.ans[k])}</article>`).join("") : `<p class="empty">Nothing in this list.</p>`}</div>
+  </section>`;
+  bindBM($("#app"));
+  $("#app").querySelectorAll("[data-rf]").forEach(b => b.onclick = () => { M.filter = b.dataset.rf; drawMockResult(); });
+  $("#mnew").onclick = () => { M = null; renderMock(); };
+  $("#mretry").onclick = () => {
+    const list = M.list.map(it=>({q:it.q, perm:makePerm(it.q)}));
+    M = { running:true, list, ans:list.map(()=>null), mark:list.map(()=>false), i:0, neg:MCFG.neg, secs:list.length*36, start:Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000; startTimer(); drawMockRun();
+  };
+}
+
+/* ============================================================
+   REVISE
+   ============================================================ */
+let RV = "heat", FC = null, FCSCOPE = "all";
+const HID = {}, REV = {};
+Object.keys(COVERS).forEach(k => { HID[k] = 1; REV[k] = {}; });
+function renderRevise(){
+  const tabs = [["heat","🔥 PYQ heat map"]].concat(Object.keys(COVERS).map(k=>[k, COVERS[k].tab]), [["dis",FIND.tab],["nums","Numbers & pairs"],["links","Connections"],["tricks","Tricks"],["traps","Traps"],["flash","Flashcards"]]);
+  if (!tabs.some(t=>t[0]===RV)) RV = "heat";
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Last-day revision</span><h1>Revise</h1></div>
+    <div class="seg" role="tablist">${tabs.map(t=>`<button type="button" role="tab" data-rv="${t[0]}" aria-selected="${RV===t[0]}">${t[1]}</button>`).join("")}</div>
+    <div id="rv" class="stack"></div></section>`;
+  $("#app").querySelectorAll("[data-rv]").forEach(b => b.onclick = () => { RV = b.dataset.rv; renderRevise(); });
+  const on = $(`.seg [aria-selected="true"]`); if (on) on.scrollIntoView({block:"nearest", inline:"center"});
+  const box = $("#rv");
+  const pk = (key, i, val) => (HID[key] && !REV[key][i]) ? `<button type="button" class="peek" data-pk="${key}:${i}">tap</button>` : val;
+  const coverChips = (key, label) => `<div class="chips"><button type="button" class="chip" data-hide="${key}" aria-pressed="${!!HID[key]}">${label}</button><button type="button" class="chip" data-cover="${key}">Cover all again</button></div>`;
+  const bindCover = () => {
+    box.querySelectorAll("[data-hide]").forEach(b => b.onclick = () => { const k=b.dataset.hide; HID[k] = HID[k]?0:1; renderRevise(); });
+    box.querySelectorAll("[data-cover]").forEach(b => b.onclick = () => { REV[b.dataset.cover] = {}; renderRevise(); });
+    box.querySelectorAll("[data-pk]").forEach(b => b.onclick = () => { const [k,i] = b.dataset.pk.split(":"); REV[k][i]=1; renderRevise(); });
+  };
+  if (RV === "heat") {
+    const max = Math.max(...HEAT.map(h=>h[1]));
+    box.innerHTML = `<p class="muted">${APP.heatNote}</p>
+      <div class="block"><div class="heat">${HEAT.map(h=>`<button type="button" class="hrow" data-open="${h[2]}"><span class="ht"><b>${esc(h[0])}</b><span class="muted">${esc(h[3])}</span></span><span class="hbar"><i style="width:${h[1]/max*100}%"></i></span><span class="num hp">${h[1]}%</span></button>`).join("")}</div></div>
+      <div class="block"><h3>Lessons by exam heat</h3><dl class="rk">${[3,2,1].map(n=>`<div><dt>${"🔥".repeat(n)} ${n===3?"Very frequent":n===2?"Regular":"Occasional"}</dt><dd>${LESSONS.map((l,i)=>[l,i]).filter(x=>(x[0].heat||1)===n).map(x=>`L${x[1]+1} ${esc(x[0].title)}`).join(" · ")}</dd></div>`).join("")}</dl></div>`;
+    box.querySelectorAll("[data-open]").forEach(b => b.onclick = () => openLesson(b.dataset.open, "learn"));
+  }
+  if (COVERS[RV]) {
+    const c = COVERS[RV];
+    box.innerHTML = `<p class="muted">${c.note}</p>${coverChips(RV, c.hideLabel)}
+      <div class="block"><div class="tbl"><table class="cover"><thead><tr>${c.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${c.rows.map((r,i)=>`<tr>${r.map((v,ci)=>`<td ${ci?`data-l="${c.head[ci]}"`:""}>${ci===0?`<b>${esc(v)}</b>`:ci===c.hide?pk(RV,i,esc(v)):esc(v)}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+    bindCover();
+  }
+  if (RV === "dis") {
+    box.innerHTML = `<input class="search" id="fs" type="search" placeholder="${FIND.ph}" aria-label="${FIND.tab}">
+      <div class="chips" id="dtype"></div>
+      <div class="block"><div class="tbl"><table class="cover"><thead><tr>${FIND.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody id="fb"></tbody></table></div></div>`;
+    const types = ["All"].concat([...new Set(FIND.rows.map(d=>d[2]))]);
+    let T = "All";
+    const draw = () => { const q = $("#fs").value.trim().toLowerCase();
+      $("#dtype").innerHTML = types.map(t=>`<button type="button" class="chip" data-t="${esc(t)}" aria-pressed="${T===t}">${esc(t)}</button>`).join("");
+      $("#dtype").querySelectorAll("[data-t]").forEach(b => b.onclick = () => { T = b.dataset.t; draw(); });
+      const rows = FIND.rows.filter(x => (T==="All"||x[2]===T) && (!q || x.join(" ").toLowerCase().includes(q)));
+      $("#fb").innerHTML = rows.length ? rows.map(a=>`<tr><td><b>${esc(a[0])}</b></td><td data-l="${FIND.head[1]}">${esc(a[1])}</td><td data-l="${FIND.head[2]}">${esc(a[2])}</td><td data-l="${FIND.head[3]}" class="muted">${esc(a[3])}</td></tr>`).join("") : `<tr><td colspan="4" class="muted">No match.</td></tr>`; };
+    $("#fs").oninput = draw; draw();
+  }
+  if (RV === "links") {
+    const items = LESSONS.flatMap((l,i) => l.blocks.filter(b=>b.k==="link").map(b=>({l:i+1, t:l.title, h:b.h})));
+    box.innerHTML = items.map(x => `<div class="link"><span class="lab">L${x.l} · ${esc(x.t)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "nums") {
+    box.innerHTML = `<div class="tiles">${TILES.map(t=>`<div class="tile"><span class="num">${t[0]}</span><span>${t[1]}</span></div>`).join("")}</div>
+    <div class="block"><h3>Look-alike pairs</h3><dl class="rk">${PAIRS.map(p=>`<div><dt>${esc(p[0])}</dt><dd>${esc(p[1])}</dd></div>`).join("")}</dl></div>`;
+  }
+  if (RV === "tricks" || RV === "traps") {
+    const kind = RV==="tricks" ? "trick" : "trap";
+    const items = LESSONS.flatMap((l,i) => l.blocks.filter(b=>b.k===kind).map(b=>({l:i+1, t:l.title, h:b.h})));
+    const extra = kind==="trick" ? `<div class="trick"><span class="lab">Exam craft</span>${APP.craft}</div>` : "";
+    box.innerHTML = extra + items.map(x => `<div class="${kind}"><span class="lab">L${x.l} · ${esc(x.t)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "flash") drawFlash(box);
+}
+
+
+function drawFlash(box){
+  if (!FC) { const pool = FCSCOPE==="all" ? QS : FCSCOPE==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===FCSCOPE); FC = {list: shuffle(pool), i:0, flip:false, known:0}; }
+  const sel = `<select id="fcs" aria-label="Flashcard set"><option value="all">All questions</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}">L${i+1} · ${esc(l.title)}</option>`).join("")}</select>`;
+  if (!FC.list.length || FC.i >= FC.list.length) {
+    box.innerHTML = `<div class="row">${sel}</div><div class="block stack"><h3>${FC.list.length ? "Deck finished" : "No cards in this set"}</h3>${FC.list.length?`<p class="muted">You knew ${FC.known} of ${FC.list.length} on first look.</p>`:""}<div class="row"><button class="btn pri" type="button" id="fcr">Shuffle and restart</button></div></div>`;
+    $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+    $("#fcr").onclick = () => { FC = null; drawFlash(box); }; return;
+  }
+  const q = FC.list[FC.i];
+  box.innerHTML = `<div class="row between">${sel}<span class="muted num" style="font-size:13px">${FC.i+1}/${FC.list.length}</span></div>
+    <button type="button" class="flash" id="fcard" aria-label="Flip card">
+      <span class="side">${FC.flip?"Answer":"Question · tap to flip"}</span>
+      <span class="front">${esc(q.q)}</span>
+      ${FC.flip ? `<span class="ans">${esc(q.o[q.a])}</span><span class="muted">${esc(q.e)}</span>` : ""}
+    </button>
+    <div class="row between"><button class="btn" type="button" id="fca" ${FC.flip?"":"disabled"}>Again later</button><button class="btn pri" type="button" id="fck" ${FC.flip?"":"disabled"}>Got it</button></div>`;
+  $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+  $("#fcard").onclick = () => { FC.flip = !FC.flip; drawFlash(box); };
+  $("#fca").onclick = () => { FC.list.push(q); FC.list.splice(FC.i,1); FC.flip=false; drawFlash(box); };
+  $("#fck").onclick = () => { FC.known++; FC.i++; FC.flip=false; drawFlash(box); };
+}
+
+/* boot */
+renderTop();
+const start = (location.hash||"").replace("#","");
+go(["learn","practice","mock","revise"].includes(start) ? start : "learn");
+</script>
+
+
+<style id="shabd-skin">
+/* ===== शब्दRegister skin: app colours + fonts (only when opened from the app) ===== */
+:root[data-skin="paper"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(150,128,90,.10) 31px, rgba(150,128,90,.10) 32px);--app-psize:auto;--app-card:#FFFCF6;--app-rule:#DCCFB2;--app-pri:#2F6F63;--app-ink:#221E17;--app-soft:#5E5547;--app-faint:#857B6A;--app-bg:#F3EEE3;--app-deep:#E9E1CF;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#F3EEE3;--sheet:#FFFCF6;--sunk:#E9E1CF;--ink:#221E17;--ink2:#5E5547;--rule:#DCCFB2;--blue:#2F6F63;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--accent:#A87E1F;--accent-bg:color-mix(in srgb, #A87E1F 16%, #FFFCF6);--good:#2F6F63;--good-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--bad:#8C2F39;--bad-bg:color-mix(in srgb, #8C2F39 14%, #FFFCF6);--warn-bg:color-mix(in srgb, #C99A2E 18%, #FFFCF6);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="paper"][data-theme="dark"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--sheet:#26211A;--sunk:#25201A;--ink:#EFE6D2;--ink2:#BDB195;--rule:#3B3429;--blue:#3F9A86;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3F9A86 22%, #26211A);--accent:#D9AE4B;--accent-bg:color-mix(in srgb, #D9AE4B 24%, #26211A);--good:#5FB9A3;--good-bg:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-bg:color-mix(in srgb, #D06B74 22%, #26211A);--warn-bg:color-mix(in srgb, #D9AE4B 26%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="paper"]:not([data-theme="light"]){--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--sheet:#26211A;--sunk:#25201A;--ink:#EFE6D2;--ink2:#BDB195;--rule:#3B3429;--blue:#3F9A86;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3F9A86 22%, #26211A);--accent:#D9AE4B;--accent-bg:color-mix(in srgb, #D9AE4B 24%, #26211A);--good:#5FB9A3;--good-bg:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-bg:color-mix(in srgb, #D06B74 22%, #26211A);--warn-bg:color-mix(in srgb, #D9AE4B 26%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin="indigo"]{--app-pattern:radial-gradient(rgba(61,92,240,.10) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#FFFFFF;--app-rule:#CBD3EC;--app-pri:#3D5CF0;--app-ink:#0F1B3D;--app-soft:#4A5680;--app-faint:#67739C;--app-bg:#EEF1FA;--app-deep:#E1E6F5;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#EEF1FA;--sheet:#FFFFFF;--sunk:#E1E6F5;--ink:#0F1B3D;--ink2:#4A5680;--rule:#CBD3EC;--blue:#3D5CF0;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3D5CF0 14%, #FFFFFF);--accent:#D9831A;--accent-bg:color-mix(in srgb, #D9831A 16%, #FFFFFF);--good:#147D53;--good-bg:color-mix(in srgb, #147D53 14%, #FFFFFF);--bad:#C8402F;--bad-bg:color-mix(in srgb, #C8402F 14%, #FFFFFF);--warn-bg:color-mix(in srgb, #F7C548 18%, #FFFFFF);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="indigo"][data-theme="dark"]{--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--sheet:#121D47;--sunk:#0E1839;--ink:#EEF2FF;--ink2:#A7B3DA;--rule:#22306A;--blue:#6F86FF;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #6F86FF 22%, #121D47);--accent:#F7B24D;--accent-bg:color-mix(in srgb, #F7B24D 24%, #121D47);--good:#45C08A;--good-bg:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-bg:color-mix(in srgb, #F07B6E 22%, #121D47);--warn-bg:color-mix(in srgb, #F7C548 26%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="indigo"]:not([data-theme="light"]){--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--sheet:#121D47;--sunk:#0E1839;--ink:#EEF2FF;--ink2:#A7B3DA;--rule:#22306A;--blue:#6F86FF;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #6F86FF 22%, #121D47);--accent:#F7B24D;--accent-bg:color-mix(in srgb, #F7B24D 24%, #121D47);--good:#45C08A;--good-bg:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-bg:color-mix(in srgb, #F07B6E 22%, #121D47);--warn-bg:color-mix(in srgb, #F7C548 26%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin] body{background-color:var(--app-bg);background-image:var(--app-pattern);background-size:var(--app-psize);background-attachment:fixed}
+:root[data-skin] h1,:root[data-skin] h2{letter-spacing:-.01em}
+
+/* ===== Desktop layout (PC / tablet landscape) ===== */
+@media (min-width: 1024px){
+  :root{--side:236px}
+  body{padding-left:var(--side);font-size:16.5px}
+  .top{border-bottom:1px solid var(--rule)}
+  .top-in{max-width:1320px;padding:16px 36px}
+  .brand{font-size:21px}
+  .brand small{font-size:13px}
+  .stat{font-size:13px}
+  .wrap{max-width:1320px;padding:0 36px 56px}
+  .view{padding-top:28px}
+  h1{font-size:34px} h2{font-size:22px} h3{font-size:17px}
+
+  /* bottom tab bar becomes a left sidebar */
+  .nav{top:0;bottom:0;left:0;right:auto;width:var(--side);height:auto;border-top:0;border-right:1px solid var(--rule);padding:84px 14px 20px;display:block;overflow:auto}
+  .nav-in{display:flex;flex-direction:column;gap:4px;height:auto;max-width:none;margin:0}
+  .nav-in::before{content:"Sections";display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);padding:0 14px 8px}
+  .nav button{flex-direction:row;justify-content:flex-start;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;font-size:15px;min-height:0;height:auto;width:100%;text-align:left}
+  .nav button svg{width:20px;height:20px;flex-shrink:0}
+  .nav button:hover{background:var(--sunk)}
+  .nav button[aria-current="page"]{background:var(--blue-bg)}
+  .nav button[aria-current="page"] span{border-bottom:0!important}
+
+  /* home: intro beside progress, lessons as a card grid */
+  .hero{grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);column-gap:48px;align-items:end;padding-bottom:10px}
+  .hero > .eyebrow,.hero > h1,.hero > p{grid-column:1}
+  .hero > .meter{grid-column:2;grid-row:3;align-self:center}
+  .hero > .row{grid-column:2;grid-row:2;align-self:end}
+  .lessons{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;border-top:0}
+  .les{background:var(--sheet);border:1px solid var(--rule);border-radius:16px;padding:16px 18px;transition:transform .15s ease,box-shadow .15s ease,border-color .15s}
+  .les:hover{transform:translateY(-2px);border-color:var(--blue);box-shadow:0 14px 30px -22px rgba(0,0,0,.45)}
+  .les.next{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
+
+  /* lesson reader: facts, timelines, tricks sit side by side */
+  .lhead{margin-bottom:0}
+  .steps{max-width:640px}
+  .steps + .stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+  .steps + .stack > .plain,.steps + .stack > .row,.steps + .stack > p,.steps + .stack > .fig,.steps + .stack > h2,.steps + .stack > .tbl{grid-column:1/-1}
+  .steps + .stack > .plain{max-width:86ch;font-size:17px}
+  .steps + .stack:not(:has(> .block ~ .block)) > .block{grid-column:1/-1}
+  .block,.qcard{padding:18px 20px;border-radius:14px}
+
+  /* quizzes and question bank */
+  #lq > .stack{display:grid;grid-template-columns:minmax(0,1fr);max-width:980px;gap:16px}
+  .opts{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .qt{font-size:18px}
+  #plist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #plist .opts{grid-template-columns:minmax(0,1fr)}
+  .chips{flex-wrap:wrap;overflow:visible}
+
+  /* mock test: question with the answer grid alongside */
+  .mbar{top:calc(env(safe-area-inset-top,0px) + 67px)}
+  .view > .qcard{max-width:1000px}
+  .view > .row.between{max-width:1000px}
+  .view > #msub{max-width:1000px;width:100%}
+  .view > .block.stack{max-width:760px}
+  .pal{grid-template-columns:repeat(auto-fill,minmax(46px,1fr))}
+  .kpis{max-width:760px}
+
+  /* revise: cards in columns */
+  #rkl,#rv > .stack:not(#rkl){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #rv > .search{max-width:520px}
+  .tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .flash{min-height:300px;max-width:760px;margin:0 auto;padding:32px 36px}
+  .flash .front{font-size:22px}
+}
+@media (min-width: 1500px){
+  #plist,#rkl{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+</style>
+<script id="shabd-deeplink">
+(function(){
+  var l; try{ l = new URLSearchParams(location.search).get('lesson'); }catch(e){}
+  if(!l) return;
+  function run(){
+    try{
+      if(typeof openLesson === 'function' && typeof LESSONS !== 'undefined'){ if(LESSONS.some(function(x){ return x.id === l; })) openLesson(l, 'learn'); }
+      else if(typeof openRule === 'function'){ var n = parseInt(String(l).replace(/\D/g, ''), 10); if(n) openRule(n, 'learn'); }
+      else if(typeof COURSE !== 'undefined' && typeof go === 'function'){ var i = COURSE.findIndex(function(c){ return c.id === l; }); if(i >= 0) go({ name: 'lesson', i: i, step: 0, ans: {}, score: 0 }); }
+    }catch(e){}
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(run, 30); }); else setTimeout(run, 30);
+})();
+</script>
+</body></html>

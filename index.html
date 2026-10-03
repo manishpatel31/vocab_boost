@@ -813,6 +813,40 @@
     .celebrate{ right:16px; bottom:96px; }
     .toast{ bottom:96px; }
   }
+  /* ---------- search ---------- */
+  .search-page{ z-index:395; }
+  .search-bar{ gap:6px; }
+  .search-field{ flex:1; min-width:0; display:flex; align-items:center; gap:8px; height:38px; padding:0 12px; border-radius:12px; background:var(--bar-hover); color:var(--bar-fg); }
+  .search-field svg{ flex-shrink:0; opacity:.7; }
+  .search-field input{ flex:1; min-width:0; border:0; outline:0; background:transparent; color:inherit; font:inherit; font-size:16px; padding:0; }
+  .search-field input::placeholder{ color:var(--bar-muted); }
+  #searchResults{ max-width:900px; padding-top:18px; }
+  .sr-chips{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:6px; position:sticky; top:0; z-index:2; padding:6px 0; background:var(--paper); }
+  .sr-chips button{ border:1px solid var(--rule); background:var(--card); color:var(--ink); border-radius:999px; padding:7px 14px; font:inherit; font-size:13.5px; font-weight:600; cursor:pointer; }
+  .sr-chips button small{ color:var(--ink-faint); font-weight:700; margin-left:2px; }
+  .sr-chips button.on{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .sr-chips button.on small{ color:inherit; opacity:.7; }
+  .sr-sec{ margin-top:16px; }
+  .sr-sec h3{ margin:0 0 8px; font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint); }
+  .sr-item{ display:flex; align-items:flex-start; gap:12px; width:100%; text-align:left; padding:12px 14px; margin-bottom:8px; background:var(--card); border:1px solid var(--rule); border-left:4px solid var(--sr-c, var(--teal)); border-radius:14px; color:var(--ink); font:inherit; }
+  button.sr-item{ cursor:pointer; }
+  button.sr-item:hover{ border-color:var(--sr-c, var(--teal)); }
+  .sr-ico{ font-size:20px; line-height:1.2; flex-shrink:0; }
+  .sr-body{ flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
+  .sr-meta{ font-size:11.5px; font-weight:700; letter-spacing:.04em; color:var(--ink-faint); text-transform:uppercase; }
+  .sr-body b{ font-size:15.5px; }
+  .sr-snip{ font-size:13.5px; color:var(--ink-soft); line-height:1.45; overflow-wrap:anywhere; }
+  .sr-qq{ font-size:14.5px; font-weight:600; line-height:1.4; }
+  .sr-ans{ font-size:14px; font-weight:700; color:var(--teal); }
+  .sr-go{ align-self:center; font-size:13px; font-weight:700; color:var(--sr-c, var(--teal)); white-space:nowrap; }
+  .sr-links button{ border:0; background:none; padding:4px 0 0; color:var(--sr-c, var(--teal)); font:inherit; font-size:13px; font-weight:700; cursor:pointer; }
+  .sr-item mark{ background:color-mix(in srgb, var(--mustard) 35%, transparent); color:inherit; border-radius:3px; padding:0 1px; }
+  .sr-more{ border:1px dashed var(--rule); background:transparent; color:var(--ink-soft); border-radius:12px; padding:9px 14px; width:100%; font:inherit; font-weight:700; cursor:pointer; }
+  .sr-empty{ text-align:center; padding:40px 12px; color:var(--ink-soft); }
+  .sr-empty b{ display:block; font-size:18px; color:var(--ink); margin-bottom:6px; }
+  .sr-try{ display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:14px; }
+  .sr-try button{ border:1px solid var(--rule); background:var(--card); color:var(--ink); border-radius:999px; padding:6px 13px; font:inherit; font-size:13.5px; cursor:pointer; }
+  @media (max-width: 860px){ .search-bar .sb-lab{ display:none; } .sr-go{ display:none; } }
   /* ---------- पाठShala home (default page) ---------- */
   body.on-home header.top, .main:has(#view-home.active) header.top{ display:none; }
   .h1-sub{ font-family:var(--font-body); font-size:.42em; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint); margin-left:8px; vertical-align:middle; }
@@ -904,7 +938,7 @@
   .hub-sub-h .sub-prog{ margin-left:auto; display:flex; align-items:center; gap:8px; font-weight:600; color:var(--ink-soft); }
   .hub-sub-h .sub-prog i{ display:block; width:90px; height:5px; border-radius:5px; background:var(--rule); overflow:hidden; }
   .hub-sub-h .sub-prog i b{ display:block; height:100%; background:var(--teal); }
-  @media (min-width: 1100px){ .subj-tiles{ grid-template-columns:repeat(9, minmax(0, 1fr)); } .subj-tile{ padding:12px 11px 11px; } }
+  @media (min-width: 1100px){ .subj-tiles{ grid-template-columns:repeat(10, minmax(0, 1fr)); } .subj-tile{ padding:12px 11px 11px; } }
   @media (min-width: 1000px){ #homeBody .hub-grid{ grid-template-columns:repeat(3, minmax(0, 1fr)); } }
   @media (max-width: 860px){ .subj-tiles{ grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; } .subj-tile{ padding:10px; } .subj-tile em{ font-size:10.5px; } .hub-sub-h .sub-prog i{ width:60px; } }
   @media (max-width: 460px){ .subj-tile .ic{ font-size:19px; margin-bottom:3px; } .subj-tile b{ font-size:13px; } .subj-tile small{ font-size:10.5px; } .subj-tile .bar{ margin:6px 0 4px; } }
@@ -950,6 +984,14 @@
 <script>(function(){try{var t=localStorage.getItem("vocabRegisterTheme");var m=localStorage.getItem("vocabRegisterDarkMode");var d=m==="1"||(m===null&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.body.className=(t==="indigo"?"theme-indigo":"theme-paper")+(d?" dark":"");}catch(e){document.body.className="theme-paper";}})();</script>
 
 <div class="loading-overlay" id="loadingOverlay"><div>Opening पाठShala…</div></div>
+
+<div class="hub-page search-page" id="searchPage" role="dialog" aria-label="Search">
+  <div class="study-bar search-bar">
+    <button id="searchBack" title="Close search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg><span class="sb-lab">Back</span></button>
+    <label class="search-field"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg><input type="search" id="searchInput" placeholder="Search lessons, formulas, questions, words…" autocomplete="off" enterkeyhint="search"></label>
+  </div>
+  <div class="hub-scroll"><div class="hub-wrap" id="searchResults"></div></div>
+</div>
 
 <div class="hub-page drill-page" id="drillPage" role="dialog" aria-label="Practice">
   <div class="study-bar">
@@ -1076,6 +1118,7 @@
           </div>
         </div>
       </div>
+      <button class="bar-icon" id="searchBtn" aria-label="Search all apps" title="Search all apps (Ctrl + K)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg></button>
       <button class="bar-icon" id="notifBtn" aria-label="Notifications" style="display:none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg><span class="notif-count" id="notifCount" style="display:none;"></span></button>
       <div class="navgroup" data-group="account">
         <button class="account-btn" aria-label="Account menu" aria-haspopup="true" aria-expanded="false"><span class="who" id="whoBox"></span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
@@ -1573,6 +1616,10 @@
     appointments:{ title: 'Appointments 2026',          file: 'study-appointments.html', key: 'appointments_workbook_v1' },
     polity:   { title: 'Indian Polity',                file: 'study-polity.html',       key: 'polity_pyq_workbook_v1' },
     economics:{ title: 'Indian Economy',               file: 'study-economics.html',    key: 'economics_pyq_workbook_v1' },
+    geometry: { title: 'Geometry',                     file: 'study-geometry.html',     key: 'geometry_workbook_v1' },
+    mensuration2d:{ title: 'Mensuration 2D',           file: 'study-mensuration2d.html', key: 'mensuration2d_workbook_v1' },
+    mensuration3d:{ title: 'Mensuration 3D',           file: 'study-mensuration3d.html', key: 'mensuration3d_workbook_v1' },
+    trigonometry: { title: 'Trigonometry',             file: 'study-trigonometry.html', key: 'trigonometry_workbook_v1' },
     physics:  { title: 'Physics',                      file: 'study-physics.html',      key: 'physics_pyq_workbook_v1' },
     biology:  { title: 'Biology',                      file: 'study-biology.html',      key: 'biology_pyq_workbook_v1' },
     space:    { title: 'Space & ISRO Missions',              file: 'study-space.html',        key: 'space_missions_workbook_v1' }
@@ -1593,6 +1640,12 @@
   STUDY.space.subj = 'gs'; STUDY.space.ico = '🚀'; STUDY.space.hi = 'अंतरिक्ष मिशन · Science & Tech'; STUDY.space.desc = 'Orbits, rockets and ISRO centres; Chandrayaan, Aditya-L1, Gaganyaan, NISAR and the 2024–26 launches.'; STUDY.space.meta = '16 lessons · 374 questions'; STUDY.space.color = '#5B45B0';
   STUDY.physics.subj = 'gs'; STUDY.physics.ico = '🔭'; STUDY.physics.hi = 'भौतिकी · PYQ'; STUDY.physics.desc = 'SI units, motion, Newton’s laws, gravitation, pressure, heat, sound, mirrors, lenses and the human eye.'; STUDY.physics.meta = '16 lessons · 321 questions'; STUDY.physics.color = '#C4572A';
   STUDY.biology.subj = 'gs'; STUDY.biology.ico = '🧬'; STUDY.biology.hi = 'जीव विज्ञान · PYQ'; STUDY.biology.desc = 'Cell to classification, vitamins, human body systems, hormones, plants, genetics and diseases.'; STUDY.biology.meta = '24 lessons · 461 questions'; STUDY.biology.color = '#3E8A4F';
+  // Maths section (Tier 1 + Tier 2): formulas, concepts, tricks, figures and PYQs
+  [['geometry', '📐', 'ज्यामिति', 'Lines and triangles to circles and coordinate geometry — centres, similarity, tangents, cyclic quadrilaterals, with figures and PYQs.', 12, 237, '#2F6DB5'],
+   ['mensuration2d', '⬛', 'क्षेत्रमिति · 2D', 'Areas and perimeters of triangles, quadrilaterals, circles, sectors, polygons, paths, inscribed figures and shaded regions.', 11, 190, '#B5662F'],
+   ['mensuration3d', '🧊', 'क्षेत्रमिति · 3D', 'Cube to frustum — volumes and surface areas, melting and recasting, water flow, combined solids and painted cubes.', 11, 179, '#7A4FB0'],
+   ['trigonometry', '📏', 'त्रिकोणमिति', 'Ratios, standard values, identities, max–min, allied and compound angles, heights and distances, radians.', 11, 196, '#2F8F7A']
+  ].forEach(function(x){ var m = STUDY[x[0]]; m.subj = 'maths'; m.ico = x[1]; m.hi = x[2]; m.desc = x[3]; m.meta = x[4] + ' lessons · ' + x[5] + ' questions'; m.color = x[6]; m.lessons = x[4]; m.unit = 'lessons'; });
   // General Studies is split by subject in पाठShala
   var GS_SUBJECTS = [
     ['history', 'History', 'इतिहास'], ['culture', 'Art & Culture', 'कला एवं संस्कृति'], ['polity', 'Polity', 'राजव्यवस्था'],
@@ -1629,8 +1682,8 @@
     return '<section class="hub-sec"><div class="hub-sec-h"><h2>Practice across subjects</h2><span>सभी विषय</span></div><div class="hub-grid hub-actions">' +
       '<button class="hub-card hub-act" data-hub-act="mistakes" style="--hub-c:var(--maroon);"><div class="hub-top"><div class="hub-ico">📕</div><div><h3>Mistakes book</h3><div class="hi">गलतियाँ · all subjects</div></div><div class="hub-big">' + totalWrong + '</div></div>' +
         '<p>Every question you got wrong in any mini app or mock — practise them until they’re gone.</p><div class="hub-meta"><span>' + (totalWrong ? totalWrong + ' waiting' : 'Nothing to fix yet') + '</span><b>Open ›</b></div></button>' +
-      '<button class="hub-card hub-act" data-hub-act="mock" style="--hub-c:var(--teal);"><div class="hub-top"><div class="hub-ico">⏱️</div><div><h3>Mixed mock test</h3><div class="hi">English + GS · timed</div></div>' + (last ? '<div class="hub-big">' + last.score + '<small>/' + last.max + '</small></div>' : '') + '</div>' +
-        '<p>Vocab + Grammar + all ' + gsIds().length + ' GS mini apps in one SSC-style paper, +2 / −0.5, with a subject-wise report.</p><div class="hub-meta"><span>' + (hist.length ? hist.length + ' taken · last ' + agoText(last.at).replace('Opened ', '') : 'Not taken yet') + '</span><b>Start ›</b></div></button>' +
+      '<button class="hub-card hub-act" data-hub-act="mock" style="--hub-c:var(--teal);"><div class="hub-top"><div class="hub-ico">⏱️</div><div><h3>Mixed mock test</h3><div class="hi">English + Maths + GS · timed</div></div>' + (last ? '<div class="hub-big">' + last.score + '<small>/' + last.max + '</small></div>' : '') + '</div>' +
+        '<p>Vocab, Grammar, ' + mathIds().length + ' Maths apps and ' + gsIds().length + ' GS apps in one SSC-style paper, +2 / −0.5, with a subject-wise report.</p><div class="hub-meta"><span>' + (hist.length ? hist.length + ' taken · last ' + agoText(last.at).replace('Opened ', '') : 'Not taken yet') + '</span><b>Start ›</b></div></button>' +
       '</div></section>';
   }
   // ================= पाठShala home: the app's front page =================
@@ -1733,7 +1786,7 @@
       '<div class="hub-stats"><span><b>' + ve.length + '</b> words</span><span><b>' + mem + '</b> memorized</span>' + (due ? '<span class="hub-wrong"><b>' + due + '</b> due</span>' : '') + '</div>' +
       '<div class="hub-meta"><span>Library · Spelling Bank · Roots</span><b>Open ›</b></div></button>';
   }
-  var SUBJ_ICO = { english: '🔤', history: '🏺', culture: '🎭', polity: '⚖️', geography: '🗺️', economy: '💰', science: '🔬', staticgk: '📚', current: '📰', other: '📘' };
+  var SUBJ_ICO = { maths: '➗', english: '🔤', history: '🏺', culture: '🎭', polity: '⚖️', geography: '🗺️', economy: '💰', science: '🔬', staticgk: '📚', current: '📰', other: '📘' };
   function subjIds(key){
     return gsIds().filter(function(id){ return (STUDY[id].gsub || 'other') === key; }).sort(function(a, b){ return (STUDY[b].core || 0) - (STUDY[a].core || 0); });
   }
@@ -1746,7 +1799,9 @@
   function homeSubjects(){
     var en = ['grammar'], ve = viewEntries(), mem = ve.filter(function(e){ return e.confidence >= 5; }).length;
     var gp = subjProgress(en), vocPct = ve.length ? Math.round(mem * 100 / ve.length) : 0;
-    var tiles = [{ key: 'english', name: 'English', hi: 'अंग्रेज़ी', n: 2, pct: Math.round((gp.pct + vocPct) / 2), acc: gp.acc, jump: 'english' }];
+    var mp = subjProgress(mathIds());
+    var tiles = [{ key: 'english', name: 'English', hi: 'अंग्रेज़ी', n: 2, pct: Math.round((gp.pct + vocPct) / 2), acc: gp.acc, jump: 'english' },
+      { key: 'maths', name: 'Maths', hi: 'गणित', n: mathIds().length, pct: mp.pct, acc: mp.acc, jump: 'maths' }];
     GS_SUBJECTS.forEach(function(g){
       var list = subjIds(g[0]);
       var sp = subjProgress(list);
@@ -1769,6 +1824,7 @@
       homeSubjects() +
       hubPracticeSection() +
       '<section class="hub-sec hub-sub" id="hubsub-english"><div class="hub-sec-h"><h2>English</h2><span>अंग्रेज़ी</span></div><div class="hub-grid">' + homeVocabCard() + ids.filter(function(id){ return STUDY[id].subj === 'english'; }).map(hubCard).join('') + '</div></section>' +
+      '<section class="hub-sec hub-sub" id="hubsub-maths"><div class="hub-sec-h"><h2>Maths</h2><span>गणित · formulas, figures, tricks & PYQs</span></div><div class="hub-grid">' + mathIds().map(hubCard).join('') + '</div></section>' +
       '<section class="hub-sec" id="homeGs"><div class="hub-sec-h"><h2>General Studies</h2><span>सामान्य अध्ययन · ' + gsIds().length + ' mini apps in ' + GS_SUBJECTS.filter(function(g){ return subjIds(g[0]).length; }).length + ' subjects</span></div>' +
         GS_SUBJECTS.concat([['other', 'More', 'अन्य']]).map(function(g){
           var list = subjIds(g[0]);
@@ -1836,6 +1892,151 @@
   document.getElementById('navMistakesBtn').addEventListener('click', function(){ closeAllMenus(); openMistakes(); });
   document.getElementById('navMockBtn').addEventListener('click', function(){ closeAllMenus(); openMock(); });
 
+  // ================= Search across everything: lesson notes, questions, words, spellings =================
+  var searchIdx = null, searchKind = 'all', searchTimer = null, searchOpen = false, searchMore = {};
+  function loadSearchIndex(){
+    if(searchIdx) return Promise.resolve(searchIdx);
+    return Promise.all([
+      fetch('study-search.json').then(function(r){ if(!r.ok) throw new Error('study-search.json missing'); return r.json(); }),
+      loadStudyBank()
+    ]).then(function(res){
+      var idx = { lessons: [], qs: [] };
+      Object.keys(res[0].modules).forEach(function(mid){
+        if(!STUDY[mid]) return;
+        res[0].modules[mid].forEach(function(l){ idx.lessons.push({ mod: mid, id: l.id, t: l.t, h: l.h || '', x: l.x || '', lt: (l.t + ' ' + (l.h || '')).toLowerCase(), lx: (l.x || '').toLowerCase() }); });
+      });
+      Object.keys(studyBank.modules).forEach(function(mid){
+        if(!STUDY[mid]) return;
+        studyBank.modules[mid].qs.forEach(function(q){ idx.qs.push({ mod: mid, q: q, s: (q.q + ' ' + q.o[q.a] + ' ' + (q.e || '') + ' ' + (q.tag || '')).toLowerCase() }); });
+      });
+      searchIdx = idx;
+      return idx;
+    });
+  }
+  function srTokens(s){ return String(s || '').toLowerCase().replace(/[“”"']/g, ' ').split(/\s+/).filter(function(t){ return t.length > 0; }); }
+  // a word must START with the typed text: "sin" finds sin/sine, not business
+  function srHas(text, t){
+    var i = text.indexOf(t);
+    var word = /[a-z0-9]/.test(t.charAt(0)), whole = word && t.length <= 3;   // short words (sin, gst, 75) must match whole
+    while(i !== -1){
+      var okStart = !word || i === 0 || !/[a-z0-9]/.test(text.charAt(i - 1));
+      var okEnd = !whole || !/[a-z0-9]/.test(text.charAt(i + t.length));
+      if(okStart && okEnd) return true;
+      i = text.indexOf(t, i + 1);
+    }
+    return false;
+  }
+  function srAll(text, toks){ for(var i = 0; i < toks.length; i++){ if(!srHas(text, toks[i])) return false; } return true; }
+  function srMark(text, toks){
+    var h = escapeHtml(text);
+    toks.filter(function(t){ return t.length > 1; }).sort(function(a, b){ return b.length - a.length; }).forEach(function(t){
+      var wd = /[a-z0-9]/i.test(t.charAt(0));
+      var re = new RegExp((wd ? '(?<![a-z0-9])' : '') + '(' + escapeHtml(t).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')' + (wd && t.length <= 3 ? '(?![a-z0-9])' : ''), 'gi');
+      h = h.replace(re, '<mark>$1</mark>');
+    });
+    return h.replace(/<mark>([^<]*)<mark>([^<]*)<\/mark>([^<]*)<\/mark>/g, '<mark>$1$2$3</mark>');
+  }
+  function srSnippet(x, lx, toks){
+    var i = lx.indexOf(toks.join(' ')); if(i < 0) i = lx.indexOf(toks[0]); if(i < 0) i = 0;
+    var a = Math.max(0, i - 70), b = Math.min(x.length, i + 150);
+    return (a ? '…' : '') + x.slice(a, b) + (b < x.length ? '…' : '');
+  }
+  function wordText(w){ return [w.term, w.type, w.english_meaning, w.hindi_meaning, w.example, w.usage, w.synonyms, w.antonyms, w.root, (w.tags || []).join(' ')].map(function(v){ return Array.isArray(v) ? v.join(' ') : (v || ''); }).join(' ').toLowerCase(); }
+  function runSearch(){
+    var box = document.getElementById('searchResults'), q = document.getElementById('searchInput').value.trim();
+    var toks = srTokens(q);
+    if(!toks.length){
+      box.innerHTML = '<div class="sr-empty"><b>Search everything</b><p>Lesson notes and formulas in all ' + Object.keys(STUDY).length + ' apps, ' + (searchIdx ? searchIdx.qs.length.toLocaleString('en-IN') + ' questions' : 'every question') + ', your ' + words.length + ' words and the Spelling Bank.</p>' +
+        '<div class="sr-try">' + ['Article 21', 'Chandrayaan', 'centroid', 'frustum', 'vitamin', 'repo rate', 'Bihu', 'sin 75'].map(function(t){ return '<button data-sr-try="' + escapeAttr(t) + '">' + escapeHtml(t) + '</button>'; }).join('') + '</div></div>';
+      return;
+    }
+    var res = { lessons: [], qs: [], words: [], spell: [] }, phrase = toks.join(' ');
+    if(searchIdx){
+      searchIdx.lessons.forEach(function(l){
+        var inTitle = srAll(l.lt, toks), inText = !inTitle && srAll(l.lt + ' ' + l.lx, toks);
+        if(!inTitle && !inText) return;
+        var hits = 0, p = -1; if(phrase.length > 2) while((p = l.lx.indexOf(phrase, p + 1)) !== -1 && hits < 50){ if(p === 0 || !/[a-z0-9]/.test(l.lx.charAt(p - 1))) hits++; }
+        res.lessons.push({ l: l, rank: inTitle ? 0 : (hits ? 1 : 2), hits: hits });
+      });
+      res.lessons.sort(function(a, b){ return a.rank - b.rank || b.hits - a.hits; });
+      searchIdx.qs.forEach(function(x){ if(srAll(x.s, toks)) res.qs.push({ mod: x.mod, q: x.q, s: x.s, r: x.s.indexOf(phrase) !== -1 ? 0 : 1 }); });
+      res.qs.sort(function(a, b){ return a.r - b.r; });
+    }
+    words.forEach(function(w){ var t = wordText(w); if(srAll(t, toks)) res.words.push({ w: w, rank: (w.term || '').toLowerCase().indexOf(toks[0]) === 0 ? 0 : 1 }); });
+    res.words.sort(function(a, b){ return a.rank - b.rank; });
+    spellWords.forEach(function(w){ var t = [w.word, w.term, w.english_meaning, w.hindi_meaning].join(' ').toLowerCase(); if(srAll(t, toks)) res.spell.push(w); });
+    var count = { lessons: res.lessons.length, qs: res.qs.length, words: res.words.length + res.spell.length };
+    var chips = [['all', 'All', count.lessons + count.qs + count.words], ['lessons', 'Lessons & notes', count.lessons], ['qs', 'Questions', count.qs], ['words', 'Words', count.words]];
+    var html = '<div class="sr-chips">' + chips.map(function(c){ return '<button data-sr-kind="' + c[0] + '" class="' + (searchKind === c[0] ? 'on' : '') + '">' + c[1] + ' <small>' + c[2] + '</small></button>'; }).join('') + '</div>';
+    var show = function(k){ return searchKind === 'all' || searchKind === k; };
+    var lim = function(k, n){ return searchMore[k] ? 400 : (searchKind === 'all' ? n : n * 3); };
+    var more = function(k, total, n){ return total > lim(k, n) ? '<button class="sr-more" data-sr-more="' + k + '">Show ' + Math.min(total - lim(k, n), 400) + ' more</button>' : ''; };
+    if(show('lessons') && res.lessons.length){
+      html += '<section class="sr-sec"><h3>Lessons &amp; notes</h3>' + res.lessons.slice(0, lim('lessons', 8)).map(function(r){
+        var l = r.l, m = STUDY[l.mod];
+        return '<button class="sr-item sr-lesson" data-sr-open="' + l.mod + '" data-sr-lesson="' + escapeAttr(l.id) + '" style="--sr-c:' + m.color + '"><span class="sr-ico">' + m.ico + '</span><span class="sr-body"><span class="sr-meta">' + escapeHtml(m.title) + (l.h ? ' · ' + escapeHtml(l.h) : '') + '</span><b>' + srMark(l.t, toks) + '</b>' +
+          (r.rank ? '<span class="sr-snip">' + srMark(srSnippet(l.x, l.lx, toks), toks) + '</span>' : '') + '</span><span class="sr-go">Open ›</span></button>';
+      }).join('') + more('lessons', res.lessons.length, 8) + '</section>';
+    }
+    if(show('words') && (res.words.length || res.spell.length)){
+      html += '<section class="sr-sec"><h3>Words</h3>' + res.words.slice(0, lim('words', 6)).map(function(r){
+        var w = r.w;
+        return '<button class="sr-item" data-sr-word="' + escapeAttr(w.id) + '" style="--sr-c:var(--mustard)"><span class="sr-ico">📖</span><span class="sr-body"><span class="sr-meta">शब्दRegister' + (w.type ? ' · ' + escapeHtml(w.type) : '') + '</span><b>' + srMark(w.term || '', toks) + '</b><span class="sr-snip">' + srMark([w.english_meaning, w.hindi_meaning].filter(Boolean).join(' · '), toks) + '</span></span></button>';
+      }).join('') + res.spell.slice(0, lim('words', 4)).map(function(w){
+        return '<div class="sr-item" style="--sr-c:var(--maroon)"><span class="sr-ico">🔤</span><span class="sr-body"><span class="sr-meta">Spelling Bank</span><b>' + srMark(w.word || w.term || '', toks) + '</b><span class="sr-snip">' + srMark([w.english_meaning, w.hindi_meaning].filter(Boolean).join(' · '), toks) + '</span></span></div>';
+      }).join('') + more('words', res.words.length, 6) + '</section>';
+    }
+    if(show('qs') && res.qs.length){
+      html += '<section class="sr-sec"><h3>Questions</h3>' + res.qs.slice(0, lim('qs', 10)).map(function(x, i){
+        var q = x.q, m = STUDY[x.mod];
+        return '<div class="sr-item sr-q" style="--sr-c:' + m.color + '"><span class="sr-ico">' + m.ico + '</span><span class="sr-body"><span class="sr-meta">' + escapeHtml(m.title) + (q.tag ? ' · ' + escapeHtml(q.tag) : '') + '</span>' +
+          '<span class="sr-qq">' + srMark(q.q, toks) + '</span><span class="sr-ans">✓ ' + srMark(q.o[q.a], toks) + '</span>' + (q.e ? '<span class="sr-snip">' + srMark(q.e, toks) + '</span>' : '') +
+          (q.l ? '<span class="sr-links"><button data-sr-open="' + x.mod + '" data-sr-lesson="' + escapeAttr(q.l) + '">Open the lesson ›</button></span>' : '') + '</span></div>';
+      }).join('') + more('qs', res.qs.length, 10) + '</section>';
+    }
+    if(!count.lessons && !count.qs && !count.words) html += '<div class="sr-empty"><b>Nothing found for “' + escapeHtml(q) + '”</b><p>Try fewer or shorter words — e.g. “tangent” instead of “tangents to a circle”.</p></div>';
+    box.innerHTML = html;
+  }
+  function openSearch(prefill){
+    closeAllMenus();
+    searchOpen = true; searchMore = {};
+    var page = document.getElementById('searchPage');
+    page.classList.add('open');
+    document.body.classList.add('study-on');
+    var inp = document.getElementById('searchInput');
+    if(typeof prefill === 'string') inp.value = prefill;
+    setTimeout(function(){ inp.focus(); inp.select(); }, 30);
+    try{ history.pushState({ search: 1 }, '', '#search'); }catch(e){}
+    runSearch();
+    loadSearchIndex().then(function(){ if(searchOpen) runSearch(); }).catch(function(){
+      document.getElementById('searchResults').insertAdjacentHTML('afterbegin', '<div class="sr-empty"><b>Lesson search needs study-search.json on the site.</b><p>Words still work.</p></div>');
+    });
+  }
+  function closeSearch(fromHistory){
+    if(!searchOpen) return;
+    searchOpen = false;
+    document.getElementById('searchPage').classList.remove('open');
+    if(!studyOpen && !drillOpen) document.body.classList.remove('study-on');
+    if(!fromHistory && location.hash === '#search'){ try{ history.back(); }catch(e){} }
+  }
+  document.getElementById('searchBtn').addEventListener('click', function(){ openSearch(); });
+  document.getElementById('searchBack').addEventListener('click', function(){ closeSearch(false); });
+  document.getElementById('searchInput').addEventListener('input', function(){ searchMore = {}; clearTimeout(searchTimer); searchTimer = setTimeout(runSearch, 120); });
+  document.getElementById('searchInput').addEventListener('keydown', function(ev){ if(ev.key === 'Escape'){ ev.stopPropagation(); closeSearch(false); } });
+  document.getElementById('searchResults').addEventListener('click', function(ev){
+    var t = ev.target.closest('[data-sr-try]'); if(t){ document.getElementById('searchInput').value = t.dataset.srTry; runSearch(); return; }
+    var k = ev.target.closest('[data-sr-kind]'); if(k){ searchKind = k.dataset.srKind; searchMore = {}; runSearch(); return; }
+    var mo = ev.target.closest('[data-sr-more]'); if(mo){ searchMore[mo.dataset.srMore] = 1; runSearch(); return; }
+    var o = ev.target.closest('[data-sr-open]'); if(o){ openStudy(o.dataset.srOpen, false, o.dataset.srLesson); return; }
+    var w = ev.target.closest('[data-sr-word]'); if(w){ openWordPreviewModal(w.dataset.srWord); return; }
+  });
+  document.addEventListener('keydown', function(ev){
+    var tag = (ev.target && ev.target.tagName) || '';
+    if(searchOpen || !currentUser || studyOpen || drillOpen) return;
+    if(((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === 'k') || (ev.key === '/' && !/INPUT|TEXTAREA|SELECT/.test(tag) && !(ev.target && ev.target.isContentEditable))){ ev.preventDefault(); openSearch(); }
+  });
+  window.addEventListener('popstate', function(){ if(searchOpen && location.hash !== '#search' && !studyOpen) closeSearch(true); });
+
   // ---- Progress tab: every subject at a glance ----
   function renderStudyStats(){
     var box = document.getElementById('studyStatsPanel');
@@ -1845,7 +2046,7 @@
       var m = STUDY[id], pr = studyProgress(id), pct = pr.total ? Math.round(pr.done * 100 / pr.total) : 0;
       tq += pr.tried; tr += pr.right; tl += pr.done; tt += pr.total;
       return '<button class="ss-row" data-open-study="' + id + '" style="--hub-c:' + m.color + ';"><span class="hub-ring">' + ringSvg(pct, m.color, 44) + '<span>' + pct + '%</span></span>' +
-        '<span class="ss-name"><b>' + m.ico + ' ' + escapeHtml(m.title) + '</b><small>' + (m.subj === 'english' ? 'English' : ((GS_SUBJECTS.filter(function(g){ return g[0] === m.gsub; })[0] || ['', 'GS'])[1])) + '</small></span>' +
+        '<span class="ss-name"><b>' + m.ico + ' ' + escapeHtml(m.title) + '</b><small>' + (m.subj === 'english' ? 'English' : m.subj === 'maths' ? 'Maths' : ((GS_SUBJECTS.filter(function(g){ return g[0] === m.gsub; })[0] || ['', 'GS'])[1])) + '</small></span>' +
         '<span class="ss-num"><b>' + pr.done + '/' + pr.total + '</b><small>' + m.unit + '</small></span>' +
         '<span class="ss-num ss-acc"><b>' + (pr.acc === null ? '—' : pr.acc + '%') + '</b><small>' + pr.tried + ' tried</small></span>' +
         '<span class="ss-num' + (pr.wrong ? ' bad' : '') + '"><b>' + pr.wrong + '</b><small>mistakes</small></span></button>';
@@ -1929,14 +2130,14 @@
   }
   window.addEventListener('storage', function(ev){ if(studyOpen && ev.key === STUDY[studyOpen].key) studyCheckChange(); });
 
-  async function openStudy(id, fromHistory){
+  async function openStudy(id, fromHistory, lesson){
     var mod = STUDY[id];
     if(!mod) return;
     closeAllMenus();
     studyOpen = id;
     setStudyMeta(id, { openedAt: Date.now() });
     document.getElementById('studyTitle').textContent = mod.title;
-    document.getElementById('studyBackLabel').textContent = isActive('stats') ? 'Progress' : 'पाठShala';
+    document.getElementById('studyBackLabel').textContent = searchOpen ? 'Search' : isActive('stats') ? 'Progress' : 'पाठShala';
     studySyncLabel('Loading your progress…');
     document.getElementById('studyOverlay').classList.add('open');
     document.body.classList.add('study-on');
@@ -1945,7 +2146,7 @@
     if(studyOpen !== id) return;
     studyLast = lsGet(mod.key);
     Object.keys(STUDY).concat(Object.keys(STUDY_EXTRA)).forEach(function(k){ studyPush(k); });   // this device's unsaved progress (incl. from before syncing existed)
-    document.getElementById('studyFrame').src = mod.file + '?embed=1&skin=' + studySkinValue() + '&theme=' + studyThemeValue();
+    document.getElementById('studyFrame').src = mod.file + '?embed=1&skin=' + studySkinValue() + '&theme=' + studyThemeValue() + (lesson ? '&lesson=' + encodeURIComponent(lesson) : '');
     studySyncLabel(currentUser ? '✓ Synced with your account' : '');
     clearInterval(studyWatch);
     studyWatch = setInterval(studyCheckChange, 4000);
@@ -2003,6 +2204,7 @@
   STUDY.physics.lessons = 16; STUDY.physics.unit = 'lessons';
   STUDY.biology.lessons = 24; STUDY.biology.unit = 'lessons';
   function gsIds(){ return Object.keys(STUDY).filter(function(id){ return STUDY[id].subj === 'gs'; }); }
+  function mathIds(){ return Object.keys(STUDY).filter(function(id){ return STUDY[id].subj === 'maths'; }); }
   var STUDY_EXTRA = { mocks: { key: 'shabdMockHistory', title: 'Mixed mock history' } };
   function studyMod(id){ return STUDY[id] || STUDY_EXTRA[id]; }
   var studyStateTimers = {};
@@ -2088,7 +2290,7 @@
 
   // ---- the practice / mock screen ----
   var drill = null, drillOpen = false, drillTimer = null;
-  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments', polity: 'Polity', economics: 'Economy', space: 'Space', physics: 'Physics', biology: 'Biology' };
+  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments', polity: 'Polity', economics: 'Economy', space: 'Space', physics: 'Physics', biology: 'Biology', geometry: 'Geometry', mensuration2d: 'Mensuration 2D', mensuration3d: 'Mensuration 3D', trigonometry: 'Trigonometry' };
   function openDrill(title){
     closeAllMenus();
     drillOpen = true;
@@ -2193,13 +2395,19 @@
 
   // Mixed mock test
   var mockCfg = (function(){
-    var def = { en: 25, gs: 25, vocab: true, grammar: true, gsMods: gsIds(), neg: true, known: gsIds() };
+    var def = { en: 25, gs: 25, mt: 0, vocab: true, grammar: true, gsMods: gsIds(), mtMods: mathIds(), neg: true, known: gsIds() };
     var c;
     try{ c = Object.assign({}, def, JSON.parse(lsGet('shabdMockCfg') || '{}')); }catch(e){ c = def; }
     var known = c.known || ['bns', 'schemes', 'census', 'intlorgs'];
     gsIds().forEach(function(id){ if(known.indexOf(id) === -1 && c.gsMods.indexOf(id) === -1) c.gsMods.push(id); });
     c.known = gsIds();
     c.gsMods = c.gsMods.filter(function(id){ return STUDY[id]; });
+    if(!Array.isArray(c.mtMods)) c.mtMods = mathIds();
+    var mk = c.knownMt || [];
+    mathIds().forEach(function(id){ if(mk.indexOf(id) === -1 && c.mtMods.indexOf(id) === -1) c.mtMods.push(id); });
+    c.knownMt = mathIds();
+    c.mtMods = c.mtMods.filter(function(id){ return STUDY[id]; });
+    if(typeof c.mt !== 'number') c.mt = 0;
     return c;
   })();
   function mockHistory(){ var h = studyState('mocks'); return Array.isArray(h.list) ? h.list : []; }
@@ -2211,26 +2419,33 @@
     renderMockSetup();
   }
   function renderMockSetup(){
-    var c = mockCfg, n = c.en + c.gs, mins = Math.round(n * 36 / 60);
+    var c = mockCfg, n = c.en + c.gs + c.mt, mins = Math.round(n * 36 / 60);
     var seg = function(key, vals){ return '<div class="dq-seg">' + vals.map(function(v){ return '<button data-cfg="' + key + '" data-val="' + v + '" class="' + (c[key] === v ? 'on' : '') + '">' + v + '</button>'; }).join('') + '</div>'; };
     var tog = function(key, label){ return '<button class="dq-tog' + (c[key] ? ' on' : '') + '" data-tog="' + key + '">' + label + '</button>'; };
     var gsTog = function(m){ return '<button class="dq-tog' + (c.gsMods.indexOf(m) !== -1 ? ' on' : '') + '" data-gsmod="' + m + '">' + escapeHtml(MOD_NAME[m]) + '</button>'; };
+    var mtTog = function(m){ return '<button class="dq-tog' + (c.mtMods.indexOf(m) !== -1 ? ' on' : '') + '" data-mtmod="' + m + '">' + escapeHtml(MOD_NAME[m]) + '</button>'; };
     var hist = mockHistory().slice(-5).reverse();
-    drillBody('<div class="dq-hero"><div class="eyebrow">English + General Studies · SSC pattern</div><h1>Mixed mock test</h1><p>Questions from your vocab register and every mini app, timed like Tier 1 (36 seconds a question), marked +2 / −0.5. Wrong answers go to your Mistakes book.</p></div>' +
+    drillBody('<div class="dq-hero"><div class="eyebrow">English + Maths + General Studies · SSC pattern</div><h1>Mixed mock test</h1><p>Questions from your vocab register and every mini app, timed like Tier 1 (36 seconds a question), marked +2 / −0.5. Wrong answers go to your Mistakes book.</p></div>' +
       '<div class="dq-setup">' +
         '<div class="dq-box"><h3>English</h3>' + seg('en', [0, 10, 25]) + '<div class="dq-tags">' + tog('vocab', 'Vocabulary (' + words.length + ' words)') + tog('grammar', 'Grammar 100') + '</div></div>' +
         '<div class="dq-box"><h3>General Studies</h3>' + seg('gs', [0, 10, 25]) + '<div class="dq-tags">' + GS_SUBJECTS.map(function(g){ var l = gsIds().filter(function(id){ return STUDY[id].gsub === g[0]; }); return l.length ? '<div class="dq-gsub"><span>' + g[1] + '</span>' + l.map(gsTog).join('') + '</div>' : ''; }).join('') + gsIds().filter(function(id){ return !STUDY[id].gsub; }).map(gsTog).join('') + '</div></div>' +
+        '<div class="dq-box"><h3>Maths</h3>' + seg('mt', [0, 10, 25]) + '<div class="dq-tags">' + mathIds().map(mtTog).join('') + '</div></div>' +
         '<div class="dq-box"><h3>Marking</h3><div class="dq-tags">' + tog('neg', 'Negative marking −0.5') + '</div><p class="help" style="margin:10px 0 0;">' + n + ' questions · ' + mins + ' minutes · maximum ' + (n * 2) + ' marks</p></div>' +
       '</div>' +
       '<div class="dq-actions"><button class="btn teal" id="mkStart"' + (n ? '' : ' disabled') + '>Start test ›</button></div>' +
       (hist.length ? '<h3 class="dq-h3">Recent tests</h3><div class="dq-hist">' + hist.map(function(h){
-        return '<div><b>' + h.score + ' / ' + h.max + '</b><span>' + new Date(h.at).toLocaleDateString([], { day: 'numeric', month: 'short' }) + ' · English ' + h.en.r + '/' + h.en.t + ' · GS ' + h.gs.r + '/' + h.gs.t + '</span></div>';
+        return '<div><b>' + h.score + ' / ' + h.max + '</b><span>' + new Date(h.at).toLocaleDateString([], { day: 'numeric', month: 'short' }) + ' · English ' + h.en.r + '/' + h.en.t + (h.mt && h.mt.t ? ' · Maths ' + h.mt.r + '/' + h.mt.t : '') + ' · GS ' + h.gs.r + '/' + h.gs.t + '</span></div>';
       }).join('') + '</div>' : ''));
     document.querySelectorAll('#drillBody [data-cfg]').forEach(function(b){ b.addEventListener('click', function(){ mockCfg[b.dataset.cfg] = +b.dataset.val; saveMockCfg(); renderMockSetup(); }); });
     document.querySelectorAll('#drillBody [data-tog]').forEach(function(b){ b.addEventListener('click', function(){ mockCfg[b.dataset.tog] = !mockCfg[b.dataset.tog]; saveMockCfg(); renderMockSetup(); }); });
     document.querySelectorAll('#drillBody [data-gsmod]').forEach(function(b){ b.addEventListener('click', function(){
       var m = b.dataset.gsmod, i = mockCfg.gsMods.indexOf(m);
       if(i === -1) mockCfg.gsMods.push(m); else if(mockCfg.gsMods.length > 1) mockCfg.gsMods.splice(i, 1);
+      saveMockCfg(); renderMockSetup();
+    }); });
+    document.querySelectorAll('#drillBody [data-mtmod]').forEach(function(b){ b.addEventListener('click', function(){
+      var m = b.dataset.mtmod, i = mockCfg.mtMods.indexOf(m);
+      if(i === -1) mockCfg.mtMods.push(m); else if(mockCfg.mtMods.length > 1) mockCfg.mtMods.splice(i, 1);
       saveMockCfg(); renderMockSetup();
     }); });
     document.getElementById('mkStart').addEventListener('click', startMock);
@@ -2242,7 +2457,7 @@
     return shuffleArr(pool).slice(0, n).map(prepQ);
   }
   function startMock(){
-    var c = mockCfg, en = [], gs = [];
+    var c = mockCfg, en = [], gs = [], mt = [];
     if(c.en){
       var nv = c.vocab ? (c.grammar ? Math.round(c.en * 0.6) : c.en) : 0;
       var v = nv ? vocabQuestions(nv) : [];
@@ -2251,7 +2466,8 @@
       en.forEach(function(q){ q.sec = 'en'; });
     }
     if(c.gs){ gs = pickFrom(c.gsMods, c.gs); gs.forEach(function(q){ q.sec = 'gs'; }); }
-    var qs = shuffleArr(en).concat(shuffleArr(gs));
+    if(c.mt){ mt = pickFrom(c.mtMods, c.mt); mt.forEach(function(q){ q.sec = 'mt'; }); }
+    var qs = shuffleArr(en).concat(shuffleArr(mt), shuffleArr(gs));
     if(!qs.length){ showToast('No questions available for that choice.'); return; }
     drill = { kind: 'mock', phase: 'run', qs: qs, i: 0, secs: qs.length * 36, start: Date.now(), marked: {} };
     clearInterval(drillTimer);
@@ -2270,7 +2486,7 @@
   function renderMockRun(){
     var d = drill, q = d.qs[d.i], answered = d.qs.filter(function(x){ return x.pick !== null; }).length;
     drillBody('<div class="dq-run"><div class="dq-main">' +
-      '<div class="dq-card" style="--dq-c:' + (q.sec === 'en' ? 'var(--mustard)' : 'var(--teal)') + '"><div class="dq-meta"><span>Q ' + (d.i + 1) + ' / ' + d.qs.length + '</span><span>' + (q.sec === 'en' ? 'English' : 'General Studies') + '</span><span>' + escapeHtml(MOD_NAME[q.mod]) + '</span></div>' +
+      '<div class="dq-card" style="--dq-c:' + (q.sec === 'en' ? 'var(--mustard)' : q.sec === 'mt' ? 'var(--accent)' : 'var(--teal)') + '"><div class="dq-meta"><span>Q ' + (d.i + 1) + ' / ' + d.qs.length + '</span><span>' + (q.sec === 'en' ? 'English' : q.sec === 'mt' ? 'Maths' : 'General Studies') + '</span><span>' + escapeHtml(MOD_NAME[q.mod]) + '</span></div>' +
       '<div class="dq-q">' + escapeHtml(q.q) + '</div><div class="dq-opts">' + q.o.map(function(_, i){ return optHtml(q, i, q.pick === i ? ' sel' : ''); }).join('') + '</div></div>' +
       '<div class="dq-nav"><button class="btn ghost" id="mkPrev"' + (d.i ? '' : ' disabled') + '>‹ Prev</button><button class="btn ghost" id="mkMark">' + (d.marked[d.i] ? '★ Marked' : '☆ Mark') + '</button><button class="btn ghost" id="mkClear"' + (q.pick === null ? ' disabled' : '') + '>Clear</button><button class="btn teal" id="mkNext">' + (d.i === d.qs.length - 1 ? 'Review' : 'Next ›') + '</button></div></div>' +
       '<aside class="dq-side"><div class="dq-side-h"><b>' + answered + '</b> of ' + d.qs.length + ' answered</div><div class="dq-pal">' +
@@ -2293,7 +2509,7 @@
     clearInterval(drillTimer);
     d.phase = 'result';
     document.getElementById('drillClock').textContent = '';
-    var neg = mockCfg.neg, sec = { en: { r: 0, w: 0, t: 0 }, gs: { r: 0, w: 0, t: 0 } }, byMod = {}, score = 0;
+    var neg = mockCfg.neg, sec = { en: { r: 0, w: 0, t: 0 }, gs: { r: 0, w: 0, t: 0 }, mt: { r: 0, w: 0, t: 0 } }, byMod = {}, score = 0;
     d.qs.forEach(function(q){
       var s = sec[q.sec], m = byMod[q.mod] = byMod[q.mod] || { r: 0, t: 0 };
       s.t++; m.t++;
@@ -2302,10 +2518,10 @@
       if(STUDY[q.mod]) studyMark(q.mod, q.id, q.pick === q.a);
       if(q.mod === 'vocab') logQuizAttempt(q.id, (words.find(function(w){ return w.id === q.id; }) || {}).term || '', q.pick === q.a);
     });
-    var right = sec.en.r + sec.gs.r, wrong = sec.en.w + sec.gs.w, skipped = d.qs.length - right - wrong;
+    var right = sec.en.r + sec.gs.r + sec.mt.r, wrong = sec.en.w + sec.gs.w + sec.mt.w, skipped = d.qs.length - right - wrong;
     addGoalExtra((right + wrong) * GOAL_PER_Q);
     var secsUsed = Math.min(d.secs, Math.round((Date.now() - d.start) / 1000));
-    var h = studyState('mocks'); h.list = (Array.isArray(h.list) ? h.list : []).concat([{ at: Date.now(), score: score, max: d.qs.length * 2, right: right, wrong: wrong, skipped: skipped, secs: secsUsed, en: { r: sec.en.r, t: sec.en.t }, gs: { r: sec.gs.r, t: sec.gs.t } }]).slice(-50);
+    var h = studyState('mocks'); h.list = (Array.isArray(h.list) ? h.list : []).concat([{ at: Date.now(), score: score, max: d.qs.length * 2, right: right, wrong: wrong, skipped: skipped, secs: secsUsed, en: { r: sec.en.r, t: sec.en.t }, gs: { r: sec.gs.r, t: sec.gs.t }, mt: { r: sec.mt.r, t: sec.mt.t } }]).slice(-50);
     setStudyState('mocks', h);
     var pct = function(r, t){ return t ? Math.round(r * 100 / t) + '%' : '—'; };
     var review = d.qs.filter(function(q){ return q.pick !== q.a; });
@@ -2314,6 +2530,7 @@
       '<p>' + right + ' right · ' + wrong + ' wrong · ' + skipped + ' skipped · ' + Math.floor(secsUsed / 60) + ' min ' + (secsUsed % 60) + ' s</p></div>' +
       '<div class="dq-kpis">' +
         (sec.en.t ? '<div><b>' + pct(sec.en.r, sec.en.t) + '</b><span>English · ' + sec.en.r + '/' + sec.en.t + '</span></div>' : '') +
+        (sec.mt.t ? '<div><b>' + pct(sec.mt.r, sec.mt.t) + '</b><span>Maths · ' + sec.mt.r + '/' + sec.mt.t + '</span></div>' : '') +
         (sec.gs.t ? '<div><b>' + pct(sec.gs.r, sec.gs.t) + '</b><span>General Studies · ' + sec.gs.r + '/' + sec.gs.t + '</span></div>' : '') +
         Object.keys(byMod).map(function(m){ return '<div style="--dq-c:' + (STUDY[m] ? STUDY[m].color : 'var(--mustard)') + '"><b>' + pct(byMod[m].r, byMod[m].t) + '</b><span>' + escapeHtml(MOD_NAME[m]) + ' · ' + byMod[m].r + '/' + byMod[m].t + '</span></div>'; }).join('') +
       '</div>' +
@@ -6544,6 +6761,7 @@ listBlock,
       goal: prof.dailyGoal || 0, mode: prof.goalMode || 'levelup',
       goalDay: prof.goalDay || '', goalIds: prof.goalDay === t ? lockGoalIds(prof) : [],
       streak: prof.streakCurrent || 0, lastMet: prof.lastMetDay || '', best: prof.streakBest || 0,
+      site: location.origin + location.pathname.replace(/[^\/]*$/, ''),   // the phone downloads study-bank.json (GS facts) from here
       lastEventT: lockLastEventT, pushedAt: Date.now()
     });
   }

@@ -84,6 +84,11 @@
   .w-pill.lvl{ color:var(--accent); border-color:color-mix(in srgb, var(--accent) 55%, transparent); }
   .w-pill.due{ color:var(--gold); border-color:color-mix(in srgb, var(--gold) 60%, transparent); }
   .w-dot{ opacity:.5; }
+  .w-q{ font-family:var(--display); font-weight:600; font-size:calc(var(--k) * clamp(26px, 2.5vw, 46px)); line-height:1.18; letter-spacing:-.01em; margin:.4em 0 .5em; overflow-wrap:anywhere; text-wrap:pretty; max-width:30ch; }
+  .w-ans{ font-size:calc(var(--k) * clamp(22px, 1.9vw, 34px)); line-height:1.3; font-weight:700; color:var(--accent); overflow-wrap:anywhere; }
+  .w-ans::before{ content:'✓ '; }
+  .w-grid.one{ grid-template-columns:1fr; }
+  .w-pill.gs{ color:var(--gold); border-color:color-mix(in srgb, var(--gold) 60%, transparent); }
   .w-term{ font-family:var(--display); font-weight:600; font-size:calc(var(--k) * clamp(40px, 4.3vw, 82px)); line-height:1.04; letter-spacing:-.018em; margin:.22em 0 .2em; overflow-wrap:anywhere; text-wrap:balance; }
   .w-mean{ font-size:calc(var(--k) * clamp(18px, 1.5vw, 27px)); line-height:1.42; color:var(--ink); max-width:44ch; text-wrap:pretty; }
   .w-hindi{ font-family:var(--hindi); font-size:calc(var(--k) * clamp(17px, 1.38vw, 25px)); color:var(--soft); margin-top:.45em; }
@@ -209,12 +214,15 @@
   if(params.get('code')) lsSet('vw_code', code);
   var EXAM = params.get('exam') || '2026-10-13';
 
-  var DEFAULT_CFG = { tags: [], types: [], roots: [], mode: 'levels', levels: [0, 1, 2, 3, 4], order: 'shuffle', auto: 120, reveal: 'show', detail: 'full', theme: params.get('theme') || 'paperdark', drift: false };
+  var DEFAULT_CFG = { src: 'words', apps: [], tags: [], types: [], roots: [], mode: 'levels', levels: [0, 1, 2, 3, 4], order: 'shuffle', auto: 120, reveal: 'show', detail: 'full', theme: params.get('theme') || 'paperdark', drift: false };
   var cfg = Object.assign({}, DEFAULT_CFG, lsGet('vw_cfg', {}));
   if(!Array.isArray(cfg.roots)) cfg.roots = [];
+  if(!Array.isArray(cfg.apps)) cfg.apps = [];
+  if(!cfg.src) cfg.src = 'words';
   if(!cfg.v2){ cfg.drift = false; cfg.v2 = 1; lsSet('vw_cfg', cfg); }
   var session = lsGet('vw_session', null);   // { ids:[...], idx:n }
 
+  var bank = null, gsCards = [], gsById = {}, gsKnown = lsGet('vw_gs_known', {});   // GS / Maths fact cards from study-bank.json
   var words = [], rootGroups = [], byId = {}, summary = {}, feedStamp = '', lastSync = 0, syncState = 'off';
   var deck = [], idx = 0, revealed = true, revealTimer = null, autoTimer = null, autoStart = 0, pausedByHover = false;
 
@@ -272,6 +280,36 @@
   }
 
   // ---------- your progress (link code) ----------
+  // ---------- GS & Maths facts (every question from the पाठShala mini apps) ----------
+  async function loadBank(){
+    try{
+      var r = await fetch('study-bank.json', { cache: 'no-cache' });
+      if(!r.ok) throw new Error('HTTP ' + r.status);
+      bank = await r.json();
+    }catch(e){ bank = null; return false; }
+    gsCards = []; gsById = {};
+    Object.keys(bank.modules).forEach(function(mid){
+      var m = bank.modules[mid];
+      m.qs.forEach(function(q){
+        if(!q.o || !(q.a >= 0) || q.k === 'e') return;                 // error-spotting cards don't read well on a wallpaper
+        var c = { gs: true, id: mid + ':' + q.id, mod: mid, app: m.t || mid, grp: m.g || 'gs', q: q.q, ans: q.o[q.a], e: q.e || '', tag: q.tag || '' };
+        gsCards.push(c); gsById[c.id] = c;
+      });
+    });
+    return true;
+  }
+  function bankApps(){
+    if(!bank) return [];
+    return Object.keys(bank.modules).filter(function(mid){ return gsCards.some(function(c){ return c.mod === mid; }); })
+      .map(function(mid){ var m = bank.modules[mid]; return { id: mid, t: m.t || mid, g: m.g || 'gs', n: m.qs.length }; });
+  }
+  function gsMatches(c, conf){
+    var apps = conf.apps || [];
+    if(apps.length) return apps.indexOf(c.mod) !== -1;
+    return c.grp === 'gs';                                             // default: all General Studies apps
+  }
+  function gsSkip(c){ var t = gsKnown[c.id]; return t && Date.now() - t < 7 * DAY; }   // "Knew it" hides a card for a week
+
   async function pullSummary(){
     if(!code){ syncState = 'off'; return; }
     try{
@@ -362,13 +400,28 @@
     if(c.mode === 'levels' && code) return c.levels.indexOf(st.level(w.id)) !== -1;
     return true;
   }
-  function buildDeck(c){
+  function buildWordDeck(c){
     var st = state();
-    var list = words.filter(function(w){ return matches(w, st, c || cfg); });
-    if(cfg.mode === 'due') list.sort(function(a, b){ return (st.p[a.id].due || 0) - (st.p[b.id].due || 0); });
-    else if(cfg.order === 'shuffle') shuffle(list);
-    else if(cfg.order === 'az') list.sort(function(a, b){ return a.term.localeCompare(b.term); });
+    var list = words.filter(function(w){ return matches(w, st, c); });
+    if(c.mode === 'due') list.sort(function(a, b){ return (st.p[a.id].due || 0) - (st.p[b.id].due || 0); });
+    else if(c.order === 'shuffle') shuffle(list);
+    else if(c.order === 'az') list.sort(function(a, b){ return a.term.localeCompare(b.term); });
     return list;
+  }
+  function buildGsDeck(c){
+    var list = gsCards.filter(function(x){ return gsMatches(x, c) && !gsSkip(x); });
+    if(!list.length) list = gsCards.filter(function(x){ return gsMatches(x, c); });
+    return shuffle(list);
+  }
+  function buildDeck(c){
+    c = c || cfg;
+    if(c.src === 'gs') return buildGsDeck(c);
+    if(c.src === 'mix'){
+      var a = buildWordDeck(c), b = buildGsDeck(c), out = [], i = 0;
+      while(i < a.length || i < b.length){ if(i < a.length) out.push(a[i]); if(i < b.length) out.push(b[i]); i++; }
+      return out;
+    }
+    return buildWordDeck(c);
   }
   function startDeck(){
     deck = buildDeck();
@@ -380,6 +433,7 @@
     if(!session || !session.ids || !session.ids.length) return false;
     var map = {};
     words.forEach(function(w){ map[w.id || w.term] = w; });
+    gsCards.forEach(function(c){ map[c.id] = c; });
     deck = session.ids.map(function(k){ return map[k]; }).filter(Boolean);
     idx = Math.min(session.idx || 0, Math.max(deck.length - 1, 0));
     return deck.length > 0;
@@ -403,6 +457,7 @@
       $('controls').style.display = 'none';
       return;
     }
+    if(deck[idx] && deck[idx].gs){ renderGs(deck[idx], anim); return; }
     var w = deck[idx], st = state(), lvl = st.level(w.id), due = st.isDue(w.id);
     revealed = cfg.reveal === 'show';
     var sub = '<span class="w-pill">' + esc(TYPES[w.type] || 'Other') + '</span>' + (w.pos ? '<span>' + esc(w.pos) + '</span>' : '');
@@ -433,6 +488,36 @@
       }
     }
     renderControls(w, st);
+    $('count').textContent = (idx + 1) + ' / ' + deck.length;
+    $('controls').style.display = 'flex';
+    fit();
+    restartAuto();
+  }
+  function renderGs(c, anim){
+    var box = $('word');
+    revealed = cfg.reveal === 'show';
+    var sub = '<span class="w-pill gs">' + esc(c.grp === 'maths' ? 'Maths' : c.grp === 'english' ? 'English' : 'GS') + '</span><span>' + esc(c.app) + '</span>' + (c.tag ? '<span class="w-dot">·</span><span>' + esc(c.tag) + '</span>' : '');
+    box.innerHTML = '<div class="w-sub">' + sub + '</div>' +
+      '<div class="w-q">' + esc(c.q) + '</div>' +
+      '<div id="hid" class="' + (revealed ? '' : 'hidden-part') + '">' +
+        '<div class="w-ans">' + esc(c.ans) + '</div>' +
+        (c.e && c.e.replace(/[\s.]/g, '').length > 6 ? '<div class="w-grid one">' + field('exp', 'Why', c.e) + '</div>' : '') +
+      '</div>' +
+      (revealed ? '' : '<div class="reveal-hint" id="revealHint">' + (cfg.reveal === 'timed' ? 'Think of the answer… it appears in <span id="rc">8</span>s · ' : 'Recall the answer, then ') + '<button id="revealBtn">Show answer</button></div>');
+    if(anim !== false){ box.classList.remove('swap'); void box.offsetWidth; box.classList.add('swap'); }
+    if(!revealed){
+      $('revealBtn').addEventListener('click', reveal);
+      $('hid').addEventListener('click', reveal);
+      if(cfg.reveal === 'timed'){
+        var left = 8;
+        (function tick(){ revealTimer = setTimeout(function(){ left--; var rc = $('rc'); if(rc) rc.textContent = left; if(left <= 0) reveal(); else tick(); }, 1000); })();
+      }
+    }
+    $('levels').innerHTML = '<span>Fact card</span><button class="rev no" data-gsk="0">↺ Show again soon</button><button class="rev yes" data-gsk="1">✓ Knew it</button>';
+    $('levels').querySelectorAll('[data-gsk]').forEach(function(b){ b.addEventListener('click', function(){
+      if(b.dataset.gsk === '1'){ gsKnown[c.id] = Date.now(); lsSet('vw_gs_known', gsKnown); say('Hidden for a week.'); deck.splice(idx, 1); if(idx >= deck.length) idx = 0; saveSession(); render(); renderCard(); }
+      else { deck.splice(idx, 1); deck.splice(Math.min(idx + 4, deck.length), 0, c); saveSession(); render(); say('It will come back in a few cards.'); }
+    }); });
     $('count').textContent = (idx + 1) + ' / ' + deck.length;
     $('controls').style.display = 'flex';
     fit();
@@ -532,6 +617,12 @@
   }
   function deckLabel(){
     var parts = [];
+    if(cfg.src !== 'words'){
+      var apps = bankApps(), names = (cfg.apps.length ? apps.filter(function(a){ return cfg.apps.indexOf(a.id) !== -1; }) : []).map(function(a){ return a.t; });
+      var gsLabel = names.length ? names.slice(0, 3).join(', ') + (names.length > 3 ? ' +' + (names.length - 3) : '') : 'All GS apps';
+      if(cfg.src === 'gs') return 'Facts · ' + gsLabel;
+      parts.push('Facts: ' + gsLabel + ' +');
+    }
     parts.push(cfg.tags.length ? cfg.tags.slice(0, 3).join(', ') + (cfg.tags.length > 3 ? ' +' + (cfg.tags.length - 3) : '') : 'All tags');
     if(cfg.types.length) parts.push(cfg.types.map(function(t){ return TYPES[t]; }).join(', '));
     if(cfg.roots.length) parts.push('Roots: ' + cfg.roots.slice(0, 3).join(', ') + (cfg.roots.length > 3 ? ' +' + (cfg.roots.length - 3) : ''));
@@ -558,7 +649,7 @@
         (days >= 0 ? '<div class="c-row exam"><span>📅 CGL · ' + esc(new Date(EXAM + 'T00:00').toLocaleDateString([], { day: 'numeric', month: 'short' })) + '</span><b>' + (days === 0 ? 'Today — best of luck!' : days + ' day' + (days === 1 ? '' : 's') + ' to go') + '</b></div>' : '') +
         (code ? '<div class="c-row"><span>🔁 Due for revision</span><b>' + st.due + '</b></div>' +
                 '<div class="c-row"><span>⭐ Memorized</span><b>' + st.mastered + ' / ' + (summary.total || words.length) + '</b></div>' : '') +
-        '<div class="c-row"><span>In this set</span><b>' + deck.length + ' words</b></div>' +
+        '<div class="c-row"><span>In this set</span><b>' + deck.length + (cfg.src === 'words' ? ' words' : ' cards') + '</b></div>' +
       '</div>' +
       '<div class="c-deck">' + esc(deckLabel()) + '<br>' + syncTxt + '</div>';
     $('topbar').innerHTML = (code && st.due ? '<button id="dueBtn">🔁 Revise ' + st.due + '</button>' : '') +
@@ -590,12 +681,20 @@
     var tags = Object.keys(tagCount).sort();
     var typeCount = {};
     words.forEach(function(w){ typeCount[w.type] = (typeCount[w.type] || 0) + 1; });
-    var n = words.filter(function(w){ return matches(w, state(), draft); }).length;
+    var n = buildDeck(draft).length;
+    var apps = bankApps();
+    var appGroups = [['gs', 'General Studies'], ['maths', 'Maths'], ['english', 'English']].map(function(g){
+      var list = apps.filter(function(a){ return a.g === g[0]; });
+      return list.length ? '<div style="margin:8px 0 4px; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--faint); font-weight:700;">' + g[1] + '</div>' + chips('apps', list.map(function(a){ return [a.id, esc(a.t) + '<small>' + a.n + '</small>']; }), true) : '';
+    }).join('');
     var lvlPresets = [['[0,1,2,3,4]', 'Not memorized (0–4)'], ['[0,1,2]', 'Weak (0–2)'], ['[0]', 'New (0)'], ['[1,2,3,4]', 'Learning (1–4)'], ['[5]', 'Memorized (5)'], ['[0,1,2,3,4,5]', 'All levels']];
     $('panel').innerHTML =
       '<h2>Choose what to study on your desktop</h2>' +
-      '<p class="help">Pick a set like in Present mode. The words play on your wallpaper; use ‹ › and the 0–5 buttons at the bottom.</p>' +
-      '<div class="cols">' +
+      '<p class="help">Pick a set like in Present mode. The cards play on your wallpaper; use ‹ › and the buttons at the bottom.</p>' +
+      '<div class="sec"><h3>What to show</h3>' + chips('src', [['words', 'Vocab words'], ['gs', 'GS & Maths facts'], ['mix', 'Mix of both']], false) + '</div>' +
+      (draft.src !== 'words' ? '<div class="sec"><h3>Fact apps <span style="text-transform:none; letter-spacing:0;">(none = all General Studies)</span></h3>' +
+        (apps.length ? '<div class="tagbox" style="max-height:190px;">' + appGroups + '</div>' : '<p class="help">Couldn’t load study-bank.json from the site — check the internet connection.</p>') + '</div>' : '') +
+      '<div class="cols"' + (draft.src === 'gs' ? ' style="display:none;"' : '') + '>' +
         '<div>' +
           '<div class="sec"><h3>Tags <span style="text-transform:none; letter-spacing:0;">(none = all)</span></h3><div class="tagbox">' +
             chips('tags', tags.map(function(t){ return [t, esc(t) + '<small>' + tagCount[t] + '</small>']; }), true) + '</div></div>' +
@@ -624,7 +723,10 @@
             '<div style="margin-top:8px;">' + chips('drift', [[false, 'Calm background'], [true, 'Floating words (subtle)']], false) + '</div></div>' +
         '</div>' +
       '</div>' +
-      '<div class="p-foot"><div class="n"><b>' + n + '</b> word' + (n === 1 ? '' : 's') + ' in this set</div>' +
+      (draft.src === 'gs' ? '<div class="cols"><div><div class="sec"><h3>Next card automatically</h3>' + chips('auto', [[0, 'Off'], [30, '30 sec'], [60, '1 min'], [120, '2 min'], [300, '5 min'], [600, '10 min']], false) + '</div>' +
+        '<div class="sec"><h3>Answer</h3>' + chips('reveal', [['show', 'Show right away'], ['timed', 'After 8 sec (recall first)'], ['click', 'When I click']], false) + '</div></div>' +
+        '<div><div class="sec"><h3>Look</h3>' + chips('theme', [['paper', 'Paper'], ['paperdark', 'Paper dark'], ['indigo', 'Indigo'], ['indigodark', 'Indigo dark'], ['black', 'Pure black']], false) + '</div></div></div>' : '') +
+      '<div class="p-foot"><div class="n"><b>' + n + '</b> ' + (draft.src === 'words' ? 'word' : 'card') + (n === 1 ? '' : 's') + ' in this set</div>' +
         '<div style="display:flex; gap:10px;"><button class="ghost" id="setupCancel">Cancel</button><button class="big" id="setupGo"' + (n ? '' : ' disabled style="opacity:.5"') + '>Start this set ›</button></div></div>';
     $('panel').querySelectorAll('.chips[data-key] button').forEach(function(b){
       b.addEventListener('click', function(){
@@ -707,6 +809,7 @@
     catch(e){ if(!words.length){ $('word').innerHTML = '<div class="empty"><h1>Couldn’t load words</h1>' + esc(e.message) + '</div>'; return; } }
     await pullSummary();
     await flush();
+    await loadBank();
     if(!restoreSession()) startDeck();
     render();
     renderCard();
@@ -715,6 +818,7 @@
     // keep fresh: progress every 5 min, new words every 30 min, resend anything unsent every 2 min
     setInterval(async function(){ await pullSummary(); renderCard(); var w = deck[idx]; if(w) renderControls(w, state()); }, 5 * 60000);
     setInterval(async function(){ try{ if(await loadFeed(false)){ say('New words arrived in the register.'); renderCard(); } }catch(e){} }, 30 * 60000);
+    setInterval(loadBank, 6 * 3600000);   // new mini apps / questions
     setInterval(flush, 2 * 60000);
     setInterval(renderCard, 60 * 60000);   // day change / countdown
   }
