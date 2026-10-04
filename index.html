@@ -974,6 +974,78 @@
   .ss-num b{ font-variant-numeric:tabular-nums; }
   .ss-num.bad b{ color:var(--maroon); }
   @media (max-width: 600px){ .ss-row{ grid-template-columns:44px minmax(0, 1fr) 62px 58px; gap:8px; } .ss-row .ss-acc{ display:none; } }
+  /* ---------- study tracker ---------- */
+  .hub-track{ font-size:12.5px; color:var(--ink-soft); line-height:1.4; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+  .hub-track.due{ color:var(--maroon); font-weight:600; }
+  .tr-chip{ display:inline-block; font-size:11px; font-weight:700; letter-spacing:.04em; padding:2px 8px; border-radius:999px; white-space:nowrap; border:1px solid currentColor; }
+  .st-new{ color:var(--ink-faint); } .st-prog{ color:var(--mustard); } .st-done{ color:var(--teal); } .st-due{ color:var(--maroon); background:color-mix(in srgb, var(--maroon) 10%, transparent); }
+  .tr-up{ color:var(--teal); font-weight:700; font-size:.88em; } .tr-down{ color:var(--maroon); font-weight:700; font-size:.88em; }
+  .home-revise{ gap:4px; border-color:color-mix(in srgb, var(--maroon) 35%, var(--rule)); }
+  .home-revise .rv-row{ display:flex; align-items:center; gap:10px; padding:8px 6px; border-radius:12px; }
+  .home-revise .rv-row + .rv-row{ border-top:1px dashed var(--rule); }
+  .home-revise .rv-row .ic{ width:38px; height:38px; border-radius:11px; display:flex; align-items:center; justify-content:center; background:color-mix(in srgb, var(--hub-c) 14%, var(--paper)); font-size:18px; flex-shrink:0; }
+  .home-revise .rv-row .tx{ flex:1; min-width:0; display:flex; flex-direction:column; }
+  .home-revise .rv-row .tx b{ font-size:14.5px; } .home-revise .rv-row small{ font-size:12.5px; color:var(--ink-faint); }
+  .home-revise .btn.sm, .tr-sheet .btn.sm{ padding:7px 12px; font-size:13px; min-height:0; }
+  .rv-more{ border:none; background:none; color:var(--ink-soft); font:inherit; font-size:13px; text-align:left; padding:6px; cursor:pointer; }
+  .tr-head{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+  .tr-head h2{ margin:0; }
+  .tr-every{ font-size:13px; color:var(--ink-soft); display:flex; align-items:center; gap:8px; }
+  .tr-every select{ width:auto; font:inherit; padding:5px 8px; border-radius:10px; border:1px solid var(--rule); background:var(--paper); color:var(--ink); }
+  .tr-kpis{ display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:8px; margin:14px 0; }
+  .tr-kpis button{ text-align:left; padding:10px 12px; border-radius:14px; border:1px solid var(--rule); background:var(--paper); color:var(--ink); font:inherit; cursor:pointer; }
+  .tr-kpis button.on{ border-color:var(--ink); box-shadow:0 0 0 1px var(--ink) inset; }
+  .tr-kpis b{ display:block; font-family:var(--font-display); font-weight:var(--h-weight); font-size:24px; line-height:1.1; }
+  .tr-kpis span{ font-size:12px; color:var(--ink-faint); }
+  .tr-kpis .hot b{ color:var(--maroon); }
+  .tr-table{ display:grid; gap:6px; }
+  .tr-table:not([data-f="new"]) .tr-row[data-st="new"]{ display:none; }
+  .tr-table[data-f="due"] .tr-row[data-st]:not([data-st="due"]), .tr-table[data-f="progress"] .tr-row[data-st]:not([data-st="progress"]),
+  .tr-table[data-f="done"] .tr-row[data-st]:not([data-st="done"]), .tr-table[data-f="new"] .tr-row[data-st]:not([data-st="new"]){ display:none; }
+  .tr-table[data-f="new"] .tr-more{ display:none; }
+  .tr-more{ border:1px dashed var(--rule); background:none; border-radius:12px; padding:10px 12px; font:inherit; font-size:13px; color:var(--ink-soft); text-align:left; cursor:pointer; }
+  .tr-row{ display:grid; grid-template-columns:minmax(0, 2.2fr) 110px 110px 150px 100px; align-items:center; gap:10px; padding:9px 12px; border-radius:12px; border:1px solid var(--rule); border-left:4px solid var(--hub-c, var(--rule)); background:var(--paper); color:var(--ink); font:inherit; font-size:13.5px; text-align:left; cursor:pointer; }
+  .tr-row:hover{ border-color:var(--ink-faint); }
+  .tr-row.tr-th{ background:none; border:none; cursor:default; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); font-weight:700; padding:2px 16px; }
+  .tr-app{ display:flex; align-items:center; gap:10px; min-width:0; }
+  .tr-app i{ font-style:normal; font-size:18px; }
+  .tr-app > span{ display:flex; flex-direction:column; min-width:0; }
+  .tr-app b{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tr-app small, .tr-when small{ font-size:12px; color:var(--ink-faint); }
+  .tr-score{ display:flex; align-items:center; gap:8px; font-variant-numeric:tabular-nums; }
+  .tr-spark{ color:var(--hub-c, var(--teal)); flex-shrink:0; }
+  .tr-when{ color:var(--ink-soft); }
+  @media (max-width: 760px){
+    .tr-row{ grid-template-columns:minmax(0, 1fr) auto; gap:4px 10px; }
+    .tr-row.tr-th{ display:none; }
+    .tr-row > span:nth-child(3), .tr-row > span:nth-child(5){ display:none; }
+    .tr-row > .tr-score{ grid-column:2; grid-row:2; justify-self:end; }
+    .tr-kpis{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+  }
+  .tr-sheet h3{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .tr-sheet h4{ margin:18px 0 8px; font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); }
+  .tr-facts{ display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:8px; }
+  .tr-facts div{ padding:9px 11px; border-radius:12px; background:var(--paper); border:1px solid var(--rule); }
+  .tr-facts span{ display:block; font-size:11.5px; color:var(--ink-faint); }
+  .tr-facts b{ font-size:15px; }
+  .tr-est{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; margin-top:8px; }
+  .tr-est div{ padding:10px 12px; border-radius:12px; background:color-mix(in srgb, var(--hub-c) 10%, var(--paper)); }
+  .tr-est b{ display:block; font-family:var(--font-display); font-weight:var(--h-weight); font-size:20px; }
+  .tr-est span{ font-size:12px; color:var(--ink-soft); }
+  .tr-chart{ display:flex; align-items:flex-end; gap:6px; height:120px; padding:6px 2px 0; border-bottom:1px solid var(--rule); }
+  .tr-chart div{ flex:1; height:100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:2px; min-width:0; }
+  .tr-chart i{ display:block; width:100%; max-width:30px; border-radius:6px 6px 2px 2px; background:var(--hub-c); opacity:.85; }
+  .tr-chart span{ font-size:11px; font-weight:700; order:-1; }
+  .tr-chart small{ font-size:10px; color:var(--ink-faint); white-space:nowrap; }
+  .tr-sess{ display:grid; gap:4px; max-height:260px; overflow:auto; }
+  .tr-sess div{ display:grid; grid-template-columns:130px 56px minmax(0, 1fr) 48px; gap:10px; align-items:center; padding:7px 10px; border-radius:10px; background:var(--paper); font-size:13px; }
+  .tr-sess .d{ color:var(--ink-soft); } .tr-sess b{ text-align:right; font-variant-numeric:tabular-nums; }
+  @media (max-width: 600px){ .tr-facts{ grid-template-columns:repeat(2, minmax(0, 1fr)); } .tr-sess div{ grid-template-columns:96px 46px minmax(0, 1fr) 40px; gap:6px; font-size:12px; } }
+  .study-timer{ font-size:12.5px; color:var(--bar-muted); white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .study-track{ border:1px solid color-mix(in srgb, var(--bar-muted) 45%, transparent); background:none; color:inherit; border-radius:999px; padding:5px 11px; font:inherit; font-size:12.5px; cursor:pointer; white-space:nowrap; }
+  @media (max-width: 600px){ .study-track span{ display:none; } }
+  body.study-on .modal-bg{ z-index:450; }
+
   .ss-mocks{ display:flex; gap:8px; align-items:flex-end; height:130px; padding:6px 0 4px; }
   .ss-mocks div{ flex:1; max-width:60px; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:4px; height:100%; }
   .ss-mocks i{ display:block; width:100%; background:var(--teal); border-radius:7px 7px 3px 3px; }
@@ -1007,6 +1079,8 @@
     <button id="studyBack" title="Back to शब्दRegister"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg><span id="studyBackLabel">शब्दRegister</span></button>
     <span class="study-title" id="studyTitle"></span>
     <span class="study-sync" id="studySync"></span>
+    <span class="study-timer" id="studyTimer"></span>
+    <button class="study-track" id="studyTrackBtn" title="This app's sessions and scores">📈<span> Tracker</span></button>
   </div>
   <iframe class="study-frame" id="studyFrame" title="Study module"></iframe>
 </div>
@@ -1427,6 +1501,7 @@
 
     <section class="view" id="view-stats">
       <div class="panel" style="max-width:900px;" id="streakPanel"></div>
+      <div class="panel" style="max-width:900px;" id="trackerPanel"></div>
       <div class="panel" style="max-width:900px;" id="studyStatsPanel"></div>
       <div class="panel" style="max-width:560px;"><h2>By confidence</h2><div id="statsByConf"></div></div>
       <div class="panel" style="max-width:560px;"><h2>By type</h2><div id="statsByType"></div></div>
@@ -1680,6 +1755,7 @@
       '<p>' + escapeHtml(m.desc) + '</p>' +
       '<div class="hub-stats"><span><b>' + pr.done + '/' + pr.total + '</b> ' + (m.noq ? m.unit + ' revised' : m.unit) + '</span>' + (m.noq ? '<span>Revision only</span>' : '<span><b>' + (pr.acc === null ? '—' : pr.acc + '%') + '</b> right</span>' +
         (pr.wrong ? '<span class="hub-wrong"><b>' + pr.wrong + '</b> mistake' + (pr.wrong === 1 ? '' : 's') + '</span>' : '<span><b>' + pr.tried + '</b> tried</span>')) + '</div>' +
+      trackCardLine(id) +
       '<div class="hub-meta"><span>' + escapeHtml(m.meta) + '</span><b>' + escapeHtml(agoText(meta.openedAt)) + '</b></div></button>';
   }
   function hubPracticeSection(){
@@ -1827,7 +1903,7 @@
     var ids = Object.keys(STUDY);
     box.innerHTML = homeHero() +
       '<div class="home-row1">' + homeTodayCard() + homeContinueCard() + '</div>' +
-      '<div class="home-row2">' + homeDueCard() + '</div>' +
+      '<div class="home-row2">' + homeDueCard() + homeReviseCard() + '</div>' +
       homeSubjects() +
       hubPracticeSection() +
       '<section class="hub-sec hub-sub" id="hubsub-english"><div class="hub-sec-h"><h2>English</h2><span>अंग्रेज़ी</span></div><div class="hub-grid">' + homeVocabCard() + ids.filter(function(id){ return STUDY[id].subj === 'english'; }).map(hubCard).join('') + '</div></section>' +
@@ -1854,7 +1930,7 @@
     homeTimer = setTimeout(function(){
       if(isActive('home') && !drillOpen) renderHub();
       if(isActive('library')) renderVocabDash();
-      if(isActive('stats')) renderStudyStats();
+      if(isActive('stats')){ renderTracker(); renderStudyStats(); }
     }, 250);
   }
   function setExamDate(){
@@ -2088,6 +2164,12 @@
       var snap = await studyDocRef(id).get();
       if(!snap.exists) return;
       var r = snap.data() || {};
+      if(id === 'tracker' && typeof r.data === 'string'){
+        var mine = lsGet(mod.key), merged = trackMerge(trackParse(mine), trackParse(r.data)), mj = JSON.stringify(merged);
+        lsSet(mod.key, mj);
+        if(mj !== r.data) setStudyMeta(id, { localAt: Date.now() }); else setStudyMeta(id, { syncedAt: r.updatedAt || Date.now(), localAt: r.updatedAt || Date.now() });
+        return;
+      }
       var meta = studyMeta()[id] || {};
       var local = lsGet(mod.key);
       var localAt = meta.localAt || 0, syncedAt = meta.syncedAt || 0;
@@ -2152,16 +2234,18 @@
     await studyPull(id);
     if(studyOpen !== id) return;
     studyLast = lsGet(mod.key);
+    trackStart(id);
     Object.keys(STUDY).concat(Object.keys(STUDY_EXTRA)).forEach(function(k){ studyPush(k); });   // this device's unsaved progress (incl. from before syncing existed)
     document.getElementById('studyFrame').src = mod.file + '?embed=1&skin=' + studySkinValue() + '&theme=' + studyThemeValue() + (lesson ? '&lesson=' + encodeURIComponent(lesson) : '');
     studySyncLabel(currentUser ? '✓ Synced with your account' : '');
     clearInterval(studyWatch);
-    studyWatch = setInterval(studyCheckChange, 4000);
+    studyWatch = setInterval(function(){ studyCheckChange(); trackTick(); }, 4000);
   }
   function closeStudy(fromHistory){
     if(!studyOpen) return;
     studyCheckChange();
-    var id = studyOpen;
+    var id = studyOpen, sess = trackFinish();
+    trackToast(sess, id);
     clearTimeout(studyPushTimer);
     studyPush(id);
     clearInterval(studyWatch);
@@ -2173,6 +2257,7 @@
     if(!fromHistory && location.hash.indexOf('#study-') === 0){ try{ history.back(); }catch(e){} }
   }
   document.getElementById('studyBack').addEventListener('click', function(){ closeStudy(false); });
+  document.getElementById('studyTrackBtn').addEventListener('click', function(){ if(studyOpen){ trackTick(); openTrackerApp(studyOpen); } });
   window.addEventListener('popstate', function(){
     if(location.hash === '#drill') return;
     if(drillOpen){ closeDrill(true); if(drillOpen) return; }
@@ -2180,7 +2265,7 @@
     if(m && STUDY[m[1]]){ if(studyOpen !== m[1]) openStudy(m[1], true); return; }
     if(studyOpen) closeStudy(true);
   });
-  window.addEventListener('pagehide', function(){ if(studyOpen){ studyCheckChange(); studyPush(studyOpen); } });
+  window.addEventListener('pagehide', function(){ if(studyOpen){ studyCheckChange(); trackTick(); studyPush(studyOpen); } });
   // keep an open module in step with the app's Light / Dark / Auto choice
   new MutationObserver(function(){
     var f = document.getElementById('studyFrame');
@@ -2214,8 +2299,257 @@
   function englishIds(){ return Object.keys(STUDY).filter(function(id){ return STUDY[id].subj === 'english'; }); }
   function mathIds(){ return Object.keys(STUDY).filter(function(id){ return STUDY[id].subj === 'maths'; }); }
   function mathQIds(){ return mathIds().filter(function(id){ return !STUDY[id].noq; }); }
-  var STUDY_EXTRA = { mocks: { key: 'shabdMockHistory', title: 'Mixed mock history' } };
+  var STUDY_EXTRA = { mocks: { key: 'shabdMockHistory', title: 'Mixed mock history' }, tracker: { key: 'shabdTracker', title: 'Study tracker' } };
   function studyMod(id){ return STUDY[id] || STUDY_EXTRA[id]; }
+  // ================= Study tracker: one record per visit to a mini app =================
+  // Stored in localStorage 'shabdTracker' and synced like the mini apps (users/{uid}/study/tracker).
+  // { v:1, every:15, apps:{ id:{ s:[session…], completedAt, snooze } } }
+  // session = { id, at (start ms), d (active seconds), q (answered this visit), r (right of those), sc (overall % right after it),
+  //             cov (% of the app's questions tried), l (lessons done), done (1 = finished the app in this visit), m (mock {score,max,acc}) }
+  var TRACK_KEY = 'shabdTracker', TRACK_LIVE = 'shabdTrackerLive', TRACK_MIN_SEC = 120, TRACK_KEEP = 60;
+  function trackData(){ var t; try{ t = JSON.parse(lsGet(TRACK_KEY) || '{}') || {}; }catch(e){ t = {}; } t.v = 1; t.every = t.every || 15; t.apps = t.apps || {}; return t; }
+  function trackSave(t){
+    lsSet(TRACK_KEY, JSON.stringify(t));
+    setStudyMeta('tracker', { localAt: Date.now() });
+    clearTimeout(trackSave.timer);
+    trackSave.timer = setTimeout(function(){ studyPush('tracker'); }, 1500);
+  }
+  /** Two devices' trackers: keep every session from both, newest settings win. */
+  function trackMerge(a, b){
+    var out = { v: 1, every: (a.at || 0) >= (b.at || 0) ? (a.every || b.every || 15) : (b.every || a.every || 15), at: Math.max(a.at || 0, b.at || 0), apps: {} };
+    [a.apps || {}, b.apps || {}].forEach(function(apps){
+      Object.keys(apps).forEach(function(id){
+        var x = apps[id] || {}, o = out.apps[id] || (out.apps[id] = { s: [] });
+        var seen = {}; o.s.forEach(function(s){ seen[s.id] = 1; });
+        (x.s || []).forEach(function(s){ if(!seen[s.id]){ o.s.push(s); seen[s.id] = 1; } });
+        if(x.completedAt && (!o.completedAt || x.completedAt < o.completedAt)) o.completedAt = x.completedAt;
+        if(x.snooze && (!o.snooze || x.snooze > o.snooze)) o.snooze = x.snooze;
+      });
+    });
+    Object.keys(out.apps).forEach(function(id){ var o = out.apps[id]; o.s.sort(function(p, q){ return p.at - q.at; }); if(o.s.length > TRACK_KEEP) o.s = o.s.slice(-TRACK_KEEP); });
+    return out;
+  }
+  function trackParse(json){ try{ return JSON.parse(json || '{}') || {}; }catch(e){ return {}; } }
+  /** What the mini app's saved state says right now. */
+  function trackSnap(id){
+    var st = studyState(id), ans = st.ans || {}, keys = Object.keys(ans);
+    var l = (id === 'grammar' || id === 'bns') ? Object.keys(st.done || {}).length : Object.keys(st.les || {}).filter(function(k){ return st.les[k] && st.les[k].done; }).length;
+    return { ans: ans, tried: keys.length, right: keys.filter(function(k){ return ans[k] === 1; }).length, l: l, mocks: Array.isArray(st.mocks) ? st.mocks.length : 0, lastMock: Array.isArray(st.mocks) && st.mocks.length ? st.mocks[st.mocks.length - 1] : null };
+  }
+  function trackTotalQ(id){
+    if(studyBank && studyBank.modules && studyBank.modules[id]) return studyBank.modules[id].qs.length;
+    var m = /([\d,]+)\s+questions/.exec(STUDY[id].meta || ''); return m ? +m[1].replace(/,/g, '') : 0;
+  }
+
+  // ---- the visit in progress ----
+  var trackLive = null, trackLastInput = 0;
+  function trackStart(id){
+    trackFinishStale();
+    var b = trackSnap(id);
+    trackLive = { id: id, at: Date.now(), act: 0, tick: Date.now(), base: { ans: b.ans, l: b.l, mocks: b.mocks } };
+    trackLastInput = Date.now();
+    lsSet(TRACK_LIVE, JSON.stringify(trackLive));
+    trackLabel();
+  }
+  /** Counts only time the app is on screen and in use (no input for 3 minutes = paused). */
+  function trackTick(){
+    if(!trackLive) return;
+    var now = Date.now(), gap = Math.min(now - trackLive.tick, 10000);
+    trackLive.tick = now;
+    if(document.visibilityState === 'visible' && now - trackLastInput < 180000) trackLive.act += gap / 1000;
+    lsSet(TRACK_LIVE, JSON.stringify(trackLive));
+    trackLabel();
+  }
+  function trackInput(){ trackLastInput = Date.now(); }
+  ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(function(t){ document.addEventListener(t, trackInput, { passive: true, capture: true }); });
+  /** Watch clicks and scrolling inside the mini app too (same site, so its window is reachable). */
+  document.getElementById('studyFrame').addEventListener('load', function(){
+    try{ var w = this.contentWindow; ['pointerdown', 'keydown', 'wheel', 'touchstart', 'scroll'].forEach(function(t){ w.addEventListener(t, trackInput, { passive: true, capture: true }); }); }catch(e){}
+  });
+  function trackLabel(){
+    var el = document.getElementById('studyTimer');
+    if(!el) return;
+    if(!trackLive){ el.textContent = ''; return; }
+    var b = trackLive.base, s = trackSnap(trackLive.id), q = 0;
+    Object.keys(s.ans).forEach(function(k){ if(b.ans[k] !== s.ans[k]) q++; });
+    el.textContent = '⏱ ' + Math.floor(trackLive.act / 60) + ' min' + (q ? ' · ' + q + ' answered' : '');
+  }
+  /** Closes the visit: saves it as a session if it was real study (2+ minutes, or any answers / lessons). */
+  function trackFinish(live){
+    live = live || trackLive;
+    if(!live || !STUDY[live.id]) { trackLive = null; lsSet(TRACK_LIVE, ''); return null; }
+    if(live === trackLive) trackTick();
+    var id = live.id, m = STUDY[id], b = live.base, s = trackSnap(id), q = 0, r = 0;
+    Object.keys(s.ans).forEach(function(k){ if(b.ans[k] !== s.ans[k]){ q++; if(s.ans[k] === 1) r++; } });
+    var total = trackTotalQ(id), sess = null;
+    if(live.act >= TRACK_MIN_SEC || q > 0 || s.l > b.l || s.mocks > b.mocks){
+      var t = trackData(), a = t.apps[id] || (t.apps[id] = { s: [] });
+      sess = { id: live.at.toString(36) + Math.random().toString(36).slice(2, 6), at: live.at, d: Math.round(live.act), q: q, r: r,
+        sc: s.tried ? Math.round(s.right * 100 / s.tried) : null, cov: total ? Math.min(100, Math.round(s.tried * 100 / total)) : null, l: s.l };
+      if(s.mocks > b.mocks && s.lastMock){ var lm = s.lastMock; sess.m = { score: lm.score, max: lm.max, acc: lm.acc }; }
+      if(m.lessons && s.l >= m.lessons && b.l < m.lessons){ sess.done = 1; if(!a.completedAt) a.completedAt = Date.now(); }
+      if(m.lessons && s.l >= m.lessons && !a.completedAt) a.completedAt = Date.now();
+      a.s.push(sess); if(a.s.length > TRACK_KEEP) a.s = a.s.slice(-TRACK_KEEP);
+      delete a.snooze;
+      t.at = Date.now();
+      trackSave(t);
+    }
+    if(live === trackLive) trackLive = null;
+    lsSet(TRACK_LIVE, '');
+    trackLabel();
+    return sess;
+  }
+  /** A visit that never closed properly (app killed, tab closed) is saved the next time the app starts. */
+  function trackFinishStale(){
+    var old = trackParse(lsGet(TRACK_LIVE));
+    if(old && old.id && (!trackLive || trackLive.at !== old.at)) trackFinish(old);
+  }
+  function trackToast(sess, id){
+    if(!sess) return;
+    var prev = trackSessions(id).filter(function(x){ return x.id !== sess.id && x.sc !== null && x.sc !== undefined; }).pop();
+    var bits = [Math.max(1, Math.round(sess.d / 60)) + ' min'];
+    if(sess.q) bits.push(sess.q + ' answered · ' + Math.round(sess.r * 100 / sess.q) + '% right');
+    if(sess.m) bits.push('mock ' + sess.m.score + '/' + sess.m.max);
+    if(sess.sc !== null && sess.sc !== undefined) bits.push('score ' + sess.sc + '%' + (prev ? (sess.sc > prev.sc ? ' ↑' : sess.sc < prev.sc ? ' ↓' : '') : ''));
+    showToast('Session saved · ' + bits.join(' · ') + (sess.done ? ' · 🎉 app completed' : ''));
+  }
+
+  // ---- reading the tracker ----
+  function trackSessions(id){ var a = trackData().apps[id]; return a && a.s ? a.s : []; }
+  function trackEvery(){ return trackData().every || 15; }
+  function trackDaysAgo(ms){ if(!ms) return null; var a = new Date(ms); a.setHours(0, 0, 0, 0); var b = new Date(); b.setHours(0, 0, 0, 0); return Math.round((b - a) / DAY_MS); }
+  function trackAgo(ms){ var d = trackDaysAgo(ms); return d === null ? '—' : d === 0 ? 'today' : d === 1 ? 'yesterday' : d + ' days ago'; }
+  function trackDate(ms){ return ms ? new Date(ms).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '—'; }
+  function fmtMin(min){ min = Math.max(5, Math.round(min / 5) * 5); return min < 60 ? min + ' min' : Math.floor(min / 60) + ' h' + (min % 60 ? ' ' + (min % 60) + ' min' : ''); }
+  /** Everything the cards, Home and the tracker screen need for one app. */
+  function trackInfo(id){
+    var m = STUDY[id], t = trackData(), a = t.apps[id] || {}, ss = a.s || [], pr = studyProgress(id);
+    var last = ss[ss.length - 1] || null, scored = ss.filter(function(x){ return x.sc !== null && x.sc !== undefined; });
+    var started = ss.length > 0 || pr.done > 0 || pr.tried > 0;
+    var completed = a.completedAt || (m.lessons && pr.done >= m.lessons ? (last ? last.at : Date.now()) : 0);
+    var lastStudy = last ? last.at : 0, every = t.every || 15, visited = (studyMeta()[id] || {}).openedAt || 0;
+    var base = lastStudy || (started ? visited : 0);              // studied before the tracker existed: count from the last visit
+    var nextAt = base ? base + every * DAY_MS : 0;
+    if(a.snooze && a.snooze > nextAt) nextAt = a.snooze;
+    var due = started && base > 0 && Date.now() >= nextAt;
+    var revisedAt = 0;
+    if(completed) ss.forEach(function(x){ if(x.at > completed + 3600000) revisedAt = x.at; });
+    // time: first pass = every lesson + every question; a revision round = skim the lessons + one mock
+    var perLesson = id === 'grammar' ? 3 : m.noq ? 5 : 7, totalQ = trackTotalQ(id);
+    var fullMin = (m.lessons || 0) * perLesson + totalQ * 0.6;
+    var revMin = Math.max(15, (m.lessons || 0) * (id === 'grammar' ? 0.5 : 2) + (m.noq ? 0 : 15));   // skim every lesson + one 25-question mock
+    var real = ss.filter(function(x){ return x.d >= TRACK_MIN_SEC; }), avgMin = real.length >= 2 ? real.reduce(function(s, x){ return s + x.d; }, 0) / real.length / 60 : 0;
+    var status = !started ? 'new' : due ? 'due' : completed ? 'done' : 'progress';
+    return { id: id, m: m, pr: pr, sessions: ss, last: last, scored: scored, started: started, completed: completed, revisedAt: revisedAt,
+      visited: visited, lastStudy: lastStudy, base: base, nextAt: nextAt, due: due, every: every,
+      fullMin: fullMin, revMin: revMin, avgMin: avgMin, status: status,
+      score: scored.length ? scored[scored.length - 1].sc : pr.acc, prevScore: scored.length > 1 ? scored[scored.length - 2].sc : null };
+  }
+  var TRACK_STATUS = { new: ['Not started', 'st-new'], progress: ['In progress', 'st-prog'], done: ['Completed', 'st-done'], due: ['Revise now', 'st-due'] };
+  function trackDueList(){ return Object.keys(STUDY).map(trackInfo).filter(function(x){ return x.due; }).sort(function(a, b){ return (a.lastStudy || 0) - (b.lastStudy || 0); }); }
+  function trackTrend(x){
+    if(x.score === null || x.score === undefined) return '—';
+    var d = x.prevScore === null || x.prevScore === undefined ? 0 : x.score - x.prevScore;
+    return x.score + '%' + (d > 0 ? ' <span class="tr-up">↑' + d + '</span>' : d < 0 ? ' <span class="tr-down">↓' + (-d) + '</span>' : '');
+  }
+  function trackSpark(x){
+    var pts = x.scored.slice(-12).map(function(s){ return s.sc; });
+    if(pts.length < 2) return '';
+    var w = 84, h = 26, n = pts.length, path = pts.map(function(v, i){ return (i ? 'L' : 'M') + (i * (w - 4) / (n - 1) + 2).toFixed(1) + ' ' + (h - 3 - v / 100 * (h - 6)).toFixed(1); }).join(' ');
+    return '<svg class="tr-spark" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" aria-hidden="true"><path d="' + path + '" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+  /** One line for a hub card. */
+  function trackCardLine(id){
+    var x = trackInfo(id);
+    if(!x.started) return '<div class="hub-track">⏳ Full app ≈ ' + fmtMin(x.fullMin) + '</div>';
+    if(x.due) return '<div class="hub-track due"><span class="tr-chip st-due">Revise now</span>' + (x.lastStudy ? 'Last studied ' + trackAgo(x.lastStudy) : 'Last opened ' + trackAgo(x.base)) + ' · ≈ ' + fmtMin(x.revMin) + '</div>';
+    var days = Math.max(0, Math.ceil((x.nextAt - Date.now()) / DAY_MS));
+    return '<div class="hub-track">' + (x.completed ? '✅ ' : '📈 ') + (x.lastStudy ? 'Studied ' : 'Opened ') + trackAgo(x.base) +
+      (x.score !== null && x.score !== undefined ? ' · ' + trackTrend(x) : '') + ' · revise in ' + days + ' d</div>';
+  }
+  /** Home: the nudge. Shows only when something is due. */
+  function homeReviseCard(){
+    var list = trackDueList();
+    if(!list.length) return '';
+    return '<div class="home-card home-revise"><div class="home-card-h">Time to revise <span class="lvl">every ' + trackEvery() + ' days</span></div>' +
+      list.slice(0, 5).map(function(x){
+        return '<div class="rv-row" style="--hub-c:' + x.m.color + ';"><span class="ic">' + x.m.ico + '</span><span class="tx"><b>' + escapeHtml(x.m.title) + '</b><small>' +
+          (x.lastStudy ? 'Last studied ' + trackAgo(x.lastStudy) : 'Last opened ' + trackAgo(x.base)) + (x.score !== null && x.score !== undefined ? ' · score ' + x.score + '%' : '') + ' · ≈ ' + fmtMin(x.revMin) + '</small></span>' +
+          '<button class="btn ghost sm" data-track-snooze="' + x.id + '" title="Remind me in 3 days">Later</button><button class="btn teal sm" data-open-study="' + x.id + '">Revise</button></div>';
+      }).join('') + (list.length > 5 ? '<button class="rv-more" data-track-open="all">+ ' + (list.length - 5) + ' more in the tracker ›</button>' : '') + '</div>';
+  }
+  /** Progress tab: every app in one organised table. */
+  function renderTracker(){
+    var box = document.getElementById('trackerPanel');
+    if(!box) return;
+    var all = Object.keys(STUDY).map(trackInfo), n = { new: 0, progress: 0, done: 0, due: 0 };
+    all.forEach(function(x){ n[x.status]++; });
+    var order = { due: 0, progress: 1, done: 2, new: 3 };
+    all.sort(function(a, b){ return order[a.status] - order[b.status] || (b.lastStudy || 0) - (a.lastStudy || 0); });
+    var every = trackEvery();
+    box.innerHTML = '<div class="tr-head"><h2>Study tracker</h2><label class="tr-every">Remind me to revise every <select id="trackEvery">' +
+        [10, 15, 20, 30].map(function(d){ return '<option value="' + d + '"' + (d === every ? ' selected' : '') + '>' + d + ' days</option>'; }).join('') + '</select></label></div>' +
+      '<div class="tr-kpis"><button data-track-filter="due" class="' + (n.due ? 'hot' : '') + '"><b>' + n.due + '</b><span>Revise now</span></button><button data-track-filter="progress"><b>' + n.progress + '</b><span>In progress</span></button>' +
+        '<button data-track-filter="done"><b>' + n.done + '</b><span>Completed</span></button><button data-track-filter="new"><b>' + n.new + '</b><span>Not started</span></button></div>' +
+      '<div class="tr-table" id="trTable"><div class="tr-row tr-th"><span>App</span><span>Status</span><span>Last studied</span><span>Score</span><span>Next revision</span></div>' +
+      all.map(function(x){
+        var st = TRACK_STATUS[x.status], next = !x.started ? '—' : x.due ? '<b class="tr-down">now</b>' : trackDate(x.nextAt);
+        return '<button class="tr-row" data-track-open="' + x.id + '" data-st="' + x.status + '" style="--hub-c:' + x.m.color + ';">' +
+          '<span class="tr-app"><i>' + x.m.ico + '</i><span><b>' + escapeHtml(x.m.title) + '</b><small>' + x.sessions.length + ' session' + (x.sessions.length === 1 ? '' : 's') + (x.completed ? ' · completed ' + trackDate(x.completed) : '') + '</small></span></span>' +
+          '<span><span class="tr-chip ' + st[1] + '">' + st[0] + '</span></span>' +
+          '<span class="tr-when">' + (x.lastStudy ? trackAgo(x.lastStudy) : x.visited ? '<small>visited ' + trackAgo(x.visited) + '</small>' : '—') + '</span>' +
+          '<span class="tr-score">' + trackTrend(x) + trackSpark(x) + '</span>' +
+          '<span class="tr-when">' + next + '</span></button>';
+      }).join('') + (n.new ? '<button class="tr-more" data-track-filter="new">+ ' + n.new + ' not started yet — show</button>' : '') + '</div>' +
+      '<p class="help" style="margin-top:10px;">A session is saved each time you study a mini app for 2 minutes or more (or answer anything). Score = share of the app’s questions you got right on your latest try, so it rises as you fix mistakes. Only active time is counted.</p>';
+    document.getElementById('trackEvery').addEventListener('change', function(){ var t = trackData(); t.every = +this.value; t.at = Date.now(); trackSave(t); renderTracker(); renderHomeSoon(); });
+  }
+  /** One app's history in a sheet. */
+  function openTrackerApp(id){
+    var x = trackInfo(id), modalBg = document.getElementById('modalBg'), body = document.getElementById('modalBody');
+    var ss = x.sessions.slice().reverse(), best = x.scored.reduce(function(b, s){ return Math.max(b, s.sc); }, 0);
+    var totalMin = x.sessions.reduce(function(s, v){ return s + v.d; }, 0) / 60;
+    var chart = x.scored.length >= 2 ? '<div class="tr-chart">' + x.scored.slice(-14).map(function(s){
+      return '<div title="' + escapeAttr(trackDate(s.at) + ' · ' + s.sc + '%') + '"><i style="height:' + Math.max(4, s.sc) + '%"></i><span>' + s.sc + '</span><small>' + trackDate(s.at) + '</small></div>';
+    }).join('') + '</div>' : '';
+    body.innerHTML = '<div class="tr-sheet" style="--hub-c:' + x.m.color + ';">' +
+      '<h3>' + x.m.ico + ' ' + escapeHtml(x.m.title) + ' <span class="tr-chip ' + TRACK_STATUS[x.status][1] + '">' + TRACK_STATUS[x.status][0] + '</span></h3>' +
+      '<div class="tr-facts">' +
+        '<div><span>Last visited</span><b>' + (x.visited ? trackAgo(x.visited) : '—') + '</b></div>' +
+        '<div><span>Last studied</span><b>' + (x.lastStudy ? trackAgo(x.lastStudy) : '—') + '</b></div>' +
+        '<div><span>Completed</span><b>' + (x.completed ? trackDate(x.completed) : 'not yet') + '</b></div>' +
+        '<div><span>Last revised</span><b>' + (x.revisedAt ? trackAgo(x.revisedAt) : '—') + '</b></div>' +
+        '<div><span>Next revision</span><b>' + (!x.started ? '—' : x.due ? 'now' : trackDate(x.nextAt)) + '</b></div>' +
+        '<div><span>Score now</span><b>' + trackTrend(x) + '</b></div>' +
+        '<div><span>Best score</span><b>' + (best ? best + '%' : '—') + '</b></div>' +
+        '<div><span>Time spent</span><b>' + (totalMin ? Math.round(totalMin) + ' min' : '—') + '</b></div>' +
+      '</div>' +
+      '<div class="tr-est"><div><b>' + fmtMin(x.fullMin) + '</b><span>Full app, first time</span></div><div><b>' + fmtMin(x.revMin) + '</b><span>One revision round</span></div><div><b>' + (x.avgMin ? fmtMin(x.avgMin) : '—') + '</b><span>Your usual session</span></div></div>' +
+      (chart ? '<h4>Score over sessions</h4>' + chart : '') +
+      '<h4>Sessions</h4>' + (ss.length ? '<div class="tr-sess">' + ss.slice(0, 20).map(function(s){
+        return '<div><span class="d">' + new Date(s.at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) + ' · ' + new Date(s.at).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' }) + '</span>' +
+          '<span>' + Math.max(1, Math.round(s.d / 60)) + ' min</span>' +
+          '<span>' + (s.q ? s.q + ' answered · ' + Math.round(s.r * 100 / s.q) + '% right' : x.m.noq ? (s.l ? s.l + ' chapters revised' : 'revision') : 'reading') + (s.m ? ' · mock ' + s.m.score + '/' + s.m.max : '') + (s.done ? ' · 🎉 completed' : '') + '</span>' +
+          '<b>' + (s.sc !== null && s.sc !== undefined ? s.sc + '%' : '—') + '</b></div>';
+      }).join('') + '</div>' : '<p class="help">No sessions yet — they are saved automatically from your next visit.</p>') +
+      '<div class="modal-actions">' + (x.due ? '<button class="btn ghost" data-track-snooze="' + id + '">Remind me in 3 days</button>' : '') + '<button class="btn ghost" id="trClose">Close</button><button class="btn teal" data-open-study="' + id + '">' + (x.started ? 'Open & revise' : 'Start') + ' ›</button></div></div>';
+    modalBg.classList.add('open');
+    document.getElementById('trClose').addEventListener('click', function(){ modalBg.classList.remove('open'); body.innerHTML = ''; });
+  }
+  function trackSnooze(id){ var t = trackData(), a = t.apps[id] || (t.apps[id] = { s: [] }); a.snooze = Date.now() + 3 * DAY_MS; t.at = Date.now(); trackSave(t); showToast('OK — reminder in 3 days.'); }
+  /** All tracker buttons, wherever they are. */
+  document.addEventListener('click', function(ev){
+    var sn = ev.target.closest('[data-track-snooze]');
+    if(sn){ ev.stopPropagation(); trackSnooze(sn.dataset.trackSnooze); var mb = document.getElementById('modalBg'); if(mb.classList.contains('open') && mb.contains(sn)){ mb.classList.remove('open'); } renderHomeSoon(); renderTracker(); return; }
+    var op = ev.target.closest('[data-track-open]');
+    if(op){ ev.stopPropagation(); if(op.dataset.trackOpen === 'all'){ switchTab('stats'); setTimeout(function(){ var p = document.getElementById('trackerPanel'); if(p) p.scrollIntoView({ behavior: 'smooth' }); }, 80); } else openTrackerApp(op.dataset.trackOpen); return; }
+    var fl = ev.target.closest('[data-track-filter]');
+    if(fl){ var tb = document.getElementById('trTable'), f = fl.dataset.trackFilter, on = tb.dataset.f === f; tb.dataset.f = on ? '' : f;
+      document.querySelectorAll('.tr-kpis [data-track-filter]').forEach(function(b){ b.classList.toggle('on', !on && b.dataset.trackFilter === f); }); return; }
+    var inModal = ev.target.closest('#modalBody [data-open-study]');
+    if(inModal){ document.getElementById('modalBg').classList.remove('open'); openStudy(inModal.dataset.openStudy, false); }
+  }, true);
+
   var studyStateTimers = {};
   function studyState(id){ try{ return JSON.parse(lsGet(studyMod(id).key) || '{}') || {}; }catch(e){ return {}; } }
   function setStudyState(id, st){
@@ -2566,7 +2900,7 @@
   function refreshHubProgress(){
     if(!currentUser) return;
     hubPulledAt = Date.now();
-    Promise.all(Object.keys(STUDY).concat(Object.keys(STUDY_EXTRA)).map(function(id){ return studyPull(id); })).then(function(){ renderHomeSoon(); });
+    Promise.all(Object.keys(STUDY).concat(Object.keys(STUDY_EXTRA)).map(function(id){ return studyPull(id); })).then(function(){ if(!trackLive) trackFinishStale(); renderHomeSoon(); });
   }
 
   // ---------------- text-to-speech ----------------
@@ -3160,7 +3494,7 @@
     window.scrollTo(0, 0);
     if(name === 'library'){ renderVocabDash(); renderLibrary(); }
     if(name === 'home'){ renderHub(); refreshHubProgressSoon(); }
-    if(name === 'stats'){ renderStreakPanel(); renderStudyStats(); renderStats(); renderLeaderboard(); renderAllUsers(); refreshHubProgressSoon(); }
+    if(name === 'stats'){ renderStreakPanel(); renderTracker(); renderStudyStats(); renderStats(); renderLeaderboard(); renderAllUsers(); refreshHubProgressSoon(); }
     if(name === 'review'){ renderReview(); renderSpellReview(); }
     if(name === 'quiz') renderQuizHome();
     if(name === 'roots') renderRoots();
