@@ -975,8 +975,6 @@
   .ss-num.bad b{ color:var(--maroon); }
   @media (max-width: 600px){ .ss-row{ grid-template-columns:44px minmax(0, 1fr) 62px 58px; gap:8px; } .ss-row .ss-acc{ display:none; } }
   /* ---------- study tracker ---------- */
-  .hub-track{ font-size:12.5px; color:var(--ink-soft); line-height:1.4; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
-  .hub-track.due{ color:var(--maroon); font-weight:600; }
   .tr-chip{ display:inline-block; font-size:11px; font-weight:700; letter-spacing:.04em; padding:2px 8px; border-radius:999px; white-space:nowrap; border:1px solid currentColor; }
   .st-new{ color:var(--ink-faint); } .st-prog{ color:var(--mustard); } .st-done{ color:var(--teal); } .st-due{ color:var(--maroon); background:color-mix(in srgb, var(--maroon) 10%, transparent); }
   .tr-up{ color:var(--teal); font-weight:700; font-size:.88em; } .tr-down{ color:var(--maroon); font-weight:700; font-size:.88em; }
@@ -1024,27 +1022,79 @@
   }
   .tr-sheet h3{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
   .tr-sheet h4{ margin:18px 0 8px; font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); }
-  .tr-facts{ display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:8px; }
-  .tr-facts div{ padding:9px 11px; border-radius:12px; background:var(--paper); border:1px solid var(--rule); }
-  .tr-facts span{ display:block; font-size:11.5px; color:var(--ink-faint); }
-  .tr-facts b{ font-size:15px; }
-  .tr-est{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; margin-top:8px; }
-  .tr-est div{ padding:10px 12px; border-radius:12px; background:color-mix(in srgb, var(--hub-c) 10%, var(--paper)); }
-  .tr-est b{ display:block; font-family:var(--font-display); font-weight:var(--h-weight); font-size:20px; }
-  .tr-est span{ font-size:12px; color:var(--ink-soft); }
   .tr-chart{ display:flex; align-items:flex-end; gap:6px; height:120px; padding:6px 2px 0; border-bottom:1px solid var(--rule); }
   .tr-chart div{ flex:1; height:100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:2px; min-width:0; }
   .tr-chart i{ display:block; width:100%; max-width:30px; border-radius:6px 6px 2px 2px; background:var(--hub-c); opacity:.85; }
   .tr-chart span{ font-size:11px; font-weight:700; order:-1; }
   .tr-chart small{ font-size:10px; color:var(--ink-faint); white-space:nowrap; }
-  .tr-sess{ display:grid; gap:4px; max-height:260px; overflow:auto; }
-  .tr-sess div{ display:grid; grid-template-columns:130px 56px minmax(0, 1fr) 48px; gap:10px; align-items:center; padding:7px 10px; border-radius:10px; background:var(--paper); font-size:13px; }
-  .tr-sess .d{ color:var(--ink-soft); } .tr-sess b{ text-align:right; font-variant-numeric:tabular-nums; }
-  @media (max-width: 600px){ .tr-facts{ grid-template-columns:repeat(2, minmax(0, 1fr)); } .tr-sess div{ grid-template-columns:96px 46px minmax(0, 1fr) 40px; gap:6px; font-size:12px; } }
   .study-timer{ font-size:12.5px; color:var(--bar-muted); white-space:nowrap; font-variant-numeric:tabular-nums; }
   .study-track{ border:1px solid color-mix(in srgb, var(--bar-muted) 45%, transparent); background:none; color:inherit; border-radius:999px; padding:5px 11px; font:inherit; font-size:12.5px; cursor:pointer; white-space:nowrap; }
   @media (max-width: 600px){ .study-track span{ display:none; } }
   body.study-on .modal-bg{ z-index:450; }
+  /* app card: facts + History / Revise beside the ring */
+  div.hub-card{ cursor:pointer; transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease; }
+  div.hub-card:focus-visible{ outline:2px solid var(--hub-c, var(--teal)); outline-offset:2px; }
+  .hub-side{ display:flex; align-items:center; gap:8px; flex-shrink:0; }
+  .hub-tbs{ display:flex; flex-direction:column; gap:4px; }
+  .hub-tb{ display:flex; align-items:center; gap:5px; border:1px solid var(--rule); background:var(--paper); color:var(--ink); border-radius:999px; padding:3px 10px 3px 7px; font:inherit; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; line-height:1.3; }
+  .hub-tb:hover{ border-color:var(--hub-c, var(--ink)); }
+  .hub-tb.due{ color:var(--maroon); border-color:color-mix(in srgb, var(--maroon) 55%, transparent); background:color-mix(in srgb, var(--maroon) 9%, var(--paper)); }
+  .hub-facts{ display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:5px; margin-top:4px; }
+  .hub-facts div{ padding:8px 7px; border-radius:11px; background:color-mix(in srgb, var(--hub-c, var(--teal)) 7%, var(--paper)); min-width:0; }
+  .hub-facts b{ display:block; font-size:15px; font-variant-numeric:tabular-nums; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .hub-facts span{ display:block; font-size:11.5px; color:var(--ink-faint); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  @media (max-width: 420px){ .hub-tb span{ display:none; } .hub-tb{ padding:4px 8px; } .hub-facts b{ font-size:14px; letter-spacing:-.01em; } }
+  @media (max-width: 380px){ .hub-facts{ grid-template-columns:repeat(2, minmax(0, 1fr)); } }
+  /* history / revision sheets */
+  .tr-sheet-h{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
+  .tr-sheet-h h3{ margin:0; }
+  .tr-tabs{ display:flex; gap:4px; padding:3px; border-radius:999px; background:var(--paper); border:1px solid var(--rule); }
+  .tr-tabs button{ border:none; background:none; color:var(--ink-soft); font:inherit; font-size:13px; font-weight:600; padding:6px 12px; border-radius:999px; cursor:pointer; }
+  .tr-tabs button.on{ background:var(--card); color:var(--ink); box-shadow:0 1px 3px rgba(0,0,0,.12); }
+  .tr-kpi5{ display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); gap:8px; }
+  .tr-kpi5 div{ padding:10px 11px; border-radius:12px; background:color-mix(in srgb, var(--hub-c) 8%, var(--paper)); min-width:0; }
+  .tr-kpi5 b{ display:block; font-family:var(--font-display); font-weight:var(--h-weight); font-size:21px; line-height:1.15; white-space:nowrap; }
+  .tr-kpi5 b small{ font-size:13px; color:var(--ink-faint); }
+  .tr-kpi5 > div > span{ display:block; font-size:12px; color:var(--ink-soft); margin-top:2px; }
+  .tr-kpi5 > div > small{ display:block; font-size:11px; color:var(--ink-faint); }
+  .tr-mocks{ display:grid; gap:4px; }
+  .tr-mocks div{ display:grid; grid-template-columns:120px minmax(0, 1fr) 70px 120px; gap:10px; align-items:center; padding:6px 10px; border-radius:10px; background:var(--paper); font-size:13px; }
+  .tr-mocks .d{ color:var(--ink-soft); } .tr-mocks .p{ color:var(--ink-faint); font-size:12px; text-align:right; }
+  .tr-mocks .bar{ height:8px; border-radius:4px; background:color-mix(in srgb, var(--ink) 8%, transparent); overflow:hidden; } .tr-mocks .bar i{ display:block; height:100%; background:var(--hub-c); border-radius:4px; }
+  .tr-sess{ display:grid; gap:3px; max-height:300px; overflow:auto; }
+  .tr-sess > div{ display:grid; grid-template-columns:minmax(0, 1.5fr) 58px minmax(0, 1.2fr) 64px 64px 52px; gap:8px; align-items:center; padding:7px 10px; border-radius:10px; background:var(--paper); font-size:13px; font-variant-numeric:tabular-nums; }
+  .tr-sess > div.th{ background:none; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-faint); font-weight:700; padding:2px 10px; position:sticky; top:0; background:var(--card); }
+  .tr-sess .d small{ color:var(--ink-faint); } .tr-sess em{ font-style:normal; font-size:11.5px; color:var(--ink-faint); } .tr-sess b{ text-align:right; }
+  .tr-next{ margin:2px 0 10px; font-size:15px; }
+  .tl{ position:relative; height:64px; margin:6px 8px 4px; }
+  .tl-axis{ position:absolute; left:0; right:0; top:28px; height:3px; border-radius:2px; background:color-mix(in srgb, var(--ink) 12%, transparent); }
+  .tl-dot{ position:absolute; top:23px; width:13px; height:13px; margin-left:-6.5px; border-radius:50%; background:var(--hub-c); border:2px solid var(--card); }
+  .tl-dot.m{ background:var(--teal); border-radius:3px; transform:rotate(45deg); }
+  .tl-now{ position:absolute; top:12px; width:2px; height:36px; margin-left:-1px; background:var(--ink); }
+  .tl-now span{ position:absolute; top:-15px; left:50%; transform:translateX(-50%); font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; white-space:nowrap; }
+  .tl-plan{ position:absolute; top:21px; width:17px; height:17px; margin-left:-8.5px; border-radius:50%; border:2.5px dashed var(--hub-c); background:var(--card); }
+  .tl-plan.due{ border-color:var(--maroon); border-style:solid; background:color-mix(in srgb, var(--maroon) 15%, var(--card)); }
+  .tl-plan span{ position:absolute; top:22px; left:50%; transform:translateX(-50%); font-size:11px; color:var(--ink-soft); white-space:nowrap; }
+  .tl-l{ position:absolute; left:0; top:44px; font-size:11px; color:var(--ink-faint); }
+  .tl-key{ display:flex; gap:14px; flex-wrap:wrap; font-size:11.5px; color:var(--ink-faint); margin:4px 0 12px; }
+  .tl-key span{ display:flex; align-items:center; gap:6px; } .tl-key .tl-dot{ position:static; margin:0; border-width:0; width:10px; height:10px; }
+  .tl-plan-k{ display:inline-block; width:11px; height:11px; border-radius:50%; border:2px dashed var(--hub-c); }
+  .tr-facts3{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; }
+  .tr-facts3 div{ padding:9px 11px; border-radius:12px; background:var(--paper); border:1px solid var(--rule); }
+  .tr-facts3 span{ display:block; font-size:11.5px; color:var(--ink-faint); } .tr-facts3 b{ font-size:15px; }
+  .tr-opts{ display:flex; flex-wrap:wrap; gap:6px; }
+  .tr-opts button{ border:1px solid var(--rule); background:var(--paper); color:var(--ink); border-radius:999px; padding:6px 12px; font:inherit; font-size:13px; cursor:pointer; }
+  .tr-opts button.on{ background:var(--ink); color:var(--card); border-color:var(--ink); }
+  .tr-date{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .tr-date input{ font:inherit; padding:6px 10px; border-radius:10px; border:1px solid var(--rule); background:var(--paper); color:var(--ink); }
+  @media (max-width: 640px){
+    .tr-kpi5{ grid-template-columns:repeat(2, minmax(0, 1fr)); } .tr-kpi5 div:first-child{ grid-column:1 / -1; }
+    .tr-mocks div{ grid-template-columns:90px minmax(0, 1fr) 60px; } .tr-mocks .p{ display:none; }
+    .tr-sess > div{ grid-template-columns:minmax(0, 1.4fr) 44px 46px 46px 44px 42px; gap:5px; font-size:12px; padding:6px 7px; }
+    .tr-sess em, .tr-sess .d small{ display:none; }
+    .tr-facts3{ grid-template-columns:1fr 1fr; }
+  }
+
 
   .ss-mocks{ display:flex; gap:8px; align-items:flex-end; height:130px; padding:6px 0 4px; }
   .ss-mocks div{ flex:1; max-width:60px; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:4px; height:100%; }
@@ -1747,16 +1797,23 @@
     return 'Opened ' + (d <= 0 ? 'today' : d === 1 ? 'yesterday' : d + ' days ago');
   }
   function hubCard(id){
-    var m = STUDY[id], meta = studyMeta()[id] || {}, pr = studyProgress(id);
+    var m = STUDY[id], pr = studyProgress(id), x = trackInfo(id);
     var pct = pr.total ? Math.round(pr.done * 100 / pr.total) : 0;
-    return '<button class="hub-card" data-open-study="' + id + '" style="--hub-c:' + m.color + ';">' +
+    var qn = trackTotalQ(id), fm = m.noq ? (/([\d,]+)\s+formulas/.exec(m.meta || '') || [])[1] : 0;
+    var revTitle = !x.started ? 'Plan revision' : x.off ? 'Revision reminders are off' : x.due ? 'Revision due now' : 'Next revision ' + trackDate(x.nextAt);
+    return '<div class="hub-card" role="button" tabindex="0" data-open-study="' + id + '" style="--hub-c:' + m.color + ';">' +
       '<div class="hub-top"><div class="hub-ico">' + m.ico + '</div><div style="flex:1; min-width:0;"><h3>' + escapeHtml(m.title) + '</h3><div class="hi">' + escapeHtml(m.hi) + '</div></div>' +
-        '<div class="hub-ring" title="' + pct + '% done">' + ringSvg(pct, m.color, 50) + '<span>' + pct + '%</span></div></div>' +
-      '<p>' + escapeHtml(m.desc) + '</p>' +
-      '<div class="hub-stats"><span><b>' + pr.done + '/' + pr.total + '</b> ' + (m.noq ? m.unit + ' revised' : m.unit) + '</span>' + (m.noq ? '<span>Revision only</span>' : '<span><b>' + (pr.acc === null ? '—' : pr.acc + '%') + '</b> right</span>' +
-        (pr.wrong ? '<span class="hub-wrong"><b>' + pr.wrong + '</b> mistake' + (pr.wrong === 1 ? '' : 's') + '</span>' : '<span><b>' + pr.tried + '</b> tried</span>')) + '</div>' +
-      trackCardLine(id) +
-      '<div class="hub-meta"><span>' + escapeHtml(m.meta) + '</span><b>' + escapeHtml(agoText(meta.openedAt)) + '</b></div></button>';
+        '<div class="hub-side"><div class="hub-tbs">' +
+          '<button class="hub-tb" data-track-history="' + id + '" title="Your sessions, scores and mocks">🕘<span>History</span></button>' +
+          '<button class="hub-tb' + (x.due ? ' due' : '') + '" data-track-revise="' + id + '" title="' + escapeAttr(revTitle) + '">🔁<span>' + (x.due ? 'Revise!' : 'Revise') + '</span></button>' +
+        '</div><div class="hub-ring" title="' + pct + '% done">' + ringSvg(pct, m.color, 50) + '<span>' + pct + '%</span></div></div></div>' +
+      '<div class="hub-facts">' +
+        '<div><b>' + (m.lessons || '—') + '</b><span>' + (m.unit || 'lessons') + '</span></div>' +
+        '<div><b>' + (m.noq ? (fm || '—') : (qn || '—')) + '</b><span>' + (m.noq ? 'formulas' : 'questions') + '</span></div>' +
+        '<div title="' + escapeAttr('About ' + fmtMin(x.fullMin) + ' to do every lesson and question') + '"><b>' + fmtShort(x.fullMin) + '</b><span>to finish</span></div>' +
+        '<div title="' + escapeAttr('About ' + fmtMin(x.revMin) + ': skim the lessons + one 25-question mock') + '"><b>' + fmtShort(x.revMin) + '</b><span>to revise</span></div>' +
+      '</div>' +
+      '<div class="hub-meta"><span>' + (x.visited ? 'Last opened ' + trackAgo(x.visited) : 'Not opened yet') + '</span><b>' + (x.started ? 'Continue ›' : 'Start ›') + '</b></div></div>';
   }
   function hubPracticeSection(){
     var totalWrong = 0;
@@ -1970,6 +2027,9 @@
     if(h) homeAction(h.dataset.homeAct, h);
   }
   document.getElementById('homeBody').addEventListener('click', studyClick);
+  document.getElementById('homeBody').addEventListener('keydown', function(ev){
+    if((ev.key === 'Enter' || ev.key === ' ') && ev.target.matches && ev.target.matches('.hub-card[data-open-study]')){ ev.preventDefault(); openStudy(ev.target.dataset.openStudy, false); }
+  });
   function openHub(){ closeAllMenus(); if(studyOpen) closeStudy(false); switchTab('home'); }
   document.getElementById('homeBrand').addEventListener('click', function(ev){ ev.stopPropagation(); openHub(); });
   document.getElementById('navMistakesBtn').addEventListener('click', function(){ closeAllMenus(); openMistakes(); });
@@ -2324,6 +2384,8 @@
         (x.s || []).forEach(function(s){ if(!seen[s.id]){ o.s.push(s); seen[s.id] = 1; } });
         if(x.completedAt && (!o.completedAt || x.completedAt < o.completedAt)) o.completedAt = x.completedAt;
         if(x.snooze && (!o.snooze || x.snooze > o.snooze)) o.snooze = x.snooze;
+        if((x.u || 0) >= (o.u || 0)){ o.u = x.u || 0; if('every' in x) o.every = x.every; else delete o.every; if(x.nextOn) o.nextOn = x.nextOn; else delete o.nextOn; }
+        if(x.manual){ o.manual = (o.manual || []).concat(x.manual.filter(function(v){ return (o.manual || []).indexOf(v) === -1; })).sort().slice(-20); }
       });
     });
     Object.keys(out.apps).forEach(function(id){ var o = out.apps[id]; o.s.sort(function(p, q){ return p.at - q.at; }); if(o.s.length > TRACK_KEEP) o.s = o.s.slice(-TRACK_KEEP); });
@@ -2391,6 +2453,7 @@
       if(m.lessons && s.l >= m.lessons && !a.completedAt) a.completedAt = Date.now();
       a.s.push(sess); if(a.s.length > TRACK_KEEP) a.s = a.s.slice(-TRACK_KEEP);
       delete a.snooze;
+      if(a.nextOn && a.nextOn <= Date.now() + DAY_MS){ delete a.nextOn; a.u = Date.now(); }
       t.at = Date.now();
       trackSave(t);
     }
@@ -2420,6 +2483,7 @@
   function trackDaysAgo(ms){ if(!ms) return null; var a = new Date(ms); a.setHours(0, 0, 0, 0); var b = new Date(); b.setHours(0, 0, 0, 0); return Math.round((b - a) / DAY_MS); }
   function trackAgo(ms){ var d = trackDaysAgo(ms); return d === null ? '—' : d === 0 ? 'today' : d === 1 ? 'yesterday' : d + ' days ago'; }
   function trackDate(ms){ return ms ? new Date(ms).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '—'; }
+  function fmtShort(min){ min = Math.max(5, Math.round(min / 5) * 5); return min < 60 ? min + ' min' : Math.floor(min / 60) + 'h' + (min % 60 ? ' ' + (min % 60) + 'm' : ''); }
   function fmtMin(min){ min = Math.max(5, Math.round(min / 5) * 5); return min < 60 ? min + ' min' : Math.floor(min / 60) + ' h' + (min % 60 ? ' ' + (min % 60) + ' min' : ''); }
   /** Everything the cards, Home and the tracker screen need for one app. */
   function trackInfo(id){
@@ -2427,13 +2491,16 @@
     var last = ss[ss.length - 1] || null, scored = ss.filter(function(x){ return x.sc !== null && x.sc !== undefined; });
     var started = ss.length > 0 || pr.done > 0 || pr.tried > 0;
     var completed = a.completedAt || (m.lessons && pr.done >= m.lessons ? (last ? last.at : Date.now()) : 0);
-    var lastStudy = last ? last.at : 0, every = t.every || 15, visited = (studyMeta()[id] || {}).openedAt || 0;
+    var manual = (a.manual || []).reduce(function(mx, v){ return Math.max(mx, v); }, 0);
+    var lastStudy = Math.max(last ? last.at : 0, manual), off = a.every === 0, every = a.every || t.every || 15, visited = (studyMeta()[id] || {}).openedAt || 0;
     var base = lastStudy || (started ? visited : 0);              // studied before the tracker existed: count from the last visit
     var nextAt = base ? base + every * DAY_MS : 0;
+    if(a.nextOn && a.nextOn > base) nextAt = a.nextOn;             // a date you picked
     if(a.snooze && a.snooze > nextAt) nextAt = a.snooze;
-    var due = started && base > 0 && Date.now() >= nextAt;
+    var due = !off && started && base > 0 && Date.now() >= nextAt;
     var revisedAt = 0;
     if(completed) ss.forEach(function(x){ if(x.at > completed + 3600000) revisedAt = x.at; });
+    if(manual > revisedAt) revisedAt = manual;
     // time: first pass = every lesson + every question; a revision round = skim the lessons + one mock
     var perLesson = id === 'grammar' ? 3 : m.noq ? 5 : 7, totalQ = trackTotalQ(id);
     var fullMin = (m.lessons || 0) * perLesson + totalQ * 0.6;
@@ -2441,7 +2508,7 @@
     var real = ss.filter(function(x){ return x.d >= TRACK_MIN_SEC; }), avgMin = real.length >= 2 ? real.reduce(function(s, x){ return s + x.d; }, 0) / real.length / 60 : 0;
     var status = !started ? 'new' : due ? 'due' : completed ? 'done' : 'progress';
     return { id: id, m: m, pr: pr, sessions: ss, last: last, scored: scored, started: started, completed: completed, revisedAt: revisedAt,
-      visited: visited, lastStudy: lastStudy, base: base, nextAt: nextAt, due: due, every: every,
+      visited: visited, lastStudy: lastStudy, base: base, nextAt: off ? 0 : nextAt, due: due, every: every, off: off, ownEvery: a.every, nextOn: a.nextOn || 0, manual: a.manual || [],
       fullMin: fullMin, revMin: revMin, avgMin: avgMin, status: status,
       score: scored.length ? scored[scored.length - 1].sc : pr.acc, prevScore: scored.length > 1 ? scored[scored.length - 2].sc : null };
   }
@@ -2457,15 +2524,6 @@
     if(pts.length < 2) return '';
     var w = 84, h = 26, n = pts.length, path = pts.map(function(v, i){ return (i ? 'L' : 'M') + (i * (w - 4) / (n - 1) + 2).toFixed(1) + ' ' + (h - 3 - v / 100 * (h - 6)).toFixed(1); }).join(' ');
     return '<svg class="tr-spark" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" aria-hidden="true"><path d="' + path + '" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  }
-  /** One line for a hub card. */
-  function trackCardLine(id){
-    var x = trackInfo(id);
-    if(!x.started) return '<div class="hub-track">⏳ Full app ≈ ' + fmtMin(x.fullMin) + '</div>';
-    if(x.due) return '<div class="hub-track due"><span class="tr-chip st-due">Revise now</span>' + (x.lastStudy ? 'Last studied ' + trackAgo(x.lastStudy) : 'Last opened ' + trackAgo(x.base)) + ' · ≈ ' + fmtMin(x.revMin) + '</div>';
-    var days = Math.max(0, Math.ceil((x.nextAt - Date.now()) / DAY_MS));
-    return '<div class="hub-track">' + (x.completed ? '✅ ' : '📈 ') + (x.lastStudy ? 'Studied ' : 'Opened ') + trackAgo(x.base) +
-      (x.score !== null && x.score !== undefined ? ' · ' + trackTrend(x) : '') + ' · revise in ' + days + ' d</div>';
   }
   /** Home: the nudge. Shows only when something is due. */
   function homeReviseCard(){
@@ -2493,7 +2551,7 @@
         '<button data-track-filter="done"><b>' + n.done + '</b><span>Completed</span></button><button data-track-filter="new"><b>' + n.new + '</b><span>Not started</span></button></div>' +
       '<div class="tr-table" id="trTable"><div class="tr-row tr-th"><span>App</span><span>Status</span><span>Last studied</span><span>Score</span><span>Next revision</span></div>' +
       all.map(function(x){
-        var st = TRACK_STATUS[x.status], next = !x.started ? '—' : x.due ? '<b class="tr-down">now</b>' : trackDate(x.nextAt);
+        var st = TRACK_STATUS[x.status], next = !x.started ? '—' : x.off ? 'off' : x.due ? '<b class="tr-down">now</b>' : trackDate(x.nextAt);
         return '<button class="tr-row" data-track-open="' + x.id + '" data-st="' + x.status + '" style="--hub-c:' + x.m.color + ';">' +
           '<span class="tr-app"><i>' + x.m.ico + '</i><span><b>' + escapeHtml(x.m.title) + '</b><small>' + x.sessions.length + ' session' + (x.sessions.length === 1 ? '' : 's') + (x.completed ? ' · completed ' + trackDate(x.completed) : '') + '</small></span></span>' +
           '<span><span class="tr-chip ' + st[1] + '">' + st[0] + '</span></span>' +
@@ -2504,43 +2562,102 @@
       '<p class="help" style="margin-top:10px;">A session is saved each time you study a mini app for 2 minutes or more (or answer anything). Score = share of the app’s questions you got right on your latest try, so it rises as you fix mistakes. Only active time is counted.</p>';
     document.getElementById('trackEvery').addEventListener('change', function(){ var t = trackData(); t.every = +this.value; t.at = Date.now(); trackSave(t); renderTracker(); renderHomeSoon(); });
   }
-  /** One app's history in a sheet. */
-  function openTrackerApp(id){
-    var x = trackInfo(id), modalBg = document.getElementById('modalBg'), body = document.getElementById('modalBody');
-    var ss = x.sessions.slice().reverse(), best = x.scored.reduce(function(b, s){ return Math.max(b, s.sc); }, 0);
-    var totalMin = x.sessions.reduce(function(s, v){ return s + v.d; }, 0) / 60;
+  /** Mock tests taken inside the app (newest last): the app's own list, else what sessions captured. */
+  function trackMocks(id){
+    var st = studyState(id), list = Array.isArray(st.mocks) ? st.mocks.slice() : [];
+    if(!list.length) trackSessions(id).forEach(function(x){ if(x.m) list.push({ d: trackDate(x.at), score: x.m.score, max: x.m.max, acc: x.m.acc }); });
+    return list.map(function(mk){ return { d: mk.d || '', score: mk.score, max: mk.max, pct: mk.max ? Math.max(0, Math.round(mk.score * 100 / mk.max)) : 0, acc: mk.acc }; });
+  }
+  function trackSheet(html){
+    var bg = document.getElementById('modalBg'), body = document.getElementById('modalBody');
+    body.innerHTML = html; bg.classList.add('open');
+    body.querySelectorAll('[data-tr-close]').forEach(function(bt){ bt.addEventListener('click', function(){ bg.classList.remove('open'); body.innerHTML = ''; }); });
+    return body;
+  }
+  function trackSheetHead(x, tab){
+    return '<div class="tr-sheet-h"><h3>' + x.m.ico + ' ' + escapeHtml(x.m.title) + ' <span class="tr-chip ' + TRACK_STATUS[x.status][1] + '">' + TRACK_STATUS[x.status][0] + '</span></h3>' +
+      '<div class="tr-tabs"><button data-track-history="' + x.id + '" class="' + (tab === 'h' ? 'on' : '') + '">🕘 History</button><button data-track-revise="' + x.id + '" class="' + (tab === 'r' ? 'on' : '') + '">🔁 Revision plan</button></div></div>';
+  }
+  /** History: every session, recent averages and mock scores. */
+  function openTrackHistory(id){
+    var x = trackInfo(id), m = x.m, ss = x.sessions.slice().reverse();
+    var withQ = x.sessions.filter(function(s){ return s.q > 0; }), last3 = withQ.slice(-3);
+    var avg3 = last3.length ? Math.round(last3.reduce(function(t, s){ return t + s.r * 100 / s.q; }, 0) / last3.length) : null;
+    var best = x.scored.reduce(function(bst, s){ return Math.max(bst, s.sc); }, 0);
+    var mins = Math.round(x.sessions.reduce(function(t, v){ return t + v.d; }, 0) / 60);
+    var mocks = trackMocks(id), m5 = mocks.slice(-5), mAvg = m5.length ? Math.round(m5.reduce(function(t, k){ return t + k.pct; }, 0) / m5.length) : null;
+    var kpi = function(v, label, sub){ return '<div><b>' + v + '</b><span>' + label + '</span>' + (sub ? '<small>' + sub + '</small>' : '') + '</div>'; };
     var chart = x.scored.length >= 2 ? '<div class="tr-chart">' + x.scored.slice(-14).map(function(s){
       return '<div title="' + escapeAttr(trackDate(s.at) + ' · ' + s.sc + '%') + '"><i style="height:' + Math.max(4, s.sc) + '%"></i><span>' + s.sc + '</span><small>' + trackDate(s.at) + '</small></div>';
     }).join('') + '</div>' : '';
-    body.innerHTML = '<div class="tr-sheet" style="--hub-c:' + x.m.color + ';">' +
-      '<h3>' + x.m.ico + ' ' + escapeHtml(x.m.title) + ' <span class="tr-chip ' + TRACK_STATUS[x.status][1] + '">' + TRACK_STATUS[x.status][0] + '</span></h3>' +
-      '<div class="tr-facts">' +
-        '<div><span>Last visited</span><b>' + (x.visited ? trackAgo(x.visited) : '—') + '</b></div>' +
-        '<div><span>Last studied</span><b>' + (x.lastStudy ? trackAgo(x.lastStudy) : '—') + '</b></div>' +
-        '<div><span>Completed</span><b>' + (x.completed ? trackDate(x.completed) : 'not yet') + '</b></div>' +
-        '<div><span>Last revised</span><b>' + (x.revisedAt ? trackAgo(x.revisedAt) : '—') + '</b></div>' +
-        '<div><span>Next revision</span><b>' + (!x.started ? '—' : x.due ? 'now' : trackDate(x.nextAt)) + '</b></div>' +
-        '<div><span>Score now</span><b>' + trackTrend(x) + '</b></div>' +
-        '<div><span>Best score</span><b>' + (best ? best + '%' : '—') + '</b></div>' +
-        '<div><span>Time spent</span><b>' + (totalMin ? Math.round(totalMin) + ' min' : '—') + '</b></div>' +
+    trackSheet('<div class="tr-sheet" style="--hub-c:' + m.color + ';">' + trackSheetHead(x, 'h') +
+      '<div class="tr-kpi5">' +
+        kpi(avg3 === null ? '—' : avg3 + '%', 'Avg correct', 'last ' + (last3.length || 3) + ' sessions') +
+        kpi(x.score === null || x.score === undefined ? '—' : trackTrend(x), 'App score now', best ? 'best ' + best + '%' : '') +
+        kpi(m.noq ? '—' : (mAvg === null ? '—' : mAvg + '%'), 'Mock average', m5.length ? 'last ' + m5.length + ' mocks' : 'no mock yet') +
+        kpi(x.pr.done + '<small>/' + x.pr.total + '</small>', m.unit || 'lessons', x.completed ? 'completed ' + trackDate(x.completed) : '') +
+        kpi(x.sessions.length, 'sessions', mins ? mins + ' min in all' : '') +
       '</div>' +
-      '<div class="tr-est"><div><b>' + fmtMin(x.fullMin) + '</b><span>Full app, first time</span></div><div><b>' + fmtMin(x.revMin) + '</b><span>One revision round</span></div><div><b>' + (x.avgMin ? fmtMin(x.avgMin) : '—') + '</b><span>Your usual session</span></div></div>' +
-      (chart ? '<h4>Score over sessions</h4>' + chart : '') +
-      '<h4>Sessions</h4>' + (ss.length ? '<div class="tr-sess">' + ss.slice(0, 20).map(function(s){
-        return '<div><span class="d">' + new Date(s.at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) + ' · ' + new Date(s.at).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' }) + '</span>' +
+      (m.noq ? '' : '<h4>Last 5 mock tests</h4>' + (m5.length ? '<div class="tr-mocks">' + m5.slice().reverse().map(function(k){
+          return '<div><span class="d">' + escapeHtml(k.d) + '</span><span class="bar"><i style="width:' + k.pct + '%"></i></span><b>' + k.score + '/' + k.max + '</b><span class="p">' + k.pct + '%' + (k.acc !== undefined ? ' · ' + k.acc + '% right' : '') + '</span></div>';
+        }).join('') + '</div>' : '<p class="help">' + (id === 'grammar' || id === 'bns' ? 'This app has unit tests instead of mock tests.' : 'No mock test yet — open the app’s Mock test tab to take one.') + '</p>')) +
+      (chart ? '<h4>App score after each session</h4>' + chart : '') +
+      '<h4>All sessions</h4>' + (ss.length ? '<div class="tr-sess"><div class="th"><span>Date</span><span>Time</span><span>Questions</span><span>Correct</span><span>' + escapeHtml(m.unit || 'Lessons') + '</span><span>Score</span></div>' + ss.map(function(s){
+        return '<div><span class="d">' + new Date(s.at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) + ' <small>' + new Date(s.at).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' }) + '</small></span>' +
           '<span>' + Math.max(1, Math.round(s.d / 60)) + ' min</span>' +
-          '<span>' + (s.q ? s.q + ' answered · ' + Math.round(s.r * 100 / s.q) + '% right' : x.m.noq ? (s.l ? s.l + ' chapters revised' : 'revision') : 'reading') + (s.m ? ' · mock ' + s.m.score + '/' + s.m.max : '') + (s.done ? ' · 🎉 completed' : '') + '</span>' +
+          '<span>' + (s.q || '—') + (s.m ? ' <em title="Mock test">+ mock ' + s.m.score + '/' + s.m.max + '</em>' : '') + '</span>' +
+          '<span>' + (s.q ? Math.round(s.r * 100 / s.q) + '%' : '—') + '</span>' +
+          '<span>' + (s.l !== undefined ? s.l + '/' + (m.lessons || '?') : '—') + (s.done ? ' 🎉' : '') + '</span>' +
           '<b>' + (s.sc !== null && s.sc !== undefined ? s.sc + '%' : '—') + '</b></div>';
-      }).join('') + '</div>' : '<p class="help">No sessions yet — they are saved automatically from your next visit.</p>') +
-      '<div class="modal-actions">' + (x.due ? '<button class="btn ghost" data-track-snooze="' + id + '">Remind me in 3 days</button>' : '') + '<button class="btn ghost" id="trClose">Close</button><button class="btn teal" data-open-study="' + id + '">' + (x.started ? 'Open & revise' : 'Start') + ' ›</button></div></div>';
-    modalBg.classList.add('open');
-    document.getElementById('trClose').addEventListener('click', function(){ modalBg.classList.remove('open'); body.innerHTML = ''; });
+      }).join('') + '</div>' : '<p class="help">No sessions yet — every visit of 2 minutes or more is saved here automatically.</p>') +
+      '<div class="modal-actions"><button class="btn ghost" data-tr-close>Close</button><button class="btn teal" data-open-study="' + id + '">' + (x.started ? 'Open app' : 'Start') + ' ›</button></div></div>');
+  }
+  var openTrackerApp = openTrackHistory;
+  /** Revision plan: a timeline of past study and coming revisions, and the controls to set it. */
+  function openTrackRevise(id){
+    var x = trackInfo(id), m = x.m, t = trackData(), now = Date.now(), every = x.every;
+    var past = x.sessions.map(function(s){ return { at: s.at, k: 's', tip: Math.max(1, Math.round(s.d / 60)) + ' min' + (s.q ? ' · ' + s.q + ' answered' : '') }; })
+      .concat(x.manual.map(function(v){ return { at: v, k: 'm', tip: 'marked revised' }; }));
+    var plan = [];
+    if(!x.off && x.started && x.nextAt){ var first = Math.max(x.nextAt, now - (x.due ? 0 : 0)); plan.push(first); plan.push(first + every * DAY_MS); plan.push(first + 2 * every * DAY_MS); }
+    var start = Math.min(now - 30 * DAY_MS, past.length ? Math.min.apply(null, past.map(function(p){ return p.at; })) : now), end = plan.length ? plan[plan.length - 1] + 3 * DAY_MS : now + 30 * DAY_MS;
+    start = Math.max(start, now - 120 * DAY_MS);
+    var pos = function(v){ return Math.max(0, Math.min(100, (v - start) * 100 / (end - start))); };
+    var line = '<div class="tl"><div class="tl-axis"></div>' +
+      past.filter(function(p){ return p.at >= start; }).map(function(p){ return '<i class="tl-dot ' + p.k + '" style="left:' + pos(p.at) + '%" title="' + escapeAttr(trackDate(p.at) + ' · ' + p.tip) + '"></i>'; }).join('') +
+      '<i class="tl-now" style="left:' + pos(now) + '%"><span>Today</span></i>' +
+      plan.map(function(v, i){ return '<i class="tl-plan' + (i === 0 && x.due ? ' due' : '') + '" style="left:' + pos(v) + '%" title="' + escapeAttr((i ? 'Then ' : 'Next revision ') + trackDate(v)) + '"><span>' + (i === 0 && x.due ? 'Due' : trackDate(v)) + '</span></i>'; }).join('') +
+      '<span class="tl-l">' + trackDate(start) + '</span></div>' +
+      '<div class="tl-key"><span><i class="tl-dot s"></i>studied</span><span><i class="tl-dot m"></i>marked revised</span><span><i class="tl-plan-k"></i>planned revision</span></div>';
+    var nextTxt = !x.started ? 'Start the app first — the plan begins after your first session.' : x.off ? 'Reminders are off for this app.' :
+      x.due ? '<b class="tr-down">Due now</b> — last studied ' + trackAgo(x.base) + '.' : 'Next revision <b>' + new Date(x.nextAt).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }) + '</b> (in ' + Math.max(1, Math.ceil((x.nextAt - now) / DAY_MS)) + ' days)' + (x.nextOn && x.nextOn === x.nextAt ? ' · date you picked' : ' · every ' + every + ' days');
+    var opt = function(v, label){ var on = v === 'def' ? x.ownEvery === undefined : x.ownEvery === v; return '<button data-rv-every="' + v + '" class="' + (on ? 'on' : '') + '">' + label + '</button>'; };
+    var iso = function(ms){ var d = new Date(ms); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+    var body = trackSheet('<div class="tr-sheet" style="--hub-c:' + m.color + ';">' + trackSheetHead(x, 'r') +
+      '<p class="tr-next">' + nextTxt + '</p>' + line +
+      '<div class="tr-facts3"><div><span>Last studied</span><b>' + (x.lastStudy ? trackAgo(x.lastStudy) : x.visited ? 'opened ' + trackAgo(x.visited) : '—') + '</b></div><div><span>Last revised</span><b>' + (x.revisedAt ? trackDate(x.revisedAt) : '—') + '</b></div><div><span>One revision round</span><b>≈ ' + fmtMin(x.revMin) + '</b></div></div>' +
+      '<h4>Remind me to revise this app</h4><div class="tr-opts">' + opt('def', 'Default (' + (t.every || 15) + ' days)') + opt(7, '7 days') + opt(10, '10 days') + opt(15, '15 days') + opt(20, '20 days') + opt(30, '30 days') + opt(0, 'Off') + '</div>' +
+      '<h4>Or pick a date</h4><div class="tr-date"><input type="date" id="rvDate" min="' + iso(now + DAY_MS) + '" value="' + (x.nextOn ? iso(x.nextOn) : '') + '"><button class="btn ghost sm" id="rvDateSet">Set date</button>' + (x.nextOn ? '<button class="btn ghost sm" id="rvDateClear">Clear</button>' : '') + '</div>' +
+      '<div class="modal-actions"><button class="btn ghost" data-tr-close>Close</button>' + (x.due ? '<button class="btn ghost" data-track-snooze="' + id + '">Remind in 3 days</button>' : '') +
+        (x.started ? '<button class="btn ghost" id="rvDone">✓ I revised it today</button>' : '') + '<button class="btn teal" data-open-study="' + id + '">' + (x.started ? 'Revise now' : 'Start') + ' ›</button></div></div>');
+    var save = function(fn){ var tt = trackData(), ap = tt.apps[id] || (tt.apps[id] = { s: [] }); fn(ap); ap.u = Date.now(); tt.at = Date.now(); trackSave(tt); openTrackRevise(id); renderHomeSoon(); renderTracker(); };
+    body.querySelectorAll('[data-rv-every]').forEach(function(bt){ bt.addEventListener('click', function(){ var v = bt.dataset.rvEvery; save(function(ap){ if(v === 'def') delete ap.every; else ap.every = +v; }); }); });
+    var ds = document.getElementById('rvDateSet');
+    if(ds) ds.addEventListener('click', function(){ var v = document.getElementById('rvDate').value; if(!v){ showToast('Pick a date first.'); return; } var p = v.split('-'); var at = new Date(+p[0], +p[1] - 1, +p[2], 9, 0).getTime(); save(function(ap){ ap.nextOn = at; delete ap.snooze; }); showToast('Revision set for ' + trackDate(at) + '.'); });
+    var dc = document.getElementById('rvDateClear');
+    if(dc) dc.addEventListener('click', function(){ save(function(ap){ delete ap.nextOn; }); });
+    var dn = document.getElementById('rvDone');
+    if(dn) dn.addEventListener('click', function(){ save(function(ap){ ap.manual = (ap.manual || []).concat([Date.now()]).slice(-20); delete ap.snooze; delete ap.nextOn; }); showToast('Marked as revised today — next reminder in ' + trackInfo(id).every + ' days.'); });
   }
   function trackSnooze(id){ var t = trackData(), a = t.apps[id] || (t.apps[id] = { s: [] }); a.snooze = Date.now() + 3 * DAY_MS; t.at = Date.now(); trackSave(t); showToast('OK — reminder in 3 days.'); }
   /** All tracker buttons, wherever they are. */
   document.addEventListener('click', function(ev){
     var sn = ev.target.closest('[data-track-snooze]');
-    if(sn){ ev.stopPropagation(); trackSnooze(sn.dataset.trackSnooze); var mb = document.getElementById('modalBg'); if(mb.classList.contains('open') && mb.contains(sn)){ mb.classList.remove('open'); } renderHomeSoon(); renderTracker(); return; }
+    if(sn){ ev.stopPropagation(); trackSnooze(sn.dataset.trackSnooze); var mb = document.getElementById('modalBg'); if(mb.classList.contains('open') && mb.contains(sn)) openTrackRevise(sn.dataset.trackSnooze); renderHomeSoon(); renderTracker(); return; }
+    var hb = ev.target.closest('[data-track-history]');
+    if(hb){ ev.stopPropagation(); ev.preventDefault(); openTrackHistory(hb.dataset.trackHistory); return; }
+    var rb = ev.target.closest('[data-track-revise]');
+    if(rb){ ev.stopPropagation(); ev.preventDefault(); openTrackRevise(rb.dataset.trackRevise); return; }
     var op = ev.target.closest('[data-track-open]');
     if(op){ ev.stopPropagation(); if(op.dataset.trackOpen === 'all'){ switchTab('stats'); setTimeout(function(){ var p = document.getElementById('trackerPanel'); if(p) p.scrollIntoView({ behavior: 'smooth' }); }, 80); } else openTrackerApp(op.dataset.trackOpen); return; }
     var fl = ev.target.closest('[data-track-filter]');
