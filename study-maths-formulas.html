@@ -1,0 +1,1171 @@
+<!doctype html><html><head><meta charset=utf8>
+<script>
+/* शब्दRegister bridge: follows the app's look (Paper / Indigo) and Light / Dark / Auto choice. */
+(function(){
+  var root = document.documentElement;
+  function theme(t){ if(t === 'dark' || t === 'light') root.setAttribute('data-theme', t); else root.removeAttribute('data-theme'); }
+  function skin(s){ if(s === 'paper' || s === 'indigo') root.setAttribute('data-skin', s); }
+  try{
+    var q = new URLSearchParams(location.search);
+    theme(q.get('theme'));
+    skin(q.get('skin') || (q.get('embed') ? 'paper' : ''));
+    if(q.get('embed')) root.classList.add('in-shabd');
+  }catch(e){}
+  window.addEventListener('message', function(e){
+    if(e.origin !== location.origin || !e.data || e.data.type !== 'shabd-theme') return;
+    theme(e.data.theme);
+    if(e.data.skin) skin(e.data.skin);
+  });
+})();
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap">
+<meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Maths Formula Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<style>
+/* Layout: Physics PYQ Workbook — follows the शब्दRegister Paper / Indigo look; one column + bottom tabs on phones, sidebar on PC. */
+:root{
+  --paper:#f6f3ea; --sheet:#fffdf7; --sunk:#ebe6d8;
+  --ink:#1d2a22; --ink2:#56625a; --rule:#dcd5c3;
+  --blue:#1f5c3d; --on-blue:#ffffff; --blue-bg:#dcebdf;
+  --accent:#b4530f; --accent-bg:#fbe7d3;
+  --good:#1b7547; --good-bg:#dff1e6; --bad:#b0271f; --bad-bg:#f8e1de;
+  --warn-bg:#fff2d2;
+  --f-display:"Fraunces", "Tiro Devanagari Hindi", Georgia, serif;
+  --f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-num:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r:10px; --nav-h:64px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#111612; --sheet:#1a211c; --sunk:#222b25;
+  --ink:#e8eee9; --ink2:#a3b0a7; --rule:#2f3a33;
+  --blue:#86cfa2; --on-blue:#111612; --blue-bg:#1d3a29;
+  --accent:#f3a764; --accent-bg:#3b2614;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#111612; --sheet:#1a211c; --sunk:#222b25;
+  --ink:#e8eee9; --ink2:#a3b0a7; --rule:#2f3a33;
+  --blue:#86cfa2; --on-blue:#111612; --blue-bg:#1d3a29;
+  --accent:#f3a764; --accent-bg:#3b2614;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
+.wrap{max-width:640px;margin:0 auto;padding-inline:16px;padding-block:0 calc(var(--nav-h) + 28px + env(safe-area-inset-bottom,0px))}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);border-bottom:1px solid var(--rule)}
+.top-in{max-width:640px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px}
+.brand{font-family:var(--f-display);font-weight:800;font-size:17px;line-height:1.2;flex:1;min-width:0}
+.brand small{display:block;font-family:var(--f-body);font-weight:500;font-size:12px;color:var(--ink2);letter-spacing:.02em}
+.stat{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right;white-space:nowrap}
+.stat b{color:var(--ink);font-weight:600}
+
+/* bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--sheet);border-top:1px solid var(--rule);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);height:var(--nav-h)}
+.nav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer}
+.nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav button[aria-current="page"]{color:var(--blue)}
+.nav button[aria-current="page"] span{border-bottom:2px solid var(--blue)}
+
+/* type */
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.25;margin:0}
+h1{font-size:24px;font-weight:800}
+h2{font-size:19px;font-weight:800}
+h3{font-size:16px;font-weight:700}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--ink2)}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+p{margin:0}
+.stack{display:flex;flex-direction:column;gap:14px}
+.view{padding-top:18px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--rule);background:var(--sheet);font-weight:600;cursor:pointer;text-decoration:none}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:var(--on-blue)}
+.btn.ghost{background:transparent}
+.btn.sm{min-height:36px;padding:0 14px;font-size:14px}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.end{justify-content:flex-end}
+.row.between{justify-content:space-between}
+
+/* hero */
+.hero{display:grid;gap:10px;padding:4px 0 6px}
+.hero p{color:var(--ink2)}
+.meter{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--blue);border-radius:99px}
+
+/* lesson list */
+.lessons{display:flex;flex-direction:column;border-top:1px solid var(--rule)}
+.les{display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;padding:14px 2px;border-bottom:1px solid var(--rule);background:none;border-left:0;border-right:0;border-top:0;text-align:left;cursor:pointer;width:100%}
+.les .no{font-family:var(--f-num);font-weight:600;font-size:15px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--rule);color:var(--ink2)}
+.les.done .no{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.les .t{min-width:0}
+.les .t b{display:block;font-weight:700;font-size:16px;line-height:1.3}
+.les .t span{font-size:13px;color:var(--ink2)}
+.les .sc{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right}
+.les.next .no{border-color:var(--blue);color:var(--blue)}
+
+/* lesson reader */
+.lhead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.back{background:none;border:0;padding:8px 8px 8px 0;cursor:pointer;color:var(--blue);font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0 4px}
+.steps button{border:1px solid var(--rule);background:var(--sheet);border-radius:8px;padding:8px 4px;font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer}
+.steps button[aria-current="step"]{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.block{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;min-width:0}
+.block h3{margin-bottom:8px}
+.block p + p{margin-top:8px}
+.plain{padding:0 2px}
+.facts{display:grid;gap:0}
+.facts div{display:grid;grid-template-columns:minmax(0,42%) minmax(0,1fr);gap:10px;padding:7px 0;border-top:1px dashed var(--rule)}
+.facts div:first-child{border-top:0}
+.facts dt{font-size:14px;color:var(--ink2);margin:0}
+.facts dd{margin:0;font-weight:600;min-width:0}
+.tl{display:grid;gap:0;margin:0;padding:0;list-style:none}
+.tl li{display:grid;grid-template-columns:92px 1fr;gap:10px;padding:8px 0;border-top:1px dashed var(--rule)}
+.tl li:first-child{border-top:0}
+.tl .y{font-family:var(--f-num);font-weight:600;font-size:13px;color:var(--accent);padding-top:2px}
+.trick,.trap{border-radius:var(--r);padding:12px 14px 12px 14px;border:1px solid var(--rule)}
+.trick{background:var(--accent-bg);border-color:transparent}
+.trap{background:var(--bad-bg);border-color:transparent}
+.trick .lab,.trap .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.trick .lab{color:var(--accent)}
+.trap .lab{color:var(--bad)}
+.rk div{grid-template-columns:minmax(0,48%) minmax(0,1fr)}
+.rk dd{min-width:0;overflow-wrap:anywhere}
+.hot{border-radius:var(--r);padding:12px 14px;background:var(--warn-bg,var(--accent-bg));border-left:4px solid var(--warn,var(--accent))}
+.hot .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;color:var(--warn,var(--accent))}
+.heatb{display:inline-block;font-size:11px;letter-spacing:-.1em;margin-left:6px;vertical-align:1px}
+.heat{display:flex;flex-direction:column;gap:2px}
+.hrow{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(60px,1fr) 44px;gap:10px;align-items:center;text-align:left;background:none;border:0;border-bottom:1px solid var(--rule);padding:9px 2px;color:inherit;font:inherit;cursor:pointer}
+.hrow:last-child{border-bottom:0}
+.hrow .ht{display:flex;flex-direction:column;min-width:0}
+.hrow .ht .muted{font-size:12px}
+.hbar{height:10px;border-radius:5px;background:var(--rule);overflow:hidden}
+.hbar i{display:block;height:100%;background:var(--accent);border-radius:5px}
+.hp{text-align:right;font-weight:700}
+
+.tbl{overflow-x:auto;margin:0 -2px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);font-weight:700}
+td.n{font-family:var(--f-num);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fig{margin:0}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-size:13px;color:var(--ink2);margin-top:6px}
+.pyr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pyr div{text-align:center;font-size:13px}
+.pyr b{display:block;font-size:14px}
+.pm{fill:var(--blue)} .pf{fill:var(--accent)}
+.sum{margin:0;padding-left:20px;display:grid;gap:6px}
+
+/* questions */
+.qcard{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px;min-width:0}
+.qmeta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}
+.qno{font-family:var(--f-num);font-weight:600;color:var(--ink2)}
+.tag{background:var(--sunk);color:var(--ink2);border-radius:99px;padding:1px 9px;font-weight:600}
+.tag.pyq{background:var(--accent-bg);color:var(--accent)}
+.bm{margin-left:auto;background:none;border:0;cursor:pointer;color:var(--ink2);font-size:20px;line-height:1;padding:4px}
+.bm[aria-pressed="true"]{color:var(--accent)}
+.qt{font-weight:600;font-size:16px}
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:start;text-align:left;width:100%;border:1.5px solid var(--rule);background:var(--paper);border-radius:9px;padding:10px 12px;cursor:pointer;min-height:44px}
+.opt .k{font-family:var(--f-num);font-weight:600;color:var(--ink2);font-size:14px;padding-top:1px}
+.opt.sel{border-color:var(--blue);background:var(--blue-bg)}
+.opt.ok{border-color:var(--good);background:var(--good-bg)}
+.opt.no{border-color:var(--bad);background:var(--bad-bg)}
+.opt.ok .k{color:var(--good)} .opt.no .k{color:var(--bad)}
+.opt:disabled{cursor:default;color:inherit}
+.exp{font-size:15px;border-left:3px solid var(--blue);padding:4px 0 4px 12px;color:var(--ink)}
+.exp b.okl{color:var(--good)} .exp b.nol{color:var(--bad)}
+
+/* chips */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 13px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.seg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--rule)}
+.seg::-webkit-scrollbar{display:none}
+.seg button{flex:none;background:none;border:0;border-bottom:2px solid transparent;padding:10px 8px;font-weight:600;color:var(--ink2);cursor:pointer}
+.seg button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+
+/* score panel */
+.scorebig{display:flex;align-items:baseline;gap:8px}
+.scorebig .num{font-size:44px;font-weight:600;line-height:1;color:var(--blue)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.kpi{background:var(--sunk);border-radius:8px;padding:8px;text-align:center}
+.kpi .num{display:block;font-size:20px;font-weight:600}
+.kpi span{font-size:12px;color:var(--ink2)}
+.kpi.g .num{color:var(--good)} .kpi.b .num{color:var(--bad)}
+
+/* mock */
+.mbar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 57px);z-index:10;background:var(--paper);padding:10px 0;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--rule)}
+.timer{font-family:var(--f-num);font-weight:600;font-size:18px;padding:4px 10px;border-radius:8px;background:var(--sunk)}
+.timer.low{background:var(--bad-bg);color:var(--bad)}
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px}
+.pal button{height:40px;border-radius:8px;border:1px solid var(--rule);background:var(--sheet);font-family:var(--f-num);font-weight:600;font-size:13px;cursor:pointer}
+.pal button.a{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.pal button.m{box-shadow:inset 0 -4px 0 var(--accent)}
+.pal button.cur{outline:2px solid var(--ink);outline-offset:1px}
+.pal button.ok{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.pal button.no{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.confirm{background:var(--warn-bg);border-radius:var(--r);padding:12px 14px;display:grid;gap:10px}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}
+legend{font-weight:700;margin-bottom:6px;padding:0}
+.radios{display:flex;gap:8px;flex-wrap:wrap}
+.radios label{border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 14px;font-weight:600;cursor:pointer;font-size:14px}
+.radios input{position:absolute;opacity:0;pointer-events:none}
+.radios input:checked + span{color:var(--blue)}
+.radios label:has(input:checked){border-color:var(--blue);background:var(--blue-bg)}
+.radios label:has(input:focus-visible){outline:2px solid var(--blue);outline-offset:2px}
+select{font:inherit;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:8px;padding:8px 10px;max-width:100%}
+.hist{display:grid;gap:0}
+.hist div{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:14px}
+
+/* revise */
+.search{width:100%;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:10px;padding:10px 12px;font:inherit}
+.rk{display:grid;gap:0}
+.rk div{display:grid;grid-template-columns:minmax(0,48%) 1fr;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:15px}
+.rk div:first-child{border-top:0}
+.rk dt{font-size:13px;color:var(--ink2);margin:0}
+.rk dt.up{color:var(--good)} .rk dt.dn{color:var(--bad)}
+.rk dd{margin:0;font-weight:600;min-width:0}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px}
+.tile .num{display:block;font-size:24px;font-weight:600;color:var(--accent);line-height:1.2}
+.tile span{font-size:13px;color:var(--ink2)}
+.gbar{display:grid;grid-template-columns:78px 1fr 52px;gap:8px;align-items:center;font-size:13px;padding:3px 0}
+.gbar .tr{height:12px;background:var(--sunk);border-radius:3px;position:relative;overflow:hidden}
+.gbar .tr i{position:absolute;left:0;top:0;bottom:0;background:var(--blue);border-radius:3px}
+.gbar .tr i.neg{background:var(--bad)}
+.gbar .v{font-family:var(--f-num);text-align:right}
+.flash{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;min-height:240px;padding:20px 18px;display:grid;align-content:center;gap:12px;cursor:pointer;text-align:left;width:100%}
+.flash .side{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.flash .front{font-size:18px;font-weight:600}
+.flash .ans{font-size:20px;font-weight:700;color:var(--good)}
+.empty{padding:24px 4px;color:var(--ink2);text-align:center}
+.foot{font-size:13px;color:var(--ink2);padding-top:10px}
+@media (prefers-reduced-motion: no-preference){ .opt,.chip,.btn{transition:background-color .15s, border-color .15s} }
+.link{background:var(--blue-bg);border-radius:var(--r);padding:12px 14px}
+.link .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;color:var(--blue)}
+.icheck{background:var(--sheet);border:1.5px dashed var(--blue);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px}
+.icheck .lab{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue)}
+.cat{font-size:12px;font-weight:700;border-radius:99px;padding:1px 8px;white-space:nowrap}
+.cat.CS{background:var(--blue-bg);color:var(--blue)} .cat.CSS{background:var(--accent-bg);color:var(--accent)} .cat.ST{background:var(--sunk);color:var(--ink)} .cat.OT{background:var(--sunk);color:var(--ink2)}
+
+/* ---- workbook additions ---- */
+table.cover td:nth-child(4){min-width:180px}
+.plist .dl{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.plist .dl em{font-style:normal;font-weight:700;color:var(--blue);text-align:right}
+.ladder{list-style:none;margin:0;padding:0;display:grid;gap:0;border-top:1px solid var(--rule)}
+.ladder li{display:grid;grid-template-columns:62px 1fr auto;gap:12px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--rule)}
+.ladder .rk-n{font-size:22px;font-weight:600;color:var(--blue);text-align:right}
+.ladder .rk-t{min-width:0}
+.ladder .rk-t b{display:block;line-height:1.3}
+.ladder .rk-t span{font-size:13px;color:var(--ink2)}
+.ladder .rk-d{font-weight:700;font-size:14px;white-space:nowrap}
+.ladder li.up .rk-d{color:var(--good)} .ladder li.dn .rk-d{color:var(--bad)}
+.ladder small{font-weight:600;color:var(--ink2)}
+table.cover td{min-width:90px}
+.peek{border:1.5px dashed var(--blue);background:var(--blue-bg);color:var(--blue);border-radius:8px;padding:6px 10px;font-weight:600;cursor:pointer;min-height:36px;width:100%}
+.pubs{display:grid;gap:12px}
+.plist{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.plist li{padding:7px 0;border-top:1px dashed var(--rule);display:grid;gap:1px}
+.plist li:first-child{border-top:0}
+.plist li span{font-size:13px;color:var(--ink2)}
+.seg{scroll-snap-type:x proximity}
+@media (max-width: 700px){
+  table.cover thead{display:none}
+  table.cover tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 10px;padding:10px 0;border-bottom:1px solid var(--rule)}
+  table.cover td{border:0;padding:0;min-width:0;font-size:14px}
+  table.cover td:first-child{grid-column:1/-1;font-size:15px}
+  table.cover td:nth-child(4){grid-column:1/-1;min-width:0}
+  table.cover td[data-l]::before{content:attr(data-l);display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-bottom:2px}
+}
+/* ---- maths blocks ---- */
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(250px,100%),1fr));gap:10px}
+.fcard{background:var(--sheet);border:1px solid var(--rule);border-left:4px solid var(--blue);border-radius:var(--r);padding:10px 12px;display:grid;gap:4px;min-width:0}
+.fcard .fn{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);font-weight:700}
+.fcard .fx{font-family:var(--f-num);font-size:16px;color:var(--ink);overflow-wrap:anywhere;line-height:1.45}
+.fcard .fnote{font-size:13px;color:var(--ink2)}
+.ex{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px 14px;display:grid;gap:8px}
+.ex .exhead .lab{display:inline;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);font-weight:700}
+.ex .src{display:inline-block;margin-left:6px;font-size:11.5px;font-weight:700;color:var(--accent);border:1px solid currentColor;border-radius:999px;padding:0 8px}
+.ex .exq{font-weight:600}
+.ex details summary{cursor:pointer;font-weight:700;color:var(--blue);list-style:none}
+.ex details summary::-webkit-details-marker{display:none}
+.ex details summary::before{content:'▸ '}
+.ex details[open] summary::before{content:'▾ '}
+.ex ol{margin:8px 0 0;padding-left:20px;display:grid;gap:4px}
+.ex .exans{margin-top:8px;padding:8px 10px;border-radius:8px;background:var(--good-bg);color:var(--good);font-weight:700}
+.figwrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(260px,100%),1fr));gap:12px}
+.figwrap figure{margin:0;display:grid;gap:6px;justify-items:center;text-align:center}
+.fig svg,.figwrap svg{width:100%;max-width:340px;height:auto;color:var(--ink)}
+.fig figcaption,.figwrap figcaption{font-size:13px;color:var(--ink2)}
+sup,sub{font-size:.72em;line-height:0}
+
+</style>
+
+<style>
+/* formula book extras */
+ul.pts{margin:0;padding-left:20px;display:grid;gap:6px}
+.grp{font-size:19px;margin-top:6px}
+.fcard.star{border-left-color:var(--accent)}
+.hrow.h2{grid-template-columns:minmax(0,1.4fr) minmax(80px,1fr)}
+.hbar.two{height:14px;display:grid;gap:2px;background:none;border-radius:0}
+.hbar.two i{height:6px;background:var(--accent)}
+.hbar.two i.t2{background:var(--blue);opacity:.55}
+dl.sheet{margin:0;display:grid;gap:0}
+dl.sheet div{display:grid;grid-template-columns:minmax(110px,34%) 1fr;gap:10px;padding:7px 0;border-top:1px solid var(--rule)}
+dl.sheet div:first-child{border-top:0}
+dl.sheet dt{font-weight:600;color:var(--ink2);font-size:14px}
+dl.sheet dd{margin:0;font-family:var(--f-num);font-size:14px}
+.linkbtn{background:none;border:0;padding:0;font:inherit;color:inherit;cursor:pointer;text-align:left}
+hr.sep{border:0;border-top:2px dashed var(--rule);margin:22px 0}
+@media (max-width:520px){dl.sheet div{grid-template-columns:1fr;gap:2px}}
+@media print{.top,.nav,.btn,.back,.search{display:none!important}body{padding:0!important;background:#fff!important}.wrap{max-width:none;padding:0}.chap,.block{break-inside:avoid-page}}
+</style>
+<header class="top">
+  <div class="top-in">
+    <div class="brand">Maths Formula Book<small>गणित सूत्र पुस्तिका · SSC CGL final revision</small></div>
+    <div class="stat" id="topstat"></div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<nav class="nav" aria-label="Sections">
+  <div class="nav-in">
+    <button type="button" data-tab="book"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg><span>Chapters</span></button>
+    <button type="button" data-tab="heat"><svg viewBox="0 0 24 24"><path d="M12 3c1 4 5 5.5 5 10a5 5 0 0 1-10 0c0-2.5 1.5-3.5 2.5-5 .5 2 1.5 2.5 2.5 2.5 0-3-1-5 0-7.5z"/></svg><span>Heat map</span></button>
+    <button type="button" data-tab="tricks"><svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9V16h7v-2.1A6 6 0 0 0 12 3z"/></svg><span>Tricks</span></button>
+    <button type="button" data-tab="sheet"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/></svg><span>Last hour</span></button>
+  </div>
+</nav>
+
+<script>
+"use strict";
+/* Each chapter: f = formula rows [name, formula, note, star(1 = last-hour sheet)], c = key concepts, tb = tables, tr = tricks, tp = traps.
+   t1 / t2 = usual number of questions in CGL Tier 1 (25 maths questions) and Tier 2 (Paper 1, Module I: 30 maths questions). Approximate. */
+const CH = [
+{ id:"C1", g:"Foundation", t:"Must-know values", hi:"याद रखने योग्य मान", heat:3, t1:"used everywhere", t2:"used everywhere",
+ ask:"Not a chapter in the paper, but every chapter needs these values. Knowing them by heart saves 10–15 seconds per question.",
+ tb:[
+  {title:"Squares 11–30", head:["n","n²","n","n²","n","n²"], rows:[["11","121","18","324","25","625"],["12","144","19","361","26","676"],["13","169","20","400","27","729"],["14","196","21","441","28","784"],["15","225","22","484","29","841"],["16","256","23","529","30","900"],["17","289","24","576","",""]]},
+  {title:"Cubes 1–20", head:["n","n³","n","n³","n","n³"], rows:[["1","1","8","512","15","3375"],["2","8","9","729","16","4096"],["3","27","10","1000","17","4913"],["4","64","11","1331","18","5832"],["5","125","12","1728","19","6859"],["6","216","13","2197","20","8000"],["7","343","14","2744","",""]]},
+  {title:"Fractions ↔ percentages", head:["Fraction","%","Fraction","%"], rows:[["1/2","50","1/11","9.09"],["1/3","33.33","1/12","8.33"],["1/4","25","1/13","7.69"],["1/5","20","1/14","7.14"],["1/6","16.67","1/15","6.67"],["1/7","14.28","1/16","6.25"],["1/8","12.5","1/20","5"],["1/9","11.11","1/25","4"],["1/10","10","3/8","37.5"]]},
+  {title:"Powers and roots", head:["Value","","Value",""], rows:[["√2","1.414","2¹⁰","1024"],["√3","1.732","3⁵","243"],["√5","2.236","3⁶","729"],["√6","2.449","5⁴","625"],["√7","2.646","7³","343"],["π","22/7 ≈ 3.1416","1/π","≈ 0.318"]]},
+  {title:"Pythagorean triplets", head:["Triplet","Multiples to spot"], rows:[["3, 4, 5","6-8-10, 9-12-15, 12-16-20, 15-20-25"],["5, 12, 13","10-24-26"],["7, 24, 25","14-48-50"],["8, 15, 17","16-30-34"],["9, 40, 41",""],["20, 21, 29",""],["11, 60, 61",""],["12, 35, 37",""]]}],
+ tr:["Squares ending in 5: (a5)² = a(a+1) followed by 25 → 65² = 6·7 | 25 = 4225.","Squares near 50: (50 ± x)² = (25 ± x) hundreds + x² → 47² = 22|09 = 2209.","Unit digit of a perfect square is never 2, 3, 7 or 8."],
+ tp:["1/7 = 14.28 % (not 14.5); 1/11 = 9.09 % (not 9.9).","√5 = 2.236, √6 = 2.449 — candidates often swap them."]},
+
+{ id:"C2", g:"Arithmetic", t:"Number system", hi:"संख्या पद्धति", heat:3, t1:"1–2", t2:"1–2",
+ ask:"Divisibility (find the missing digit), remainders, unit digit, number of factors, trailing zeros, sums of series.",
+ f:[["Division","Dividend = Divisor × Quotient + Remainder","",1],
+  ["Divisibility by 3 / 9","sum of digits divisible by 3 / 9","",1],
+  ["Divisibility by 4 / 8","last 2 / last 3 digits divisible by 4 / 8","",1],
+  ["Divisibility by 11","(sum of odd-place digits) − (sum of even-place digits) = 0 or a multiple of 11","",1],
+  ["Divisibility by 7, 11, 13","abcabc is always divisible by 7, 11, 13 (= abc × 1001)",""],
+  ["Number of factors","N = a<sup>p</sup> × b<sup>q</sup> × c<sup>r</sup> → (p + 1)(q + 1)(r + 1)","72 = 2³·3² → 4·3 = 12",1],
+  ["Sum of factors","(a<sup>p+1</sup> − 1)/(a − 1) × (b<sup>q+1</sup> − 1)/(b − 1)",""],
+  ["Trailing zeros of n!","⌊n/5⌋ + ⌊n/25⌋ + ⌊n/125⌋ + …","100! → 20 + 4 = 24",1],
+  ["Unit digit cycles","2, 3, 7, 8 → cycle 4; 4, 9 → cycle 2; 0, 1, 5, 6 → same","divide power by 4; remainder 0 → use 4th term",1],
+  ["Remainder of product / sum","(a × b) mod n = (a mod n × b mod n) mod n","negative remainders allowed",1],
+  ["aⁿ − bⁿ","divisible by (a − b) always; by (a + b) when n is even",""],
+  ["aⁿ + bⁿ","divisible by (a + b) when n is odd",""],
+  ["Sum 1 to n","n(n + 1)/2","",1],
+  ["Sum of squares","n(n + 1)(2n + 1)/6","",1],
+  ["Sum of cubes","[n(n + 1)/2]²","",1],
+  ["First n odd / even numbers","sum = n² / n(n + 1)",""],
+  ["AP","Tₙ = a + (n − 1)d; Sₙ = n/2 [2a + (n − 1)d] = n/2 (first + last)","",1],
+  ["GP","Tₙ = arⁿ⁻¹; Sₙ = a(rⁿ − 1)/(r − 1); S∞ = a/(1 − r), |r| < 1",""],
+  ["Recurring decimals","0.ababab… = ab/99; 0.abbb… = (ab − a)/90","0.454545… = 45/99 = 5/11"],
+  ["Fermat","aᵖ⁻¹ mod p = 1 (p prime, a not a multiple of p)","2¹⁰⁰ mod 101 = 1"]],
+ c:["Primes up to 100: 25. 1 is neither prime nor composite; 2 is the only even prime.","Co-primes have HCF 1 (they need not be prime: 8 and 9).","Every prime > 3 is of the form 6k ± 1.","Product of n consecutive integers is divisible by n!.","A number and its digit-sum leave the same remainder on division by 9."],
+ tr:["Remainder of a big power: write the base as (divisor ± 1). 17²⁰⁰ ÷ 18 → (18 − 1)²⁰⁰ → remainder (−1)²⁰⁰ = 1.","Unit digit of a sum/product: work only with unit digits.","Missing digit for 11: set (odd − even) = 0 or 11 and test options."],
+ tp:["Unit digit when power ÷ 4 leaves 0: use the 4th term of the cycle (e.g. 2⁴ → 6), not 1.","Trailing zeros: 25 contributes two 5s, 125 three — don’t stop at ⌊n/5⌋."]},
+
+{ id:"C3", g:"Arithmetic", t:"HCF & LCM", hi:"म.स. और ल.स.", heat:1, t1:"0–1", t2:"0–1",
+ ask:"HCF × LCM, bells tolling together, largest number leaving given remainders, smallest number with given remainders.",
+ f:[["Two numbers","HCF × LCM = product of the numbers","only for two numbers",1],
+  ["Numbers with HCF h","a = hx, b = hy, x and y co-prime","count co-prime pairs",1],
+  ["HCF / LCM of fractions","HCF = HCF(numerators)/LCM(denominators); LCM = LCM(numerators)/HCF(denominators)","",1],
+  ["Largest number dividing a, b, c leaving remainders r₁, r₂, r₃","HCF(a − r₁, b − r₂, c − r₃)","",1],
+  ["Largest number leaving the same remainder","HCF(|a − b|, |b − c|, |c − a|)","",1],
+  ["Smallest number leaving remainder r with each of a, b, c","LCM(a, b, c) + r","",1],
+  ["Smallest number leaving remainders that are k less than each divisor","LCM(a, b, c) − k","5 when ÷6, 6 when ÷7 → LCM − 1",1],
+  ["Greatest n-digit number divisible by a, b, c","largest n-digit number − (its remainder ÷ LCM)",""],
+  ["Bells / lights together","after LCM of the intervals",""]],
+ c:["HCF always divides LCM.","HCF of co-primes = 1; LCM = product.","HCF of numbers ≤ the smallest; LCM ≥ the largest."],
+ tr:["Options test: LCM must be divisible by HCF — strike out options that fail."],
+ tp:["HCF × LCM = product holds for TWO numbers only, not three."]},
+
+{ id:"C4", g:"Arithmetic", t:"Simplification, surds & indices", hi:"सरलीकरण, करणी और घातांक", heat:2, t1:"1–2", t2:"1",
+ ask:"BODMAS simplification, comparing surds, rationalising, infinite roots, laws of indices.",
+ f:[["BODMAS","Brackets (), {}, [] → Of → Division → Multiplication → Addition → Subtraction","‘of’ before ÷",1],
+  ["Indices","aᵐ·aⁿ = aᵐ⁺ⁿ; aᵐ/aⁿ = aᵐ⁻ⁿ; (aᵐ)ⁿ = aᵐⁿ; a⁰ = 1; a⁻ⁿ = 1/aⁿ","",1],
+  ["Fractional power","a^(m/n) = ⁿ√(aᵐ)","",1],
+  ["Rationalise","1/(√a + √b) = (√a − √b)/(a − b)","",1],
+  ["Root of a + 2√b","√(a + 2√b) = √x + √y where x + y = a, xy = b","√(5 + 2√6) = √3 + √2",1],
+  ["Infinite root (+)","√(x + √(x + …)) = (1 + √(1 + 4x))/2","= n + 1 if x = n(n + 1)",1],
+  ["Infinite root (−)","√(x − √(x − …)) = (−1 + √(1 + 4x))/2","= n if x = n(n + 1)",1],
+  ["Infinite product root","√(x√(x√(x…))) = x",""],
+  ["Finite product root","n roots of x → x^((2ⁿ − 1)/2ⁿ)",""],
+  ["Comparing surds","make the root order equal: LCM of indices","∛3 vs √2 → ⁶√9 vs ⁶√8"]],
+ c:["If aˣ = aʸ (a ≠ 0, ±1) then x = y.","Add/subtract surds only when the radical is the same: 2√3 + 5√3 = 7√3.","(√a + √b)² = a + b + 2√(ab)."],
+ tr:["Approximate: √2 ≈ 1.414, √3 ≈ 1.732 and eliminate options by size.","For long fractions, look for a ± b and a² − b² patterns before multiplying out."],
+ tp:["‘of’ is done before division: 24 ÷ 4 of 3 = 24 ÷ 12 = 2.","−3² = −9 but (−3)² = 9."]},
+
+{ id:"C5", g:"Arithmetic", t:"Percentage", hi:"प्रतिशत", heat:3, t1:"1–2", t2:"1–2",
+ ask:"Successive change, population/depreciation, consumption–price, elections, exam pass marks, income–expenditure.",
+ f:[["Percentage change","(change ÷ original) × 100","",1],
+  ["Successive change a %, b %","a + b + ab/100","use − for a decrease",1],
+  ["Up r % then down r %","net loss of r²/100 %","",1],
+  ["A is r % more than B","B is r/(100 + r) × 100 % less than A","25 % more → 20 % less",1],
+  ["A is r % less than B","B is r/(100 − r) × 100 % more than A","20 % less → 25 % more",1],
+  ["Price up r %, keep spending same","cut consumption by r/(100 + r) × 100 %","",1],
+  ["Population growth","P(1 + r/100)ⁿ","",1],
+  ["Depreciation","P(1 − r/100)ⁿ","",1],
+  ["x % of y","= y % of x",""],
+  ["Product constant (A × B fixed)","A up by 1/n → B down by 1/(n + 1)","price × quantity, speed × time"]],
+ c:["Express percentages as fractions: 12.5 % = 1/8, 16.67 % = 1/6, 37.5 % = 3/8.","Elections: votes for winner − loser = margin; invalid votes are removed first."],
+ tr:["Successive changes: multiply fractions. +25 % then −20 % → 5/4 × 4/5 = 1 → no change.","Exam pass mark: if a student scoring x % fails by a marks and one scoring y % passes by b marks, maximum marks = (a + b)/(y − x) × 100."],
+ tp:["‘Percentage of’ vs ‘percentage points’: 10 % to 12 % is a 2-point rise but a 20 % rise.","Base changes in successive steps — never just add the percentages."]},
+
+{ id:"C6", g:"Arithmetic", t:"Profit, loss & discount", hi:"लाभ, हानि और बट्टा", heat:3, t1:"1–2", t2:"1–2",
+ ask:"Profit %, MP–discount–profit chains, successive discounts, dishonest dealer, buy-x-get-y offers.",
+ f:[["Profit %","(SP − CP)/CP × 100","always on CP",1],
+  ["SP from profit","SP = CP × (100 + P%)/100; loss: CP × (100 − L%)/100","",1],
+  ["Discount","on MP: SP = MP × (100 − d%)/100","",1],
+  ["MP : CP","= (100 + P%) : (100 − d%)","",1],
+  ["Successive discounts","d₁ + d₂ − d₁d₂/100","",1],
+  ["Mark up m %, discount d %","net profit % = m − d − md/100","",1],
+  ["Same SP, x % gain and x % loss","always a loss of x²/100 %","",1],
+  ["False weight","gain % = (true − false)/false × 100","900 g for 1 kg → 11.11 %",1],
+  ["CP of x articles = SP of y articles","profit % = (x − y)/y × 100","",1],
+  ["Buy n get m free","discount = m/(n + m) × 100 %",""]],
+ c:["Profit and loss are on CP; discount is on MP.","Overhead / transport costs are added to CP."],
+ tr:["Use multiplying factors: 20 % profit = ×6/5, 25 % discount = ×3/4. Chain them in one line.","Dishonest dealer + profit: final factor = (1 + p) × true/false weight."],
+ tp:["Discount % is never calculated on CP.","Two successive 10 % discounts = 19 %, not 20 %."]},
+
+{ id:"C7", g:"Arithmetic", t:"Simple & compound interest", hi:"साधारण और चक्रवृद्धि ब्याज", heat:2, t1:"1", t2:"1–2",
+ ask:"CI − SI for 2/3 years, half-yearly compounding, doubling time, instalments, amount after n years.",
+ f:[["Simple interest","SI = P × R × T/100; A = P + SI","",1],
+  ["Compound amount","A = P(1 + R/100)ᵀ; CI = A − P","",1],
+  ["CI − SI (2 years)","P(R/100)²","",1],
+  ["CI − SI (3 years)","P(R/100)²(3 + R/100)","",1],
+  ["Half-yearly / quarterly","rate R/2, time 2T / rate R/4, time 4T","",1],
+  ["Effective rate, 2 years","2R + R²/100","10 % → 21 %",1],
+  ["Different rates","A = P(1 + R₁/100)(1 + R₂/100)(1 + R₃/100)",""],
+  ["SI doubling","doubles in T years → R = 100/T","",1],
+  ["CI multiplying","becomes x times in n years → x² in 2n, x³ in 3n","",1],
+  ["SI from two amounts","SI per year = (A₂ − A₁)/(T₂ − T₁)",""],
+  ["CI from two amounts","R = (A₂/A₁ − 1) × 100 for consecutive years",""],
+  ["Equal instalments (CI)","P = x/(1 + r) + x/(1 + r)² + … (r = R/100)",""]],
+ c:["SI is the same every year; CI grows every year.","For 1 year with yearly compounding, CI = SI."],
+ tr:["CI for 2 years at R % on P: use 2R + R²/100 as the total % (10 % → 21 %, 20 % → 44 %).","Fractional rates: 12.5 % = 1/8 → A/P = (9/8)ⁿ."],
+ tp:["Half-yearly: change BOTH rate and time.","CI − SI for 3 years is not 3 × (CI − SI for 2 years)."]},
+
+{ id:"C8", g:"Arithmetic", t:"Ratio, proportion & partnership", hi:"अनुपात, समानुपात और साझेदारी", heat:2, t1:"1", t2:"1",
+ ask:"Combining ratios, mean/third/fourth proportional, incomes and savings, coins, partnership profit share.",
+ f:[["Proportion","a : b = c : d ⇔ ad = bc","",1],
+  ["Mean proportional","√(ab)","",1],
+  ["Third proportional","b²/a","of a and b",1],
+  ["Fourth proportional","bc/a","of a, b, c",1],
+  ["Combine ratios","A:B = 2:3, B:C = 4:5 → A:B:C = 8:12:15","make B common",1],
+  ["Duplicate / sub-duplicate","a² : b² / √a : √b",""],
+  ["Componendo–dividendo","a/b = c/d ⇒ (a + b)/(a − b) = (c + d)/(c − d)","",1],
+  ["Partnership","profit share ∝ capital × time","",1],
+  ["Income–expenditure","saving = income − expenditure","",1],
+  ["Adding x to both terms","(a + x)/(b + x) = c/d → solve for x",""]],
+ c:["If incomes are a:b and expenditures c:d with savings S each, write 'a k − c m = S' for both and solve.","Working partner’s salary is paid first; the rest is split by capital × time."],
+ tr:["Answer must make the units whole — test options with the ratio’s multiples.","Coins: value ratio = number ratio × denomination."],
+ tp:["Partnership with capital changed midway: multiply each amount by its own months."]},
+
+{ id:"C9", g:"Arithmetic", t:"Mixture & alligation", hi:"मिश्रण और एलिगेशन", heat:1, t1:"0–1", t2:"0–1",
+ ask:"Ratio to mix two qualities, replacement of liquid, milk–water profit.",
+ f:[["Alligation","cheaper qty : dearer qty = (dearer − mean) : (mean − cheaper)","",1],
+  ["Repeated replacement","pure left = V(1 − x/V)ⁿ","x litres taken out n times",1],
+  ["Mixing two mixtures","convert each to fraction of one component, then use alligation",""],
+  ["Water to gain p % at CP","water : milk = p : 100",""]],
+ c:["Alligation works for any average: prices, speeds, percentages, marks."],
+ tr:["Draw the cross: cheaper and dearer on top, mean in the middle, differences diagonally."],
+ tp:["The mean must lie between the two values; check the ratio order (cheaper first)."]},
+
+{ id:"C10", g:"Arithmetic", t:"Average & ages", hi:"औसत और आयु", heat:2, t1:"1", t2:"1",
+ ask:"Average after adding/removing a member, average speed, consecutive numbers, ages in ratio.",
+ f:[["Average","sum ÷ number of items","",1],
+  ["Consecutive numbers","average = (first + last)/2","",1],
+  ["New member joins, average rises by d","new value = old average + (n + 1)d","",1],
+  ["Member replaced, average rises by d","new person = old person + n·d","",1],
+  ["Average speed (equal distances)","2xy/(x + y)","",1],
+  ["Three equal distances","3xyz/(xy + yz + zx)",""],
+  ["First n naturals / odds / evens","(n + 1)/2 / n / n + 1",""],
+  ["Ages","n years ago each age falls by n; ratio method with ‘k’",""]],
+ c:["If every value rises by k, the average rises by k; if multiplied by k, the average is multiplied by k.","Average of an AP = average of first and last term."],
+ tr:["Deviation method: pick an assumed average, add the deviations, divide."],
+ tp:["Average speed is not (x + y)/2 unless the TIMES are equal."]},
+
+{ id:"C11", g:"Arithmetic", t:"Time & work, pipes & cisterns", hi:"समय और कार्य, नल और टंकी", heat:2, t1:"1", t2:"1",
+ ask:"Together/alone, efficiency, M-D-H rule, alternate days, leaks, wages.",
+ f:[["Together (two)","ab/(a + b) days","",1],
+  ["Together (three)","abc/(ab + bc + ca)","",1],
+  ["LCM method","total work = LCM of days; efficiency = work ÷ days","",1],
+  ["Man-days","M₁D₁H₁/W₁ = M₂D₂H₂/W₂","",1],
+  ["Efficiency","A is k times as efficient → A’s time = B’s time ÷ k","",1],
+  ["Fill a, empty b","net time = ab/(b − a)","",1],
+  ["A alone after working together","remaining work ÷ A’s rate",""],
+  ["Wages","share ∝ work done (efficiency × days)","",1]],
+ c:["Efficiency and time are inversely proportional.","Pipes: filling = +, emptying = −, then same as work."],
+ tr:["Always use the LCM method — it avoids fractions.","Alternate days: find work done in one 2-day cycle, then count full cycles."],
+ tp:["In alternate-day questions, the last day may be partial — check who finishes it."]},
+
+{ id:"C12", g:"Arithmetic", t:"Time, speed & distance", hi:"समय, चाल और दूरी", heat:3, t1:"1–2", t2:"1–2",
+ ask:"Trains, boats and streams, relative speed, late/early problems, races and circular tracks.",
+ f:[["Basic","Distance = Speed × Time","",1],
+  ["Units","km/h × 5/18 = m/s; m/s × 18/5 = km/h","",1],
+  ["Relative speed","same direction: S₁ − S₂; opposite: S₁ + S₂","",1],
+  ["Train crosses a pole / man","time = train length ÷ speed","",1],
+  ["Train crosses a platform / train","time = (L₁ + L₂) ÷ relative speed","",1],
+  ["Boats","downstream = u + v; upstream = u − v; u = (D + U)/2; v = (D − U)/2","",1],
+  ["Late at s₁ by t₁, early at s₂ by t₂","D = s₁s₂(t₁ + t₂)/(s₂ − s₁)","",1],
+  ["After meeting, times t₁, t₂","S₁ : S₂ = √t₂ : √t₁","",1],
+  ["Speed ratio a : b","time ratio b : a (same distance)","",1],
+  ["Circular track","first meeting = L ÷ relative speed; meet at start = LCM of lap times",""],
+  ["Race: A beats B by x m in L m","B runs L − x while A runs L",""]],
+ c:["Stoppage time per hour = (speed without stops − speed with stops)/speed without stops × 60 min.","Average speed for a round trip = 2xy/(x + y)."],
+ tr:["Convert km/h to m/s by ×5/18 — speeds like 36, 54, 72, 90 km/h become 10, 15, 20, 25 m/s.","In ‘late and early’ questions, the time difference is t₁ + t₂ (one late, one early) or |t₁ − t₂| (both late)."],
+ tp:["Train crossing a platform: add the platform length.","Boats: ‘against the stream’ = upstream."]},
+
+{ id:"C13", g:"Algebra", t:"Algebra", hi:"बीजगणित", heat:3, t1:"2–3", t2:"3–4",
+ ask:"x + 1/x type values, identities, a + b + c = 0, simplifying expressions, linear equations, quadratic roots.",
+ f:[["Square identities","(a ± b)² = a² ± 2ab + b²; a² − b² = (a + b)(a − b)","",1],
+  ["Cube identities","(a ± b)³ = a³ ± b³ ± 3ab(a ± b)","",1],
+  ["Sum / difference of cubes","a³ ± b³ = (a ± b)(a² ∓ ab + b²)","",1],
+  ["Three terms","(a + b + c)² = a² + b² + c² + 2(ab + bc + ca)","",1],
+  ["a³ + b³ + c³ − 3abc","= (a + b + c)(a² + b² + c² − ab − bc − ca)","",1],
+  ["If a + b + c = 0","a³ + b³ + c³ = 3abc","",1],
+  ["x + 1/x = k","x² + 1/x² = k² − 2; x³ + 1/x³ = k³ − 3k","",1],
+  ["x − 1/x = k","x² + 1/x² = k² + 2; x³ − 1/x³ = k³ + 3k","",1],
+  ["x⁴ + 1/x⁴","= (x² + 1/x²)² − 2",""],
+  ["Special values","x + 1/x = 2 → x = 1; = −2 → x = −1; = 1 → x³ = −1; = √3 → x⁶ = −1","",1],
+  ["Sum of squares = 0","a² + b² + c² = 0 (real) → a = b = c = 0",""],
+  ["a² + b² + c² = ab + bc + ca","→ a = b = c",""],
+  ["Quadratic ax² + bx + c = 0","sum of roots = −b/a; product = c/a; D = b² − 4ac","",1],
+  ["Linear pair","unique: a₁/a₂ ≠ b₁/b₂; none: a₁/a₂ = b₁/b₂ ≠ c₁/c₂; infinite: all equal","",1],
+  ["Remainder theorem","p(x) ÷ (x − a) leaves p(a)",""],
+  ["Min / max of ax² + bx + c","at x = −b/2a; value = c − b²/4a",""]],
+ c:["Degree check: in an expression that must be constant, terms of different degree cannot cancel.","Symmetric expressions: put easy values (a = b = c = 1, or x = 1) when the answer is a number."],
+ tr:["Value putting: if a + b + c = 0, try a = 1, b = 1, c = −2 in the options.","x + 1/x = 3 → x² + 1/x² = 7 → x⁴ + 1/x⁴ = 47: build the ladder k, k² − 2, (k² − 2)² − 2."],
+ tp:["x − 1/x squared gives x² + 1/x² − 2, so x² + 1/x² = k² + 2 (plus, not minus).","D < 0 means no real roots — not ‘roots equal’."]},
+
+{ id:"C14", g:"Geometry", t:"Lines, angles & triangles", hi:"रेखाएँ, कोण और त्रिभुज", heat:3, t1:"1–2", t2:"2",
+ ask:"Triangle centres and their angles, similarity, Pythagoras, angle bisector, medians, special triangles.",
+ f:[["Angle sum","A + B + C = 180°; exterior angle = sum of opposite interior angles","",1],
+  ["Side rule","sum of any two sides > third; difference < third","",1],
+  ["Pythagoras","c² = a² + b² (right); c² > a² + b² (obtuse); c² < a² + b² (acute)","",1],
+  ["Centroid (G)","meets the medians; divides each in 2 : 1 from the vertex","",1],
+  ["Incentre (I)","∠BIC = 90° + A/2","angle bisectors",1],
+  ["Excentre","∠BEC = 90° − A/2",""],
+  ["Circumcentre (O)","∠BOC = 2A","perpendicular bisectors",1],
+  ["Orthocentre (H)","∠BHC = 180° − A","altitudes",1],
+  ["Median length","AD = ½√(2b² + 2c² − a²)",""],
+  ["Apollonius","AB² + AC² = 2(AD² + BD²)",""],
+  ["Angle bisector theorem","BD/DC = AB/AC","",1],
+  ["Areas","½ × base × height; ½ab sin C; Heron √(s(s − a)(s − b)(s − c))","",1],
+  ["Inradius / circumradius","r = Area/s; R = abc/(4 × Area)","",1],
+  ["Equilateral (side a)","h = √3a/2; area = √3a²/4; R = a/√3; r = a/(2√3); R = 2r","",1],
+  ["Right triangle","R = hypotenuse/2; r = (a + b − c)/2; altitude to hypotenuse = ab/c","",1],
+  ["Similar triangles","area ratio = (side ratio)²","",1],
+  ["Special triangles","30-60-90 → 1 : √3 : 2; 45-45-90 → 1 : 1 : √2","",1],
+  ["Midpoint theorem","segment joining midpoints ∥ third side and half of it",""]],
+ c:["Parallel lines with a transversal: alternate angles equal, corresponding equal, co-interior add to 180°.","In an equilateral triangle all four centres coincide.","Congruence: SSS, SAS, ASA, AAS, RHS (not SSA, not AAA).","Centroid divides the triangle into 6 equal-area parts; a median halves the area."],
+ tr:["If a figure is ‘any triangle’, draw an equilateral one and measure.","Area ratios of triangles with the same height = ratio of bases."],
+ tp:["∠BIC uses +A/2, the excentre −A/2 — don’t swap them.","Similarity gives side ratio; area needs its square."]},
+
+{ id:"C15", g:"Geometry", t:"Quadrilaterals & polygons", hi:"चतुर्भुज और बहुभुज", heat:2, t1:"0–1", t2:"1",
+ ask:"Angles of regular polygons, number of diagonals, properties of rhombus/parallelogram/cyclic quadrilateral.",
+ f:[["Interior angle sum","(n − 2) × 180°","",1],
+  ["Each exterior angle (regular)","360°/n; interior = 180° − 360°/n","",1],
+  ["Diagonals","n(n − 3)/2","",1],
+  ["Parallelogram","area = base × height; d₁² + d₂² = 2(a² + b²)","",1],
+  ["Rhombus","area = d₁d₂/2; 4a² = d₁² + d₂²","",1],
+  ["Trapezium","area = ½(a + b)h",""],
+  ["Square / rectangle diagonal","a√2 / √(l² + b²)",""],
+  ["Regular hexagon","area = (3√3/2)a²","6 equilateral triangles",1],
+  ["Cyclic quadrilateral","opposite angles sum 180°; area = √((s − a)(s − b)(s − c)(s − d))","",1]],
+ c:["Diagonals of a parallelogram bisect each other; of a rhombus also at 90°; of a rectangle are equal.","Joining midpoints of any quadrilateral gives a parallelogram with half the area."],
+ tr:["Exterior angle = 360/n gives n quickly: exterior 24° → 15 sides."],
+ tp:["Interior angle sum uses (n − 2), not n."]},
+
+{ id:"C16", g:"Geometry", t:"Circles", hi:"वृत्त", heat:3, t1:"1", t2:"1",
+ ask:"Tangent lengths, common tangents, chord distance, angles in segments, intersecting chords.",
+ f:[["Angle at centre","= 2 × angle at circumference (same arc)","",1],
+  ["Semicircle","angle in a semicircle = 90°","",1],
+  ["Same segment","angles in the same segment are equal","",1],
+  ["Tangent","⟂ radius at the point of contact; two tangents from a point are equal","",1],
+  ["Tangent length","√(d² − r²)","",1],
+  ["Direct common tangent","√(d² − (r₁ − r₂)²)","",1],
+  ["Transverse common tangent","√(d² − (r₁ + r₂)²)","",1],
+  ["Chord","perpendicular from centre bisects it; length = 2√(r² − p²)","",1],
+  ["Intersecting chords","AP × PB = CP × PD","",1],
+  ["Secant–tangent","PT² = PA × PB","",1],
+  ["Alternate segment","angle between tangent and chord = angle in the alternate segment",""],
+  ["Touching circles","external: d = r₁ + r₂; internal: d = r₁ − r₂",""],
+  ["Common tangents","apart 4; touch outside 3; intersect 2; touch inside 1; one inside other 0",""]],
+ c:["Equal chords are equidistant from the centre.","The angle between two tangents from P and the angle at the centre add to 180°."],
+ tr:["Common tangent questions: direct uses the DIFFERENCE of radii, transverse the SUM."],
+ tp:["Angle at the centre doubles only for the SAME arc."]},
+
+{ id:"C17", g:"Geometry", t:"Coordinate geometry", hi:"निर्देशांक ज्यामिति", heat:1, t1:"0–1", t2:"0–1",
+ ask:"Slope, intercepts, area of triangle by a line with the axes, section formula, reflection.",
+ f:[["Distance","√((x₂ − x₁)² + (y₂ − y₁)²)","",1],
+  ["Section (m : n internal)","((mx₂ + nx₁)/(m + n), (my₂ + ny₁)/(m + n))","",1],
+  ["Midpoint / centroid","((x₁ + x₂)/2, …) / ((x₁ + x₂ + x₃)/3, …)","",1],
+  ["Area of triangle","½|x₁(y₂ − y₃) + x₂(y₃ − y₁) + x₃(y₁ − y₂)|; = 0 → collinear","",1],
+  ["Slope","m = (y₂ − y₁)/(x₂ − x₁); ax + by + c = 0 → m = −a/b","",1],
+  ["Parallel / perpendicular","m₁ = m₂ / m₁m₂ = −1","",1],
+  ["Intercept form","x/a + y/b = 1",""],
+  ["Line ax + by = c with the axes","area = c²/(2|ab|)","",1],
+  ["Point to line","|ax₁ + by₁ + c|/√(a² + b²)",""],
+  ["Reflection","in x-axis (x, −y); y-axis (−x, y); origin (−x, −y); y = x → (y, x)",""]],
+ c:["x-intercept: put y = 0; y-intercept: put x = 0.","Quadrants: I (+,+), II (−,+), III (−,−), IV (+,−)."],
+ tr:["For a line with the axes, find the two intercepts and use ½ × base × height."],
+ tp:["Slope of ax + by + c = 0 is −a/b, not a/b."]},
+
+{ id:"C18", g:"Mensuration", t:"Mensuration 2D", hi:"क्षेत्रमिति · 2D", heat:3, t1:"1–2", t2:"2",
+ ask:"Areas and perimeters, paths, sectors, % change in area, wheels, inscribed figures.",
+ f:[["Rectangle / square","area lb, a²; perimeter 2(l + b), 4a; diagonal √(l² + b²), a√2","",1],
+  ["Circle","area πr²; circumference 2πr","",1],
+  ["Semicircle","area πr²/2; perimeter πr + 2r","",1],
+  ["Sector","area = (θ/360)πr²; arc = (θ/360)2πr","",1],
+  ["Ring","π(R² − r²)",""],
+  ["Segment","sector − triangle",""],
+  ["Isosceles triangle","area = (b/4)√(4a² − b²)","a = equal side",1],
+  ["Path outside a rectangle (width w)","2w(l + b + 2w)","",1],
+  ["Path inside a rectangle","2w(l + b − 2w)",""],
+  ["Two crossroads","w(l + b − w)",""],
+  ["% change in area","sides change x % → 2x + x²/100 %","",1],
+  ["Wheel","revolutions = distance ÷ 2πr","",1],
+  ["Inscribed / circumscribed","circle in square r = a/2; square in circle a = r√2 (area 2r²)",""],
+  ["Equilateral triangle and circle","incircle r = a/(2√3); circumcircle R = a/√3",""]],
+ c:["Area ratio of similar figures = (ratio of sides)².","Minute hand sweeps 6° per minute; hour hand 0.5° per minute."],
+ tr:["π = 22/7 → choose radii that are multiples of 7.","Shaded-region questions: total − unshaded is usually faster."],
+ tp:["Semicircle perimeter includes the diameter (πr + 2r).","Percentage change in area is not 2x — add x²/100."]},
+
+{ id:"C19", g:"Mensuration", t:"Mensuration 3D", hi:"क्षेत्रमिति · 3D", heat:3, t1:"1–2", t2:"2",
+ ask:"Volumes and surface areas, melting and recasting, water flow, painted cubes, frustum.",
+ f:[["Cube","V a³; TSA 6a²; LSA 4a²; diagonal a√3","",1],
+  ["Cuboid","V lbh; TSA 2(lb + bh + hl); diagonal √(l² + b² + h²)","",1],
+  ["Cylinder","V πr²h; CSA 2πrh; TSA 2πr(r + h)","",1],
+  ["Cone","V ⅓πr²h; l = √(r² + h²); CSA πrl; TSA πr(l + r)","",1],
+  ["Sphere","V (4/3)πr³; SA 4πr²","",1],
+  ["Hemisphere","V (2/3)πr³; CSA 2πr²; TSA 3πr²","",1],
+  ["Frustum","V (πh/3)(R² + r² + Rr); CSA π(R + r)l; l = √(h² + (R − r)²)","",1],
+  ["Prism","V = base area × h; LSA = base perimeter × h",""],
+  ["Pyramid","V = ⅓ × base area × h; LSA = ½ × perimeter × slant height",""],
+  ["Regular tetrahedron","V = a³/(6√2)",""],
+  ["Hollow cylinder","V = π(R² − r²)h",""],
+  ["Melting & recasting","volume stays the same; number = big volume ÷ small volume","",1],
+  ["Painted cube cut into n³","3 faces: 8; 2 faces: 12(n − 2); 1 face: 6(n − 2)²; none: (n − 2)³","",1],
+  ["Water flow","volume per unit time = cross-section area × speed",""],
+  ["Cone from a sector","sector radius = slant height; arc length = 2πr of base",""]],
+ c:["Cylinder, cone, hemisphere of same radius and height = r: volumes 3 : 1 : 2.","Sphere in a cube: diameter = side."],
+ tr:["Scale factor k on all lengths → area ×k², volume ×k³.","Keep π symbolic until the end — it often cancels."],
+ tp:["CSA vs TSA: read whether the top/bottom is included (open tank, hollow pipe).","Frustum slant uses (R − r), not (R + r)."]},
+
+{ id:"C20", g:"Trigonometry", t:"Trigonometry", hi:"त्रिकोणमिति", heat:3, t1:"1–2", t2:"2–3",
+ ask:"Values of standard angles, identities, complementary angles, max–min, value putting.",
+ f:[["Ratios","sin = P/H, cos = B/H, tan = P/B; cosec, sec, cot are reciprocals","",1],
+  ["Values","sin 0°, 30°, 45°, 60°, 90° = 0, ½, 1/√2, √3/2, 1 (cos in reverse)","",1],
+  ["tan values","tan 0°, 30°, 45°, 60° = 0, 1/√3, 1, √3; tan 90° undefined","",1],
+  ["Identities","sin² + cos² = 1; sec² − tan² = 1; cosec² − cot² = 1","",1],
+  ["sec + tan = x","sec − tan = 1/x","same for cosec + cot",1],
+  ["sin + cos = x","sin θ cos θ = (x² − 1)/2","",1],
+  ["Higher powers","sin⁴ + cos⁴ = 1 − 2s²c²; sin⁶ + cos⁶ = 1 − 3s²c²",""],
+  ["Complementary","sin(90° − θ) = cos θ; tan(90° − θ) = cot θ; sec(90° − θ) = cosec θ","",1],
+  ["A + B = 90°","tan A tan B = 1; sin²A + sin²B = 1","",1],
+  ["Max / min","a sin θ + b cos θ: ±√(a² + b²); a sin²θ + b cos²θ: between a and b; a tan²θ + b cot²θ: min 2√(ab)","",1],
+  ["Compound","sin(A ± B) = sAcB ± cAsB; cos(A ± B) = cAcB ∓ sAsB; tan(A ± B) = (tA ± tB)/(1 ∓ tAtB)",""],
+  ["Double angle","sin 2θ = 2 sin θ cos θ; cos 2θ = 1 − 2sin²θ = 2cos²θ − 1",""],
+  ["A + B = 45°","(1 + tan A)(1 + tan B) = 2",""],
+  ["Allied (ASTC)","All, Sin, Tan, Cos positive in quadrants I–IV",""],
+  ["Special","tan 15° = 2 − √3; tan 75° = 2 + √3; sin 18° = (√5 − 1)/4",""],
+  ["Radians","π rad = 180°; 1 rad ≈ 57.3°",""]],
+ c:["Every ratio depends only on the angle, not the triangle size.","sin and cos lie between −1 and 1; sec and cosec are never between −1 and 1."],
+ tr:["Value putting: numbers in the options → put θ = 0° or 45°; ratios in the options → put 30° or 60°.","Given one ratio, draw the right triangle using a triplet (3-4-5, 5-12-13, 7-24-25, 8-15-17)."],
+ tp:["sin²30° + cos²60° = ½ (different angles) — the identity needs the SAME angle.","Never put 45° when options contain both tan and cot — they tie."]},
+
+{ id:"C21", g:"Trigonometry", t:"Heights & distances", hi:"ऊँचाई और दूरी", heat:2, t1:"0–1", t2:"1",
+ ask:"Tower with one or two angles, moving observer, shadows, angles of depression.",
+ f:[["Basic","tan θ = height ÷ distance","",1],
+  ["Ratios h : d","30° → 1 : √3; 45° → 1 : 1; 60° → √3 : 1","",1],
+  ["Two angles, same side","h = x/(cot α − cot β)","",1],
+  ["30° → 60° by walking x","h = (√3/2)x; remaining distance = x/2","",1],
+  ["Complementary angles from a and b","h = √(ab)","",1],
+  ["Shadow","shadow = h cot θ; shadow = height at 45°",""],
+  ["Depression","angle of depression = angle of elevation (alternate angles)",""]],
+ c:["Angles are measured from the horizontal line through the observer’s eye."],
+ tr:["Draw the triangle and write the side ratio straight from the 30-60-90 / 45-45-90 pattern."],
+ tp:["Two ships on opposite sides: ADD the distances; same side: subtract."]},
+
+{ id:"C22", g:"Statistics & DI", t:"Statistics", hi:"सांख्यिकी", heat:2, t1:"0–1", t2:"1",
+ ask:"Mean, median, mode of raw and grouped data, range, variance and standard deviation (Tier 2).",
+ f:[["Mean","Σx/n; grouped: Σfx/Σf","",1],
+  ["Median (raw)","odd n: ((n + 1)/2)th term; even n: average of (n/2)th and (n/2 + 1)th","sort first",1],
+  ["Mode","most frequent value","",1],
+  ["Empirical relation","Mode = 3 Median − 2 Mean","",1],
+  ["Range","maximum − minimum","",1],
+  ["Variance","σ² = Σ(x − x̄)²/n = Σx²/n − x̄²","",1],
+  ["Standard deviation","σ = √variance","",1],
+  ["Grouped median","L + ((N/2 − cf)/f) × h",""],
+  ["Grouped mode","L + (f₁ − f₀)/(2f₁ − f₀ − f₂) × h",""],
+  ["Coefficient of variation","σ/x̄ × 100",""],
+  ["First n natural numbers","mean (n + 1)/2; variance (n² − 1)/12",""]],
+ c:["Adding k to every value: mean + k, median + k, SD unchanged.","Multiplying every value by k: mean × k, SD × |k|, variance × k²."],
+ tr:["Median questions: always arrange in order first — options are often built from the unsorted middle."],
+ tp:["Variance changes by k², SD by |k| when values are multiplied by k."]},
+
+{ id:"C23", g:"Statistics & DI", t:"Probability", hi:"प्रायिकता", heat:1, t1:"0", t2:"0–1",
+ ask:"Coins, dice, cards, balls from a bag (Tier 2).",
+ f:[["Probability","P = favourable ÷ total; 0 ≤ P ≤ 1","",1],
+  ["Complement","P(not A) = 1 − P(A)","",1],
+  ["Addition","P(A ∪ B) = P(A) + P(B) − P(A ∩ B)","",1],
+  ["Independent","P(A ∩ B) = P(A) × P(B)",""],
+  ["Combinations","ⁿCᵣ = n!/(r!(n − r)!)","",1],
+  ["Coins / dice","n coins: 2ⁿ outcomes; n dice: 6ⁿ outcomes","",1]],
+ c:["Two dice: sum 7 has 6 ways (most likely); sums 2 and 12 have 1 way each.","Cards: 52 = 4 suits × 13; 26 red, 26 black; 12 face cards; 4 aces."],
+ tr:["‘At least one’ → 1 − P(none)."],
+ tp:["Face cards are J, Q, K only (12) — aces are not face cards."]},
+
+{ id:"C24", g:"Statistics & DI", t:"Data interpretation", hi:"आँकड़ों की व्याख्या", heat:3, t1:"2–3", t2:"2–3",
+ ask:"Tables, bar graphs, line graphs and pie charts: percentages, ratios, averages, growth.",
+ f:[["Percentage share","part ÷ total × 100","",1],
+  ["Pie chart","angle = value ÷ total × 360°; 1 % = 3.6°","",1],
+  ["Growth %","(new − old) ÷ old × 100","",1],
+  ["Average","total ÷ number of years/items","",1],
+  ["Ratio","compare two values; simplify by common factors",""],
+  ["Difference of percentages","use the same base before comparing",""]],
+ c:["Read the units and the scale before calculating (thousands, lakhs, %).","‘By what percent more’ uses the second value as the base."],
+ tr:["Approximate and pick the nearest option — DI options are usually far apart.","Convert pie-chart degrees to percent with ÷3.6 only when needed; ratios work directly on degrees."],
+ tp:["Percentage growth from year 1 to year 3 is not the sum of yearly growth rates."]}
+];
+
+const GROUPS = ["Foundation","Arithmetic","Algebra","Geometry","Mensuration","Trigonometry","Statistics & DI"];
+
+const PATTERN = [
+ ["CGL Tier 1","Quantitative Aptitude: 25 questions, 50 marks, +2 / −0.5 (part of a 60-minute, 100-question paper)"],
+ ["CGL Tier 2","Paper 1, Section I, Module I (Mathematical Abilities): 30 questions, +3 / −1"],
+ ["CHSL Tier 1","Quantitative Aptitude: 25 questions, +2 / −0.5 (basic arithmetic level)"],
+ ["Time target","Tier 1: about 40–45 seconds per maths question; Tier 2: about 1 minute"]
+];
+
+const STRATEGY = [
+ "First pass: do arithmetic, DI and value-putting algebra/trig questions — they are the fastest marks.",
+ "Second pass: geometry and mensuration with figures; skip any question that needs more than 90 seconds.",
+ "Use options: put values, check units digits, test divisibility and compare sizes before solving fully.",
+ "Mark-and-move: with −0.5 negative marking in Tier 1, guess only when you can eliminate two options.",
+ "Night before: read only the last-hour sheet and the traps — no new topics."
+];
+
+/* CGL shortcuts, extra concepts and traps — merged into each chapter below. */
+const MORE = {
+C1:{ tr:["×5 = ×10 ÷ 2; ×25 = ×100 ÷ 4; ×125 = ×1000 ÷ 8 → 48 × 125 = 48000 ÷ 8 = 6000.",
+  "11 × a two-digit number: put the digit sum in the middle → 11 × 43 = 4 | 7 | 3 = 473 (carry if the sum ≥ 10: 11 × 78 = 858).",
+  "Squares near 100: 97² = (97 − 3) | 3² = 9409; 104² = (104 + 4) | 4² = 10816.",
+  "Cube root of a perfect cube: last digit maps 2 ↔ 8, 3 ↔ 7 (others same); the rest from the leading part → ∛3375 = 15.",
+  "Check any multiplication with digit sums (casting out 9s): wrong options often fail it.",
+  "Factorials: 4! = 24, 5! = 120, 6! = 720, 7! = 5040."],
+  c:["The fraction ↔ percentage table drives percentage, profit–loss, interest and DI — learn it before anything else."] },
+C2:{ tr:["Only perfect squares have an odd number of factors — the fastest answer to ‘which has an odd number of divisors?’",
+  "Remainders add and multiply: if a ÷ d leaves r₁ and b ÷ d leaves r₂, then (a + b) leaves (r₁ + r₂) mod d and ab leaves r₁r₂ mod d.",
+  "Largest n-digit number divisible by k = 99…9 − (99…9 mod k); smallest = 10…0 + (k − 10…0 mod k).",
+  "Successive division (N ÷ a leaves r₁, quotient ÷ b leaves r₂): N = a(b·1 + r₂) + r₁ with the smallest quotient 1.",
+  "2ⁿ ÷ 3 leaves 1 if n is even, 2 if n is odd (2 ≡ −1 mod 3)."],
+  c:["Odd factors of N = factors of its odd part; even factors = total − odd.","Square of any odd number leaves remainder 1 when divided by 8.","Perfect squares end in 0, 1, 4, 5, 6 or 9 — never 2, 3, 7, 8."] },
+C3:{ tr:["HCF divides every difference: HCF(391, 437) = HCF(391, 46) = 23 — use differences to find HCF fast.",
+  "If one number is a factor of the other, HCF = smaller, LCM = larger.",
+  "Two numbers with HCF h and LCM l: product = hl; their ratio x : y must be co-prime with hxy = l."],
+  tp:["LCM equals the product only for co-prime numbers."] },
+C4:{ tr:["x = a + √b with a² − b = 1 → 1/x = a − √b and x + 1/x = 2a (x = 3 + 2√2 → 6; x = 2 + √3 → 4). Very common in CGL.",
+  "a² − b² for quick products: 87² − 13² = 100 × 74 = 7400; 49 × 51 = 50² − 1 = 2499.",
+  "(√5 + √3)/(√5 − √3) = (√5 + √3)²/2 = (8 + 2√15)/2 = 4 + √15.",
+  "Comparing a/(a + 1) type fractions: the one with the bigger numerator is bigger (closer to 1).",
+  "Long BODMAS with far-apart options: round to two significant figures and pick the nearest."],
+  c:["Surds can be compared by squaring both sides when both are positive."] },
+C5:{ tr:["Write percentage changes as fractions: +16.67 % = ×7/6, −12.5 % = ×7/8, +37.5 % = ×11/8.",
+  "Common successive changes: +10 %, +10 % = +21 %; +20 %, +20 % = +44 %; −10 %, −10 % = −19 %; +20 %, −20 % = −4 %.",
+  "Restore after a cut: salary cut by x % needs a rise of x/(100 − x) × 100 % (cut 20 % → rise 25 %).",
+  "If x % of A = y % of B, then A : B = y : x.",
+  "Population first rises a % then falls b %: net = a − b − ab/100 %."],
+  c:["Percentage points vs percent: 40 % → 50 % is 10 points but a 25 % rise."] },
+C6:{ tr:["Profit p % on SP = p/(100 − p) × 100 % on CP (20 % of SP = 25 % of CP).",
+  "Mark up x % and give x % discount → always a loss of x²/100 %.",
+  "Two items sold at the same SP: assume SP = LCM of (100 + gain) and (100 − loss) and add the CPs.",
+  "Dishonest dealer selling at a loss of l % with a false weight: overall factor = (1 − l/100) × true/false.",
+  "Chain the whole question in one line: CP × 6/5 (20 % profit) × 7/8 (12.5 % discount) …"],
+  tp:["When the question says ‘profit on selling price’, convert before using the profit % formula."] },
+C7:{ tr:["CI as % of P: 2 years = 2R + R²/100; 3 years = 3R + 3R²/100 + R³/10⁴ (10 % → 21 %, 33.1 %).",
+  "Rate as a fraction: 10 % = 1/10 → P : A after 2 years = 10² : 11² = 100 : 121.",
+  "Amount x after 2 years and y after 5 years (SI) → SI per year = (y − x)/3; P = x − 2 × that.",
+  "CI of year 2 − CI of year 1 = interest on year 1’s interest = CI(1) × R/100.",
+  "CI amounts in consecutive years A₁, A₂ → R = (A₂ − A₁)/A₁ × 100."],
+  c:["Simple interest grows linearly (AP); compound amount grows geometrically (GP)."] },
+C8:{ tr:["Ratio answers are multiples of the ratio sum — check options for divisibility before solving.",
+  "Salaries a : b rise by x % and y % → new ratio a(100 + x) : b(100 + y).",
+  "Ages a : b now and c : d after n years → (bk + n)/(ak + n) form; solve one equation for k.",
+  "Replace with ‘units’: incomes 3u and 4u — the unit cancels in most ratio questions."],
+  tp:["Mean proportional of a and b is √(ab), third proportional is b²/a — don’t swap."] },
+C9:{ tr:["Alligation works for any weighted average: two speeds, two interest rates, two classes’ marks.",
+  "Repeated removal: take out 1/4 three times → pure part left = (3/4)³ = 27/64.",
+  "Adding water to change a ratio: keep the milk constant and scale the ratio."],
+  c:["Mean price must lie between the cheaper and dearer prices — use it to reject options."] },
+C10:{ tr:["Wrong entry corrected: change in average = (correct − wrong)/n.",
+  "Batsman’s average rises by d after scoring x in the (n + 1)th innings: x = new average + n·d.",
+  "One of n members leaves and the average falls by d: that member’s value = old average + (n − 1)·d.",
+  "Ages: the average age of a group rises by 1 every year; a family of n has total age rising n per year."],
+  tp:["‘Rises by d’ with a NEW member uses (n + 1)·d; with a member REPLACED it uses n·d — read which one it is."] },
+C11:{ tr:["A + B in x days, B + C in y, C + A in z → all three together = 2xyz/(xy + yz + zx).",
+  "A (a days) and B (b days) start together; A leaves k days before the end → total time = b(a + k)/(a + b).",
+  "A is x % more efficient than B → time ratio A : B = 100 : (100 + x).",
+  "Men, women, children: convert everyone to one unit first (1 man = 2 women …).",
+  "Pipes with a leak: leak alone empties in (fill time × net time)/(net time − fill time)."],
+  c:["Work done = efficiency × time; with LCM as total work, efficiencies are whole numbers."] },
+C12:{ tr:["Speed reduced to a/b of usual, late by t → usual time = a·t/(b − a) (¾ speed, 20 min late → 60 min).",
+  "Upstream time = k × downstream time → boat : stream speed = (k + 1) : (k − 1).",
+  "Two people D apart walking towards each other meet after D/(x + y); a dog running between them covers speed × that time.",
+  "Train passes a man walking in the same direction: relative speed = train − man.",
+  "Police–thief: time to catch = gap ÷ (difference of speeds); distance run by police = police speed × that time."],
+  tp:["Mixing minutes and hours: convert times to hours when speed is in km/h."] },
+C13:{ tr:["Value putting: choose numbers that satisfy the condition — a + b + c = 0 → (1, 1, −2); x + 1/x = 2 → x = 1.",
+  "x² − kx + 1 = 0 → divide by x → x + 1/x = k.",
+  "x/(x² + 1) = 1/k → x + 1/x = k (flip both sides).",
+  "a + b = s, ab = p → a² + b² = s² − 2p; a³ + b³ = s³ − 3ps; (a − b)² = s² − 4p.",
+  "a/b + b/a = 2 → a = b.",
+  "Degree check: if options differ in degree, compare with the question’s degree and strike out."],
+  c:["An identity true for all values can be checked by putting any one value — options failing it are wrong."] },
+C14:{ tr:["Check for triplets before using Heron: sides 5, 12, 13 → right triangle, area 30.",
+  "Equilateral: area ≈ 0.433a²; from height h, area = h²/√3.",
+  "Right triangle: orthocentre = right-angle vertex; circumcentre = midpoint of the hypotenuse.",
+  "Angle bisector from A meets BC at D: BD = a·c/(b + c).",
+  "Inradius of a 3-4-5 triangle = (3 + 4 − 5)/2 = 1 — scale for multiples.",
+  "The three medians split a triangle into 6 triangles of equal area."],
+  c:["Exterior angle bisectors and interior bisectors are perpendicular.","Larger side faces the larger angle."] },
+C15:{ tr:["Interior : exterior = k : 1 → number of sides n = 2(k + 1) (150° interior → exterior 30° → 12 sides).",
+  "Rhombus with diagonals 16 and 12: half-diagonals 8 and 6 → side 10.",
+  "Regular hexagon = 6 equilateral triangles; its longest diagonal = 2 × side."],
+  tp:["A rhombus is a square only if its diagonals are equal."] },
+C16:{ tr:["Chord questions are triplets: radius 13, chord 24 → distance from centre 5.",
+  "Two parallel chords: same side → subtract distances; opposite sides → add.",
+  "Angle between two tangents = 180° − angle at the centre between the radii.",
+  "Cyclic quadrilateral: an exterior angle equals the interior opposite angle."],
+  c:["The perpendicular bisector of any chord passes through the centre."] },
+C17:{ tr:["x/a + y/b = 1 with the axes → triangle area = ab/2.",
+  "Line parallel to ax + by = c is ax + by = k; perpendicular is bx − ay = k.",
+  "Ratio in which a point divides a segment: use x-coordinates only → (x − x₁) : (x₂ − x).",
+  "Point on a line? Substitute it in the options — fastest check."] },
+C18:{ tr:["Square from its diagonal: area = d²/2.",
+  "Rectangle sides change by x % and y % → area changes x + y + xy/100 %.",
+  "For the same perimeter, the circle has the largest area.",
+  "Semicircle perimeter = (36/7)r with π = 22/7.",
+  "Square inscribed in a circle of radius r has area 2r²; circle inscribed in a square of side a has area πa²/4."],
+  tp:["Path area: subtract inner from outer — don’t multiply perimeter by width at the corners twice."] },
+C19:{ tr:["Cuboid: (l + b + h)² = diagonal² + TSA — gives the diagonal from sum of edges and TSA.",
+  "Cube from its diagonal d: side = d/√3.",
+  "Melting a sphere into a wire or cylinder: equate volumes; π cancels.",
+  "Volume ratios: cylinder or cone ∝ r²h; sphere ∝ r³ — use ratios directly without π.",
+  "Radius doubles → volume ×8, surface area ×4."],
+  c:["Hemisphere’s TSA = 3πr² (curved 2πr² + base πr²)."] },
+C20:{ tr:["sin θ + cosec θ = 2 → sin θ = 1, so sinⁿθ + cosecⁿθ = 2 for any n.",
+  "tan θ + cot θ = 2 → θ = 45°.",
+  "sin θ + sin²θ = 1 → cos²θ + cos⁴θ = 1 (since sin θ = cos²θ).",
+  "tan 1° · tan 2° · … · tan 89° = 1; cos 1° · … · cos 90° = 0.",
+  "sin²5° + sin²10° + … + sin²85°: pair complementary angles (each pair = 1) and count the pairs.",
+  "Maximum of sin θ cos θ = ½; of sin θ + cos θ = √2."],
+  c:["θ acute and sin θ = cos θ → θ = 45°."] },
+C21:{ tr:["Shadow grows by x when the sun’s altitude changes from 60° to 30° → height = (√3/2)x.",
+  "If the angle of elevation doubles as you walk d towards a tower, the distance walked equals your new line-of-sight distance to the top (isosceles triangle).",
+  "Two towers seen at 30° and 60° from the midpoint between them: heights ratio 1 : 3."],
+  tp:["Height above the observer’s eye: add the observer’s height at the end if asked for the tower’s total height."] },
+C22:{ tr:["Mean of an AP = its middle term = (first + last)/2.",
+  "Median of consecutive numbers = their mean.",
+  "All values equal → SD = 0."] },
+C23:{ tr:["Two dice: P(sum 7) = 1/6; P(doublet) = 1/6; P(sum ≥ 10) = 1/6.",
+  "Three coins: P(at least one head) = 7/8.",
+  "Cards: P(king or heart) = 4/52 + 13/52 − 1/52 = 16/52."] },
+C24:{ tr:["Compare ratios, not totals: the year with the highest growth % is not always the year with the highest increase.",
+  "Average of many values in a table: use a base value and add deviations.",
+  "Pie charts in degrees: 18° = 5 %, 36° = 10 %, 72° = 20 %, 90° = 25 %."],
+  c:["Answer only from the data given — never use outside knowledge in DI."] }
+};
+Object.keys(MORE).forEach(id => { const c = CH.find(x => x.id === id), m = MORE[id]; ["c","tr","tp"].forEach(k => { if (m[k]) c[k] = (c[k] || []).concat(m[k]); }); });
+
+const APP = { key:"maths_formula_book_v1" };
+const LESSONS = CH;   // the app's deep links (?lesson=C5) look for LESSONS + openLesson
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const plain = s => String(s).replace(/<[^>]+>/g, "");
+const CNUM = id => CH.findIndex(c => c.id === id) + 1;
+const C = id => CH.find(c => c.id === id);
+
+let S = { les:{} };
+try { const raw = localStorage.getItem(APP.key); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch(e) {}
+const save = () => { try { localStorage.setItem(APP.key, JSON.stringify(S)); } catch(e) {} };
+const isDone = id => !!(S.les[id] && S.les[id].done);
+
+function renderTop(){
+  const n = CH.filter(c => isDone(c.id)).length;
+  const stars = CH.reduce((a,c) => a + (c.f||[]).filter(r => r[3]).length, 0);
+  $("#topstat").innerHTML = `<b>${n}</b>/${CH.length} revised<br><b>${stars}</b> key formulas`;
+}
+
+let TAB = "book";
+function go(tab){
+  TAB = tab;
+  document.querySelectorAll(".nav button").forEach(b => b.setAttribute("aria-current", b.dataset.tab===tab ? "page" : "false"));
+  if (tab === "book") renderBook();
+  if (tab === "heat") renderHeat();
+  if (tab === "tricks") renderTricks();
+  if (tab === "sheet") renderSheet();
+  window.scrollTo(0,0);
+  try { history.replaceState(null, "", "#"+tab); } catch(e) {}
+}
+document.querySelectorAll(".nav button").forEach(b => b.addEventListener("click", () => go(b.dataset.tab)));
+
+const flames = h => `<span class="heatb" title="Exam frequency">${"🔥".repeat(h||1)}</span>`;
+
+/* ---------- chapter list + search ---------- */
+let Q = "";
+function renderBook(){
+  const done = CH.filter(c => isDone(c.id)).length;
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="hero">
+      <span class="eyebrow">SSC CGL Maths · Tier 1 & Tier 2</span>
+      <h1>Formula & concept book</h1>
+      <p>Every formula, key concept, trick and trap for SSC maths in ${CH.length} short chapters — made for the last week and the night before the exam. No questions here: open a chapter, read it top to bottom in five minutes, and mark it revised.</p>
+      <div class="meter" aria-label="Chapters revised"><i style="width:${done/CH.length*100}%"></i></div>
+      <div class="row between"><span class="muted num" style="font-size:13px">${done}/${CH.length} chapters revised</span>
+        <span class="row" style="gap:8px"><button class="btn sm" type="button" id="all">Full book</button>${done ? `<button class="btn sm ghost" type="button" id="reset">Start a new round</button>` : ""}</span></div>
+    </div>
+    <input class="search" id="fs" type="search" placeholder="Search any formula or concept (e.g. frustum, CI, median, tangent)" aria-label="Search formulas" value="${esc(Q)}">
+    <div id="res" class="stack"></div>
+  </section>`;
+  $("#fs").oninput = e => { Q = e.target.value; drawList(); };
+  $("#all").onclick = renderAll;
+  if ($("#reset")) $("#reset").onclick = () => { if (confirm("Clear every ‘revised’ tick and start a new revision round?")) { S.les = {}; save(); renderTop(); renderBook(); } };
+  drawList();
+}
+function drawList(){
+  const box = $("#res"), q = Q.trim().toLowerCase();
+  if (q) {
+    const hits = [];
+    CH.forEach(c => {
+      (c.f||[]).forEach(r => { if ((r[0]+" "+plain(r[1])+" "+(r[2]||"")+" "+c.t).toLowerCase().includes(q)) hits.push({c, h:`<div class="fcard"><span class="fn">${r[0]}</span><span class="fx">${r[1]}</span>${r[2]?`<span class="fnote">${r[2]}</span>`:""}</div>`}); });
+      (c.c||[]).concat(c.tr||[], c.tp||[]).forEach(t => { if (plain(t).toLowerCase().includes(q)) hits.push({c, h:`<div class="plain"><p>${t}</p></div>`}); });
+    });
+    box.innerHTML = hits.length ? `<p class="muted">${hits.length} match${hits.length>1?"es":""}</p>` + hits.slice(0,60).map(x => `<div class="block"><button type="button" class="back" data-open="${x.c.id}">Ch ${CNUM(x.c.id)} · ${esc(x.c.t)} ›</button>${x.h}</div>`).join("")
+      : `<p class="muted">No match. Try a shorter word (e.g. “cone”, “interest”, “tangent”).</p>`;
+  } else {
+    box.innerHTML = GROUPS.map(g => {
+      const list = CH.filter(c => c.g === g);
+      return `<div class="stack" style="gap:8px"><h2 class="grp">${g}</h2><div class="lessons">${list.map(c => `<button type="button" class="les ${isDone(c.id)?"done":""}" data-open="${c.id}">
+        <span class="no">${isDone(c.id) ? "✓" : CNUM(c.id)}</span>
+        <span class="t"><b>${esc(c.t)}${flames(c.heat)}</b><span>${c.hi} · Tier 1: ${c.t1} · Tier 2: ${c.t2}</span></span>
+        <span class="sc">${(c.f||[]).length ? (c.f||[]).length+"<br>formulas" : ""}</span></button>`).join("")}</div></div>`;
+    }).join("") + `<p class="foot">Question counts are approximate, estimated from recent SSC CGL papers (Tier 1: 25 maths questions; Tier 2 Module I: 30). 🔥🔥🔥 = asked in almost every shift.</p>`;
+  }
+  box.querySelectorAll("[data-open]").forEach(b => b.addEventListener("click", () => openLesson(b.dataset.open)));
+}
+
+/* ---------- one chapter ---------- */
+function chapterHTML(c, full){
+  const i = CNUM(c.id);
+  return `<article class="stack chap" id="ch-${c.id}">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Chapter ${i} of ${CH.length} · ${c.g}</span><h1>${esc(c.t)}</h1><span class="muted">${c.hi}</span></div>
+    <div class="hot"><span class="lab">🔥 Exam radar ${"🔥".repeat(c.heat)}</span><b>Tier 1:</b> ${c.t1} · <b>Tier 2:</b> ${c.t2} questions. ${c.ask}</div>
+    ${(c.f||[]).length ? `<div class="block"><h3>Formulas <span class="muted" style="font-weight:400;font-size:13px">★ = last-hour sheet</span></h3><div class="fgrid">${c.f.map(r=>`<div class="fcard${r[3]?" star":""}"><span class="fn">${r[3]?"★ ":""}${r[0]}</span><span class="fx">${r[1]}</span>${r[2]?`<span class="fnote">${r[2]}</span>`:""}</div>`).join("")}</div></div>` : ""}
+    ${(c.tb||[]).map(t => `<div class="block"><h3>${t.title}</h3><div class="tbl"><table><thead><tr>${t.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${t.rows.map(r=>`<tr>${r.map(v=>`<td>${v}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`).join("")}
+    ${(c.c||[]).length ? `<div class="block"><h3>Key concepts</h3><ul class="pts">${c.c.map(x=>`<li>${x}</li>`).join("")}</ul></div>` : ""}
+    ${(c.tr||[]).map(x => `<div class="trick"><span class="lab">Trick</span>${x}</div>`).join("")}
+    ${(c.tp||[]).map(x => `<div class="trap"><span class="lab">Trap · don’t fall for it</span>${x}</div>`).join("")}
+    ${full ? "" : `<div class="row between">
+      <button class="btn" type="button" data-nav="${i-2}" ${i===1?"disabled":""}>‹ Previous</button>
+      <button class="btn ${isDone(c.id)?"":"pri"}" type="button" id="mark">${isDone(c.id) ? "✓ Revised" : "Mark as revised"}</button>
+      <button class="btn" type="button" data-nav="${i}" ${i===CH.length?"disabled":""}>Next ›</button></div>`}
+  </article>`;
+}
+function openLesson(id){
+  const c = C(id); if (!c) return;
+  TAB = "book";
+  document.querySelectorAll(".nav button").forEach(b => b.setAttribute("aria-current", b.dataset.tab==="book" ? "page" : "false"));
+  $("#app").innerHTML = `<section class="view stack"><button type="button" class="back" id="bk">‹ All chapters</button>${chapterHTML(c)}</section>`;
+  $("#bk").onclick = () => go("book");
+  $("#mark").onclick = () => { S.les[c.id] = isDone(c.id) ? {done:0} : {done:1, at:Date.now()}; if (!S.les[c.id].done) delete S.les[c.id]; save(); renderTop(); openLesson(c.id); };
+  $("#app").querySelectorAll("[data-nav]").forEach(b => b.onclick = () => openLesson(CH[+b.dataset.nav].id));
+  window.scrollTo(0,0);
+}
+function renderAll(){
+  $("#app").innerHTML = `<section class="view stack"><div class="row between"><button type="button" class="back" id="bk">‹ All chapters</button><button class="btn sm" type="button" id="pr">Print / save PDF</button></div>
+    <div class="hero"><span class="eyebrow">Full book</span><h1>SSC Maths formula book</h1><p>All ${CH.length} chapters on one page. Use your browser’s print to keep a PDF copy.</p></div>
+    ${CH.map(c => chapterHTML(c, true)).join('<hr class="sep">')}</section>`;
+  $("#bk").onclick = () => go("book");
+  $("#pr").onclick = () => window.print();
+  window.scrollTo(0,0);
+}
+
+/* ---------- heat map ---------- */
+const mid = s => { const m = String(s).match(/\d+/g); return m ? m.map(Number).reduce((a,b)=>a+b,0)/m.length : 0; };
+function renderHeat(){
+  const rows = CH.filter(c => c.g !== "Foundation").map(c => ({c, a:mid(c.t1), b:mid(c.t2)}));
+  const max = Math.max(...rows.map(r => Math.max(r.a, r.b)));
+  const byGroup = GROUPS.filter(g => g !== "Foundation").map(g => { const l = rows.filter(r => r.c.g === g); return [g, l.reduce((s,r)=>s+r.a,0), l.reduce((s,r)=>s+r.b,0)]; });
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Where the marks are</span><h1>Exam heat map</h1></div>
+    <div class="block"><h3>Exam pattern</h3><dl class="facts">${PATTERN.map(p=>`<div><dt>${p[0]}</dt><dd>${p[1]}</dd></div>`).join("")}</dl></div>
+    <div class="block"><h3>By section (approximate questions)</h3><div class="tbl"><table><thead><tr><th>Section</th><th>Tier 1 (of 25)</th><th>Tier 2 (of 30)</th></tr></thead><tbody>${byGroup.map(g=>`<tr><td><b>${g[0]}</b></td><td class="n">≈ ${Math.round(g[1])}</td><td class="n">≈ ${Math.round(g[2])}</td></tr>`).join("")}</tbody></table></div></div>
+    <div class="block"><h3>By chapter <span class="muted" style="font-weight:400;font-size:13px">bar = Tier 1 · light bar = Tier 2</span></h3><div class="heat">${rows.map(r=>`<button type="button" class="hrow h2" data-open="${r.c.id}"><span class="ht"><b>${esc(r.c.t)} ${"🔥".repeat(r.c.heat)}</b><span class="muted">T1 ${r.c.t1} · T2 ${r.c.t2}</span></span><span class="hbar two"><i style="width:${r.a/max*100}%"></i><i class="t2" style="width:${r.b/max*100}%"></i></span></button>`).join("")}</div></div>
+    <div class="block"><h3>Revise in this order</h3><dl class="rk">${[3,2,1].map(n=>`<div><dt>${"🔥".repeat(n)} ${n===3?"Every shift":n===2?"Most shifts":"Some shifts"}</dt><dd>${CH.filter(c=>c.heat===n).map(c=>esc(c.t)).join(" · ")}</dd></div>`).join("")}</dl></div>
+    <div class="block"><h3>Exam-hall strategy</h3><ul class="pts">${STRATEGY.map(s=>`<li>${s}</li>`).join("")}</ul></div>
+    <p class="foot">Counts are approximate, estimated from recent SSC CGL Tier 1 and Tier 2 papers; they vary from shift to shift.</p>
+  </section>`;
+  $("#app").querySelectorAll("[data-open]").forEach(b => b.addEventListener("click", () => openLesson(b.dataset.open)));
+}
+
+/* ---------- tricks & traps ---------- */
+let TT = "trick";
+function renderTricks(){
+  const items = CH.flatMap(c => (TT==="trick" ? c.tr : c.tp || []).map(h => ({c, h})));
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Speed and accuracy</span><h1>Tricks & traps</h1></div>
+    <div class="seg" role="tablist"><button type="button" role="tab" data-tt="trick" aria-selected="${TT==="trick"}">Tricks (${CH.reduce((a,c)=>a+(c.tr||[]).length,0)})</button><button type="button" role="tab" data-tt="trap" aria-selected="${TT==="trap"}">Traps (${CH.reduce((a,c)=>a+(c.tp||[]).length,0)})</button></div>
+    ${items.map(x => `<div class="${TT}"><span class="lab">${esc(x.c.t)}</span>${x.h}</div>`).join("")}
+  </section>`;
+  $("#app").querySelectorAll("[data-tt]").forEach(b => b.onclick = () => { TT = b.dataset.tt; renderTricks(); });
+}
+
+/* ---------- last-hour sheet ---------- */
+function renderSheet(){
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="row between"><div class="stack" style="gap:6px"><span class="eyebrow">Night before the exam</span><h1>Last-hour sheet</h1></div><button class="btn sm" type="button" id="pr">Print</button></div>
+    <p class="muted">Only the ★ formulas from every chapter, one line each. If you can say each one without looking, you are ready.</p>
+    ${CH.filter(c => (c.f||[]).some(r=>r[3])).map(c => `<div class="block"><h3><button type="button" class="linkbtn" data-open="${c.id}">${esc(c.t)} ›</button></h3><dl class="sheet">${c.f.filter(r=>r[3]).map(r=>`<div><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join("")}</dl></div>`).join("")}
+    <div class="block"><h3>Must-know values</h3><p class="muted">Squares to 30, cubes to 20, fractions as percentages, √2 = 1.414, √3 = 1.732, √5 = 2.236 and the triplets 3-4-5, 5-12-13, 7-24-25, 8-15-17 — see chapter 1.</p></div>
+  </section>`;
+  $("#pr").onclick = () => window.print();
+  $("#app").querySelectorAll("[data-open]").forEach(b => b.addEventListener("click", () => openLesson(b.dataset.open)));
+}
+
+/* boot */
+renderTop();
+const start = (location.hash||"").replace("#","");
+go(["book","heat","tricks","sheet"].includes(start) ? start : "book");
+</script>
+
+
+<style id="shabd-skin">
+/* ===== शब्दRegister skin: app colours + fonts (only when opened from the app) ===== */
+:root[data-skin="paper"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(150,128,90,.10) 31px, rgba(150,128,90,.10) 32px);--app-psize:auto;--app-card:#FFFCF6;--app-rule:#DCCFB2;--app-pri:#2F6F63;--app-ink:#221E17;--app-soft:#5E5547;--app-faint:#857B6A;--app-bg:#F3EEE3;--app-deep:#E9E1CF;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#F3EEE3;--sheet:#FFFCF6;--sunk:#E9E1CF;--ink:#221E17;--ink2:#5E5547;--rule:#DCCFB2;--blue:#2F6F63;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--accent:#A87E1F;--accent-bg:color-mix(in srgb, #A87E1F 16%, #FFFCF6);--good:#2F6F63;--good-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--bad:#8C2F39;--bad-bg:color-mix(in srgb, #8C2F39 14%, #FFFCF6);--warn-bg:color-mix(in srgb, #C99A2E 18%, #FFFCF6);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="paper"][data-theme="dark"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--sheet:#26211A;--sunk:#25201A;--ink:#EFE6D2;--ink2:#BDB195;--rule:#3B3429;--blue:#3F9A86;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3F9A86 22%, #26211A);--accent:#D9AE4B;--accent-bg:color-mix(in srgb, #D9AE4B 24%, #26211A);--good:#5FB9A3;--good-bg:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-bg:color-mix(in srgb, #D06B74 22%, #26211A);--warn-bg:color-mix(in srgb, #D9AE4B 26%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="paper"]:not([data-theme="light"]){--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--sheet:#26211A;--sunk:#25201A;--ink:#EFE6D2;--ink2:#BDB195;--rule:#3B3429;--blue:#3F9A86;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3F9A86 22%, #26211A);--accent:#D9AE4B;--accent-bg:color-mix(in srgb, #D9AE4B 24%, #26211A);--good:#5FB9A3;--good-bg:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-bg:color-mix(in srgb, #D06B74 22%, #26211A);--warn-bg:color-mix(in srgb, #D9AE4B 26%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin="indigo"]{--app-pattern:radial-gradient(rgba(61,92,240,.10) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#FFFFFF;--app-rule:#CBD3EC;--app-pri:#3D5CF0;--app-ink:#0F1B3D;--app-soft:#4A5680;--app-faint:#67739C;--app-bg:#EEF1FA;--app-deep:#E1E6F5;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#EEF1FA;--sheet:#FFFFFF;--sunk:#E1E6F5;--ink:#0F1B3D;--ink2:#4A5680;--rule:#CBD3EC;--blue:#3D5CF0;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3D5CF0 14%, #FFFFFF);--accent:#D9831A;--accent-bg:color-mix(in srgb, #D9831A 16%, #FFFFFF);--good:#147D53;--good-bg:color-mix(in srgb, #147D53 14%, #FFFFFF);--bad:#C8402F;--bad-bg:color-mix(in srgb, #C8402F 14%, #FFFFFF);--warn-bg:color-mix(in srgb, #F7C548 18%, #FFFFFF);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="indigo"][data-theme="dark"]{--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--sheet:#121D47;--sunk:#0E1839;--ink:#EEF2FF;--ink2:#A7B3DA;--rule:#22306A;--blue:#6F86FF;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #6F86FF 22%, #121D47);--accent:#F7B24D;--accent-bg:color-mix(in srgb, #F7B24D 24%, #121D47);--good:#45C08A;--good-bg:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-bg:color-mix(in srgb, #F07B6E 22%, #121D47);--warn-bg:color-mix(in srgb, #F7C548 26%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="indigo"]:not([data-theme="light"]){--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--sheet:#121D47;--sunk:#0E1839;--ink:#EEF2FF;--ink2:#A7B3DA;--rule:#22306A;--blue:#6F86FF;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #6F86FF 22%, #121D47);--accent:#F7B24D;--accent-bg:color-mix(in srgb, #F7B24D 24%, #121D47);--good:#45C08A;--good-bg:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-bg:color-mix(in srgb, #F07B6E 22%, #121D47);--warn-bg:color-mix(in srgb, #F7C548 26%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin] body{background-color:var(--app-bg);background-image:var(--app-pattern);background-size:var(--app-psize);background-attachment:fixed}
+:root[data-skin] h1,:root[data-skin] h2{letter-spacing:-.01em}
+
+/* ===== Desktop layout (PC / tablet landscape) ===== */
+@media (min-width: 1024px){
+  :root{--side:236px}
+  body{padding-left:var(--side);font-size:16.5px}
+  .top{border-bottom:1px solid var(--rule)}
+  .top-in{max-width:1320px;padding:16px 36px}
+  .brand{font-size:21px}
+  .brand small{font-size:13px}
+  .stat{font-size:13px}
+  .wrap{max-width:1320px;padding:0 36px 56px}
+  .view{padding-top:28px}
+  h1{font-size:34px} h2{font-size:22px} h3{font-size:17px}
+
+  /* bottom tab bar becomes a left sidebar */
+  .nav{top:0;bottom:0;left:0;right:auto;width:var(--side);height:auto;border-top:0;border-right:1px solid var(--rule);padding:84px 14px 20px;display:block;overflow:auto}
+  .nav-in{display:flex;flex-direction:column;gap:4px;height:auto;max-width:none;margin:0}
+  .nav-in::before{content:"Sections";display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);padding:0 14px 8px}
+  .nav button{flex-direction:row;justify-content:flex-start;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;font-size:15px;min-height:0;height:auto;width:100%;text-align:left}
+  .nav button svg{width:20px;height:20px;flex-shrink:0}
+  .nav button:hover{background:var(--sunk)}
+  .nav button[aria-current="page"]{background:var(--blue-bg)}
+  .nav button[aria-current="page"] span{border-bottom:0!important}
+
+  /* home: intro beside progress, lessons as a card grid */
+  .hero{grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);column-gap:48px;align-items:end;padding-bottom:10px}
+  .hero > .eyebrow,.hero > h1,.hero > p{grid-column:1}
+  .hero > .meter{grid-column:2;grid-row:3;align-self:center}
+  .hero > .row{grid-column:2;grid-row:2;align-self:end}
+  .lessons{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;border-top:0}
+  .les{background:var(--sheet);border:1px solid var(--rule);border-radius:16px;padding:16px 18px;transition:transform .15s ease,box-shadow .15s ease,border-color .15s}
+  .les:hover{transform:translateY(-2px);border-color:var(--blue);box-shadow:0 14px 30px -22px rgba(0,0,0,.45)}
+  .les.next{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
+
+  /* lesson reader: facts, timelines, tricks sit side by side */
+  .lhead{margin-bottom:0}
+  .steps{max-width:640px}
+  .steps + .stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+  .steps + .stack > .plain,.steps + .stack > .row,.steps + .stack > p,.steps + .stack > .fig,.steps + .stack > h2,.steps + .stack > .tbl{grid-column:1/-1}
+  .steps + .stack > .plain{max-width:86ch;font-size:17px}
+  .steps + .stack:not(:has(> .block ~ .block)) > .block{grid-column:1/-1}
+  .block,.qcard{padding:18px 20px;border-radius:14px}
+
+  /* quizzes and question bank */
+  #lq > .stack{display:grid;grid-template-columns:minmax(0,1fr);max-width:980px;gap:16px}
+  .opts{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .qt{font-size:18px}
+  #plist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #plist .opts{grid-template-columns:minmax(0,1fr)}
+  .chips{flex-wrap:wrap;overflow:visible}
+
+  /* mock test: question with the answer grid alongside */
+  .mbar{top:calc(env(safe-area-inset-top,0px) + 67px)}
+  .view > .qcard{max-width:1000px}
+  .view > .row.between{max-width:1000px}
+  .view > #msub{max-width:1000px;width:100%}
+  .view > .block.stack{max-width:760px}
+  .pal{grid-template-columns:repeat(auto-fill,minmax(46px,1fr))}
+  .kpis{max-width:760px}
+
+  /* revise: cards in columns */
+  #rkl,#rv > .stack:not(#rkl){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #rv > .search{max-width:520px}
+  .tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .flash{min-height:300px;max-width:760px;margin:0 auto;padding:32px 36px}
+  .flash .front{font-size:22px}
+}
+@media (min-width: 1500px){
+  #plist,#rkl{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+</style>
+<script id="shabd-deeplink">
+(function(){
+  var l; try{ l = new URLSearchParams(location.search).get('lesson'); }catch(e){}
+  if(!l) return;
+  function run(){
+    try{
+      if(typeof openLesson === 'function' && typeof LESSONS !== 'undefined'){ if(LESSONS.some(function(x){ return x.id === l; })) openLesson(l, 'learn'); }
+      else if(typeof openRule === 'function'){ var n = parseInt(String(l).replace(/\D/g, ''), 10); if(n) openRule(n, 'learn'); }
+      else if(typeof COURSE !== 'undefined' && typeof go === 'function'){ var i = COURSE.findIndex(function(c){ return c.id === l; }); if(i >= 0) go({ name: 'lesson', i: i, step: 0, ans: {}, score: 0 }); }
+    }catch(e){}
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(run, 30); }); else setTimeout(run, 30);
+})();
+</script>
+</body></html>
