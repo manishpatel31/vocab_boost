@@ -117,7 +117,7 @@
     display:grid; grid-template-rows:auto minmax(0, 1fr) auto; gap:clamp(14px, 2.4vh, 30px); }
 
   /* masthead: clock · countdown · streak & goal · buttons */
-  .mast{ display:grid; grid-template-columns:auto auto minmax(0, 1fr) auto; align-items:end; gap:clamp(18px, 2.6vw, 52px); padding-bottom:clamp(10px, 1.6vh, 18px); border-bottom:1px solid var(--line); }
+  .mast{ display:grid; grid-template-columns:auto auto minmax(0, 1fr); align-items:end; gap:clamp(18px, 2.6vw, 52px); padding-bottom:clamp(10px, 1.6vh, 18px); border-bottom:1px solid var(--line); }
   .clock .time{ font-family:var(--display); font-weight:400; font-size:clamp(46px, 5.4vw, 108px); line-height:.86; letter-spacing:-.035em; font-variant-numeric:tabular-nums; }
   .clock .time small{ font-family:var(--body); font-size:.22em; font-weight:600; letter-spacing:.08em; margin-left:.3em; color:var(--faint); vertical-align:top; }
   .clock .date{ margin-top:10px; font-size:clamp(12px, .78vw, 15px); font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--faint); }
@@ -134,7 +134,9 @@
   .segs i{ flex:1; border-radius:3px; background:color-mix(in srgb, var(--ink) 12%, transparent); }
   .segs i.on{ background:var(--gold); }
   .segs.met i.on{ background:var(--accent); }
-  .topbar{ display:flex; gap:8px; justify-content:flex-end; align-self:start; white-space:nowrap; }
+  .topbar{ display:flex; gap:6px; white-space:nowrap; }
+  .topbar button{ flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; }
+  .topbar button.primary{ flex:2 1 auto; }
   .topbar button{ border:1px solid var(--line); background:var(--card); backdrop-filter:blur(12px); border-radius:999px; padding:9px 15px; font-size:13px; font-weight:600; transition:transform .15s ease, border-color .2s ease; }
   .topbar button:hover{ transform:translateY(-1px); border-color:var(--ink); }
   .topbar button.primary{ background:var(--chip-on); color:var(--chip-on-fg); border-color:var(--chip-on); }
@@ -184,26 +186,23 @@
   .rail > section{ min-width:0; }
   .rail h4{ margin:0 0 10px; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint); font-weight:700; display:flex; justify-content:space-between; }
   .rail h4 span{ white-space:nowrap; } .rail h4 span + span{ min-width:0; overflow:hidden; text-overflow:ellipsis; margin-left:12px; }
-  .queue{ position:relative; display:grid; grid-template-columns:minmax(0, 1fr); gap:7px; }
-  .qi{ display:flex; align-items:center; gap:10px; width:100%; min-width:0; text-align:left; border:1px solid var(--line); background:var(--card); backdrop-filter:blur(10px); border-radius:14px; padding:10px 14px; transition:transform .2s ease, border-color .2s ease; }
-  .qi:hover{ transform:translateX(-4px); border-color:var(--ink); }
-  .qi:nth-child(1){ transform:rotate(-.6deg); } .qi:nth-child(2){ transform:rotate(.5deg); opacity:.88; } .qi:nth-child(3){ transform:rotate(-.3deg); opacity:.72; } .qi:nth-child(4){ opacity:.56; }
-  .qi:hover{ opacity:1; }
-  .qi .t{ flex:1; min-width:0; font-family:var(--display); font-weight:600; font-size:clamp(15px, 1.08vw, 20px); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .qi .t.q{ font-family:var(--body); font-weight:500; font-size:clamp(13px, .86vw, 15px); }
-  .qi .n{ font-size:11px; color:var(--faint); font-variant-numeric:tabular-nums; }
   .dot{ width:9px; height:9px; border-radius:50%; flex-shrink:0; background:var(--faint); }
-  .fact{ flex:0 1 auto; min-height:0; overflow:hidden; border:1px solid var(--line); background:var(--card); backdrop-filter:blur(12px); border-radius:20px; padding:16px 18px; display:flex; flex-direction:column; gap:10px; }
-  .fact .fq{ font-family:var(--display); font-weight:600; font-size:clamp(15px, 1.1vw, 21px); line-height:1.3; overflow:hidden; display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; }
-  .fact .fa{ font-weight:700; color:var(--accent); font-size:clamp(14px, .98vw, 18px); filter:blur(7px); opacity:.5; transition:filter .4s ease, opacity .4s ease; }
-  .fact .fe{ font-size:clamp(12.5px, .82vw, 14.5px); color:var(--soft); line-height:1.45; filter:blur(7px); opacity:.4; transition:filter .4s ease, opacity .4s ease; overflow:hidden; display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; }
-  .fact:hover .fa, .fact:hover .fe{ filter:none; opacity:1; }
+  .fact{ flex:1 1 auto; min-height:0; overflow:hidden; border:1px solid var(--line); background:var(--card); backdrop-filter:blur(12px); border-radius:20px; padding:16px 18px; display:flex; flex-direction:column; gap:10px; }
+  .fact .fq{ font-family:var(--display); font-weight:600; font-size:calc(var(--fk, 1) * clamp(16px, 1.2vw, 23px)); line-height:1.32; overflow-wrap:anywhere; }
+  .fact .fa{ font-weight:700; color:var(--accent); font-size:calc(var(--fk, 1) * clamp(15px, 1.05vw, 19px)); overflow-wrap:anywhere; filter:blur(7px); opacity:.5; transition:filter .4s ease, opacity .4s ease; }
+  .fact .fe{ font-size:calc(var(--fk, 1) * clamp(12.5px, .86vw, 15px)); color:var(--soft); line-height:1.45; filter:blur(7px); opacity:.4; transition:filter .4s ease, opacity .4s ease; overflow-wrap:anywhere; }
+  .fact:hover .fa, .fact:hover .fe, .fact.open .fa, .fact.open .fe{ filter:none; opacity:1; }
+  .fact .fbody{ flex:1 1 auto; min-height:0; overflow:hidden; display:flex; flex-direction:column; gap:10px; }
+  .fact .fbtns{ display:flex; gap:8px; align-items:center; }
+  .fact .fbtns button{ border:1px solid var(--line); background:var(--chip); border-radius:999px; padding:6px 13px; font-size:12.5px; font-weight:600; }
+  .fact .fbtns button:hover{ border-color:var(--ink); }
+  .fact .fbtns .fh{ margin-left:auto; text-align:right; }
   .fact .fh{ font-size:11.5px; color:var(--faint); }
   .rail > section:last-child{ margin-top:auto; }
   .stats{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; }
   .stat{ min-width:0; border:1px solid var(--line); background:var(--card); backdrop-filter:blur(10px); border-radius:14px; padding:10px 12px; }
   .stat b{ display:block; font-family:var(--display); font-weight:600; font-size:clamp(20px, 1.6vw, 30px); line-height:1; font-variant-numeric:tabular-nums; }
-  .stat span{ display:block; margin-top:5px; font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--faint); font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .stat span{ display:block; margin-top:5px; font-size:12px; letter-spacing:.02em; color:var(--faint); font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .stat.due b{ color:var(--gold); } .stat.mem b{ color:var(--accent); }
   .deckline{ font-size:12px; color:var(--faint); line-height:1.5; }
   .sync{ display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--accent); margin-right:6px; vertical-align:1px; }
@@ -256,11 +255,11 @@
 
   /* ---------- smaller screens (1366 × 768 and below) ---------- */
   @media (max-width:1500px), (max-height:820px){
-    .mast{ grid-template-columns:auto auto minmax(0, 1fr) auto; }
     .lv button{ width:34px; height:34px; font-size:13.5px; }
+    .stat{ padding:9px 9px; } .stat span{ font-size:11px; letter-spacing:0; }
     .nav{ width:38px; height:38px; }
   }
-  @media (max-height:820px){ .queue .qi:nth-child(n+4){ display:none; } }
+  @media (max-width:1760px){ .topbar button{ padding:8px 10px; font-size:12.5px; } .topbar .lbl{ display:none; } .topbar button:not(.primary){ flex:0 0 auto; min-width:44px; } }
   @media (max-width:1180px){ .cols{ grid-template-columns:1fr; } .mid{ grid-template-columns:minmax(0, 1fr); } .rail{ display:none; } .tminus{ display:none; } }
 </style>
 </head>
@@ -275,7 +274,6 @@
     <div class="clock"><div class="time" id="clock"></div><div class="date" id="date"></div><div class="greet" id="greet"></div></div>
     <div class="tminus" id="tminus"></div>
     <div class="goal" id="goal"></div>
-    <div class="topbar" id="topbar"></div>
   </header>
 
   <div class="mid">
@@ -284,7 +282,7 @@
       <div class="word" id="word"></div>
     </main>
     <aside class="rail">
-      <section><h4><span>On deck</span><span id="qn"></span></h4><div class="queue" id="queue"></div></section>
+      <section class="topbar" id="topbar"></section>
       <section class="fact" id="fact"></section>
       <section><div class="stats" id="card"></div></section>
     </aside>
@@ -559,12 +557,12 @@
     clearTimeout(revealTimer);
     if(!words.length){
       box.innerHTML = '<div class="empty"><h1>Loading your register…</h1>If this stays, check the internet connection.</div>';
-      $('controls').style.display = 'none'; $('ghost').textContent = ''; $('queue').innerHTML = '';
+      $('controls').style.display = 'none'; $('ghost').textContent = '';
       return;
     }
     if(!deck.length){
       box.innerHTML = '<div class="empty"><h1>No words in this set</h1>' + (cfg.mode === 'due' ? 'Nothing is due for revision right now. 🎉 ' : '') + 'Click <b>Change set</b> at the top right and pick different tags or levels.</div>';
-      $('controls').style.display = 'none'; $('ghost').textContent = ''; $('queue').innerHTML = '';
+      $('controls').style.display = 'none'; $('ghost').textContent = '';
       return;
     }
     if(deck[idx] && deck[idx].gs){ renderGs(deck[idx], anim); return; }
@@ -601,7 +599,7 @@
     renderControls(w, st);
     $('count').textContent = (idx + 1) + ' / ' + deck.length;
     $('controls').style.display = 'flex';
-    renderQueue(); renderStrip();
+    renderStrip();
     fit();
     restartAuto();
   }
@@ -633,7 +631,7 @@
     }); });
     $('count').textContent = (idx + 1) + ' / ' + deck.length;
     $('controls').style.display = 'flex';
-    renderQueue(); renderStrip();
+    renderStrip();
     fit();
     restartAuto();
   }
@@ -764,33 +762,14 @@
       (code ? '<div class="stat due"><b>' + st.due + '</b><span>Due</span></div><div class="stat mem"><b>' + st.mastered + '</b><span>Mastered</span></div>' : '') +
       '<div class="stat"' + (code ? '' : ' style="grid-column:1 / -1"') + '><b>' + deck.length + '</b><span>In set</span></div>' +
       '<div class="deckline" style="grid-column:1 / -1">' + esc(deckLabel()) + '<br>' + syncTxt + '</div>';
-    $('topbar').innerHTML = (code && st.due ? '<button class="due" id="dueBtn">🔁 Revise ' + st.due + '</button>' : '') +
-      '<button id="shufBtn">Shuffle</button><button class="primary" id="setBtn">⚙ Change set</button>';
+    $('topbar').innerHTML = (code && st.due ? '<button class="due" id="dueBtn" title="Revise the ' + st.due + ' due words">🔁<span class="lbl"> Revise</span> ' + st.due + '</button>' : '') +
+      '<button id="shufBtn" title="Shuffle this set">⤮<span class="lbl"> Shuffle</span></button><button class="primary" id="setBtn">⚙ Change set</button>';
     $('setBtn').addEventListener('click', openSetup);
     var db = $('dueBtn');
     if(db) db.addEventListener('click', function(){ cfg.mode = 'due'; cfg.tags = []; cfg.types = []; lsSet('vw_cfg', cfg); startDeck(); render(); renderCard(); });
     var sb = $('shufBtn');
     if(sb) sb.addEventListener('click', function(){ shuffle(deck); idx = 0; saveSession(); render(); say('Shuffled.'); });
-    renderQueue(); renderStrip(); tickClock();
-  }
-
-  // ---------- on deck: the next few cards, click to jump ----------
-  function lvColor(item, st){
-    if(!item || item.gs || !code || !item.id) return 'var(--faint)';
-    return 'var(--lv' + Math.max(0, Math.min(5, st.level(item.id))) + ')';
-  }
-  function renderQueue(){
-    var box = $('queue');
-    if(!deck.length){ box.innerHTML = ''; $('qn').textContent = ''; return; }
-    var st = state(), n = Math.min(4, deck.length - 1), h = '';
-    for(var i = 1; i <= n; i++){
-      var j = (idx + i) % deck.length, it = deck[j];
-      h += '<button class="qi" data-j="' + j + '"><span class="dot" style="background:' + lvColor(it, st) + '"></span>' +
-        (it.gs ? '<span class="t q">' + esc(it.q) + '</span>' : '<span class="t">' + esc(it.term) + '</span>') + '<span class="n">' + (j + 1) + '</span></button>';
-    }
-    box.innerHTML = h || '<div class="deckline">Only one card in this set.</div>';
-    $('qn').textContent = deck.length > 1 ? (deck.length - idx - 1) + ' left' : '';
-    box.querySelectorAll('[data-j]').forEach(function(b){ b.addEventListener('click', function(){ idx = +b.dataset.j; saveSession(); render(); }); });
+    renderStrip(); tickClock();
   }
 
   // ---------- deck heat strip: every card coloured by level ----------
@@ -813,25 +792,39 @@
     box.querySelectorAll('[data-k]').forEach(function(i){ i.addEventListener('click', function(){ idx = +i.dataset.k; saveSession(); render(); }); });
   }
 
-  // ---------- flash fact: the other kind of card, answer shows on hover ----------
+  // ---------- flash fact: the other kind of card; answer on hover or 'Show answer' ----------
   var factTimer = null;
   function renderFact(){
-    var box = $('fact');
-    var pool, item;
+    var box = $('fact'), pool, item;
     if(cfg.src === 'gs'){ pool = words; item = pool.length ? pool[Math.floor(Math.random() * pool.length)] : null; }
     else { pool = gsCards.filter(function(x){ return gsMatches(x, cfg) && !gsSkip(x); }); if(!pool.length) pool = gsCards; item = pool.length ? pool[Math.floor(Math.random() * pool.length)] : null; }
+    box.classList.remove('open');
     if(!item){ box.innerHTML = '<h4><span>Flash fact</span></h4><div class="deckline">Facts load from study-bank.json when the site is reachable.</div>'; return; }
+    var head, body;
     if(item.gs){
-      box.innerHTML = '<h4><span>Flash fact</span><span>' + esc(item.app) + '</span></h4><div class="fq">' + esc(item.q) + '</div>' +
-        '<div class="fa">✓ ' + esc(item.ans) + '</div>' + (item.e && item.e.replace(/[\s.]/g, '').length > 6 ? '<div class="fe">' + esc(item.e) + '</div>' : '') +
-        '<div class="fh">Recall it, then hover to check · new fact every minute</div>';
+      head = '<h4><span>Flash fact</span><span>' + esc(item.app) + '</span></h4>';
+      body = '<div class="fq">' + esc(item.q) + '</div><div class="fa">✓ ' + esc(item.ans) + '</div>' + (item.e && item.e.replace(/[\s.]/g, '').length > 6 ? '<div class="fe">' + esc(item.e) + '</div>' : '');
     } else {
-      box.innerHTML = '<h4><span>Word of the moment</span><span>' + esc(TYPES[item.type] || '') + '</span></h4><div class="fq">' + esc(item.term) + '</div>' +
-        '<div class="fa">' + esc(item.meaning) + '</div>' + (item.syn ? '<div class="fe">Synonyms: ' + esc(item.syn) + '</div>' : '') +
-        '<div class="fh">Recall the meaning, then hover to check</div>';
+      head = '<h4><span>Word of the moment</span><span>' + esc(TYPES[item.type] || '') + '</span></h4>';
+      body = '<div class="fq">' + esc(item.term) + '</div><div class="fa">' + esc(item.meaning) + '</div>' + (item.syn ? '<div class="fe">Synonyms: ' + esc(item.syn) + '</div>' : '');
     }
+    box.innerHTML = head + '<div class="fbody" id="fbody">' + body + '</div>' +
+      '<div class="fbtns"><button id="fShow">Show answer</button><button id="fNext">Next ›</button><span class="fh deckline">or hover to check</span></div>';
+    $('fShow').addEventListener('click', function(){ box.classList.toggle('open'); $('fShow').textContent = box.classList.contains('open') ? 'Hide' : 'Show answer'; });
+    $('fNext').addEventListener('click', function(){ startFacts(); });
+    fitFact();
   }
-  function startFacts(){ clearInterval(factTimer); renderFact(); factTimer = setInterval(function(){ if(!document.hidden) renderFact(); }, 60000); }
+  /** Shrinks the fact text until the question, answer and explanation all fit; drops the explanation last. */
+  function fitFact(){
+    var b = $('fbody'); if(!b) return;
+    var k = 1, box = $('fact'), fe = b.querySelector('.fe');
+    box.style.setProperty('--fk', k); if(fe) fe.style.display = '';
+    function over(){ return b.scrollHeight > b.clientHeight + 1; }
+    while(over() && k > 0.72){ k -= 0.04; box.style.setProperty('--fk', k); }
+    if(over() && fe) fe.style.display = 'none';
+  }
+  window.addEventListener('resize', fitFact);
+  function startFacts(){ clearInterval(factTimer); renderFact(); factTimer = setInterval(function(){ if(!document.hidden && !$('fact').matches(':hover')) renderFact(); }, 60000); }
 
   // ---------- clock, greeting and the live sky ----------
   var DARK = { paperdark: 1, indigodark: 1, black: 1, 'sky-dusk': 1, 'sky-night': 1 };
@@ -965,7 +958,9 @@
     function size(){ cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; }
     size();
     window.onresize = size;
-    var pool = (deck.length ? deck : words).slice(0, 400);
+    var pool = (deck.length ? deck : words).filter(function(w){ return w && w.term; }).slice(0, 400);
+    if(!pool.length) pool = words.slice(0, 400);
+    if(!pool.length) return;
     var items = [];
     for(var i = 0; i < 16; i++) items.push(newItem(true));
     function newItem(anywhere){
