@@ -1,0 +1,1454 @@
+<!doctype html><html><head><meta charset=utf8>
+<script>
+/* शब्दRegister bridge: follows the app's look (Paper / Indigo) and Light / Dark / Auto choice. */
+(function(){
+  var root = document.documentElement;
+  function theme(t){ if(t === 'dark' || t === 'light') root.setAttribute('data-theme', t); else root.removeAttribute('data-theme'); }
+  function skin(s){ if(s === 'paper' || s === 'indigo') root.setAttribute('data-skin', s); }
+  try{
+    var q = new URLSearchParams(location.search);
+    theme(q.get('theme'));
+    skin(q.get('skin') || (q.get('embed') ? 'paper' : ''));
+    if(q.get('embed')) root.classList.add('in-shabd');
+  }catch(e){}
+  window.addEventListener('message', function(e){
+    if(e.origin !== location.origin || !e.data || e.data.type !== 'shabd-theme') return;
+    theme(e.data.theme);
+    if(e.data.skin) skin(e.data.skin);
+  });
+})();
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap">
+<meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Active &amp; Passive Voice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<style>
+/* Layout: Physics PYQ Workbook — follows the शब्दRegister Paper / Indigo look; one column + bottom tabs on phones, sidebar on PC. */
+:root{
+  --paper:#f6f3ea; --sheet:#fffdf7; --sunk:#ebe6d8;
+  --ink:#1d2a22; --ink2:#56625a; --rule:#dcd5c3;
+  --blue:#1f5c3d; --on-blue:#ffffff; --blue-bg:#dcebdf;
+  --accent:#b4530f; --accent-bg:#fbe7d3;
+  --good:#1b7547; --good-bg:#dff1e6; --bad:#b0271f; --bad-bg:#f8e1de;
+  --warn-bg:#fff2d2;
+  --f-display:"Fraunces", "Tiro Devanagari Hindi", Georgia, serif;
+  --f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-num:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r:10px; --nav-h:64px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#111612; --sheet:#1a211c; --sunk:#222b25;
+  --ink:#e8eee9; --ink2:#a3b0a7; --rule:#2f3a33;
+  --blue:#86cfa2; --on-blue:#111612; --blue-bg:#1d3a29;
+  --accent:#f3a764; --accent-bg:#3b2614;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#111612; --sheet:#1a211c; --sunk:#222b25;
+  --ink:#e8eee9; --ink2:#a3b0a7; --rule:#2f3a33;
+  --blue:#86cfa2; --on-blue:#111612; --blue-bg:#1d3a29;
+  --accent:#f3a764; --accent-bg:#3b2614;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
+.wrap{max-width:640px;margin:0 auto;padding-inline:16px;padding-block:0 calc(var(--nav-h) + 28px + env(safe-area-inset-bottom,0px))}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);border-bottom:1px solid var(--rule)}
+.top-in{max-width:640px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px}
+.brand{font-family:var(--f-display);font-weight:800;font-size:17px;line-height:1.2;flex:1;min-width:0}
+.brand small{display:block;font-family:var(--f-body);font-weight:500;font-size:12px;color:var(--ink2);letter-spacing:.02em}
+.stat{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right;white-space:nowrap}
+.stat b{color:var(--ink);font-weight:600}
+
+/* bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--sheet);border-top:1px solid var(--rule);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);height:var(--nav-h)}
+.nav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer}
+.nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav button[aria-current="page"]{color:var(--blue)}
+.nav button[aria-current="page"] span{border-bottom:2px solid var(--blue)}
+
+/* type */
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.25;margin:0}
+h1{font-size:24px;font-weight:800}
+h2{font-size:19px;font-weight:800}
+h3{font-size:16px;font-weight:700}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--ink2)}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+p{margin:0}
+.stack{display:flex;flex-direction:column;gap:14px}
+.view{padding-top:18px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--rule);background:var(--sheet);font-weight:600;cursor:pointer;text-decoration:none}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:var(--on-blue)}
+.btn.ghost{background:transparent}
+.btn.sm{min-height:36px;padding:0 14px;font-size:14px}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.end{justify-content:flex-end}
+.row.between{justify-content:space-between}
+
+/* hero */
+.hero{display:grid;gap:10px;padding:4px 0 6px}
+.hero p{color:var(--ink2)}
+.meter{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--blue);border-radius:99px}
+
+/* lesson list */
+.lessons{display:flex;flex-direction:column;border-top:1px solid var(--rule)}
+.les{display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;padding:14px 2px;border-bottom:1px solid var(--rule);background:none;border-left:0;border-right:0;border-top:0;text-align:left;cursor:pointer;width:100%}
+.les .no{font-family:var(--f-num);font-weight:600;font-size:15px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--rule);color:var(--ink2)}
+.les.done .no{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.les .t{min-width:0}
+.les .t b{display:block;font-weight:700;font-size:16px;line-height:1.3}
+.les .t span{font-size:13px;color:var(--ink2)}
+.les .sc{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right}
+.les.next .no{border-color:var(--blue);color:var(--blue)}
+
+/* lesson reader */
+.lhead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.back{background:none;border:0;padding:8px 8px 8px 0;cursor:pointer;color:var(--blue);font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0 4px}
+.steps button{border:1px solid var(--rule);background:var(--sheet);border-radius:8px;padding:8px 4px;font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer}
+.steps button[aria-current="step"]{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.block{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;min-width:0}
+.block h3{margin-bottom:8px}
+.block p + p{margin-top:8px}
+.plain{padding:0 2px}
+.facts{display:grid;gap:0}
+.facts div{display:grid;grid-template-columns:minmax(0,42%) minmax(0,1fr);gap:10px;padding:7px 0;border-top:1px dashed var(--rule)}
+.facts div:first-child{border-top:0}
+.facts dt{font-size:14px;color:var(--ink2);margin:0}
+.facts dd{margin:0;font-weight:600;min-width:0}
+.tl{display:grid;gap:0;margin:0;padding:0;list-style:none}
+.tl li{display:grid;grid-template-columns:92px 1fr;gap:10px;padding:8px 0;border-top:1px dashed var(--rule)}
+.tl li:first-child{border-top:0}
+.tl .y{font-family:var(--f-num);font-weight:600;font-size:13px;color:var(--accent);padding-top:2px}
+.trick,.trap{border-radius:var(--r);padding:12px 14px 12px 14px;border:1px solid var(--rule)}
+.trick{background:var(--accent-bg);border-color:transparent}
+.trap{background:var(--bad-bg);border-color:transparent}
+.trick .lab,.trap .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.trick .lab{color:var(--accent)}
+.trap .lab{color:var(--bad)}
+.rk div{grid-template-columns:minmax(0,48%) minmax(0,1fr)}
+.rk dd{min-width:0;overflow-wrap:anywhere}
+.hot{border-radius:var(--r);padding:12px 14px;background:var(--warn-bg,var(--accent-bg));border-left:4px solid var(--warn,var(--accent))}
+.hot .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;color:var(--warn,var(--accent))}
+.heatb{display:inline-block;font-size:11px;letter-spacing:-.1em;margin-left:6px;vertical-align:1px}
+.heat{display:flex;flex-direction:column;gap:2px}
+.hrow{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(60px,1fr) 44px;gap:10px;align-items:center;text-align:left;background:none;border:0;border-bottom:1px solid var(--rule);padding:9px 2px;color:inherit;font:inherit;cursor:pointer}
+.hrow:last-child{border-bottom:0}
+.hrow .ht{display:flex;flex-direction:column;min-width:0}
+.hrow .ht .muted{font-size:12px}
+.hbar{height:10px;border-radius:5px;background:var(--rule);overflow:hidden}
+.hbar i{display:block;height:100%;background:var(--accent);border-radius:5px}
+.hp{text-align:right;font-weight:700}
+
+.tbl{overflow-x:auto;margin:0 -2px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);font-weight:700}
+td.n{font-family:var(--f-num);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fig{margin:0}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-size:13px;color:var(--ink2);margin-top:6px}
+.pyr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pyr div{text-align:center;font-size:13px}
+.pyr b{display:block;font-size:14px}
+.pm{fill:var(--blue)} .pf{fill:var(--accent)}
+.sum{margin:0;padding-left:20px;display:grid;gap:6px}
+
+/* questions */
+.qcard{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px;min-width:0}
+.qmeta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}
+.qno{font-family:var(--f-num);font-weight:600;color:var(--ink2)}
+.tag{background:var(--sunk);color:var(--ink2);border-radius:99px;padding:1px 9px;font-weight:600}
+.tag.pyq{background:var(--accent-bg);color:var(--accent)}
+.bm{margin-left:auto;background:none;border:0;cursor:pointer;color:var(--ink2);font-size:20px;line-height:1;padding:4px}
+.bm[aria-pressed="true"]{color:var(--accent)}
+.qt{font-weight:600;font-size:16px}
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:start;text-align:left;width:100%;border:1.5px solid var(--rule);background:var(--paper);border-radius:9px;padding:10px 12px;cursor:pointer;min-height:44px}
+.opt .k{font-family:var(--f-num);font-weight:600;color:var(--ink2);font-size:14px;padding-top:1px}
+.opt.sel{border-color:var(--blue);background:var(--blue-bg)}
+.opt.ok{border-color:var(--good);background:var(--good-bg)}
+.opt.no{border-color:var(--bad);background:var(--bad-bg)}
+.opt.ok .k{color:var(--good)} .opt.no .k{color:var(--bad)}
+.opt:disabled{cursor:default;color:inherit}
+.exp{font-size:15px;border-left:3px solid var(--blue);padding:4px 0 4px 12px;color:var(--ink)}
+.exp b.okl{color:var(--good)} .exp b.nol{color:var(--bad)}
+
+/* chips */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 13px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.seg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--rule)}
+.seg::-webkit-scrollbar{display:none}
+.seg button{flex:none;background:none;border:0;border-bottom:2px solid transparent;padding:10px 8px;font-weight:600;color:var(--ink2);cursor:pointer}
+.seg button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+
+/* score panel */
+.scorebig{display:flex;align-items:baseline;gap:8px}
+.scorebig .num{font-size:44px;font-weight:600;line-height:1;color:var(--blue)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.kpi{background:var(--sunk);border-radius:8px;padding:8px;text-align:center}
+.kpi .num{display:block;font-size:20px;font-weight:600}
+.kpi span{font-size:12px;color:var(--ink2)}
+.kpi.g .num{color:var(--good)} .kpi.b .num{color:var(--bad)}
+
+/* mock */
+.mbar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 57px);z-index:10;background:var(--paper);padding:10px 0;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--rule)}
+.timer{font-family:var(--f-num);font-weight:600;font-size:18px;padding:4px 10px;border-radius:8px;background:var(--sunk)}
+.timer.low{background:var(--bad-bg);color:var(--bad)}
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px}
+.pal button{height:40px;border-radius:8px;border:1px solid var(--rule);background:var(--sheet);font-family:var(--f-num);font-weight:600;font-size:13px;cursor:pointer}
+.pal button.a{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.pal button.m{box-shadow:inset 0 -4px 0 var(--accent)}
+.pal button.cur{outline:2px solid var(--ink);outline-offset:1px}
+.pal button.ok{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.pal button.no{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.confirm{background:var(--warn-bg);border-radius:var(--r);padding:12px 14px;display:grid;gap:10px}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}
+legend{font-weight:700;margin-bottom:6px;padding:0}
+.radios{display:flex;gap:8px;flex-wrap:wrap}
+.radios label{border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 14px;font-weight:600;cursor:pointer;font-size:14px}
+.radios input{position:absolute;opacity:0;pointer-events:none}
+.radios input:checked + span{color:var(--blue)}
+.radios label:has(input:checked){border-color:var(--blue);background:var(--blue-bg)}
+.radios label:has(input:focus-visible){outline:2px solid var(--blue);outline-offset:2px}
+select{font:inherit;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:8px;padding:8px 10px;max-width:100%}
+.hist{display:grid;gap:0}
+.hist div{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:14px}
+
+/* revise */
+.search{width:100%;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:10px;padding:10px 12px;font:inherit}
+.rk{display:grid;gap:0}
+.rk div{display:grid;grid-template-columns:minmax(0,48%) 1fr;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:15px}
+.rk div:first-child{border-top:0}
+.rk dt{font-size:13px;color:var(--ink2);margin:0}
+.rk dt.up{color:var(--good)} .rk dt.dn{color:var(--bad)}
+.rk dd{margin:0;font-weight:600;min-width:0}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px}
+.tile .num{display:block;font-size:24px;font-weight:600;color:var(--accent);line-height:1.2}
+.tile span{font-size:13px;color:var(--ink2)}
+.gbar{display:grid;grid-template-columns:78px 1fr 52px;gap:8px;align-items:center;font-size:13px;padding:3px 0}
+.gbar .tr{height:12px;background:var(--sunk);border-radius:3px;position:relative;overflow:hidden}
+.gbar .tr i{position:absolute;left:0;top:0;bottom:0;background:var(--blue);border-radius:3px}
+.gbar .tr i.neg{background:var(--bad)}
+.gbar .v{font-family:var(--f-num);text-align:right}
+.flash{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;min-height:240px;padding:20px 18px;display:grid;align-content:center;gap:12px;cursor:pointer;text-align:left;width:100%}
+.flash .side{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.flash .front{font-size:18px;font-weight:600}
+.flash .ans{font-size:20px;font-weight:700;color:var(--good)}
+.empty{padding:24px 4px;color:var(--ink2);text-align:center}
+.foot{font-size:13px;color:var(--ink2);padding-top:10px}
+@media (prefers-reduced-motion: no-preference){ .opt,.chip,.btn{transition:background-color .15s, border-color .15s} }
+.link{background:var(--blue-bg);border-radius:var(--r);padding:12px 14px}
+.link .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;color:var(--blue)}
+.icheck{background:var(--sheet);border:1.5px dashed var(--blue);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px}
+.icheck .lab{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue)}
+.cat{font-size:12px;font-weight:700;border-radius:99px;padding:1px 8px;white-space:nowrap}
+.cat.CS{background:var(--blue-bg);color:var(--blue)} .cat.CSS{background:var(--accent-bg);color:var(--accent)} .cat.ST{background:var(--sunk);color:var(--ink)} .cat.OT{background:var(--sunk);color:var(--ink2)}
+
+/* ---- workbook additions ---- */
+table.cover td:nth-child(4){min-width:180px}
+.plist .dl{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.plist .dl em{font-style:normal;font-weight:700;color:var(--blue);text-align:right}
+.ladder{list-style:none;margin:0;padding:0;display:grid;gap:0;border-top:1px solid var(--rule)}
+.ladder li{display:grid;grid-template-columns:62px 1fr auto;gap:12px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--rule)}
+.ladder .rk-n{font-size:22px;font-weight:600;color:var(--blue);text-align:right}
+.ladder .rk-t{min-width:0}
+.ladder .rk-t b{display:block;line-height:1.3}
+.ladder .rk-t span{font-size:13px;color:var(--ink2)}
+.ladder .rk-d{font-weight:700;font-size:14px;white-space:nowrap}
+.ladder li.up .rk-d{color:var(--good)} .ladder li.dn .rk-d{color:var(--bad)}
+.ladder small{font-weight:600;color:var(--ink2)}
+table.cover td{min-width:90px}
+.peek{border:1.5px dashed var(--blue);background:var(--blue-bg);color:var(--blue);border-radius:8px;padding:6px 10px;font-weight:600;cursor:pointer;min-height:36px;width:100%}
+.pubs{display:grid;gap:12px}
+.plist{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.plist li{padding:7px 0;border-top:1px dashed var(--rule);display:grid;gap:1px}
+.plist li:first-child{border-top:0}
+.plist li span{font-size:13px;color:var(--ink2)}
+.seg{scroll-snap-type:x proximity}
+@media (max-width: 700px){
+  table.cover thead{display:none}
+  table.cover tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 10px;padding:10px 0;border-bottom:1px solid var(--rule)}
+  table.cover td{border:0;padding:0;min-width:0;font-size:14px}
+  table.cover td:first-child{grid-column:1/-1;font-size:15px}
+  table.cover td:nth-child(4){grid-column:1/-1;min-width:0}
+  table.cover td[data-l]::before{content:attr(data-l);display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-bottom:2px}
+}
+/* ---- maths blocks ---- */
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(250px,100%),1fr));gap:10px}
+.fcard{background:var(--sheet);border:1px solid var(--rule);border-left:4px solid var(--blue);border-radius:var(--r);padding:10px 12px;display:grid;gap:4px;min-width:0}
+.fcard .fn{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);font-weight:700}
+.fcard .fx{font-family:var(--f-num);font-size:16px;color:var(--ink);overflow-wrap:anywhere;line-height:1.45}
+.fcard .fnote{font-size:13px;color:var(--ink2)}
+.ex{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px 14px;display:grid;gap:8px}
+.ex .exhead .lab{display:inline;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);font-weight:700}
+.ex .src{display:inline-block;margin-left:6px;font-size:11.5px;font-weight:700;color:var(--accent);border:1px solid currentColor;border-radius:999px;padding:0 8px}
+.ex .exq{font-weight:600}
+.ex details summary{cursor:pointer;font-weight:700;color:var(--blue);list-style:none}
+.ex details summary::-webkit-details-marker{display:none}
+.ex details summary::before{content:'▸ '}
+.ex details[open] summary::before{content:'▾ '}
+.ex ol{margin:8px 0 0;padding-left:20px;display:grid;gap:4px}
+.ex .exans{margin-top:8px;padding:8px 10px;border-radius:8px;background:var(--good-bg);color:var(--good);font-weight:700}
+.figwrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(260px,100%),1fr));gap:12px}
+.figwrap figure{margin:0;display:grid;gap:6px;justify-items:center;text-align:center}
+.fig svg,.figwrap svg{width:100%;max-width:340px;height:auto;color:var(--ink)}
+.fig figcaption,.figwrap figcaption{font-size:13px;color:var(--ink2)}
+sup,sub{font-size:.72em;line-height:0}
+
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">Active &amp; Passive Voice<small>वाच्य · SSC CGL English workbook</small></div>
+    <div class="stat" id="topstat"></div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<nav class="nav" aria-label="Sections">
+  <div class="nav-in">
+    <button type="button" id="nav-learn" data-tab="learn"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg><span>Learn</span></button>
+    <button type="button" id="nav-practice" data-tab="practice"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span>Practice</span></button>
+    <button type="button" id="nav-mock" data-tab="mock"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6M12 2v3"/></svg><span>Mock test</span></button>
+    <button type="button" id="nav-revise" data-tab="revise"><svg viewBox="0 0 24 24"><path d="M12 3 2 8l10 5 10-5z"/><path d="m2 13 10 5 10-5"/></svg><span>Revise</span></button>
+  </div>
+</nav>
+
+<script>
+"use strict";
+const PV = "Select the option that expresses the given sentence in passive voice. ";
+const AV = "Select the option that expresses the given sentence in active voice. ";
+const LESSONS = [
+{ id:"L1", heat:3, title:"SSC CGL pattern & exam strategy", hi:"परीक्षा पैटर्न और रणनीति", blocks:[
+ {k:"hot", h:"<b>Active–passive voice is one of the most reliable marks in SSC English.</b> In CGL Tier 1 (25 English questions, +2 / −0.5) it usually appears as <b>one question in most shifts</b>. In CGL Tier 2 (Paper 1, Module II: 45 English questions, +3 / −1) expect <b>one to three</b>. CHSL, CPO and Selection Post ask it in the same format. Once the method is automatic, a voice question takes 20–30 seconds."},
+ {k:"table", title:"Where voice is asked in SSC exams", head:["Exam","English section","Voice questions (usual)","Marking"], rows:[
+  ["CGL Tier 1","25 questions","0–1 per shift, mostly 1","+2 / −0.5"],
+  ["CGL Tier 2 (Paper 1, Module II)","45 questions","1–3","+3 / −1"],
+  ["CHSL Tier 1","25 questions","0–1","+2 / −0.5"],
+  ["CPO Paper 1","50 questions","1–2","+1 / −0.25"],
+  ["Selection Post / Stenographer","25–200 (by level)","1–2","Varies"]]},
+ {k:"p", h:"<b>The question is almost always worded the same way:</b> “Select the option that expresses the given sentence in passive voice” (or “in active voice”). Four full sentences are given. Usually only the helping verb, the pronoun or the word order differs between options, so you are really checking <b>four things</b>: tense, subject/object swap, the third form (V3) of the verb, and the pronoun case after “by”."},
+ {k:"table", title:"Recent pattern (2023–2025 shifts): what the sentences test", head:["Type","How often","Typical sentence"], rows:[
+  ["Simple present / past / future","Very often","The gardener waters the plants every morning."],
+  ["Continuous (is being / was being)","Very often","The workers were repairing the road."],
+  ["Perfect (has been / had been)","Very often","She has completed the project."],
+  ["Modals (can be / must be / should have been)","Often, rising","You must submit the form by Monday."],
+  ["Interrogative (By whom / Who)","Often","Who wrote this novel?"],
+  ["Imperative (Let … be / You are requested)","Regular","Please close the window."],
+  ["Passive → active","Regular (about 1 in 4)","The thief was caught by the police."],
+  ["Two objects, ‘It is said that’, infinitives","Tier 2 favourite","People say that he is honest."]]},
+ {k:"trick", h:"<b>The 30-second elimination.</b> (1) Find the tense from the helping verb and strike out options with the wrong tense — usually two go at once. (2) Check the new subject: the old object must come first, in subject form (him → he, them → they). (3) Check that the main verb is in V3. (4) Check “by + object form” at the end and that no word has been dropped or added (time words like <i>every day, yesterday</i> stay)."},
+ {k:"trap", h:"SSC distractors are built from <b>tiny tense slips</b>: <i>is</i> vs <i>was</i>, <i>was</i> vs <i>was being</i>, <i>has been</i> vs <i>had been</i>, <i>will be</i> vs <i>would be</i>. Read the helping verb of each option before reading anything else."},
+ {k:"trick", h:"<b>Meaning check.</b> Voice change never changes the meaning, the tense or the time words. If an option changes <i>yesterday</i> to <i>today</i>, drops <i>not</i>, or changes <i>can</i> to <i>could</i>, it is wrong — even if the grammar looks fine."},
+ {k:"link", h:"Voice and narration (direct–indirect speech) are asked side by side in SSC papers and use the same skill: keeping tense under control. Revise them together on the last day."},
+ {k:"q", q:"In CGL Tier 1, which step usually eliminates two options at once in a voice question?", o:["Checking the tense (helping verb)","Checking the spelling of the noun","Counting the words","Checking the full stop"], e:"Most distractors use the wrong tense form, so checking the helping verb removes them first."}
+]},
+{ id:"L2", heat:3, title:"The rules: object, V3 and pronouns", hi:"मूल नियम · कर्म, V3 और सर्वनाम", blocks:[
+ {k:"hot", h:"Every voice question uses these rules. If you know them by heart, the tense lessons are just tables to remember."},
+ {k:"p", h:"In the <b>active voice</b> the doer (agent) is the subject: <i>Ravi <b>wrote</b> a letter.</i> In the <b>passive voice</b> the receiver of the action becomes the subject: <i>A letter <b>was written</b> by Ravi.</i> Only sentences with an <b>object</b> (transitive verbs) can be changed. <i>She sleeps</i> has no object, so it has no passive."},
+ {k:"formula", title:"Four steps of active → passive", rows:[
+  ["1. Swap","Object → new subject; subject → after “by”","Ravi … a letter → A letter … by Ravi"],
+  ["2. Helping verb","Add the correct form of “be” for the tense","is / was / will be / is being / has been …"],
+  ["3. Verb","Main verb always in V3 (past participle)","write → written, sing → sung"],
+  ["4. Agree","Helping verb agrees with the NEW subject","Letters were written; a letter was written"]]},
+ {k:"table", title:"Pronoun change (subject ↔ object form)", head:["Subject form","Object form (after “by”)"], rows:[["I","me"],["we","us"],["you","you"],["he","him"],["she","her"],["it","it"],["they","them"],["who","whom"]]},
+ {k:"table", title:"V3 forms SSC uses again and again", head:["V1","V2","V3"], rows:[["write","wrote","written"],["sing","sang","sung"],["teach","taught","taught"],["catch","caught","caught"],["steal","stole","stolen"],["break","broke","broken"],["speak","spoke","spoken"],["choose","chose","chosen"],["bite","bit","bitten"],["hide","hid","hidden"],["lay (put down)","laid","laid"],["tear","tore","torn"],["draw","drew","drawn"],["forgive","forgave","forgiven"],["sow","sowed","sown"],["shake","shook","shaken"]]},
+ {k:"ex", src:"PYQ-type · CGL Tier 1 format", q:"Select the option that expresses the given sentence in passive voice.<br><i>She invited us to the party.</i>", steps:["Tense: simple past (invited) → was/were + V3","Object “us” becomes subject “we” → plural → <b>were</b>","Subject “she” goes after “by” in object form → by <b>her</b>"], ans:"We were invited to the party by her.", tip:"Change the pronoun first (us → we), then the helping verb agrees with it."},
+ {k:"trap", h:"<b>Agreement with the new subject.</b> <i>The teacher praised the students</i> → <i>The students <b>were</b> praised</i>, not <i>was</i>. The helping verb follows the new subject, not the old one."},
+ {k:"trap", h:"<b>Not every object makes a passive.</b> Verbs of state such as <i>have (own), resemble, lack, suit, fit</i> are not changed: <i>She has a car</i> → ✗ <i>A car is had by her</i>."},
+ {k:"trick", h:"Write the V3 column on your rough sheet once a week: half the wrong options in SSC use V2 (<i>was wrote, is spoke</i>) or a misspelt V3 (<i>was teached</i>)."},
+ {k:"q", q:"Which of these sentences cannot be changed into passive voice?", o:["The baby sleeps peacefully.","The baby drinks milk.","The baby broke the toy.","The baby likes music."], e:"“Sleeps” is intransitive — there is no object to become the subject."},
+ {k:"q", q:"In passive voice, “by they” should be written as:", o:["by them","by their","by theirs","by they"], e:"After a preposition we use the object form: them."}
+]},
+{ id:"L3", heat:3, title:"Present tenses", hi:"वर्तमान काल", blocks:[
+ {k:"hot", h:"Present tenses appear in roughly one voice question in six. The present continuous (<b>is being</b>) and the present perfect (<b>has been</b>) are the ones SSC likes most, because the distractors are easy to build."},
+ {k:"formula", title:"Present tense table", rows:[
+  ["Simple present","V1 / V5 → is / am / are + V3","He writes a letter → A letter is written by him"],
+  ["Present continuous","is / am / are + Ving → is / am / are + being + V3","He is writing a letter → A letter is being written by him"],
+  ["Present perfect","has / have + V3 → has / have + been + V3","He has written a letter → A letter has been written by him"],
+  ["Present perfect continuous","has been + Ving → usually no passive","SSC rarely asks it"]]},
+ {k:"ex", src:"PYQ-type · CGL Tier 1 format", q:"Select the option that expresses the given sentence in passive voice.<br><i>The gardener waters the plants every morning.</i>", steps:["Simple present (waters) → is/are + V3","Plants (plural) → <b>are watered</b>","“every morning” stays at the end"], ans:"The plants are watered by the gardener every morning."},
+ {k:"ex", src:"PYQ-type · CGL Tier 2 format", q:"Select the option that expresses the given sentence in passive voice.<br><i>The committee is reviewing the new proposal.</i>", steps:["Present continuous (is reviewing) → is/are <b>being</b> + V3","Proposal (singular) → is being reviewed"], ans:"The new proposal is being reviewed by the committee.", tip:"If the active has “-ing”, the passive must have “being”."},
+ {k:"trick", h:"<b>Continuous ↔ being, perfect ↔ been.</b> “-ing” in the active → “being” in the passive. “has/have” in the active → “has/have been” in the passive. Options that drop these words are wrong."},
+ {k:"trap", h:"<i>Is being written</i> (present continuous) vs <i>has been written</i> (present perfect) vs <i>was being written</i> (past continuous): SSC puts all three in the options. Match the time of the active verb exactly."},
+ {k:"q", q:"Passive of: “They have painted the walls.”", o:["The walls have been painted by them.","The walls had been painted by them.","The walls are being painted by them.","The walls has been painted by them."], e:"Present perfect → have been + V3; walls is plural → have."}
+]},
+{ id:"L4", heat:3, title:"Past tenses", hi:"भूतकाल", blocks:[
+ {k:"hot", h:"Past tenses are the <b>single most common</b> voice type in recent SSC shifts — about one question in five. The simple past (<b>was/were + V3</b>) is the easiest mark in the English section."},
+ {k:"formula", title:"Past tense table", rows:[
+  ["Simple past","V2 → was / were + V3","She sang a song → A song was sung by her"],
+  ["Past continuous","was / were + Ving → was / were + being + V3","She was singing a song → A song was being sung by her"],
+  ["Past perfect","had + V3 → had + been + V3","She had sung a song → A song had been sung by her"],
+  ["Past perfect continuous","had been + Ving → usually no passive","Not asked"]]},
+ {k:"ex", src:"PYQ-type · CGL Tier 1 format", q:"Select the option that expresses the given sentence in passive voice.<br><i>The workers were repairing the road.</i>", steps:["Past continuous (were repairing) → was/were <b>being</b> + V3","Road (singular) → <b>was</b> being repaired"], ans:"The road was being repaired by the workers.", tip:"The verb agrees with “road”, not with “workers”."},
+ {k:"ex", src:"PYQ-type · CGL Tier 1 format", q:"Select the option that expresses the given sentence in passive voice.<br><i>The police had arrested the thief before sunset.</i>", steps:["Past perfect (had arrested) → had been + V3","“before sunset” stays"], ans:"The thief had been arrested by the police before sunset."},
+ {k:"trap", h:"<b>“had” never changes to “has”.</b> <i>had been</i> stays past perfect. Options with <i>has been</i> or <i>was</i> for a past perfect sentence are traps."},
+ {k:"trick", h:"Simple past is one word in the active (V2). If the active has only one verb word in the past, the answer is just <b>was/were + V3</b> — no <i>being</i>, no <i>been</i>."},
+ {k:"q", q:"Passive of: “The cat was chasing the mice.”", o:["The mice were being chased by the cat.","The mice was being chased by the cat.","The mice were chased by the cat.","The mice had been chased by the cat."], e:"Past continuous → were being + V3; mice is plural."}
+]},
+{ id:"L5", heat:3, title:"Future tenses & modals", hi:"भविष्य काल और मॉडल", blocks:[
+ {k:"hot", h:"Modal verbs (<i>can, must, should, may, have to</i>) have become more frequent since 2023, and <b>modal + have + V3</b> (<i>should have been done</i>) is a Tier 2 favourite."},
+ {k:"formula", title:"Future and modal table", rows:[
+  ["Simple future","will / shall + V1 → will / shall + be + V3","He will help me → I will be helped by him"],
+  ["Future perfect","will have + V3 → will have + been + V3","He will have finished it → It will have been finished by him"],
+  ["Future continuous","will be + Ving → usually no passive","Rarely asked"],
+  ["Modal + V1","can / could / may / might / must / should / would + V1 → modal + be + V3","You must obey the rules → The rules must be obeyed by you"],
+  ["Modal perfect","modal + have + V3 → modal + have been + V3","She should have sent it → It should have been sent by her"],
+  ["Going to","is going to + V1 → is going to be + V3","They are going to sell the house → The house is going to be sold by them"],
+  ["Have to / used to / ought to","to + V1 → to be + V3","We have to finish it → It has to be finished by us"]]},
+ {k:"ex", src:"PYQ-type · CGL Tier 2 format", q:"Select the option that expresses the given sentence in passive voice.<br><i>You should have informed the police.</i>", steps:["Modal perfect (should have informed) → should have <b>been</b> + V3","police → subject"], ans:"The police should have been informed by you."},
+ {k:"ex", src:"PYQ-type · CGL Tier 1 format", q:"Select the option that expresses the given sentence in passive voice.<br><i>We have to finish this work today.</i>", steps:["have to + V1 → has/have to <b>be</b> + V3","“this work” is singular → <b>has</b> to be finished"], ans:"This work has to be finished by us today.", tip:"“have to” agrees with the new subject: it has to, they have to."},
+ {k:"trap", h:"<b>Modals do not change.</b> <i>can</i> stays <i>can</i>, <i>may</i> stays <i>may</i>. An option with <i>could</i> for <i>can</i> or <i>would</i> for <i>will</i> changes the tense and is wrong."},
+ {k:"trick", h:"<b>Modal + be + V3</b> is the whole rule. Never <i>can being</i>, never <i>must been</i> (without have)."},
+ {k:"q", q:"Passive of: “Someone must clean the kitchen.”", o:["The kitchen must be cleaned.","The kitchen must been cleaned.","The kitchen must have been cleaned.","The kitchen must being cleaned."], e:"Modal + be + V3; “someone” is dropped as the agent."}
+]},
+{ id:"L6", heat:2, title:"Imperative sentences", hi:"आज्ञार्थक वाक्य", blocks:[
+ {k:"hot", h:"Imperatives (orders, requests, advice) come up in about one question in eight. SSC accepts two forms: <b>Let + object + be + V3</b>, and <b>You are requested / ordered / advised + to + V1</b>."},
+ {k:"formula", title:"Imperative patterns", rows:[
+  ["Order with object","Let + object + be + V3","Shut the door → Let the door be shut"],
+  ["Negative order","Let + object + not + be + V3","Don’t touch the wire → Let the wire not be touched"],
+  ["Request (please / kindly)","You are requested to + V1","Please help me → You are requested to help me"],
+  ["Order (no object / strong)","You are ordered to + V1","Get out → You are ordered to get out"],
+  ["Advice","You are advised to + V1","Work hard → You are advised to work hard"],
+  ["Warning","You are warned (not) to + V1","Don’t smoke here → You are warned not to smoke here"],
+  ["Let + person + V1 + object","Let + object + be + V3 + by + person","Let him do the work → Let the work be done by him"]]},
+ {k:"ex", src:"PYQ-type · CGL Tier 1 format", q:"Select the option that expresses the given sentence in passive voice.<br><i>Please lend me your pen.</i>", steps:["“Please” → request","Request → <b>You are requested to</b> + V1","Keep the rest of the sentence unchanged"], ans:"You are requested to lend me your pen."},
+ {k:"ex", src:"PYQ-type · CHSL format", q:"Select the option that expresses the given sentence in passive voice.<br><i>Let her sing a song.</i>", steps:["Let + person + V1 + object → Let + object + be + V3 + by + person","song → Let a song be sung by her"], ans:"Let a song be sung by her."},
+ {k:"trap", h:"<i>Let us play cricket</i> is a suggestion: its passive is <i>Let cricket be played by us</i> — not <i>We are requested to play cricket</i>."},
+ {k:"trick", h:"Look at the first word. <b>Please / kindly</b> → requested. A bare verb with an object → <b>Let … be …</b>. <b>Don’t</b> → <i>Let … not be …</i> or <i>You are warned/forbidden …</i>."},
+ {k:"q", q:"Passive of: “Do not waste your time.”", o:["Let your time not be wasted.","Let your time be not waste.","Your time is not wasted.","Let not waste your time."], e:"Negative imperative → Let + object + not be + V3."}
+]},
+{ id:"L7", heat:3, title:"Interrogative sentences", hi:"प्रश्नवाचक वाक्य", blocks:[
+ {k:"hot", h:"Questions in the passive are asked often, and the options are designed to catch mistakes in word order. The <b>Who → By whom</b> rule appears in some form almost every month."},
+ {k:"formula", title:"Question patterns", rows:[
+  ["Do / does + V1","Is / am / are + subject + V3","Does he sing songs? → Are songs sung by him?"],
+  ["Did + V1","Was / were + subject + V3","Did she write the letter? → Was the letter written by her?"],
+  ["Has / have + V3","Has / have + subject + been + V3","Have you finished it? → Has it been finished by you?"],
+  ["Is / are + Ving","Is / are + subject + being + V3","Is he writing a book? → Is a book being written by him?"],
+  ["Modal question","Modal + subject + be + V3","Can you solve this? → Can this be solved by you?"],
+  ["Who …?","By whom + helping verb + subject + V3","Who broke the vase? → By whom was the vase broken?"],
+  ["Whom …?","Who + helping verb + subject + V3","Whom did you call? → Who was called by you?"],
+  ["Why / when / where / how","Wh-word + helping verb + subject + V3 + by …","Why did he beat the dog? → Why was the dog beaten by him?"],
+  ["What + V (what is object)","What + helping verb + V3 + by …","What are you doing? → What is being done by you?"]]},
+ {k:"ex", src:"PYQ-type · CGL Tier 1 format", q:"Select the option that expresses the given sentence in passive voice.<br><i>Who wrote this novel?</i>", steps:["Who → <b>By whom</b> at the start","Simple past → was + V3","this novel → subject"], ans:"By whom was this novel written?"},
+ {k:"ex", src:"PYQ-type · CGL Tier 2 format", q:"Select the option that expresses the given sentence in passive voice.<br><i>Why did they postpone the meeting?</i>", steps:["Wh-word stays first","did + V1 → was + V3","by them at the end"], ans:"Why was the meeting postponed by them?"},
+ {k:"trap", h:"The passive of a question is still a <b>question</b>. Options that end with a full stop or have statement word order (<i>The letter was written by her?</i>) are wrong in SSC answers."},
+ {k:"trick", h:"<b>Who and whom swap.</b> <i>Who</i> (doer) → <i>By whom</i>. <i>Whom</i> (receiver) → <i>Who</i>. Remember: by + whom, because after “by” we need the object form."},
+ {k:"q", q:"Passive of: “Whom did the manager praise?”", o:["Who was praised by the manager?","By whom was the manager praised?","Whom was praised by the manager?","Who praised the manager?"], e:"Whom (receiver) becomes the subject “Who”; the manager goes after by."}
+]},
+{ id:"L8", heat:2, title:"Two objects, infinitives & ‘It is said’", hi:"दो कर्म, इन्फ़िनिटिव और 'It is said'", blocks:[
+ {k:"hot", h:"These are <b>Tier 2 favourites</b>: sentences with two objects, sentences with <i>that</i>-clauses (<i>People say that …</i>) and infinitives (<i>to be + V3</i>). Expect one in Tier 2 and occasionally one in Tier 1."},
+ {k:"formula", title:"Two objects (give, show, tell, teach, offer, send …)", rows:[
+  ["Person as subject (preferred)","Person + was/were + V3 + thing + by …","He gave me a book → I was given a book by him"],
+  ["Thing as subject","Thing + was + V3 + to + person + by …","He gave me a book → A book was given to me by him"]]},
+ {k:"formula", title:"Saying and believing verbs (say, believe, know, think, report)", rows:[
+  ["It-form","It + is/was + V3 + that + clause","People say that he is honest → It is said that he is honest"],
+  ["Subject-form (same time)","Subject + is/was + V3 + to be …","→ He is said to be honest"],
+  ["Subject-form (earlier time)","Subject + is + V3 + to have + V3","People believe that he stole it → He is believed to have stolen it"]]},
+ {k:"formula", title:"Infinitives", rows:[
+  ["to + V1 with object","to be + V3","It is time to close the shop → It is time for the shop to be closed"],
+  ["want / ask + object + to V1","object + to be + V3","I want you to do this → I want this to be done by you"],
+  ["Nothing / no time + to V1","to be + V3","There is no time to waste → There is no time to be wasted"]]},
+ {k:"ex", src:"PYQ-type · CGL Tier 2 format", q:"Select the option that expresses the given sentence in passive voice.<br><i>People say that honesty is the best policy.</i>", steps:["“People say” → agent is general, so drop it","It + is + said + that + clause"], ans:"It is said that honesty is the best policy.", tip:"With say / believe / know, SSC usually wants the It-form."},
+ {k:"ex", src:"PYQ-type · CGL Tier 1 format", q:"Select the option that expresses the given sentence in passive voice.<br><i>The teacher taught us grammar.</i>", steps:["Two objects: us (person), grammar (thing)","Person first: us → We were taught grammar by the teacher"], ans:"We were taught grammar by the teacher."},
+ {k:"trap", h:"With the thing as subject, add <b>to</b> before the person: <i>A book was given <b>to</b> me</i>. <i>A book was given me</i> is old-fashioned and SSC treats it as wrong."},
+ {k:"trick", h:"If both “person-first” and “thing-first” forms appear in the options, check the other parts (tense, pronoun). Only one option will be fully correct."},
+ {k:"q", q:"Passive of: “They offered him a job.”", o:["He was offered a job by them.","He was offering a job by them.","A job was offered by him to them.","He is offered a job by them."], e:"Person as subject, simple past → was offered."}
+]},
+{ id:"L9", heat:2, title:"Prepositions other than ‘by’, phrasal verbs & gerunds", hi:"‘by’ के अलावा प्रीपोज़िशन, फ़्रेज़ल वर्ब", blocks:[
+ {k:"hot", h:"About one question in sixteen, but these are the ones most students get wrong. The fixed prepositions below are tested both in voice and in error-spotting."},
+ {k:"table", title:"Verbs that take a preposition other than “by”", head:["Active","Passive"], rows:[
+  ["I know him.","He is known <b>to</b> me."],
+  ["The news surprised us.","We were surprised <b>at</b> the news."],
+  ["Smoke filled the room.","The room was filled <b>with</b> smoke."],
+  ["Snow covered the hills.","The hills were covered <b>with</b> snow."],
+  ["His work pleased the boss.","The boss was pleased <b>with</b> his work."],
+  ["The result satisfied her.","She was satisfied <b>with</b> the result."],
+  ["Music interests me.","I am interested <b>in</b> music."],
+  ["The jar contains honey.","Honey is contained <b>in</b> the jar."],
+  ["His rudeness annoyed me.","I was annoyed <b>at</b> his rudeness."],
+  ["The accident shocked us.","We were shocked <b>at</b> the accident."]]},
+ {k:"formula", title:"Phrasal verbs and gerunds", rows:[
+  ["Phrasal verb","Keep the particle after V3","They looked after the child → The child was looked after by them"],
+  ["Laugh at / send for / put off","V3 + particle + by","We sent for the doctor → The doctor was sent for"],
+  ["Gerund (-ing) with object","being + V3","I remember my father taking me there → I remember being taken there by my father"],
+  ["need / want + -ing","= need to be + V3","The room needs cleaning → The room needs to be cleaned"]]},
+ {k:"ex", src:"PYQ-type · CGL Tier 1 format", q:"Select the option that expresses the given sentence in passive voice.<br><i>Everybody laughed at the joker.</i>", steps:["Phrasal verb “laugh at” – keep “at”","Simple past → was + V3","Everybody → by everybody"], ans:"The joker was laughed at by everybody.", tip:"Never drop the particle: “The joker was laughed by everybody” is wrong."},
+ {k:"trap", h:"<i>The room was filled <b>by</b> smoke</i> and <i>I am known <b>by</b> him</i> are classic SSC distractors. Learn the table above."},
+ {k:"q", q:"Passive of: “The answer surprised the teacher.”", o:["The teacher was surprised at the answer.","The teacher is surprised at the answer.","The teacher was surprised from the answer.","The answer was surprised by the teacher."], e:"surprise → surprised at; simple past → was."}
+]},
+{ id:"L10", heat:2, title:"Negatives, agent omission & no-passive sentences", hi:"नकारात्मक वाक्य, कर्ता का लोप", blocks:[
+ {k:"hot", h:"Negative words and unknown agents appear in about one question in sixteen. They are quick marks once you know three rules."},
+ {k:"formula", title:"Negatives", rows:[
+  ["not","stays in the same place after the first helping verb","I did not see her → She was not seen by me"],
+  ["Nobody / No one","→ not … by anybody / anyone","Nobody saw him → He was not seen by anybody"],
+  ["Never","stays: was never + V3","She never tells lies → Lies are never told by her"],
+  ["Nothing (as object)","→ Nothing … / not anything","He did nothing → Nothing was done by him"]]},
+ {k:"formula", title:"When to drop “by …”", rows:[
+  ["Unknown / general agent","someone, somebody, people, they (general), one","Someone has stolen my bag → My bag has been stolen"],
+  ["Obvious agent","the police arrest, the court sentences","He was arrested (by the police) – may be dropped"],
+  ["Keep it","when the agent is a named person or a pronoun like he, she, us","She cooked dinner → Dinner was cooked by her"]]},
+ {k:"ex", src:"PYQ-type · CGL Tier 1 format", q:"Select the option that expresses the given sentence in passive voice.<br><i>Nobody can solve this puzzle.</i>", steps:["Nobody → not … by anybody","Modal → can not be + V3"], ans:"This puzzle cannot be solved by anybody."},
+ {k:"trap", h:"<i>This puzzle can be solved by nobody</i> is grammatical but SSC keys <i>cannot be solved by anybody</i>. If both appear, choose the <b>not … anybody</b> form."},
+ {k:"trick", h:"<b>No passive:</b> intransitive verbs (sleep, go, come, die), verbs of state (have, resemble, lack, fit, suit) and perfect continuous tenses. If the question asks for one, look for the option that keeps the meaning without inventing a strange verb."},
+ {k:"q", q:"Passive of: “Someone has stolen my purse.”", o:["My purse has been stolen.","My purse had been stolen.","My purse has stolen by someone.","My purse was being stolen."], e:"Present perfect → has been + V3; drop the unknown agent “someone”."}
+]},
+{ id:"L11", heat:2, title:"Passive → active & Tier 2 tricky sentences", hi:"कर्मवाच्य से कर्तृवाच्य · कठिन वाक्य", blocks:[
+ {k:"hot", h:"About one SSC voice question in four asks for the <b>active</b> voice. Tier 2 also uses longer sentences with two clauses, causatives and modal perfects."},
+ {k:"formula", title:"Passive → active: reverse the steps", rows:[
+  ["1. Agent first","The word after “by” becomes the subject (object → subject form)","by him → he"],
+  ["2. Remove “be”","Drop the be-form and rebuild the tense on the main verb","was written → wrote; has been written → has written"],
+  ["3. Object","The old subject becomes the object (subject → object form)","I → me, they → them"],
+  ["4. No agent?","Use a general subject: someone, people, they","The shop was robbed → Someone robbed the shop"],
+  ["Let … be …","Back to a bare imperative","Let the door be shut → Shut the door"],
+  ["You are requested to …","Please + V1","You are requested to sit → Please sit"]]},
+ {k:"ex", src:"PYQ-type · CGL Tier 1 format", q:"Select the option that expresses the given sentence in active voice.<br><i>The match was won by India.</i>", steps:["Agent India → subject","was won → simple past → won"], ans:"India won the match."},
+ {k:"ex", src:"PYQ-type · CGL Tier 2 format", q:"Select the option that expresses the given sentence in active voice.<br><i>The documents are being checked by the clerk.</i>", steps:["Agent the clerk → subject (singular)","are being checked → present continuous → <b>is checking</b>"], ans:"The clerk is checking the documents.", tip:"The helping verb now agrees with the new subject (clerk → is)."},
+ {k:"formula", title:"Tier 2 tricky types", rows:[
+  ["Causative have/get","Already passive in meaning","I had my car repaired = Someone repaired my car for me"],
+  ["Two clauses","Change the clause that has the object, keep the rest","He said that he would finish the task → He said that the task would be finished by him"],
+  ["Modal perfect","must / might / could + have been + V3","They might have sold the house → The house might have been sold by them"],
+  ["Question with tag","Change the main clause and the tag agrees with it","He cleaned it, didn’t he? → It was cleaned by him, wasn’t it?"]]},
+ {k:"trap", h:"In passive → active, the commonest trap is <b>wrong tense</b>: <i>was being repaired</i> → <i>were repairing</i> (not <i>repaired</i>), <i>had been finished</i> → <i>had finished</i> (not <i>has finished</i>)."},
+ {k:"q", q:"Active of: “A new bridge will be built by the government.”", o:["The government will build a new bridge.","The government would build a new bridge.","The government will be building a new bridge.","The government builds a new bridge."], e:"will be + V3 → will + V1."}
+]},
+{ id:"L12", heat:3, title:"Recent-pattern mixed set & last-day tips", hi:"नवीन पैटर्न अभ्यास · अंतिम दिन के सुझाव", blocks:[
+ {k:"hot", h:"This lesson’s question bank is a <b>mixed set modelled on recent CGL, CHSL and CPO shifts (2023–2025)</b>: everyday sentences (office, school, government, sport, environment), all tense types, and both directions. Do it in one sitting with a 30-second limit per question."},
+ {k:"p", h:"<b>What changed recently.</b> Sentences are longer and more formal (<i>The ministry has launched a new scheme for farmers</i>), modals and perfect tenses appear more often, and passive → active is asked more than before. The four steps from L2 still answer every one."},
+ {k:"facts", title:"Last-day checklist", rows:[
+  ["Tense first","is/was/will + being/been — match it exactly"],
+  ["Pronoun case","subject form at the start, object form after “by”"],
+  ["V3 spelling","written, chosen, stolen, taught, laid"],
+  ["Agreement","helping verb agrees with the new subject"],
+  ["Nothing lost","not, never, time words and modals stay"],
+  ["Special","Who → By whom; Please → requested; Let … be …; known to; filled with"]]},
+ {k:"trick", h:"<b>Time budget:</b> voice and narration should take under 30 seconds each in Tier 1. Use the saved time on reading comprehension and cloze, which take longer."},
+ {k:"trick", h:"<b>If two options look correct</b>, compare them word by word. The difference is usually one helping verb or one pronoun — and only one of them matches the tense and case rules."},
+ {k:"link", h:"Error-spotting questions sometimes hide a voice error: <i>The letter was wrote by him</i> (V2 for V3) or <i>The room was filled by smoke</i> (wrong preposition). The rules here earn marks there too."}
+]}
+];
+const QB = [
+// L1
+["L1","In SSC CGL Tier 1, English has 25 questions. How many active–passive voice questions are usually asked in a shift?",["Usually one","Usually five","Usually ten","Never asked"],"Voice appears as about one question in most Tier 1 shifts."],
+["L1","In CGL Tier 2 (Paper 1, Module II), the English section has:",["45 questions, +3 / −1","25 questions, +2 / −0.5","50 questions, +1 / −0.25","100 questions, +1 / −0.25"],"Tier 2 English: 45 questions, 3 marks each, 1 mark negative."],
+["L1","Which is the fastest first step to eliminate options in a voice question?",["Check the tense of the helping verb","Check the length of each option","Check the first letter","Check the punctuation only"],"Wrong tense is the commonest distractor; checking it removes two options quickly."],
+["L1","In a voice question, which of these must NOT change?",["The meaning and the tense","The subject","The position of the object","The helping verb"],"The subject, object position and helping verb all change; the meaning and the tense stay the same."],
+["L1","An option changes “yesterday” to “today”. What should you do?",["Reject it: time words must stay","Accept it if the grammar is right","Accept it only in Tier 2","Ignore time words"],"Voice change never changes time words."],
+["L1","What is the negative marking per wrong answer in CGL Tier 1?",["0.5 marks","1 mark","0.25 marks","No negative marking"],"Tier 1: +2 for a right answer, −0.5 for a wrong one."],
+["L1","Which pair of grammar topics is usually asked together and uses the same tense skill?",["Voice and narration","Voice and synonyms","Voice and spelling","Voice and idioms"],"Active–passive and direct–indirect speech both test tense control."],
+// L2
+["L2","Which sentence can be changed into passive voice?",["She cooked the dinner.","She laughed loudly.","She went home.","She slept early."],"Only “cooked” has an object (the dinner).","p"],
+["L2","The V3 (past participle) of “write” is:",["written","wrote","writed","writing"],"write – wrote – written."],
+["L2","The V3 of “teach” is:",["taught","teached","teaching","teach"],"teach – taught – taught."],
+["L2","The V3 of “choose” is:",["chosen","chose","choosed","choosen"],"choose – chose – chosen."],
+["L2","The V3 of “steal” is:",["stolen","stole","stealed","stealen"],"steal – stole – stolen."],
+["L2","In the passive voice, the pronoun “we” after “by” becomes:",["us","our","we","ours"],"Object form of we is us."],
+["L2",PV+"She invited us to the party.",["We were invited to the party by her.","We was invited to the party by her.","Us were invited to the party by her.","We were invited to the party by she."],"Simple past; us → we (plural → were); she → by her.","p"],
+["L2",PV+"The teacher praised the students.",["The students were praised by the teacher.","The students was praised by the teacher.","The students are praised by the teacher.","The teacher was praised by the students."],"Simple past; students is plural → were praised."],
+["L2",PV+"He helps them.",["They are helped by him.","Them are helped by him.","They were helped by him.","They are helped by he."],"Simple present; them → they; he → him."],
+["L2","Which sentence has NO passive form?",["He has a big house.","He built a big house.","He sold a big house.","He painted a big house."],"“have” meaning own/possess is a verb of state and is not made passive."],
+["L2","“She resembles her mother.” The passive voice of this sentence is:",["Not possible; “resemble” is not used in the passive","Her mother is resembled by her.","Her mother was resembled by her.","Her mother is being resembled by her."],"Resemble is a state verb and has no passive."],
+["L2","In “The boy kicked the ball”, which word becomes the subject in the passive?",["the ball","the boy","kicked","by"],"The object (the ball) becomes the subject."],
+["L2",PV+"I love my country.",["My country is loved by me.","My country was loved by me.","My country is loved by I.","My country is love by me."],"Simple present; love → loved; I → me."],
+["L2",PV+"The dog bit the postman.",["The postman was bitten by the dog.","The postman was bit by the dog.","The postman is bitten by the dog.","The postman was biting by the dog."],"bite – bit – bitten.","p"],
+// L3
+["L3",PV+"The gardener waters the plants every morning.",["The plants are watered by the gardener every morning.","The plants were watered by the gardener every morning.","The plants is watered by the gardener every morning.","The plants are being watered by the gardener every morning."],"Simple present; plants is plural → are watered.","p"],
+["L3",PV+"The committee is reviewing the new proposal.",["The new proposal is being reviewed by the committee.","The new proposal was being reviewed by the committee.","The new proposal has been reviewed by the committee.","The new proposal is reviewed by the committee."],"Present continuous → is being + V3.","p"],
+["L3",PV+"They have painted the walls.",["The walls have been painted by them.","The walls had been painted by them.","The walls has been painted by them.","The walls are being painted by them."],"Present perfect → have been + V3."],
+["L3",PV+"She sings a song.",["A song is sung by her.","A song was sung by her.","A song is sang by her.","A song is being sung by her."],"sing – sang – sung; simple present → is sung."],
+["L3",PV+"The chef is preparing a special dish.",["A special dish is being prepared by the chef.","A special dish was being prepared by the chef.","A special dish is prepared by the chef.","A special dish has been prepared by the chef."],"Present continuous → is being prepared."],
+["L3",PV+"The government has launched a new scheme for farmers.",["A new scheme for farmers has been launched by the government.","A new scheme for farmers had been launched by the government.","A new scheme for farmers is launched by the government.","A new scheme for farmers was being launched by the government."],"Present perfect → has been launched.","p"],
+["L3",PV+"Rohan does not eat meat.",["Meat is not eaten by Rohan.","Meat was not eaten by Rohan.","Meat is not eat by Rohan.","Meat does not eaten by Rohan."],"does not + V1 → is not + V3."],
+["L3",PV+"The students are writing an essay.",["An essay is being written by the students.","An essay are being written by the students.","An essay is written by the students.","An essay was being written by the students."],"Present continuous; essay is singular → is being written."],
+["L3",PV+"Has she completed the project?",["Has the project been completed by her?","Had the project been completed by her?","Has the project completed by her?","Is the project being completed by her?"],"Present perfect question → Has + subject + been + V3."],
+["L3",PV+"The manager signs all the letters.",["All the letters are signed by the manager.","All the letters were signed by the manager.","All the letters is signed by the manager.","All the letters are being signed by the manager."],"Simple present; letters plural → are signed."],
+["L3",PV+"We are planting trees in the park.",["Trees are being planted by us in the park.","Trees were being planted by us in the park.","Trees are planted by us in the park.","Trees have been planted by us in the park."],"Present continuous → are being planted."],
+["L3",PV+"I have already informed the principal.",["The principal has already been informed by me.","The principal had already been informed by me.","The principal is already informed by me.","The principal has already informed by me."],"Present perfect → has been informed; I → me."],
+["L3",PV+"My mother makes tea every evening.",["Tea is made by my mother every evening.","Tea was made by my mother every evening.","Tea is being made by my mother every evening.","Tea is make by my mother every evening."],"Simple present → is made."],
+["L3",AV+"The bills are paid by my father.",["My father pays the bills.","My father paid the bills.","My father is paying the bills.","My father has paid the bills."],"are + V3 → simple present; father is singular → pays."],
+["L3",PV+"The company has not paid the workers.",["The workers have not been paid by the company.","The workers has not been paid by the company.","The workers had not been paid by the company.","The workers are not paid by the company."],"Present perfect; workers plural → have not been paid."],
+// L4
+["L4",PV+"The workers were repairing the road.",["The road was being repaired by the workers.","The road were being repaired by the workers.","The road was repaired by the workers.","The road had been repaired by the workers."],"Past continuous → was being repaired; road is singular.","p"],
+["L4",PV+"The police had arrested the thief before sunset.",["The thief had been arrested by the police before sunset.","The thief has been arrested by the police before sunset.","The thief was arrested by the police before sunset.","The thief had arrested by the police before sunset."],"Past perfect → had been + V3."],
+["L4",PV+"The cat was chasing the mice.",["The mice were being chased by the cat.","The mice was being chased by the cat.","The mice were chased by the cat.","The mice had been chased by the cat."],"Past continuous; mice plural → were being chased."],
+["L4",PV+"Shakespeare wrote Hamlet.",["Hamlet was written by Shakespeare.","Hamlet is written by Shakespeare.","Hamlet was wrote by Shakespeare.","Hamlet has been written by Shakespeare."],"Simple past → was written.","p"],
+["L4",PV+"The children broke the window.",["The window was broken by the children.","The window were broken by the children.","The window is broken by the children.","The window was broke by the children."],"break – broke – broken; window singular → was."],
+["L4",PV+"She was cooking dinner when I arrived.",["Dinner was being cooked by her when I arrived.","Dinner was cooked by her when I arrived.","Dinner had been cooked by her when I arrived.","Dinner is being cooked by her when I arrived."],"Change only the main clause; past continuous → was being cooked.","p"],
+["L4",PV+"They had finished the work before noon.",["The work had been finished by them before noon.","The work has been finished by them before noon.","The work was being finished by them before noon.","The work had finished by them before noon."],"Past perfect → had been finished."],
+["L4",PV+"Did he return the book?",["Was the book returned by him?","Is the book returned by him?","Was the book return by him?","Had the book been returned by him?"],"Did + V1 → Was + subject + V3."],
+["L4",PV+"The boy did not tell a lie.",["A lie was not told by the boy.","A lie is not told by the boy.","A lie was not tell by the boy.","A lie had not been told by the boy."],"did not + V1 → was not + V3."],
+["L4",PV+"The farmers were sowing the seeds.",["The seeds were being sown by the farmers.","The seeds were sown by the farmers.","The seeds was being sown by the farmers.","The seeds are being sown by the farmers."],"sow – sowed – sown; past continuous → were being sown."],
+["L4",PV+"The storm destroyed many houses.",["Many houses were destroyed by the storm.","Many houses was destroyed by the storm.","Many houses are destroyed by the storm.","Many houses had destroyed by the storm."],"Simple past; houses plural → were destroyed."],
+["L4",PV+"Ravi had not seen the film.",["The film had not been seen by Ravi.","The film has not been seen by Ravi.","The film was not seen by Ravi.","The film had not seen by Ravi."],"Past perfect negative → had not been seen."],
+["L4",PV+"The principal was addressing the students.",["The students were being addressed by the principal.","The students was being addressed by the principal.","The students were addressed by the principal.","The students are being addressed by the principal."],"Past continuous → were being addressed."],
+["L4",AV+"The letter was posted by Meena.",["Meena posted the letter.","Meena posts the letter.","Meena has posted the letter.","Meena had posted the letter."],"was + V3 → simple past."],
+["L4",AV+"The thief was caught by the police.",["The police caught the thief.","The police has caught the thief.","The police catches the thief.","The police were catching the thief."],"was + V3 → simple past.","p"],
+["L4",PV+"The audience applauded the singer.",["The singer was applauded by the audience.","The singer is applauded by the audience.","The singer had applauded the audience.","The audience was applauded by the singer."],"Simple past → was applauded."],
+["L4",PV+"The army had captured the fort.",["The fort had been captured by the army.","The fort was being captured by the army.","The fort has been captured by the army.","The fort had captured by the army."],"Past perfect → had been captured."],
+// L5
+["L5",PV+"You should have informed the police.",["The police should have been informed by you.","The police should be informed by you.","The police should have informed by you.","The police would have been informed by you."],"Modal perfect → should have been + V3.","p"],
+["L5",PV+"We have to finish this work today.",["This work has to be finished by us today.","This work have to be finished by us today.","This work has to finished by us today.","This work had to be finished by us today."],"have to + V1 → has to be + V3."],
+["L5",PV+"Someone must clean the kitchen.",["The kitchen must be cleaned.","The kitchen must been cleaned.","The kitchen must have been cleaned.","The kitchen must being cleaned."],"Modal + be + V3; unknown agent dropped."],
+["L5",PV+"He will help me.",["I will be helped by him.","I would be helped by him.","Me will be helped by him.","I will be help by him."],"Simple future → will be + V3; me → I."],
+["L5",PV+"You must obey the rules.",["The rules must be obeyed by you.","The rules must obeyed by you.","The rules must have been obeyed by you.","The rules should be obeyed by you."],"must + V1 → must be + V3; keep the same modal.","p"],
+["L5",PV+"They will have completed the bridge by next year.",["The bridge will have been completed by them by next year.","The bridge will be completed by them by next year.","The bridge would have been completed by them by next year.","The bridge will have completed by them by next year."],"Future perfect → will have been + V3."],
+["L5",PV+"She can speak three languages.",["Three languages can be spoken by her.","Three languages could be spoken by her.","Three languages can be spoke by her.","Three languages can spoken by her."],"can + V1 → can be + V3; speak – spoke – spoken."],
+["L5",PV+"They are going to sell the old house.",["The old house is going to be sold by them.","The old house is going to sold by them.","The old house was going to be sold by them.","The old house is going to be sell by them."],"is going to + V1 → is going to be + V3."],
+["L5",PV+"You may take this book.",["This book may be taken by you.","This book might be taken by you.","This book may be take by you.","This book may taken by you."],"may + be + V3."],
+["L5",PV+"The court will announce the verdict tomorrow.",["The verdict will be announced by the court tomorrow.","The verdict would be announced by the court tomorrow.","The verdict will announced by the court tomorrow.","The verdict will have been announced by the court tomorrow."],"Simple future → will be announced.","p"],
+["L5",PV+"My grandfather used to tell us stories.",["We used to be told stories by my grandfather.","We were used to tell stories by my grandfather.","We used to tell stories by my grandfather.","Stories used to told us by my grandfather."],"used to + V1 → used to be + V3; us → we."],
+["L5",PV+"They might have sold the car.",["The car might have been sold by them.","The car might be sold by them.","The car may have been sold by them.","The car might have sold by them."],"Modal perfect → might have been + V3; keep might."],
+["L5",PV+"You ought to respect your elders.",["Your elders ought to be respected by you.","Your elders ought to respected by you.","Your elders ought be respected by you.","Your elders should be respected to you."],"ought to + V1 → ought to be + V3."],
+["L5",PV+"Will you invite him to the meeting?",["Will he be invited to the meeting by you?","Would he be invited to the meeting by you?","Will him be invited to the meeting by you?","Will he be invite to the meeting by you?"],"Future question → Will + subject + be + V3; him → he."],
+["L5",PV+"The doctor could not save the patient.",["The patient could not be saved by the doctor.","The patient cannot be saved by the doctor.","The patient could not saved by the doctor.","The patient could not have been saved by the doctor."],"could not + be + V3; keep could."],
+["L5",AV+"The form must be submitted by the candidates before Monday.",["The candidates must submit the form before Monday.","The candidates must have submitted the form before Monday.","The candidates should submit the form before Monday.","The candidates must be submitting the form before Monday."],"must be + V3 → must + V1."],
+["L5",AV+"The project should have been completed by the team.",["The team should have completed the project.","The team should complete the project.","The team should have been completing the project.","The team would have completed the project."],"should have been + V3 → should have + V3."],
+// L6
+["L6",PV+"Please lend me your pen.",["You are requested to lend me your pen.","You are ordered to lend me your pen.","Let your pen be lend to me.","Your pen is lent to me."],"Please → You are requested to + V1.","p"],
+["L6",PV+"Let her sing a song.",["Let a song be sung by her.","Let a song be sang by her.","A song is sung by her.","Let her be sung a song."],"Let + object + be + V3 + by + person."],
+["L6",PV+"Do not waste your time.",["Let your time not be wasted.","Let your time be not waste.","Your time is not wasted.","Let not waste your time."],"Negative imperative → Let + object + not be + V3."],
+["L6",PV+"Shut the door.",["Let the door be shut.","Let the door be shutted.","The door is shut.","Let the door shut."],"Let + object + be + V3; shut – shut – shut.","p"],
+["L6",PV+"Work hard.",["You are advised to work hard.","You are requested to work hard by me.","Let hard be worked.","Hard work is done by you."],"Advice without an object → You are advised to + V1."],
+["L6",PV+"Kindly help the poor.",["You are requested to help the poor.","The poor are helped kindly.","Let the poor be helping.","You are ordered to help the poor."],"Kindly → request → You are requested to."],
+["L6",PV+"Get out of the room.",["You are ordered to get out of the room.","You are requested to get out of the room.","Let the room be got out.","The room is got out of by you."],"A strong command → You are ordered to."],
+["L6",PV+"Open the window.",["Let the window be opened.","Let the window be open.","The window is opened.","Let open the window."],"Let + object + be + V3."],
+["L6",PV+"Let us play football.",["Let football be played by us.","Let football be played by we.","Football is played by us.","We are requested to play football."],"Let + object + be + V3 + by us."],
+["L6",PV+"Don't touch the live wire.",["Let the live wire not be touched.","Let the live wire be not touch.","The live wire is not touched.","Let the live wire be touched."],"Negative imperative → Let … not be + V3."],
+["L6",PV+"Please give me a glass of water.",["You are requested to give me a glass of water.","Let a glass of water be given to me.","A glass of water is given to me.","You are ordered to give me a glass of water."],"Please → requested. (Let … be given is used only without please.)"],
+["L6",PV+"Switch off the lights before leaving.",["Let the lights be switched off before leaving.","Let the lights switched off before leaving.","The lights are switched off before leaving.","Let the lights be switch off before leaving."],"Let + object + be + V3 + particle."],
+["L6",PV+"Let him finish the report.",["Let the report be finished by him.","Let the report be finished by he.","The report is finished by him.","Let him be finished the report."],"Let + object + be + V3 + by him."],
+["L6",AV+"Let the instructions be followed.",["Follow the instructions.","The instructions follow.","Let follow the instructions.","You followed the instructions."],"Let … be + V3 → bare imperative."],
+["L6",AV+"You are requested to sit down.",["Please sit down.","You sit down.","Let you sit down.","Sit down by you."],"You are requested to → Please."],
+["L6",PV+"Never tell a lie.",["Let a lie never be told.","Let a lie be never tell.","A lie is never told.","You are requested never to tell."],"Let + object + never be + V3."],
+// L7
+["L7",PV+"Who wrote this novel?",["By whom was this novel written?","Who was this novel written by whom?","By whom this novel was written?","By whom is this novel written?"],"Who → By whom; simple past → was written.","p"],
+["L7",PV+"Why did they postpone the meeting?",["Why was the meeting postponed by them?","Why the meeting was postponed by them?","Why was the meeting postpone by them?","Why is the meeting postponed by them?"],"Wh-word + was + subject + V3."],
+["L7",PV+"Whom did the manager praise?",["Who was praised by the manager?","By whom was the manager praised?","Whom was praised by the manager?","Who praised the manager?"],"Whom → Who."],
+["L7",PV+"Did you see the accident?",["Was the accident seen by you?","Is the accident seen by you?","Was the accident saw by you?","Did the accident seen by you?"],"Did + V1 → Was + subject + V3."],
+["L7",PV+"Does he play the guitar?",["Is the guitar played by him?","Was the guitar played by him?","Does the guitar played by him?","Is the guitar being played by him?"],"Does + V1 → Is + subject + V3."],
+["L7",PV+"Can you solve this problem?",["Can this problem be solved by you?","Could this problem be solved by you?","Can this problem solved by you?","Can this problem be solve by you?"],"Modal question → Modal + subject + be + V3."],
+["L7",PV+"Have they announced the results?",["Have the results been announced by them?","Has the results been announced by them?","Had the results been announced by them?","Have the results announced by them?"],"Present perfect question; results plural → Have … been."],
+["L7",PV+"What are you doing?",["What is being done by you?","What are being done by you?","What was being done by you?","What is done by you?"],"Present continuous → What is being done."],
+["L7",PV+"Who is teaching you English?",["By whom are you being taught English?","By whom are you taught English?","Who are you being taught English?","By whom were you being taught English?"],"Who → By whom; present continuous → are being taught."],
+["L7",PV+"Where did you buy this watch?",["Where was this watch bought by you?","Where this watch was bought by you?","Where was this watch buyed by you?","Where is this watch bought by you?"],"buy – bought – bought; simple past question."],
+["L7",PV+"Who has broken the vase?",["By whom has the vase been broken?","By whom was the vase broken?","Who has the vase been broken?","By whom had the vase been broken?"],"Present perfect → has been broken; Who → By whom."],
+["L7",PV+"Is she writing a letter?",["Is a letter being written by her?","Was a letter being written by her?","Is a letter written by her?","Is a letter being wrote by her?"],"Present continuous question → Is + subject + being + V3."],
+["L7",PV+"How did you solve this puzzle?",["How was this puzzle solved by you?","How this puzzle was solved by you?","How is this puzzle solved by you?","How was this puzzle solve by you?"],"Wh-word + was + subject + V3."],
+["L7",AV+"By whom was the window broken?",["Who broke the window?","Whom broke the window?","Who had broken the window?","Who breaks the window?"],"By whom → Who; was + V3 → simple past.","p"],
+["L7",AV+"Was the cake baked by your sister?",["Did your sister bake the cake?","Does your sister bake the cake?","Has your sister baked the cake?","Did your sister baked the cake?"],"Was + V3 → Did + V1."],
+["L7",PV+"Will they accept our offer?",["Will our offer be accepted by them?","Would our offer be accepted by them?","Will our offer accepted by them?","Will our offer be accept by them?"],"Will + subject + be + V3."],
+// L8
+["L8",PV+"People say that honesty is the best policy.",["It is said that honesty is the best policy.","It was said that honesty is the best policy.","Honesty is said the best policy by people.","It is say that honesty is the best policy."],"It + is + said + that.","p"],
+["L8",PV+"The teacher taught us grammar.",["We were taught grammar by the teacher.","We are taught grammar by the teacher.","Us were taught grammar by the teacher.","Grammar was taught us by the teacher."],"Two objects: person first; simple past → were taught."],
+["L8",PV+"They offered him a job.",["He was offered a job by them.","He was offering a job by them.","A job was offered by him to them.","He is offered a job by them."],"Person as subject, simple past."],
+["L8",PV+"My uncle gave me a watch.",["A watch was given to me by my uncle.","A watch was given by me to my uncle.","A watch is given to me by my uncle.","A watch was gave to me by my uncle."],"Thing as subject → given to me."],
+["L8",PV+"People believe that he is innocent.",["He is believed to be innocent.","He was believed to be innocent.","He is believed being innocent.","He believes to be innocent."],"Subject-form: is believed to be."],
+["L8",PV+"It is time to close the shop.",["It is time for the shop to be closed.","It is time for the shop to close.","It was time for the shop to be closed.","It is time for the shop being closed."],"to + V1 → to be + V3."],
+["L8",PV+"I want you to complete this task.",["I want this task to be completed by you.","I want this task to complete by you.","This task is wanted to be completed by me.","I want this task completed to you."],"object + to be + V3."],
+["L8",PV+"There is no time to waste.",["There is no time to be wasted.","There is no time to waste by us.","There was no time to be wasted.","There is no time being wasted."],"to + V1 → to be + V3."],
+["L8",PV+"They say that the Taj Mahal is a wonder of the world.",["It is said that the Taj Mahal is a wonder of the world.","It was said that the Taj Mahal is a wonder of the world.","The Taj Mahal is said that it is a wonder of the world.","It is says that the Taj Mahal is a wonder of the world."],"It is said that + clause."],
+["L8",PV+"She showed me her new house.",["I was shown her new house by her.","I am shown her new house by her.","Me was shown her new house by her.","I was showed her new house by her."],"Person as subject; show – showed – shown."],
+["L8",PV+"People think that he stole the money.",["He is thought to have stolen the money.","He is thought to steal the money.","He was thought to have stole the money.","He thinks to have stolen the money."],"Earlier action → is thought to have + V3."],
+["L8",PV+"The company sends its customers a newsletter every month.",["Its customers are sent a newsletter by the company every month.","Its customers were sent a newsletter by the company every month.","A newsletter is sent its customers by the company every month.","Its customers are send a newsletter by the company every month."],"Two objects; simple present; customers → are sent."],
+["L8",PV+"The coach asked the players to report early.",["The players were asked by the coach to report early.","The players are asked by the coach to report early.","The players were asking by the coach to report early.","The coach was asked by the players to report early."],"Simple past → were asked; the infinitive stays."],
+["L8",PV+"Everyone knows that the earth is round.",["It is known to everyone that the earth is round.","It is known by everyone that the earth was round.","It was known to everyone that the earth is round.","The earth is known round to everyone."],"It is known (to) + that-clause; keep tenses."],
+["L8",AV+"It is said that he is a good doctor.",["People say that he is a good doctor.","People said that he is a good doctor.","He says that he is a good doctor.","People say that he was a good doctor."],"It is said → People say."],
+// L9
+["L9",PV+"Everybody laughed at the joker.",["The joker was laughed at by everybody.","The joker was laughed by everybody.","The joker is laughed at by everybody.","The joker laughed at everybody."],"Keep the particle “at”.","p"],
+["L9",PV+"I know him.",["He is known to me.","He is known by me.","He was known to me.","Him is known to me."],"know → known to.","p"],
+["L9",PV+"Smoke filled the room.",["The room was filled with smoke.","The room was filled by smoke.","The room is filled with smoke.","The room filled with smoke."],"fill → filled with."],
+["L9",PV+"The answer surprised the teacher.",["The teacher was surprised at the answer.","The teacher is surprised at the answer.","The teacher was surprised from the answer.","The answer was surprised by the teacher."],"surprise → surprised at."],
+["L9",PV+"They looked after the orphan carefully.",["The orphan was looked after carefully by them.","The orphan was looked carefully by them.","The orphan is looked after carefully by them.","The orphan was being look after carefully by them."],"Phrasal verb: keep “after”."],
+["L9",PV+"We sent for the doctor.",["The doctor was sent for.","The doctor was sent.","The doctor is sent for.","The doctor was sending for."],"Keep “for”; the agent “we” may be dropped."],
+["L9",PV+"Snow covered the mountains.",["The mountains were covered with snow.","The mountains were covered by snow on.","The mountains was covered with snow.","The mountains are covered with snow."],"cover → covered with; mountains plural → were."],
+["L9",PV+"His performance satisfied the judges.",["The judges were satisfied with his performance.","The judges were satisfied by his performance of.","The judges are satisfied with his performance.","The judges was satisfied with his performance."],"satisfy → satisfied with."],
+["L9",PV+"This book interests me.",["I am interested in this book.","I am interested by this book.","I was interested in this book.","Me am interested in this book."],"interest → interested in; simple present → am."],
+["L9",PV+"The box contains sweets.",["Sweets are contained in the box.","Sweets are contained by the box.","Sweets were contained in the box.","Sweets is contained in the box."],"contain → contained in."],
+["L9",PV+"The authorities put off the exam.",["The exam was put off by the authorities.","The exam was put by the authorities.","The exam is put off by the authorities.","The exam was putted off by the authorities."],"put – put – put; keep “off”."],
+["L9",PV+"The room needs cleaning.",["The room needs to be cleaned.","The room needs to clean.","The room is needed to be cleaned.","The room need to be cleaned."],"need + -ing = need to be + V3."],
+["L9",PV+"I remember my father taking me to the zoo.",["I remember being taken to the zoo by my father.","I remember my father being taken to the zoo.","I remember being took to the zoo by my father.","I was remembered taking to the zoo by my father."],"Gerund with object → being + V3."],
+["L9",PV+"Her rude reply shocked everyone.",["Everyone was shocked at her rude reply.","Everyone is shocked at her rude reply.","Everyone was shocked to her rude reply.","Her rude reply was shocked by everyone."],"shock → shocked at."],
+["L9",PV+"The good news pleased my parents.",["My parents were pleased with the good news.","My parents was pleased with the good news.","My parents were pleased of the good news.","My parents are pleased with the good news."],"please → pleased with."],
+["L9",PV+"We should not laugh at the poor.",["The poor should not be laughed at.","The poor should not be laughed.","The poor should not laughed at.","The poor would not be laughed at."],"Modal + be + V3 + particle."],
+// L10
+["L10",PV+"Nobody can solve this puzzle.",["This puzzle cannot be solved by anybody.","This puzzle can be solved by nobody.","This puzzle cannot solved by anybody.","This puzzle could not be solved by anybody."],"Nobody → not … by anybody.","p"],
+["L10",PV+"Someone has stolen my purse.",["My purse has been stolen.","My purse had been stolen.","My purse has stolen by someone.","My purse was being stolen."],"Present perfect; drop the unknown agent.","p"],
+["L10",PV+"Nobody saw the thief.",["The thief was not seen by anybody.","The thief was seen by nobody.","The thief is not seen by anybody.","The thief was not saw by anybody."],"Nobody → not … by anybody; see – saw – seen."],
+["L10",PV+"She never tells lies.",["Lies are never told by her.","Lies were never told by her.","Lies are never tell by her.","Lies are not told by her ever."],"never stays; simple present → are told."],
+["L10",PV+"People speak English all over the world.",["English is spoken all over the world.","English is spoken by people all over the world by them.","English was spoken all over the world.","English is speaking all over the world."],"General agent “people” is dropped."],
+["L10",PV+"I did not see her yesterday.",["She was not seen by me yesterday.","She is not seen by me yesterday.","She was not seen by I yesterday.","Her was not seen by me yesterday."],"did not → was not; her → she; keep yesterday."],
+["L10",PV+"No one has cleaned the floor.",["The floor has not been cleaned by anyone.","The floor has been cleaned by no one at all.","The floor had not been cleaned by anyone.","The floor has not cleaned by anyone."],"No one → not … by anyone."],
+["L10",PV+"Someone is following us.",["We are being followed.","We were being followed.","Us are being followed.","We are followed by someone."],"Present continuous → are being followed; agent dropped."],
+["L10",PV+"They will not accept late applications.",["Late applications will not be accepted.","Late applications would not be accepted.","Late applications will not accepted.","Late applications are not accepted."],"will not be + V3; general “they” dropped."],
+["L10",PV+"He did nothing to help us.",["Nothing was done by him to help us.","Nothing is done by him to help us.","Nothing was did by him to help us.","Nothing had been done by him to help us."],"Simple past → was done."],
+["L10",PV+"One should keep one's promises.",["Promises should be kept.","Promises should be keep.","Promises would be kept.","Promises should kept."],"one (general) is dropped; should be + V3."],
+["L10","Which sentence does NOT have a passive form?",["The old man died last night.","The old man wrote a will.","The old man sold his land.","The old man planted a tree."],"die is intransitive."],
+["L10","Which sentence does NOT have a passive form in SSC usage?",["This shirt fits me well.","The tailor stitched this shirt.","My mother bought this shirt.","I washed this shirt."],"fit (be the right size) is a state verb."],
+["L10",PV+"Somebody had locked the gate.",["The gate had been locked.","The gate has been locked.","The gate was being locked.","The gate had locked."],"Past perfect → had been + V3."],
+["L10",AV+"The bridge has been damaged.",["Someone has damaged the bridge.","Someone had damaged the bridge.","Someone damages the bridge.","The bridge has damaged someone."],"No agent → use “someone”; has been + V3 → has + V3."],
+["L10",PV+"They never allow mobile phones in the exam hall.",["Mobile phones are never allowed in the exam hall.","Mobile phones were never allowed in the exam hall.","Mobile phones are never allow in the exam hall.","Mobile phones are not allowed never in the exam hall."],"never stays; simple present → are allowed."],
+// L11
+["L11",AV+"The match was won by India.",["India won the match.","India wins the match.","India has won the match.","India had won the match."],"was + V3 → simple past.","p"],
+["L11",AV+"The documents are being checked by the clerk.",["The clerk is checking the documents.","The clerk are checking the documents.","The clerk was checking the documents.","The clerk checks the documents."],"are being + V3 → is + Ving (agrees with clerk)."],
+["L11",AV+"A new bridge will be built by the government.",["The government will build a new bridge.","The government would build a new bridge.","The government will be building a new bridge.","The government builds a new bridge."],"will be + V3 → will + V1."],
+["L11",AV+"The road was being repaired by the workers.",["The workers were repairing the road.","The workers was repairing the road.","The workers repaired the road.","The workers had been repairing the road."],"was being + V3 → were + Ving.","p"],
+["L11",AV+"The work had been finished by them.",["They had finished the work.","They have finished the work.","They finished the work.","Them had finished the work."],"had been + V3 → had + V3; them → they."],
+["L11",AV+"I was taught by Mrs Sharma.",["Mrs Sharma taught me.","Mrs Sharma teaches me.","Mrs Sharma taught I.","Mrs Sharma had taught me."],"was + V3 → V2; I → me."],
+["L11",AV+"The shop was robbed last night.",["Someone robbed the shop last night.","The shop robbed someone last night.","Someone has robbed the shop last night.","Someone robs the shop last night."],"No agent → someone; keep last night."],
+["L11",AV+"English is spoken all over the world.",["People speak English all over the world.","People spoke English all over the world.","English speaks people all over the world.","People are speaking English all over the world."],"No agent → people; simple present."],
+["L11",AV+"The thieves have been caught by the police.",["The police have caught the thieves.","The police had caught the thieves.","The police caught the thieves.","The police have been catching the thieves."],"have been + V3 → have + V3."],
+["L11",PV+"He said that he would finish the task.",["He said that the task would be finished by him.","He said that the task will be finished by him.","It was said by him that he would finish the task by him.","He said that the task would finish by him."],"Change the clause with the object; keep would."],
+["L11",PV+"They might have cancelled the flight.",["The flight might have been cancelled.","The flight might be cancelled.","The flight may have been cancelled.","The flight might have cancelled."],"Modal perfect → might have been + V3."],
+["L11","“I had my car repaired.” What does this sentence mean?",["Someone repaired my car for me.","I repaired my car myself.","My car repaired itself.","I will repair my car."],"Causative have: someone else did the work."],
+["L11",AV+"Let the poor be helped.",["Help the poor.","The poor help.","Let help the poor.","You helped the poor."],"Let … be + V3 → imperative."],
+["L11",AV+"By whom was this poem written?",["Who wrote this poem?","Whom wrote this poem?","Who has written this poem?","Who writes this poem?"],"By whom → Who; was + V3 → V2."],
+["L11",AV+"Rice is grown in Punjab by farmers.",["Farmers grow rice in Punjab.","Farmers grew rice in Punjab.","Farmers are growing rice in Punjab.","Rice grows farmers in Punjab."],"is + V3 → simple present; farmers plural → grow."],
+["L11",AV+"The plan should have been approved by the board.",["The board should have approved the plan.","The board should approve the plan.","The board would have approved the plan.","The board should have been approving the plan."],"should have been + V3 → should have + V3."],
+["L11",PV+"He cleaned the room, didn't he?",["The room was cleaned by him, wasn't it?","The room was cleaned by him, didn't he?","The room was cleaned by him, wasn't he?","The room is cleaned by him, isn't it?"],"The tag agrees with the new main clause."],
+// L12 — mixed set modelled on recent shifts
+["L12",PV+"The ministry has launched a new portal for students.",["A new portal for students has been launched by the ministry.","A new portal for students had been launched by the ministry.","A new portal for students is launched by the ministry.","A new portal for students has launched by the ministry."],"Present perfect → has been + V3.","p"],
+["L12",PV+"The volunteers are distributing food packets in the village.",["Food packets are being distributed by the volunteers in the village.","Food packets were being distributed by the volunteers in the village.","Food packets are distributed by the volunteers in the village.","Food packets is being distributed by the volunteers in the village."],"Present continuous; packets plural → are being.","p"],
+["L12",PV+"The officer checked all the files carefully.",["All the files were checked carefully by the officer.","All the files was checked carefully by the officer.","All the files are checked carefully by the officer.","All the files had been checked carefully by the officer."],"Simple past; files plural → were checked."],
+["L12",AV+"The national anthem was sung by the students.",["The students sang the national anthem.","The students sing the national anthem.","The students had sung the national anthem.","The students were singing the national anthem."],"was + V3 → V2.","p"],
+["L12",PV+"The municipal corporation will plant a thousand trees this year.",["A thousand trees will be planted by the municipal corporation this year.","A thousand trees would be planted by the municipal corporation this year.","A thousand trees will been planted by the municipal corporation this year.","A thousand trees are planted by the municipal corporation this year."],"Simple future → will be + V3.","p"],
+["L12",PV+"Who invented the telephone?",["By whom was the telephone invented?","Who was the telephone invented by whom?","By whom the telephone was invented?","By whom is the telephone invented?"],"Who → By whom; simple past.","p"],
+["L12",PV+"The guard was checking the visitors' passes.",["The visitors' passes were being checked by the guard.","The visitors' passes was being checked by the guard.","The visitors' passes were checked by the guard.","The visitors' passes had been checked by the guard."],"Past continuous; passes plural → were being.","p"],
+["L12",AV+"The criminal had been sentenced by the judge.",["The judge had sentenced the criminal.","The judge has sentenced the criminal.","The judge sentenced the criminal.","The judge was sentencing the criminal."],"had been + V3 → had + V3.","p"],
+["L12",PV+"Please switch off your mobile phones.",["You are requested to switch off your mobile phones.","Let your mobile phones be switched off by please.","Your mobile phones are switched off.","You are ordered to switch off your mobile phones."],"Please → requested.","p"],
+["L12",PV+"You must wear a helmet while riding.",["A helmet must be worn by you while riding.","A helmet must be wore by you while riding.","A helmet must have been worn by you while riding.","A helmet should be worn by you while riding."],"wear – wore – worn; must be + V3.","p"],
+["L12",AV+"A new record was set by the young athlete.",["The young athlete set a new record.","The young athlete sets a new record.","The young athlete has set a new record.","The young athlete was setting a new record."],"was + V3 → V2 (set – set – set).","p"],
+["L12",PV+"The Reserve Bank of India announces the repo rate.",["The repo rate is announced by the Reserve Bank of India.","The repo rate was announced by the Reserve Bank of India.","The repo rate is being announced by the Reserve Bank of India.","The repo rate is announce by the Reserve Bank of India."],"Simple present → is + V3.","p"],
+["L12",PV+"Did the team win the trophy?",["Was the trophy won by the team?","Is the trophy won by the team?","Was the trophy win by the team?","Had the trophy been won by the team?"],"Did + V1 → Was + subject + V3.","p"],
+["L12",AV+"The guests are being welcomed by the host.",["The host is welcoming the guests.","The host was welcoming the guests.","The host welcomes the guests.","The host are welcoming the guests."],"are being + V3 → is + Ving.","p"],
+["L12",PV+"The teacher has explained the lesson twice.",["The lesson has been explained twice by the teacher.","The lesson had been explained twice by the teacher.","The lesson was explained twice by the teacher.","The lesson has explained twice by the teacher."],"Present perfect → has been + V3."],
+["L12",PV+"They are building a new hospital in our town.",["A new hospital is being built in our town.","A new hospital was being built in our town.","A new hospital is built in our town.","A new hospital has been built in our town."],"Present continuous → is being built; general “they” dropped."],
+["L12",AV+"The cheque must be signed by the manager.",["The manager must sign the cheque.","The manager must have signed the cheque.","The manager should sign the cheque.","The manager must be signing the cheque."],"must be + V3 → must + V1."],
+["L12",PV+"The heavy rain had flooded the streets.",["The streets had been flooded by the heavy rain.","The streets have been flooded by the heavy rain.","The streets were flooded by the heavy rain.","The streets had flooded by the heavy rain."],"Past perfect → had been + V3."],
+["L12",PV+"Let the students submit their assignments.",["Let the assignments be submitted by the students.","Let the assignments submitted by the students.","The assignments are submitted by the students.","Let the students be submitted their assignments."],"Let + object + be + V3 + by …"],
+["L12",AV+"The cricket match is being telecast by Doordarshan.",["Doordarshan is telecasting the cricket match.","Doordarshan was telecasting the cricket match.","Doordarshan telecasts the cricket match.","Doordarshan has telecast the cricket match."],"is being + V3 → is + Ving."],
+["L12",PV+"The examiner may cancel your paper.",["Your paper may be cancelled by the examiner.","Your paper might be cancelled by the examiner.","Your paper may cancelled by the examiner.","Your paper may have been cancelled by the examiner."],"may be + V3; keep may."],
+["L12",AV+"Has the parcel been delivered by the courier?",["Has the courier delivered the parcel?","Had the courier delivered the parcel?","Did the courier deliver the parcel?","Has the courier been delivering the parcel?"],"Has … been + V3 → Has + subject + V3."],
+["L12",PV+"The scientists were testing a new vaccine.",["A new vaccine was being tested by the scientists.","A new vaccine were being tested by the scientists.","A new vaccine was tested by the scientists.","A new vaccine is being tested by the scientists."],"Past continuous; vaccine singular → was being."],
+["L12",AV+"Our house was painted last month.",["Someone painted our house last month.","Someone paints our house last month.","Someone had painted our house last month.","Our house painted someone last month."],"No agent → someone; was + V3 → V2."],
+["L12",PV+"Why are you wasting your money?",["Why is your money being wasted by you?","Why your money is being wasted by you?","Why was your money being wasted by you?","Why is your money wasted by you?"],"Wh-question, present continuous → Why is … being + V3."],
+["L12",PV+"The principal will have announced the results by noon.",["The results will have been announced by the principal by noon.","The results will be announced by the principal by noon.","The results would have been announced by the principal by noon.","The results will have announced by the principal by noon."],"Future perfect → will have been + V3."],
+["L12",PV+"People consider him a great leader.",["He is considered a great leader.","He was considered a great leader.","He is considering a great leader.","He considers a great leader."],"Simple present; general “people” dropped."],
+["L12",AV+"The injured were taken to the hospital by the villagers.",["The villagers took the injured to the hospital.","The villagers take the injured to the hospital.","The villagers had taken the injured to the hospital.","The villagers were taking the injured to the hospital."],"were + V3 → V2."],
+["L12",PV+"The professor is delivering a lecture on climate change.",["A lecture on climate change is being delivered by the professor.","A lecture on climate change was being delivered by the professor.","A lecture on climate change is delivered by the professor.","A lecture on climate change has been delivered by the professor."],"Present continuous → is being + V3."],
+["L12",PV+"Can anyone answer this question?",["Can this question be answered by anyone?","Could this question be answered by anyone?","Can this question answered by anyone?","Can anyone be answered this question?"],"Modal question → Can + subject + be + V3."]
+//@@Q
+];
+const HEAT = [
+["Present tenses",16,"L3","is/are + V3, is being + V3, has been + V3"],
+["Past tenses",20,"L4","was/were + V3, was being + V3, had been + V3"],
+["Future & modals",16,"L5","will be, must be, should have been, has to be"],
+["Imperative",10,"L6","Let … be + V3; You are requested / ordered / advised to"],
+["Interrogative",12,"L7","By whom; Was … by …?; What is being done?"],
+["Two objects, ‘It is said’, infinitives",6,"L8","He was given …; It is said that …; to be + V3"],
+["Prepositions & phrasal verbs",5,"L9","known to, filled with, laughed at, looked after"],
+["Negatives & agent omission",5,"L10","Nobody → not … by anybody; Someone has stolen → has been stolen"],
+["Passive → active",10,"L11","was won by India → India won"]
+];
+const TILES = [
+["V1 → is/are + V3","simple present"],
+["V2 → was/were + V3","simple past"],
+["will + V1 → will be + V3","simple future"],
+["is + Ving → is being + V3","present continuous"],
+["was + Ving → was being + V3","past continuous"],
+["has + V3 → has been + V3","present perfect"],
+["had + V3 → had been + V3","past perfect"],
+["will have → will have been","future perfect"],
+["modal + V1 → modal + be + V3","can, must, should, may"],
+["modal + have → have been","should have been done"],
+["Who → By whom","question with a doer"],
+["Whom → Who","question with a receiver"],
+["Please → You are requested to","request"],
+["Do it → Let it be done","order with an object"],
+["Nobody → not … by anybody","negative subject"],
+["People say → It is said","general agent"],
+["known to · filled with","not “by”"],
+["needs cleaning = needs to be cleaned","need + -ing"]
+];
+const PAIRS = [
+["is being written vs has been written","present continuous vs present perfect"],
+["was being written vs had been written","past continuous vs past perfect"],
+["will be done vs would be done","will stays will — would changes the tense"],
+["should be done vs should have been done","modal + V1 vs modal + have + V3"],
+["By whom vs Who","Who (doer) → By whom; Whom (receiver) → Who"],
+["was wrote vs was written","V2 can never follow “be”; use V3"],
+["known by me vs known to me","“know” takes “to”"],
+["filled by smoke vs filled with smoke","fill / cover take “with”"],
+["laughed by vs laughed at by","keep the particle of a phrasal verb"],
+["can be solved by nobody vs cannot be solved by anybody","SSC keys the second"],
+["A book was given me vs A book was given to me","add “to” when the thing is the subject"],
+["Please help → requested vs Help him → Let him be helped","please / kindly → requested"]
+];
+const COVERS = {
+ tense:{tab:"Tense drill", hideLabel:"Hide passive", note:"Cover the passive column and say the passive form of each tense aloud. Check, then move on.", head:["Tense","Active","Passive"], hide:2, rows:[
+  ["Simple present","He writes a letter.","A letter is written by him."],
+  ["Present continuous","He is writing a letter.","A letter is being written by him."],
+  ["Present perfect","He has written a letter.","A letter has been written by him."],
+  ["Simple past","He wrote a letter.","A letter was written by him."],
+  ["Past continuous","He was writing a letter.","A letter was being written by him."],
+  ["Past perfect","He had written a letter.","A letter had been written by him."],
+  ["Simple future","He will write a letter.","A letter will be written by him."],
+  ["Future perfect","He will have written a letter.","A letter will have been written by him."],
+  ["Modal","He can write a letter.","A letter can be written by him."],
+  ["Modal perfect","He should have written a letter.","A letter should have been written by him."],
+  ["Going to","He is going to write a letter.","A letter is going to be written by him."],
+  ["Has to","He has to write a letter.","A letter has to be written by him."]]},
+ special:{tab:"Special types drill", hideLabel:"Hide answers", note:"Cover the passive and recall the special pattern.", head:["Active","Passive"], hide:1, rows:[
+  ["Who wrote it?","By whom was it written?"],
+  ["Whom did you call?","Who was called by you?"],
+  ["Please help me.","You are requested to help me."],
+  ["Shut the door.","Let the door be shut."],
+  ["Don't touch it.","Let it not be touched."],
+  ["Let him do it.","Let it be done by him."],
+  ["Nobody saw him.","He was not seen by anybody."],
+  ["Someone has stolen my bag.","My bag has been stolen."],
+  ["People say that he is rich.","It is said that he is rich."],
+  ["He gave me a pen.","I was given a pen by him."],
+  ["I know her.","She is known to me."],
+  ["Smoke filled the room.","The room was filled with smoke."],
+  ["They looked after him.","He was looked after by them."],
+  ["The room needs cleaning.","The room needs to be cleaned."]]},
+ v3:{tab:"V3 drill", hideLabel:"Hide V3", note:"Cover the V3 column — half the wrong SSC options use the wrong verb form.", head:["V1","V2","V3"], hide:2, rows:[
+  ["write","wrote","written"],["sing","sang","sung"],["speak","spoke","spoken"],["break","broke","broken"],["choose","chose","chosen"],["steal","stole","stolen"],["bite","bit","bitten"],["hide","hid","hidden"],["teach","taught","taught"],["catch","caught","caught"],["buy","bought","bought"],["wear","wore","worn"],["tear","tore","torn"],["sow","sowed","sown"],["draw","drew","drawn"],["forgive","forgave","forgiven"],["lay","laid","laid"],["shake","shook","shaken"],["see","saw","seen"],["eat","ate","eaten"]]}
+};
+const FIND = { tab:"Rule finder", ph:"Search a rule (e.g. being, Let, by whom, known)", head:["Type","Active → Passive","Lesson","Example"], rows:[
+["Four steps","object → subject; be-form; V3; by + object form","L2","She invited us → We were invited by her"],
+["Pronouns","I/we/he/she/they → me/us/him/her/them","L2","by they ✗ → by them ✓"],
+["Agreement","be-form agrees with the new subject","L2","The students were praised"],
+["No passive","intransitive verbs; have/resemble/lack/fit/suit","L2","She sleeps · He has a car"],
+["Simple present","V1/V5 → is/am/are + V3","L3","He writes → is written"],
+["Present continuous","is + Ving → is being + V3","L3","is writing → is being written"],
+["Present perfect","has + V3 → has been + V3","L3","has written → has been written"],
+["Simple past","V2 → was/were + V3","L4","wrote → was written"],
+["Past continuous","was + Ving → was being + V3","L4","was writing → was being written"],
+["Past perfect","had + V3 → had been + V3","L4","had written → had been written"],
+["Simple future","will + V1 → will be + V3","L5","will write → will be written"],
+["Future perfect","will have + V3 → will have been + V3","L5","will have written → will have been written"],
+["Modal","modal + V1 → modal + be + V3","L5","must obey → must be obeyed"],
+["Modal perfect","modal + have + V3 → modal + have been + V3","L5","should have sent → should have been sent"],
+["Going to / has to / used to","to + V1 → to be + V3","L5","has to finish → has to be finished"],
+["Request","Please/Kindly → You are requested to","L6","Please help → You are requested to help"],
+["Order with object","Let + object + be + V3","L6","Shut the door → Let the door be shut"],
+["Negative order","Let + object + not be + V3","L6","Don't touch it → Let it not be touched"],
+["Order without object","You are ordered / advised to","L6","Work hard → You are advised to work hard"],
+["Let + person","Let + object + be + V3 + by + person","L6","Let him sing → Let a song be sung by him"],
+["Yes/no question","helping verb + subject + V3 + by …?","L7","Did he write? → Was it written by him?"],
+["Who","By whom + be + subject + V3?","L7","Who wrote it? → By whom was it written?"],
+["Whom","Who + be + V3 + by …?","L7","Whom did you see? → Who was seen by you?"],
+["What","What + be + V3 + by …?","L7","What are you doing? → What is being done by you?"],
+["Two objects","person first; or thing + to + person","L8","I was given a book / A book was given to me"],
+["Say / believe / know","It is said that … / He is said to be …","L8","People say that … → It is said that …"],
+["Infinitive","to + V1 → to be + V3","L8","no time to waste → no time to be wasted"],
+["know","known to","L9","He is known to me"],
+["fill / cover","filled with / covered with","L9","The room was filled with smoke"],
+["please / satisfy","pleased with / satisfied with","L9","She was pleased with the result"],
+["surprise / shock / annoy","surprised at / shocked at / annoyed at","L9","We were surprised at the news"],
+["interest / contain","interested in / contained in","L9","I am interested in music"],
+["Phrasal verb","V3 + particle + by …","L9","was looked after by them"],
+["Gerund","being + V3","L9","I remember being taken there"],
+["need + -ing","need to be + V3","L9","needs cleaning = needs to be cleaned"],
+["Nobody / No one","not … by anybody / anyone","L10","He was not seen by anybody"],
+["Never","stays in place","L10","Lies are never told by her"],
+["Unknown agent","drop by someone / people / they","L10","My purse has been stolen"],
+["Passive → active","agent first, remove be, rebuild tense","L11","was won by India → India won"],
+["Let … be → active","bare imperative","L11","Let the door be shut → Shut the door"],
+["Causative","have/get + object + V3","L11","I had my car repaired"],
+["Question tag","tag agrees with the new main clause","L11","It was cleaned by him, wasn't it?"]
+]};
+const APP = { key:"voice_workbook_v1", brand:"Active & Passive Voice", sub:"वाच्य · SSC CGL English workbook",
+  eyebrow:"SSC CGL English",
+  intro:"Twelve lessons on active and passive voice built around the SSC CGL pattern: how and how often voice is asked in Tier 1 and Tier 2, the four-step method, every tense and modal, imperatives, questions, two objects, ‘It is said that’, prepositions other than ‘by’, negatives and passive to active. Each lesson has rule cards, solved PYQ-type examples, tricks, traps and a question bank in the exact SSC format.",
+  foot:"Read a lesson’s rule cards and solved examples, then try its quick check and question bank. Use the drills to cover a column and recall it, and the rule finder to look anything up in seconds. Do the L12 mixed set with a 30-second limit before every mock.",
+  craft:"Every voice question falls to the same four checks, in this order. (1) Tense: read only the helping verb of each option and strike out the wrong tense — is/was, being/been, will/would. (2) Subject: the old object comes first, in subject form. (3) Verb: the main verb is V3 — never V2. (4) Agent and extras: by + object form at the end; not, never, modals and time words unchanged. Who → By whom, Please → requested, Do it → Let it be done.",
+  heatNote:"Shares are approximate, estimated from recent SSC CGL, CHSL and CPO papers; they show which voice types are asked most, not exact counts." };
+
+/* ============================================================
+   HELPERS & STATE
+   ============================================================ */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const hash = s => { let h = 5381; for (let i=0;i<s.length;i++) h = ((h<<5)+h + s.charCodeAt(i))|0; return "q"+(h>>>0).toString(36); };
+const shuffle = a => { const b=a.slice(); for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]];} return b; };
+const L = id => LESSONS.find(l => l.id === id);
+const LNUM = id => LESSONS.findIndex(l => l.id === id) + 1;
+
+const QS = QB.map(r => {
+  const fixed = !!r[6];
+  return { t:r[0], q:r[1], o:r[2], e:r[3], p:(r[4]||"").includes("p"), a: fixed ? (r[5]||0) : 0, fixed, id:hash(r[1]) };
+});
+const byLesson = id => QS.filter(q => q.t === id);
+// order of options to show: array of original indexes
+const makePerm = q => q.fixed ? q.o.map((_,i)=>i) : shuffle(q.o.map((_,i)=>i));
+
+const KEY = APP.key;
+let S = { ans:{}, bm:{}, les:{}, mocks:[] };
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch(e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
+const record = (q, ok) => { S.ans[q.id] = ok ? 1 : 0; save(); renderTop(); };
+
+function renderTop(){
+  const ids = Object.keys(S.ans).filter(k => QS.some(q => q.id === k));
+  const right = ids.filter(k => S.ans[k] === 1).length;
+  const pct = ids.length ? Math.round(right*100/ids.length) : 0;
+  $("#topstat").innerHTML = `<b>${ids.length}</b>/${QS.length} tried<br><b>${pct}%</b> right now`;
+}
+
+/* ============================================================
+   ROUTING
+   ============================================================ */
+let TAB = "learn";
+let timerId = null;
+function go(tab){
+  TAB = tab;
+  document.querySelectorAll(".nav button").forEach(b => b.setAttribute("aria-current", b.dataset.tab===tab ? "page" : "false"));
+  if (tab === "learn") renderLearn();
+  if (tab === "practice") renderPractice();
+  if (tab === "mock") renderMock();
+  if (tab === "revise") renderRevise();
+  window.scrollTo(0,0);
+  try { history.replaceState(null, "", "#"+tab); } catch(e) {}
+}
+document.querySelectorAll(".nav button").forEach(b => b.addEventListener("click", () => {
+  if (TAB === "mock" && M && M.running && b.dataset.tab !== "mock") { go("mock"); showMockLeave(b.dataset.tab); return; }
+  go(b.dataset.tab);
+}));
+
+/* ============================================================
+   LEARN
+   ============================================================ */
+function renderLearn(){
+  const done = LESSONS.filter(l => S.les[l.id] && S.les[l.id].done).length;
+  const nextIdx = LESSONS.findIndex(l => !(S.les[l.id] && S.les[l.id].done));
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="hero">
+      <span class="eyebrow">${APP.eyebrow}</span>
+      <h1>Learn it, test it, revise it</h1>
+      <p>${APP.intro} ${QS.length} exam-style questions in all.</p>
+      <div class="meter" aria-label="Lessons done"><i style="width:${done/LESSONS.length*100}%"></i></div>
+      <div class="row between"><span class="muted num" style="font-size:13px">${done}/${LESSONS.length} lessons done</span>
+      ${nextIdx>=0 ? `<button class="btn pri sm" type="button" data-open="${LESSONS[nextIdx].id}">${done? "Continue" : "Start"}: Lesson ${nextIdx+1}</button>` : `<span class="muted" style="font-size:13px">All lessons done. Try a mock test.</span>`}</div>
+    </div>
+    <div class="lessons">${LESSONS.map((l,i) => {
+      const st = S.les[l.id] || {}; const n = byLesson(l.id).length;
+      return `<button type="button" class="les ${st.done?"done":""} ${i===nextIdx?"next":""}" data-open="${l.id}">
+        <span class="no">${st.done ? "✓" : i+1}</span>
+        <span class="t"><b>${esc(l.title)}<span class="heatb" title="Exam frequency">${"🔥".repeat(l.heat||1)}</span></b><span>${l.hi} · ${n} questions</span></span>
+        <span class="sc">${st.best!=null ? `best<br>${st.best}/${n}` : ""}</span></button>`;}).join("")}
+    </div>
+    <p class="foot">${APP.foot}</p>
+  </section>`;
+  $("#app").querySelectorAll("[data-open]").forEach(b => b.addEventListener("click", () => openLesson(b.dataset.open, "learn")));
+}
+
+function blockHTML(b){
+
+  if (b.k==="formula") return `<div class="block"><h3>${b.title}</h3><div class="fgrid">${b.rows.map(r=>`<div class="fcard"><span class="fn">${r[0]}</span><span class="fx">${r[1]}</span>${r[2]?`<span class="fnote">${r[2]}</span>`:""}</div>`).join("")}</div></div>`;
+  if (b.k==="ex") return `<div class="ex"><div class="exhead"><span class="lab">${b.src ? "PYQ-type" : "Solved example"}</span>${b.src?`<span class="src">${b.src}</span>`:""}</div><div class="exq">${b.q}</div>${b.fig?`<figure class="fig">${b.fig}</figure>`:""}<details><summary>Show solution</summary><ol>${b.steps.map(x=>`<li>${x}</li>`).join("")}</ol><div class="exans">Answer: ${b.ans}</div>${b.tip?`<div class="trick" style="margin-top:8px"><span class="lab">Shortcut</span>${b.tip}</div>`:""}</details></div>`;
+  if (b.k==="figs") return `<div class="block"><h3>${b.title}</h3><div class="figwrap">${b.items.map(it=>`<figure>${it.svg}<figcaption>${it.cap}</figcaption></figure>`).join("")}</div></div>`;
+  if (b.k==="p") return `<div class="plain"><p>${b.h}</p></div>`;
+  if (b.k==="trick") return `<div class="trick"><span class="lab">Trick</span>${b.h}</div>`;
+  if (b.k==="link") return `<div class="link"><span class="lab">Link · connect the dots</span>${b.h}</div>`;
+  if (b.k==="q") { const perm = shuffle(b.o.map((_,i)=>i)); return `<div class="icheck" data-ic><span class="lab">Quick check</span><p class="qt">${esc(b.q)}</p><div class="opts">${perm.map((oi,k)=>`<button type="button" class="opt" data-ioi="${oi}"><span class="k">${"ABCD"[k]}</span><span>${esc(b.o[oi])}</span></button>`).join("")}</div><div class="exp" hidden><b class="okl"></b> ${esc(b.e)}</div></div>`; }
+  if (b.k==="hot") return `<div class="hot"><span class="lab">🔥 Exam radar · how often it's asked</span>${b.h}</div>`;
+  if (b.k==="trap") return `<div class="trap"><span class="lab">Trap · correction</span>${b.h}</div>`;
+  if (b.k==="facts") return `<div class="block"><h3>${b.title}</h3><dl class="facts">${b.rows.map(r=>`<div><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join("")}</dl></div>`;
+  if (b.k==="tl") return `<div class="block"><h3>${b.title}</h3><ul class="tl">${b.rows.map(r=>`<li><span class="y">${r[0]}</span><span>${r[1]}</span></li>`).join("")}</ul></div>`;
+  if (b.k==="table") {
+    const isNum = (ci) => b.numcol==="all" ? ci>0 : (b.numcol===1 && ci===1) || (typeof b.numcol==="string" && b.numcol.includes(String(ci)));
+    return `<div class="block"><h3>${b.title}</h3><div class="tbl"><table><thead><tr>${b.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${b.rows.map(r=>`<tr>${r.map((c,ci)=>`<td class="${isNum(ci)?"n":""}">${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+  }
+  if (b.k==="fig") return `<div class="block"><h3>${b.title}</h3><figure class="fig">${b.svg}<figcaption>${b.cap}</figcaption></figure></div>`;
+  if (b.k==="pyr") return `<div class="block"><h3>${b.title}</h3><div class="pyr">${b.items.map(it=>`<div>${PYR(it.rows)}<b>${it.name}</b><span class="muted">${it.note}</span></div>`).join("")}</div><p class="muted" style="font-size:13px;margin-top:8px"><span style="color:var(--blue)">■</span> males · <span style="color:var(--accent)">■</span> females · top = old, base = young</p></div>`;
+  return "";
+}
+
+let LQ = null;
+function openLesson(id, step){
+  const l = L(id), i = LNUM(id);
+  if (step === "quiz") { LQ = { id, list: shuffle(byLesson(id)).map(q => ({q, perm:makePerm(q)})), i:0, score:0, picked:null }; }
+  const head = `<div class="lhead"><button class="back" type="button" id="lback">‹ Lessons</button></div>
+    <span class="eyebrow">Lesson ${i} of ${LESSONS.length} · ${l.hi}</span><h1>${esc(l.title)}</h1>
+    <div class="steps" role="tablist">
+      <button type="button" data-step="learn" aria-current="${step==="learn"?"step":"false"}">1 · Learn</button>
+      <button type="button" data-step="quiz" aria-current="${step==="quiz"?"step":"false"}">2 · Quiz</button>
+      <button type="button" data-step="sum" aria-current="${step==="sum"?"step":"false"}">3 · Summary</button>
+    </div>`;
+  let body = "";
+  if (step === "learn") {
+    body = `<div class="stack">${l.blocks.map(blockHTML).join("")}
+      <div class="row end"><button class="btn pri" type="button" id="toquiz">Take the lesson quiz · ${byLesson(id).length} questions</button></div></div>`;
+  } else if (step === "quiz") {
+    body = `<div id="lq"></div>`;
+  } else {
+    const nxt = LESSONS[i];
+    body = `<div class="stack"><div class="block"><h3>Remember these</h3><ul class="sum">${l.sum.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>
+      <div class="row between"><button class="btn" type="button" id="relearn">Read again</button>
+      ${nxt ? `<button class="btn pri" type="button" id="nextles">Next: ${esc(nxt.title)}</button>` : `<button class="btn pri" type="button" id="tomock">Take a mock test</button>`}</div></div>`;
+    S.les[id] = Object.assign(S.les[id]||{}, {done:1}); save();
+  }
+  $("#app").innerHTML = `<section class="view stack">${head}${body}</section>`;
+  $("#lback").onclick = () => renderLearn();
+  $("#app").querySelectorAll("[data-step]").forEach(b => b.onclick = () => openLesson(id, b.dataset.step));
+  if (step==="learn") { $("#toquiz").onclick = () => openLesson(id,"quiz");
+    const ics = l.blocks.filter(b=>b.k==="q");
+    $("#app").querySelectorAll("[data-ic]").forEach((box,n) => { const b = ics[n];
+      box.querySelectorAll("[data-ioi]").forEach(btn => btn.onclick = () => {
+        if (box.dataset.done) return; box.dataset.done = 1; const pick = +btn.dataset.ioi;
+        box.querySelectorAll("[data-ioi]").forEach(x => { const oi=+x.dataset.ioi; x.disabled = true; if (oi===0) x.classList.add("ok"); else if (oi===pick) x.classList.add("no"); });
+        const ex = box.querySelector(".exp"); ex.hidden = false; const lab = ex.querySelector("b");
+        if (pick===0) { lab.textContent = "Correct."; } else { lab.className = "nol"; lab.textContent = "Answer: " + b.o[0] + "."; }
+      }); }); }
+  if (step==="quiz") renderLQ();
+  if (step==="sum") {
+    $("#relearn").onclick = () => openLesson(id,"learn");
+    const n = $("#nextles"); if (n) n.onclick = () => openLesson(LESSONS[i].id,"learn");
+    const m = $("#tomock"); if (m) m.onclick = () => go("mock");
+  }
+  window.scrollTo(0,0);
+}
+
+function optsHTML(q, perm, state){
+  // state: {picked: originalIndex|null, reveal: bool, sel: originalIndex|null}
+  return perm.map((oi, k) => {
+    let cls = "opt";
+    if (state.reveal) { if (oi === q.a) cls += " ok"; else if (oi === state.picked) cls += " no"; }
+    else if (state.sel === oi) cls += " sel";
+    return `<button type="button" class="${cls}" data-oi="${oi}" ${state.reveal?"disabled":""}><span class="k">${"ABCD"[k]}</span><span>${esc(q.o[oi])}</span></button>`;
+  }).join("");
+}
+function expHTML(q, picked){
+  const ok = picked === q.a;
+  return `<div class="exp">${ok ? `<b class="okl">Correct.</b>` : `<b class="nol">Answer: ${esc(q.o[q.a])}.</b>`} ${esc(q.e)}</div>`;
+}
+function metaHTML(q, no){
+  return `<div class="qmeta"><span class="qno">${no}</span><span class="tag">L${LNUM(q.t)} · ${esc(L(q.t).title)}</span>${q.p?`<span class="tag pyq">High-yield</span>`:""}
+  <button type="button" class="bm" data-bm="${q.id}" aria-pressed="${S.bm[q.id]?"true":"false"}" aria-label="Bookmark">${S.bm[q.id]?"★":"☆"}</button></div>`;
+}
+
+function renderLQ(){
+  const box = $("#lq");
+  if (LQ.i >= LQ.list.length) {
+    const n = LQ.list.length, l = L(LQ.id);
+    const st = S.les[LQ.id] || {}; st.best = Math.max(st.best||0, LQ.score); S.les[LQ.id] = st; save();
+    box.innerHTML = `<div class="stack"><div class="block stack"><span class="eyebrow">Quiz done</span>
+      <div class="scorebig"><span class="num">${LQ.score}</span><span class="muted">/ ${n} correct</span></div>
+      <p class="muted">${LQ.score===n ? "Full marks." : LQ.score >= n*0.8 ? "Strong. Review the ones you missed in Practice → Mistakes." : "Read the lesson once more, then retry. Missed questions are saved under Practice → Mistakes."}</p></div>
+      <div class="row between"><button class="btn" type="button" id="retry">Retry quiz</button><button class="btn pri" type="button" id="tosum">See summary</button></div></div>`;
+    $("#retry").onclick = () => openLesson(LQ.id,"quiz");
+    $("#tosum").onclick = () => openLesson(LQ.id,"sum");
+    return;
+  }
+  const it = LQ.list[LQ.i], q = it.q;
+  const reveal = LQ.picked !== null;
+  box.innerHTML = `<div class="stack"><div class="meter"><i style="width:${LQ.i/LQ.list.length*100}%"></i></div>
+    <article class="qcard">${metaHTML(q, `Q${LQ.i+1}/${LQ.list.length}`)}
+    <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {picked:LQ.picked, reveal})}</div>
+    ${reveal ? expHTML(q, LQ.picked) : ""}</article>
+    ${reveal ? `<div class="row end"><button class="btn pri" type="button" id="lqnext">${LQ.i+1 < LQ.list.length ? "Next question" : "Finish"}</button></div>` : `<p class="muted" style="font-size:13px">Score so far: <span class="num">${LQ.score}</span></p>`}</div>`;
+  box.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    if (LQ.picked !== null) return;
+    LQ.picked = +b.dataset.oi; const ok = LQ.picked === q.a; if (ok) LQ.score++; record(q, ok); renderLQ();
+  });
+  bindBM(box);
+  const nx = $("#lqnext"); if (nx) nx.onclick = () => { LQ.i++; LQ.picked = null; renderLQ(); window.scrollTo(0,0); };
+}
+
+function bindBM(root){
+  root.querySelectorAll("[data-bm]").forEach(b => b.onclick = (ev) => {
+    ev.stopPropagation();
+    const id = b.dataset.bm; if (S.bm[id]) delete S.bm[id]; else S.bm[id] = 1; save();
+    b.setAttribute("aria-pressed", S.bm[id] ? "true":"false"); b.textContent = S.bm[id] ? "★" : "☆";
+  });
+}
+
+/* ============================================================
+   PRACTICE
+   ============================================================ */
+let PF = "all", PSHOW = 20, PORDER = null, PPERM = {}, PPICK = {};
+function practiceList(){
+  let list = QS;
+  if (PF === "pyq") list = QS.filter(q => q.p);
+  else if (PF === "hot") list = QS.filter(q => (L(q.t).heat||1) === 3);
+  else if (PF === "wrong") list = QS.filter(q => S.ans[q.id] === 0);
+  else if (PF === "new") list = QS.filter(q => S.ans[q.id] === undefined);
+  else if (PF === "bm") list = QS.filter(q => S.bm[q.id]);
+  else if (PF !== "all") list = QS.filter(q => q.t === PF);
+  if (PORDER) { const pos = new Map(PORDER.map((id,i)=>[id,i])); list = list.slice().sort((a,b)=>(pos.get(a.id)??0)-(pos.get(b.id)??0)); }
+  return list;
+}
+function renderPractice(){
+  const wrongN = QS.filter(q => S.ans[q.id] === 0).length, bmN = QS.filter(q=>S.bm[q.id]).length, pyqN = QS.filter(q=>q.p).length;
+  const chips = [["all",`All ${QS.length}`],["new","Not tried"],["wrong",`Mistakes ${wrongN}`],["hot",`🔥 Hot topics ${QS.filter(q=>(L(q.t).heat||1)===3).length}`],["pyq",`PYQ-type ${pyqN}`],["bm",`Starred ${bmN}`]].concat(LESSONS.map((l,i)=>[l.id,`L${i+1} ${l.title}`]));
+  const list = practiceList();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Question bank</span><h1>Practice</h1>
+    <p class="muted">Tap an option to check it. Wrong answers go to <b>Mistakes</b> until you get them right.</p></div>
+    <div class="chips" role="group" aria-label="Filter">${chips.map(c=>`<button type="button" class="chip" data-f="${c[0]}" aria-pressed="${PF===c[0]}">${esc(c[1])}</button>`).join("")}</div>
+    <div class="row between"><span class="muted num" style="font-size:13px">${list.length} questions</span>
+      <div class="row"><button class="btn sm ghost" type="button" id="pshuf">${PORDER?"In order":"Shuffle"}</button></div></div>
+    <div class="stack" id="plist"></div>
+  </section>`;
+  $("#app").querySelectorAll("[data-f]").forEach(b => b.onclick = () => { PF = b.dataset.f; PSHOW = 20; PPICK = {}; renderPractice(); });
+  $("#pshuf").onclick = () => { PORDER = PORDER ? null : shuffle(QS.map(q=>q.id)); PSHOW = 20; renderPractice(); };
+  const chipOn = $(`.chip[aria-pressed="true"]`); if (chipOn) chipOn.scrollIntoView({block:"nearest", inline:"center"});
+  drawPList();
+}
+function pCard(q, idx){
+  if (!PPERM[q.id]) PPERM[q.id] = makePerm(q);
+  const picked = PPICK[q.id]; const reveal = picked !== undefined;
+  return `<article class="qcard" data-q="${q.id}">${metaHTML(q, "Q"+(idx+1))}<p class="qt">${esc(q.q)}</p>
+    <div class="opts">${optsHTML(q, PPERM[q.id], {picked: reveal?picked:null, reveal})}</div>${reveal?expHTML(q,picked):""}</article>`;
+}
+function drawPList(){
+  const list = practiceList(), box = $("#plist");
+  if (!list.length) { box.innerHTML = `<p class="empty">${PF==="wrong"?"No mistakes saved. Answer some questions first, or you've cleared them all.":PF==="bm"?"Nothing starred yet. Tap ☆ on any question.":"Nothing here."}</p>`; return; }
+  box.innerHTML = list.slice(0, PSHOW).map((q,i)=>pCard(q,i)).join("") + (list.length > PSHOW ? `<button class="btn" type="button" id="pmore">Show 20 more (${list.length-PSHOW} left)</button>` : "");
+  bindP(box);
+  const more = $("#pmore"); if (more) more.onclick = () => { PSHOW += 20; drawPList(); };
+}
+function bindP(box){ box.querySelectorAll(".qcard").forEach(bindCard); }
+function bindCard(card){
+  card.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    const q = QS.find(x => x.id === card.dataset.q); if (PPICK[q.id] !== undefined) return;
+    PPICK[q.id] = +b.dataset.oi; record(q, PPICK[q.id] === q.a);
+    const idx = +card.querySelector(".qno").textContent.slice(1) - 1;
+    const tmp = document.createElement("div"); tmp.innerHTML = pCard(q, idx); const nc = tmp.firstElementChild;
+    card.replaceWith(nc); bindCard(nc);
+  });
+  bindBM(card);
+}
+
+/* ============================================================
+   MOCK TEST
+   ============================================================ */
+let M = null, MCFG = {n:25, scope:"all", neg:1}, LEAVE_TO = null;
+function renderMock(){
+  if (M && M.running) return drawMockRun();
+  if (M && M.done) return drawMockResult();
+  const hist = (S.mocks||[]).slice(-6).reverse();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Timed, SSC pattern</span><h1>Mock test</h1>
+    <p class="muted">+2 for a right answer, −0.5 for a wrong one, 36 seconds per question (CGL Tier-1 pace). Answers show only after you submit.</p></div>
+    <div class="block stack">
+      <fieldset><legend>Questions</legend><div class="radios">${[10,25,50,100].map(n=>`<label><input type="radio" name="mn" id="mn${n}" value="${n}" ${MCFG.n===n?"checked":""}><span>${n} · ${Math.round(n*36/60)} min</span></label>`).join("")}</div></fieldset>
+      <fieldset><legend>From</legend><select id="mscope" aria-label="Lessons to draw from"><option value="all">All lessons</option><option value="hot">🔥 Hot topics only</option><option value="pyq">PYQ-type only</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}" ${MCFG.scope===l.id?"selected":""}>L${i+1} · ${esc(l.title)}</option>`).join("")}</select></fieldset>
+      <label class="row" style="gap:8px;font-weight:600"><input type="checkbox" id="mneg" ${MCFG.neg?"checked":""}> Negative marking (−0.5)</label>
+      <div id="merr" class="muted" style="font-size:14px"></div>
+      <div class="row end"><button class="btn pri" type="button" id="mstart">Start test</button></div>
+    </div>
+    ${hist.length ? `<div class="block"><h3>Recent attempts</h3><div class="hist">${hist.map(h=>`<div><span>${esc(h.d)} · ${h.n} Q</span><span class="num">${h.score}/${h.max} · ${h.acc}%</span></div>`).join("")}</div></div>` : ""}
+  </section>`;
+  $("#mscope").value = MCFG.scope;
+  $("#mstart").onclick = () => {
+    MCFG.n = +(document.querySelector('input[name="mn"]:checked')||{value:25}).value;
+    MCFG.scope = $("#mscope").value; MCFG.neg = $("#mneg").checked ? 1 : 0;
+    let pool = MCFG.scope==="all" ? QS : MCFG.scope==="pyq" ? QS.filter(q=>q.p) : MCFG.scope==="hot" ? QS.filter(q=>(L(q.t).heat||1)===3) : MCFG.scope==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===MCFG.scope);
+    if (!pool.length) { $("#merr").textContent = "No questions in that set yet. Pick another source."; return; }
+    const qs = shuffle(pool).slice(0, MCFG.n);
+    M = { running:true, list: qs.map(q=>({q, perm:makePerm(q)})), ans: qs.map(()=>null), mark: qs.map(()=>false), i:0, neg:MCFG.neg, secs: qs.length*36, start: Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000;
+    startTimer(); drawMockRun();
+  };
+}
+function startTimer(){
+  clearInterval(timerId);
+  timerId = setInterval(() => {
+    if (!M || !M.running) { clearInterval(timerId); return; }
+    const left = Math.max(0, Math.round((M.end - Date.now())/1000));
+    const el = $("#mtime"); if (el) { el.textContent = fmt(left); el.classList.toggle("low", left <= 60); }
+    if (left <= 0) submitMock();
+  }, 1000);
+}
+const fmt = s => `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+function drawMockRun(){
+  const it = M.list[M.i], q = it.q, left = Math.max(0, Math.round((M.end-Date.now())/1000));
+  const answered = M.ans.filter(a=>a!==null).length;
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="mbar"><span class="timer num ${left<=60?"low":""}" id="mtime">${fmt(left)}</span>
+      <span class="muted num" style="font-size:13px;flex:1">Q ${M.i+1}/${M.list.length} · ${answered} answered</span>
+      <button class="btn sm" type="button" id="mpal">${M.showPal?"Hide":"All Qs"}</button></div>
+    ${LEAVE_TO ? `<div class="confirm"><b>Leave the test?</b><span>Your answers so far will be scored now.</span><div class="row"><button class="btn sm pri" type="button" id="lvy">Submit and leave</button><button class="btn sm" type="button" id="lvn">Stay</button></div></div>` : ""}
+    ${M.showPal ? `<div class="block"><div class="pal">${M.list.map((_,k)=>`<button type="button" data-j="${k}" class="${M.ans[k]!==null?"a":""} ${M.mark[k]?"m":""} ${k===M.i?"cur":""}" aria-label="Question ${k+1}">${k+1}</button>`).join("")}</div>
+      <p class="muted" style="font-size:12px;margin-top:8px">Filled = answered · orange line = marked for review</p></div>` : ""}
+    <article class="qcard"><div class="qmeta"><span class="qno">Q${M.i+1}</span><span class="tag">L${LNUM(q.t)}</span>${M.mark[M.i]?`<span class="tag pyq">Marked</span>`:""}</div>
+      <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {sel:M.ans[M.i], reveal:false})}</div></article>
+    <div class="row between"><button class="btn" type="button" id="mprev" ${M.i===0?"disabled":""}>‹ Prev</button>
+      <button class="btn ghost" type="button" id="mmark">${M.mark[M.i]?"Unmark":"Mark"}</button>
+      <button class="btn ghost" type="button" id="mclr" ${M.ans[M.i]===null?"disabled":""}>Clear</button>
+      <button class="btn ${M.i<M.list.length-1?"pri":""}" type="button" id="mnext" ${M.i===M.list.length-1?"disabled":""}>Next ›</button></div>
+    ${M.confirm ? `<div class="confirm"><b>Submit the test?</b><span>${M.list.length-answered} unanswered${M.mark.filter(Boolean).length?`, ${M.mark.filter(Boolean).length} marked for review`:""}.</span><div class="row"><button class="btn sm pri" type="button" id="msubY">Submit</button><button class="btn sm" type="button" id="msubN">Keep going</button></div></div>`
+      : `<button class="btn pri" type="button" id="msub">Submit test</button>`}
+  </section>`;
+  $("#app").querySelectorAll(".opt").forEach(b => b.onclick = () => { M.ans[M.i] = +b.dataset.oi; drawMockRun(); });
+  $("#mprev").onclick = () => { if (M.i>0){M.i--; drawMockRun();} };
+  $("#mnext").onclick = () => { if (M.i<M.list.length-1){M.i++; drawMockRun(); window.scrollTo(0,0);} };
+  $("#mmark").onclick = () => { M.mark[M.i] = !M.mark[M.i]; drawMockRun(); };
+  $("#mclr").onclick = () => { M.ans[M.i] = null; drawMockRun(); };
+  $("#mpal").onclick = () => { M.showPal = !M.showPal; drawMockRun(); };
+  $("#app").querySelectorAll("[data-j]").forEach(b => b.onclick = () => { M.i = +b.dataset.j; drawMockRun(); });
+  const s = $("#msub"); if (s) s.onclick = () => { M.confirm = true; drawMockRun(); };
+  const y = $("#msubY"); if (y) y.onclick = submitMock;
+  const n = $("#msubN"); if (n) n.onclick = () => { M.confirm = false; drawMockRun(); };
+  const lvy = $("#lvy"); if (lvy) lvy.onclick = () => { const t = LEAVE_TO; LEAVE_TO = null; submitMock(); go(t); };
+  const lvn = $("#lvn"); if (lvn) lvn.onclick = () => { LEAVE_TO = null; drawMockRun(); };
+}
+function showMockLeave(tab){ LEAVE_TO = tab; drawMockRun(); }
+function submitMock(){
+  if (!M || !M.running) return;
+  clearInterval(timerId);
+  M.running = false; M.done = true; M.confirm = false;
+  let c=0,w=0,sk=0; const per = {};
+  M.list.forEach((it,k) => {
+    const a = M.ans[k]; const t = it.q.t; per[t] = per[t] || {c:0,n:0}; per[t].n++;
+    if (a===null) sk++; else if (a===it.q.a) { c++; per[t].c++; S.ans[it.q.id]=1; } else { w++; S.ans[it.q.id]=0; }
+  });
+  const max = M.list.length*2, score = +(c*2 - (M.neg? w*0.5 : 0)).toFixed(1);
+  const used = Math.min(M.secs, Math.round((Date.now()-M.start)/1000));
+  M.res = {c,w,sk,score,max,used,per, acc: (c+w) ? Math.round(c*100/(c+w)) : 0};
+  const d = new Date(); const ds = d.toLocaleDateString("en-IN",{day:"numeric",month:"short"})+" "+d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
+  S.mocks = (S.mocks||[]).concat([{d:ds, n:M.list.length, score, max, acc:M.res.acc}]).slice(-20); save(); renderTop();
+  M.filter = "wrong";
+  if (TAB==="mock") drawMockResult();
+}
+function drawMockResult(){
+  const r = M.res;
+  const per = Object.keys(r.per).sort((a,b)=>LNUM(a)-LNUM(b)).map(t => `<div><span>L${LNUM(t)} · ${esc(L(t).title)}</span><span class="num">${r.per[t].c}/${r.per[t].n}</span></div>`).join("");
+  const rows = M.list.map((it,k)=>({it,k})).filter(({it,k}) => M.filter==="all" ? true : M.filter==="wrong" ? (M.ans[k]!==null && M.ans[k]!==it.q.a) : M.ans[k]===null);
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Result</span>
+    <div class="scorebig"><span class="num">${r.score}</span><span class="muted">/ ${r.max} marks</span></div></div>
+    <div class="kpis"><div class="kpi g"><span class="num">${r.c}</span><span>right</span></div><div class="kpi b"><span class="num">${r.w}</span><span>wrong</span></div><div class="kpi"><span class="num">${r.sk}</span><span>skipped</span></div><div class="kpi"><span class="num">${r.acc}%</span><span>accuracy</span></div></div>
+    <p class="muted num" style="font-size:13px">Time used ${fmt(r.used)} of ${fmt(M.secs)}</p>
+    <div class="block"><h3>By lesson</h3><div class="hist">${per}</div></div>
+    <div class="row between"><button class="btn" type="button" id="mnew">New test</button><button class="btn pri" type="button" id="mretry">Retake same questions</button></div>
+    <h2>Review</h2>
+    <div class="chips">${[["wrong",`Wrong ${r.w}`],["skip",`Skipped ${r.sk}`],["all",`All ${M.list.length}`]].map(c=>`<button class="chip" type="button" data-rf="${c[0]}" aria-pressed="${M.filter===c[0]}">${c[1]}</button>`).join("")}</div>
+    <div class="stack">${rows.length ? rows.map(({it,k}) => `<article class="qcard">${metaHTML(it.q, "Q"+(k+1))}<p class="qt">${esc(it.q.q)}</p><div class="opts">${optsHTML(it.q, it.perm, {picked:M.ans[k], reveal:true})}</div>${M.ans[k]===null?`<div class="exp"><b class="nol">Skipped. Answer: ${esc(it.q.o[it.q.a])}.</b> ${esc(it.q.e)}</div>`:expHTML(it.q, M.ans[k])}</article>`).join("") : `<p class="empty">Nothing in this list.</p>`}</div>
+  </section>`;
+  bindBM($("#app"));
+  $("#app").querySelectorAll("[data-rf]").forEach(b => b.onclick = () => { M.filter = b.dataset.rf; drawMockResult(); });
+  $("#mnew").onclick = () => { M = null; renderMock(); };
+  $("#mretry").onclick = () => {
+    const list = M.list.map(it=>({q:it.q, perm:makePerm(it.q)}));
+    M = { running:true, list, ans:list.map(()=>null), mark:list.map(()=>false), i:0, neg:MCFG.neg, secs:list.length*36, start:Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000; startTimer(); drawMockRun();
+  };
+}
+
+/* ============================================================
+   REVISE
+   ============================================================ */
+let RV = "heat", FC = null, FCSCOPE = "all";
+const HID = {}, REV = {};
+Object.keys(COVERS).forEach(k => { HID[k] = 1; REV[k] = {}; });
+function renderRevise(){
+  const tabs = [["heat","🔥 Exam heat map"]].concat(Object.keys(COVERS).map(k=>[k, COVERS[k].tab]), [["dis",FIND.tab],["nums","Numbers & pairs"],["links","Connections"],["tricks","Tricks"],["traps","Traps"],["flash","Flashcards"]]);
+  if (!tabs.some(t=>t[0]===RV)) RV = "heat";
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Last-day revision</span><h1>Revise</h1></div>
+    <div class="seg" role="tablist">${tabs.map(t=>`<button type="button" role="tab" data-rv="${t[0]}" aria-selected="${RV===t[0]}">${t[1]}</button>`).join("")}</div>
+    <div id="rv" class="stack"></div></section>`;
+  $("#app").querySelectorAll("[data-rv]").forEach(b => b.onclick = () => { RV = b.dataset.rv; renderRevise(); });
+  const on = $(`.seg [aria-selected="true"]`); if (on) on.scrollIntoView({block:"nearest", inline:"center"});
+  const box = $("#rv");
+  const pk = (key, i, val) => (HID[key] && !REV[key][i]) ? `<button type="button" class="peek" data-pk="${key}:${i}">tap</button>` : val;
+  const coverChips = (key, label) => `<div class="chips"><button type="button" class="chip" data-hide="${key}" aria-pressed="${!!HID[key]}">${label}</button><button type="button" class="chip" data-cover="${key}">Cover all again</button></div>`;
+  const bindCover = () => {
+    box.querySelectorAll("[data-hide]").forEach(b => b.onclick = () => { const k=b.dataset.hide; HID[k] = HID[k]?0:1; renderRevise(); });
+    box.querySelectorAll("[data-cover]").forEach(b => b.onclick = () => { REV[b.dataset.cover] = {}; renderRevise(); });
+    box.querySelectorAll("[data-pk]").forEach(b => b.onclick = () => { const [k,i] = b.dataset.pk.split(":"); REV[k][i]=1; renderRevise(); });
+  };
+  if (RV === "heat") {
+    const max = Math.max(...HEAT.map(h=>h[1]));
+    box.innerHTML = `<p class="muted">${APP.heatNote}</p>
+      <div class="block"><div class="heat">${HEAT.map(h=>`<button type="button" class="hrow" data-open="${h[2]}"><span class="ht"><b>${esc(h[0])}</b><span class="muted">${esc(h[3])}</span></span><span class="hbar"><i style="width:${h[1]/max*100}%"></i></span><span class="num hp">${h[1]}%</span></button>`).join("")}</div></div>
+      <div class="block"><h3>Lessons by exam heat</h3><dl class="rk">${[3,2,1].map(n=>`<div><dt>${"🔥".repeat(n)} ${n===3?"Very frequent":n===2?"Regular":"Occasional"}</dt><dd>${LESSONS.map((l,i)=>[l,i]).filter(x=>(x[0].heat||1)===n).map(x=>`L${x[1]+1} ${esc(x[0].title)}`).join(" · ")}</dd></div>`).join("")}</dl></div>`;
+    box.querySelectorAll("[data-open]").forEach(b => b.onclick = () => openLesson(b.dataset.open, "learn"));
+  }
+  if (COVERS[RV]) {
+    const c = COVERS[RV];
+    box.innerHTML = `<p class="muted">${c.note}</p>${coverChips(RV, c.hideLabel)}
+      <div class="block"><div class="tbl"><table class="cover"><thead><tr>${c.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${c.rows.map((r,i)=>`<tr>${r.map((v,ci)=>`<td ${ci?`data-l="${c.head[ci]}"`:""}>${ci===0?`<b>${esc(v)}</b>`:ci===c.hide?pk(RV,i,esc(v)):esc(v)}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+    bindCover();
+  }
+  if (RV === "dis") {
+    box.innerHTML = `<input class="search" id="fs" type="search" placeholder="${FIND.ph}" aria-label="${FIND.tab}">
+      <div class="chips" id="dtype"></div>
+      <div class="block"><div class="tbl"><table class="cover"><thead><tr>${FIND.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody id="fb"></tbody></table></div></div>`;
+    const types = ["All"].concat([...new Set(FIND.rows.map(d=>d[2]))]);
+    let T = "All";
+    const draw = () => { const q = $("#fs").value.trim().toLowerCase();
+      $("#dtype").innerHTML = types.map(t=>`<button type="button" class="chip" data-t="${esc(t)}" aria-pressed="${T===t}">${esc(t)}</button>`).join("");
+      $("#dtype").querySelectorAll("[data-t]").forEach(b => b.onclick = () => { T = b.dataset.t; draw(); });
+      const rows = FIND.rows.filter(x => (T==="All"||x[2]===T) && (!q || x.join(" ").toLowerCase().includes(q)));
+      $("#fb").innerHTML = rows.length ? rows.map(a=>`<tr><td><b>${esc(a[0])}</b></td><td data-l="${FIND.head[1]}">${esc(a[1])}</td><td data-l="${FIND.head[2]}">${esc(a[2])}</td><td data-l="${FIND.head[3]}" class="muted">${esc(a[3])}</td></tr>`).join("") : `<tr><td colspan="4" class="muted">No match.</td></tr>`; };
+    $("#fs").oninput = draw; draw();
+  }
+  if (RV === "links") {
+    const items = LESSONS.flatMap((l,i) => l.blocks.filter(b=>b.k==="link").map(b=>({l:i+1, t:l.title, h:b.h})));
+    box.innerHTML = items.map(x => `<div class="link"><span class="lab">L${x.l} · ${esc(x.t)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "nums") {
+    box.innerHTML = `<div class="tiles">${TILES.map(t=>`<div class="tile"><span class="num">${t[0]}</span><span>${t[1]}</span></div>`).join("")}</div>
+    <div class="block"><h3>Look-alike pairs</h3><dl class="rk">${PAIRS.map(p=>`<div><dt>${esc(p[0])}</dt><dd>${esc(p[1])}</dd></div>`).join("")}</dl></div>`;
+  }
+  if (RV === "tricks" || RV === "traps") {
+    const kind = RV==="tricks" ? "trick" : "trap";
+    const items = LESSONS.flatMap((l,i) => l.blocks.filter(b=>b.k===kind).map(b=>({l:i+1, t:l.title, h:b.h})));
+    const extra = kind==="trick" ? `<div class="trick"><span class="lab">Exam craft</span>${APP.craft}</div>` : "";
+    box.innerHTML = extra + items.map(x => `<div class="${kind}"><span class="lab">L${x.l} · ${esc(x.t)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "flash") drawFlash(box);
+}
+
+
+function drawFlash(box){
+  if (!FC) { const pool = FCSCOPE==="all" ? QS : FCSCOPE==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===FCSCOPE); FC = {list: shuffle(pool), i:0, flip:false, known:0}; }
+  const sel = `<select id="fcs" aria-label="Flashcard set"><option value="all">All questions</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}">L${i+1} · ${esc(l.title)}</option>`).join("")}</select>`;
+  if (!FC.list.length || FC.i >= FC.list.length) {
+    box.innerHTML = `<div class="row">${sel}</div><div class="block stack"><h3>${FC.list.length ? "Deck finished" : "No cards in this set"}</h3>${FC.list.length?`<p class="muted">You knew ${FC.known} of ${FC.list.length} on first look.</p>`:""}<div class="row"><button class="btn pri" type="button" id="fcr">Shuffle and restart</button></div></div>`;
+    $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+    $("#fcr").onclick = () => { FC = null; drawFlash(box); }; return;
+  }
+  const q = FC.list[FC.i];
+  box.innerHTML = `<div class="row between">${sel}<span class="muted num" style="font-size:13px">${FC.i+1}/${FC.list.length}</span></div>
+    <button type="button" class="flash" id="fcard" aria-label="Flip card">
+      <span class="side">${FC.flip?"Answer":"Question · tap to flip"}</span>
+      <span class="front">${esc(q.q)}</span>
+      ${FC.flip ? `<span class="ans">${esc(q.o[q.a])}</span><span class="muted">${esc(q.e)}</span>` : ""}
+    </button>
+    <div class="row between"><button class="btn" type="button" id="fca" ${FC.flip?"":"disabled"}>Again later</button><button class="btn pri" type="button" id="fck" ${FC.flip?"":"disabled"}>Got it</button></div>`;
+  $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+  $("#fcard").onclick = () => { FC.flip = !FC.flip; drawFlash(box); };
+  $("#fca").onclick = () => { FC.list.push(q); FC.list.splice(FC.i,1); FC.flip=false; drawFlash(box); };
+  $("#fck").onclick = () => { FC.known++; FC.i++; FC.flip=false; drawFlash(box); };
+}
+
+/* boot */
+renderTop();
+const start = (location.hash||"").replace("#","");
+go(["learn","practice","mock","revise"].includes(start) ? start : "learn");
+</script>
+
+
+<style id="shabd-skin">
+/* ===== शब्दRegister skin: app colours + fonts (only when opened from the app) ===== */
+:root[data-skin="paper"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(150,128,90,.10) 31px, rgba(150,128,90,.10) 32px);--app-psize:auto;--app-card:#FFFCF6;--app-rule:#DCCFB2;--app-pri:#2F6F63;--app-ink:#221E17;--app-soft:#5E5547;--app-faint:#857B6A;--app-bg:#F3EEE3;--app-deep:#E9E1CF;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#F3EEE3;--sheet:#FFFCF6;--sunk:#E9E1CF;--ink:#221E17;--ink2:#5E5547;--rule:#DCCFB2;--blue:#2F6F63;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--accent:#A87E1F;--accent-bg:color-mix(in srgb, #A87E1F 16%, #FFFCF6);--good:#2F6F63;--good-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--bad:#8C2F39;--bad-bg:color-mix(in srgb, #8C2F39 14%, #FFFCF6);--warn-bg:color-mix(in srgb, #C99A2E 18%, #FFFCF6);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="paper"][data-theme="dark"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--sheet:#26211A;--sunk:#25201A;--ink:#EFE6D2;--ink2:#BDB195;--rule:#3B3429;--blue:#3F9A86;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3F9A86 22%, #26211A);--accent:#D9AE4B;--accent-bg:color-mix(in srgb, #D9AE4B 24%, #26211A);--good:#5FB9A3;--good-bg:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-bg:color-mix(in srgb, #D06B74 22%, #26211A);--warn-bg:color-mix(in srgb, #D9AE4B 26%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="paper"]:not([data-theme="light"]){--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--sheet:#26211A;--sunk:#25201A;--ink:#EFE6D2;--ink2:#BDB195;--rule:#3B3429;--blue:#3F9A86;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3F9A86 22%, #26211A);--accent:#D9AE4B;--accent-bg:color-mix(in srgb, #D9AE4B 24%, #26211A);--good:#5FB9A3;--good-bg:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-bg:color-mix(in srgb, #D06B74 22%, #26211A);--warn-bg:color-mix(in srgb, #D9AE4B 26%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin="indigo"]{--app-pattern:radial-gradient(rgba(61,92,240,.10) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#FFFFFF;--app-rule:#CBD3EC;--app-pri:#3D5CF0;--app-ink:#0F1B3D;--app-soft:#4A5680;--app-faint:#67739C;--app-bg:#EEF1FA;--app-deep:#E1E6F5;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#EEF1FA;--sheet:#FFFFFF;--sunk:#E1E6F5;--ink:#0F1B3D;--ink2:#4A5680;--rule:#CBD3EC;--blue:#3D5CF0;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3D5CF0 14%, #FFFFFF);--accent:#D9831A;--accent-bg:color-mix(in srgb, #D9831A 16%, #FFFFFF);--good:#147D53;--good-bg:color-mix(in srgb, #147D53 14%, #FFFFFF);--bad:#C8402F;--bad-bg:color-mix(in srgb, #C8402F 14%, #FFFFFF);--warn-bg:color-mix(in srgb, #F7C548 18%, #FFFFFF);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="indigo"][data-theme="dark"]{--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--sheet:#121D47;--sunk:#0E1839;--ink:#EEF2FF;--ink2:#A7B3DA;--rule:#22306A;--blue:#6F86FF;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #6F86FF 22%, #121D47);--accent:#F7B24D;--accent-bg:color-mix(in srgb, #F7B24D 24%, #121D47);--good:#45C08A;--good-bg:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-bg:color-mix(in srgb, #F07B6E 22%, #121D47);--warn-bg:color-mix(in srgb, #F7C548 26%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="indigo"]:not([data-theme="light"]){--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--sheet:#121D47;--sunk:#0E1839;--ink:#EEF2FF;--ink2:#A7B3DA;--rule:#22306A;--blue:#6F86FF;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #6F86FF 22%, #121D47);--accent:#F7B24D;--accent-bg:color-mix(in srgb, #F7B24D 24%, #121D47);--good:#45C08A;--good-bg:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-bg:color-mix(in srgb, #F07B6E 22%, #121D47);--warn-bg:color-mix(in srgb, #F7C548 26%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin] body{background-color:var(--app-bg);background-image:var(--app-pattern);background-size:var(--app-psize);background-attachment:fixed}
+:root[data-skin] h1,:root[data-skin] h2{letter-spacing:-.01em}
+
+/* ===== Desktop layout (PC / tablet landscape) ===== */
+@media (min-width: 1024px){
+  :root{--side:236px}
+  body{padding-left:var(--side);font-size:16.5px}
+  .top{border-bottom:1px solid var(--rule)}
+  .top-in{max-width:1320px;padding:16px 36px}
+  .brand{font-size:21px}
+  .brand small{font-size:13px}
+  .stat{font-size:13px}
+  .wrap{max-width:1320px;padding:0 36px 56px}
+  .view{padding-top:28px}
+  h1{font-size:34px} h2{font-size:22px} h3{font-size:17px}
+
+  /* bottom tab bar becomes a left sidebar */
+  .nav{top:0;bottom:0;left:0;right:auto;width:var(--side);height:auto;border-top:0;border-right:1px solid var(--rule);padding:84px 14px 20px;display:block;overflow:auto}
+  .nav-in{display:flex;flex-direction:column;gap:4px;height:auto;max-width:none;margin:0}
+  .nav-in::before{content:"Sections";display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);padding:0 14px 8px}
+  .nav button{flex-direction:row;justify-content:flex-start;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;font-size:15px;min-height:0;height:auto;width:100%;text-align:left}
+  .nav button svg{width:20px;height:20px;flex-shrink:0}
+  .nav button:hover{background:var(--sunk)}
+  .nav button[aria-current="page"]{background:var(--blue-bg)}
+  .nav button[aria-current="page"] span{border-bottom:0!important}
+
+  /* home: intro beside progress, lessons as a card grid */
+  .hero{grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);column-gap:48px;align-items:end;padding-bottom:10px}
+  .hero > .eyebrow,.hero > h1,.hero > p{grid-column:1}
+  .hero > .meter{grid-column:2;grid-row:3;align-self:center}
+  .hero > .row{grid-column:2;grid-row:2;align-self:end}
+  .lessons{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;border-top:0}
+  .les{background:var(--sheet);border:1px solid var(--rule);border-radius:16px;padding:16px 18px;transition:transform .15s ease,box-shadow .15s ease,border-color .15s}
+  .les:hover{transform:translateY(-2px);border-color:var(--blue);box-shadow:0 14px 30px -22px rgba(0,0,0,.45)}
+  .les.next{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
+
+  /* lesson reader: facts, timelines, tricks sit side by side */
+  .lhead{margin-bottom:0}
+  .steps{max-width:640px}
+  .steps + .stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+  .steps + .stack > .plain,.steps + .stack > .row,.steps + .stack > p,.steps + .stack > .fig,.steps + .stack > h2,.steps + .stack > .tbl{grid-column:1/-1}
+  .steps + .stack > .plain{max-width:86ch;font-size:17px}
+  .steps + .stack:not(:has(> .block ~ .block)) > .block{grid-column:1/-1}
+  .block,.qcard{padding:18px 20px;border-radius:14px}
+
+  /* quizzes and question bank */
+  #lq > .stack{display:grid;grid-template-columns:minmax(0,1fr);max-width:980px;gap:16px}
+  .opts{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .qt{font-size:18px}
+  #plist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #plist .opts{grid-template-columns:minmax(0,1fr)}
+  .chips{flex-wrap:wrap;overflow:visible}
+
+  /* mock test: question with the answer grid alongside */
+  .mbar{top:calc(env(safe-area-inset-top,0px) + 67px)}
+  .view > .qcard{max-width:1000px}
+  .view > .row.between{max-width:1000px}
+  .view > #msub{max-width:1000px;width:100%}
+  .view > .block.stack{max-width:760px}
+  .pal{grid-template-columns:repeat(auto-fill,minmax(46px,1fr))}
+  .kpis{max-width:760px}
+
+  /* revise: cards in columns */
+  #rkl,#rv > .stack:not(#rkl){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #rv > .search{max-width:520px}
+  .tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .flash{min-height:300px;max-width:760px;margin:0 auto;padding:32px 36px}
+  .flash .front{font-size:22px}
+}
+@media (min-width: 1500px){
+  #plist,#rkl{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+</style>
+<script id="shabd-deeplink">
+(function(){
+  var l; try{ l = new URLSearchParams(location.search).get('lesson'); }catch(e){}
+  if(!l) return;
+  function run(){
+    try{
+      if(typeof openLesson === 'function' && typeof LESSONS !== 'undefined'){ if(LESSONS.some(function(x){ return x.id === l; })) openLesson(l, 'learn'); }
+      else if(typeof openRule === 'function'){ var n = parseInt(String(l).replace(/\D/g, ''), 10); if(n) openRule(n, 'learn'); }
+      else if(typeof COURSE !== 'undefined' && typeof go === 'function'){ var i = COURSE.findIndex(function(c){ return c.id === l; }); if(i >= 0) go({ name: 'lesson', i: i, step: 0, ans: {}, score: 0 }); }
+    }catch(e){}
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(run, 30); }); else setTimeout(run, 30);
+})();
+</script>
+</body></html>

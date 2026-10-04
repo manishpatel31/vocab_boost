@@ -15,11 +15,11 @@ Vocabulary, General Studies and Maths in one place, with one daily goal, one str
 | **Progress** | Study points, streak, per-subject progress |
 | **Search** | One box that searches lessons and notes across every mini app |
 
-## Mini apps (20)
+## Mini apps (21)
 
-Each mini app is one self-contained page (`study-<name>.html`) with lessons, a quick-revise tab and practice questions. About 5,100 questions in total.
+Each mini app is one self-contained page (`study-<name>.html`) with lessons, a quick-revise tab and practice questions. About 6,650 questions in total.
 
-**English:** Grammar 100
+**English:** Grammar 100, `study-voice` (Active & Passive Voice, built around the SSC CGL pattern)
 
 **General Studies**
 - Polity: `study-polity`, `study-bns-bnss-bsa` (BNS · BNSS · BSA)
