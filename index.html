@@ -1622,7 +1622,8 @@
     trigonometry: { title: 'Trigonometry',             file: 'study-trigonometry.html', key: 'trigonometry_workbook_v1' },
     physics:  { title: 'Physics',                      file: 'study-physics.html',      key: 'physics_pyq_workbook_v1' },
     biology:  { title: 'Biology',                      file: 'study-biology.html',      key: 'biology_pyq_workbook_v1' },
-    space:    { title: 'Space & ISRO Missions',              file: 'study-space.html',        key: 'space_missions_workbook_v1' }
+    space:    { title: 'Space & ISRO Missions',              file: 'study-space.html',        key: 'space_missions_workbook_v1' },
+    voice:    { title: 'Active & Passive Voice',       file: 'study-voice.html',        key: 'voice_workbook_v1' }
   };
   STUDY.grammar.subj = 'english'; STUDY.grammar.ico = '✍️'; STUDY.grammar.hi = 'व्याकरण · error spotting'; STUDY.grammar.desc = '100 rules with logic, tricks and examples; unit tests after every 10 rules; revise and mistakes lists.'; STUDY.grammar.meta = '100 rules · unit tests'; STUDY.grammar.color = '#C8402F';
   STUDY.bns.subj = 'gs'; STUDY.bns.ico = '⚖️'; STUDY.bns.hi = 'नए आपराधिक क़ानून · Polity'; STUDY.bns.desc = 'The three new criminal laws — what replaced what, key offences, police & court procedure, evidence.'; STUDY.bns.meta = '12 lessons · mock test'; STUDY.bns.color = '#3D5CF0';
@@ -1640,6 +1641,7 @@
   STUDY.space.subj = 'gs'; STUDY.space.ico = '🚀'; STUDY.space.hi = 'अंतरिक्ष मिशन · Science & Tech'; STUDY.space.desc = 'Orbits, rockets and ISRO centres; Chandrayaan, Aditya-L1, Gaganyaan, NISAR and the 2024–26 launches.'; STUDY.space.meta = '16 lessons · 374 questions'; STUDY.space.color = '#5B45B0';
   STUDY.physics.subj = 'gs'; STUDY.physics.ico = '🔭'; STUDY.physics.hi = 'भौतिकी · PYQ'; STUDY.physics.desc = 'SI units, motion, Newton’s laws, gravitation, pressure, heat, sound, mirrors, lenses and the human eye.'; STUDY.physics.meta = '16 lessons · 321 questions'; STUDY.physics.color = '#C4572A';
   STUDY.biology.subj = 'gs'; STUDY.biology.ico = '🧬'; STUDY.biology.hi = 'जीव विज्ञान · PYQ'; STUDY.biology.desc = 'Cell to classification, vitamins, human body systems, hormones, plants, genetics and diseases.'; STUDY.biology.meta = '24 lessons · 461 questions'; STUDY.biology.color = '#3E8A4F';
+  STUDY.voice.subj = 'english'; STUDY.voice.ico = '🔁'; STUDY.voice.hi = 'वाच्य · CGL pattern'; STUDY.voice.desc = 'Active ↔ passive the SSC CGL way — every tense and modal, Let / requested, By whom, It is said, PYQ-type questions and tricks.'; STUDY.voice.meta = '12 lessons · 196 questions'; STUDY.voice.color = '#B5487A'; STUDY.voice.lessons = 12; STUDY.voice.unit = 'lessons';
   // Maths section (Tier 1 + Tier 2): formulas, concepts, tricks, figures and PYQs
   [['geometry', '📐', 'ज्यामिति', 'Lines and triangles to circles and coordinate geometry — centres, similarity, tangents, cyclic quadrilaterals, with figures and PYQs.', 12, 237, '#2F6DB5'],
    ['mensuration2d', '⬛', 'क्षेत्रमिति · 2D', 'Areas and perimeters of triangles, quadrilaterals, circles, sectors, polygons, paths, inscribed figures and shaded regions.', 11, 190, '#B5662F'],
@@ -1797,10 +1799,10 @@
   }
   /** One tile per subject: how far along it is; tap to jump to its row. */
   function homeSubjects(){
-    var en = ['grammar'], ve = viewEntries(), mem = ve.filter(function(e){ return e.confidence >= 5; }).length;
+    var en = englishIds(), ve = viewEntries(), mem = ve.filter(function(e){ return e.confidence >= 5; }).length;
     var gp = subjProgress(en), vocPct = ve.length ? Math.round(mem * 100 / ve.length) : 0;
     var mp = subjProgress(mathIds());
-    var tiles = [{ key: 'english', name: 'English', hi: 'अंग्रेज़ी', n: 2, pct: Math.round((gp.pct + vocPct) / 2), acc: gp.acc, jump: 'english' },
+    var tiles = [{ key: 'english', name: 'English', hi: 'अंग्रेज़ी', n: en.length + 1, pct: Math.round((gp.pct + vocPct) / 2), acc: gp.acc, jump: 'english' },
       { key: 'maths', name: 'Maths', hi: 'गणित', n: mathIds().length, pct: mp.pct, acc: mp.acc, jump: 'maths' }];
     GS_SUBJECTS.forEach(function(g){
       var list = subjIds(g[0]);
@@ -2204,6 +2206,7 @@
   STUDY.physics.lessons = 16; STUDY.physics.unit = 'lessons';
   STUDY.biology.lessons = 24; STUDY.biology.unit = 'lessons';
   function gsIds(){ return Object.keys(STUDY).filter(function(id){ return STUDY[id].subj === 'gs'; }); }
+  function englishIds(){ return Object.keys(STUDY).filter(function(id){ return STUDY[id].subj === 'english'; }); }
   function mathIds(){ return Object.keys(STUDY).filter(function(id){ return STUDY[id].subj === 'maths'; }); }
   var STUDY_EXTRA = { mocks: { key: 'shabdMockHistory', title: 'Mixed mock history' } };
   function studyMod(id){ return STUDY[id] || STUDY_EXTRA[id]; }
@@ -2290,7 +2293,7 @@
 
   // ---- the practice / mock screen ----
   var drill = null, drillOpen = false, drillTimer = null;
-  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments', polity: 'Polity', economics: 'Economy', space: 'Space', physics: 'Physics', biology: 'Biology', geometry: 'Geometry', mensuration2d: 'Mensuration 2D', mensuration3d: 'Mensuration 3D', trigonometry: 'Trigonometry' };
+  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments', polity: 'Polity', economics: 'Economy', space: 'Space', physics: 'Physics', biology: 'Biology', geometry: 'Geometry', mensuration2d: 'Mensuration 2D', mensuration3d: 'Mensuration 3D', trigonometry: 'Trigonometry', voice: 'Active & Passive Voice' };
   function openDrill(title){
     closeAllMenus();
     drillOpen = true;
@@ -2395,7 +2398,7 @@
 
   // Mixed mock test
   var mockCfg = (function(){
-    var def = { en: 25, gs: 25, mt: 0, vocab: true, grammar: true, gsMods: gsIds(), mtMods: mathIds(), neg: true, known: gsIds() };
+    var def = { en: 25, gs: 25, mt: 0, vocab: true, grammar: true, voice: true, gsMods: gsIds(), mtMods: mathIds(), neg: true, known: gsIds() };
     var c;
     try{ c = Object.assign({}, def, JSON.parse(lsGet('shabdMockCfg') || '{}')); }catch(e){ c = def; }
     var known = c.known || ['bns', 'schemes', 'census', 'intlorgs'];
@@ -2427,7 +2430,7 @@
     var hist = mockHistory().slice(-5).reverse();
     drillBody('<div class="dq-hero"><div class="eyebrow">English + Maths + General Studies · SSC pattern</div><h1>Mixed mock test</h1><p>Questions from your vocab register and every mini app, timed like Tier 1 (36 seconds a question), marked +2 / −0.5. Wrong answers go to your Mistakes book.</p></div>' +
       '<div class="dq-setup">' +
-        '<div class="dq-box"><h3>English</h3>' + seg('en', [0, 10, 25]) + '<div class="dq-tags">' + tog('vocab', 'Vocabulary (' + words.length + ' words)') + tog('grammar', 'Grammar 100') + '</div></div>' +
+        '<div class="dq-box"><h3>English</h3>' + seg('en', [0, 10, 25]) + '<div class="dq-tags">' + tog('vocab', 'Vocabulary (' + words.length + ' words)') + tog('grammar', 'Grammar 100') + tog('voice', 'Active & Passive Voice') + '</div></div>' +
         '<div class="dq-box"><h3>General Studies</h3>' + seg('gs', [0, 10, 25]) + '<div class="dq-tags">' + GS_SUBJECTS.map(function(g){ var l = gsIds().filter(function(id){ return STUDY[id].gsub === g[0]; }); return l.length ? '<div class="dq-gsub"><span>' + g[1] + '</span>' + l.map(gsTog).join('') + '</div>' : ''; }).join('') + gsIds().filter(function(id){ return !STUDY[id].gsub; }).map(gsTog).join('') + '</div></div>' +
         '<div class="dq-box"><h3>Maths</h3>' + seg('mt', [0, 10, 25]) + '<div class="dq-tags">' + mathIds().map(mtTog).join('') + '</div></div>' +
         '<div class="dq-box"><h3>Marking</h3><div class="dq-tags">' + tog('neg', 'Negative marking −0.5') + '</div><p class="help" style="margin:10px 0 0;">' + n + ' questions · ' + mins + ' minutes · maximum ' + (n * 2) + ' marks</p></div>' +
@@ -2459,9 +2462,10 @@
   function startMock(){
     var c = mockCfg, en = [], gs = [], mt = [];
     if(c.en){
-      var nv = c.vocab ? (c.grammar ? Math.round(c.en * 0.6) : c.en) : 0;
+      var enMods = ['grammar', 'voice'].filter(function(m){ return c[m]; });
+      var nv = c.vocab ? (enMods.length ? Math.round(c.en * 0.6) : c.en) : 0;
       var v = nv ? vocabQuestions(nv) : [];
-      en = v.concat(c.grammar ? pickFrom(['grammar'], c.en - v.length) : []);
+      en = v.concat(enMods.length ? pickFrom(enMods, c.en - v.length) : []);
       if(en.length < c.en && c.vocab) en = en.concat(vocabQuestions(c.en - en.length));
       en.forEach(function(q){ q.sec = 'en'; });
     }
