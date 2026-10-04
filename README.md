@@ -17,12 +17,12 @@ Vocabulary, General Studies and Maths in one place, with one daily goal, one str
 
 ## Mini apps (23)
 
-Each mini app is one self-contained page (`study-<name>.html`) with lessons, a quick-revise tab and practice questions. About 6,800 questions in total.
+Each mini app is one self-contained page (`study-<name>.html`) with lessons, a quick-revise tab and practice questions. About 7,000 questions in total.
 
 **English:** Grammar 100, `study-voice` (Active & Passive Voice), `study-narration` (Narration / direct–indirect speech) — both built around the SSC CGL pattern
 
 **General Studies**
-- Polity: `study-polity`, `study-bns-bnss-bsa` (BNS · BNSS · BSA)
+- Polity: `study-polity`, `study-bns-bnss-bsa` (BNS · BNSS · BSA: 15 lessons on the three new criminal laws from recent SSC questions — numbers and dates, new offences, FIR, arrest, bail and timelines, electronic evidence, section finder and drills)
 - Economy: `study-economics`, `study-ipr-plans` (IPR & Five Year Plans), `study-govt-schemes`
 - Science: `study-physics`, `study-biology`
 - Current affairs & static GK: `study-appointments`, `study-reports-indices`, `study-intl-orgs`, `study-sports`, `study-space`, `study-census`

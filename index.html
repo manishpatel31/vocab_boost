@@ -1729,7 +1729,7 @@
   // (users/{uid}/study/{id}) so every device shows the same progress.
   var STUDY = {
     grammar:  { title: 'Grammar 100',                  file: 'study-grammar-100.html',  key: 'grammar100_v1' },
-    bns:      { title: 'BNS · BNSS · BSA',             file: 'study-bns-bnss-bsa.html', key: 'crimlaw-course-v1' },
+    bns:      { title: 'BNS · BNSS · BSA',             file: 'study-bns-bnss-bsa.html', key: 'bns_workbook_v1' },
     schemes:  { title: 'Government Schemes',           file: 'study-govt-schemes.html', key: 'govt_schemes_workbook_v1' },
     census:   { title: 'Census & Population',          file: 'study-census.html',       key: 'census_workbook_v1' },
     intlorgs: { title: 'International Organisations', file: 'study-intl-orgs.html',    key: 'intl_orgs_workbook_v1' },
@@ -1753,7 +1753,7 @@
     narration:{ title: 'Narration',                    file: 'study-narration.html',    key: 'narration_workbook_v1' }
   };
   STUDY.grammar.subj = 'english'; STUDY.grammar.ico = '✍️'; STUDY.grammar.hi = 'व्याकरण · error spotting'; STUDY.grammar.desc = '100 rules with logic, tricks and examples; unit tests after every 10 rules; revise and mistakes lists.'; STUDY.grammar.meta = '100 rules · unit tests'; STUDY.grammar.color = '#C8402F';
-  STUDY.bns.subj = 'gs'; STUDY.bns.ico = '⚖️'; STUDY.bns.hi = 'नए आपराधिक क़ानून · Polity'; STUDY.bns.desc = 'The three new criminal laws — what replaced what, key offences, police & court procedure, evidence.'; STUDY.bns.meta = '12 lessons · mock test'; STUDY.bns.color = '#3D5CF0';
+  STUDY.bns.subj = 'gs'; STUDY.bns.ico = '⚖️'; STUDY.bns.hi = 'नए आपराधिक क़ानून · Polity'; STUDY.bns.desc = 'The three new criminal laws the SSC way — numbers and dates, new offences, FIR, arrest, bail and timelines, electronic evidence, PYQ-type questions and tricks.'; STUDY.bns.meta = '15 lessons · 267 questions'; STUDY.bns.color = '#3D5CF0';
   STUDY.schemes.subj = 'gs'; STUDY.schemes.ico = '🏛️'; STUDY.schemes.hi = 'सरकारी योजनाएँ'; STUDY.schemes.desc = 'Central, centrally sponsored and state schemes linked as stories, with 2025–26 updates.'; STUDY.schemes.meta = '15 lessons · 359 questions'; STUDY.schemes.color = '#2F6F63';
   STUDY.census.subj = 'gs'; STUDY.census.ico = '📊'; STUDY.census.hi = 'जनगणना · जनसंख्या'; STUDY.census.desc = 'Census 2011 & 2027 and population geography — size, growth, density, sex ratio, literacy.'; STUDY.census.meta = '11 lessons · 250 questions'; STUDY.census.color = '#C99A2E';
   STUDY.intlorgs.subj = 'gs'; STUDY.intlorgs.ico = '🌐'; STUDY.intlorgs.hi = 'अंतरराष्ट्रीय संगठन'; STUDY.intlorgs.desc = 'UN bodies, financial and regional groupings — HQs, heads, members and recent news.'; STUDY.intlorgs.meta = 'Lessons · practice · mock'; STUDY.intlorgs.color = '#8C2F39';
@@ -2224,6 +2224,7 @@
       var snap = await studyDocRef(id).get();
       if(!snap.exists) return;
       var r = snap.data() || {};
+      if(r.key && mod.key && r.key !== mod.key) return; /* saved by an older version of this app */
       if(id === 'tracker' && typeof r.data === 'string'){
         var mine = lsGet(mod.key), merged = trackMerge(trackParse(mine), trackParse(r.data)), mj = JSON.stringify(merged);
         lsSet(mod.key, mj);
@@ -2260,7 +2261,7 @@
   function studyCounts(id, json){
     var st; try{ st = JSON.parse(json || '{}') || {}; }catch(e){ st = {}; }
     var q = Object.keys(st.ans || {}).length, l = 0;
-    if(id === 'grammar' || id === 'bns') l = Object.keys(st.done || {}).length;
+    if(id === 'grammar') l = Object.keys(st.done || {}).length;
     else l = Object.keys(st.les || {}).filter(function(k){ return st.les[k] && st.les[k].done; }).length;
     return { q: q, l: l };
   }
@@ -2340,7 +2341,7 @@
 
   // ================= पाठShala extras: progress rings, one Mistakes book, mixed mock test =================
   STUDY.grammar.lessons = 100; STUDY.grammar.unit = 'rules';
-  STUDY.bns.lessons = 12; STUDY.bns.unit = 'lessons';
+  STUDY.bns.lessons = 15; STUDY.bns.unit = 'lessons';
   STUDY.schemes.lessons = 15; STUDY.schemes.unit = 'lessons';
   STUDY.census.lessons = 11; STUDY.census.unit = 'lessons';
   STUDY.intlorgs.lessons = 12; STUDY.intlorgs.unit = 'lessons';
@@ -2395,7 +2396,7 @@
   /** What the mini app's saved state says right now. */
   function trackSnap(id){
     var st = studyState(id), ans = st.ans || {}, keys = Object.keys(ans);
-    var l = (id === 'grammar' || id === 'bns') ? Object.keys(st.done || {}).length : Object.keys(st.les || {}).filter(function(k){ return st.les[k] && st.les[k].done; }).length;
+    var l = id === 'grammar' ? Object.keys(st.done || {}).length : Object.keys(st.les || {}).filter(function(k){ return st.les[k] && st.les[k].done; }).length;
     return { ans: ans, tried: keys.length, right: keys.filter(function(k){ return ans[k] === 1; }).length, l: l, mocks: Array.isArray(st.mocks) ? st.mocks.length : 0, lastMock: Array.isArray(st.mocks) && st.mocks.length ? st.mocks[st.mocks.length - 1] : null };
   }
   function trackTotalQ(id){
@@ -2600,7 +2601,7 @@
       '</div>' +
       (m.noq ? '' : '<h4>Last 5 mock tests</h4>' + (m5.length ? '<div class="tr-mocks">' + m5.slice().reverse().map(function(k){
           return '<div><span class="d">' + escapeHtml(k.d) + '</span><span class="bar"><i style="width:' + k.pct + '%"></i></span><b>' + k.score + '/' + k.max + '</b><span class="p">' + k.pct + '%' + (k.acc !== undefined ? ' · ' + k.acc + '% right' : '') + '</span></div>';
-        }).join('') + '</div>' : '<p class="help">' + (id === 'grammar' || id === 'bns' ? 'This app has unit tests instead of mock tests.' : 'No mock test yet — open the app’s Mock test tab to take one.') + '</p>')) +
+        }).join('') + '</div>' : '<p class="help">' + (id === 'grammar' ? 'This app has unit tests instead of mock tests.' : 'No mock test yet — open the app’s Mock test tab to take one.') + '</p>')) +
       (chart ? '<h4>App score after each session</h4>' + chart : '') +
       '<h4>All sessions</h4>' + (ss.length ? '<div class="tr-sess"><div class="th"><span>Date</span><span>Time</span><span>Questions</span><span>Correct</span><span>' + escapeHtml(m.unit || 'Lessons') + '</span><span>Score</span></div>' + ss.map(function(s){
         return '<div><span class="d">' + new Date(s.at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) + ' <small>' + new Date(s.at).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' }) + '</small></span>' +
@@ -2677,7 +2678,7 @@
   }
   function studyProgress(id){
     var m = STUDY[id], st = studyState(id), done = 0, ans = st.ans || {};
-    if(id === 'grammar' || id === 'bns') done = Object.keys(st.done || {}).length;
+    if(id === 'grammar') done = Object.keys(st.done || {}).length;
     else done = Object.keys(st.les || {}).filter(function(k){ return st.les[k] && st.les[k].done; }).length;
     var keys = Object.keys(ans), right = keys.filter(function(k){ return ans[k] === 1; }).length;
     return { done: Math.min(done, m.lessons), total: m.lessons, tried: keys.length, right: right,
