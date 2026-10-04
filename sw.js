@@ -2,11 +2,11 @@
 // - Lets browsers offer "Install app".
 // - Network first: you always get the newest version when online.
 // - Everything opened once is kept, so the app and the study modules open offline too.
-var CACHE = 'shabd-v11';
+var CACHE = 'shabd-v12';
 var PRECACHE = [
   './', './index.html', './manifest.json',
   './study-grammar-100.html', './study-bns-bnss-bsa.html', './study-govt-schemes.html',
-  './study-census.html', './study-intl-orgs.html', './study-reports-indices.html', './study-sports.html', './study-festivals.html', './study-ipr-plans.html', './study-folk-dances.html', './study-appointments.html', './study-polity.html', './study-economics.html', './study-space.html', './study-physics.html', './study-biology.html', './study-geometry.html', './study-mensuration2d.html', './study-mensuration3d.html', './study-trigonometry.html', './study-voice.html', './study-bank.json',
+  './study-census.html', './study-intl-orgs.html', './study-reports-indices.html', './study-sports.html', './study-festivals.html', './study-ipr-plans.html', './study-folk-dances.html', './study-appointments.html', './study-polity.html', './study-economics.html', './study-space.html', './study-physics.html', './study-biology.html', './study-geometry.html', './study-mensuration2d.html', './study-mensuration3d.html', './study-trigonometry.html', './study-voice.html', './study-narration.html', './study-maths-formulas.html', './study-bank.json',
   './icon-192.png', './icon-512.png'
 ];
 

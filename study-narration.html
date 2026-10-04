@@ -1,0 +1,1420 @@
+<!doctype html><html><head><meta charset=utf8>
+<script>
+/* शब्दRegister bridge: follows the app's look (Paper / Indigo) and Light / Dark / Auto choice. */
+(function(){
+  var root = document.documentElement;
+  function theme(t){ if(t === 'dark' || t === 'light') root.setAttribute('data-theme', t); else root.removeAttribute('data-theme'); }
+  function skin(s){ if(s === 'paper' || s === 'indigo') root.setAttribute('data-skin', s); }
+  try{
+    var q = new URLSearchParams(location.search);
+    theme(q.get('theme'));
+    skin(q.get('skin') || (q.get('embed') ? 'paper' : ''));
+    if(q.get('embed')) root.classList.add('in-shabd');
+  }catch(e){}
+  window.addEventListener('message', function(e){
+    if(e.origin !== location.origin || !e.data || e.data.type !== 'shabd-theme') return;
+    theme(e.data.theme);
+    if(e.data.skin) skin(e.data.skin);
+  });
+})();
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap">
+<meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Narration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<style>
+/* Layout: Physics PYQ Workbook — follows the शब्दRegister Paper / Indigo look; one column + bottom tabs on phones, sidebar on PC. */
+:root{
+  --paper:#f6f3ea; --sheet:#fffdf7; --sunk:#ebe6d8;
+  --ink:#1d2a22; --ink2:#56625a; --rule:#dcd5c3;
+  --blue:#1f5c3d; --on-blue:#ffffff; --blue-bg:#dcebdf;
+  --accent:#b4530f; --accent-bg:#fbe7d3;
+  --good:#1b7547; --good-bg:#dff1e6; --bad:#b0271f; --bad-bg:#f8e1de;
+  --warn-bg:#fff2d2;
+  --f-display:"Fraunces", "Tiro Devanagari Hindi", Georgia, serif;
+  --f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-num:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r:10px; --nav-h:64px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#111612; --sheet:#1a211c; --sunk:#222b25;
+  --ink:#e8eee9; --ink2:#a3b0a7; --rule:#2f3a33;
+  --blue:#86cfa2; --on-blue:#111612; --blue-bg:#1d3a29;
+  --accent:#f3a764; --accent-bg:#3b2614;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#111612; --sheet:#1a211c; --sunk:#222b25;
+  --ink:#e8eee9; --ink2:#a3b0a7; --rule:#2f3a33;
+  --blue:#86cfa2; --on-blue:#111612; --blue-bg:#1d3a29;
+  --accent:#f3a764; --accent-bg:#3b2614;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
+.wrap{max-width:640px;margin:0 auto;padding-inline:16px;padding-block:0 calc(var(--nav-h) + 28px + env(safe-area-inset-bottom,0px))}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);border-bottom:1px solid var(--rule)}
+.top-in{max-width:640px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px}
+.brand{font-family:var(--f-display);font-weight:800;font-size:17px;line-height:1.2;flex:1;min-width:0}
+.brand small{display:block;font-family:var(--f-body);font-weight:500;font-size:12px;color:var(--ink2);letter-spacing:.02em}
+.stat{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right;white-space:nowrap}
+.stat b{color:var(--ink);font-weight:600}
+
+/* bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--sheet);border-top:1px solid var(--rule);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);height:var(--nav-h)}
+.nav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer}
+.nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav button[aria-current="page"]{color:var(--blue)}
+.nav button[aria-current="page"] span{border-bottom:2px solid var(--blue)}
+
+/* type */
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.25;margin:0}
+h1{font-size:24px;font-weight:800}
+h2{font-size:19px;font-weight:800}
+h3{font-size:16px;font-weight:700}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--ink2)}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+p{margin:0}
+.stack{display:flex;flex-direction:column;gap:14px}
+.view{padding-top:18px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--rule);background:var(--sheet);font-weight:600;cursor:pointer;text-decoration:none}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:var(--on-blue)}
+.btn.ghost{background:transparent}
+.btn.sm{min-height:36px;padding:0 14px;font-size:14px}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.end{justify-content:flex-end}
+.row.between{justify-content:space-between}
+
+/* hero */
+.hero{display:grid;gap:10px;padding:4px 0 6px}
+.hero p{color:var(--ink2)}
+.meter{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--blue);border-radius:99px}
+
+/* lesson list */
+.lessons{display:flex;flex-direction:column;border-top:1px solid var(--rule)}
+.les{display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;padding:14px 2px;border-bottom:1px solid var(--rule);background:none;border-left:0;border-right:0;border-top:0;text-align:left;cursor:pointer;width:100%}
+.les .no{font-family:var(--f-num);font-weight:600;font-size:15px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--rule);color:var(--ink2)}
+.les.done .no{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.les .t{min-width:0}
+.les .t b{display:block;font-weight:700;font-size:16px;line-height:1.3}
+.les .t span{font-size:13px;color:var(--ink2)}
+.les .sc{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right}
+.les.next .no{border-color:var(--blue);color:var(--blue)}
+
+/* lesson reader */
+.lhead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.back{background:none;border:0;padding:8px 8px 8px 0;cursor:pointer;color:var(--blue);font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0 4px}
+.steps button{border:1px solid var(--rule);background:var(--sheet);border-radius:8px;padding:8px 4px;font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer}
+.steps button[aria-current="step"]{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.block{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;min-width:0}
+.block h3{margin-bottom:8px}
+.block p + p{margin-top:8px}
+.plain{padding:0 2px}
+.facts{display:grid;gap:0}
+.facts div{display:grid;grid-template-columns:minmax(0,42%) minmax(0,1fr);gap:10px;padding:7px 0;border-top:1px dashed var(--rule)}
+.facts div:first-child{border-top:0}
+.facts dt{font-size:14px;color:var(--ink2);margin:0}
+.facts dd{margin:0;font-weight:600;min-width:0}
+.tl{display:grid;gap:0;margin:0;padding:0;list-style:none}
+.tl li{display:grid;grid-template-columns:92px 1fr;gap:10px;padding:8px 0;border-top:1px dashed var(--rule)}
+.tl li:first-child{border-top:0}
+.tl .y{font-family:var(--f-num);font-weight:600;font-size:13px;color:var(--accent);padding-top:2px}
+.trick,.trap{border-radius:var(--r);padding:12px 14px 12px 14px;border:1px solid var(--rule)}
+.trick{background:var(--accent-bg);border-color:transparent}
+.trap{background:var(--bad-bg);border-color:transparent}
+.trick .lab,.trap .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.trick .lab{color:var(--accent)}
+.trap .lab{color:var(--bad)}
+.rk div{grid-template-columns:minmax(0,48%) minmax(0,1fr)}
+.rk dd{min-width:0;overflow-wrap:anywhere}
+.hot{border-radius:var(--r);padding:12px 14px;background:var(--warn-bg,var(--accent-bg));border-left:4px solid var(--warn,var(--accent))}
+.hot .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;color:var(--warn,var(--accent))}
+.heatb{display:inline-block;font-size:11px;letter-spacing:-.1em;margin-left:6px;vertical-align:1px}
+.heat{display:flex;flex-direction:column;gap:2px}
+.hrow{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(60px,1fr) 44px;gap:10px;align-items:center;text-align:left;background:none;border:0;border-bottom:1px solid var(--rule);padding:9px 2px;color:inherit;font:inherit;cursor:pointer}
+.hrow:last-child{border-bottom:0}
+.hrow .ht{display:flex;flex-direction:column;min-width:0}
+.hrow .ht .muted{font-size:12px}
+.hbar{height:10px;border-radius:5px;background:var(--rule);overflow:hidden}
+.hbar i{display:block;height:100%;background:var(--accent);border-radius:5px}
+.hp{text-align:right;font-weight:700}
+
+.tbl{overflow-x:auto;margin:0 -2px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);font-weight:700}
+td.n{font-family:var(--f-num);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fig{margin:0}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-size:13px;color:var(--ink2);margin-top:6px}
+.pyr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pyr div{text-align:center;font-size:13px}
+.pyr b{display:block;font-size:14px}
+.pm{fill:var(--blue)} .pf{fill:var(--accent)}
+.sum{margin:0;padding-left:20px;display:grid;gap:6px}
+
+/* questions */
+.qcard{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px;min-width:0}
+.qmeta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}
+.qno{font-family:var(--f-num);font-weight:600;color:var(--ink2)}
+.tag{background:var(--sunk);color:var(--ink2);border-radius:99px;padding:1px 9px;font-weight:600}
+.tag.pyq{background:var(--accent-bg);color:var(--accent)}
+.bm{margin-left:auto;background:none;border:0;cursor:pointer;color:var(--ink2);font-size:20px;line-height:1;padding:4px}
+.bm[aria-pressed="true"]{color:var(--accent)}
+.qt{font-weight:600;font-size:16px}
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:start;text-align:left;width:100%;border:1.5px solid var(--rule);background:var(--paper);border-radius:9px;padding:10px 12px;cursor:pointer;min-height:44px}
+.opt .k{font-family:var(--f-num);font-weight:600;color:var(--ink2);font-size:14px;padding-top:1px}
+.opt.sel{border-color:var(--blue);background:var(--blue-bg)}
+.opt.ok{border-color:var(--good);background:var(--good-bg)}
+.opt.no{border-color:var(--bad);background:var(--bad-bg)}
+.opt.ok .k{color:var(--good)} .opt.no .k{color:var(--bad)}
+.opt:disabled{cursor:default;color:inherit}
+.exp{font-size:15px;border-left:3px solid var(--blue);padding:4px 0 4px 12px;color:var(--ink)}
+.exp b.okl{color:var(--good)} .exp b.nol{color:var(--bad)}
+
+/* chips */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 13px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.seg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--rule)}
+.seg::-webkit-scrollbar{display:none}
+.seg button{flex:none;background:none;border:0;border-bottom:2px solid transparent;padding:10px 8px;font-weight:600;color:var(--ink2);cursor:pointer}
+.seg button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+
+/* score panel */
+.scorebig{display:flex;align-items:baseline;gap:8px}
+.scorebig .num{font-size:44px;font-weight:600;line-height:1;color:var(--blue)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.kpi{background:var(--sunk);border-radius:8px;padding:8px;text-align:center}
+.kpi .num{display:block;font-size:20px;font-weight:600}
+.kpi span{font-size:12px;color:var(--ink2)}
+.kpi.g .num{color:var(--good)} .kpi.b .num{color:var(--bad)}
+
+/* mock */
+.mbar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 57px);z-index:10;background:var(--paper);padding:10px 0;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--rule)}
+.timer{font-family:var(--f-num);font-weight:600;font-size:18px;padding:4px 10px;border-radius:8px;background:var(--sunk)}
+.timer.low{background:var(--bad-bg);color:var(--bad)}
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px}
+.pal button{height:40px;border-radius:8px;border:1px solid var(--rule);background:var(--sheet);font-family:var(--f-num);font-weight:600;font-size:13px;cursor:pointer}
+.pal button.a{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.pal button.m{box-shadow:inset 0 -4px 0 var(--accent)}
+.pal button.cur{outline:2px solid var(--ink);outline-offset:1px}
+.pal button.ok{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.pal button.no{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.confirm{background:var(--warn-bg);border-radius:var(--r);padding:12px 14px;display:grid;gap:10px}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}
+legend{font-weight:700;margin-bottom:6px;padding:0}
+.radios{display:flex;gap:8px;flex-wrap:wrap}
+.radios label{border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 14px;font-weight:600;cursor:pointer;font-size:14px}
+.radios input{position:absolute;opacity:0;pointer-events:none}
+.radios input:checked + span{color:var(--blue)}
+.radios label:has(input:checked){border-color:var(--blue);background:var(--blue-bg)}
+.radios label:has(input:focus-visible){outline:2px solid var(--blue);outline-offset:2px}
+select{font:inherit;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:8px;padding:8px 10px;max-width:100%}
+.hist{display:grid;gap:0}
+.hist div{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:14px}
+
+/* revise */
+.search{width:100%;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:10px;padding:10px 12px;font:inherit}
+.rk{display:grid;gap:0}
+.rk div{display:grid;grid-template-columns:minmax(0,48%) 1fr;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:15px}
+.rk div:first-child{border-top:0}
+.rk dt{font-size:13px;color:var(--ink2);margin:0}
+.rk dt.up{color:var(--good)} .rk dt.dn{color:var(--bad)}
+.rk dd{margin:0;font-weight:600;min-width:0}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px}
+.tile .num{display:block;font-size:24px;font-weight:600;color:var(--accent);line-height:1.2}
+.tile span{font-size:13px;color:var(--ink2)}
+.gbar{display:grid;grid-template-columns:78px 1fr 52px;gap:8px;align-items:center;font-size:13px;padding:3px 0}
+.gbar .tr{height:12px;background:var(--sunk);border-radius:3px;position:relative;overflow:hidden}
+.gbar .tr i{position:absolute;left:0;top:0;bottom:0;background:var(--blue);border-radius:3px}
+.gbar .tr i.neg{background:var(--bad)}
+.gbar .v{font-family:var(--f-num);text-align:right}
+.flash{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;min-height:240px;padding:20px 18px;display:grid;align-content:center;gap:12px;cursor:pointer;text-align:left;width:100%}
+.flash .side{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.flash .front{font-size:18px;font-weight:600}
+.flash .ans{font-size:20px;font-weight:700;color:var(--good)}
+.empty{padding:24px 4px;color:var(--ink2);text-align:center}
+.foot{font-size:13px;color:var(--ink2);padding-top:10px}
+@media (prefers-reduced-motion: no-preference){ .opt,.chip,.btn{transition:background-color .15s, border-color .15s} }
+.link{background:var(--blue-bg);border-radius:var(--r);padding:12px 14px}
+.link .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;color:var(--blue)}
+.icheck{background:var(--sheet);border:1.5px dashed var(--blue);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px}
+.icheck .lab{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue)}
+.cat{font-size:12px;font-weight:700;border-radius:99px;padding:1px 8px;white-space:nowrap}
+.cat.CS{background:var(--blue-bg);color:var(--blue)} .cat.CSS{background:var(--accent-bg);color:var(--accent)} .cat.ST{background:var(--sunk);color:var(--ink)} .cat.OT{background:var(--sunk);color:var(--ink2)}
+
+/* ---- workbook additions ---- */
+table.cover td:nth-child(4){min-width:180px}
+.plist .dl{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.plist .dl em{font-style:normal;font-weight:700;color:var(--blue);text-align:right}
+.ladder{list-style:none;margin:0;padding:0;display:grid;gap:0;border-top:1px solid var(--rule)}
+.ladder li{display:grid;grid-template-columns:62px 1fr auto;gap:12px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--rule)}
+.ladder .rk-n{font-size:22px;font-weight:600;color:var(--blue);text-align:right}
+.ladder .rk-t{min-width:0}
+.ladder .rk-t b{display:block;line-height:1.3}
+.ladder .rk-t span{font-size:13px;color:var(--ink2)}
+.ladder .rk-d{font-weight:700;font-size:14px;white-space:nowrap}
+.ladder li.up .rk-d{color:var(--good)} .ladder li.dn .rk-d{color:var(--bad)}
+.ladder small{font-weight:600;color:var(--ink2)}
+table.cover td{min-width:90px}
+.peek{border:1.5px dashed var(--blue);background:var(--blue-bg);color:var(--blue);border-radius:8px;padding:6px 10px;font-weight:600;cursor:pointer;min-height:36px;width:100%}
+.pubs{display:grid;gap:12px}
+.plist{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.plist li{padding:7px 0;border-top:1px dashed var(--rule);display:grid;gap:1px}
+.plist li:first-child{border-top:0}
+.plist li span{font-size:13px;color:var(--ink2)}
+.seg{scroll-snap-type:x proximity}
+@media (max-width: 700px){
+  table.cover thead{display:none}
+  table.cover tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 10px;padding:10px 0;border-bottom:1px solid var(--rule)}
+  table.cover td{border:0;padding:0;min-width:0;font-size:14px}
+  table.cover td:first-child{grid-column:1/-1;font-size:15px}
+  table.cover td:nth-child(4){grid-column:1/-1;min-width:0}
+  table.cover td[data-l]::before{content:attr(data-l);display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-bottom:2px}
+}
+/* ---- maths blocks ---- */
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(250px,100%),1fr));gap:10px}
+.fcard{background:var(--sheet);border:1px solid var(--rule);border-left:4px solid var(--blue);border-radius:var(--r);padding:10px 12px;display:grid;gap:4px;min-width:0}
+.fcard .fn{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);font-weight:700}
+.fcard .fx{font-family:var(--f-num);font-size:16px;color:var(--ink);overflow-wrap:anywhere;line-height:1.45}
+.fcard .fnote{font-size:13px;color:var(--ink2)}
+.ex{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px 14px;display:grid;gap:8px}
+.ex .exhead .lab{display:inline;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);font-weight:700}
+.ex .src{display:inline-block;margin-left:6px;font-size:11.5px;font-weight:700;color:var(--accent);border:1px solid currentColor;border-radius:999px;padding:0 8px}
+.ex .exq{font-weight:600}
+.ex details summary{cursor:pointer;font-weight:700;color:var(--blue);list-style:none}
+.ex details summary::-webkit-details-marker{display:none}
+.ex details summary::before{content:'▸ '}
+.ex details[open] summary::before{content:'▾ '}
+.ex ol{margin:8px 0 0;padding-left:20px;display:grid;gap:4px}
+.ex .exans{margin-top:8px;padding:8px 10px;border-radius:8px;background:var(--good-bg);color:var(--good);font-weight:700}
+.figwrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(260px,100%),1fr));gap:12px}
+.figwrap figure{margin:0;display:grid;gap:6px;justify-items:center;text-align:center}
+.fig svg,.figwrap svg{width:100%;max-width:340px;height:auto;color:var(--ink)}
+.fig figcaption,.figwrap figcaption{font-size:13px;color:var(--ink2)}
+sup,sub{font-size:.72em;line-height:0}
+
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">Narration<small>प्रत्यक्ष-अप्रत्यक्ष कथन · SSC CGL English workbook</small></div>
+    <div class="stat" id="topstat"></div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<nav class="nav" aria-label="Sections">
+  <div class="nav-in">
+    <button type="button" id="nav-learn" data-tab="learn"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg><span>Learn</span></button>
+    <button type="button" id="nav-practice" data-tab="practice"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span>Practice</span></button>
+    <button type="button" id="nav-mock" data-tab="mock"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6M12 2v3"/></svg><span>Mock test</span></button>
+    <button type="button" id="nav-revise" data-tab="revise"><svg viewBox="0 0 24 24"><path d="M12 3 2 8l10 5 10-5z"/><path d="m2 13 10 5 10-5"/></svg><span>Revise</span></button>
+  </div>
+</nav>
+
+<script>
+"use strict";
+const IS = "Select the option that expresses the given sentence in indirect speech. ";
+const DS = "Select the option that expresses the given sentence in direct speech. ";
+const LESSONS = [
+{ id:"L1", heat:3, title:"SSC CGL pattern & exam strategy", hi:"परीक्षा पैटर्न और रणनीति", blocks:[
+ {k:"hot", h:"<b>Narration (direct–indirect speech) is asked in almost every SSC English section.</b> CGL Tier 1 (25 questions, +2 / −0.5) usually has <b>one</b> narration question in a shift. CGL Tier 2 (Paper 1, Module II: 45 questions, +3 / −1) has <b>one to three</b>. CHSL, CPO and Selection Post ask it in the same format. With the method below it takes 25–35 seconds."},
+ {k:"table", title:"Where narration is asked in SSC exams", head:["Exam","English section","Narration questions (usual)","Marking"], rows:[
+  ["CGL Tier 1","25 questions","0–1 per shift, mostly 1","+2 / −0.5"],
+  ["CGL Tier 2 (Paper 1, Module II)","45 questions","1–3","+3 / −1"],
+  ["CHSL Tier 1","25 questions","0–1","+2 / −0.5"],
+  ["CPO Paper 1","50 questions","1–2","+1 / −0.25"],
+  ["Selection Post / Stenographer","25–200 (by level)","1–2","Varies"]]},
+ {k:"p", h:"<b>The wording is fixed:</b> “Select the option that expresses the given sentence in indirect speech” (or “in direct speech”). Four full sentences are given. They usually differ in only one or two places, so you are checking <b>five things</b>: the reporting verb, the joining word, the pronouns, the tense, and the time/place words."},
+ {k:"table", title:"Recent pattern (2023–2025 shifts): what the sentences test", head:["Type","How often","Typical sentence"], rows:[
+  ["Statements with tense change","Very often","He said, “I am writing a letter.”"],
+  ["Questions (asked if / asked wh-)","Very often","She said to me, “Where do you live?”"],
+  ["Commands and requests","Often","The teacher said to us, “Do not make a noise.”"],
+  ["Time and place words","Often","He said, “I will come tomorrow.”"],
+  ["Exclamations, wishes, greetings","Regular","She said, “What a lovely view!”"],
+  ["Indirect → direct","Regular (about 1 in 4)","He told me that he was busy."],
+  ["Exceptions (universal truth, past perfect, modals)","Tier 2 favourite","The teacher said, “The sun rises in the east.”"]]},
+ {k:"trick", h:"<b>The 30-second elimination (RJPTW).</b> (1) <b>R</b>eporting verb: said to → told / asked / ordered / requested. (2) <b>J</b>oining word: that / if / whether / wh-word / to. (3) <b>P</b>ronouns: SON rule. (4) <b>T</b>ense: one step back if the reporting verb is past. (5) <b>W</b>ords of time and place: now → then, tomorrow → the next day. Most distractors fail at T or W."},
+ {k:"trap", h:"SSC distractors are built from <b>one wrong change</b>: <i>is</i> left as <i>is</i>, <i>will</i> left as <i>will</i>, <i>tomorrow</i> left as <i>tomorrow</i>, a question left in question order (<i>asked where did I live</i>), or <i>said me</i> instead of <i>told me</i>."},
+ {k:"link", h:"Narration and active–passive voice appear side by side and both test tense control. Revise them together; the Voice mini app uses the same layout."},
+ {k:"q", q:"Which check usually removes the most wrong options in a narration question?", o:["The tense and time words","The spelling of names","The length of the sentence","The full stop"], e:"Most distractors keep the original tense or time word."}
+]},
+{ id:"L2", heat:3, title:"Basic rules: reporting verb & pronouns", hi:"मूल नियम · रिपोर्टिंग वर्ब और सर्वनाम", blocks:[
+ {k:"hot", h:"Every narration question uses these rules. Pronoun mistakes are the second most common SSC distractor after tense."},
+ {k:"p", h:"In <b>direct speech</b> the exact words are inside inverted commas: <i>Ram said, “I am tired.”</i> In <b>indirect speech</b> we report them in our own words: <i>Ram said that he was tired.</i> The verb outside the commas (<i>said</i>) is the <b>reporting verb</b>; the words inside are the <b>reported speech</b>."},
+ {k:"formula", title:"Five steps of direct → indirect", rows:[
+  ["1. Reporting verb","said → said; said to + person → told + person","He said to me → He told me"],
+  ["2. Joining word","statement → that; question → if/whether or wh-word; order → to","told me that …"],
+  ["3. Pronouns","SON rule (below)","“I” → he / she"],
+  ["4. Tense","one step back if the reporting verb is in the past","am → was, will → would"],
+  ["5. Time / place","near words → far words","now → then, here → there"]]},
+ {k:"table", title:"SON rule for pronouns", head:["Person inside the commas","Changes to match","Example"], rows:[
+  ["1st person (I, me, my, we, us, our)","<b>S</b>ubject of the reporting verb","He said, “I am ill.” → He said that <b>he</b> was ill."],
+  ["2nd person (you, your)","<b>O</b>bject of the reporting verb","She said to me, “You are late.” → She told me that <b>I</b> was late."],
+  ["3rd person (he, she, it, they)","<b>N</b>o change","He said, “She is clever.” → He said that she was clever."]]},
+ {k:"ex", src:"PYQ-type · CGL Tier 1 format", q:"Select the option that expresses the given sentence in indirect speech.<br><i>Rita said to me, “You have done your work well.”</i>", steps:["said to me → <b>told me</b>","Statement → <b>that</b>","you (2nd person) → object of reporting verb = me → <b>I</b>; your → my","has/have done → <b>had done</b>"], ans:"Rita told me that I had done my work well."},
+ {k:"trap", h:"<b>said me</b> and <b>told that</b> are both wrong. <i>told</i> must have a person after it (<i>told me that</i>); <i>said</i> must not (<i>said that</i>, or <i>said to me that</i> — rare)."},
+ {k:"trick", h:"Do pronouns before tense. Once <i>I</i> has become <i>he</i>, the verb agreement (<i>was</i>, not <i>were</i>) follows easily."},
+ {k:"q", q:"He said to her, “I like your dress.” Indirect:", o:["He told her that he liked her dress.","He told her that I liked your dress.","He said her that he liked her dress.","He told her that he likes her dress."], e:"said to → told; I → he; your → her; like → liked."}
+]},
+{ id:"L3", heat:3, title:"Tense change (backshift)", hi:"काल परिवर्तन", blocks:[
+ {k:"hot", h:"Tense is tested in nearly every SSC narration question. If the reporting verb is in the <b>past</b> (said, told, asked), the tense inside goes <b>one step back</b>."},
+ {k:"formula", title:"Backshift table", rows:[
+  ["Simple present → simple past","V1 / V5 → V2","“I write” → he wrote"],
+  ["Present continuous → past continuous","is / am / are + Ving → was / were + Ving","“I am writing” → he was writing"],
+  ["Present perfect → past perfect","has / have + V3 → had + V3","“I have written” → he had written"],
+  ["Present perfect continuous → past perfect continuous","has been + Ving → had been + Ving","“I have been writing” → he had been writing"],
+  ["Simple past → past perfect","V2 → had + V3","“I wrote” → he had written"],
+  ["Past continuous → past perfect continuous","was + Ving → had been + Ving","“I was writing” → he had been writing"],
+  ["Past perfect","no change","“I had written” → he had written"],
+  ["will / shall → would","will / shall + V1 → would + V1","“I will write” → he would write"],
+  ["can / may → could / might","modal + V1","“I can write” → he could write"]]},
+ {k:"formula", title:"When the tense does NOT change", rows:[
+  ["Reporting verb in present / future","says, will say → no backshift","He says, “I am busy” → He says that he is busy"],
+  ["Universal truth / scientific fact","stays in present","The sun rises in the east"],
+  ["Habitual fact still true","may stay in present","She said that she goes for a walk daily"],
+  ["Past perfect, would, could, might, should, ought to, used to","no change","“I could swim” → he could swim"]]},
+ {k:"ex", src:"PYQ-type · CGL Tier 1 format", q:"Select the option that expresses the given sentence in indirect speech.<br><i>He said, “I am writing a letter.”</i>", steps:["said → said that","I → he","am writing → <b>was writing</b>"], ans:"He said that he was writing a letter."},
+ {k:"ex", src:"PYQ-type · CGL Tier 2 format", q:"Select the option that expresses the given sentence in indirect speech.<br><i>She said, “I bought this car last year.”</i>", steps:["bought (simple past) → <b>had bought</b>","this → that; last year → <b>the previous year</b>"], ans:"She said that she had bought that car the previous year."},
+ {k:"trap", h:"<b>Simple past → past perfect</b>, not simple past. <i>“I saw him”</i> → <i>he had seen him</i>. SSC options often keep <i>saw</i>."},
+ {k:"trick", h:"Think of each helping verb moving one step: is → was, has → had, was → had been, will → would, can → could, may → might. Past perfect is already at the back: it stays."},
+ {k:"q", q:"She said, “I have finished my homework.” Indirect:", o:["She said that she had finished her homework.","She said that she has finished her homework.","She said that she finished her homework.","She said that I had finished my homework."], e:"has finished → had finished; I → she; my → her."}
+]},
+{ id:"L4", heat:2, title:"Exceptions & modals", hi:"अपवाद और मॉडल", blocks:[
+ {k:"hot", h:"Exceptions are a <b>Tier 2 favourite</b> and appear in Tier 1 about once a month. The universal-truth exception is the one SSC asks most."},
+ {k:"formula", title:"Modal changes", rows:[
+  ["will / shall","→ would","“I shall go” → he would go"],
+  ["can","→ could","“I can help” → he could help"],
+  ["may (possibility / permission)","→ might","“It may rain” → it might rain"],
+  ["may (wish)","→ might (in a wish) / prayed that … might","“May you live long!” → prayed that I might live long"],
+  ["must (obligation)","→ had to (or must)","“I must go” → he had to go"],
+  ["must (deduction / permanent rule)","→ no change","“He must be tired” → he must be tired"],
+  ["would, could, might, should, ought to, used to, had better","→ no change","“You should rest” → I should rest"]]},
+ {k:"formula", title:"No-change cases", rows:[
+  ["Universal truth","present stays","The teacher said that the earth revolves around the sun"],
+  ["Historical fact","simple past may stay","He said that Akbar ruled India for many years"],
+  ["Unreal past (wish / if only / it is time)","past stays","He said that he wished he were rich"],
+  ["Conditional type 2 / 3","no change","He said that if he had money he would buy a car"],
+  ["Past perfect","no change","She said that she had already eaten"]]},
+ {k:"ex", src:"PYQ-type · CGL Tier 1 format", q:"Select the option that expresses the given sentence in indirect speech.<br><i>The teacher said, “The earth revolves around the sun.”</i>", steps:["Universal truth → tense does <b>not</b> change","said → said that"], ans:"The teacher said that the earth revolves around the sun."},
+ {k:"trap", h:"An option with <i>revolved</i> is a trap for universal truths. But a <i>personal</i> present fact (<i>“I live in Delhi”</i>) <b>does</b> backshift → <i>he lived in Delhi</i>."},
+ {k:"trick", h:"<b>Modals already in the past form never move:</b> would, could, might, should, ought to. If the option changes <i>should</i> to <i>should have</i>, it is wrong."},
+ {k:"q", q:"He said, “You should take some rest.” Indirect (he said this to me):", o:["He told me that I should take some rest.","He told me that I should have taken some rest.","He told me that you should take some rest.","He told me that I shall take some rest."], e:"should does not change."}
+]},
+{ id:"L5", heat:3, title:"Time & place words", hi:"समय और स्थान सूचक शब्द", blocks:[
+ {k:"hot", h:"Time words decide about one SSC narration question in three: often <b>two options are identical except for one time word</b>."},
+ {k:"table", title:"Near → far words", head:["Direct","Indirect"], rows:[
+  ["now","then"],["today","that day"],["tonight","that night"],["yesterday","the previous day / the day before"],["tomorrow","the next day / the following day"],
+  ["last night","the previous night / the night before"],["last week / year","the previous week / year"],["next week / month","the following week / month"],["ago","before"],["this","that"],["these","those"],["here","there"],["hence","thence"],["thus","so / in that way"],["come","go (when the place changes)"]]},
+ {k:"ex", src:"PYQ-type · CGL Tier 1 format", q:"Select the option that expresses the given sentence in indirect speech.<br><i>He said, “I will come here tomorrow.”</i>", steps:["will → would","here → there","tomorrow → the next day"], ans:"He said that he would come there the next day."},
+ {k:"trap", h:"<i>ago</i> → <i>before</i> (not <i>back</i>), <i>yesterday</i> → <i>the previous day</i> (not <i>the last day</i>), and <i>this</i> → <i>that</i> only when it is a time/place pointer, not inside a fixed name."},
+ {k:"trick", h:"If the reporting verb is <b>present</b> (<i>says</i>) or the speech is reported the same day and place, time words need not change. SSC almost always uses <i>said</i>, so change them."},
+ {k:"q", q:"She said, “I met him two days ago.” Indirect:", o:["She said that she had met him two days before.","She said that she met him two days ago.","She said that she had met him two days ago.","She said that she has met him two days before."], e:"met → had met; ago → before."}
+]},
+{ id:"L6", heat:3, title:"Questions (interrogative)", hi:"प्रश्नवाचक वाक्य", blocks:[
+ {k:"hot", h:"Questions come up very often. SSC tests three things: <b>asked</b> (not said/told), <b>if / whether</b> or the wh-word, and <b>statement word order</b> without a question mark."},
+ {k:"formula", title:"Question patterns", rows:[
+  ["Reporting verb","said / said to → asked / enquired of","He said to me → He asked me"],
+  ["Yes/no question","asked + if / whether + statement order","“Are you ready?” → asked if I was ready"],
+  ["Wh-question","asked + wh-word + statement order","“Where do you live?” → asked where I lived"],
+  ["do / does / did","drop it and change the main verb","“Do you like tea?” → asked if I liked tea"],
+  ["End","full stop, no question mark","… where I lived."]]},
+ {k:"ex", src:"PYQ-type · CGL Tier 1 format", q:"Select the option that expresses the given sentence in indirect speech.<br><i>She said to me, “Where do you live?”</i>", steps:["said to → asked","Keep “where”, statement order: where + I + verb","do you live → I lived"], ans:"She asked me where I lived."},
+ {k:"ex", src:"PYQ-type · CGL Tier 2 format", q:"Select the option that expresses the given sentence in indirect speech.<br><i>He said to her, “Have you seen my keys?”</i>", steps:["Yes/no → asked her <b>if</b>","have you seen → she had seen","my → his"], ans:"He asked her if she had seen his keys."},
+ {k:"trap", h:"<i>He asked me where did I live</i> and <i>He asked me that where I lived</i> are the classic wrong options: no question order and no <i>that</i> before a wh-word."},
+ {k:"trick", h:"Look at the end of each option: one that still ends with <b>?</b> is wrong in indirect speech."},
+ {k:"q", q:"He said to me, “Are you coming with us?” Indirect:", o:["He asked me if I was coming with them.","He asked me if I was coming with us.","He asked me that was I coming with them.","He told me if I was coming with them."], e:"asked + if; you → I; us → them; are → was."}
+]},
+{ id:"L7", heat:3, title:"Commands, requests & suggestions", hi:"आज्ञा, अनुरोध और सुझाव", blocks:[
+ {k:"hot", h:"Imperatives appear often. The key is choosing the reporting verb from the tone and using <b>to + V1</b> (or <b>not to + V1</b>)."},
+ {k:"formula", title:"Imperative patterns", rows:[
+  ["Order","ordered / commanded + person + to V1","“Stand up.” → The teacher ordered the boy to stand up"],
+  ["Request (please)","requested + person + to V1 (drop please)","“Please help me.” → She requested me to help her"],
+  ["Advice","advised + person + to V1","“Work hard.” → He advised me to work hard"],
+  ["Negative","told / ordered + person + not to V1 (or forbade + to V1)","“Don’t shout.” → He told me not to shout"],
+  ["Let’s (suggestion)","suggested / proposed that + we/they + should + V1","“Let’s go out.” → He suggested that they should go out"],
+  ["Let (permission)","asked / requested + to let / allow","“Let me go.” → He requested to be allowed to go"],
+  ["Sir / Madam","respectfully","“Sir, please listen.” → He respectfully requested his teacher to listen"]]},
+ {k:"ex", src:"PYQ-type · CGL Tier 1 format", q:"Select the option that expresses the given sentence in indirect speech.<br><i>The teacher said to the students, “Do not make a noise.”</i>", steps:["Command → <b>told / ordered</b>","Negative → <b>not to</b> + V1","No tense change in a to-infinitive"], ans:"The teacher told the students not to make a noise."},
+ {k:"ex", src:"PYQ-type · CHSL format", q:"Select the option that expresses the given sentence in indirect speech.<br><i>He said, “Let’s go for a picnic.”</i>", steps:["Let’s = suggestion → <b>suggested that</b>","we → they; add <b>should</b>"], ans:"He suggested that they should go for a picnic."},
+ {k:"trap", h:"<i>He suggested them to go</i> is wrong — <i>suggest</i> does not take person + to. Use <i>suggested that they should go</i>. Also <i>requested me please to help</i> is wrong: drop <i>please</i>."},
+ {k:"trick", h:"<b>Please → requested. Don’t → not to. Let’s → suggested that … should.</b> Three patterns cover almost all imperatives."},
+ {k:"q", q:"She said to me, “Please close the door.” Indirect:", o:["She requested me to close the door.","She requested me that I close the door please.","She ordered me to close the door.","She said me to close the door."], e:"Please → requested + to V1."}
+]},
+{ id:"L8", heat:2, title:"Exclamations, wishes & greetings", hi:"विस्मयादिबोधक, शुभकामनाएँ", blocks:[
+ {k:"hot", h:"Asked regularly in Tier 1 and Tier 2. The trick is choosing the <b>reporting verb with an adverb</b> and turning the exclamation into a statement."},
+ {k:"formula", title:"Exclamatory & optative patterns", rows:[
+  ["What / How …!","exclaimed (with joy / wonder) that it was a very …","“What a lovely view!” → She exclaimed that it was a very lovely view"],
+  ["Alas!","exclaimed with sorrow / sadly that","“Alas! I am ruined.” → He exclaimed sadly that he was ruined"],
+  ["Hurrah!","exclaimed with joy that","“Hurrah! We have won.” → They exclaimed with joy that they had won"],
+  ["Bravo! / Well done!","applauded / praised + person + saying that","“Well done!” → He applauded me"],
+  ["May you …!","wished / prayed that + person + might","“May you live long!” → She prayed that I might live long"],
+  ["Good morning / night","wished + person + good morning","“Good morning, sir.” → He wished his teacher good morning"],
+  ["Thank you","thanked + person","“Thank you.” → She thanked me"],
+  ["Goodbye","bade + person + goodbye","“Goodbye, friends.” → He bade his friends goodbye"]]},
+ {k:"ex", src:"PYQ-type · CGL Tier 1 format", q:"Select the option that expresses the given sentence in indirect speech.<br><i>She said, “What a beautiful garden this is!”</i>", steps:["What a … ! → exclaimed that it was a very …","this → that; is → was"], ans:"She exclaimed that that was a very beautiful garden."},
+ {k:"trap", h:"Keep the joining word <b>that</b> after <i>exclaimed</i>, and turn <i>What a / How</i> into <i>very</i>. Options that keep the exclamation mark are wrong."},
+ {k:"trick", h:"<b>May you …</b> is always a wish or prayer → <i>wished / prayed that … might</i>."},
+ {k:"q", q:"The old man said to me, “May God bless you!” Indirect:", o:["The old man prayed that God might bless me.","The old man prayed that God may bless you.","The old man told me that God bless me.","The old man ordered that God might bless me."], e:"May … ! → prayed that … might; you → me."}
+]},
+{ id:"L9", heat:2, title:"Mixed & multiple sentences", hi:"मिश्रित और अनेक वाक्य", blocks:[
+ {k:"hot", h:"Tier 2 likes longer speech: a statement plus a question, an answer with Yes/No, or two sentences. Each part gets its own reporting verb, joined by <b>and</b>."},
+ {k:"formula", title:"Joining patterns", rows:[
+  ["Statement + statement","said that … and added that …","“I am tired. I will rest.” → said that he was tired and added that he would rest"],
+  ["Statement + question","said that … and asked …","“I am lost. Can you help me?” → said that he was lost and asked if I could help him"],
+  ["Yes / No answer","replied in the affirmative / negative","“Yes,” he said → He replied in the affirmative"],
+  ["Yes + clause","replied that + clause","“Yes, I will come.” → He replied that he would come"],
+  ["Vocative (name / Sir)","becomes the object of the reporting verb","“Ravi, sit down.” → He told Ravi to sit down"],
+  ["Order + reason","told … to … as / because …","“Hurry up, we are late.” → told me to hurry up as we were late"]]},
+ {k:"ex", src:"PYQ-type · CGL Tier 2 format", q:"Select the option that expresses the given sentence in indirect speech.<br><i>He said to me, “I am new here. Can you show me the way?”</i>", steps:["First part: told me that he was new there","Second part: and asked if I could show him the way"], ans:"He told me that he was new there and asked if I could show him the way."},
+ {k:"trap", h:"Do not use one reporting verb for two different kinds of sentence. <i>He told me that he was new there and that could I show him the way</i> is wrong."},
+ {k:"trick", h:"Split the speech at each full stop or question mark. Convert each piece with its own pattern, then join with <i>and added / and asked / and told</i>."},
+ {k:"q", q:"“Yes,” she said, “I can drive.” Indirect:", o:["She replied that she could drive.","She replied in the negative that she could drive.","She said yes that I can drive.","She replied that she can drove."], e:"Yes + clause → replied that + backshifted clause."}
+]},
+{ id:"L10", heat:2, title:"Indirect → direct", hi:"अप्रत्यक्ष से प्रत्यक्ष", blocks:[
+ {k:"hot", h:"About one SSC narration question in four asks for the <b>direct</b> form. Reverse each step: put the words back in inverted commas and move tenses one step <b>forward</b>."},
+ {k:"formula", title:"Reverse the steps", rows:[
+  ["Reporting verb","told + person → said to + person; asked → said to + person","He told me → He said to me"],
+  ["Remove that / if","add inverted commas and the right punctuation (. ? !)","asked if → said, “Are …?”"],
+  ["Pronouns","the speaker becomes I; the listener becomes you","told me that he … → said to me, “I …”"],
+  ["Tense forward","was → is, had → has/have (or simple past), would → will, could → can","he would come → “I will come”"],
+  ["Time words","then → now, the next day → tomorrow, that → this, there → here","the previous day → yesterday"],
+  ["Commands","ordered / requested + to V1 → imperative (add Please for requested)","requested me to sit → said to me, “Please sit.”"]]},
+ {k:"ex", src:"PYQ-type · CGL Tier 1 format", q:"Select the option that expresses the given sentence in direct speech.<br><i>He told me that he was busy then.</i>", steps:["told me → said to me","he → I; was → am","then → now"], ans:"He said to me, “I am busy now.”"},
+ {k:"trap", h:"<i>had + V3</i> in indirect may come from simple past <b>or</b> present perfect in direct. Check the time words: <i>the previous day</i> → yesterday (simple past); no time word → often <i>has / have</i>."},
+ {k:"trick", h:"Check punctuation in the options: a question must end with <b>?</b> inside the commas, a command must start with a bare verb, an exclamation with <b>What / How / Alas</b> and end with <b>!</b>."},
+ {k:"q", q:"She asked me if I was hungry. Direct:", o:["She said to me, “Are you hungry?”","She said to me, “Was I hungry?”","She said to me, “Am I hungry?”","She told me, “Are you hungry.”"], e:"asked if → said to me + question; I → you; was → are."}
+]},
+{ id:"L11", heat:2, title:"Tier 2 tricky sentences", hi:"टियर 2 के कठिन वाक्य", blocks:[
+ {k:"hot", h:"Tier 2 uses longer, formal sentences: reporting verbs in the present tense, <i>must</i>, conditionals, <i>let</i> for permission, and questions with <i>shall I</i>."},
+ {k:"formula", title:"Tricky types", rows:[
+  ["Present reporting verb","says / tells → no backshift","He says, “I am busy.” → He says that he is busy"],
+  ["Shall I / Shall we (offer / advice)","asked + if / whether + he/they + should","“Shall I open the window?” → He asked if he should open the window"],
+  ["Shall (pure future)","would","“I shall be late.” → He said that he would be late"],
+  ["Conditional","if-clause: type 1 backshifts; types 2 and 3 stay","“If it rains, I will stay.” → … if it rained he would stay"],
+  ["Question tag","drop the tag, report as a statement","“You are new, aren’t you?” → asked if I was new"],
+  ["Let (permission)","asked to be allowed / requested … to let","“Let me go home.” → He asked to be allowed to go home"],
+  ["Must (deduction)","stays must","“She must be at home.” → he said that she must be at home"]]},
+ {k:"ex", src:"PYQ-type · CGL Tier 2 format", q:"Select the option that expresses the given sentence in indirect speech.<br><i>He said to me, “Shall I bring you a glass of water?”</i>", steps:["Shall I (offer) → asked if he <b>should</b>","you → me"], ans:"He asked me if he should bring me a glass of water."},
+ {k:"trap", h:"With <i>says</i> or <i>will say</i> nothing backshifts. An option with <i>was</i> for “He says, ‘I am …’” is wrong."},
+ {k:"trick", h:"Before converting, look at the <b>reporting verb’s tense</b>. Present → keep tenses; past → backshift. That one glance decides two options."},
+ {k:"q", q:"She says, “I am going to the market.” Indirect:", o:["She says that she is going to the market.","She says that she was going to the market.","She said that she was going to the market.","She says that I am going to the market."], e:"Present reporting verb → no tense change."}
+]},
+{ id:"L12", heat:3, title:"Recent-pattern mixed set & last-day tips", hi:"नवीन पैटर्न अभ्यास · अंतिम दिन के सुझाव", blocks:[
+ {k:"hot", h:"This lesson’s question bank is a <b>mixed set modelled on recent CGL, CHSL and CPO shifts (2023–2025)</b>: office, school, family and travel sentences across every type, in both directions. Do it in one sitting with a 35-second limit per question."},
+ {k:"p", h:"<b>What changed recently.</b> Sentences are longer, mix two kinds of speech, and more often ask for the direct form. Options now differ in a single word, so the five-step check from L1 matters more than ever."},
+ {k:"facts", title:"Last-day checklist", rows:[
+  ["Reporting verb","said to → told / asked / ordered / requested / suggested"],
+  ["Joining word","that · if / whether · wh-word · to · not to"],
+  ["Pronouns","SON: 1st → subject, 2nd → object, 3rd → no change"],
+  ["Tense","one step back after a past reporting verb; none after says"],
+  ["Exceptions","universal truth, past perfect, would / could / might / should"],
+  ["Time words","now → then, today → that day, tomorrow → the next day, ago → before"]]},
+ {k:"trick", h:"<b>If two options look correct</b>, compare them word by word — the difference is usually one time word or one pronoun."},
+ {k:"link", h:"Error-spotting sometimes hides a narration error: <i>He asked me where was I going</i> or <i>She said me that …</i>. The same rules earn marks there too."}
+]}
+];
+const QB = [
+// L1
+["L1","In SSC CGL Tier 1, how many narration questions are usually asked in a shift?",["Usually one","Usually five","Usually ten","Never asked"],"Narration appears as about one question in most Tier 1 shifts."],
+["L1","In a narration question, which is the commonest mistake built into wrong options?",["Tense or time word left unchanged","Wrong capital letter","Extra comma","Different name"],"Most distractors keep the original tense or time word."],
+["L1","What does “RJPTW” stand for in the five-step check?",["Reporting verb, Joining word, Pronouns, Tense, Words of time/place","Read, Join, Paste, Type, Write","Rules, Jokes, Phrases, Tenses, Words","Reported, Joined, Past, Third, Who"],"The five checks in order."],
+["L1","In CGL Tier 2, each English question carries:",["+3 marks and −1 for a wrong answer","+2 marks and −0.5","+1 mark and −0.25","+3 marks and no negative"],"Tier 2 Module II English: +3 / −1."],
+["L1","Which option is surely wrong in an indirect-speech question?",["One that ends with a question mark","One that uses “asked”","One that uses “that”","One that uses “told”"],"Indirect speech is never a direct question."],
+["L1","Which grammar topic is usually revised with narration because both test tense control?",["Active–passive voice","Spelling","Idioms","Synonyms"],"Voice and narration both need tense control."],
+// L2
+["L2",IS+"Rita said to me, “You have done your work well.”",["Rita told me that I had done my work well.","Rita told me that you had done your work well.","Rita said me that I had done my work well.","Rita told me that I have done my work well."],"said to → told; you → I; your → my; have done → had done.","p"],
+["L2",IS+"He said to her, “I like your dress.”",["He told her that he liked her dress.","He told her that I liked your dress.","He said her that he liked her dress.","He told her that he likes her dress."],"I → he; your → her; like → liked."],
+["L2",IS+"Ram said, “I am tired.”",["Ram said that he was tired.","Ram said that I was tired.","Ram told that he was tired.","Ram said that he is tired."],"I → he; am → was; said (no object) stays said."],
+["L2",IS+"She said to us, “We are proud of you.”",["She told us that they were proud of us.","She told us that we were proud of you.","She told us that they are proud of us.","She said us that they were proud of us."],"we (1st) → they (subject side); you → us (object)."],
+["L2",IS+"Mohan said, “My brother is a doctor.”",["Mohan said that his brother was a doctor.","Mohan said that my brother was a doctor.","Mohan said that his brother is a doctor.","Mohan told that his brother was a doctor."],"my → his; is → was."],
+["L2",IS+"The boy said to his mother, “I want some milk.”",["The boy told his mother that he wanted some milk.","The boy told his mother that I wanted some milk.","The boy said his mother that he wanted some milk.","The boy told his mother that he wants some milk."],"said to → told; I → he; want → wanted."],
+["L2",IS+"Priya said to me, “You are my best friend.”",["Priya told me that I was her best friend.","Priya told me that you were her best friend.","Priya told me that I was my best friend.","Priya told me that I am her best friend."],"you → I; my → her; are → was."],
+["L2",IS+"He said, “She sings well.”",["He said that she sang well.","He said that he sang well.","He said that she sings well always.","He told that she sang well."],"3rd person – no pronoun change; sings → sang."],
+["L2","In indirect speech, which reporting verb is correct with an object (me, him)?",["told","said","spoke","talked"],"“told me”, never “said me”."],
+["L2",IS+"They said to me, “We will help you.”",["They told me that they would help me.","They told me that we would help you.","They told me that they will help me.","They said me that they would help me."],"we → they; you → me; will → would."],
+["L2",IS+"Anita said to Ravi, “I have lost your pen.”",["Anita told Ravi that she had lost his pen.","Anita told Ravi that she had lost her pen.","Anita told Ravi that I had lost your pen.","Anita told Ravi that she has lost his pen."],"I → she; your → his (Ravi); have lost → had lost."],
+["L2",IS+"The manager said to the clerk, “You must complete this file.”",["The manager told the clerk that he had to complete that file.","The manager told the clerk that you must complete this file.","The manager told the clerk that he must completed that file.","The manager said the clerk that he had to complete that file."],"you → he; must (obligation) → had to; this → that."],
+["L2",IS+"My father said, “I am proud of my son.”",["My father said that he was proud of his son.","My father said that I was proud of my son.","My father said that he is proud of his son.","My father told that he was proud of his son."],"I → he; my → his; am → was."],
+// L3
+["L3",IS+"He said, “I am writing a letter.”",["He said that he was writing a letter.","He said that he is writing a letter.","He said that he had written a letter.","He said that I was writing a letter."],"Present continuous → past continuous.","p"],
+["L3",IS+"She said, “I bought this car last year.”",["She said that she had bought that car the previous year.","She said that she bought this car last year.","She said that she had bought this car last year.","She said that she has bought that car the previous year."],"bought → had bought; this → that; last year → the previous year.","p"],
+["L3",IS+"She said, “I have finished my homework.”",["She said that she had finished her homework.","She said that she has finished her homework.","She said that she finished her homework.","She said that I had finished my homework."],"Present perfect → past perfect."],
+["L3",IS+"He said, “I play cricket every Sunday.”",["He said that he played cricket every Sunday.","He said that he plays cricket every Sunday.","He said that he had played cricket every Sunday.","He said that he was playing cricket every Sunday."],"Simple present → simple past."],
+["L3",IS+"They said, “We have been waiting for an hour.”",["They said that they had been waiting for an hour.","They said that they have been waiting for an hour.","They said that we had been waiting for an hour.","They said that they were waiting for an hour."],"Present perfect continuous → past perfect continuous."],
+["L3",IS+"He said, “I was reading a novel.”",["He said that he had been reading a novel.","He said that he was reading a novel.","He said that he had read a novel.","He said that he has been reading a novel."],"Past continuous → past perfect continuous."],
+["L3",IS+"She said, “I will call you.” (She said this to me.)",["She told me that she would call me.","She told me that she will call me.","She told me that she would call you.","She told me that I would call her."],"will → would; you → me."],
+["L3",IS+"He said, “I can solve this sum.”",["He said that he could solve that sum.","He said that he can solve that sum.","He said that he could solve this sum.","He said that he could solved that sum."],"can → could; this → that."],
+["L3",IS+"She said, “It may rain today.”",["She said that it might rain that day.","She said that it may rain that day.","She said that it might rain today.","She said that it might rained that day."],"may → might; today → that day."],
+["L3",IS+"He said, “I did not go to school.”",["He said that he had not gone to school.","He said that he did not go to school.","He said that he has not gone to school.","He said that he had not went to school."],"did not go → had not gone."],
+["L3",IS+"The girl said, “I am learning French.”",["The girl said that she was learning French.","The girl said that she is learning French.","The girl said that she had learnt French.","The girl said that I was learning French."],"is/am learning → was learning."],
+["L3",IS+"He said, “I had already eaten.”",["He said that he had already eaten.","He said that he has already eaten.","He said that he had already been eating.","He said that he already ate."],"Past perfect does not change."],
+["L3",IS+"Raju says, “I am very busy.”",["Raju says that he is very busy.","Raju says that he was very busy.","Raju said that he was very busy.","Raju says that I am very busy."],"Present reporting verb → no backshift."],
+["L3",IS+"She said, “I saw a snake in the garden.”",["She said that she had seen a snake in the garden.","She said that she saw a snake in the garden.","She said that she has seen a snake in the garden.","She said that she had saw a snake in the garden."],"saw → had seen."],
+["L3",IS+"The students said, “We shall finish the project.”",["The students said that they would finish the project.","The students said that they should finish the project.","The students said that we would finish the project.","The students said that they shall finish the project."],"shall (future) → would."],
+// L4
+["L4",IS+"The teacher said, “The earth revolves around the sun.”",["The teacher said that the earth revolves around the sun.","The teacher said that the earth revolved around the sun.","The teacher said that the earth had revolved around the sun.","The teacher told that the earth revolves around the sun."],"Universal truth – no tense change.","p"],
+["L4",IS+"He said, “Water boils at 100 °C.”",["He said that water boils at 100 °C.","He said that water boiled at 100 °C.","He said that water had boiled at 100 °C.","He said that water was boiling at 100 °C."],"Scientific fact – present stays."],
+["L4",IS+"He said, “You should take some rest.” (He said this to me.)",["He told me that I should take some rest.","He told me that I should have taken some rest.","He told me that you should take some rest.","He told me that I shall take some rest."],"should does not change."],
+["L4",IS+"She said, “I could swim when I was five.”",["She said that she could swim when she was five.","She said that she can swim when she was five.","She said that she could have swum when she was five.","She said that she could swim when I was five."],"could stays; was in a time clause stays."],
+["L4",IS+"He said, “I must leave now.”",["He said that he had to leave then.","He said that he must leave now.","He said that he has to leave then.","He said that he had to leave now."],"must (obligation) → had to; now → then.","p"],
+["L4",IS+"He said, “She must be very tired.”",["He said that she must be very tired.","He said that she had to be very tired.","He said that she must have be very tired.","He said that she must been very tired."],"must (deduction) does not change."],
+["L4",IS+"She said, “I wish I were a bird.”",["She said that she wished she were a bird.","She said that she wished she had been a bird.","She said that she wishes she were a bird.","She said that she wished I were a bird."],"wish → wished; unreal “were” stays."],
+["L4",IS+"He said, “If I had money, I would buy a car.”",["He said that if he had money, he would buy a car.","He said that if he had had money, he would have bought a car.","He said that if he has money, he will buy a car.","He said that if I had money, I would buy a car."],"Type-2 conditional – no tense change."],
+["L4",IS+"The teacher said, “Honesty is the best policy.”",["The teacher said that honesty is the best policy.","The teacher said that honesty was the best policy.","The teacher said that honesty had been the best policy.","The teacher told that honesty is the best policy."],"Proverb / universal truth – present stays."],
+["L4",IS+"He said, “I used to live in Mumbai.”",["He said that he used to live in Mumbai.","He said that he had used to live in Mumbai.","He said that he use to live in Mumbai.","He said that I used to live in Mumbai."],"used to does not change."],
+["L4",IS+"She said to me, “You ought to respect your elders.”",["She told me that I ought to respect my elders.","She told me that I ought to have respected my elders.","She told me that you ought to respect your elders.","She told me that I should respected my elders."],"ought to does not change."],
+["L4",IS+"The guide said, “The Taj Mahal was built by Shah Jahan.”",["The guide said that the Taj Mahal was built by Shah Jahan.","The guide said that the Taj Mahal is built by Shah Jahan.","The guide said that the Taj Mahal has been built by Shah Jahan.","The guide said that the Taj Mahal will be built by Shah Jahan."],"Historical fact – simple past may stay (SSC key)."],
+["L4",IS+"He said, “I might come late.”",["He said that he might come late.","He said that he may come late.","He said that he might came late.","He said that he might have come lately."],"might does not change."],
+["L4",IS+"She said, “It is time we left.”",["She said that it was time they left.","She said that it is time they had left.","She said that it was time we leave.","She said that it was time they had been leaving."],"It is → it was; unreal past “left” stays; we → they."],
+// L5
+["L5",IS+"He said, “I will come here tomorrow.”",["He said that he would come there the next day.","He said that he would come here tomorrow.","He said that he will come there the next day.","He said that he would come there yesterday."],"will → would; here → there; tomorrow → the next day.","p"],
+["L5",IS+"She said, “I met him two days ago.”",["She said that she had met him two days before.","She said that she met him two days ago.","She said that she had met him two days ago.","She said that she has met him two days before."],"met → had met; ago → before."],
+["L5",IS+"He said, “I am busy now.”",["He said that he was busy then.","He said that he was busy now.","He said that he is busy then.","He said that he had been busy then."],"am → was; now → then."],
+["L5",IS+"She said, “I visited my aunt yesterday.”",["She said that she had visited her aunt the previous day.","She said that she visited her aunt yesterday.","She said that she had visited her aunt the next day.","She said that she has visited her aunt the previous day."],"yesterday → the previous day."],
+["L5",IS+"He said, “These books are mine.”",["He said that those books were his.","He said that these books were his.","He said that those books are mine.","He said that those books were mine."],"these → those; mine → his; are → was/were."],
+["L5",IS+"She said, “I am leaving tonight.”",["She said that she was leaving that night.","She said that she was leaving tonight.","She said that she is leaving that night.","She said that she was leaving the last night."],"tonight → that night."],
+["L5",IS+"He said, “I will finish this work next week.”",["He said that he would finish that work the following week.","He said that he would finish this work next week.","He said that he will finish that work the following week.","He said that he would finish that work the previous week."],"next week → the following week."],
+["L5",IS+"She said, “I did not sleep last night.”",["She said that she had not slept the previous night.","She said that she did not sleep last night.","She said that she had not slept the next night.","She said that she has not slept the previous night."],"last night → the previous night."],
+["L5",IS+"He said, “I live here.”",["He said that he lived there.","He said that he lived here.","He said that he lives there.","He said that I lived there."],"here → there; live → lived."],
+["L5",IS+"The officer said, “The meeting is today.”",["The officer said that the meeting was that day.","The officer said that the meeting was today.","The officer said that the meeting is that day.","The officer said that the meeting had been the next day."],"today → that day."],
+["L5",IS+"She said, “I joined this office a year ago.”",["She said that she had joined that office a year before.","She said that she joined this office a year ago.","She said that she had joined that office a year ago.","She said that she had joined this office a year back."],"ago → before; this → that."],
+["L5",IS+"He said, “I shall be here at this time tomorrow.”",["He said that he would be there at that time the next day.","He said that he would be here at this time tomorrow.","He said that he should be there at that time the next day.","He said that he would be there at this time the next day."],"shall → would; here → there; this → that; tomorrow → the next day."],
+["L5",IS+"She said, “We moved to Pune last year.”",["She said that they had moved to Pune the previous year.","She said that we had moved to Pune last year.","She said that they moved to Pune the next year.","She said that they have moved to Pune the previous year."],"we → they; moved → had moved; last year → the previous year."],
+["L5",IS+"He said, “I am going to Delhi today.”",["He said that he was going to Delhi that day.","He said that he is going to Delhi that day.","He said that he was going to Delhi today.","He said that he had gone to Delhi that day."],"am going → was going; today → that day."],
+// L6
+["L6",IS+"She said to me, “Where do you live?”",["She asked me where I lived.","She asked me where did I live.","She asked me that where I lived.","She told me where I lived."],"asked + wh-word + statement order.","p"],
+["L6",IS+"He said to her, “Have you seen my keys?”",["He asked her if she had seen his keys.","He asked her if she has seen his keys.","He asked her had she seen his keys.","He told her if she had seen his keys."],"asked if; have seen → had seen; my → his."],
+["L6",IS+"He said to me, “Are you coming with us?”",["He asked me if I was coming with them.","He asked me if I was coming with us.","He asked me that was I coming with them.","He told me if I was coming with them."],"asked if; you → I; us → them."],
+["L6",IS+"The teacher said to the boy, “Why are you late?”",["The teacher asked the boy why he was late.","The teacher asked the boy why was he late.","The teacher asked the boy that why he was late.","The teacher told the boy why he was late."],"Statement order after why.","p"],
+["L6",IS+"She said to him, “Do you like tea?”",["She asked him if he liked tea.","She asked him if he likes tea.","She asked him did he like tea.","She asked him if he does like tea."],"Drop do; like → liked."],
+["L6",IS+"He said to me, “What is your name?”",["He asked me what my name was.","He asked me what was my name.","He asked me what is my name.","He asked me that what my name was."],"Statement order: what + subject + verb."],
+["L6",IS+"Mother said to me, “Did you eat your lunch?”",["Mother asked me if I had eaten my lunch.","Mother asked me if I ate my lunch.","Mother asked me did I eat my lunch.","Mother asked me if I have eaten my lunch."],"did eat → had eaten."],
+["L6",IS+"The stranger said to me, “Can you show me the way to the station?”",["The stranger asked me if I could show him the way to the station.","The stranger asked me if I can show him the way to the station.","The stranger asked me could I show him the way to the station.","The stranger told me if I could show him the way to the station."],"can → could; me → him."],
+["L6",IS+"She said to me, “How old are you?”",["She asked me how old I was.","She asked me how old was I.","She asked me how old I am.","She asked me that how old I was."],"Statement order."],
+["L6",IS+"He said to them, “Will you help me?”",["He asked them if they would help him.","He asked them if they will help him.","He asked them would they help him.","He asked them if we would help him."],"will → would; you → they; me → him."],
+["L6",IS+"The officer said to the clerk, “When will the report be ready?”",["The officer asked the clerk when the report would be ready.","The officer asked the clerk when would the report be ready.","The officer asked the clerk when the report will be ready.","The officer told the clerk when the report would be ready."],"Statement order; will → would."],
+["L6",IS+"She said to me, “Who gave you this book?”",["She asked me who had given me that book.","She asked me who gave me this book.","She asked me who had given you that book.","She asked me that who had given me that book."],"gave → had given; you → me; this → that."],
+["L6",IS+"He said to me, “Is it raining?”",["He asked me whether it was raining.","He asked me whether it is raining.","He asked me was it raining.","He told me whether it was raining."],"whether + statement order."],
+["L6",IS+"The doctor said to the patient, “How do you feel now?”",["The doctor asked the patient how he felt then.","The doctor asked the patient how did he feel then.","The doctor asked the patient how he feels now.","The doctor asked the patient how he felt now."],"Drop do; feel → felt; now → then."],
+["L6",IS+"She said to her friend, “Where have you been all these days?”",["She asked her friend where she had been all those days.","She asked her friend where had she been all those days.","She asked her friend where she has been all these days.","She asked her friend where she had been all these days."],"have been → had been; these → those."],
+// L7
+["L7",IS+"The teacher said to the students, “Do not make a noise.”",["The teacher told the students not to make a noise.","The teacher told the students do not make a noise.","The teacher told the students to not making a noise.","The teacher said the students not to make a noise."],"Negative command → not to + V1.","p"],
+["L7",IS+"He said, “Let’s go for a picnic.”",["He suggested that they should go for a picnic.","He suggested them to go for a picnic.","He said let’s go for a picnic.","He ordered that they go for a picnic."],"Let’s → suggested that … should."],
+["L7",IS+"She said to me, “Please close the door.”",["She requested me to close the door.","She requested me that I close the door please.","She ordered me to close the door.","She said me to close the door."],"Please → requested + to V1.","p"],
+["L7",IS+"The officer said to the soldiers, “March forward.”",["The officer ordered the soldiers to march forward.","The officer requested the soldiers to march forward.","The officer told the soldiers that march forward.","The officer ordered the soldiers march forward."],"Order → ordered + to V1."],
+["L7",IS+"The doctor said to me, “Take this medicine twice a day.”",["The doctor advised me to take that medicine twice a day.","The doctor advised me to take this medicine twice a day.","The doctor advised me that take that medicine twice a day.","The doctor requested me to took that medicine twice a day."],"Advice → advised + to V1; this → that."],
+["L7",IS+"Mother said to me, “Don’t play in the sun.”",["Mother told me not to play in the sun.","Mother told me don’t play in the sun.","Mother told me to not played in the sun.","Mother asked me that not to play in the sun."],"Negative → not to."],
+["L7",IS+"He said to his servant, “Bring me a glass of water.”",["He ordered his servant to bring him a glass of water.","He ordered his servant to bring me a glass of water.","He ordered his servant that bring him a glass of water.","He requested his servant brought him a glass of water."],"me → him; ordered + to V1."],
+["L7",IS+"The beggar said to the lady, “Please give me some food.”",["The beggar requested the lady to give him some food.","The beggar requested the lady to give me some food.","The beggar ordered the lady to give him some food.","The beggar requested the lady that give him some food."],"Please → requested; me → him."],
+["L7",IS+"She said to the children, “Let’s sing a song.”",["She suggested to the children that they should sing a song.","She suggested the children to sing a song.","She told the children let’s sing a song.","She ordered the children that they sing a song."],"Let’s → suggested that … should."],
+["L7",IS+"The coach said to the players, “Work hard and win the match.”",["The coach advised the players to work hard and win the match.","The coach advised the players that work hard and win the match.","The coach advised the players worked hard and won the match.","The coach said the players to work hard and win the match."],"advised + to V1."],
+["L7",IS+"He said to me, “Let me go home.”",["He requested me to let him go home.","He requested me to let me go home.","He suggested that we should go home.","He requested me let him go home."],"Let (permission) → requested … to let him."],
+["L7",IS+"The policeman said to the driver, “Show me your licence.”",["The policeman ordered the driver to show him his licence.","The policeman ordered the driver to show me your licence.","The policeman ordered the driver that show him his licence.","The policeman requested the driver showed him his licence."],"me → him; your → his."],
+["L7",IS+"The teacher said, “Sit down, boys.”",["The teacher ordered the boys to sit down.","The teacher ordered to sit down boys.","The teacher said boys that sit down.","The teacher requested sit down to the boys."],"Vocative becomes the object: ordered the boys to sit down."],
+["L7",IS+"He said to me, “Never tell a lie.”",["He advised me never to tell a lie.","He advised me not never to tell a lie.","He advised me never tell a lie.","He advised me that never to tell a lie."],"never to + V1."],
+["L7",IS+"She said to her son, “Do your homework now.”",["She told her son to do his homework then.","She told her son to do your homework now.","She told her son do his homework then.","She told her son that do his homework then."],"your → his; now → then."],
+// L8
+["L8",IS+"She said, “What a beautiful garden this is!”",["She exclaimed that that was a very beautiful garden.","She exclaimed what a beautiful garden that was.","She said that what a beautiful garden this is.","She exclaimed that this is a very beautiful garden."],"What a … ! → exclaimed that it was a very …","p"],
+["L8",IS+"The old man said to me, “May God bless you!”",["The old man prayed that God might bless me.","The old man prayed that God may bless you.","The old man told me that God bless me.","The old man ordered that God might bless me."],"May … ! → prayed that … might."],
+["L8",IS+"He said, “Alas! I have lost my purse.”",["He exclaimed with sorrow that he had lost his purse.","He exclaimed with joy that he had lost his purse.","He said alas that he had lost his purse.","He exclaimed with sorrow that he has lost my purse."],"Alas → exclaimed with sorrow."],
+["L8",IS+"The boys said, “Hurrah! We have won the match.”",["The boys exclaimed with joy that they had won the match.","The boys exclaimed with sorrow that they had won the match.","The boys exclaimed with joy that we have won the match.","The boys said hurrah that they had won the match."],"Hurrah → exclaimed with joy."],
+["L8",IS+"He said to me, “Good morning!”",["He wished me good morning.","He told me good morning.","He exclaimed me good morning.","He said me good morning."],"Greeting → wished."],
+["L8",IS+"She said to him, “Thank you for your help.”",["She thanked him for his help.","She thanked him for your help.","She told him thank you for his help.","She thanked to him for his help."],"Thank you → thanked."],
+["L8",IS+"He said, “How clever the girl is!”",["He exclaimed that the girl was very clever.","He exclaimed how clever the girl was!","He said that how clever the girl is.","He exclaimed that the girl is very clever."],"How … ! → exclaimed that … very …"],
+["L8",IS+"The mother said to her son, “May you succeed!”",["The mother wished that her son might succeed.","The mother wished that her son may succeed.","The mother told her son may you succeed.","The mother ordered her son to succeed."],"May you … ! → wished that … might."],
+["L8",IS+"The captain said, “Bravo! Well played, boys.”",["The captain applauded the boys, saying that they had played well.","The captain exclaimed with sorrow that the boys had played well.","The captain told the boys bravo that they played well.","The captain applauded the boys that bravo they played well."],"Bravo / well done → applauded."],
+["L8",IS+"He said to his friends, “Goodbye!”",["He bade his friends goodbye.","He told his friends goodbye!","He wished goodbye to his friends that.","He said his friends goodbye."],"Goodbye → bade goodbye."],
+["L8",IS+"She said, “What a terrible accident!”",["She exclaimed that it was a very terrible accident.","She exclaimed what a terrible accident it was.","She said that what a terrible accident.","She exclaimed that it is a very terrible accident."],"exclaimed that it was a very …"],
+["L8",IS+"The students said to the teacher, “Good night, sir.”",["The students respectfully wished the teacher good night.","The students told the teacher good night sir.","The students respectfully ordered the teacher good night.","The students said to the teacher that good night."],"Sir → respectfully; wished good night."],
+["L8",IS+"He said, “Oh! I am ruined.”",["He exclaimed with sorrow that he was ruined.","He exclaimed with joy that he was ruined.","He said oh that he was ruined.","He exclaimed with sorrow that I was ruined."],"Exclamation of sorrow; I → he; am → was."],
+["L8",IS+"She said, “How I wish I could fly!”",["She exclaimed that she wished very much that she could fly.","She exclaimed how she wished she can fly.","She said how I wish I could fly.","She exclaimed that she wishes that she could fly."],"How I wish → wished very much; could stays."],
+// L9
+["L9",IS+"He said to me, “I am new here. Can you show me the way?”",["He told me that he was new there and asked if I could show him the way.","He told me that he was new there and that could I show him the way.","He told me that he is new here and asked if I can show him the way.","He asked me that he was new there and could I show him the way."],"Two sentences → two reporting verbs joined with and."],
+["L9",IS+"“Yes,” she said, “I can drive.”",["She replied that she could drive.","She replied in the negative that she could drive.","She said yes that I can drive.","She replied that she can drove."],"Yes + clause → replied that."],
+["L9",IS+"He said, “I am tired. I will go to bed.”",["He said that he was tired and added that he would go to bed.","He said that he was tired and he will go to bed.","He said that he is tired and added that he would go to bed.","He said that I was tired and added that I would go to bed."],"Statement + statement → and added that."],
+["L9",IS+"She said to me, “Will you come to the party?” I said, “No.”",["She asked me if I would come to the party and I replied in the negative.","She asked me if I will come to the party and I said no.","She asked me would I come to the party and I replied in the affirmative.","She told me if I would come to the party and I replied no."],"No → replied in the negative."],
+["L9",IS+"The teacher said, “Ravi, why are you late? Sit down.”",["The teacher asked Ravi why he was late and told him to sit down.","The teacher asked Ravi why was he late and told him sit down.","The teacher told Ravi why he was late and to sit down.","The teacher asked Ravi why he is late and ordered him sit down."],"Question + command → asked … and told … to."],
+["L9",IS+"He said, “Sir, I am sorry. I will not repeat the mistake.”",["He respectfully told his teacher that he was sorry and added that he would not repeat the mistake.","He told sir that he was sorry and will not repeat the mistake.","He respectfully said that I am sorry and would not repeat the mistake.","He respectfully told his teacher that he is sorry and would not repeat the mistake."],"Sir → respectfully + listener; two statements."],
+["L9",IS+"She said to me, “Hurry up, we are getting late.”",["She told me to hurry up as we were getting late.","She told me to hurry up as we are getting late.","She told me hurry up that we were getting late.","She asked me if we were getting late and hurry up."],"Command + reason → told … to … as …"],
+["L9",IS+"He said to me, “Do you know her? She is my cousin.”",["He asked me if I knew her and told me that she was his cousin.","He asked me if I knew her and she was his cousin.","He asked me do I know her and told me that she is his cousin.","He told me if I knew her and that she was my cousin."],"Question + statement."],
+["L9",IS+"“No,” he said, “I have not seen the film.”",["He replied that he had not seen the film.","He replied in the affirmative that he had not seen the film.","He said no that he has not seen the film.","He replied that I had not seen the film."],"No + clause → replied that + clause."],
+["L9",IS+"The mother said, “Children, finish your food. It is getting cold.”",["The mother told the children to finish their food as it was getting cold.","The mother told the children finish their food as it is getting cold.","The mother told the children to finish your food as it was getting cold.","The mother asked the children if they finished their food as it was getting cold."],"Vocative → object; your → their."],
+["L9",IS+"He said, “What a lovely day! Let’s go out.”",["He exclaimed that it was a very lovely day and suggested that they should go out.","He exclaimed what a lovely day and let’s go out.","He said that it is a lovely day and suggested them to go out.","He exclaimed that it was a lovely day and ordered to go out."],"Exclamation + suggestion."],
+["L9",IS+"She said to me, “Yes, I will help you.”",["She told me that she would help me.","She replied in the affirmative that she will help you.","She told me yes that she would help me.","She told me that I would help her."],"Yes + clause → told me that + clause."],
+["L9",IS+"The boy said, “Mother, I am hungry. Give me some bread.”",["The boy told his mother that he was hungry and asked her to give him some bread.","The boy told his mother that he is hungry and give him some bread.","The boy told mother that I was hungry and asked her to give me some bread.","The boy asked his mother that he was hungry and gave him some bread."],"Statement + request."],
+["L9",IS+"He said, “Friends, the train has arrived. Let’s get in.”",["He told his friends that the train had arrived and suggested that they should get in.","He told his friends that the train has arrived and let’s get in.","He told friends that the train had arrived and ordered them get in.","He suggested his friends that the train had arrived and to get in."],"Statement + suggestion."],
+// L10
+["L10",DS+"He told me that he was busy then.",["He said to me, “I am busy now.”","He said to me, “He is busy now.”","He said to me, “I was busy then.”","He told me, “I am busy then.”"],"told me → said to me; he → I; was → am; then → now.","p"],
+["L10",DS+"She asked me if I was hungry.",["She said to me, “Are you hungry?”","She said to me, “Was I hungry?”","She said to me, “Am I hungry?”","She told me, “Are you hungry.”"],"asked if → question; I → you; was → are."],
+["L10",DS+"The teacher told the students not to make a noise.",["The teacher said to the students, “Do not make a noise.”","The teacher said to the students, “Not to make a noise.”","The teacher said to the students, “Did not make a noise.”","The teacher said to the students, “You do not make a noise?”"],"not to + V1 → Do not + V1."],
+["L10",DS+"He said that he would come the next day.",["He said, “I will come tomorrow.”","He said, “I would come tomorrow.”","He said, “He will come tomorrow.”","He said, “I will come the next day.”"],"would → will; the next day → tomorrow."],
+["L10",DS+"She requested me to help her.",["She said to me, “Please help me.”","She said to me, “Please help her.”","She said to me, “Help me please?”","She told me, “You helped me.”"],"requested → Please + imperative; her → me."],
+["L10",DS+"He asked me where I lived.",["He said to me, “Where do you live?”","He said to me, “Where did you live?”","He said to me, “Where I live?”","He said to me, “Where do I live?”"],"lived → do you live."],
+["L10",DS+"She exclaimed with joy that she had passed the exam.",["She said, “Hurrah! I have passed the exam.”","She said, “Alas! I have passed the exam.”","She said, “Hurrah! She had passed the exam.”","She said, “Hurrah! I had passed the exam?”"],"exclaimed with joy → Hurrah!; had passed → have passed."],
+["L10",DS+"He suggested that they should go for a walk.",["He said, “Let’s go for a walk.”","He said, “Let them go for a walk.”","He said, “We should went for a walk.”","He said, “Let’s went for a walk.”"],"suggested that … should → Let’s."],
+["L10",DS+"The boy told his mother that he had broken the glass.",["The boy said to his mother, “I have broken the glass.”","The boy said to his mother, “He has broken the glass.”","The boy said to his mother, “I had broken the glass.”","The boy said to his mother, “I break the glass.”"],"had broken → have broken (no past time word)."],
+["L10",DS+"She told me that she had met my brother the previous day.",["She said to me, “I met your brother yesterday.”","She said to me, “I met my brother yesterday.”","She said to me, “I have met your brother the previous day.”","She said to me, “I met your brother tomorrow.”"],"the previous day → yesterday → simple past; my → your."],
+["L10",DS+"He prayed that God might bless me.",["He said to me, “May God bless you!”","He said to me, “God might bless you.”","He said to me, “May God bless me!”","He said to me, “Might God bless you?”"],"prayed that … might → May …!"],
+["L10",DS+"The teacher asked the boy why he had not done his homework.",["The teacher said to the boy, “Why have you not done your homework?”","The teacher said to the boy, “Why had he not done his homework?”","The teacher said to the boy, “Why you have not done your homework?”","The teacher said to the boy, “Why did not you done your homework?”"],"had not done → have not done; he → you."],
+["L10",DS+"He ordered the servant to bring him a cup of tea.",["He said to the servant, “Bring me a cup of tea.”","He said to the servant, “Bring him a cup of tea.”","He said to the servant, “Please bring me a cup of tea?”","He said to the servant, “Brought me a cup of tea.”"],"ordered → bare imperative; him → me."],
+["L10",DS+"She told her friend that she was going to the market then.",["She said to her friend, “I am going to the market now.”","She said to her friend, “I was going to the market then.”","She said to her friend, “She is going to the market now.”","She said to her friend, “I am going to the market then.”"],"was going → am going; then → now."],
+["L10",DS+"He asked me whether I could lend him my bike.",["He said to me, “Can you lend me your bike?”","He said to me, “Could I lend you my bike?”","He said to me, “Can you lend him your bike?”","He said to me, “Can I lend me your bike?”"],"could → can; him → me; my → your."],
+// L11
+["L11",IS+"He said to me, “Shall I bring you a glass of water?”",["He asked me if he should bring me a glass of water.","He asked me if he would bring me a glass of water.","He asked me if I should bring him a glass of water.","He asked me shall he bring me a glass of water."],"Shall I (offer) → should.","p"],
+["L11",IS+"She says, “I am going to the market.”",["She says that she is going to the market.","She says that she was going to the market.","She said that she was going to the market.","She says that I am going to the market."],"Present reporting verb → no change."],
+["L11",IS+"He said, “If it rains, I will stay at home.”",["He said that if it rained, he would stay at home.","He said that if it rains, he will stay at home.","He said that if it had rained, he would have stayed at home.","He said that if it rained, I would stay at home."],"Type-1 conditional backshifts."],
+["L11",IS+"She said to me, “You are new here, aren’t you?”",["She asked me if I was new there.","She asked me if I was new there, wasn’t I?","She told me that you are new here, aren’t you.","She asked me if I am new here."],"Drop the tag; report as a question."],
+["L11",IS+"He said, “Let me go home.”",["He asked to be allowed to go home.","He suggested that they should go home.","He ordered to let him go home.","He asked that let him go home."],"Let (permission, no listener) → asked to be allowed."],
+["L11",IS+"The teacher will say, “The test is postponed.”",["The teacher will say that the test is postponed.","The teacher will say that the test was postponed.","The teacher would say that the test was postponed.","The teacher will say that the test had been postponed."],"Future reporting verb → no backshift."],
+["L11",IS+"She said, “I shall be late tomorrow.”",["She said that she would be late the next day.","She said that she should be late the next day.","She said that she shall be late tomorrow.","She said that she would be late tomorrow."],"shall (pure future) → would."],
+["L11",IS+"He said to me, “Shall we go for a movie?”",["He asked me if we should go for a movie.","He asked me if we would go for a movie.","He asked me shall we go for a movie.","He told me that we shall go for a movie."],"Shall we (suggestion) → should."],
+["L11",IS+"He said, “I had better leave now.”",["He said that he had better leave then.","He said that he had better left then.","He said that he would better leave then.","He said that he had better leave now."],"had better stays; now → then."],
+["L11",IS+"She said to me, “If I were you, I would accept the offer.”",["She told me that if she were me, she would accept the offer.","She told me that if she had been me, she would have accepted the offer.","She told me that if I were you, I would accept the offer.","She told me that if she was me, she will accept the offer."],"Type-2 conditional – no change; I → she; you → me."],
+["L11",IS+"The principal said, “All the students must wear uniform.”",["The principal said that all the students had to wear uniform.","The principal said that all the students must wore uniform.","The principal said that all the students has to wear uniform.","The principal said that all the students must have worn uniform."],"must (obligation) → had to."],
+["L11",IS+"He said to me, “Why don’t you join us?”",["He asked me why I did not join them.","He asked me why didn’t I join them.","He asked me why I do not join us.","He suggested me why I did not join them."],"Statement order; don’t → did not; us → them."],
+["L11",IS+"She said, “Neither of the answers is correct.”",["She said that neither of the answers was correct.","She said that neither of the answers were correct.","She said that neither of the answers is correct.","She told that neither of the answers was correct."],"is → was; neither takes a singular verb."],
+["L11",IS+"He said, “I have been working here since 2020.”",["He said that he had been working there since 2020.","He said that he has been working here since 2020.","He said that he had worked here since 2020.","He said that he was working there since 2020."],"have been working → had been working; here → there."],
+["L11",IS+"She said to him, “You may go now.”",["She told him that he might go then.","She told him that he may go now.","She told him that you might go then.","She told him that he might went then."],"may (permission) → might; now → then."],
+// L12
+["L12",IS+"The manager said to me, “You will get the report tomorrow.”",["The manager told me that I would get the report the next day.","The manager told me that I will get the report tomorrow.","The manager told me that you would get the report the next day.","The manager said me that I would get the report the next day."],"will → would; you → I; tomorrow → the next day.","p"],
+["L12",IS+"She said to me, “Why did you not attend the meeting?”",["She asked me why I had not attended the meeting.","She asked me why did I not attend the meeting.","She asked me why I did not attended the meeting.","She told me why I had not attended the meeting."],"did not attend → had not attended; statement order.","p"],
+["L12",IS+"The guard said to the visitors, “Do not take photographs here.”",["The guard told the visitors not to take photographs there.","The guard told the visitors not to take photographs here.","The guard told the visitors do not take photographs there.","The guard said the visitors not to take photographs there."],"not to + V1; here → there.","p"],
+["L12",DS+"He told me that he had finished the work.",["He said to me, “I have finished the work.”","He said to me, “He has finished the work.”","He said to me, “I had finished the work.”","He said to me, “I finish the work.”"],"had finished → have finished; he → I.","p"],
+["L12",IS+"My friend said, “I am preparing for the CGL exam.”",["My friend said that he was preparing for the CGL exam.","My friend said that I was preparing for the CGL exam.","My friend said that he is preparing for the CGL exam.","My friend said that he had prepared for the CGL exam."],"am preparing → was preparing.","p"],
+["L12",IS+"The mother said to her daughter, “Have you taken your medicine?”",["The mother asked her daughter if she had taken her medicine.","The mother asked her daughter had she taken her medicine.","The mother asked her daughter if she has taken your medicine.","The mother told her daughter if she had taken her medicine."],"asked if; have taken → had taken.","p"],
+["L12",IS+"He said, “What a wonderful performance!”",["He exclaimed that it was a very wonderful performance.","He exclaimed what a wonderful performance it is.","He said that what a wonderful performance.","He exclaimed that it is a wonderful performance."],"exclaimed that it was a very …","p"],
+["L12",DS+"She asked me where I was going.",["She said to me, “Where are you going?”","She said to me, “Where were you going?”","She said to me, “Where am I going?”","She said to me, “Where you are going?”"],"was going → are going; I → you.","p"],
+["L12",IS+"The officer said, “The office will remain closed on Monday.”",["The officer said that the office would remain closed on Monday.","The officer said that the office will remain closed on Monday.","The officer said that the office would remained closed on Monday.","The officer told that the office would remain closed on Monday."],"will → would.","p"],
+["L12",IS+"He said to his son, “Always speak the truth.”",["He advised his son to always speak the truth.","He advised his son that always speak the truth.","He advised his son always spoke the truth.","He said his son to always speak the truth."],"advised + to V1.","p"],
+["L12",IS+"She said, “I have been living in this city for ten years.”",["She said that she had been living in that city for ten years.","She said that she has been living in this city for ten years.","She said that she had been living in this city for ten years.","She said that she was living in that city for ten years."],"have been living → had been living; this → that."],
+["L12",DS+"The teacher advised us to read newspapers daily.",["The teacher said to us, “Read newspapers daily.”","The teacher said to us, “You read newspapers daily?”","The teacher said to us, “We read newspapers daily.”","The teacher said to us, “To read newspapers daily.”"],"advised to → imperative."],
+["L12",IS+"Ravi said to me, “Can you lend me your notes?”",["Ravi asked me if I could lend him my notes.","Ravi asked me if I can lend him my notes.","Ravi asked me could I lend him my notes.","Ravi asked me if I could lend me your notes."],"can → could; me → him; your → my."],
+["L12",IS+"She said, “I lost my phone yesterday.”",["She said that she had lost her phone the previous day.","She said that she lost her phone yesterday.","She said that she had lost her phone the next day.","She said that she has lost her phone the previous day."],"lost → had lost; yesterday → the previous day."],
+["L12",IS+"He said, “The sun sets in the west.”",["He said that the sun sets in the west.","He said that the sun set in the west.","He said that the sun had set in the west.","He said that the sun was setting in the west."],"Universal truth – no change."],
+["L12",DS+"He exclaimed with sorrow that he had failed.",["He said, “Alas! I have failed.”","He said, “Hurrah! I have failed.”","He said, “Alas! He has failed.”","He said, “Alas! I had failed?”"],"exclaimed with sorrow → Alas!"],
+["L12",IS+"The receptionist said to me, “Please wait here for a few minutes.”",["The receptionist requested me to wait there for a few minutes.","The receptionist requested me to wait here for a few minutes.","The receptionist ordered me to wait there for a few minutes.","The receptionist requested me that wait there for a few minutes."],"Please → requested; here → there."],
+["L12",IS+"He said to me, “Where were you yesterday?”",["He asked me where I had been the previous day.","He asked me where was I the previous day.","He asked me where I was yesterday.","He asked me where I had been yesterday."],"were → had been; yesterday → the previous day."],
+["L12",DS+"She told me that she would call me that evening.",["She said to me, “I will call you this evening.”","She said to me, “I would call you this evening.”","She said to me, “She will call me this evening.”","She said to me, “I will call you that evening.”"],"would → will; that → this; she → I; me → you."],
+["L12",IS+"The coach said, “Let’s practise for another hour.”",["The coach suggested that they should practise for another hour.","The coach suggested them to practise for another hour.","The coach ordered that let’s practise for another hour.","The coach said that let them practise for another hour."],"Let’s → suggested that … should."],
+["L12",IS+"She said to me, “Do you know where the bank is?”",["She asked me if I knew where the bank was.","She asked me if I know where the bank is.","She asked me did I know where the bank was.","She asked me if I knew where was the bank."],"Two levels of statement order; know → knew; is → was."],
+["L12",DS+"He asked me if I had seen his brother.",["He said to me, “Have you seen my brother?”","He said to me, “Had you seen my brother?”","He said to me, “Have I seen his brother?”","He said to me, “Have you seen his brother.”"],"had seen → have seen; his → my."],
+["L12",IS+"The old woman said, “May you all be happy!”",["The old woman prayed that they might all be happy.","The old woman prayed that they may all be happy.","The old woman told that may they all be happy.","The old woman ordered that they all be happy."],"May …! → prayed that … might."],
+["L12",IS+"He said, “I will be waiting for you here.” (He said this to me.)",["He told me that he would be waiting for me there.","He told me that he will be waiting for me there.","He told me that he would be waiting for you here.","He told me that I would be waiting for him there."],"will be → would be; here → there; you → me."],
+["L12",IS+"She said to the shopkeeper, “How much does this pen cost?”",["She asked the shopkeeper how much that pen cost.","She asked the shopkeeper how much does that pen cost.","She asked the shopkeeper how much this pen costs.","She told the shopkeeper how much that pen cost."],"Drop does; cost (V2 = cost); this → that."]
+//@@Q
+];
+const HEAT = [
+["Statements & tense",24,"L3","is → was, has → had, V2 → had + V3, will → would"],
+["Questions",18,"L6","asked if / whether / wh-word + statement order"],
+["Commands & requests",14,"L7","told / requested / advised + (not) to V1; Let’s → suggested"],
+["Time & place words",12,"L5","tomorrow → the next day, ago → before, here → there"],
+["Pronouns & reporting verb",8,"L2","said to → told; SON rule"],
+["Exclamations & wishes",6,"L8","exclaimed that it was very …; prayed that … might"],
+["Exceptions & modals",6,"L4","universal truth, must → had to, should / could stay"],
+["Indirect → direct",10,"L10","told me that he was → said to me, “I am …”"],
+["Mixed sentences",2,"L9","and added that / and asked; replied in the negative"]
+];
+const TILES = [
+["said to → told","statement with a listener"],
+["said to → asked","question"],
+["if / whether","yes/no question"],
+["wh + statement order","where I lived (not where did I live)"],
+["to / not to + V1","commands"],
+["Please → requested","request"],
+["Let’s → suggested that … should","suggestion"],
+["May you … → prayed that … might","wish / blessing"],
+["What a … ! → exclaimed that it was a very …","exclamation"],
+["S-O-N","1st → subject, 2nd → object, 3rd → no change"],
+["is → was · has → had","present → past"],
+["V2 → had + V3","simple past → past perfect"],
+["will → would · can → could · may → might","modals"],
+["must → had to","obligation (deduction stays must)"],
+["now → then · today → that day","time"],
+["tomorrow → the next day","time"],
+["yesterday → the previous day","time"],
+["ago → before · here → there","time / place"]
+];
+const PAIRS = [
+["said me vs told me","“told me” — said never takes a direct object"],
+["asked where did I live vs asked where I lived","statement order after the wh-word"],
+["asked that if vs asked if","no “that” before if / whether / wh-word"],
+["revolves vs revolved","universal truth keeps the present"],
+["I live in Delhi → lived","personal fact backshifts"],
+["saw → saw vs saw → had seen","simple past moves to past perfect"],
+["had eaten → had eaten","past perfect never moves"],
+["should → should vs shall → would","should stays; shall (future) → would; shall I → should"],
+["must (have to) vs must (deduction)","had to vs must"],
+["suggested them to vs suggested that they should","suggest + that-clause"],
+["the previous day vs the next day","yesterday vs tomorrow"],
+["says → no change vs said → backshift","look at the reporting verb’s tense first"]
+];
+const COVERS = {
+ tense:{tab:"Backshift drill", hideLabel:"Hide indirect", note:"Cover the indirect column and say the backshifted form aloud.", head:["Tense","Direct (He said, “…”)","Indirect"], hide:2, rows:[
+  ["Simple present","“I write.”","he wrote"],
+  ["Present continuous","“I am writing.”","he was writing"],
+  ["Present perfect","“I have written.”","he had written"],
+  ["Present perfect continuous","“I have been writing.”","he had been writing"],
+  ["Simple past","“I wrote.”","he had written"],
+  ["Past continuous","“I was writing.”","he had been writing"],
+  ["Past perfect","“I had written.”","he had written (no change)"],
+  ["Future","“I will write.”","he would write"],
+  ["can / may","“I can / may write.”","he could / might write"],
+  ["must (obligation)","“I must write.”","he had to write"],
+  ["should / could / would","“I should write.”","he should write (no change)"],
+  ["Universal truth","“The sun rises in the east.”","the sun rises in the east"]]},
+ words:{tab:"Time words drill", hideLabel:"Hide indirect", note:"Cover the right column and recall the far word.", head:["Direct","Indirect"], hide:1, rows:[
+  ["now","then"],["today","that day"],["tonight","that night"],["yesterday","the previous day"],["tomorrow","the next day"],["last night","the previous night"],["last week","the previous week"],["next month","the following month"],["ago","before"],["this","that"],["these","those"],["here","there"]]},
+ types:{tab:"Sentence types drill", hideLabel:"Hide answers", note:"Cover the indirect form and recall the pattern.", head:["Direct","Indirect"], hide:1, rows:[
+  ["He said to me, “Are you ready?”","He asked me if I was ready."],
+  ["He said to me, “Where do you live?”","He asked me where I lived."],
+  ["She said to me, “Please help me.”","She requested me to help her."],
+  ["He said to me, “Don’t go.”","He told me not to go."],
+  ["He said, “Let’s play.”","He suggested that they should play."],
+  ["She said, “What a nice day!”","She exclaimed that it was a very nice day."],
+  ["He said, “Alas! I failed.”","He exclaimed with sorrow that he had failed."],
+  ["She said to me, “May you win!”","She wished that I might win."],
+  ["He said to me, “Good morning.”","He wished me good morning."],
+  ["She said to me, “Thank you.”","She thanked me."],
+  ["“Yes,” he said.","He replied in the affirmative."],
+  ["He said to me, “Shall I help you?”","He asked me if he should help me."]]}
+};
+const FIND = { tab:"Rule finder", ph:"Search a rule (e.g. asked, ago, Let’s, must)", head:["Type","Rule","Lesson","Example"], rows:[
+["Five steps","reporting verb, joining word, pronouns, tense, time/place words","L1","RJPTW"],
+["Reporting verb","said → said; said to → told","L2","He said to me → He told me"],
+["SON rule","1st → subject; 2nd → object; 3rd → no change","L2","“I am ill” → he was ill"],
+["Statement","said/told + that","L2","told me that he was busy"],
+["Simple present","V1 → V2","L3","write → wrote"],
+["Present continuous","is + Ving → was + Ving","L3","is writing → was writing"],
+["Present perfect","has + V3 → had + V3","L3","has written → had written"],
+["Simple past","V2 → had + V3","L3","wrote → had written"],
+["Past continuous","was + Ving → had been + Ving","L3","was writing → had been writing"],
+["Past perfect","no change","L3","had written"],
+["Future","will / shall → would","L3","will write → would write"],
+["Present reporting verb","says → no backshift","L3","He says that he is busy"],
+["can / may","→ could / might","L4","can → could"],
+["must","obligation → had to; deduction → must","L4","must go → had to go"],
+["No change modals","would, could, might, should, ought to, used to, had better","L4","should rest → should rest"],
+["Universal truth","present stays","L4","the earth revolves around the sun"],
+["Conditional 2/3, wish","no change","L4","if he had money he would …"],
+["now","then","L5","busy now → busy then"],
+["today / tonight","that day / that night","L5","today → that day"],
+["yesterday","the previous day / the day before","L5","yesterday → the previous day"],
+["tomorrow","the next day / the following day","L5","tomorrow → the next day"],
+["ago","before","L5","two days ago → two days before"],
+["this / these / here","that / those / there","L5","here → there"],
+["Yes/no question","asked + if / whether + statement order","L6","asked if I was ready"],
+["Wh-question","asked + wh-word + statement order","L6","asked where I lived"],
+["do / does / did","drop and change the main verb","L6","Do you like → if I liked"],
+["Order","ordered / told + to V1","L7","ordered him to stand"],
+["Request","Please → requested + to V1","L7","requested me to help"],
+["Advice","advised + to V1","L7","advised me to rest"],
+["Negative command","not to + V1","L7","told me not to shout"],
+["Let’s","suggested that … should","L7","suggested that they should go"],
+["Let (permission)","requested … to let / asked to be allowed","L7","requested me to let him go"],
+["Exclamation","exclaimed (with joy / sorrow) that … very …","L8","exclaimed that it was a very nice day"],
+["Wish / blessing","wished / prayed that … might","L8","prayed that God might bless me"],
+["Greetings","wished good morning; thanked; bade goodbye","L8","He wished me good morning"],
+["Two sentences","and added that / and asked","L9","said that … and added that …"],
+["Yes / No","replied in the affirmative / negative","L9","He replied in the negative"],
+["Sir / Madam","respectfully","L9","He respectfully told his teacher"],
+["Indirect → direct","said to + inverted commas; tense forward; then → now","L10","told me he was busy then → said to me, “I am busy now.”"],
+["Shall I / we","asked if … should","L11","asked if he should open it"],
+["Question tag","drop the tag","L11","asked if I was new"],
+["Conditional type 1","backshift both parts","L11","if it rained, he would stay"]
+]};
+const APP = { key:"narration_workbook_v1", brand:"Narration", sub:"प्रत्यक्ष-अप्रत्यक्ष कथन · SSC CGL English workbook",
+  eyebrow:"SSC CGL English",
+  intro:"Twelve lessons on direct and indirect speech built around the SSC CGL pattern: how and how often narration is asked in Tier 1 and Tier 2, the five-step RJPTW method, pronouns, tense backshift and its exceptions, time and place words, questions, commands, exclamations, mixed sentences and indirect to direct. Each lesson has rule cards, solved PYQ-type examples, tricks, traps and a question bank in the exact SSC format.",
+  foot:"Read a lesson’s rule cards and solved examples, then try its quick check and question bank. Use the drills to cover a column and recall it, and the rule finder to look anything up in seconds. Do the L12 mixed set with a 35-second limit before every mock.",
+  craft:"Every narration question falls to five checks, in this order (RJPTW). (1) Reporting verb: said to → told, asked, ordered, requested, suggested. (2) Joining word: that, if/whether, the wh-word, to or not to. (3) Pronouns by SON. (4) Tense: one step back after said; none after says; none for universal truths, past perfect or would/could/should/might. (5) Words of time and place: now → then, tomorrow → the next day, ago → before, here → there. Strike out any option that still ends with a question mark or keeps question word order.",
+  heatNote:"Shares are approximate, estimated from recent SSC CGL, CHSL and CPO papers; they show which narration types are asked most, not exact counts." };
+
+/* ============================================================
+   HELPERS & STATE
+   ============================================================ */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const hash = s => { let h = 5381; for (let i=0;i<s.length;i++) h = ((h<<5)+h + s.charCodeAt(i))|0; return "q"+(h>>>0).toString(36); };
+const shuffle = a => { const b=a.slice(); for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]];} return b; };
+const L = id => LESSONS.find(l => l.id === id);
+const LNUM = id => LESSONS.findIndex(l => l.id === id) + 1;
+
+const QS = QB.map(r => {
+  const fixed = !!r[6];
+  return { t:r[0], q:r[1], o:r[2], e:r[3], p:(r[4]||"").includes("p"), a: fixed ? (r[5]||0) : 0, fixed, id:hash(r[1]) };
+});
+const byLesson = id => QS.filter(q => q.t === id);
+// order of options to show: array of original indexes
+const makePerm = q => q.fixed ? q.o.map((_,i)=>i) : shuffle(q.o.map((_,i)=>i));
+
+const KEY = APP.key;
+let S = { ans:{}, bm:{}, les:{}, mocks:[] };
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch(e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
+const record = (q, ok) => { S.ans[q.id] = ok ? 1 : 0; save(); renderTop(); };
+
+function renderTop(){
+  const ids = Object.keys(S.ans).filter(k => QS.some(q => q.id === k));
+  const right = ids.filter(k => S.ans[k] === 1).length;
+  const pct = ids.length ? Math.round(right*100/ids.length) : 0;
+  $("#topstat").innerHTML = `<b>${ids.length}</b>/${QS.length} tried<br><b>${pct}%</b> right now`;
+}
+
+/* ============================================================
+   ROUTING
+   ============================================================ */
+let TAB = "learn";
+let timerId = null;
+function go(tab){
+  TAB = tab;
+  document.querySelectorAll(".nav button").forEach(b => b.setAttribute("aria-current", b.dataset.tab===tab ? "page" : "false"));
+  if (tab === "learn") renderLearn();
+  if (tab === "practice") renderPractice();
+  if (tab === "mock") renderMock();
+  if (tab === "revise") renderRevise();
+  window.scrollTo(0,0);
+  try { history.replaceState(null, "", "#"+tab); } catch(e) {}
+}
+document.querySelectorAll(".nav button").forEach(b => b.addEventListener("click", () => {
+  if (TAB === "mock" && M && M.running && b.dataset.tab !== "mock") { go("mock"); showMockLeave(b.dataset.tab); return; }
+  go(b.dataset.tab);
+}));
+
+/* ============================================================
+   LEARN
+   ============================================================ */
+function renderLearn(){
+  const done = LESSONS.filter(l => S.les[l.id] && S.les[l.id].done).length;
+  const nextIdx = LESSONS.findIndex(l => !(S.les[l.id] && S.les[l.id].done));
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="hero">
+      <span class="eyebrow">${APP.eyebrow}</span>
+      <h1>Learn it, test it, revise it</h1>
+      <p>${APP.intro} ${QS.length} exam-style questions in all.</p>
+      <div class="meter" aria-label="Lessons done"><i style="width:${done/LESSONS.length*100}%"></i></div>
+      <div class="row between"><span class="muted num" style="font-size:13px">${done}/${LESSONS.length} lessons done</span>
+      ${nextIdx>=0 ? `<button class="btn pri sm" type="button" data-open="${LESSONS[nextIdx].id}">${done? "Continue" : "Start"}: Lesson ${nextIdx+1}</button>` : `<span class="muted" style="font-size:13px">All lessons done. Try a mock test.</span>`}</div>
+    </div>
+    <div class="lessons">${LESSONS.map((l,i) => {
+      const st = S.les[l.id] || {}; const n = byLesson(l.id).length;
+      return `<button type="button" class="les ${st.done?"done":""} ${i===nextIdx?"next":""}" data-open="${l.id}">
+        <span class="no">${st.done ? "✓" : i+1}</span>
+        <span class="t"><b>${esc(l.title)}<span class="heatb" title="Exam frequency">${"🔥".repeat(l.heat||1)}</span></b><span>${l.hi} · ${n} questions</span></span>
+        <span class="sc">${st.best!=null ? `best<br>${st.best}/${n}` : ""}</span></button>`;}).join("")}
+    </div>
+    <p class="foot">${APP.foot}</p>
+  </section>`;
+  $("#app").querySelectorAll("[data-open]").forEach(b => b.addEventListener("click", () => openLesson(b.dataset.open, "learn")));
+}
+
+function blockHTML(b){
+
+  if (b.k==="formula") return `<div class="block"><h3>${b.title}</h3><div class="fgrid">${b.rows.map(r=>`<div class="fcard"><span class="fn">${r[0]}</span><span class="fx">${r[1]}</span>${r[2]?`<span class="fnote">${r[2]}</span>`:""}</div>`).join("")}</div></div>`;
+  if (b.k==="ex") return `<div class="ex"><div class="exhead"><span class="lab">${b.src ? "PYQ-type" : "Solved example"}</span>${b.src?`<span class="src">${b.src}</span>`:""}</div><div class="exq">${b.q}</div>${b.fig?`<figure class="fig">${b.fig}</figure>`:""}<details><summary>Show solution</summary><ol>${b.steps.map(x=>`<li>${x}</li>`).join("")}</ol><div class="exans">Answer: ${b.ans}</div>${b.tip?`<div class="trick" style="margin-top:8px"><span class="lab">Shortcut</span>${b.tip}</div>`:""}</details></div>`;
+  if (b.k==="figs") return `<div class="block"><h3>${b.title}</h3><div class="figwrap">${b.items.map(it=>`<figure>${it.svg}<figcaption>${it.cap}</figcaption></figure>`).join("")}</div></div>`;
+  if (b.k==="p") return `<div class="plain"><p>${b.h}</p></div>`;
+  if (b.k==="trick") return `<div class="trick"><span class="lab">Trick</span>${b.h}</div>`;
+  if (b.k==="link") return `<div class="link"><span class="lab">Link · connect the dots</span>${b.h}</div>`;
+  if (b.k==="q") { const perm = shuffle(b.o.map((_,i)=>i)); return `<div class="icheck" data-ic><span class="lab">Quick check</span><p class="qt">${esc(b.q)}</p><div class="opts">${perm.map((oi,k)=>`<button type="button" class="opt" data-ioi="${oi}"><span class="k">${"ABCD"[k]}</span><span>${esc(b.o[oi])}</span></button>`).join("")}</div><div class="exp" hidden><b class="okl"></b> ${esc(b.e)}</div></div>`; }
+  if (b.k==="hot") return `<div class="hot"><span class="lab">🔥 Exam radar · how often it's asked</span>${b.h}</div>`;
+  if (b.k==="trap") return `<div class="trap"><span class="lab">Trap · correction</span>${b.h}</div>`;
+  if (b.k==="facts") return `<div class="block"><h3>${b.title}</h3><dl class="facts">${b.rows.map(r=>`<div><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join("")}</dl></div>`;
+  if (b.k==="tl") return `<div class="block"><h3>${b.title}</h3><ul class="tl">${b.rows.map(r=>`<li><span class="y">${r[0]}</span><span>${r[1]}</span></li>`).join("")}</ul></div>`;
+  if (b.k==="table") {
+    const isNum = (ci) => b.numcol==="all" ? ci>0 : (b.numcol===1 && ci===1) || (typeof b.numcol==="string" && b.numcol.includes(String(ci)));
+    return `<div class="block"><h3>${b.title}</h3><div class="tbl"><table><thead><tr>${b.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${b.rows.map(r=>`<tr>${r.map((c,ci)=>`<td class="${isNum(ci)?"n":""}">${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+  }
+  if (b.k==="fig") return `<div class="block"><h3>${b.title}</h3><figure class="fig">${b.svg}<figcaption>${b.cap}</figcaption></figure></div>`;
+  if (b.k==="pyr") return `<div class="block"><h3>${b.title}</h3><div class="pyr">${b.items.map(it=>`<div>${PYR(it.rows)}<b>${it.name}</b><span class="muted">${it.note}</span></div>`).join("")}</div><p class="muted" style="font-size:13px;margin-top:8px"><span style="color:var(--blue)">■</span> males · <span style="color:var(--accent)">■</span> females · top = old, base = young</p></div>`;
+  return "";
+}
+
+let LQ = null;
+function openLesson(id, step){
+  const l = L(id), i = LNUM(id);
+  if (step === "quiz") { LQ = { id, list: shuffle(byLesson(id)).map(q => ({q, perm:makePerm(q)})), i:0, score:0, picked:null }; }
+  const head = `<div class="lhead"><button class="back" type="button" id="lback">‹ Lessons</button></div>
+    <span class="eyebrow">Lesson ${i} of ${LESSONS.length} · ${l.hi}</span><h1>${esc(l.title)}</h1>
+    <div class="steps" role="tablist">
+      <button type="button" data-step="learn" aria-current="${step==="learn"?"step":"false"}">1 · Learn</button>
+      <button type="button" data-step="quiz" aria-current="${step==="quiz"?"step":"false"}">2 · Quiz</button>
+      <button type="button" data-step="sum" aria-current="${step==="sum"?"step":"false"}">3 · Summary</button>
+    </div>`;
+  let body = "";
+  if (step === "learn") {
+    body = `<div class="stack">${l.blocks.map(blockHTML).join("")}
+      <div class="row end"><button class="btn pri" type="button" id="toquiz">Take the lesson quiz · ${byLesson(id).length} questions</button></div></div>`;
+  } else if (step === "quiz") {
+    body = `<div id="lq"></div>`;
+  } else {
+    const nxt = LESSONS[i];
+    body = `<div class="stack"><div class="block"><h3>Remember these</h3><ul class="sum">${l.sum.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>
+      <div class="row between"><button class="btn" type="button" id="relearn">Read again</button>
+      ${nxt ? `<button class="btn pri" type="button" id="nextles">Next: ${esc(nxt.title)}</button>` : `<button class="btn pri" type="button" id="tomock">Take a mock test</button>`}</div></div>`;
+    S.les[id] = Object.assign(S.les[id]||{}, {done:1}); save();
+  }
+  $("#app").innerHTML = `<section class="view stack">${head}${body}</section>`;
+  $("#lback").onclick = () => renderLearn();
+  $("#app").querySelectorAll("[data-step]").forEach(b => b.onclick = () => openLesson(id, b.dataset.step));
+  if (step==="learn") { $("#toquiz").onclick = () => openLesson(id,"quiz");
+    const ics = l.blocks.filter(b=>b.k==="q");
+    $("#app").querySelectorAll("[data-ic]").forEach((box,n) => { const b = ics[n];
+      box.querySelectorAll("[data-ioi]").forEach(btn => btn.onclick = () => {
+        if (box.dataset.done) return; box.dataset.done = 1; const pick = +btn.dataset.ioi;
+        box.querySelectorAll("[data-ioi]").forEach(x => { const oi=+x.dataset.ioi; x.disabled = true; if (oi===0) x.classList.add("ok"); else if (oi===pick) x.classList.add("no"); });
+        const ex = box.querySelector(".exp"); ex.hidden = false; const lab = ex.querySelector("b");
+        if (pick===0) { lab.textContent = "Correct."; } else { lab.className = "nol"; lab.textContent = "Answer: " + b.o[0] + "."; }
+      }); }); }
+  if (step==="quiz") renderLQ();
+  if (step==="sum") {
+    $("#relearn").onclick = () => openLesson(id,"learn");
+    const n = $("#nextles"); if (n) n.onclick = () => openLesson(LESSONS[i].id,"learn");
+    const m = $("#tomock"); if (m) m.onclick = () => go("mock");
+  }
+  window.scrollTo(0,0);
+}
+
+function optsHTML(q, perm, state){
+  // state: {picked: originalIndex|null, reveal: bool, sel: originalIndex|null}
+  return perm.map((oi, k) => {
+    let cls = "opt";
+    if (state.reveal) { if (oi === q.a) cls += " ok"; else if (oi === state.picked) cls += " no"; }
+    else if (state.sel === oi) cls += " sel";
+    return `<button type="button" class="${cls}" data-oi="${oi}" ${state.reveal?"disabled":""}><span class="k">${"ABCD"[k]}</span><span>${esc(q.o[oi])}</span></button>`;
+  }).join("");
+}
+function expHTML(q, picked){
+  const ok = picked === q.a;
+  return `<div class="exp">${ok ? `<b class="okl">Correct.</b>` : `<b class="nol">Answer: ${esc(q.o[q.a])}.</b>`} ${esc(q.e)}</div>`;
+}
+function metaHTML(q, no){
+  return `<div class="qmeta"><span class="qno">${no}</span><span class="tag">L${LNUM(q.t)} · ${esc(L(q.t).title)}</span>${q.p?`<span class="tag pyq">High-yield</span>`:""}
+  <button type="button" class="bm" data-bm="${q.id}" aria-pressed="${S.bm[q.id]?"true":"false"}" aria-label="Bookmark">${S.bm[q.id]?"★":"☆"}</button></div>`;
+}
+
+function renderLQ(){
+  const box = $("#lq");
+  if (LQ.i >= LQ.list.length) {
+    const n = LQ.list.length, l = L(LQ.id);
+    const st = S.les[LQ.id] || {}; st.best = Math.max(st.best||0, LQ.score); S.les[LQ.id] = st; save();
+    box.innerHTML = `<div class="stack"><div class="block stack"><span class="eyebrow">Quiz done</span>
+      <div class="scorebig"><span class="num">${LQ.score}</span><span class="muted">/ ${n} correct</span></div>
+      <p class="muted">${LQ.score===n ? "Full marks." : LQ.score >= n*0.8 ? "Strong. Review the ones you missed in Practice → Mistakes." : "Read the lesson once more, then retry. Missed questions are saved under Practice → Mistakes."}</p></div>
+      <div class="row between"><button class="btn" type="button" id="retry">Retry quiz</button><button class="btn pri" type="button" id="tosum">See summary</button></div></div>`;
+    $("#retry").onclick = () => openLesson(LQ.id,"quiz");
+    $("#tosum").onclick = () => openLesson(LQ.id,"sum");
+    return;
+  }
+  const it = LQ.list[LQ.i], q = it.q;
+  const reveal = LQ.picked !== null;
+  box.innerHTML = `<div class="stack"><div class="meter"><i style="width:${LQ.i/LQ.list.length*100}%"></i></div>
+    <article class="qcard">${metaHTML(q, `Q${LQ.i+1}/${LQ.list.length}`)}
+    <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {picked:LQ.picked, reveal})}</div>
+    ${reveal ? expHTML(q, LQ.picked) : ""}</article>
+    ${reveal ? `<div class="row end"><button class="btn pri" type="button" id="lqnext">${LQ.i+1 < LQ.list.length ? "Next question" : "Finish"}</button></div>` : `<p class="muted" style="font-size:13px">Score so far: <span class="num">${LQ.score}</span></p>`}</div>`;
+  box.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    if (LQ.picked !== null) return;
+    LQ.picked = +b.dataset.oi; const ok = LQ.picked === q.a; if (ok) LQ.score++; record(q, ok); renderLQ();
+  });
+  bindBM(box);
+  const nx = $("#lqnext"); if (nx) nx.onclick = () => { LQ.i++; LQ.picked = null; renderLQ(); window.scrollTo(0,0); };
+}
+
+function bindBM(root){
+  root.querySelectorAll("[data-bm]").forEach(b => b.onclick = (ev) => {
+    ev.stopPropagation();
+    const id = b.dataset.bm; if (S.bm[id]) delete S.bm[id]; else S.bm[id] = 1; save();
+    b.setAttribute("aria-pressed", S.bm[id] ? "true":"false"); b.textContent = S.bm[id] ? "★" : "☆";
+  });
+}
+
+/* ============================================================
+   PRACTICE
+   ============================================================ */
+let PF = "all", PSHOW = 20, PORDER = null, PPERM = {}, PPICK = {};
+function practiceList(){
+  let list = QS;
+  if (PF === "pyq") list = QS.filter(q => q.p);
+  else if (PF === "hot") list = QS.filter(q => (L(q.t).heat||1) === 3);
+  else if (PF === "wrong") list = QS.filter(q => S.ans[q.id] === 0);
+  else if (PF === "new") list = QS.filter(q => S.ans[q.id] === undefined);
+  else if (PF === "bm") list = QS.filter(q => S.bm[q.id]);
+  else if (PF !== "all") list = QS.filter(q => q.t === PF);
+  if (PORDER) { const pos = new Map(PORDER.map((id,i)=>[id,i])); list = list.slice().sort((a,b)=>(pos.get(a.id)??0)-(pos.get(b.id)??0)); }
+  return list;
+}
+function renderPractice(){
+  const wrongN = QS.filter(q => S.ans[q.id] === 0).length, bmN = QS.filter(q=>S.bm[q.id]).length, pyqN = QS.filter(q=>q.p).length;
+  const chips = [["all",`All ${QS.length}`],["new","Not tried"],["wrong",`Mistakes ${wrongN}`],["hot",`🔥 Hot topics ${QS.filter(q=>(L(q.t).heat||1)===3).length}`],["pyq",`PYQ-type ${pyqN}`],["bm",`Starred ${bmN}`]].concat(LESSONS.map((l,i)=>[l.id,`L${i+1} ${l.title}`]));
+  const list = practiceList();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Question bank</span><h1>Practice</h1>
+    <p class="muted">Tap an option to check it. Wrong answers go to <b>Mistakes</b> until you get them right.</p></div>
+    <div class="chips" role="group" aria-label="Filter">${chips.map(c=>`<button type="button" class="chip" data-f="${c[0]}" aria-pressed="${PF===c[0]}">${esc(c[1])}</button>`).join("")}</div>
+    <div class="row between"><span class="muted num" style="font-size:13px">${list.length} questions</span>
+      <div class="row"><button class="btn sm ghost" type="button" id="pshuf">${PORDER?"In order":"Shuffle"}</button></div></div>
+    <div class="stack" id="plist"></div>
+  </section>`;
+  $("#app").querySelectorAll("[data-f]").forEach(b => b.onclick = () => { PF = b.dataset.f; PSHOW = 20; PPICK = {}; renderPractice(); });
+  $("#pshuf").onclick = () => { PORDER = PORDER ? null : shuffle(QS.map(q=>q.id)); PSHOW = 20; renderPractice(); };
+  const chipOn = $(`.chip[aria-pressed="true"]`); if (chipOn) chipOn.scrollIntoView({block:"nearest", inline:"center"});
+  drawPList();
+}
+function pCard(q, idx){
+  if (!PPERM[q.id]) PPERM[q.id] = makePerm(q);
+  const picked = PPICK[q.id]; const reveal = picked !== undefined;
+  return `<article class="qcard" data-q="${q.id}">${metaHTML(q, "Q"+(idx+1))}<p class="qt">${esc(q.q)}</p>
+    <div class="opts">${optsHTML(q, PPERM[q.id], {picked: reveal?picked:null, reveal})}</div>${reveal?expHTML(q,picked):""}</article>`;
+}
+function drawPList(){
+  const list = practiceList(), box = $("#plist");
+  if (!list.length) { box.innerHTML = `<p class="empty">${PF==="wrong"?"No mistakes saved. Answer some questions first, or you've cleared them all.":PF==="bm"?"Nothing starred yet. Tap ☆ on any question.":"Nothing here."}</p>`; return; }
+  box.innerHTML = list.slice(0, PSHOW).map((q,i)=>pCard(q,i)).join("") + (list.length > PSHOW ? `<button class="btn" type="button" id="pmore">Show 20 more (${list.length-PSHOW} left)</button>` : "");
+  bindP(box);
+  const more = $("#pmore"); if (more) more.onclick = () => { PSHOW += 20; drawPList(); };
+}
+function bindP(box){ box.querySelectorAll(".qcard").forEach(bindCard); }
+function bindCard(card){
+  card.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    const q = QS.find(x => x.id === card.dataset.q); if (PPICK[q.id] !== undefined) return;
+    PPICK[q.id] = +b.dataset.oi; record(q, PPICK[q.id] === q.a);
+    const idx = +card.querySelector(".qno").textContent.slice(1) - 1;
+    const tmp = document.createElement("div"); tmp.innerHTML = pCard(q, idx); const nc = tmp.firstElementChild;
+    card.replaceWith(nc); bindCard(nc);
+  });
+  bindBM(card);
+}
+
+/* ============================================================
+   MOCK TEST
+   ============================================================ */
+let M = null, MCFG = {n:25, scope:"all", neg:1}, LEAVE_TO = null;
+function renderMock(){
+  if (M && M.running) return drawMockRun();
+  if (M && M.done) return drawMockResult();
+  const hist = (S.mocks||[]).slice(-6).reverse();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Timed, SSC pattern</span><h1>Mock test</h1>
+    <p class="muted">+2 for a right answer, −0.5 for a wrong one, 36 seconds per question (CGL Tier-1 pace). Answers show only after you submit.</p></div>
+    <div class="block stack">
+      <fieldset><legend>Questions</legend><div class="radios">${[10,25,50,100].map(n=>`<label><input type="radio" name="mn" id="mn${n}" value="${n}" ${MCFG.n===n?"checked":""}><span>${n} · ${Math.round(n*36/60)} min</span></label>`).join("")}</div></fieldset>
+      <fieldset><legend>From</legend><select id="mscope" aria-label="Lessons to draw from"><option value="all">All lessons</option><option value="hot">🔥 Hot topics only</option><option value="pyq">PYQ-type only</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}" ${MCFG.scope===l.id?"selected":""}>L${i+1} · ${esc(l.title)}</option>`).join("")}</select></fieldset>
+      <label class="row" style="gap:8px;font-weight:600"><input type="checkbox" id="mneg" ${MCFG.neg?"checked":""}> Negative marking (−0.5)</label>
+      <div id="merr" class="muted" style="font-size:14px"></div>
+      <div class="row end"><button class="btn pri" type="button" id="mstart">Start test</button></div>
+    </div>
+    ${hist.length ? `<div class="block"><h3>Recent attempts</h3><div class="hist">${hist.map(h=>`<div><span>${esc(h.d)} · ${h.n} Q</span><span class="num">${h.score}/${h.max} · ${h.acc}%</span></div>`).join("")}</div></div>` : ""}
+  </section>`;
+  $("#mscope").value = MCFG.scope;
+  $("#mstart").onclick = () => {
+    MCFG.n = +(document.querySelector('input[name="mn"]:checked')||{value:25}).value;
+    MCFG.scope = $("#mscope").value; MCFG.neg = $("#mneg").checked ? 1 : 0;
+    let pool = MCFG.scope==="all" ? QS : MCFG.scope==="pyq" ? QS.filter(q=>q.p) : MCFG.scope==="hot" ? QS.filter(q=>(L(q.t).heat||1)===3) : MCFG.scope==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===MCFG.scope);
+    if (!pool.length) { $("#merr").textContent = "No questions in that set yet. Pick another source."; return; }
+    const qs = shuffle(pool).slice(0, MCFG.n);
+    M = { running:true, list: qs.map(q=>({q, perm:makePerm(q)})), ans: qs.map(()=>null), mark: qs.map(()=>false), i:0, neg:MCFG.neg, secs: qs.length*36, start: Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000;
+    startTimer(); drawMockRun();
+  };
+}
+function startTimer(){
+  clearInterval(timerId);
+  timerId = setInterval(() => {
+    if (!M || !M.running) { clearInterval(timerId); return; }
+    const left = Math.max(0, Math.round((M.end - Date.now())/1000));
+    const el = $("#mtime"); if (el) { el.textContent = fmt(left); el.classList.toggle("low", left <= 60); }
+    if (left <= 0) submitMock();
+  }, 1000);
+}
+const fmt = s => `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+function drawMockRun(){
+  const it = M.list[M.i], q = it.q, left = Math.max(0, Math.round((M.end-Date.now())/1000));
+  const answered = M.ans.filter(a=>a!==null).length;
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="mbar"><span class="timer num ${left<=60?"low":""}" id="mtime">${fmt(left)}</span>
+      <span class="muted num" style="font-size:13px;flex:1">Q ${M.i+1}/${M.list.length} · ${answered} answered</span>
+      <button class="btn sm" type="button" id="mpal">${M.showPal?"Hide":"All Qs"}</button></div>
+    ${LEAVE_TO ? `<div class="confirm"><b>Leave the test?</b><span>Your answers so far will be scored now.</span><div class="row"><button class="btn sm pri" type="button" id="lvy">Submit and leave</button><button class="btn sm" type="button" id="lvn">Stay</button></div></div>` : ""}
+    ${M.showPal ? `<div class="block"><div class="pal">${M.list.map((_,k)=>`<button type="button" data-j="${k}" class="${M.ans[k]!==null?"a":""} ${M.mark[k]?"m":""} ${k===M.i?"cur":""}" aria-label="Question ${k+1}">${k+1}</button>`).join("")}</div>
+      <p class="muted" style="font-size:12px;margin-top:8px">Filled = answered · orange line = marked for review</p></div>` : ""}
+    <article class="qcard"><div class="qmeta"><span class="qno">Q${M.i+1}</span><span class="tag">L${LNUM(q.t)}</span>${M.mark[M.i]?`<span class="tag pyq">Marked</span>`:""}</div>
+      <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {sel:M.ans[M.i], reveal:false})}</div></article>
+    <div class="row between"><button class="btn" type="button" id="mprev" ${M.i===0?"disabled":""}>‹ Prev</button>
+      <button class="btn ghost" type="button" id="mmark">${M.mark[M.i]?"Unmark":"Mark"}</button>
+      <button class="btn ghost" type="button" id="mclr" ${M.ans[M.i]===null?"disabled":""}>Clear</button>
+      <button class="btn ${M.i<M.list.length-1?"pri":""}" type="button" id="mnext" ${M.i===M.list.length-1?"disabled":""}>Next ›</button></div>
+    ${M.confirm ? `<div class="confirm"><b>Submit the test?</b><span>${M.list.length-answered} unanswered${M.mark.filter(Boolean).length?`, ${M.mark.filter(Boolean).length} marked for review`:""}.</span><div class="row"><button class="btn sm pri" type="button" id="msubY">Submit</button><button class="btn sm" type="button" id="msubN">Keep going</button></div></div>`
+      : `<button class="btn pri" type="button" id="msub">Submit test</button>`}
+  </section>`;
+  $("#app").querySelectorAll(".opt").forEach(b => b.onclick = () => { M.ans[M.i] = +b.dataset.oi; drawMockRun(); });
+  $("#mprev").onclick = () => { if (M.i>0){M.i--; drawMockRun();} };
+  $("#mnext").onclick = () => { if (M.i<M.list.length-1){M.i++; drawMockRun(); window.scrollTo(0,0);} };
+  $("#mmark").onclick = () => { M.mark[M.i] = !M.mark[M.i]; drawMockRun(); };
+  $("#mclr").onclick = () => { M.ans[M.i] = null; drawMockRun(); };
+  $("#mpal").onclick = () => { M.showPal = !M.showPal; drawMockRun(); };
+  $("#app").querySelectorAll("[data-j]").forEach(b => b.onclick = () => { M.i = +b.dataset.j; drawMockRun(); });
+  const s = $("#msub"); if (s) s.onclick = () => { M.confirm = true; drawMockRun(); };
+  const y = $("#msubY"); if (y) y.onclick = submitMock;
+  const n = $("#msubN"); if (n) n.onclick = () => { M.confirm = false; drawMockRun(); };
+  const lvy = $("#lvy"); if (lvy) lvy.onclick = () => { const t = LEAVE_TO; LEAVE_TO = null; submitMock(); go(t); };
+  const lvn = $("#lvn"); if (lvn) lvn.onclick = () => { LEAVE_TO = null; drawMockRun(); };
+}
+function showMockLeave(tab){ LEAVE_TO = tab; drawMockRun(); }
+function submitMock(){
+  if (!M || !M.running) return;
+  clearInterval(timerId);
+  M.running = false; M.done = true; M.confirm = false;
+  let c=0,w=0,sk=0; const per = {};
+  M.list.forEach((it,k) => {
+    const a = M.ans[k]; const t = it.q.t; per[t] = per[t] || {c:0,n:0}; per[t].n++;
+    if (a===null) sk++; else if (a===it.q.a) { c++; per[t].c++; S.ans[it.q.id]=1; } else { w++; S.ans[it.q.id]=0; }
+  });
+  const max = M.list.length*2, score = +(c*2 - (M.neg? w*0.5 : 0)).toFixed(1);
+  const used = Math.min(M.secs, Math.round((Date.now()-M.start)/1000));
+  M.res = {c,w,sk,score,max,used,per, acc: (c+w) ? Math.round(c*100/(c+w)) : 0};
+  const d = new Date(); const ds = d.toLocaleDateString("en-IN",{day:"numeric",month:"short"})+" "+d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
+  S.mocks = (S.mocks||[]).concat([{d:ds, n:M.list.length, score, max, acc:M.res.acc}]).slice(-20); save(); renderTop();
+  M.filter = "wrong";
+  if (TAB==="mock") drawMockResult();
+}
+function drawMockResult(){
+  const r = M.res;
+  const per = Object.keys(r.per).sort((a,b)=>LNUM(a)-LNUM(b)).map(t => `<div><span>L${LNUM(t)} · ${esc(L(t).title)}</span><span class="num">${r.per[t].c}/${r.per[t].n}</span></div>`).join("");
+  const rows = M.list.map((it,k)=>({it,k})).filter(({it,k}) => M.filter==="all" ? true : M.filter==="wrong" ? (M.ans[k]!==null && M.ans[k]!==it.q.a) : M.ans[k]===null);
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Result</span>
+    <div class="scorebig"><span class="num">${r.score}</span><span class="muted">/ ${r.max} marks</span></div></div>
+    <div class="kpis"><div class="kpi g"><span class="num">${r.c}</span><span>right</span></div><div class="kpi b"><span class="num">${r.w}</span><span>wrong</span></div><div class="kpi"><span class="num">${r.sk}</span><span>skipped</span></div><div class="kpi"><span class="num">${r.acc}%</span><span>accuracy</span></div></div>
+    <p class="muted num" style="font-size:13px">Time used ${fmt(r.used)} of ${fmt(M.secs)}</p>
+    <div class="block"><h3>By lesson</h3><div class="hist">${per}</div></div>
+    <div class="row between"><button class="btn" type="button" id="mnew">New test</button><button class="btn pri" type="button" id="mretry">Retake same questions</button></div>
+    <h2>Review</h2>
+    <div class="chips">${[["wrong",`Wrong ${r.w}`],["skip",`Skipped ${r.sk}`],["all",`All ${M.list.length}`]].map(c=>`<button class="chip" type="button" data-rf="${c[0]}" aria-pressed="${M.filter===c[0]}">${c[1]}</button>`).join("")}</div>
+    <div class="stack">${rows.length ? rows.map(({it,k}) => `<article class="qcard">${metaHTML(it.q, "Q"+(k+1))}<p class="qt">${esc(it.q.q)}</p><div class="opts">${optsHTML(it.q, it.perm, {picked:M.ans[k], reveal:true})}</div>${M.ans[k]===null?`<div class="exp"><b class="nol">Skipped. Answer: ${esc(it.q.o[it.q.a])}.</b> ${esc(it.q.e)}</div>`:expHTML(it.q, M.ans[k])}</article>`).join("") : `<p class="empty">Nothing in this list.</p>`}</div>
+  </section>`;
+  bindBM($("#app"));
+  $("#app").querySelectorAll("[data-rf]").forEach(b => b.onclick = () => { M.filter = b.dataset.rf; drawMockResult(); });
+  $("#mnew").onclick = () => { M = null; renderMock(); };
+  $("#mretry").onclick = () => {
+    const list = M.list.map(it=>({q:it.q, perm:makePerm(it.q)}));
+    M = { running:true, list, ans:list.map(()=>null), mark:list.map(()=>false), i:0, neg:MCFG.neg, secs:list.length*36, start:Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000; startTimer(); drawMockRun();
+  };
+}
+
+/* ============================================================
+   REVISE
+   ============================================================ */
+let RV = "heat", FC = null, FCSCOPE = "all";
+const HID = {}, REV = {};
+Object.keys(COVERS).forEach(k => { HID[k] = 1; REV[k] = {}; });
+function renderRevise(){
+  const tabs = [["heat","🔥 Exam heat map"]].concat(Object.keys(COVERS).map(k=>[k, COVERS[k].tab]), [["dis",FIND.tab],["nums","Numbers & pairs"],["links","Connections"],["tricks","Tricks"],["traps","Traps"],["flash","Flashcards"]]);
+  if (!tabs.some(t=>t[0]===RV)) RV = "heat";
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Last-day revision</span><h1>Revise</h1></div>
+    <div class="seg" role="tablist">${tabs.map(t=>`<button type="button" role="tab" data-rv="${t[0]}" aria-selected="${RV===t[0]}">${t[1]}</button>`).join("")}</div>
+    <div id="rv" class="stack"></div></section>`;
+  $("#app").querySelectorAll("[data-rv]").forEach(b => b.onclick = () => { RV = b.dataset.rv; renderRevise(); });
+  const on = $(`.seg [aria-selected="true"]`); if (on) on.scrollIntoView({block:"nearest", inline:"center"});
+  const box = $("#rv");
+  const pk = (key, i, val) => (HID[key] && !REV[key][i]) ? `<button type="button" class="peek" data-pk="${key}:${i}">tap</button>` : val;
+  const coverChips = (key, label) => `<div class="chips"><button type="button" class="chip" data-hide="${key}" aria-pressed="${!!HID[key]}">${label}</button><button type="button" class="chip" data-cover="${key}">Cover all again</button></div>`;
+  const bindCover = () => {
+    box.querySelectorAll("[data-hide]").forEach(b => b.onclick = () => { const k=b.dataset.hide; HID[k] = HID[k]?0:1; renderRevise(); });
+    box.querySelectorAll("[data-cover]").forEach(b => b.onclick = () => { REV[b.dataset.cover] = {}; renderRevise(); });
+    box.querySelectorAll("[data-pk]").forEach(b => b.onclick = () => { const [k,i] = b.dataset.pk.split(":"); REV[k][i]=1; renderRevise(); });
+  };
+  if (RV === "heat") {
+    const max = Math.max(...HEAT.map(h=>h[1]));
+    box.innerHTML = `<p class="muted">${APP.heatNote}</p>
+      <div class="block"><div class="heat">${HEAT.map(h=>`<button type="button" class="hrow" data-open="${h[2]}"><span class="ht"><b>${esc(h[0])}</b><span class="muted">${esc(h[3])}</span></span><span class="hbar"><i style="width:${h[1]/max*100}%"></i></span><span class="num hp">${h[1]}%</span></button>`).join("")}</div></div>
+      <div class="block"><h3>Lessons by exam heat</h3><dl class="rk">${[3,2,1].map(n=>`<div><dt>${"🔥".repeat(n)} ${n===3?"Very frequent":n===2?"Regular":"Occasional"}</dt><dd>${LESSONS.map((l,i)=>[l,i]).filter(x=>(x[0].heat||1)===n).map(x=>`L${x[1]+1} ${esc(x[0].title)}`).join(" · ")}</dd></div>`).join("")}</dl></div>`;
+    box.querySelectorAll("[data-open]").forEach(b => b.onclick = () => openLesson(b.dataset.open, "learn"));
+  }
+  if (COVERS[RV]) {
+    const c = COVERS[RV];
+    box.innerHTML = `<p class="muted">${c.note}</p>${coverChips(RV, c.hideLabel)}
+      <div class="block"><div class="tbl"><table class="cover"><thead><tr>${c.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${c.rows.map((r,i)=>`<tr>${r.map((v,ci)=>`<td ${ci?`data-l="${c.head[ci]}"`:""}>${ci===0?`<b>${esc(v)}</b>`:ci===c.hide?pk(RV,i,esc(v)):esc(v)}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+    bindCover();
+  }
+  if (RV === "dis") {
+    box.innerHTML = `<input class="search" id="fs" type="search" placeholder="${FIND.ph}" aria-label="${FIND.tab}">
+      <div class="chips" id="dtype"></div>
+      <div class="block"><div class="tbl"><table class="cover"><thead><tr>${FIND.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody id="fb"></tbody></table></div></div>`;
+    const types = ["All"].concat([...new Set(FIND.rows.map(d=>d[2]))]);
+    let T = "All";
+    const draw = () => { const q = $("#fs").value.trim().toLowerCase();
+      $("#dtype").innerHTML = types.map(t=>`<button type="button" class="chip" data-t="${esc(t)}" aria-pressed="${T===t}">${esc(t)}</button>`).join("");
+      $("#dtype").querySelectorAll("[data-t]").forEach(b => b.onclick = () => { T = b.dataset.t; draw(); });
+      const rows = FIND.rows.filter(x => (T==="All"||x[2]===T) && (!q || x.join(" ").toLowerCase().includes(q)));
+      $("#fb").innerHTML = rows.length ? rows.map(a=>`<tr><td><b>${esc(a[0])}</b></td><td data-l="${FIND.head[1]}">${esc(a[1])}</td><td data-l="${FIND.head[2]}">${esc(a[2])}</td><td data-l="${FIND.head[3]}" class="muted">${esc(a[3])}</td></tr>`).join("") : `<tr><td colspan="4" class="muted">No match.</td></tr>`; };
+    $("#fs").oninput = draw; draw();
+  }
+  if (RV === "links") {
+    const items = LESSONS.flatMap((l,i) => l.blocks.filter(b=>b.k==="link").map(b=>({l:i+1, t:l.title, h:b.h})));
+    box.innerHTML = items.map(x => `<div class="link"><span class="lab">L${x.l} · ${esc(x.t)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "nums") {
+    box.innerHTML = `<div class="tiles">${TILES.map(t=>`<div class="tile"><span class="num">${t[0]}</span><span>${t[1]}</span></div>`).join("")}</div>
+    <div class="block"><h3>Look-alike pairs</h3><dl class="rk">${PAIRS.map(p=>`<div><dt>${esc(p[0])}</dt><dd>${esc(p[1])}</dd></div>`).join("")}</dl></div>`;
+  }
+  if (RV === "tricks" || RV === "traps") {
+    const kind = RV==="tricks" ? "trick" : "trap";
+    const items = LESSONS.flatMap((l,i) => l.blocks.filter(b=>b.k===kind).map(b=>({l:i+1, t:l.title, h:b.h})));
+    const extra = kind==="trick" ? `<div class="trick"><span class="lab">Exam craft</span>${APP.craft}</div>` : "";
+    box.innerHTML = extra + items.map(x => `<div class="${kind}"><span class="lab">L${x.l} · ${esc(x.t)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "flash") drawFlash(box);
+}
+
+
+function drawFlash(box){
+  if (!FC) { const pool = FCSCOPE==="all" ? QS : FCSCOPE==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===FCSCOPE); FC = {list: shuffle(pool), i:0, flip:false, known:0}; }
+  const sel = `<select id="fcs" aria-label="Flashcard set"><option value="all">All questions</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}">L${i+1} · ${esc(l.title)}</option>`).join("")}</select>`;
+  if (!FC.list.length || FC.i >= FC.list.length) {
+    box.innerHTML = `<div class="row">${sel}</div><div class="block stack"><h3>${FC.list.length ? "Deck finished" : "No cards in this set"}</h3>${FC.list.length?`<p class="muted">You knew ${FC.known} of ${FC.list.length} on first look.</p>`:""}<div class="row"><button class="btn pri" type="button" id="fcr">Shuffle and restart</button></div></div>`;
+    $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+    $("#fcr").onclick = () => { FC = null; drawFlash(box); }; return;
+  }
+  const q = FC.list[FC.i];
+  box.innerHTML = `<div class="row between">${sel}<span class="muted num" style="font-size:13px">${FC.i+1}/${FC.list.length}</span></div>
+    <button type="button" class="flash" id="fcard" aria-label="Flip card">
+      <span class="side">${FC.flip?"Answer":"Question · tap to flip"}</span>
+      <span class="front">${esc(q.q)}</span>
+      ${FC.flip ? `<span class="ans">${esc(q.o[q.a])}</span><span class="muted">${esc(q.e)}</span>` : ""}
+    </button>
+    <div class="row between"><button class="btn" type="button" id="fca" ${FC.flip?"":"disabled"}>Again later</button><button class="btn pri" type="button" id="fck" ${FC.flip?"":"disabled"}>Got it</button></div>`;
+  $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+  $("#fcard").onclick = () => { FC.flip = !FC.flip; drawFlash(box); };
+  $("#fca").onclick = () => { FC.list.push(q); FC.list.splice(FC.i,1); FC.flip=false; drawFlash(box); };
+  $("#fck").onclick = () => { FC.known++; FC.i++; FC.flip=false; drawFlash(box); };
+}
+
+/* boot */
+renderTop();
+const start = (location.hash||"").replace("#","");
+go(["learn","practice","mock","revise"].includes(start) ? start : "learn");
+</script>
+
+
+<style id="shabd-skin">
+/* ===== शब्दRegister skin: app colours + fonts (only when opened from the app) ===== */
+:root[data-skin="paper"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(150,128,90,.10) 31px, rgba(150,128,90,.10) 32px);--app-psize:auto;--app-card:#FFFCF6;--app-rule:#DCCFB2;--app-pri:#2F6F63;--app-ink:#221E17;--app-soft:#5E5547;--app-faint:#857B6A;--app-bg:#F3EEE3;--app-deep:#E9E1CF;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#F3EEE3;--sheet:#FFFCF6;--sunk:#E9E1CF;--ink:#221E17;--ink2:#5E5547;--rule:#DCCFB2;--blue:#2F6F63;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--accent:#A87E1F;--accent-bg:color-mix(in srgb, #A87E1F 16%, #FFFCF6);--good:#2F6F63;--good-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--bad:#8C2F39;--bad-bg:color-mix(in srgb, #8C2F39 14%, #FFFCF6);--warn-bg:color-mix(in srgb, #C99A2E 18%, #FFFCF6);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="paper"][data-theme="dark"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--sheet:#26211A;--sunk:#25201A;--ink:#EFE6D2;--ink2:#BDB195;--rule:#3B3429;--blue:#3F9A86;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3F9A86 22%, #26211A);--accent:#D9AE4B;--accent-bg:color-mix(in srgb, #D9AE4B 24%, #26211A);--good:#5FB9A3;--good-bg:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-bg:color-mix(in srgb, #D06B74 22%, #26211A);--warn-bg:color-mix(in srgb, #D9AE4B 26%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="paper"]:not([data-theme="light"]){--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--sheet:#26211A;--sunk:#25201A;--ink:#EFE6D2;--ink2:#BDB195;--rule:#3B3429;--blue:#3F9A86;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3F9A86 22%, #26211A);--accent:#D9AE4B;--accent-bg:color-mix(in srgb, #D9AE4B 24%, #26211A);--good:#5FB9A3;--good-bg:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-bg:color-mix(in srgb, #D06B74 22%, #26211A);--warn-bg:color-mix(in srgb, #D9AE4B 26%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin="indigo"]{--app-pattern:radial-gradient(rgba(61,92,240,.10) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#FFFFFF;--app-rule:#CBD3EC;--app-pri:#3D5CF0;--app-ink:#0F1B3D;--app-soft:#4A5680;--app-faint:#67739C;--app-bg:#EEF1FA;--app-deep:#E1E6F5;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#EEF1FA;--sheet:#FFFFFF;--sunk:#E1E6F5;--ink:#0F1B3D;--ink2:#4A5680;--rule:#CBD3EC;--blue:#3D5CF0;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3D5CF0 14%, #FFFFFF);--accent:#D9831A;--accent-bg:color-mix(in srgb, #D9831A 16%, #FFFFFF);--good:#147D53;--good-bg:color-mix(in srgb, #147D53 14%, #FFFFFF);--bad:#C8402F;--bad-bg:color-mix(in srgb, #C8402F 14%, #FFFFFF);--warn-bg:color-mix(in srgb, #F7C548 18%, #FFFFFF);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="indigo"][data-theme="dark"]{--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--sheet:#121D47;--sunk:#0E1839;--ink:#EEF2FF;--ink2:#A7B3DA;--rule:#22306A;--blue:#6F86FF;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #6F86FF 22%, #121D47);--accent:#F7B24D;--accent-bg:color-mix(in srgb, #F7B24D 24%, #121D47);--good:#45C08A;--good-bg:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-bg:color-mix(in srgb, #F07B6E 22%, #121D47);--warn-bg:color-mix(in srgb, #F7C548 26%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="indigo"]:not([data-theme="light"]){--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--sheet:#121D47;--sunk:#0E1839;--ink:#EEF2FF;--ink2:#A7B3DA;--rule:#22306A;--blue:#6F86FF;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #6F86FF 22%, #121D47);--accent:#F7B24D;--accent-bg:color-mix(in srgb, #F7B24D 24%, #121D47);--good:#45C08A;--good-bg:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-bg:color-mix(in srgb, #F07B6E 22%, #121D47);--warn-bg:color-mix(in srgb, #F7C548 26%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin] body{background-color:var(--app-bg);background-image:var(--app-pattern);background-size:var(--app-psize);background-attachment:fixed}
+:root[data-skin] h1,:root[data-skin] h2{letter-spacing:-.01em}
+
+/* ===== Desktop layout (PC / tablet landscape) ===== */
+@media (min-width: 1024px){
+  :root{--side:236px}
+  body{padding-left:var(--side);font-size:16.5px}
+  .top{border-bottom:1px solid var(--rule)}
+  .top-in{max-width:1320px;padding:16px 36px}
+  .brand{font-size:21px}
+  .brand small{font-size:13px}
+  .stat{font-size:13px}
+  .wrap{max-width:1320px;padding:0 36px 56px}
+  .view{padding-top:28px}
+  h1{font-size:34px} h2{font-size:22px} h3{font-size:17px}
+
+  /* bottom tab bar becomes a left sidebar */
+  .nav{top:0;bottom:0;left:0;right:auto;width:var(--side);height:auto;border-top:0;border-right:1px solid var(--rule);padding:84px 14px 20px;display:block;overflow:auto}
+  .nav-in{display:flex;flex-direction:column;gap:4px;height:auto;max-width:none;margin:0}
+  .nav-in::before{content:"Sections";display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);padding:0 14px 8px}
+  .nav button{flex-direction:row;justify-content:flex-start;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;font-size:15px;min-height:0;height:auto;width:100%;text-align:left}
+  .nav button svg{width:20px;height:20px;flex-shrink:0}
+  .nav button:hover{background:var(--sunk)}
+  .nav button[aria-current="page"]{background:var(--blue-bg)}
+  .nav button[aria-current="page"] span{border-bottom:0!important}
+
+  /* home: intro beside progress, lessons as a card grid */
+  .hero{grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);column-gap:48px;align-items:end;padding-bottom:10px}
+  .hero > .eyebrow,.hero > h1,.hero > p{grid-column:1}
+  .hero > .meter{grid-column:2;grid-row:3;align-self:center}
+  .hero > .row{grid-column:2;grid-row:2;align-self:end}
+  .lessons{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;border-top:0}
+  .les{background:var(--sheet);border:1px solid var(--rule);border-radius:16px;padding:16px 18px;transition:transform .15s ease,box-shadow .15s ease,border-color .15s}
+  .les:hover{transform:translateY(-2px);border-color:var(--blue);box-shadow:0 14px 30px -22px rgba(0,0,0,.45)}
+  .les.next{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
+
+  /* lesson reader: facts, timelines, tricks sit side by side */
+  .lhead{margin-bottom:0}
+  .steps{max-width:640px}
+  .steps + .stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+  .steps + .stack > .plain,.steps + .stack > .row,.steps + .stack > p,.steps + .stack > .fig,.steps + .stack > h2,.steps + .stack > .tbl{grid-column:1/-1}
+  .steps + .stack > .plain{max-width:86ch;font-size:17px}
+  .steps + .stack:not(:has(> .block ~ .block)) > .block{grid-column:1/-1}
+  .block,.qcard{padding:18px 20px;border-radius:14px}
+
+  /* quizzes and question bank */
+  #lq > .stack{display:grid;grid-template-columns:minmax(0,1fr);max-width:980px;gap:16px}
+  .opts{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .qt{font-size:18px}
+  #plist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #plist .opts{grid-template-columns:minmax(0,1fr)}
+  .chips{flex-wrap:wrap;overflow:visible}
+
+  /* mock test: question with the answer grid alongside */
+  .mbar{top:calc(env(safe-area-inset-top,0px) + 67px)}
+  .view > .qcard{max-width:1000px}
+  .view > .row.between{max-width:1000px}
+  .view > #msub{max-width:1000px;width:100%}
+  .view > .block.stack{max-width:760px}
+  .pal{grid-template-columns:repeat(auto-fill,minmax(46px,1fr))}
+  .kpis{max-width:760px}
+
+  /* revise: cards in columns */
+  #rkl,#rv > .stack:not(#rkl){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #rv > .search{max-width:520px}
+  .tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .flash{min-height:300px;max-width:760px;margin:0 auto;padding:32px 36px}
+  .flash .front{font-size:22px}
+}
+@media (min-width: 1500px){
+  #plist,#rkl{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+</style>
+<script id="shabd-deeplink">
+(function(){
+  var l; try{ l = new URLSearchParams(location.search).get('lesson'); }catch(e){}
+  if(!l) return;
+  function run(){
+    try{
+      if(typeof openLesson === 'function' && typeof LESSONS !== 'undefined'){ if(LESSONS.some(function(x){ return x.id === l; })) openLesson(l, 'learn'); }
+      else if(typeof openRule === 'function'){ var n = parseInt(String(l).replace(/\D/g, ''), 10); if(n) openRule(n, 'learn'); }
+      else if(typeof COURSE !== 'undefined' && typeof go === 'function'){ var i = COURSE.findIndex(function(c){ return c.id === l; }); if(i >= 0) go({ name: 'lesson', i: i, step: 0, ans: {}, score: 0 }); }
+    }catch(e){}
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(run, 30); }); else setTimeout(run, 30);
+})();
+</script>
+</body></html>
