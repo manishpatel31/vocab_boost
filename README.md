@@ -47,7 +47,7 @@ Each mini app is one self-contained page (`study-<name>.html`) with lessons, a q
 ## Features
 
 - Phone and PC layouts, Paper and Indigo themes, each with Light / Dark / Auto
-- Works offline once opened; installable on a phone
+- Opens instantly after the first visit, even on slow mobile data: the app, its libraries and fonts load from the saved copy and update in the background (a “new version is ready” bar offers a reload); every mini app, the question bank and search are saved for offline use once the app is idle; installable on a phone
 - Progress saved to your account (Firebase) and synced across devices
 - One unified daily goal and streak across vocab and all study apps
 - Study tracker: every visit to a mini app is saved as a session (active time, questions answered, score), with score trends, time estimates, last visited / studied / completed dates and a reminder to revise each app every 15 days (10–30, adjustable)
@@ -60,7 +60,7 @@ Each mini app is one self-contained page (`study-<name>.html`) with lessons, a q
 1. Build the page as `study-<name>.html` in the same format as the existing ones (lessons, quick-revise, practice, progress synced to the account).
 2. Add its questions and lesson text to `study-bank.json` and `study-search.json`.
 3. Register it in `index.html` (the `STUDY` list and name map) so it gets a card on Home.
-4. Add the file to the list in `sw.js` and bump the cache version (e.g. `shabd-v10` → `shabd-v11`) so phones pick it up.
+4. Add the file to the `WARM` list in `sw.js` and bump `VERSION` (e.g. `shabd-v15` → `shabd-v16`) so phones pick up the change.
 5. Commit and push. GitHub Pages updates in a minute or two.
 
 ## Hosting & notes

@@ -12,7 +12,22 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="पाठShala">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<script>
+  // Load only the current design's fonts, and without holding up the first paint.
+  window.loadThemeFonts = function(t){
+    var id = 'fonts-' + t;
+    if(document.getElementById(id)) return;
+    var l = document.createElement('link');
+    l.id = id; l.rel = 'preload'; l.as = 'style';                 // a preload never holds up scripts or the first paint
+    l.onload = function(){ this.onload = null; this.rel = 'stylesheet'; };
+    l.href = t === 'indigo'
+      ? 'https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500&display=swap'
+      : 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&display=swap';
+    document.head.appendChild(l);
+  };
+  try{ loadThemeFonts(localStorage.getItem('vocabRegisterTheme') === 'indigo' ? 'indigo' : 'paper'); }catch(e){ loadThemeFonts('paper'); }
+</script>
 <style>
   /* ================= DESIGN TOKENS =================
      Two designs (Refined Register = theme-paper, Indigo Night = theme-indigo),
@@ -850,6 +865,11 @@
   /* ---------- पाठShala home (default page) ---------- */
   body.on-home header.top, .main:has(#view-home.active) header.top{ display:none; }
   .main:has(#view-tasks.active) header.top{ display:none; }
+  /* sections below the first screen are laid out only when scrolled near */
+  #homeBody > .hub-sec{ content-visibility:auto; contain-intrinsic-size:auto 900px; }
+  .update-bar{ position:fixed; left:50%; transform:translateX(-50%); top:calc(12px + env(safe-area-inset-top)); z-index:200; display:flex; align-items:center; gap:10px; max-width:calc(100% - 24px); background:var(--ink); color:var(--paper); padding:8px 8px 8px 16px; border-radius:var(--pill); box-shadow:var(--shadow-lg); font-size:14px; }
+  .update-bar button{ border:none; background:transparent; color:var(--mustard); font:inherit; font-weight:700; cursor:pointer; padding:6px 10px; border-radius:var(--pill); }
+  .update-bar #updateReload{ background:var(--mustard); color:#1B1813; }
   #view-tasks{ padding-top:8px; }
   .h1-sub{ font-family:var(--font-body); font-size:.42em; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint); margin-left:8px; vertical-align:middle; }
   @media (min-width: 861px){ .phone-only{ display:none !important; } }
@@ -1764,6 +1784,7 @@
   function applyAppearance(){
     var theme = currentTheme();
     var mode = currentMode();
+    if(window.loadThemeFonts) window.loadThemeFonts(theme);
     var dark = mode === 'dark' || (mode === 'system' && !!(darkMq && darkMq.matches));
     document.body.classList.toggle('theme-indigo', theme === 'indigo');
     document.body.classList.toggle('theme-paper', theme !== 'indigo');
@@ -1934,7 +1955,8 @@
     t.setHours(0, 0, 0, 0);
     return Math.round((d - t) / DAY_MS);
   }
-  function examDateText(){ var p = examDay().split('-'); return new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }); }
+  var examFmt = null;
+  function examDateText(){ var p = examDay().split('-'); examFmt = examFmt || new Intl.DateTimeFormat('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }); return examFmt.format(new Date(+p[0], +p[1] - 1, +p[2])); }
   function greetText(){ var h = new Date().getHours(); return h < 5 ? 'Up late' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening'; }
   function firstName(){ var n = (currentUser && (currentUser.displayName || currentUser.email || '')) || ''; return n.split(/[\s@]/)[0]; }
   function lastStudyId(){
@@ -2394,15 +2416,29 @@
     document.getElementById('studyOverlay').classList.add('open');
     document.body.classList.add('study-on');
     if(!fromHistory){ try{ history.pushState({ study: id }, '', '#study-' + id); }catch(e){} }
-    await studyPull(id);
+    // fetch this app's progress from your account, but don't keep the app waiting more than a second for it
+    var pulled = false, pull = studyPull(id).then(function(){ pulled = true; }, function(){ pulled = true; });
+    await Promise.race([pull, new Promise(function(r){ setTimeout(r, 1000); })]);
     if(studyOpen !== id) return;
     studyLast = lsGet(mod.key);
     trackStart(id);
     Object.keys(STUDY).concat(Object.keys(STUDY_EXTRA)).forEach(function(k){ studyPush(k); });   // this device's unsaved progress (incl. from before syncing existed)
-    document.getElementById('studyFrame').src = mod.file + '?embed=1&skin=' + studySkinValue() + '&theme=' + studyThemeValue() + (lesson ? '&lesson=' + encodeURIComponent(lesson) : '');
+    var frameUrl = mod.file + '?embed=1&skin=' + studySkinValue() + '&theme=' + studyThemeValue() + (lesson ? '&lesson=' + encodeURIComponent(lesson) : '');
+    setStudyFrame(frameUrl);
+    if(!pulled){   // progress from your account arrived after the app opened: reopen it with the newer copy
+      var shown = lsGet(mod.key);
+      pull.then(function(){ if(studyOpen === id && lsGet(mod.key) !== shown){ studyLast = lsGet(mod.key); setStudyFrame(frameUrl); } });
+    }
     studySyncLabel(currentUser ? '✓ Synced with your account' : '');
     clearInterval(studyWatch);
     studyWatch = setInterval(function(){ studyCheckChange(); trackTick(); }, 4000);
+  }
+  /** Point the study frame at a page without adding an entry to the back history
+      (setting .src adds one, so the phone's Back button needed several presses). */
+  function setStudyFrame(url){
+    var f = document.getElementById('studyFrame');
+    try{ if(f.contentWindow){ f.contentWindow.location.replace(url); return; } }catch(e){}
+    f.src = url;
   }
   function closeStudy(fromHistory){
     if(!studyOpen) return;
@@ -2416,7 +2452,7 @@
     document.getElementById('studyOverlay').classList.remove('open');
     if(!drillOpen) document.body.classList.remove('study-on');
     renderHomeSoon();
-    document.getElementById('studyFrame').src = 'about:blank';
+    setStudyFrame('about:blank');
     if(!fromHistory && location.hash.indexOf('#study-') === 0){ try{ history.back(); }catch(e){} }
   }
   document.getElementById('studyBack').addEventListener('click', function(){ closeStudy(false); });
@@ -3177,7 +3213,24 @@
 
   // ---------------- PWA install + service worker (works even before Firebase config) ----------------
   if('serviceWorker' in navigator){
-    window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('sw.js').catch(function(){});
+      // once the app has settled, save every mini app for offline use (skipped on Data Saver)
+      setTimeout(function(){
+        var c = navigator.connection;
+        if(c && c.saveData) return;
+        navigator.serviceWorker.ready.then(function(r){ if(r.active) r.active.postMessage({ type: 'warm' }); }).catch(function(){});
+      }, 20000);
+    });
+    navigator.serviceWorker.addEventListener('message', function(ev){
+      if(!ev.data || ev.data.type !== 'app-updated' || document.getElementById('updateBar')) return;
+      var bar = document.createElement('div');
+      bar.id = 'updateBar'; bar.className = 'update-bar'; bar.setAttribute('role', 'status');
+      bar.innerHTML = '<span>A new version of पाठShala is ready.</span><button type="button" id="updateReload">Reload</button><button type="button" id="updateLater" aria-label="Later">✕</button>';
+      document.body.appendChild(bar);
+      document.getElementById('updateReload').addEventListener('click', function(){ location.reload(); });
+      document.getElementById('updateLater').addEventListener('click', function(){ bar.remove(); });
+    });
   }
   var deferredInstallPrompt = null;
   var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
@@ -3331,10 +3384,22 @@
   });
   document.getElementById('signOutBtn').addEventListener('click', function(){ auth.signOut(); });
 
+  // Signed in last time: show the app straight away from this device's saved data
+  // instead of waiting on the "Opening पाठShala…" screen for the sign-in check.
+  if(lsGet('pathshalaSignedIn') === '1') setTimeout(function(){   // after the rest of this script has run
+    if(currentUser || document.getElementById('loadingOverlay').classList.contains('hidden')) return;
+    try{
+      document.getElementById('signedOutScreen').style.display = 'none';
+      document.getElementById('appShell').style.display = 'block';
+      renderHub();
+      document.getElementById('loadingOverlay').classList.add('hidden');
+    }catch(e){}
+  }, 0);
   auth.onAuthStateChanged(function(user){
     currentUser = user;
     detachListeners();
     stopHourlyAlerts();
+    lsSet('pathshalaSignedIn', user ? '1' : null);
     if(user){
       isAdminUser = ADMIN_EMAILS.indexOf(user.email) !== -1;
       isModeratorUser = isAdminUser;
@@ -3380,7 +3445,7 @@
   function renderWhoBox(){
     var box = document.getElementById('whoBox');
     box.innerHTML =
-      (currentUser.photoURL ? '<img class="avatar" src="'+currentUser.photoURL+'">' : '') +
+      (currentUser.photoURL ? '<img class="avatar" src="'+escapeAttr(currentUser.photoURL)+'" alt="">' : '') +
       '<span>'+escapeHtml(currentUser.displayName || currentUser.email)+'</span>' +
       (isAdminUser ? '<span class="admin-badge">admin</span>' : (isModeratorUser ? '<span class="mod-badge">moderator</span>' : ''));
   }
@@ -5813,6 +5878,7 @@ list.map(function(w, i){ return (i + 1) + '. ' + w.term; }).join('\n'),
   var modalBody = document.getElementById('modalBody');
   function closeModal(){ modalBg.classList.remove('open'); modalBody.innerHTML = ''; }
   modalBg.addEventListener('click', function(ev){ if(ev.target === modalBg) closeModal(); });
+  document.addEventListener('keydown', function(ev){ if(ev.key === 'Escape' && modalBg.classList.contains('open')){ ev.preventDefault(); closeModal(); } });
 
   function entryFormHtml(e){
     e = e || {term:'',type:'word',part_of_speech:'',english_meaning:'',hindi_meaning:'',synonyms:[],antonyms:[],ssc_sentence:'',mnemonic:'',ssc_history:'',confusable_with:'',root:'',spelling_trap:false,spelling_note:'',origin:'',tags:[]};
@@ -7441,7 +7507,7 @@ listBlock,
           '<div class="vcard-top">' +
             '<div style="display:flex; align-items:center; gap:10px;">' +
               '<span style="font-family:var(--font-display); font-size:18px; font-weight:600; color:var(--ink-faint); width:24px; flex-shrink:0;">#'+(i+1)+'</span>' +
-              (u.photoURL ? '<img class="avatar" src="'+u.photoURL+'" style="width:32px;height:32px;">' : '') +
+              (u.photoURL ? '<img class="avatar" src="'+escapeAttr(u.photoURL)+'" alt="" style="width:32px;height:32px;">' : '') +
               '<div class="term" style="font-size:16px;">'+escapeHtml(u.displayName||u.email||'Someone')+'</div>' +
             '</div>' +
           '</div>' +
@@ -7469,7 +7535,7 @@ listBlock,
         return '<div class="vcard" style="cursor:default;">' +
           '<div class="vcard-top">' +
             '<div style="display:flex; align-items:center; gap:10px;">' +
-              (u.photoURL ? '<img class="avatar" src="'+u.photoURL+'" style="width:32px;height:32px;">' : '') +
+              (u.photoURL ? '<img class="avatar" src="'+escapeAttr(u.photoURL)+'" alt="" style="width:32px;height:32px;">' : '') +
               '<div class="term" style="font-size:15px;">'+escapeHtml(u.displayName||u.email||'Someone')+'</div>' +
             '</div>' +
             (isAdminU ? '<span class="admin-badge">admin</span>' : (isModU ? '<span class="mod-badge">moderator</span>' : '')) +
