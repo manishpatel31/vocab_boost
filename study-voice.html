@@ -339,7 +339,7 @@ sup,sub{font-size:.72em;line-height:0}
 const PV = "Select the option that expresses the given sentence in passive voice. ";
 const AV = "Select the option that expresses the given sentence in active voice. ";
 const LESSONS = [
-{ id:"L1", heat:3, title:"SSC CGL pattern & exam strategy", hi:"परीक्षा पैटर्न और रणनीति", blocks:[
+{ id:"L1", heat:3, title:"SSC CGL pattern & exam strategy", hi:"परीक्षा पैटर्न और रणनीति", sum:["One voice question in most CGL Tier 1 shifts; one to three in Tier 2.", "Check in order: tense, helping verb + V3, pronoun case, ‘by’ phrase.", "Most wrong options change the tense or miss ‘being’ / ‘been’."], blocks:[
  {k:"hot", h:"<b>Active–passive voice is one of the most reliable marks in SSC English.</b> In CGL Tier 1 (25 English questions, +2 / −0.5) it usually appears as <b>one question in most shifts</b>. In CGL Tier 2 (Paper 1, Module II: 45 English questions, +3 / −1) expect <b>one to three</b>. CHSL, CPO and Selection Post ask it in the same format. Once the method is automatic, a voice question takes 20–30 seconds."},
  {k:"table", title:"Where voice is asked in SSC exams", head:["Exam","English section","Voice questions (usual)","Marking"], rows:[
   ["CGL Tier 1","25 questions","0–1 per shift, mostly 1","+2 / −0.5"],
@@ -363,7 +363,7 @@ const LESSONS = [
  {k:"link", h:"Voice and narration (direct–indirect speech) are asked side by side in SSC papers and use the same skill: keeping tense under control. Revise them together on the last day."},
  {k:"q", q:"In CGL Tier 1, which step usually eliminates two options at once in a voice question?", o:["Checking the tense (helping verb)","Checking the spelling of the noun","Counting the words","Checking the full stop"], e:"Most distractors use the wrong tense form, so checking the helping verb removes them first."}
 ]},
-{ id:"L2", heat:3, title:"The rules: object, V3 and pronouns", hi:"मूल नियम · कर्म, V3 और सर्वनाम", blocks:[
+{ id:"L2", heat:3, title:"The rules: object, V3 and pronouns", hi:"मूल नियम · कर्म, V3 और सर्वनाम", sum:["Only a transitive verb (one with an object) has a passive.", "Passive = object + be (in the same tense) + V3 + by + agent.", "Pronouns change case: I → me, he → him, they → them, and back.", "Keep the tense of the active sentence."], blocks:[
  {k:"hot", h:"Every voice question uses these rules. If you know them by heart, the tense lessons are just tables to remember."},
  {k:"p", h:"In the <b>active voice</b> the doer (agent) is the subject: <i>Ravi <b>wrote</b> a letter.</i> In the <b>passive voice</b> the receiver of the action becomes the subject: <i>A letter <b>was written</b> by Ravi.</i> Only sentences with an <b>object</b> (transitive verbs) can be changed. <i>She sleeps</i> has no object, so it has no passive."},
  {k:"formula", title:"Four steps of active → passive", rows:[
@@ -380,7 +380,7 @@ const LESSONS = [
  {k:"q", q:"Which of these sentences cannot be changed into passive voice?", o:["The baby sleeps peacefully.","The baby drinks milk.","The baby broke the toy.","The baby likes music."], e:"“Sleeps” is intransitive — there is no object to become the subject."},
  {k:"q", q:"In passive voice, “by they” should be written as:", o:["by them","by their","by theirs","by they"], e:"After a preposition we use the object form: them."}
 ]},
-{ id:"L3", heat:3, title:"Present tenses", hi:"वर्तमान काल", blocks:[
+{ id:"L3", heat:3, title:"Present tenses", hi:"वर्तमान काल", sum:["Simple present: is / am / are + V3.", "Present continuous: is / am / are + being + V3.", "Present perfect: has / have + been + V3.", "Perfect continuous tenses usually have no passive."], blocks:[
  {k:"hot", h:"Present tenses appear in roughly one voice question in six. The present continuous (<b>is being</b>) and the present perfect (<b>has been</b>) are the ones SSC likes most, because the distractors are easy to build."},
  {k:"formula", title:"Present tense table", rows:[
   ["Simple present","V1 / V5 → is / am / are + V3","He writes a letter → A letter is written by him"],
@@ -393,7 +393,7 @@ const LESSONS = [
  {k:"trap", h:"<i>Is being written</i> (present continuous) vs <i>has been written</i> (present perfect) vs <i>was being written</i> (past continuous): SSC puts all three in the options. Match the time of the active verb exactly."},
  {k:"q", q:"Passive of: “They have painted the walls.”", o:["The walls have been painted by them.","The walls had been painted by them.","The walls are being painted by them.","The walls has been painted by them."], e:"Present perfect → have been + V3; walls is plural → have."}
 ]},
-{ id:"L4", heat:3, title:"Past tenses", hi:"भूतकाल", blocks:[
+{ id:"L4", heat:3, title:"Past tenses", hi:"भूतकाल", sum:["Simple past: was / were + V3.", "Past continuous: was / were + being + V3.", "Past perfect: had + been + V3."], blocks:[
  {k:"hot", h:"Past tenses are the <b>single most common</b> voice type in recent SSC shifts — about one question in five. The simple past (<b>was/were + V3</b>) is the easiest mark in the English section."},
  {k:"formula", title:"Past tense table", rows:[
   ["Simple past","V2 → was / were + V3","She sang a song → A song was sung by her"],
@@ -406,7 +406,7 @@ const LESSONS = [
  {k:"trick", h:"Simple past is one word in the active (V2). If the active has only one verb word in the past, the answer is just <b>was/were + V3</b> — no <i>being</i>, no <i>been</i>."},
  {k:"q", q:"Passive of: “The cat was chasing the mice.”", o:["The mice were being chased by the cat.","The mice was being chased by the cat.","The mice were chased by the cat.","The mice had been chased by the cat."], e:"Past continuous → were being + V3; mice is plural."}
 ]},
-{ id:"L5", heat:3, title:"Future tenses & modals", hi:"भविष्य काल और मॉडल", blocks:[
+{ id:"L5", heat:3, title:"Future tenses & modals", hi:"भविष्य काल और मॉडल", sum:["Simple future: will / shall + be + V3; future perfect: will have been + V3.", "Modals: modal + be + V3 (can be done, must be done, should be done).", "Perfect modals: modal + have been + V3."], blocks:[
  {k:"hot", h:"Modal verbs (<i>can, must, should, may, have to</i>) have become more frequent since 2023, and <b>modal + have + V3</b> (<i>should have been done</i>) is a Tier 2 favourite."},
  {k:"formula", title:"Future and modal table", rows:[
   ["Simple future","will / shall + V1 → will / shall + be + V3","He will help me → I will be helped by him"],
@@ -422,7 +422,7 @@ const LESSONS = [
  {k:"trick", h:"<b>Modal + be + V3</b> is the whole rule. Never <i>can being</i>, never <i>must been</i> (without have)."},
  {k:"q", q:"Passive of: “Someone must clean the kitchen.”", o:["The kitchen must be cleaned.","The kitchen must been cleaned.","The kitchen must have been cleaned.","The kitchen must being cleaned."], e:"Modal + be + V3; “someone” is dropped as the agent."}
 ]},
-{ id:"L6", heat:2, title:"Imperative sentences", hi:"आज्ञार्थक वाक्य", blocks:[
+{ id:"L6", heat:2, title:"Imperative sentences", hi:"आज्ञार्थक वाक्य", sum:["Order: Let + object + be + V3 (Let the door be shut).", "Request / advice: You are requested / advised to …", "Negative command: Let it not be done / You are ordered not to …"], blocks:[
  {k:"hot", h:"Imperatives (orders, requests, advice) come up in about one question in eight. SSC accepts two forms: <b>Let + object + be + V3</b>, and <b>You are requested / ordered / advised + to + V1</b>."},
  {k:"formula", title:"Imperative patterns", rows:[
   ["Order with object","Let + object + be + V3","Shut the door → Let the door be shut"],
@@ -438,7 +438,7 @@ const LESSONS = [
  {k:"trick", h:"Look at the first word. <b>Please / kindly</b> → requested. A bare verb with an object → <b>Let … be …</b>. <b>Don’t</b> → <i>Let … not be …</i> or <i>You are warned/forbidden …</i>."},
  {k:"q", q:"Passive of: “Do not waste your time.”", o:["Let your time not be wasted.","Let your time be not waste.","Your time is not wasted.","Let not waste your time."], e:"Negative imperative → Let + object + not be + V3."}
 ]},
-{ id:"L7", heat:3, title:"Interrogative sentences", hi:"प्रश्नवाचक वाक्य", blocks:[
+{ id:"L7", heat:3, title:"Interrogative sentences", hi:"प्रश्नवाचक वाक्य", sum:["Yes/no questions: helping verb first — Is the work being done?", "Who → By whom; whom → who; what / why / how stay at the front.", "Keep the question mark and question order in the passive."], blocks:[
  {k:"hot", h:"Questions in the passive are asked often, and the options are designed to catch mistakes in word order. The <b>Who → By whom</b> rule appears in some form almost every month."},
  {k:"formula", title:"Question patterns", rows:[
   ["Do / does + V1","Is / am / are + subject + V3","Does he sing songs? → Are songs sung by him?"],
@@ -456,7 +456,7 @@ const LESSONS = [
  {k:"trick", h:"<b>Who and whom swap.</b> <i>Who</i> (doer) → <i>By whom</i>. <i>Whom</i> (receiver) → <i>Who</i>. Remember: by + whom, because after “by” we need the object form."},
  {k:"q", q:"Passive of: “Whom did the manager praise?”", o:["Who was praised by the manager?","By whom was the manager praised?","Whom was praised by the manager?","Who praised the manager?"], e:"Whom (receiver) becomes the subject “Who”; the manager goes after by."}
 ]},
-{ id:"L8", heat:2, title:"Two objects, infinitives & ‘It is said’", hi:"दो कर्म, इन्फ़िनिटिव और 'It is said'", blocks:[
+{ id:"L8", heat:2, title:"Two objects, infinitives & ‘It is said’", hi:"दो कर्म, इन्फ़िनिटिव और 'It is said'", sum:["Two objects: either object can be the subject (I was given a book / A book was given to me).", "‘They say that …’ → It is said that … / He is said to …", "Infinitive and ‘to be + V3’ patterns keep the meaning of the active."], blocks:[
  {k:"hot", h:"These are <b>Tier 2 favourites</b>: sentences with two objects, sentences with <i>that</i>-clauses (<i>People say that …</i>) and infinitives (<i>to be + V3</i>). Expect one in Tier 2 and occasionally one in Tier 1."},
  {k:"formula", title:"Two objects (give, show, tell, teach, offer, send …)", rows:[
   ["Person as subject (preferred)","Person + was/were + V3 + thing + by …","He gave me a book → I was given a book by him"],
@@ -475,7 +475,7 @@ const LESSONS = [
  {k:"trick", h:"If both “person-first” and “thing-first” forms appear in the options, check the other parts (tense, pronoun). Only one option will be fully correct."},
  {k:"q", q:"Passive of: “They offered him a job.”", o:["He was offered a job by them.","He was offering a job by them.","A job was offered by him to them.","He is offered a job by them."], e:"Person as subject, simple past → was offered."}
 ]},
-{ id:"L9", heat:2, title:"Prepositions other than ‘by’, phrasal verbs & gerunds", hi:"‘by’ के अलावा प्रीपोज़िशन, फ़्रेज़ल वर्ब", blocks:[
+{ id:"L9", heat:2, title:"Prepositions other than ‘by’, phrasal verbs & gerunds", hi:"‘by’ के अलावा प्रीपोज़िशन, फ़्रेज़ल वर्ब", sum:["Some verbs take other prepositions: known to, pleased with, surprised at, interested in, filled with.", "Phrasal verbs keep their particle: looked after → was looked after by.", "Gerund objects: ‘I like people praising me’ → ‘I like being praised’."], blocks:[
  {k:"hot", h:"About one question in sixteen, but these are the ones most students get wrong. The fixed prepositions below are tested both in voice and in error-spotting."},
  {k:"table", title:"Verbs that take a preposition other than “by”", head:["Active","Passive"], rows:[
   ["I know him.","He is known <b>to</b> me."],
@@ -497,7 +497,7 @@ const LESSONS = [
  {k:"trap", h:"<i>The room was filled <b>by</b> smoke</i> and <i>I am known <b>by</b> him</i> are classic SSC distractors. Learn the table above."},
  {k:"q", q:"Passive of: “The answer surprised the teacher.”", o:["The teacher was surprised at the answer.","The teacher is surprised at the answer.","The teacher was surprised from the answer.","The answer was surprised by the teacher."], e:"surprise → surprised at; simple past → was."}
 ]},
-{ id:"L10", heat:2, title:"Negatives, agent omission & no-passive sentences", hi:"नकारात्मक वाक्य, कर्ता का लोप", blocks:[
+{ id:"L10", heat:2, title:"Negatives, agent omission & no-passive sentences", hi:"नकारात्मक वाक्य, कर्ता का लोप", sum:["Negative: put ‘not’ after the first helping verb (was not written).", "Omit ‘by’ with vague agents: someone, people, they, everybody.", "Intransitive verbs and verbs like have, resemble, lack have no passive."], blocks:[
  {k:"hot", h:"Negative words and unknown agents appear in about one question in sixteen. They are quick marks once you know three rules."},
  {k:"formula", title:"Negatives", rows:[
   ["not","stays in the same place after the first helping verb","I did not see her → She was not seen by me"],
@@ -513,7 +513,7 @@ const LESSONS = [
  {k:"trick", h:"<b>No passive:</b> intransitive verbs (sleep, go, come, die), verbs of state (have, resemble, lack, fit, suit) and perfect continuous tenses. If the question asks for one, look for the option that keeps the meaning without inventing a strange verb."},
  {k:"q", q:"Passive of: “Someone has stolen my purse.”", o:["My purse has been stolen.","My purse had been stolen.","My purse has stolen by someone.","My purse was being stolen."], e:"Present perfect → has been + V3; drop the unknown agent “someone”."}
 ]},
-{ id:"L11", heat:2, title:"Passive → active & Tier 2 tricky sentences", hi:"कर्मवाच्य से कर्तृवाच्य · कठिन वाक्य", blocks:[
+{ id:"L11", heat:2, title:"Passive → active & Tier 2 tricky sentences", hi:"कर्मवाच्य से कर्तृवाच्य · कठिन वाक्य", sum:["Passive → active: the agent after ‘by’ becomes the subject; keep the tense.", "If no agent is given, use someone / people / they.", "Tier 2 favourites: two objects, ‘It is said’, ‘Let’ and modal perfects."], blocks:[
  {k:"hot", h:"About one SSC voice question in four asks for the <b>active</b> voice. Tier 2 also uses longer sentences with two clauses, causatives and modal perfects."},
  {k:"formula", title:"Passive → active: reverse the steps", rows:[
   ["1. Agent first","The word after “by” becomes the subject (object → subject form)","by him → he"],
@@ -532,7 +532,7 @@ const LESSONS = [
  {k:"trap", h:"In passive → active, the commonest trap is <b>wrong tense</b>: <i>was being repaired</i> → <i>were repairing</i> (not <i>repaired</i>), <i>had been finished</i> → <i>had finished</i> (not <i>has finished</i>)."},
  {k:"q", q:"Active of: “A new bridge will be built by the government.”", o:["The government will build a new bridge.","The government would build a new bridge.","The government will be building a new bridge.","The government builds a new bridge."], e:"will be + V3 → will + V1."}
 ]},
-{ id:"L12", heat:3, title:"Recent-pattern mixed set & last-day tips", hi:"नवीन पैटर्न अभ्यास · अंतिम दिन के सुझाव", blocks:[
+{ id:"L12", heat:3, title:"Recent-pattern mixed set & last-day tips", hi:"नवीन पैटर्न अभ्यास · अंतिम दिन के सुझाव", sum:["Tense first, then helping verb + V3, then pronouns and ‘by’.", "Watch being / been: continuous needs ‘being’, perfect needs ‘been’.", "Do the mixed set with a 30-second limit before every mock."], blocks:[
  {k:"hot", h:"This lesson’s question bank is a <b>mixed set modelled on recent CGL, CHSL and CPO shifts (2023–2025)</b>: everyday sentences (office, school, government, sport, environment), all tense types, and both directions. Do it in one sitting with a 30-second limit per question."},
  {k:"p", h:"<b>What changed recently.</b> Sentences are longer and more formal (<i>The ministry has launched a new scheme for farmers</i>), modals and perfect tenses appear more often, and passive → active is asked more than before. The four steps from L2 still answer every one."},
  {k:"facts", title:"Last-day checklist", rows:[
