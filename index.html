@@ -1181,6 +1181,8 @@
   .td-due.late{ background:color-mix(in srgb, var(--maroon) 15%, transparent); color:var(--maroon); font-weight:600; }
   .td-due.now{ background:color-mix(in srgb, var(--mustard) 22%, transparent); color:var(--mustard-deep); font-weight:600; }
   .td-app{ border:none; background:color-mix(in srgb, var(--teal) 15%, transparent); color:var(--teal); font:inherit; font-size:12px; font-weight:600; padding:2px 9px; border-radius:var(--pill); cursor:pointer; }
+  .td-lesson{ background:color-mix(in srgb, var(--mustard) 18%, transparent); color:var(--ink); max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .td-edit .td-lsel{ max-width:min(320px, 80vw); }
   .td-acts{ display:flex; gap:2px; align-items:center; }
   .td-ib{ width:34px; height:34px; border:none; background:transparent; color:var(--ink-faint); border-radius:9px; cursor:pointer; display:grid; place-items:center; font-size:17px; padding:0; }
   .td-ib:hover{ background:var(--paper-deep); color:var(--ink); }
@@ -2160,11 +2162,17 @@
   document.getElementById('navMockBtn').addEventListener('click', function(){ closeAllMenus(); openMock(); });
 
   // ================= Search across everything: lesson notes, questions, words, spellings =================
-  var searchIdx = null, searchKind = 'all', searchTimer = null, searchOpen = false, searchMore = {};
+  var searchIdx = null, searchKind = 'all', searchTimer = null, searchOpen = false, searchMore = {}, searchJson = null;
+  /** study-search.json (every lesson's title and notes), fetched once and shared by Search and Tasks. */
+  function loadSearchJson(){
+    if(!searchJson) searchJson = fetch('study-search.json').then(function(r){ if(!r.ok) throw new Error('study-search.json missing'); return r.json(); })
+      .catch(function(e){ searchJson = null; throw e; });
+    return searchJson;
+  }
   function loadSearchIndex(){
     if(searchIdx) return Promise.resolve(searchIdx);
     return Promise.all([
-      fetch('study-search.json').then(function(r){ if(!r.ok) throw new Error('study-search.json missing'); return r.json(); }),
+      loadSearchJson(),
       loadStudyBank()
     ]).then(function(res){
       var idx = { lessons: [], qs: [] };
@@ -3843,18 +3851,110 @@
     var d = new Date(due + 'T00:00:00'), diff = Math.round((d - new Date(today + 'T00:00:00')) / DAY_MS);
     return ['', diff < 7 ? d.toLocaleString('en-IN', { weekday: 'long' }) : d.getDate() + ' ' + d.toLocaleString('en-IN', { month: 'short' })];
   }
-  function todoFindApp(s){
-    var low = ' ' + String(s).toLowerCase().replace(/[^a-z0-9\s]+/g, ' ').replace(/\s+/g, ' ') + ' ', hit = '';
-    Object.keys(STUDY).some(function(id){
-      var ti = STUDY[id].title.toLowerCase().replace(/[^a-z0-9\s]+/g, ' ').replace(/\s+/g, ' ').trim();
-      if(low.indexOf(' ' + id + ' ') !== -1 || (ti.length > 4 && low.indexOf(' ' + ti + ' ') !== -1)){ hit = id; return true; }
-      return false;
-    });
-    return hit;
+  // ---- linking a task to a mini app and to a chapter / lesson inside any app ----
+  // Other names people type for an app ("formula book", "isro", "reported speech"…), on top of its id and title.
+  var TODO_APP_ALIAS = {
+    formulas: ['formula book', 'formula books', 'formulas book', 'maths formulas', 'math formulas', 'maths formula', 'formulas'],
+    bns: ['bnss', 'bsa'], schemes: ['schemes', 'govt schemes', 'government scheme', 'yojana', 'yojanas'],
+    intlorgs: ['international organisations', 'international organizations', 'intl orgs'],
+    reports: ['reports and indices', 'reports indices', 'indices reports'], iprplans: ['ipr', 'five year plans', 'industrial policy'],
+    folkdances: ['folk dances', 'folk dance'], festivals: ['festivals'], appointments: ['appointments'],
+    polity: ['polity'], economics: ['economy', 'economics'], census: ['census'], sports: ['sports'],
+    mensuration2d: ['mensuration 2d', '2d mensuration'], mensuration3d: ['mensuration 3d', '3d mensuration'],
+    trigonometry: ['trigonometry', 'trigo'], space: ['isro', 'space missions'], voice: ['active passive', 'active and passive', 'passive voice'],
+    narration: ['narration', 'direct indirect', 'reported speech'], grammar: ['grammar'], geometry: ['geometry'], physics: ['physics'], biology: ['biology']
+  };
+  // words that say what to do, not what to study ("revise", "chapter"…) — ignored when matching a lesson
+  var TODO_FILLER = ' revise revision revisit read reread study learn practice practise do done complete finish solve test tests quiz mock questions question qs pyq pyqs chapter chapters chap ch lesson lessons topic topics unit part notes note formula formulas book again once twice full all whole the a an of and in on for to from with my me app maths math ssc cgl min mins minutes hour hours hr hrs ';
+  // words in lesson titles that don't name the topic
+  var TODO_TITLE_FILLER = ' and the of a an in on for to with how are is what who these this questions question asked vs i ii iii iv v by other more ssc cgl का की के और में से एवं ';
+  function todoNorm(s){ return String(s || '').toLowerCase().replace(/[’']/g, '').replace(/[^\p{L}\p{M}\p{N}]+/gu, ' ').replace(/\s+/g, ' ').trim(); }
+  function todoStem(w){ return /^[a-z]{5,}$/.test(w) ? w.replace(/ies$/, 'y').replace(/(ch|sh|x|ss)es$/, '$1').replace(/([^s])s$/, '$1') : w; }
+  function todoTokSame(a, b){
+    if(a === b) return true;
+    var x = todoStem(a), y = todoStem(b);
+    if(x === y) return true;
+    var sh = x.length < y.length ? x : y, lg = sh === x ? y : x;
+    return sh.length >= 5 && lg.indexOf(sh) === 0;                        // "photosynth" → photosynthesis
   }
-  /** "Revise polity #gs ! tomorrow" → text "Revise polity", tag gs, important, due tomorrow, linked to the Polity app. */
+  /** The app a task names, and the words that named it: { id, words } or null. The longest name wins. */
+  function todoFindAppHit(s){
+    var low = ' ' + todoNorm(s) + ' ', best = null;
+    Object.keys(STUDY).forEach(function(id){
+      var ti = todoNorm(STUDY[id].title), names = [id].concat(ti.length > 4 ? [ti] : [], TODO_APP_ALIAS[id] || []);
+      names.forEach(function(nm){
+        nm = todoNorm(nm);
+        if(low.indexOf(' ' + nm + ' ') === -1) return;
+        if(!best || nm.length > best.words.length) best = { id: id, words: nm };
+      });
+    });
+    return best;
+  }
+  function todoFindApp(s){ var h = todoFindAppHit(s); return h ? h.id : ''; }
+
+  // every lesson of every app: [{ mod, id, t, h, n (number in its id), tt (title tokens), segs ([token lists]), ht (Hindi tokens) }]
+  var todoLessons = null, todoLessonsP = null;
+  function todoLessonsLoad(){
+    if(todoLessons) return Promise.resolve(todoLessons);
+    if(!todoLessonsP) todoLessonsP = loadSearchJson().then(function(j){
+      var out = [];
+      Object.keys(j.modules || {}).forEach(function(mod){
+        if(!STUDY[mod]) return;
+        j.modules[mod].forEach(function(l){
+          var sig = function(txt){ return todoNorm(txt).split(' ').filter(function(w, i, all){ return w && all.indexOf(w) === i && !/^\d+$/.test(w) && TODO_TITLE_FILLER.indexOf(' ' + w + ' ') === -1; }); };
+          out.push({ mod: mod, id: l.id, t: l.t, h: l.h || '', n: parseInt(String(l.id).replace(/\D/g, ''), 10) || 0, nt: todoNorm(l.t),
+            tt: sig(l.t), ht: sig(l.h || ''), segs: String(l.t).split(/[:·—–,;()]| - /).map(sig).filter(function(x){ return x.length; }) });
+        });
+      });
+      todoLessons = out;
+      return out;
+    }).catch(function(e){ todoLessonsP = null; throw e; });
+    return todoLessonsP;
+  }
+  function todoLessonGet(mod, id){ return (todoLessons || []).filter(function(l){ return l.mod === mod && l.id === id; })[0] || null; }
+  /** How much of a lesson title the task's words cover (0–1); 0 unless every task word is in the title. */
+  function todoCover(core, toks){
+    if(!toks.length || core.length > toks.length + 1) return 0;
+    var hit = 0;
+    for(var i = 0; i < core.length; i++){ if(!toks.some(function(w){ return todoTokSame(core[i], w); })) return 0; }
+    toks.forEach(function(w){ if(core.some(function(c){ return todoTokSame(c, w); })) hit++; });
+    return hit / toks.length;
+  }
+  /** The chapter / lesson a task names: { mod, id, t } or null. Needs todoLessons loaded.
+      "Formula book chapter 3" → chapter 3 of that app; "HCF and LCM" → the lesson with that title, in any app. */
+  function todoFindLesson(text, appHit){
+    if(!todoLessons) return null;
+    var low = todoNorm(text), app = appHit ? appHit.id : '';
+    var num = /(?:^| )(?:chapter|chap|ch|lesson|les|rule|unit|part|l|c|r) ?(\d{1,3})(?= |$)/.exec(low);
+    if(num && app){
+      var byNum = todoLessons.filter(function(l){ return l.mod === app && l.n === +num[1]; })[0];
+      if(byNum) return byNum;
+    }
+    var core = low.split(' ').filter(function(w){ return w && !/^\d+$/.test(w) && TODO_FILLER.indexOf(' ' + w + ' ') === -1; });
+    // words that named the app don't have to be in the chapter title ("economy budget" → Budget)
+    var rest = appHit ? core.filter(function(w){ return (' ' + appHit.words + ' ').indexOf(' ' + w + ' ') === -1; }) : core;
+    // the task only names an app ("Revise geometry"): link a lesson only if its title is exactly those words,
+    // and never one inside that same app ("Trigonometry" → the Formula Book's Trigonometry chapter, not geometry's)
+    var onlyApp = !!appHit && !rest.length;
+    if(!onlyApp) core = rest;
+    if(!core.length || (core.length === 1 && core[0].length < 3)) return null;
+    var best = null, bestS = 0;
+    todoLessons.forEach(function(l){
+      if(onlyApp && l.mod === app) return;
+      var s = Math.max(todoCover(core, l.tt), todoCover(core, l.ht));
+      l.segs.forEach(function(sg){ s = Math.max(s, todoCover(core, sg)); });
+      if(onlyApp ? s < 1 : s < 0.5) return;
+      if((' ' + low + ' ').indexOf(' ' + l.nt + ' ') !== -1) s += 0.3;   // the whole title was typed
+      if(l.mod === app) s += 0.05;                                           // prefer a lesson in the app the task names
+      if(s > bestS){ best = l; bestS = s; }
+    });
+    return best;
+  }
+  function todoSetLesson(t, l){ t.lm = l ? l.mod : ''; t.li = l ? l.id : ''; t.lt = l ? l.t : ''; }
+  /** "Revise polity #gs ! tomorrow" → text "Revise polity", tag gs, important, due tomorrow, linked to the Polity app.
+      "HCF and LCM" → also linked to that chapter of the Formula Book (once the lesson list has loaded). */
   function todoParse(raw){
-    var o = { star: false, due: '', tag: '', app: '' }, s = ' ' + String(raw).replace(/\s+/g, ' ') + ' ';
+    var o = { star: false, due: '', tag: '', app: '', lesson: null }, s = ' ' + String(raw).replace(/\s+/g, ' ') + ' ';
     var days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
     s = s.replace(/ !+(?= )/g, function(){ o.star = true; return ' '; });
     s = s.replace(/ #([^\s#]{1,24})(?= )/g, function(m, t){ if(o.tag) return m; o.tag = t.toLowerCase(); return ' '; });
@@ -3866,7 +3966,9 @@
       return ' ';
     });
     o.t = s.replace(/\s+/g, ' ').trim() || String(raw).trim();
-    o.app = todoFindApp(o.t);
+    var hit = todoFindAppHit(o.t);
+    o.app = hit ? hit.id : '';
+    o.lesson = todoFindLesson(o.t, hit);
     return o;
   }
   function todoNewId(){ return 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
@@ -3874,10 +3976,23 @@
     var p = todoParse(raw);
     if(!p.t) return null;
     var d = todoData(), now = Date.now();
-    var t = Object.assign({ id: todoNewId(), t: p.t, n: d.def, k: 0, tk: [], star: p.star, due: p.due, tag: p.tag, app: p.app, fm: 0, c: now, u: now, done: 0, del: 0 }, extra || {});
+    var t = Object.assign({ id: todoNewId(), t: p.t, n: d.def, k: 0, tk: [], star: p.star, due: p.due, tag: p.tag, app: p.app, lm: '', li: '', lt: '', fm: 0, c: now, u: now, done: 0, del: 0 }, extra || {});
+    if(!t.lm) todoSetLesson(t, p.lesson);
     d.tasks.push(t);
     todoSave(d);
+    if(!todoLessons && !t.lm) todoLinkLater(t.id);
     return t;
+  }
+  /** The lesson list was still loading when the task was made: link its chapter once it arrives. */
+  function todoLinkLater(id){
+    todoLessonsLoad().then(function(){
+      var d = todoData(), t = d.tasks.filter(function(x){ return x.id === id; })[0];
+      if(!t || t.lm || t.del) return;
+      var l = todoFindLesson(t.t, todoFindAppHit(t.t));
+      if(!l) return;
+      todoUpd(id, function(x){ todoSetLesson(x, l); });
+      if(isActive('tasks') && todoEdit !== id) renderTodo();
+    }, function(){});
   }
   function todoUpd(id, fn){
     var d = todoData(), t = d.tasks.filter(function(x){ return x.id === id; })[0];
@@ -3924,6 +4039,7 @@
     if(t.n > 1 && !t.done) meta += '<span>' + t.k + ' of ' + t.n + ' ticks</span>';
     if(due) meta += '<span class="td-due ' + due[0] + '">' + escapeHtml(due[1]) + '</span>';
     if(t.tag) meta += '<button type="button" class="td-tag" data-td-tagf="' + escapeAttr(t.tag) + '">#' + escapeHtml(t.tag) + '</button>';
+    if(t.lm && STUDY[t.lm]) meta += '<button type="button" class="td-app td-lesson" data-td-lesson="' + t.lm + '" data-td-li="' + escapeAttr(t.li) + '" title="Open this chapter in ' + escapeAttr(STUDY[t.lm].title) + '">📖 ' + escapeHtml(t.lt || t.li) + (t.lm !== t.app ? ' · ' + escapeHtml(STUDY[t.lm].title) : '') + ' ›</button>';
     if(t.app && STUDY[t.app]) meta += '<button type="button" class="td-app" data-td-app="' + t.app + '">' + (STUDY[t.app].ico || '📘') + ' Open ' + escapeHtml(STUDY[t.app].title) + ' ›</button>';
     if(t.fm) meta += '<span>⏱ ' + t.fm + ' min focused</span>';
     if(t.done) meta += '<span>Done ' + new Date(t.done).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }) + '</span>';
@@ -3934,14 +4050,28 @@
     var edit = '';
     if(todoEdit === t.id){
       var opts = '<option value="">— none —</option>' + Object.keys(STUDY).map(function(id){ return '<option value="' + id + '"' + (t.app === id ? ' selected' : '') + '>' + escapeHtml(STUDY[id].title) + '</option>'; }).join('');
+      // chapters grouped by app; the task's own app first
+      var cur = t.lm ? t.lm + '|' + t.li : '', lopts = '<option value="">— none —</option>';
+      if(todoLessons){
+        var mods = Object.keys(STUDY).sort(function(a, b){ return (b === t.app) - (a === t.app); });
+        lopts += mods.map(function(m){
+          var ls = todoLessons.filter(function(l){ return l.mod === m; });
+          return ls.length ? '<optgroup label="' + escapeAttr(STUDY[m].title) + '">' + ls.map(function(l){ var v = m + '|' + l.id; return '<option value="' + escapeAttr(v) + '"' + (v === cur ? ' selected' : '') + '>' + escapeHtml(l.n + '. ' + l.t) + '</option>'; }).join('') + '</optgroup>' : '';
+        }).join('');
+      } else {
+        if(cur) lopts += '<option value="' + escapeAttr(cur) + '" selected>' + escapeHtml(t.lt || t.li) + '</option>';
+        todoLessonsLoad().then(function(){ if(todoEdit === t.id) renderTodo(); }, function(){});
+      }
       edit = '<div class="td-edit">' +
         '<input type="text" class="td-et" id="tdeT" value="' + escapeAttr(t.t) + '" aria-label="Task text" maxlength="200">' +
         '<div class="td-edit-row">' +
           '<label>Ticks to finish<span class="td-seg">' + [1, 2, 3].map(function(n){ return '<button type="button" data-td-n="' + n + '" class="' + (t.n === n ? 'on' : '') + '">' + '✓'.repeat(n) + '</button>'; }).join('') + '</span></label>' +
           '<label>Due<input type="date" id="tdeD" value="' + escapeAttr(t.due || '') + '"></label>' +
           '<label>Tag<input type="text" id="tdeG" value="' + escapeAttr(t.tag || '') + '" placeholder="e.g. gs" maxlength="24" style="width:110px;"></label>' +
-          '<label>Linked app<select id="tdeA">' + opts + '</select></label>' +
+          '<label>Linked app<select id="tdeA" data-was="' + escapeAttr(t.app || '') + '">' + opts + '</select></label>' +
+          '<label>Linked chapter<select id="tdeL" class="td-lsel" data-was="' + escapeAttr(cur) + '">' + lopts + '</select></label>' +
         '</div>' +
+        '<div class="td-hint" style="margin:6px 0 0;">Saving reads the text again: <code>#tag</code>, <code>!</code>, a day and app or chapter names are picked up.</div>' +
         '<div class="td-edit-btns"><button type="button" class="btn sm" data-td-save>Save</button><button type="button" class="btn ghost sm" data-td-cancel>Cancel</button>' +
           (t.k ? '<button type="button" class="btn ghost sm" data-td-reset>Clear ticks</button>' : '') +
           '<button type="button" class="btn ghost sm del" data-td-del>Delete</button></div>' +
@@ -3956,6 +4086,7 @@
   function renderTodo(){
     var root = document.getElementById('todoRoot');
     if(!root) return;
+    if(!todoLessons) todoLessonsLoad().catch(function(){});   // chapter titles, so new tasks link to them
     var d = todoData(), L = todoLists(d), f = todoFocusGet();
     var keepVal = (document.getElementById('tdIn') || {}).value || '';
     var hadFocus = document.activeElement && document.activeElement.id === 'tdIn';
@@ -3984,7 +4115,7 @@
         [1, 2, 3].map(function(n){ return '<button type="button" data-td-def="' + n + '" class="' + (d.def === n ? 'on' : '') + '" aria-pressed="' + (d.def === n) + '" title="' + TODO_NEED[n] + '">' + '✓'.repeat(n) + '</button>'; }).join('') +
       '</span><small>' + TODO_NEED[d.def] + '</small></div>' +
       '<div class="td-add"><input type="text" id="tdIn" placeholder="Add a task and press Enter…" aria-label="New task" maxlength="200" autocomplete="off" enterkeyhint="done"><button type="button" class="btn" data-td-addbtn>Add</button></div>' +
-      '<div class="td-hint">Shortcuts: <code>#tag</code> groups it · <code>!</code> marks it important · <code>today</code>, <code>tomorrow</code> or a day like <code>friday</code> sets the date · an app name (polity, bns, voice…) links the app.</div>' +
+      '<div class="td-hint">Shortcuts: <code>#tag</code> groups it · <code>!</code> marks it important · <code>today</code>, <code>tomorrow</code> or a day like <code>friday</code> sets the date · an app name (polity, formula book…) links the app · a chapter name (HCF and LCM, cone, vitamins) or “formula book chapter 3” links that chapter.</div>' +
       (sugg ? '<div class="td-sugg"><span class="td-sugg-l">Due for revision:</span>' + sugg + '</div>' : '') +
       (quick && L.live.length < 6 ? '<div class="td-sugg"><span class="td-sugg-l">Quick add:</span>' + quick + '</div>' : '') +
     '</div>';
@@ -4098,6 +4229,7 @@
       if(ds.tdSuggApp){ var m = STUDY[ds.tdSuggApp]; var t1 = todoAdd('Revise ' + m.title, { app: ds.tdSuggApp, due: todoDay(0) }); if(t1){ todoPop = t1.id; todoView = 'today'; } renderTodo(); return; }
       if(ds.tdQuick){ var t2 = todoAdd(ds.tdQuick); if(t2){ todoPop = t2.id; if(todoView !== 'all') todoView = 'today'; } renderTodo(); return; }
       if(ds.tdApp){ openStudy(ds.tdApp, false); return; }
+      if(ds.tdLesson){ openStudy(ds.tdLesson, false, ds.tdLi); return; }
       if('tdUndo' in ds){ if(todoUndo){ var uid = todoUndo.id; clearTimeout(todoUndo.timer); todoUndo = null; todoUpd(uid, function(t){ t.del = 0; }); todoPop = uid; } renderTodo(); return; }
       if('tdClear' in ds){
         var dd = todoData(), now = Date.now(), n = 0;
@@ -4157,8 +4289,24 @@
     if(!tx.trim()){ todoDelete(id); return; }
     var due = (document.getElementById('tdeD') || {}).value || '';
     var tag = ((document.getElementById('tdeG') || {}).value || '').trim().replace(/^#/, '').replace(/\s+/g, '-').toLowerCase().slice(0, 24);
-    var app = (document.getElementById('tdeA') || {}).value || '';
-    todoUpd(id, function(t){ t.t = tx.trim().replace(/\s+/g, ' '); t.due = /^\d{4}-\d{2}-\d{2}$/.test(due) ? due : ''; t.tag = tag; t.app = STUDY[app] ? app : ''; });
+    var selA = document.getElementById('tdeA') || {}, selL = document.getElementById('tdeL') || {};
+    var app = selA.value || '', les = selL.value || '';
+    // the text is read again like a new task, so "#gs", "!", "friday" or an app / chapter name typed while editing still work;
+    // a link you picked by hand in the boxes wins over one found in the text
+    var p = todoParse(tx), hit = todoFindAppHit(p.t);
+    todoUpd(id, function(t){
+      t.t = p.t;
+      t.due = p.due || (/^\d{4}-\d{2}-\d{2}$/.test(due) ? due : '');
+      t.tag = p.tag || tag;
+      if(p.star) t.star = true;
+      t.app = app !== (selA.dataset ? selA.dataset.was : app) ? (STUDY[app] ? app : '') : (p.app || (STUDY[app] ? app : ''));
+      if(les !== (selL.dataset ? selL.dataset.was : les)){
+        var bits = les.split('|');
+        todoSetLesson(t, les && STUDY[bits[0]] ? (todoLessonGet(bits[0], bits[1]) || { mod: bits[0], id: bits[1], t: t.lt }) : null);
+      } else if(p.lesson) todoSetLesson(t, p.lesson);
+      else if(!les) todoSetLesson(t, null);
+    });
+    if(!todoLessons) todoLinkLater(id);
     todoEdit = null;
     renderTodo();
   }
