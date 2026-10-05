@@ -1865,6 +1865,7 @@
     polity:   { title: 'Indian Polity',                file: 'study-polity.html',       key: 'polity_pyq_workbook_v1' },
     economics:{ title: 'Indian Economy',               file: 'study-economics.html',    key: 'economics_pyq_workbook_v1' },
     formulas: { title: 'Maths Formula Book',           file: 'study-maths-formulas.html', key: 'maths_formula_book_v1' },
+    numbersystem: { title: 'Number System',            file: 'study-number-system.html', key: 'number_system_workbook_v1' },
     geometry: { title: 'Geometry',                     file: 'study-geometry.html',     key: 'geometry_workbook_v1' },
     mensuration2d:{ title: 'Mensuration 2D',           file: 'study-mensuration2d.html', key: 'mensuration2d_workbook_v1' },
     mensuration3d:{ title: 'Mensuration 3D',           file: 'study-mensuration3d.html', key: 'mensuration3d_workbook_v1' },
@@ -1894,9 +1895,10 @@
   STUDY.voice.subj = 'english'; STUDY.voice.ico = '🔁'; STUDY.voice.hi = 'वाच्य · CGL pattern'; STUDY.voice.desc = 'Active ↔ passive the SSC CGL way — every tense and modal, Let / requested, By whom, It is said, PYQ-type questions and tricks.'; STUDY.voice.meta = '12 lessons · 196 questions'; STUDY.voice.color = '#B5487A'; STUDY.voice.lessons = 12; STUDY.voice.unit = 'lessons';
   STUDY.narration.subj = 'english'; STUDY.narration.ico = '💬'; STUDY.narration.hi = 'प्रत्यक्ष-अप्रत्यक्ष कथन · CGL pattern'; STUDY.narration.desc = 'Direct ↔ indirect speech the SSC CGL way — reporting verbs, tense backshift, time words, questions, commands, PYQ-type questions and tricks.'; STUDY.narration.meta = '12 lessons · 175 questions'; STUDY.narration.color = '#2F7A8C'; STUDY.narration.lessons = 12; STUDY.narration.unit = 'lessons';
   // Revision only: every formula and concept, chapter-wise, with heat map and last-hour sheet (no questions)
-  STUDY.formulas.subj = 'maths'; STUDY.formulas.ico = '📘'; STUDY.formulas.hi = 'सूत्र पुस्तिका · final revision'; STUDY.formulas.desc = 'All SSC maths formulas and key concepts in 24 chapters — tricks, traps, exam heat map and a last-hour sheet. Revision only, no questions.'; STUDY.formulas.meta = '24 chapters · 253 formulas'; STUDY.formulas.color = '#8C6A2F'; STUDY.formulas.lessons = 24; STUDY.formulas.unit = 'chapters'; STUDY.formulas.noq = true;
+  STUDY.formulas.subj = 'maths'; STUDY.formulas.ico = '📘'; STUDY.formulas.hi = 'सूत्र पुस्तिका · final revision'; STUDY.formulas.desc = 'All SSC maths formulas and key concepts in 24 chapters — tricks, traps, exam heat map and a last-hour sheet. Revision only, no questions.'; STUDY.formulas.meta = '24 chapters · 277 formulas'; STUDY.formulas.color = '#8C6A2F'; STUDY.formulas.lessons = 24; STUDY.formulas.unit = 'chapters'; STUDY.formulas.noq = true;
   // Maths section (Tier 1 + Tier 2): formulas, concepts, tricks, figures and PYQs
-  [['geometry', '📐', 'ज्यामिति', 'Lines and triangles to circles and coordinate geometry — centres, similarity, tangents, cyclic quadrilaterals, with figures and PYQs.', 12, 237, '#2F6DB5'],
+  [['numbersystem', '🔢', 'संख्या पद्धति', 'Primes, unit digits, factors, divisibility and missing digits, remainders and the remainder theorems, trailing zeros, bases and series sums.', 13, 204, '#9A5B1F'],
+   ['geometry', '📐', 'ज्यामिति', 'Lines and triangles to circles and coordinate geometry — centres, similarity, tangents, cyclic quadrilaterals, with figures and PYQs.', 12, 237, '#2F6DB5'],
    ['mensuration2d', '⬛', 'क्षेत्रमिति · 2D', 'Areas and perimeters of triangles, quadrilaterals, circles, sectors, polygons, paths, inscribed figures and shaded regions.', 11, 190, '#B5662F'],
    ['mensuration3d', '🧊', 'क्षेत्रमिति · 3D', 'Cube to frustum — volumes and surface areas, melting and recasting, water flow, combined solids and painted cubes.', 11, 179, '#7A4FB0'],
    ['trigonometry', '📏', 'त्रिकोणमिति', 'Ratios, standard values, identities, max–min, allied and compound angles, heights and distances, radians.', 11, 196, '#2F8F7A']
@@ -2922,7 +2924,7 @@
 
   // ---- the practice / mock screen ----
   var drill = null, drillOpen = false, drillTimer = null;
-  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments', polity: 'Polity', economics: 'Economy', space: 'Space', physics: 'Physics', biology: 'Biology', geometry: 'Geometry', mensuration2d: 'Mensuration 2D', mensuration3d: 'Mensuration 3D', trigonometry: 'Trigonometry', voice: 'Active & Passive Voice', narration: 'Narration', formulas: 'Formula Book' };
+  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments', polity: 'Polity', economics: 'Economy', space: 'Space', physics: 'Physics', biology: 'Biology', geometry: 'Geometry', mensuration2d: 'Mensuration 2D', mensuration3d: 'Mensuration 3D', trigonometry: 'Trigonometry', numbersystem: 'Number System', voice: 'Active & Passive Voice', narration: 'Narration', formulas: 'Formula Book' };
   function openDrill(title){
     closeAllMenus();
     drillOpen = true;
@@ -3854,6 +3856,7 @@
   // ---- linking a task to a mini app and to a chapter / lesson inside any app ----
   // Other names people type for an app ("formula book", "isro", "reported speech"…), on top of its id and title.
   var TODO_APP_ALIAS = {
+    numbersystem: ['number systems', 'no system'],
     formulas: ['formula book', 'formula books', 'formulas book', 'maths formulas', 'math formulas', 'maths formula', 'formulas'],
     bns: ['bnss', 'bsa'], schemes: ['schemes', 'govt schemes', 'government scheme', 'yojana', 'yojanas'],
     intlorgs: ['international organisations', 'international organizations', 'intl orgs'],
@@ -3865,7 +3868,7 @@
     narration: ['narration', 'direct indirect', 'reported speech'], grammar: ['grammar'], geometry: ['geometry'], physics: ['physics'], biology: ['biology']
   };
   // words that say what to do, not what to study ("revise", "chapter"…) — ignored when matching a lesson
-  var TODO_FILLER = ' revise revision revisit read reread study learn practice practise do done complete finish solve test tests quiz mock questions question qs pyq pyqs chapter chapters chap ch lesson lessons topic topics unit part notes note formula formulas book again once twice full all whole the a an of and in on for to from with my me app maths math ssc cgl min mins minutes hour hours hr hrs ';
+  var TODO_FILLER = ' revise revision revisit read reread study learn practice practise do done complete finish solve test tests quiz mock questions question qs pyq pyqs chapter chapters chap ch lesson lessons topic topics part notes note formula formulas book again once twice full all whole the a an of and in on for to from with my me app maths math ssc cgl min mins minutes hour hours hr hrs ';
   // words in lesson titles that don't name the topic
   var TODO_TITLE_FILLER = ' and the of a an in on for to with how are is what who these this questions question asked vs i ii iii iv v by other more ssc cgl का की के और में से एवं ';
   function todoNorm(s){ return String(s || '').toLowerCase().replace(/[’']/g, '').replace(/[^\p{L}\p{M}\p{N}]+/gu, ' ').replace(/\s+/g, ' ').trim(); }
@@ -3875,7 +3878,7 @@
     var x = todoStem(a), y = todoStem(b);
     if(x === y) return true;
     var sh = x.length < y.length ? x : y, lg = sh === x ? y : x;
-    return sh.length >= 5 && lg.indexOf(sh) === 0;                        // "photosynth" → photosynthesis
+    return sh.length >= 6 && lg.indexOf(sh) === 0;                        // "photosynth" → photosynthesis (not "digit" → digital)
   }
   /** The app a task names, and the words that named it: { id, words } or null. The longest name wins. */
   function todoFindAppHit(s){

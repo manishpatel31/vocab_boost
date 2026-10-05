@@ -1,0 +1,1134 @@
+<!doctype html><html><head><meta charset=utf8>
+<script>
+/* शब्दRegister bridge: follows the app's look (Paper / Indigo) and Light / Dark / Auto choice. */
+(function(){
+  var root = document.documentElement;
+  function theme(t){ if(t === 'dark' || t === 'light') root.setAttribute('data-theme', t); else root.removeAttribute('data-theme'); }
+  function skin(s){ if(s === 'paper' || s === 'indigo') root.setAttribute('data-skin', s); }
+  try{
+    var q = new URLSearchParams(location.search);
+    theme(q.get('theme'));
+    skin(q.get('skin') || (q.get('embed') ? 'paper' : ''));
+    if(q.get('embed')) root.classList.add('in-shabd');
+  }catch(e){}
+  window.addEventListener('message', function(e){
+    if(e.origin !== location.origin || !e.data || e.data.type !== 'shabd-theme') return;
+    theme(e.data.theme);
+    if(e.data.skin) skin(e.data.skin);
+  });
+})();
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap">
+<meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Number System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<style>
+/* Layout: Physics PYQ Workbook — follows the शब्दRegister Paper / Indigo look; one column + bottom tabs on phones, sidebar on PC. */
+:root{
+  --paper:#f6f3ea; --sheet:#fffdf7; --sunk:#ebe6d8;
+  --ink:#1d2a22; --ink2:#56625a; --rule:#dcd5c3;
+  --blue:#1f5c3d; --on-blue:#ffffff; --blue-bg:#dcebdf;
+  --accent:#b4530f; --accent-bg:#fbe7d3;
+  --good:#1b7547; --good-bg:#dff1e6; --bad:#b0271f; --bad-bg:#f8e1de;
+  --warn-bg:#fff2d2;
+  --f-display:"Fraunces", "Tiro Devanagari Hindi", Georgia, serif;
+  --f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-num:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r:10px; --nav-h:64px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#111612; --sheet:#1a211c; --sunk:#222b25;
+  --ink:#e8eee9; --ink2:#a3b0a7; --rule:#2f3a33;
+  --blue:#86cfa2; --on-blue:#111612; --blue-bg:#1d3a29;
+  --accent:#f3a764; --accent-bg:#3b2614;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#111612; --sheet:#1a211c; --sunk:#222b25;
+  --ink:#e8eee9; --ink2:#a3b0a7; --rule:#2f3a33;
+  --blue:#86cfa2; --on-blue:#111612; --blue-bg:#1d3a29;
+  --accent:#f3a764; --accent-bg:#3b2614;
+  --good:#62d098; --good-bg:#15352a; --bad:#ff8f86; --bad-bg:#3d1d1b;
+  --warn-bg:#352c14; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
+.wrap{max-width:640px;margin:0 auto;padding-inline:16px;padding-block:0 calc(var(--nav-h) + 28px + env(safe-area-inset-bottom,0px))}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);border-bottom:1px solid var(--rule)}
+.top-in{max-width:640px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px}
+.brand{font-family:var(--f-display);font-weight:800;font-size:17px;line-height:1.2;flex:1;min-width:0}
+.brand small{display:block;font-family:var(--f-body);font-weight:500;font-size:12px;color:var(--ink2);letter-spacing:.02em}
+.stat{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right;white-space:nowrap}
+.stat b{color:var(--ink);font-weight:600}
+
+/* bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--sheet);border-top:1px solid var(--rule);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);height:var(--nav-h)}
+.nav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer}
+.nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav button[aria-current="page"]{color:var(--blue)}
+.nav button[aria-current="page"] span{border-bottom:2px solid var(--blue)}
+
+/* type */
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.25;margin:0}
+h1{font-size:24px;font-weight:800}
+h2{font-size:19px;font-weight:800}
+h3{font-size:16px;font-weight:700}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--ink2)}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+p{margin:0}
+.stack{display:flex;flex-direction:column;gap:14px}
+.view{padding-top:18px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--rule);background:var(--sheet);font-weight:600;cursor:pointer;text-decoration:none}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:var(--on-blue)}
+.btn.ghost{background:transparent}
+.btn.sm{min-height:36px;padding:0 14px;font-size:14px}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.end{justify-content:flex-end}
+.row.between{justify-content:space-between}
+
+/* hero */
+.hero{display:grid;gap:10px;padding:4px 0 6px}
+.hero p{color:var(--ink2)}
+.meter{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--blue);border-radius:99px}
+
+/* lesson list */
+.lessons{display:flex;flex-direction:column;border-top:1px solid var(--rule)}
+.les{display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;padding:14px 2px;border-bottom:1px solid var(--rule);background:none;border-left:0;border-right:0;border-top:0;text-align:left;cursor:pointer;width:100%}
+.les .no{font-family:var(--f-num);font-weight:600;font-size:15px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--rule);color:var(--ink2)}
+.les.done .no{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.les .t{min-width:0}
+.les .t b{display:block;font-weight:700;font-size:16px;line-height:1.3}
+.les .t span{font-size:13px;color:var(--ink2)}
+.les .sc{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right}
+.les.next .no{border-color:var(--blue);color:var(--blue)}
+
+/* lesson reader */
+.lhead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.back{background:none;border:0;padding:8px 8px 8px 0;cursor:pointer;color:var(--blue);font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0 4px}
+.steps button{border:1px solid var(--rule);background:var(--sheet);border-radius:8px;padding:8px 4px;font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer}
+.steps button[aria-current="step"]{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.block{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;min-width:0}
+.block h3{margin-bottom:8px}
+.block p + p{margin-top:8px}
+.plain{padding:0 2px}
+.facts{display:grid;gap:0}
+.facts div{display:grid;grid-template-columns:minmax(0,42%) minmax(0,1fr);gap:10px;padding:7px 0;border-top:1px dashed var(--rule)}
+.facts div:first-child{border-top:0}
+.facts dt{font-size:14px;color:var(--ink2);margin:0}
+.facts dd{margin:0;font-weight:600;min-width:0}
+.tl{display:grid;gap:0;margin:0;padding:0;list-style:none}
+.tl li{display:grid;grid-template-columns:92px 1fr;gap:10px;padding:8px 0;border-top:1px dashed var(--rule)}
+.tl li:first-child{border-top:0}
+.tl .y{font-family:var(--f-num);font-weight:600;font-size:13px;color:var(--accent);padding-top:2px}
+.trick,.trap{border-radius:var(--r);padding:12px 14px 12px 14px;border:1px solid var(--rule)}
+.trick{background:var(--accent-bg);border-color:transparent}
+.trap{background:var(--bad-bg);border-color:transparent}
+.trick .lab,.trap .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.trick .lab{color:var(--accent)}
+.trap .lab{color:var(--bad)}
+.rk div{grid-template-columns:minmax(0,48%) minmax(0,1fr)}
+.rk dd{min-width:0;overflow-wrap:anywhere}
+.hot{border-radius:var(--r);padding:12px 14px;background:var(--warn-bg,var(--accent-bg));border-left:4px solid var(--warn,var(--accent))}
+.hot .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;color:var(--warn,var(--accent))}
+.heatb{display:inline-block;font-size:11px;letter-spacing:-.1em;margin-left:6px;vertical-align:1px}
+.heat{display:flex;flex-direction:column;gap:2px}
+.hrow{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(60px,1fr) 44px;gap:10px;align-items:center;text-align:left;background:none;border:0;border-bottom:1px solid var(--rule);padding:9px 2px;color:inherit;font:inherit;cursor:pointer}
+.hrow:last-child{border-bottom:0}
+.hrow .ht{display:flex;flex-direction:column;min-width:0}
+.hrow .ht .muted{font-size:12px}
+.hbar{height:10px;border-radius:5px;background:var(--rule);overflow:hidden}
+.hbar i{display:block;height:100%;background:var(--accent);border-radius:5px}
+.hp{text-align:right;font-weight:700}
+
+.tbl{overflow-x:auto;margin:0 -2px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);font-weight:700}
+td.n{font-family:var(--f-num);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fig{margin:0}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-size:13px;color:var(--ink2);margin-top:6px}
+.pyr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pyr div{text-align:center;font-size:13px}
+.pyr b{display:block;font-size:14px}
+.pm{fill:var(--blue)} .pf{fill:var(--accent)}
+.sum{margin:0;padding-left:20px;display:grid;gap:6px}
+
+/* questions */
+.qcard{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px;min-width:0}
+.qmeta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}
+.qno{font-family:var(--f-num);font-weight:600;color:var(--ink2)}
+.tag{background:var(--sunk);color:var(--ink2);border-radius:99px;padding:1px 9px;font-weight:600}
+.tag.pyq{background:var(--accent-bg);color:var(--accent)}
+.bm{margin-left:auto;background:none;border:0;cursor:pointer;color:var(--ink2);font-size:20px;line-height:1;padding:4px}
+.bm[aria-pressed="true"]{color:var(--accent)}
+.qt{font-weight:600;font-size:16px}
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:start;text-align:left;width:100%;border:1.5px solid var(--rule);background:var(--paper);border-radius:9px;padding:10px 12px;cursor:pointer;min-height:44px}
+.opt .k{font-family:var(--f-num);font-weight:600;color:var(--ink2);font-size:14px;padding-top:1px}
+.opt.sel{border-color:var(--blue);background:var(--blue-bg)}
+.opt.ok{border-color:var(--good);background:var(--good-bg)}
+.opt.no{border-color:var(--bad);background:var(--bad-bg)}
+.opt.ok .k{color:var(--good)} .opt.no .k{color:var(--bad)}
+.opt:disabled{cursor:default;color:inherit}
+.exp{font-size:15px;border-left:3px solid var(--blue);padding:4px 0 4px 12px;color:var(--ink)}
+.exp b.okl{color:var(--good)} .exp b.nol{color:var(--bad)}
+
+/* chips */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 13px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.seg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--rule)}
+.seg::-webkit-scrollbar{display:none}
+.seg button{flex:none;background:none;border:0;border-bottom:2px solid transparent;padding:10px 8px;font-weight:600;color:var(--ink2);cursor:pointer}
+.seg button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+
+/* score panel */
+.scorebig{display:flex;align-items:baseline;gap:8px}
+.scorebig .num{font-size:44px;font-weight:600;line-height:1;color:var(--blue)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.kpi{background:var(--sunk);border-radius:8px;padding:8px;text-align:center}
+.kpi .num{display:block;font-size:20px;font-weight:600}
+.kpi span{font-size:12px;color:var(--ink2)}
+.kpi.g .num{color:var(--good)} .kpi.b .num{color:var(--bad)}
+
+/* mock */
+.mbar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 57px);z-index:10;background:var(--paper);padding:10px 0;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--rule)}
+.timer{font-family:var(--f-num);font-weight:600;font-size:18px;padding:4px 10px;border-radius:8px;background:var(--sunk)}
+.timer.low{background:var(--bad-bg);color:var(--bad)}
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px}
+.pal button{height:40px;border-radius:8px;border:1px solid var(--rule);background:var(--sheet);font-family:var(--f-num);font-weight:600;font-size:13px;cursor:pointer}
+.pal button.a{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.pal button.m{box-shadow:inset 0 -4px 0 var(--accent)}
+.pal button.cur{outline:2px solid var(--ink);outline-offset:1px}
+.pal button.ok{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.pal button.no{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.confirm{background:var(--warn-bg);border-radius:var(--r);padding:12px 14px;display:grid;gap:10px}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}
+legend{font-weight:700;margin-bottom:6px;padding:0}
+.radios{display:flex;gap:8px;flex-wrap:wrap}
+.radios label{border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 14px;font-weight:600;cursor:pointer;font-size:14px}
+.radios input{position:absolute;opacity:0;pointer-events:none}
+.radios input:checked + span{color:var(--blue)}
+.radios label:has(input:checked){border-color:var(--blue);background:var(--blue-bg)}
+.radios label:has(input:focus-visible){outline:2px solid var(--blue);outline-offset:2px}
+select{font:inherit;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:8px;padding:8px 10px;max-width:100%}
+.hist{display:grid;gap:0}
+.hist div{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:14px}
+
+/* revise */
+.search{width:100%;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:10px;padding:10px 12px;font:inherit}
+.rk{display:grid;gap:0}
+.rk div{display:grid;grid-template-columns:minmax(0,48%) 1fr;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:15px}
+.rk div:first-child{border-top:0}
+.rk dt{font-size:13px;color:var(--ink2);margin:0}
+.rk dt.up{color:var(--good)} .rk dt.dn{color:var(--bad)}
+.rk dd{margin:0;font-weight:600;min-width:0}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px}
+.tile .num{display:block;font-size:24px;font-weight:600;color:var(--accent);line-height:1.2}
+.tile span{font-size:13px;color:var(--ink2)}
+.gbar{display:grid;grid-template-columns:78px 1fr 52px;gap:8px;align-items:center;font-size:13px;padding:3px 0}
+.gbar .tr{height:12px;background:var(--sunk);border-radius:3px;position:relative;overflow:hidden}
+.gbar .tr i{position:absolute;left:0;top:0;bottom:0;background:var(--blue);border-radius:3px}
+.gbar .tr i.neg{background:var(--bad)}
+.gbar .v{font-family:var(--f-num);text-align:right}
+.flash{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;min-height:240px;padding:20px 18px;display:grid;align-content:center;gap:12px;cursor:pointer;text-align:left;width:100%}
+.flash .side{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.flash .front{font-size:18px;font-weight:600}
+.flash .ans{font-size:20px;font-weight:700;color:var(--good)}
+.empty{padding:24px 4px;color:var(--ink2);text-align:center}
+.foot{font-size:13px;color:var(--ink2);padding-top:10px}
+@media (prefers-reduced-motion: no-preference){ .opt,.chip,.btn{transition:background-color .15s, border-color .15s} }
+.link{background:var(--blue-bg);border-radius:var(--r);padding:12px 14px}
+.link .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;color:var(--blue)}
+.icheck{background:var(--sheet);border:1.5px dashed var(--blue);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px}
+.icheck .lab{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue)}
+.cat{font-size:12px;font-weight:700;border-radius:99px;padding:1px 8px;white-space:nowrap}
+.cat.CS{background:var(--blue-bg);color:var(--blue)} .cat.CSS{background:var(--accent-bg);color:var(--accent)} .cat.ST{background:var(--sunk);color:var(--ink)} .cat.OT{background:var(--sunk);color:var(--ink2)}
+
+/* ---- workbook additions ---- */
+table.cover td:nth-child(4){min-width:180px}
+.plist .dl{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.plist .dl em{font-style:normal;font-weight:700;color:var(--blue);text-align:right}
+.ladder{list-style:none;margin:0;padding:0;display:grid;gap:0;border-top:1px solid var(--rule)}
+.ladder li{display:grid;grid-template-columns:62px 1fr auto;gap:12px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--rule)}
+.ladder .rk-n{font-size:22px;font-weight:600;color:var(--blue);text-align:right}
+.ladder .rk-t{min-width:0}
+.ladder .rk-t b{display:block;line-height:1.3}
+.ladder .rk-t span{font-size:13px;color:var(--ink2)}
+.ladder .rk-d{font-weight:700;font-size:14px;white-space:nowrap}
+.ladder li.up .rk-d{color:var(--good)} .ladder li.dn .rk-d{color:var(--bad)}
+.ladder small{font-weight:600;color:var(--ink2)}
+table.cover td{min-width:90px}
+.peek{border:1.5px dashed var(--blue);background:var(--blue-bg);color:var(--blue);border-radius:8px;padding:6px 10px;font-weight:600;cursor:pointer;min-height:36px;width:100%}
+.pubs{display:grid;gap:12px}
+.plist{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.plist li{padding:7px 0;border-top:1px dashed var(--rule);display:grid;gap:1px}
+.plist li:first-child{border-top:0}
+.plist li span{font-size:13px;color:var(--ink2)}
+.seg{scroll-snap-type:x proximity}
+@media (max-width: 700px){
+  table.cover thead{display:none}
+  table.cover tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 10px;padding:10px 0;border-bottom:1px solid var(--rule)}
+  table.cover td{border:0;padding:0;min-width:0;font-size:14px}
+  table.cover td:first-child{grid-column:1/-1;font-size:15px}
+  table.cover td:nth-child(4){grid-column:1/-1;min-width:0}
+  table.cover td[data-l]::before{content:attr(data-l);display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-bottom:2px}
+}
+/* ---- maths blocks ---- */
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(250px,100%),1fr));gap:10px}
+.fcard{background:var(--sheet);border:1px solid var(--rule);border-left:4px solid var(--blue);border-radius:var(--r);padding:10px 12px;display:grid;gap:4px;min-width:0}
+.fcard .fn{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);font-weight:700}
+.fcard .fx{font-family:var(--f-num);font-size:16px;color:var(--ink);overflow-wrap:anywhere;line-height:1.45}
+.fcard .fnote{font-size:13px;color:var(--ink2)}
+.ex{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px 14px;display:grid;gap:8px}
+.ex .exhead .lab{display:inline;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);font-weight:700}
+.ex .src{display:inline-block;margin-left:6px;font-size:11.5px;font-weight:700;color:var(--accent);border:1px solid currentColor;border-radius:999px;padding:0 8px}
+.ex .exq{font-weight:600}
+.ex details summary{cursor:pointer;font-weight:700;color:var(--blue);list-style:none}
+.ex details summary::-webkit-details-marker{display:none}
+.ex details summary::before{content:'▸ '}
+.ex details[open] summary::before{content:'▾ '}
+.ex ol{margin:8px 0 0;padding-left:20px;display:grid;gap:4px}
+.ex .exans{margin-top:8px;padding:8px 10px;border-radius:8px;background:var(--good-bg);color:var(--good);font-weight:700}
+.figwrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(260px,100%),1fr));gap:12px}
+.figwrap figure{margin:0;display:grid;gap:6px;justify-items:center;text-align:center}
+.fig svg,.figwrap svg{width:100%;max-width:340px;height:auto;color:var(--ink)}
+.fig figcaption,.figwrap figcaption{font-size:13px;color:var(--ink2)}
+sup,sub{font-size:.72em;line-height:0}
+
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">Number System<small>संख्या पद्धति · SSC maths workbook</small></div>
+    <div class="stat" id="topstat"></div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<nav class="nav" aria-label="Sections">
+  <div class="nav-in">
+    <button type="button" id="nav-learn" data-tab="learn"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg><span>Learn</span></button>
+    <button type="button" id="nav-practice" data-tab="practice"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span>Practice</span></button>
+    <button type="button" id="nav-mock" data-tab="mock"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6M12 2v3"/></svg><span>Mock test</span></button>
+    <button type="button" id="nav-revise" data-tab="revise"><svg viewBox="0 0 24 24"><path d="M12 3 2 8l10 5 10-5z"/><path d="m2 13 10 5 10-5"/></svg><span>Revise</span></button>
+  </div>
+</nav>
+
+<script>
+"use strict";
+const LESSONS = [
+{"id": "L1", "heat": 2, "title": "Classification of numbers & primes", "hi": "संख्याओं का वर्गीकरण और अभाज्य संख्याएँ", "blocks": [{"k": "hot", "h": "<b>Asked in most CGL shifts in some form.</b> Directly: “how many primes from 1 to 100?”, “which of these is irrational?”, “0.2333… as a fraction”. Indirectly: every factor, remainder and divisibility question starts with knowing what a prime, a co-prime and a composite number is. Typical time: 20–40 seconds."}, {"k": "p", "h": "All the numbers you meet in SSC are <b>real numbers</b> (they sit on the number line). A real number is either <b>rational</b> (can be written as P/Q with integers P, Q and Q ≠ 0) or <b>irrational</b> (cannot: √2, √3, π). Square roots of negative numbers (√−1 = <i>i</i>) are <b>imaginary</b>; real + imaginary together make <b>complex</b> numbers."}, {"k": "table", "title": "The family tree at a glance", "head": ["Type", "Meaning", "Examples"], "rows": [["Natural", "counting numbers", "1, 2, 3, 4 …"], ["Whole", "natural numbers and 0", "0, 1, 2, 3 …"], ["Integers", "whole numbers and negatives", "… −2, −1, 0, 1, 2 …"], ["Rational", "P/Q, Q ≠ 0; decimal ends or repeats", "5/3, −8, 22/7, 0.75, 0.333…"], ["Irrational", "decimal never ends, never repeats", "√2, √3, π, 0.1432507…"], ["Even / odd", "divisible by 2 (2k) / not (2k ± 1)", "0, 2, 4 / 1, 3, 5"], ["Prime", "exactly two factors: 1 and itself", "2, 3, 5, 7, 11 …"], ["Composite", "more than two factors", "4, 6, 8, 9 (4 smallest, 9 smallest odd)"], ["Co-prime", "HCF = 1 (need not be prime)", "(2, 3), (16, 9), (25, 19)"], ["Twin primes", "two primes with a gap of 2", "(3, 5), (5, 7), (11, 13), (17, 19)"], ["Perfect number", "sum of factors except itself = the number", "6, 28, 496, 8128"]]}, {"k": "facts", "title": "Prime facts SSC repeats", "rows": [["2", "the only even prime and the smallest prime"], ["1", "neither prime nor composite"], ["3, 5, 7", "the only three consecutive odd numbers that are all prime"], ["Count 1–100", "25 primes (15 up to 50, 10 from 51 to 100)"], ["Count 1–200 / 1–500 / 1–1000", "46 / 95 / 168"], ["2-digit primes", "21 (11 to 97); largest 97"], ["3-digit primes", "smallest 101, largest 997"], ["4-digit", "smallest prime 1009"], ["Primes up to 100", "2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97"]]}, {"k": "formula", "title": "Testing whether a number is prime", "rows": [["Square-root test", "take √N, round down; if no prime up to it divides N, N is prime", "137: √137 ≈ 11.7 → test 2, 3, 5, 7, 11 → none divides → prime"], ["6k ± 1 form", "every prime greater than 3 is 6k − 1 or 6k + 1", "the reverse is not true: 25 = 6 × 4 + 1 is not prime"], ["Quick filters", "even (except 2), ending in 5 (except 5), digit sum divisible by 3 → not prime", "then only 7, 11, 13 … need testing"]]}, {"k": "formula", "title": "Recurring decimals → fractions (added: asked often)", "rows": [["0.aaa…", "a/9", "0.777… = 7/9"], ["0.ababab…", "ab/99", "0.3636… = 36/99 = 4/11"], ["0.abbb…", "(ab − a)/90", "0.2333… = (23 − 2)/90 = 21/90 = 7/30"], ["0.abcbc…", "(abc − a)/990", "0.1454545… = (145 − 1)/990 = 144/990 = 8/55"], ["Rule", "numerator = (all digits) − (digits that do not repeat); one 9 per repeating digit, one 0 per non-repeating digit after the point", "whole-number part is added separately: 2.3636… = 2 + 4/11"], ["Terminating?", "P/Q in lowest terms ends only if Q has no prime factor other than 2 and 5", "7/80 ends (80 = 2⁴ × 5); 5/12 repeats (3 in 12)"]]}, {"k": "ex", "q": "Is 137 a prime number?", "steps": ["√137 ≈ 11.7, so test the primes up to 11: 2, 3, 5, 7, 11", "137 is odd; digit sum 11 (not a multiple of 3); does not end in 0/5", "137 ÷ 7 = 19.57…, 137 ÷ 11 = 12.45… — no prime divides it"], "ans": "Yes, 137 is prime", "tip": "You never need to test beyond √N."}, {"k": "ex", "q": "What is the average of the prime numbers from 80 to 100?", "steps": ["Primes between 80 and 100: test with 2, 3, 5, 7 (√100 = 10)", "Odd numbers not ending in 5 and not divisible by 3 or 7: 83, 89, 97", "Average = (83 + 89 + 97)/3 = 269/3"], "ans": "89.67"}, {"k": "ex", "q": "x, y, z are distinct primes with x &lt; y &lt; z and x + y + z = 70. Which of these can z be: 29, 43, 31, 37?", "steps": ["Odd + odd + odd is odd, but 70 is even → one prime must be 2, the smallest, so x = 2 and y + z = 68", "z = 29 → y = 39 (not prime); z = 43 → y = 25 (not prime)", "z = 31 → y = 37 &gt; z (fails y &lt; z); z = 37 → y = 31 ✓"], "ans": "z = 37", "tip": "An even total of three primes always forces one of them to be 2."}, {"k": "ex", "q": "x, y, z are primes with x + y + z = 38. What is the largest possible value of x?", "steps": ["38 is even → one of the primes is 2 (three odd primes would give an odd sum)", "To make x largest, make the other two smallest: 2 and the next prime that works", "x + y = 36 with y prime: y = 5 → x = 31 (prime) ✓"], "ans": "31"}, {"k": "trick", "h": "<b>Primes count ladder:</b> 0 →15→ 50 →10→ 100 (25 primes); 200 → 46; 500 → 95; 1000 → 168.<br><b>Three primes adding to an even number</b> (or two primes adding to an odd number) → one of them is 2.<br><b>Recurring decimal:</b> “all digits minus the non-repeating part, over 9s for repeating and 0s for non-repeating digits”."}, {"k": "trap", "h": "<b>1 is not prime</b> (only one factor). <b>Co-prime numbers need not be prime</b>: 8 and 9 are co-prime. <b>π is irrational but 22/7 is rational</b> — 22/7 is only an approximation of π. <b>0 is a whole number and an integer, but not a natural number.</b> <b>√4 = 2 is rational</b> — not every square root is irrational."}, {"k": "link", "h": "Primes are the building blocks for L3–L4 (every factor formula starts with the prime factorisation). The 2-and-5 rule for terminating decimals is the same idea as counting zeros in L9."}, {"k": "q", "q": "How many prime numbers are there between 1 and 50?", "o": ["15", "25", "10", "16"], "e": "2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47 → 15."}], "sum": ["Natural ⊂ whole ⊂ integers ⊂ rational ⊂ real; irrational = non-ending, non-repeating decimals", "25 primes up to 100, 46 up to 200, 95 up to 500, 168 up to 1000; 2 is the only even prime; 1 is neither", "Prime test: try primes up to √N only; every prime > 3 is 6k ± 1", "0.abbb… = (ab − a)/90; 0.abab… = ab/99; P/Q terminates only if Q = 2ᵐ × 5ⁿ", "Three primes with an even sum → one of them is 2"]},
+{"id": "L2", "heat": 3, "title": "Unit digit & cyclicity", "hi": "इकाई का अंक और चक्रीयता", "blocks": [{"k": "hot", "h": "<b>One of the most repeated number-system types in CGL Tier 1 and CHSL.</b> “Find the unit digit of (387)<sup>245</sup> × (433)<sup>69</sup>” or of a factorial sum. With the cycle table below it takes 20–30 seconds."}, {"k": "p", "h": "The unit digit of a sum, difference or product depends <b>only on the unit digits</b> of the numbers. So 232 × 235 has the same unit digit as 2 × 5 = 10 → <b>0</b>. For powers, unit digits repeat in a fixed cycle — that is <b>cyclicity</b>."}, {"k": "table", "title": "Cyclicity of every digit", "head": ["Unit digit", "Powers 1, 2, 3, 4", "Cycle length"], "rows": [["0, 1, 5, 6", "always 0, 1, 5, 6", "1"], ["2", "2, 4, 8, 6", "4"], ["3", "3, 9, 7, 1", "4"], ["4", "4, 6 (odd power 4, even power 6)", "2"], ["7", "7, 9, 3, 1", "4"], ["8", "8, 4, 2, 6", "4"], ["9", "9, 1 (odd power 9, even power 1)", "2"]]}, {"k": "formula", "title": "Unit digit of a power N = x<sup>y</sup>", "rows": [["Step 1", "keep only the unit digit of x", "(382)<sup>575</sup> → 2<sup>575</sup>"], ["Step 2", "divide the last two digits of the power by 4; keep the remainder r", "75 ÷ 4 → r = 3"], ["Step 3", "unit digit = (unit digit of x)<sup>r</sup>; if r = 0 use power 4", "2³ = 8 → answer 8"], ["Digits 4 and 9", "odd power → 4 / 9; even power → 6 / 1", "9<sup>481</sup> → 9;  4<sup>100</sup> → 6"], ["Difference", "if the second unit digit is bigger, add 10 to the first", "2383 − 1689 → 13 − 9 = 4"]]}, {"k": "formula", "title": "Factorials and last two digits (added)", "rows": [["n! for n ≥ 5", "unit digit 0 (contains 2 × 5)", "so in a sum of factorials only 1! to 4! matter"], ["1! + 2! + … + n!", "unit digit 3 for every n ≥ 4", "1 + 2 + 6 + 24 = 33"], ["Last two digits, base ending in 1", "tens digit = unit digit of (tens digit of base × power); unit digit 1", "31<sup>786</sup>: 3 × 786 = 2358 → 8 → …81"], ["Last two digits of 5<sup>n</sup>", "25 for every n ≥ 2", "…25"], ["Powers of 76 / 25 / 376", "always end in 76 / 25 / 376", "76<sup>n</sup> → 76"]]}, {"k": "ex", "q": "Find the unit digit of (382)<sup>575</sup>.", "steps": ["Unit digit of base: 2 (cycle 2, 4, 8, 6)", "Last two digits of the power: 75; 75 ÷ 4 leaves 3", "2³ = 8"], "ans": "8"}, {"k": "ex", "q": "Find the unit digit of (187)<sup>282</sup> × (529)<sup>321</sup> × (343)<sup>236</sup>.", "steps": ["7<sup>282</sup>: 82 ÷ 4 leaves 2 → 7² = 49 → 9", "9<sup>321</sup>: odd power → 9", "3<sup>236</sup>: 36 ÷ 4 leaves 0 → use 3⁴ = 81 → 1", "9 × 9 × 1 = 81 → 1"], "ans": "1"}, {"k": "ex", "q": "Find the unit digit of (789)<sup>315</sup> + (232)<sup>644</sup> + (528)<sup>253</sup>.", "steps": ["9<sup>315</sup>: odd → 9", "2<sup>644</sup>: 44 ÷ 4 leaves 0 → 2⁴ = 16 → 6", "8<sup>253</sup>: 53 ÷ 4 leaves 1 → 8", "9 + 6 + 8 = 23 → 3"], "ans": "3"}, {"k": "ex", "q": "Find the unit digit of (982)<sup>481</sup> − (219)<sup>241</sup>.", "steps": ["2<sup>481</sup>: 81 ÷ 4 leaves 1 → 2", "9<sup>241</sup>: odd → 9", "2 − 9 is negative → (2 + 10) − 9 = 3"], "ans": "3", "tip": "The first number is bigger, so borrowing 10 is safe."}, {"k": "ex", "q": "Find the unit digit of 1! + 2! + 3! + … + 100!.", "steps": ["5! onwards every term ends in 0", "1 + 2 + 6 + 24 = 33"], "ans": "3"}, {"k": "trick", "h": "<b>Remainder 0 means power 4, not power 0.</b> The cycle is 4 long, so a power that is a multiple of 4 lands on the 4th term (2 → 6, 3 → 1, 7 → 1, 8 → 6).<br><b>Any product with a 5 and an even number</b> ends in 0. <b>Odd × 5</b> ends in 5."}, {"k": "trap", "h": "<b>Divide only the last two digits of the power</b> by 4 — but use the whole power for digits 4 and 9 (odd/even). <b>Unit digit of a difference</b> can need a borrow: 13 − 9, not 3 − 9. <b>Never multiply the base by the power</b>: 3<sup>4</sup> ends in 1 (81), not in 2 (3 × 4 = 12)."}, {"k": "link", "h": "Cyclicity of remainders (L8) works the same way: 2ⁿ ÷ 7 repeats 2, 4, 1. Trailing zeros (L9) are the extreme case: once 2 × 5 appears the unit digit is 0 for good."}, {"k": "q", "q": "Unit digit of 7^95 is:", "o": ["3", "7", "9", "1"], "e": "95 ÷ 4 leaves 3 → 7³ = 343 → 3."}], "sum": ["Only unit digits matter in +, −, ×", "Cycles: 2 (2,4,8,6), 3 (3,9,7,1), 7 (7,9,3,1), 8 (8,4,2,6); 4 and 9 alternate; 0, 1, 5, 6 never change", "Power ÷ 4 (last two digits): remainder r → use r; remainder 0 → use 4", "1! + 2! + … + n! ends in 3 for n ≥ 4", "Negative unit difference → add 10"]},
+{"id": "L3", "heat": 3, "title": "Factors I: how many factors", "hi": "गुणनखंडों की संख्या", "blocks": [{"k": "hot", "h": "<b>A favourite of CGL Tier 1 and Tier 2.</b> “Number of factors of 360”, “even/odd factors of 720”, “factors that are perfect squares”, “factors divisible by 10”. All of them come from one prime factorisation and take under a minute."}, {"k": "p", "h": "Write the number as a product of primes: <b>N = a<sup>p</sup> × b<sup>q</sup> × c<sup>r</sup></b> (a, b, c prime). A factor of N picks a power of a from 0 to p, a power of b from 0 to q, and so on — that is why every formula below multiplies “(choices for a) × (choices for b) × …”."}, {"k": "formula", "title": "Counting factors (N = a<sup>p</sup> × b<sup>q</sup> × c<sup>r</sup>)", "rows": [["Total factors", "(p + 1)(q + 1)(r + 1)", "360 = 2³ × 3² × 5 → 4 × 3 × 2 = 24"], ["Odd factors", "drop the power of 2: (q + 1)(r + 1)", "360 → 3 × 2 = 6"], ["Even factors", "total − odd = p(q + 1)(r + 1) (a = 2)", "360 → 24 − 6 = 18"], ["Prime factors", "number of different primes", "720 = 2⁴ × 3² × 5 → 3"], ["Composite factors", "total − prime factors − 1", "720 → 30 − 3 − 1 = 26 (1 is neither)"], ["Factors divisible by k", "factors of N/k (when k divides N)", "720 by 10 → 72 = 2³ × 3² → 12"]]}, {"k": "formula", "title": "Special factors", "rows": [["Perfect-square factors", "(⌊p/2⌋ + 1)(⌊q/2⌋ + 1)(⌊r/2⌋ + 1)", "720 = 2⁴ × 3² × 5 → 3 × 2 × 1 = 6"], ["Perfect-cube factors", "(⌊p/3⌋ + 1)(⌊q/3⌋ + 1)(⌊r/3⌋ + 1)", "720 → 2 × 1 × 1 = 2 (1 and 8)"], ["Square and cube both", "use ⌊power/6⌋ + 1", "720 → 1 (only 1)"], ["Co-prime factor pairs, 2 primes", "(p + 1)(q + 1) + pq", "56 = 2³ × 7 → 4 × 2 + 3 = 11"], ["Co-prime factor pairs, 3 primes", "(p + 1)(q + 1)(r + 1) + pq + qr + rp + 3pqr", "720 → 30 + 8 + 2 + 4 + 24 = 68"], ["Ways to write N = A × B", "total/2; (total + 1)/2 if N is a perfect square", "36 has 9 factors → 5 ways (6 × 6 counted once)"]]}, {"k": "ex", "q": "Find the number of even and odd factors of 360.", "steps": ["360 = 2³ × 3² × 5¹", "Total = 4 × 3 × 2 = 24", "Odd = (2 + 1)(1 + 1) = 6 (ignore the 2s)", "Even = 24 − 6 = 18 (or 3 × 3 × 2)"], "ans": "18 even, 6 odd"}, {"k": "ex", "q": "N = 720. How many factors are perfect squares, how many perfect cubes, and how many both?", "steps": ["720 = 2⁴ × 3² × 5¹", "Squares: powers of 2 from {0, 2, 4}, of 3 from {0, 2}, of 5 from {0} → 3 × 2 × 1 = 6", "Cubes: 2 from {0, 3}, 3 from {0}, 5 from {0} → 2", "Both (sixth powers): only 2⁰3⁰5⁰ = 1 → 1"], "ans": "6, 2 and 1"}, {"k": "ex", "q": "How many factors of 14400 are divisible by 18 but not by 36?", "steps": ["14400 = 2⁶ × 3² × 5²", "Divisible by 18 = 2 × 3²: factors of 14400/18 = 800 = 2⁵ × 5² → 6 × 3 = 18", "Divisible by 36 = 2² × 3²: factors of 400 = 2⁴ × 5² → 5 × 3 = 15", "18 − 15 = 3"], "ans": "3"}, {"k": "ex", "q": "When 732 is divided by a positive integer x, the remainder is 12. How many values of x are there?", "steps": ["732 − 12 = 720 must be divisible by x, and x must be greater than 12 (a remainder is always smaller than the divisor)", "720 = 2⁴ × 3² × 5 has 5 × 3 × 2 = 30 factors", "Factors up to 12: 1, 2, 3, 4, 5, 6, 8, 9, 10, 12 → 10", "30 − 10 = 20"], "ans": "20"}, {"k": "ex", "q": "In how many ways can two factors of 56 be chosen that are co-prime to each other?", "steps": ["56 = 2³ × 7¹ → p = 3, q = 1", "(p + 1)(q + 1) + pq = 4 × 2 + 3 = 11"], "ans": "11", "tip": "The count includes the pair (1, 1) and every pair with 1."}, {"k": "trick", "h": "<b>Only perfect squares have an odd number of factors.</b> “Which number has exactly 3 factors?” → the square of a prime (4, 9, 25, 49…).<br><b>Divisible by k</b> → just count the factors of N/k. <b>Divisible by k but not by m</b> → (factors of N/k) − (factors of N/(LCM of k, m))."}, {"k": "trap", "h": "<b>Factorise completely before counting:</b> 360 = 8 × 45 gives (1 + 1)(1 + 1) = 4 — wrong; you must use primes, 2³ × 3² × 5. <b>Composite factors</b>: subtract the prime factors <i>and</i> 1. <b>Remainder questions</b> (732 → 12): drop the divisors that are not bigger than the remainder."}, {"k": "link", "h": "The same factorisation gives the sum and product of factors in L4, the highest power of a prime in n! in L9, and HCF/LCM (lowest and highest powers)."}, {"k": "q", "q": "How many factors does 480 have?", "o": ["24", "20", "18", "32"], "e": "480 = 2⁵ × 3 × 5 → 6 × 2 × 2 = 24."}], "sum": ["N = aᵖ bᵠ cʳ → (p + 1)(q + 1)(r + 1) factors", "Odd factors: drop the 2s; even = total − odd", "Composite = total − primes − 1", "Perfect-square factors: ⌊p/2⌋ + 1 per prime; cubes ⌊p/3⌋ + 1", "Factors divisible by k = factors of N/k", "Odd number of factors ⇔ N is a perfect square"]},
+{"id": "L4", "heat": 2, "title": "Factors II: sum, product & reciprocals", "hi": "गुणनखंडों का योग, गुणनफल", "blocks": [{"k": "hot", "h": "<b>Asked in CGL Tier 2 and occasionally Tier 1:</b> “sum of all factors of 360”, “sum of even factors of 720”, “product of all factors of 360”. One formula each — no listing."}, {"k": "formula", "title": "Sum of factors (N = a<sup>p</sup> × b<sup>q</sup> × c<sup>r</sup>)", "rows": [["All factors", "(1 + a + … + a<sup>p</sup>)(1 + b + … + b<sup>q</sup>)(1 + c + … + c<sup>r</sup>)", "= (a<sup>p+1</sup> − 1)/(a − 1) × (b<sup>q+1</sup> − 1)/(b − 1) × …"], ["Odd factors (a = 2)", "leave out the 2-bracket: (1 + b + … + b<sup>q</sup>)(1 + c + … + c<sup>r</sup>)", "360 → 13 × 6 = 78"], ["Even factors (a = 2)", "(2 + 2² + … + 2<sup>p</sup>) × the other brackets", "= all − odd: 360 → 1170 − 78 = 1092"], ["Product of all factors", "N<sup>n/2</sup>, n = number of factors", "360 has 24 factors → 360<sup>12</sup>"], ["Sum of reciprocals of factors", "(sum of factors) ÷ N", "16 → 31/16"], ["Perfect number", "sum of all factors = 2N", "28: 1 + 2 + 4 + 7 + 14 + 28 = 56"]]}, {"k": "ex", "q": "Find the sum of all factors of 360.", "steps": ["360 = 2³ × 3² × 5", "(1 + 2 + 4 + 8)(1 + 3 + 9)(1 + 5)", "= 15 × 13 × 6 = 1170"], "ans": "1170"}, {"k": "ex", "q": "Find the sum of all even factors of 360.", "steps": ["Even brackets: (2 + 4 + 8)(1 + 3 + 9)(1 + 5)", "= 14 × 13 × 6 = 1092"], "ans": "1092", "tip": "Check: all (1170) − odd (78) = 1092."}, {"k": "ex", "q": "Find the sum of all odd factors of 720.", "steps": ["720 = 2⁴ × 3² × 5", "Drop the 2s: (1 + 3 + 9)(1 + 5) = 13 × 6"], "ans": "78"}, {"k": "ex", "q": "Find the sum of all even factors of 720.", "steps": ["(2 + 4 + 8 + 16)(1 + 3 + 9)(1 + 5)", "= 30 × 13 × 6 = 2340"], "ans": "2340"}, {"k": "ex", "q": "What is the product of all factors of 360?", "steps": ["360 has 24 factors", "Factors pair up as d × (360/d) = 360 → 12 pairs", "Product = 360<sup>24/2</sup>"], "ans": "360<sup>12</sup>"}, {"k": "ex", "q": "Find the sum of the reciprocals of the factors of 16.", "steps": ["Factors: 1, 2, 4, 8, 16; their sum = 31", "Sum of reciprocals = 31/16"], "ans": "31/16"}, {"k": "trick", "h": "<b>Odd factors never depend on the power of 2</b> — 360, 720 and 1440 all have odd-factor sum 78. <b>Product of factors</b> = N<sup>(number of factors)/2</sup>: just count factors first.<br><b>Sum of reciprocals × N = sum of factors</b> — handy when one is given and the other is asked."}, {"k": "trap", "h": "<b>Sum of factors includes 1 and N itself.</b> For perfect-number checks leave N out (sum of proper factors = N). <b>Even-factor bracket starts at 2</b>, not 1."}, {"k": "link", "h": "Uses the factorisation of L3. A perfect number is the special case σ(N) = 2N; 6, 28, 496 and 8128 are the ones SSC uses."}, {"k": "q", "q": "Sum of all factors of 100 is:", "o": ["217", "216", "117", "200"], "e": "100 = 2² × 5² → (1 + 2 + 4)(1 + 5 + 25) = 7 × 31 = 217."}], "sum": ["Sum of factors = product of (1 + a + … + aᵖ) brackets", "Odd-factor sum: drop the 2-bracket; even = all − odd", "Product of factors = N^(n/2)", "Sum of reciprocals = σ(N)/N", "Perfect number: σ(N) = 2N (6, 28, 496, 8128)"]},
+{"id": "L5", "heat": 3, "title": "Divisibility rules & missing digits", "hi": "विभाज्यता के नियम", "blocks": [{"k": "hot", "h": "<b>Every CGL/CHSL paper has a “find the missing digit” question</b>: “If 7y9745x2 is divisible by 72, find 2x − y”, “479xyz divisible by 7, 11 and 13”. Know the rules for 2–13, then split any composite divisor into co-prime parts."}, {"k": "table", "title": "Divisibility rules", "head": ["By", "Rule", "Example"], "rows": [["2, 4, 8, 16", "last 1, 2, 3, 4 digits divisible by 2, 4, 8, 16", "48512: 512 ÷ 8 ✓"], ["3, 9", "sum of digits divisible by 3 / 9", "523872: 27 ✓ both"], ["5, 25, 125", "last 1, 2, 3 digits divisible by 5, 25, 125 (end in 0/5; 00, 25, 50, 75)", "375, 1000"], ["6", "divisible by 2 and by 3", "56934"], ["7", "(last three digits) − (the rest) in triplets, alternately, divisible by 7; or: double the last digit and subtract", "12348: 348 − 12 = 336 = 7 × 48 ✓"], ["11", "(sum of odd-place digits) − (sum of even-place digits) = 0 or a multiple of 11", "166452: 12 − 12 = 0 ✓"], ["13", "add 4 × last digit to the rest; repeat", "169: 16 + 36 = 52 = 13 × 4 ✓"], ["17", "subtract 5 × last digit from the rest", "391: 39 − 5 = 34 ✓"], ["7, 11, 13 together", "abcabc = abc × 1001 = abc × 7 × 11 × 13", "123123, 574574"], ["3, 7, 13, 37 together", "ababab = ab × 10101 = ab × 3 × 7 × 13 × 37", "353535"], ["101", "abab = ab × 101", "2525 = 25 × 101"], ["Composite k", "split k into co-prime factors and test each: 12 = 3 × 4, 24 = 3 × 8, 72 = 8 × 9", "never 24 = 4 × 6 (not co-prime)"]]}, {"k": "ex", "q": "If the six-digit number 479xyz is exactly divisible by 7, 11 and 13, then {(y + z) × x} is:", "steps": ["7 × 11 × 13 = 1001, and abcabc = abc × 1001", "So 479xyz = 479479 → x = 4, y = 7, z = 9", "(7 + 9) × 4 = 64"], "ans": "64"}, {"k": "ex", "q": "If the seven-digit number 35345xy is divisible by 40, find the least value of 4x + 5y.", "steps": ["40 = 5 × 8 (co-prime)", "By 5 (and 8 needs even): y = 0", "By 8: last three digits 5x0 divisible by 8 → x = 2 (520) or 6 (560)", "Least: 4 × 2 + 5 × 0 = 8"], "ans": "8"}, {"k": "ex", "q": "If 7y9745x2 is divisible by 72, find 2x − y for the greatest value of x.", "steps": ["72 = 8 × 9", "By 8: 5x2 divisible by 8 → x = 1, 5 or 9; greatest x = 9", "By 9: 7 + y + 9 + 7 + 4 + 5 + 9 + 2 = 43 + y → y = 2", "2 × 9 − 2 = 16"], "ans": "16"}, {"k": "ex", "q": "If the 5-digit number 535ab is divisible by 3, 7 and 11, find a² − b² + ab.", "steps": ["LCM(3, 7, 11) = 231", "53599 ÷ 231 leaves remainder 7 → 53599 − 7 = 53592 is divisible", "a = 9, b = 2 → 81 − 4 + 18"], "ans": "95", "tip": "Take the largest number of the pattern and subtract the remainder."}, {"k": "trick", "h": "<b>Composite divisor → co-prime pieces.</b> 72 = 8 × 9, 88 = 8 × 11, 45 = 5 × 9, 36 = 4 × 9.<br><b>Largest-number trick:</b> put 9s in the blanks, divide by the divisor, subtract the remainder — the digits that change are your answer (works when the blanks are the last digits)."}, {"k": "trap", "h": "<b>Divisible by 4 and 6 does not mean divisible by 24</b> (12 is divisible by both). Use co-prime parts. <b>For 11, places are counted from the right</b> (unit place is odd place) — the result is the same as long as you are consistent. <b>Rule for 8 needs three digits</b> — don’t stop at two."}, {"k": "link", "h": "Divisibility is remainder 0 — L7 and L8 are the general case. Counting how many numbers in a range are divisible by k is L6."}, {"k": "q", "q": "Which digit should replace * so that 5*2 is divisible by 8?", "o": ["5", "4", "3", "2"], "e": "552 ÷ 8 = 69. Other options: 542, 532, 522 are not multiples of 8."}], "sum": ["2/4/8/16 → last 1/2/3/4 digits; 5/25/125 → last 1/2/3 digits", "3/9 → digit sum; 11 → alternate-digit difference 0 or 11k", "7, 11, 13 → abcabc (× 1001); 3, 7, 13, 37 → ababab (× 10101); 101 → abab", "13: add 4 × last digit; 17: subtract 5 × last digit", "Composite divisor → test its co-prime factors (72 = 8 × 9)"]},
+{"id": "L6", "heat": 2, "title": "Counting multiples in a range", "hi": "किसी सीमा में विभाज्य संख्याएँ", "blocks": [{"k": "hot", "h": "<b>Regular in CGL and CHSL:</b> “How many numbers between 300 and 700 are divisible by 5, 6 and 8?”, “How many numbers from 1 to 100 are divisible by neither 3 nor 5?” — floor division and one subtraction."}, {"k": "formula", "title": "Counting with floor division (⌊x⌋ = whole part of x)", "rows": [["Multiples of k in 1 to N", "⌊N/k⌋", "1 to 100, multiples of 3 → 33"], ["Multiples of k from A to B", "⌊B/k⌋ − ⌊(A − 1)/k⌋", "300 to 700 by 120 → 5 − 2 = 3"], ["Divisible by a and b", "multiples of LCM(a, b)", "by 5, 6 and 8 → by 120"], ["Divisible by a or b", "N(a) + N(b) − N(LCM)", "1–100 by 3 or 5 → 33 + 20 − 6 = 47"], ["Divisible by neither", "total − N(a) − N(b) + N(LCM)", "1–100 → 100 − 47 = 53"], ["Shortcut for neither (co-prime a, b)", "N × (1 − 1/a)(1 − 1/b) when N is a multiple of ab; fix the leftover by hand", "90 × 2/3 × 4/5 = 48, then 91–100 add 5 → 53"], ["Divisible by a but not b", "N(a) − N(LCM)", "1–100 by 3 not 5 → 33 − 6 = 27"]]}, {"k": "formula", "title": "Common factor in a sum of powers", "rows": [["Take out the smallest power", "2<sup>25</sup> + 2<sup>26</sup> + 2<sup>27</sup> = 2<sup>25</sup>(1 + 2 + 4)", "= 2<sup>25</sup> × 7 → divisible by 7"], ["Same idea with 3", "3<sup>n</sup> + 3<sup>n+1</sup> + 3<sup>n+2</sup> = 3<sup>n</sup> × 13", "divisible by 13"], ["Consecutive integers", "product of n consecutive integers is divisible by n!", "3 consecutive → divisible by 6"]]}, {"k": "ex", "q": "2<sup>25</sup> + 2<sup>26</sup> + 2<sup>27</sup> is divisible by:", "steps": ["Take out 2<sup>25</sup>: 2<sup>25</sup>(2⁰ + 2¹ + 2²)", "= 2<sup>25</sup> × (1 + 2 + 4) = 2<sup>25</sup> × 7"], "ans": "7"}, {"k": "ex", "q": "How many numbers between 300 and 700 are divisible by 5, 6 and 8?", "steps": ["LCM(5, 6, 8) = 120", "Multiples of 120 between 300 and 700: 360, 480, 600"], "ans": "3"}, {"k": "ex", "q": "How many numbers from 1 to 100 are divisible by neither 3 nor 5?", "steps": ["By 3: ⌊100/3⌋ = 33; by 5: 20; by 15: 6", "By 3 or 5: 33 + 20 − 6 = 47", "Neither: 100 − 47"], "ans": "53"}, {"k": "ex", "q": "How many numbers from 700 to 950 (both included) are divisible by neither 3 nor 7?", "steps": ["Total = 950 − 700 + 1 = 251", "By 3: ⌊950/3⌋ − ⌊699/3⌋ = 316 − 233 = 83", "By 7: 135 − 99 = 36; by 21: 45 − 33 = 12", "Neither: 251 − (83 + 36 − 12) = 251 − 107"], "ans": "144", "tip": "Use ⌊B/k⌋ − ⌊(A − 1)/k⌋ for each count, never a rough ÷."}, {"k": "trick", "h": "<b>“Both” means the LCM, “either” means add then subtract the LCM.</b> For a range, always count up to B and subtract the count up to A − 1.<br><b>Sum of equal-ratio powers</b>: factor out the smallest power and add the small numbers left."}, {"k": "trap", "h": "<b>“Between 300 and 700”</b> usually excludes the end points — check whether 300 or 700 itself is a multiple. <b>Don’t divide the range length by k</b>: 700 to 950 has 251 numbers, but the number of multiples of 7 depends on where the range starts (36 here, not ⌊251/7⌋ = 35)."}, {"k": "link", "h": "LCM is the HCF & LCM chapter; divisibility tests are L5. The same inclusion–exclusion counts students who like tea or coffee in set problems."}, {"k": "q", "q": "How many numbers from 1 to 200 are divisible by 4 but not by 6?", "o": ["34", "50", "16", "33"], "e": "By 4: 50; by both 4 and 6 (LCM 12): 16 → 50 − 16 = 34."}], "sum": ["Multiples of k from A to B = ⌊B/k⌋ − ⌊(A − 1)/k⌋", "Both a and b → LCM; a or b → N(a) + N(b) − N(LCM)", "Neither = total − (a or b)", "aⁿ + aⁿ⁺¹ + aⁿ⁺² = aⁿ(1 + a + a²)", "Product of n consecutive integers is divisible by n!"]},
+{"id": "L7", "heat": 3, "title": "Remainders I: rules & successive division", "hi": "शेषफल · नियम और क्रमिक विभाजन", "blocks": [{"k": "hot", "h": "<b>Remainder questions appear in almost every CGL Tier 1 and Tier 2 paper.</b> The basic rules here — add, multiply, negative remainders, least number to add or subtract, successive division — solve most of them in 30 seconds."}, {"k": "formula", "title": "The basic rules", "rows": [["Division", "N = D × Q + R,  0 ≤ R &lt; D", "D = 38, Q = 24, R = 13 → N = 925"], ["Remainders add", "rem of (a + b + c) = rem of (r₁ + r₂ + r₃)", "(335 + 608 + 853) ÷ 13 → (10 + 10 + 8) = 28 → 2"], ["Remainders multiply", "rem of (a × b) = rem of (r₁ × r₂)", "(361 × 363) ÷ 12 → 1 × 3 = 3"], ["Negative remainder", "use r − D when it is smaller; add D at the end if the result is negative", "89 ÷ 9: 89 = 90 − 1 → −1 → 8"], ["Least number to add", "D − R", "42072 ÷ 93 leaves 36 → add 57"], ["Least number to subtract", "R", "25809 ÷ 139 leaves 94 → subtract 94"]]}, {"k": "formula", "title": "Largest, smallest and “same remainder” numbers (added)", "rows": [["Largest n-digit number divisible by k", "99…9 − (99…9 mod k)", "largest 4-digit by 88: 9999 − 55 = 9944"], ["Smallest n-digit number divisible by k", "10…0 + (k − 10…0 mod k)", "smallest 4-digit by 88: 1000 + (88 − 32) = 1056"], ["Same remainder r for divisors a, b, c", "N = k × LCM(a, b, c) + r", "least > r: LCM + r (rem 3 by 4, 6, 9 → 39)"], ["Remainders a − d, b − d, c − d (constant gap d)", "N = k × LCM − d", "rem 2, 4, 7 by 3, 5, 8 → 120 − 1 = 119"], ["Divisor from two remainders", "if N ÷ D leaves r₁ and 2N leaves r₂ … use 2r₁ − r₂ = D (when 2r₁ ≥ D)", "N rem 30, 2N rem 11 → D = 49"]]}, {"k": "formula", "title": "Successive division", "rows": [["Meaning", "divide N by a, the quotient by b, that quotient by c …", "remainders r₁, r₂, r₃"], ["Rebuild N", "start from the last quotient (take 1, or 0 if allowed) and go back: × divisor + remainder", "3, 4, 7 with 2, 1, 4: 7 × 0 + 4 = 4 → 4 × 4 + 1 = 17 → 17 × 3 + 2 = 53"], ["General", "N = r₁ + a(r₂ + b(r₃ + c·q))", "least N uses q = 0"]]}, {"k": "ex", "q": "On dividing a number by 38, the quotient is 24 and the remainder is 13. Find the number.", "steps": ["N = D × Q + R", "= 38 × 24 + 13 = 912 + 13"], "ans": "925"}, {"k": "ex", "q": "Positive numbers x, y, z divided by 31 leave remainders 17, 24 and 27. Find the remainder when 4x − 2y + 3z is divided by 31.", "steps": ["Work with remainders: 4 × 17 − 2 × 24 + 3 × 27", "= 68 − 48 + 81 = 101", "101 ÷ 31 leaves 8"], "ans": "8"}, {"k": "ex", "q": "Find the remainder of 111 ÷ 12 using negative remainders.", "steps": ["111 = 120 − 9 → remainder −9", "Add 12: −9 + 12 = 3"], "ans": "3"}, {"k": "ex", "q": "A number is successively divided by 3, 4 and 7, leaving remainders 2, 3 and 5. Find the least such number.", "steps": ["Start from the last: 7 × 0 + 5 = 5", "4 × 5 + 3 = 23", "3 × 23 + 2 = 71"], "ans": "71"}, {"k": "ex", "q": "What is the least number to be added to 42072 to make it divisible by 93?", "steps": ["42072 ÷ 93 = 452, remainder 36", "Add 93 − 36"], "ans": "57"}, {"k": "ex", "q": "A number divided successively by 2, 3 and 5 leaves remainders 1, 2 and 3 (last quotient 1). What is the remainder when it is divided by 13?", "steps": ["5 × 1 + 3 = 8 → 3 × 8 + 2 = 26 → 2 × 26 + 1 = 53", "53 ÷ 13 = 4, remainder 1"], "ans": "1"}, {"k": "trick", "h": "<b>Close to a multiple? Use a negative remainder:</b> 89 ÷ 9 → 90 − 1 → −1 → 8. Products of numbers just below the divisor become (−1)(−1)… = ±1.<br><b>Remainder of a sum or product</b>: replace every number by its remainder first, then combine."}, {"k": "trap", "h": "<b>A remainder can never be negative or ≥ the divisor</b> — always bring −9 back to 3 (add 12). <b>“Least number to add”</b> is D − R, not R. <b>Successive division</b>: rebuild from the <i>last</i> divisor backwards, not the first."}, {"k": "link", "h": "L8 extends these rules to huge powers ((a ± 1)ⁿ, Fermat, Euler). Divisibility (L5) is just “remainder = 0”."}, {"k": "q", "q": "What is the remainder when 179 × 172 × 173 is divided by 17?", "o": ["3", "5", "1", "12"], "e": "179 → 9, 172 → 2, 173 → 3: 9 × 2 × 3 = 54 → 54 ÷ 17 leaves 3."}], "sum": ["N = DQ + R with 0 ≤ R < D", "Remainders add and multiply; use negative remainders near multiples", "Least to add = D − R; least to subtract = R", "Same remainder r for a, b, c → N = k·LCM + r; constant gap d → k·LCM − d", "Successive division: rebuild from the last divisor: × divisor + remainder"]},
+{"id": "L8", "heat": 2, "title": "Remainders II: powers & theorems", "hi": "शेषफल · घात और प्रमेय", "blocks": [{"k": "hot", "h": "<b>Tier 2 favourite, sometimes in Tier 1:</b> “remainder of 72<sup>281</sup> ÷ 73”, “(8<sup>371</sup> + 5<sup>371</sup>) ÷ 13”, “40! ÷ 41”. Recognise the pattern and the answer is one line."}, {"k": "formula", "title": "Sum and difference of powers", "rows": [["(aⁿ + bⁿ) ÷ (a + b)", "remainder 0 when n is odd", "(8<sup>371</sup> + 5<sup>371</sup>) ÷ 13 → 0"], ["Terms in AP, n odd", "pair the first with the last, the second with the second-last …: every pair is divisible by (first + last)", "16<sup>73</sup> + 17<sup>73</sup> + 18<sup>73</sup> + 19<sup>73</sup>: pairs divisible by 35, total even → ÷ 70 leaves 0"], ["(aⁿ − bⁿ) ÷ (a − b)", "0 for every n", "(8<sup>36</sup> − 2<sup>36</sup>) ÷ 6 → 0"], ["(aⁿ − bⁿ) ÷ (a + b)", "0 when n is even", "(7<sup>24</sup> − 4<sup>24</sup>) ÷ 11 → 0"], ["(aⁿ + bⁿ), n even", "not divisible by a + b or a − b in general", "—"]]}, {"k": "formula", "title": "Divisor ± 1 (the most useful idea)", "rows": [["(a + 1)ⁿ ÷ a", "remainder 1 for every n", "16<sup>13</sup> ÷ 15 → 1"], ["(a − 1)ⁿ ÷ a, n even", "remainder 1", "72<sup>282</sup> ÷ 73 → 1"], ["(a − 1)ⁿ ÷ a, n odd", "remainder −1, i.e. a − 1", "72<sup>281</sup> ÷ 73 → 72"], ["Reduce the power", "find a small power with remainder ±1, then use it", "2<sup>100</sup> ÷ 7: 2³ = 8 → 1 → 2<sup>99</sup> × 2 → 2"]]}, {"k": "formula", "title": "The three theorems", "rows": [["Fermat", "a<sup>p−1</sup> ÷ p leaves 1 (p prime, a not a multiple of p)", "82<sup>54</sup> ÷ 19 = (82<sup>18</sup>)³ → 1"], ["Euler", "a<sup>φ(N)</sup> ÷ N leaves 1 (a, N co-prime)", "φ(N) = N(1 − 1/p₁)(1 − 1/p₂)…"], ["Totient φ(N)", "how many numbers from 1 to N are co-prime to N", "φ(72) = 72 × ½ × ⅔ = 24;  φ(100) = 40;  φ(prime p) = p − 1"], ["Wilson", "(p − 1)! ÷ p leaves p − 1 (i.e. −1), p prime", "40! ÷ 41 → 40"], ["Wilson, one step back", "(p − 2)! ÷ p leaves 1", "39! ÷ 41 → 1"]]}, {"k": "table", "title": "Cycles of remainders (added)", "head": ["Power of", "÷ by", "Remainders repeat", "So"], "rows": [["2", "3", "2, 1", "odd power → 2, even → 1"], ["2", "5", "2, 4, 3, 1", "cycle 4"], ["2", "7", "2, 4, 1", "cycle 3: 2<sup>3k</sup> → 1"], ["3", "7", "3, 2, 6, 4, 5, 1", "cycle 6"], ["4", "6", "4, 4, …", "always 4"], ["10", "3 or 9", "1, 1, …", "10ⁿ ÷ 9 → 1"]]}, {"k": "ex", "q": "Find the remainder of (16<sup>73</sup> + 17<sup>73</sup> + 18<sup>73</sup> + 19<sup>73</sup>) ÷ 70.", "steps": ["73 is odd, so 16<sup>73</sup> + 19<sup>73</sup> and 17<sup>73</sup> + 18<sup>73</sup> are each divisible by 35", "Two of the four numbers are odd and two even → the total is even", "Divisible by 35 and by 2 → divisible by 70"], "ans": "0"}, {"k": "ex", "q": "Find the remainder when 72<sup>281</sup> is divided by 73.", "steps": ["72 = 73 − 1 → remainder (−1)<sup>281</sup> = −1", "−1 + 73 = 72"], "ans": "72"}, {"k": "ex", "q": "Find the remainder when 93<sup>51</sup> is divided by 11.", "steps": ["93 ÷ 11 leaves 5, so work with 5<sup>51</sup>; by Fermat 5<sup>10</sup> → 1", "5<sup>51</sup> = (5<sup>10</sup>)⁵ × 5 → 1 × 5"], "ans": "5"}, {"k": "ex", "q": "Find the totient of 100.", "steps": ["100 = 2² × 5²", "φ(100) = 100 × (1 − ½)(1 − ⅕) = 100 × ½ × ⅘"], "ans": "40"}, {"k": "ex", "q": "Find the remainder when 40! is divided by 41.", "steps": ["41 is prime → Wilson: (41 − 1)! leaves −1", "−1 + 41 = 40"], "ans": "40"}, {"k": "trick", "h": "<b>Always look for divisor ± 1 first.</b> Write the base (or a small power of it) as (D + 1) or (D − 1): 2<sup>3</sup> = 8 = 7 + 1, 3<sup>4</sup> = 81 = 80 + 1.<br><b>Fermat in one line:</b> divisor prime → reduce the power modulo (p − 1)."}, {"k": "trap", "h": "<b>(a − 1)ⁿ with odd n gives −1, not 1</b> — convert to D − 1 (72 for 73). <b>Fermat needs a prime divisor</b> and a base that is not its multiple; for 12, 15, 100 use Euler. <b>aⁿ + bⁿ is divisible by a + b only for odd n.</b><br><b>Three terms in AP do not make the sum divisible by a + b + c:</b> some books give (3<sup>61</sup> + 2<sup>61</sup> + 4<sup>61</sup>) ÷ 9 → 0, but the remainder is 6. Only 2<sup>61</sup> + 4<sup>61</sup> is divisible by 6, and 3<sup>61</sup> by 3 — so the sum is divisible by 3, not 9."}, {"k": "link", "h": "Builds on negative remainders (L7). The cycle of remainders is the same idea as the unit-digit cycle (L2) — unit digit is just the remainder on division by 10."}, {"k": "q", "q": "Remainder when 9^111 is divided by 13?", "o": ["1", "9", "3", "12"], "e": "9³ = 729 = 13 × 56 + 1 → 9³ leaves 1 → 9¹¹¹ = (9³)³⁷ → 1."}], "sum": ["aⁿ + bⁿ ÷ (a + b) → 0 for odd n; aⁿ − bⁿ ÷ (a − b) → 0 always, ÷ (a + b) → 0 for even n; AP terms: pair first + last", "(D + 1)ⁿ → 1; (D − 1)ⁿ → 1 (n even) or D − 1 (n odd)", "Fermat: a^(p−1) → 1 (mod p); Euler: a^φ(N) → 1 (mod N)", "φ(N) = N(1 − 1/p₁)(1 − 1/p₂)…; φ(100) = 40", "Wilson: (p − 1)! → p − 1; (p − 2)! → 1"]},
+{"id": "L9", "heat": 2, "title": "Trailing zeros & powers in n!", "hi": "शून्यों की संख्या · n! में घात", "blocks": [{"k": "hot", "h": "<b>Asked in CGL and CHSL:</b> “number of zeros at the end of 100!”, “highest power of 5 in 300!”, “zeros in 24 × 13 × 52 × 27”. A zero needs one 2 and one 5 — count the scarcer one."}, {"k": "p", "h": "Every trailing zero comes from a factor 10 = 2 × 5. So the number of zeros at the end of a product = <b>min(number of 2s, number of 5s)</b> in its prime factorisation. In a factorial there are always more 2s than 5s, so <b>count the 5s</b>."}, {"k": "formula", "title": "Highest power of a prime p in n! (Legendre)", "rows": [["Formula", "⌊n/p⌋ + ⌊n/p²⌋ + ⌊n/p³⌋ + …", "stop when the power of p exceeds n"], ["Short way", "divide n by p, then divide the quotient by p again, and add all quotients", "300 → 60 → 12 → 2: 60 + 12 + 2 = 74"], ["Zeros at the end of n!", "highest power of 5 in n!", "100! → 20 + 4 = 24"], ["Power of a composite (e.g. 12 = 2² × 3)", "min(⌊(power of 2)/2⌋, power of 3)", "12 in 50!: 2s = 47 → 23; 3s = 22 → 22"], ["Power of p in A × (A+1) × … × B", "(power in B!) − (power in (A − 1)!)", "5 in 351 × … × 600 = 148 − 86 = 62"]]}, {"k": "table", "title": "Zeros at the end of n! — ready values", "head": ["n!", "Zeros", "n!", "Zeros"], "rows": [["10!", "2", "100!", "24"], ["25!", "6", "125!", "31"], ["47!", "10", "200!", "49"], ["50!", "12", "300!", "74"], ["75!", "18", "1000!", "249"]]}, {"k": "ex", "q": "How many zeros are there at the end of 24 × 13 × 52 × 27?", "steps": ["= 2³·3 × 13 × 2²·13 × 3³ = 2⁵ × 3⁴ × 13²", "There is no factor 5"], "ans": "0"}, {"k": "ex", "q": "How many zeros are there at the end of 8 × 15 × 24 × 13?", "steps": ["= 2³ × 3·5 × 2³·3 × 13 = 2⁶ × 3² × 5 × 13", "Six 2s but only one 5 → one pair 2 × 5"], "ans": "1"}, {"k": "ex", "q": "Find the number of zeros at the end of 47!.", "steps": ["⌊47/5⌋ = 9, ⌊47/25⌋ = 1, ⌊47/125⌋ = 0", "9 + 1"], "ans": "10"}, {"k": "ex", "q": "Find the number of zeros at the end of 300!.", "steps": ["300/5 = 60, 60/5 = 12, 12/5 = 2", "60 + 12 + 2"], "ans": "74"}, {"k": "ex", "q": "Find the highest power of 5 in the product 351 × 352 × … × 600.", "steps": ["Power of 5 in 600! = 120 + 24 + 4 = 148", "Power of 5 in 350! = 70 + 14 + 2 = 86", "148 − 86"], "ans": "62"}, {"k": "trick", "h": "<b>Repeated division:</b> 1000 → 200 → 40 → 8 → 1: 200 + 40 + 8 + 1 = 249 zeros in 1000!.<br><b>For a composite base</b> split it into primes and take the limiting prime: 6 = 2 × 3 → power of 3 decides; 12 = 2² × 3 → compare half the 2s with the 3s."}, {"k": "trap", "h": "<b>25 gives two 5s and 125 gives three</b> — never stop at ⌊n/5⌋. <b>In a plain product (not a factorial)</b> the 2s can be fewer than the 5s: 25 × 125 × 4 has 5⁵ but only 2² → 2 zeros. <b>Zeros of 5 × 10 × 15 × … × 100</b> are not the same as zeros of 100!: count both 2s and 5s."}, {"k": "link", "h": "Same prime-power thinking as factors (L3). Unit digit of n! for n ≥ 5 is 0 (L2) for the same reason."}, {"k": "q", "q": "Number of zeros at the end of 125! is:", "o": ["31", "25", "30", "28"], "e": "25 + 5 + 1 = 31."}], "sum": ["Trailing zeros = min(2s, 5s); in n! count the 5s", "Power of p in n! = ⌊n/p⌋ + ⌊n/p²⌋ + … (repeated division)", "100! → 24 zeros; 1000! → 249", "Composite base: split into primes and take the limiting one", "Product A…B: power in B! − power in (A − 1)!"]},
+{"id": "L10", "heat": 1, "title": "Counting digits, pages & digit sums", "hi": "अंकों की गिनती · पृष्ठ संख्या", "blocks": [{"k": "hot", "h": "<b>Occasional in CGL and CHSL, common in other SSC exams:</b> “digits needed to number a 428-page book”, “a printer used 3189 digits — how many pages?”, “how many times does 6 appear from 400 to 700?”. Pure counting — no tricks needed once you know the blocks."}, {"k": "table", "title": "Digits and key strokes", "head": ["Numbers", "How many numbers", "Digits used", "Total so far"], "rows": [["1 to 9", "9", "9", "9"], ["10 to 99", "90", "180", "189"], ["100 to 999", "900", "2700", "2889"], ["1000 to 9999", "9000", "36000", "38889"]]}, {"k": "formula", "title": "Formulas", "rows": [["Digits to write 1 to N", "n(N + 1) − 11…1 (n ones), n = digits in N", "N = 428: 3 × 429 − 111 = 1176"], ["Pages from digits D", "solve n(N + 1) − 11…1 = D", "D = 3189 (4-digit): 4(N + 1) − 1111 = 3189 → N = 1074"], ["n-digit numbers", "9 × 10<sup>n−1</sup>", "3-digit: 900"], ["Each digit 1–9 in 1 to 99", "appears 20 times (10 in units, 10 in tens)", "digit 5 → 20 times; digit 0 → 9 times"], ["Each digit 1–9 in 1 to 999", "appears 300 times", "digit 0 → 189 times"], ["Sum of all digits 1 to 99 / 1 to 100", "900 / 901", "units 45 × 9 = 405, tens 45 × 10 = 450, plus 45 from 1–9"], ["Sum of all digits 1 to 999", "13500 (1 to 1000 → 13501)", "each digit sums to 45, 300 times"]]}, {"k": "ex", "q": "How many digits are needed to number a book of 428 pages?", "steps": ["1–9: 9 digits; 10–99: 90 × 2 = 180", "100–428: 329 numbers × 3 = 987", "9 + 180 + 987 = 1176 (or 3 × 429 − 111)"], "ans": "1176"}, {"k": "ex", "q": "A printer numbers the pages of a book starting from 1 and uses 3189 digits in all. How many pages does the book have?", "steps": ["Up to 999: 2889 digits used, so the book goes past 999", "Remaining 3189 − 2889 = 300 digits → 300 ÷ 4 = 75 four-digit pages", "999 + 75 = 1074"], "ans": "1074"}, {"k": "ex", "q": "How many numbers from 400 to 700 contain the digit 6 exactly twice?", "steps": ["400–599: only 466 and 566 → 2", "600–699: second 6 in the tens (660–669, except 666) → 9; in the units (606, 616, … 696, except 666) → 9", "700: none → 2 + 9 + 9"], "ans": "20"}, {"k": "ex", "q": "Find the sum of all the digits of the numbers from 1 to 100.", "steps": ["1–9: 45", "10–99: tens 45 × 10 = 450, units 45 × 9 = 405", "100: 1 → 45 + 450 + 405 + 1"], "ans": "901"}, {"k": "trick", "h": "<b>Digits from pages, backwards:</b> subtract the block totals 9, 189, 2889 until the rest divides evenly by the next digit-length.<br><b>Each digit 1–9 appears 20 times in 1 to 99</b> and 300 times in 1 to 999 — 0 appears less because numbers don’t start with 0."}, {"k": "trap", "h": "<b>Two-digit numbers are 90, not 99 or 89</b> (10 to 99 inclusive). <b>Numbers with a 6</b> vs <b>number of 6s</b>: 66 is one number but two 6s. Read which one is asked. <b>“Exactly twice”</b> removes 666."}, {"k": "link", "h": "Counting by blocks is the same thinking as counting multiples in a range (L6)."}, {"k": "q", "q": "How many times does the digit 7 appear when writing all numbers from 1 to 100?", "o": ["20", "19", "21", "11"], "e": "Units: 7, 17, … 97 = 10; tens: 70–79 = 10 → 20 (77 counts twice)."}], "sum": ["Digits for 1 to N = n(N + 1) − 11…1", "Block totals: 9, 189, 2889, 38889", "Each digit 1–9 appears 20 times in 1–99, 300 times in 1–999", "Sum of digits 1–100 = 901", "n-digit numbers = 9 × 10ⁿ⁻¹"]},
+{"id": "L11", "heat": 2, "title": "Difference of squares & reversed digits", "hi": "वर्गों का अंतर · अंकों का पलटना", "blocks": [{"k": "hot", "h": "<b>Two-digit / three-digit number questions appear in most CGL and CHSL papers</b> (“the number obtained by interchanging the digits exceeds it by 45…”). Difference-of-squares pair counting is a Tier 2 type."}, {"k": "formula", "title": "Difference of two squares", "rows": [["Identity", "N = x² − y² = (x + y)(x − y)", "write N = a × b with a = x + y, b = x − y"], ["Then", "x = (a + b)/2, y = (a − b)/2", "a and b must be both odd or both even"], ["Count pairs of natural numbers", "factor pairs a &gt; b of N with the same parity", "35 = 35 × 1, 7 × 5 → 2 pairs"], ["Never possible", "N of the form 4k + 2 (2, 6, 10, 14 …)", "one factor even, one odd"], ["Any odd N", "N = ((N + 1)/2)² − ((N − 1)/2)²", "15 = 8² − 7²"], ["Middle form", "N = ab = ((a + b)/2)² − ((a − b)/2)²", "from the PDF table"]]}, {"k": "formula", "title": "Two-digit and three-digit numbers", "rows": [["Two-digit number with digits x, y", "10x + y; reversed 10y + x", "—"], ["Sum with reverse", "11(x + y)", "always a multiple of 11"], ["Difference with reverse", "9(x − y)", "always a multiple of 9"], ["Three-digit 100x + 10y + z: swap hundreds and units", "difference 99(x − z)", "multiple of 99"], ["Swap hundreds and tens", "difference 90(x − y)", "multiple of 90"], ["Swap tens and units", "difference 9(y − z)", "multiple of 9"]]}, {"k": "ex", "q": "How many pairs of natural numbers have the difference of their squares equal to 35?", "steps": ["35 = 35 × 1 → x = 18, y = 17", "35 = 7 × 5 → x = 6, y = 1", "Both pairs are odd × odd"], "ans": "2"}, {"k": "ex", "q": "How many pairs of natural numbers have the difference of their squares equal to 36?", "steps": ["Factor pairs: 36 × 1, 18 × 2, 12 × 3, 9 × 4, 6 × 6", "Same parity: 18 × 2 → x = 10, y = 8; 6 × 6 → x = 6, y = 0", "y = 0 is not a natural number"], "ans": "1 (10² − 8²)", "tip": "Some books count 6 × 6 and say 2 — only true if 0 is allowed."}, {"k": "ex", "q": "The sum of a two-digit number and the number formed by reversing its digits is 77. The digits differ by 1. Find the number (tens digit larger).", "steps": ["11(x + y) = 77 → x + y = 7", "x − y = 1 → x = 4, y = 3"], "ans": "43"}, {"k": "ex", "q": "The digits of a two-digit number add up to 9. Reversing the digits increases the number by 45. Find the number.", "steps": ["x + y = 9; 9(y − x) = 45 → y − x = 5", "x = 2, y = 7"], "ans": "27"}, {"k": "ex", "q": "Interchanging the hundreds and units digits of a three-digit number makes it 198 less. What is the difference between the hundreds and units digits?", "steps": ["99(x − z) = 198", "x − z = 2"], "ans": "2"}, {"k": "ex", "q": "Interchanging the hundreds and tens digits of a three-digit number makes it 360 less. What is the difference between the hundreds and tens digits?", "steps": ["90(x − y) = 360", "x − y = 4"], "ans": "4"}, {"k": "trick", "h": "<b>Reverse-digit answers are multiples:</b> sum → 11, difference → 9 (two digits); 99 or 90 for three digits. Use it to strike out options.<br><b>Pairs for x² − y² = N:</b> list factor pairs, keep the same-parity ones with different factors."}, {"k": "trap", "h": "<b>Numbers 4k + 2 can never be a difference of squares</b> (e.g. 30, 50). <b>For x² − y² = 36</b>, 6 × 6 gives y = 0 — reject it if natural numbers are asked. <b>In digit questions</b> the tens digit cannot be 0 (and the reversed number may then be a one-digit number)."}, {"k": "link", "h": "x² − y² = (x + y)(x − y) is the algebra identity a² − b²; counting factor pairs uses L3."}, {"k": "q", "q": "The difference between a two-digit number and the number formed by reversing its digits is always divisible by:", "o": ["9", "11", "10", "7"], "e": "(10x + y) − (10y + x) = 9(x − y)."}], "sum": ["x² − y² = N: factor N = ab with a, b same parity; x = (a + b)/2, y = (a − b)/2", "4k + 2 numbers are never a difference of squares", "Two-digit: sum with reverse 11(x + y), difference 9(x − y)", "Three-digit swaps: hundreds↔units 99(x − z), hundreds↔tens 90(x − y), tens↔units 9(y − z)"]},
+{"id": "L12", "heat": 1, "title": "Number bases: binary, octal, hex", "hi": "आधार पद्धति · बाइनरी, ऑक्टल, हेक्स", "blocks": [{"k": "hot", "h": "<b>Occasional in SSC CGL/CHSL and common in other exams with a computer section:</b> “convert (1010101)₂ to decimal”, “(675)₈ to hexadecimal”. Two methods cover everything."}, {"k": "table", "title": "The four bases", "head": ["System", "Base", "Digits used"], "rows": [["Binary", "2", "0, 1"], ["Octal", "8", "0–7"], ["Decimal", "10", "0–9"], ["Hexadecimal", "16", "0–9, A (10), B (11), C (12), D (13), E (14), F (15)"]]}, {"k": "formula", "title": "How to convert", "rows": [["Any base → decimal", "multiply each digit by the power of the base for its place and add", "(175)₈ = 1 × 64 + 7 × 8 + 5 = 125"], ["Decimal → any base", "divide by the base again and again; read the remainders from bottom to top", "63 → (111111)₂;  425 → (1A9)₁₆"], ["Binary ↔ octal", "group binary digits in 3s from the right (weights 4, 2, 1)", "(101010)₂ = 101 | 010 = (52)₈"], ["Binary ↔ hex", "group in 4s (weights 8, 4, 2, 1)", "(1010101)₂ = 101 | 0101 = (55)₁₆"], ["Octal ↔ hex", "go through binary (no direct method)", "(675)₈ = 110 111 101 = 1 1011 1101 = (1BD)₁₆"], ["Decimal fraction → binary", "multiply the fraction by 2 again and again; read the whole parts top to bottom", "0.125 → 0.25 (0) → 0.5 (0) → 1.0 (1) → .001"]]}, {"k": "table", "title": "Powers to remember", "head": ["Power", "2", "8", "16"], "rows": [["¹", "2", "8", "16"], ["²", "4", "64", "256"], ["³", "8", "512", "4096"], ["⁴", "16", "4096", "65536"]]}, {"k": "ex", "q": "Convert (1010101)₂ to decimal.", "steps": ["1 × 64 + 0 × 32 + 1 × 16 + 0 × 8 + 1 × 4 + 0 × 2 + 1 × 1", "= 64 + 16 + 4 + 1"], "ans": "85"}, {"k": "ex", "q": "Convert (675)₈ to binary and to hexadecimal.", "steps": ["Each octal digit → 3 bits: 6 = 110, 7 = 111, 5 = 101 → 110111101", "Regroup in 4s from the right: 1 | 1011 | 1101 = 1, B, D"], "ans": "(110111101)₂ = (1BD)₁₆"}, {"k": "ex", "q": "Convert (6FD)₁₆ to octal.", "steps": ["Each hex digit → 4 bits: 0110 1111 1101", "Regroup in 3s: 011 011 111 101 = 3 3 7 5"], "ans": "(3375)₈"}, {"k": "ex", "q": "Convert (425)₁₀ to hexadecimal.", "steps": ["425 ÷ 16 = 26 rem 9; 26 ÷ 16 = 1 rem 10 (A); 1 ÷ 16 = 0 rem 1", "Read bottom to top: 1, A, 9"], "ans": "(1A9)₁₆"}, {"k": "ex", "q": "Convert (17.125)₁₀ to binary.", "steps": ["17 → 10001", "0.125 × 2 = 0.25 → 0; 0.5 → 0; 1.0 → 1 → .001"], "ans": "(10001.001)₂"}, {"k": "trick", "h": "<b>8-4-2-1 rule:</b> write 8 4 2 1 above a hex digit and tick the weights that add up to it (D = 13 = 8 + 4 + 1 → 1101). For octal use 4 2 1.<br><b>Left base is decimal → divide; right base is decimal → multiply by powers.</b>"}, {"k": "trap", "h": "<b>Group from the right</b> (from the point) — pad the left with zeros, never the right. <b>Read division remainders bottom to top</b>. <b>No digit 8 or 9 in octal</b>; an option like (189)₈ is impossible."}, {"k": "link", "h": "Base 10 place value is what makes divisibility (L5) and digit questions (L10, L11) work: 10 ≡ 1 (mod 9) gives the digit-sum rule."}, {"k": "q", "q": "(1AD)₁₆ in decimal is:", "o": ["429", "413", "301", "4013"], "e": "1 × 256 + 10 × 16 + 13 = 429."}], "sum": ["To decimal: digit × base^place, add", "From decimal: divide repeatedly, read remainders bottom to top", "Binary ↔ octal in 3s (4-2-1), binary ↔ hex in 4s (8-4-2-1); octal ↔ hex via binary", "A–F = 10–15", "Fractions to binary: multiply by 2, read whole parts top to bottom"]},
+{"id": "L13", "heat": 2, "title": "Series sums & number patterns", "hi": "श्रेणियों का योग · संख्या पैटर्न", "blocks": [{"k": "hot", "h": "<b>Added — not in the book chapter but asked in most CGL papers under number system or simplification:</b> “sum of squares from 11 to 20”, “sum of all odd numbers from 1 to 99”, “how many perfect squares between 1 and 500”. One formula each."}, {"k": "formula", "title": "Standard sums", "rows": [["1 + 2 + … + n", "n(n + 1)/2", "1 to 100 → 5050"], ["1² + 2² + … + n²", "n(n + 1)(2n + 1)/6", "1 to 10 → 385"], ["1³ + 2³ + … + n³", "[n(n + 1)/2]²", "1 to 10 → 3025 (= 55²)"], ["First n odd numbers", "n²", "1 + 3 + … + 99 (50 terms) = 2500"], ["First n even numbers", "n(n + 1)", "2 + 4 + … + 100 = 2550"], ["Squares of first n odd numbers", "n(2n − 1)(2n + 1)/3", "1² + 3² + 5² = 35"], ["Squares of first n even numbers", "2n(n + 1)(2n + 1)/3", "2² + 4² + … + 20² = 1540"]]}, {"k": "formula", "title": "AP, GP and ranges", "rows": [["Terms of an AP", "n = (last − first)/d + 1", "7, 14, …, 294 → 42 terms"], ["Sum of an AP", "n/2 × (first + last)", "multiples of 7 from 105 to 294: 28 × 399/2 = 5586"], ["Sum from a to b of squares", "S(b) − S(a − 1)", "11² + … + 20² = 2870 − 385 = 2485"], ["GP sum", "a(rⁿ − 1)/(r − 1)", "1 + 2 + 4 + … + 2⁹ = 1023"], ["Perfect squares from 1 to N", "⌊√N⌋", "1 to 500 → 22"], ["Perfect cubes from 1 to N", "⌊∛N⌋", "1 to 1000 → 10"]]}, {"k": "ex", "q": "Find 11² + 12² + … + 20².", "steps": ["Sum to 20: 20 × 21 × 41/6 = 2870", "Sum to 10: 10 × 11 × 21/6 = 385", "2870 − 385"], "ans": "2485"}, {"k": "ex", "q": "Find the sum of all multiples of 7 between 100 and 300.", "steps": ["First 105 (7 × 15), last 294 (7 × 42) → 42 − 15 + 1 = 28 terms", "Sum = 28/2 × (105 + 294) = 14 × 399"], "ans": "5586"}, {"k": "ex", "q": "Find 1³ + 2³ + … + 15³.", "steps": ["[15 × 16/2]² = 120²"], "ans": "14400"}, {"k": "trick", "h": "<b>Sum of cubes = square of the sum</b>: 1³ + … + n³ = (1 + … + n)². <b>Odd numbers 1 to (2n − 1)</b> sum to n² — count the terms, square it.<br><b>Middle-term trick:</b> sum of an AP = number of terms × middle term (or average of first and last)."}, {"k": "trap", "h": "<b>Count the terms correctly:</b> from 105 to 294 in steps of 7 is (294 − 105)/7 + 1 = 28, not 27. <b>“Between 1 and 500”</b> may or may not include the ends — 1 itself is a perfect square."}, {"k": "link", "h": "Sum of digits from 1 to 100 (L10) uses the same 1 + … + 9 = 45 block. The GP sum gives the sum-of-factors brackets in L4: 1 + 2 + 4 + 8 = 2⁴ − 1."}, {"k": "q", "q": "Sum of the first 20 odd numbers is:", "o": ["400", "210", "420", "441"], "e": "n² = 20² = 400."}], "sum": ["Σn = n(n + 1)/2; Σn² = n(n + 1)(2n + 1)/6; Σn³ = [n(n + 1)/2]²", "First n odd numbers → n²; first n even → n(n + 1)", "AP: n = (l − a)/d + 1, S = n(a + l)/2", "Range sums: S(b) − S(a − 1)", "Perfect squares up to N = ⌊√N⌋"]}
+//@@L
+];
+const QB = [
+["L1", "How many prime numbers are there from 1 to 100?", ["25", "24", "26", "21"], "2, 3, 5 … 97: 15 up to 50 and 10 from 51 to 100 → 25."],
+["L1", "How many prime numbers are there from 1 to 200?", ["46", "45", "48", "50"], "25 up to 100 and 21 from 101 to 200 → 46."],
+["L1", "How many prime numbers are there between 1 and 1000?", ["168", "158", "178", "148"], "A fixed fact: 168 primes below 1000."],
+["L1", "Which is the smallest 3-digit prime number?", ["101", "103", "107", "111"], "101 is not divisible by 2, 3, 5 or 7. 111 = 3 × 37."],
+["L1", "Which is the largest 3-digit prime number?", ["997", "999", "991", "993"], "999 = 27 × 37 and 993 = 3 × 331; 991 is prime but smaller than 997."],
+["L1", "Which of the following is a prime number?", ["137", "133", "143", "161"], "133 = 7 × 19, 143 = 11 × 13, 161 = 7 × 23; 137 has no prime factor up to 11."],
+["L1", "Which of the following is NOT a prime number?", ["91", "89", "97", "83"], "91 = 7 × 13."],
+["L1", "What is the average of all prime numbers between 80 and 100?", ["89.67", "88.33", "90.5", "87.67"], "83, 89, 97 → 269/3 = 89.67."],
+["L1", "x, y, z are distinct primes with x < y < z and x + y + z = 70. Which of the following can be z?", ["37", "29", "43", "31"], "x = 2, y + z = 68. z = 37 → y = 31 ✓; 29 → 39, 43 → 25 are not prime; 31 → y = 37 > z."],
+["L1", "x, y and z are primes with x + y + z = 38. What is the largest possible value of x?", ["31", "29", "37", "23"], "38 is even → one prime is 2; x + y = 36 with y = 5 gives x = 31."],
+["L1", "What is the sum of all prime numbers from 1 to 20?", ["77", "75", "58", "79"], "2 + 3 + 5 + 7 + 11 + 13 + 17 + 19 = 77."],
+["L1", "0.363636… expressed as a fraction is:", ["4/11", "9/25", "3/11", "36/90"], "36/99 = 4/11."],
+["L1", "0.2333… expressed as a fraction is:", ["7/30", "23/90", "23/99", "2/9"], "(23 − 2)/90 = 21/90 = 7/30."],
+["L1", "0.1454545… expressed as a fraction is:", ["8/55", "16/99", "145/999", "4/25"], "(145 − 1)/990 = 144/990 = 8/55."],
+["L1", "Which of the following fractions gives a terminating decimal?", ["7/80", "5/12", "3/14", "11/30"], "80 = 2⁴ × 5 has only 2s and 5s; 12, 14 and 30 contain 3 or 7."],
+["L1", "Which of the following is an irrational number?", ["√12", "√49", "0.333…", "22/7"], "√12 = 2√3 never ends or repeats; √49 = 7, 0.333… = 1/3 and 22/7 are rational."],
+["L1", "Which of these is the smallest perfect number?", ["6", "28", "1", "12"], "1 + 2 + 3 = 6. 28 is the next one."],
+["L1", "Which pair is a pair of twin primes?", ["41, 43", "47, 49", "51, 53", "37, 39"], "Twin primes differ by 2 and both are prime; 49, 51 and 39 are composite."],
+["L1", "Which pair of numbers is co-prime?", ["16, 9", "12, 18", "15, 25", "14, 21"], "HCF(16, 9) = 1. The others share 6, 5 and 7."],
+["L1", "The product of two co-prime numbers is 117. Their LCM is:", ["117", "1", "39", "13"], "For co-prime numbers HCF = 1, so LCM = product = 117."],
+["L1", "Which of the following is the smallest odd composite number?", ["9", "15", "1", "3"], "1 is neither, 3 is prime, 9 = 3 × 3."],
+["L2", "Find the unit digit of 232 × 235.", ["0", "5", "6", "2"], "2 × 5 = 10 → 0."],
+["L2", "Find the unit digit of 628 + 493 + 589.", ["0", "8", "1", "4"], "8 + 3 + 9 = 20 → 0."],
+["L2", "Find the unit digit of 2383 − 1689.", ["4", "6", "2", "3"], "13 − 9 = 4."],
+["L2", "Find the unit digit of (382)⁵⁷⁵.", ["8", "2", "4", "6"], "75 ÷ 4 leaves 3 → 2³ = 8."],
+["L2", "Find the unit digit of (187)²⁸² × (529)³²¹ × (343)²³⁶.", ["1", "9", "7", "3"], "7² → 9, 9 (odd) → 9, 3⁴ → 1: 9 × 9 × 1 = 81 → 1."],
+["L2", "Find the unit digit of (789)³¹⁵ + (232)⁶⁴⁴ + (528)²⁵³.", ["3", "1", "7", "9"], "9 + 6 + 8 = 23 → 3."],
+["L2", "Find the unit digit of (982)⁴⁸¹ − (219)²⁴¹.", ["3", "7", "1", "9"], "2 − 9 → 12 − 9 = 3."],
+["L2", "Find the unit digit of 1! + 2! + 3! + … + 100!.", ["3", "0", "9", "1"], "From 5! every term ends in 0; 1 + 2 + 6 + 24 = 33 → 3."],
+["L2", "Find the unit digit of 7⁹⁵.", ["3", "7", "9", "1"], "95 ÷ 4 leaves 3 → 7³ = 343 → 3."],
+["L2", "Find the unit digit of 3⁶⁵ × 6⁵⁹ × 7⁷¹.", ["4", "2", "6", "8"], "3¹ → 3, 6 → 6, 7³ → 3: 3 × 6 × 3 = 54 → 4."],
+["L2", "Find the unit digit of 4¹⁹⁹⁷.", ["4", "6", "2", "8"], "Odd power of 4 → 4."],
+["L2", "Find the unit digit of 9¹⁰⁰⁰.", ["1", "9", "3", "7"], "Even power of 9 → 1."],
+["L2", "Find the unit digit of (1739)²⁴³ × (1265)³⁴⁷ × (3418)².", ["0", "5", "4", "8"], "9 × 5 × 4 = 180 → 0 (an even digit times 5)."],
+["L2", "Find the unit digit of 2¹⁰⁰ − 1.", ["5", "6", "1", "4"], "2¹⁰⁰: 00 ÷ 4 leaves 0 → 2⁴ → 6; 6 − 1 = 5."],
+["L2", "Find the unit digit of 13²⁰⁰³.", ["7", "3", "9", "1"], "03 ÷ 4 leaves 3 → 3³ = 27 → 7."],
+["L2", "Find the unit digit of 8⁴³ + 2⁴³.", ["0", "4", "2", "6"], "8³ → 2 and 2³ → 8: 2 + 8 = 10 → 0."],
+["L2", "Find the last two digits of 31⁷⁸⁶.", ["81", "61", "91", "11"], "Tens digit = unit digit of 3 × 786 = 2358 → 8; answer 81."],
+["L2", "Find the unit digit of 1 × 3 × 5 × 7 × … × 99 (product of odd numbers).", ["5", "0", "1", "3"], "An odd product containing 5 always ends in 5."],
+["L3", "Find the total number of factors of 360.", ["24", "20", "18", "36"], "360 = 2³ × 3² × 5 → 4 × 3 × 2 = 24."],
+["L3", "Find the total number of factors of 480.", ["24", "20", "30", "16"], "480 = 2⁵ × 3 × 5 → 6 × 2 × 2 = 24."],
+["L3", "Find the number of even factors of 360.", ["18", "16", "20", "12"], "3 × (2 + 1)(1 + 1) = 18."],
+["L3", "Find the number of odd factors of 360.", ["6", "8", "4", "12"], "(2 + 1)(1 + 1) = 6."],
+["L3", "N = 56 = 2³ × 7. Find the number of composite factors of N.", ["5", "6", "4", "3"], "Total 8 − 2 primes − 1 = 5."],
+["L3", "Find the number of prime factors of 720 (distinct).", ["3", "2", "4", "5"], "720 = 2⁴ × 3² × 5 → primes 2, 3, 5."],
+["L3", "Find the number of composite factors of 720.", ["26", "27", "30", "24"], "30 − 3 − 1 = 26."],
+["L3", "How many factors of 720 are perfect squares?", ["6", "4", "8", "3"], "2 from {0, 2, 4}, 3 from {0, 2}, 5 from {0} → 3 × 2 × 1 = 6."],
+["L3", "How many factors of 720 are perfect cubes?", ["2", "1", "3", "4"], "1 and 8 → 2."],
+["L3", "How many factors of 720 are divisible by 10?", ["12", "10", "15", "8"], "Factors of 72 = 2³ × 3² → 4 × 3 = 12."],
+["L3", "How many factors of 14400 are divisible by 18 but not by 36?", ["3", "15", "18", "6"], "Factors of 800 (18) − factors of 400 (15) = 3."],
+["L3", "When 732 is divided by a positive integer x, the remainder is 12. How many values of x are possible?", ["20", "30", "19", "10"], "x divides 720 and x > 12: 30 − 10 = 20."],
+["L3", "In how many ways can a pair of co-prime factors of 56 be chosen?", ["11", "8", "12", "9"], "(3 + 1)(1 + 1) + 3 × 1 = 11."],
+["L3", "N = 720 = 2⁴ × 3² × 5. In how many ways can a pair of co-prime factors of N be chosen?", ["68", "30", "38", "60"], "30 + (8 + 2 + 4) + 3 × 8 = 68."],
+["L3", "Which of the following numbers has an odd number of factors?", ["196", "198", "200", "192"], "Only perfect squares have an odd number of factors: 196 = 14²."],
+["L3", "How many numbers between 1 and 100 have exactly three factors?", ["4", "3", "5", "25"], "Exactly 3 factors = square of a prime: 4, 9, 25, 49 → 4."],
+["L3", "In how many ways can 360 be written as a product of two natural numbers?", ["12", "24", "6", "18"], "24 factors, 360 is not a perfect square → 24/2 = 12."],
+["L3", "Find the number of factors of 2⁴ × 3⁵ × 5² that are perfect squares.", ["18", "27", "12", "15"], "(2 + 1)(2 + 1)(1 + 1) = 18."],
+["L4", "Find the sum of all factors of 360.", ["1170", "1092", "1080", "1260"], "15 × 13 × 6 = 1170."],
+["L4", "Find the sum of all even factors of 360.", ["1092", "1170", "1080", "1012"], "14 × 13 × 6 = 1092."],
+["L4", "Find the sum of all odd factors of 360.", ["78", "72", "84", "91"], "13 × 6 = 78."],
+["L4", "Find the sum of all even factors of 720.", ["2340", "2418", "1092", "2200"], "(2 + 4 + 8 + 16) × 13 × 6 = 2340."],
+["L4", "Find the sum of all odd factors of 720.", ["78", "156", "39", "72"], "The power of 2 does not matter: 13 × 6 = 78."],
+["L4", "Find the sum of all factors of 100.", ["217", "216", "117", "200"], "7 × 31 = 217."],
+["L4", "Find the sum of all factors of 1000.", ["2340", "2430", "1560", "2000"], "1000 = 2³ × 5³ → (1 + 2 + 4 + 8)(1 + 5 + 25 + 125) = 15 × 156 = 2340."],
+["L4", "Find the sum of the reciprocals of all factors of 16.", ["31/16", "15/16", "2", "1"], "Sum of factors 31 ÷ 16."],
+["L4", "The sum of the reciprocals of the factors of 28 is:", ["2", "56/27", "1", "3/2"], "σ(28) = 56 → 56/28 = 2 (28 is a perfect number)."],
+["L4", "What is the product of all factors of 360?", ["360¹²", "360²⁴", "360⁶", "24³⁶⁰"], "24 factors → N^(24/2) = 360¹²."],
+["L4", "What is the product of all factors of 36?", ["6⁹", "36⁹", "6¹⁸", "36⁴"], "9 factors → 36^(9/2) = 6⁹."],
+["L4", "Which of these is a perfect number?", ["496", "500", "484", "512"], "σ(496) = 992 = 2 × 496."],
+["L4", "Find the sum of all factors of 2⁵ × 3².", ["819", "403", "728", "1001"], "63 × 13 = 819."],
+["L5", "If the six-digit number 479xyz is exactly divisible by 7, 11 and 13, then (y + z) × x is:", ["64", "48", "84", "56"], "479479 → x = 4, y = 7, z = 9 → 16 × 4 = 64."],
+["L5", "If the seven-digit number 35345xy is divisible by 40, the minimum value of 4x + 5y is:", ["8", "0", "24", "12"], "y = 0 and 5x0 divisible by 8 → x = 2 or 6 → least 8."],
+["L5", "If the 8-digit number 7y9745x2 is divisible by 72, find (2x − y) for the greatest value of x.", ["16", "14", "18", "12"], "x = 9 (592 ÷ 8 ✓), digit sum 52 + y → y = 2 → 18 − 2 = 16."],
+["L5", "If the 5-digit number 535ab is divisible by 3, 7 and 11, the value of a² − b² + ab is:", ["95", "85", "77", "108"], "53592 = 231 × 232 → a = 9, b = 2: 81 − 4 + 18 = 95."],
+["L5", "Which digit in place of * makes 5*2 divisible by 8?", ["5", "4", "3", "2"], "552 = 8 × 69."],
+["L5", "What is the value of d if the number 6d5341 is divisible by 11?", ["0", "1", "7", "9"], "Odd places (from right) 1 + 3 + d, even places 4 + 5 + 6: (4 + d) − 15 = 0 or ±11 → d = 0."],
+["L5", "The smallest digit that can replace * in 34*56 so that it is divisible by 9 is:", ["0", "1", "4", "8"], "3 + 4 + 5 + 6 = 18 → * = 0 (or 9); smallest 0."],
+["L5", "Which digit should replace * so that 76*58 is divisible by 11?", ["7", "3", "5", "8"], "Odd places (from the right) 8 + * + 7, even places 5 + 6: (15 + *) − 11 = 4 + * must be 11 → * = 7."],
+["L5", "Which of the following numbers is divisible by 24?", ["35640", "35718", "63810", "537804"], "35640: last three 640 ÷ 8 ✓, digit sum 18 ✓ (3 × 8)."],
+["L5", "Which of the following numbers is divisible by 13?", ["1027", "1037", "1047", "1057"], "1027: 102 + 4 × 7 = 130 = 13 × 10 ✓."],
+["L5", "Which of the following numbers is divisible by 17?", ["391", "381", "401", "371"], "391: 39 − 5 × 1 = 34 = 17 × 2 ✓."],
+["L5", "Every number of the form abcabc is divisible by:", ["1001", "1111", "1010", "101"], "abcabc = abc × 1001 = abc × 7 × 11 × 13."],
+["L5", "Every number of the form ababab is divisible by:", ["10101", "1001", "111", "1111"], "ababab = ab × 10101 = ab × 3 × 7 × 13 × 37."],
+["L5", "How many digits can replace * so that 52134*6 is divisible by 8? (Hint: check 4*6)", ["3", "2", "4", "5"], "4*6 divisible by 8: 416, 456, 496 → 3 digits."],
+["L5", "For how many digits x is the number 9x35x divisible by 3?", ["3", "4", "2", "5"], "17 + 2x divisible by 3 → x = 2, 5, 8 → 3 values."],
+["L5", "If 8x5 is divisible by 45, the value of x is:", ["5", "2", "4", "0"], "Ends in 5 ✓; 13 + x divisible by 9 → x = 5."],
+["L6", "2²⁵ + 2²⁶ + 2²⁷ is divisible by:", ["7", "9", "5", "11"], "2²⁵(1 + 2 + 4) = 2²⁵ × 7."],
+["L6", "How many numbers between 300 and 700 are divisible by 5, 6 and 8?", ["3", "4", "2", "5"], "LCM 120: 360, 480, 600."],
+["L6", "How many numbers from 1 to 100 are divisible by neither 3 nor 5?", ["53", "47", "54", "60"], "100 − (33 + 20 − 6) = 53."],
+["L6", "How many numbers from 700 to 950 (both included) are divisible by neither 3 nor 7?", ["144", "107", "150", "140"], "251 − (83 + 36 − 12) = 144."],
+["L6", "How many numbers from 1 to 200 are divisible by 4 but not by 6?", ["34", "50", "16", "33"], "50 − 16 = 34."],
+["L6", "How many numbers from 1 to 500 are divisible by 3 or 7?", ["214", "237", "190", "166"], "166 + 71 − 23 = 214."],
+["L6", "How many three-digit numbers are divisible by 7?", ["128", "129", "130", "127"], "⌊999/7⌋ − ⌊99/7⌋ = 142 − 14 = 128."],
+["L6", "How many numbers between 100 and 400 are divisible by 2, 3 and 5?", ["10", "9", "11", "12"], "LCM 30: 120, 150, …, 390 → 10."],
+["L6", "3ⁿ + 3ⁿ⁺¹ + 3ⁿ⁺² is always divisible by:", ["13", "11", "7", "9"], "3ⁿ(1 + 3 + 9) = 3ⁿ × 13."],
+["L6", "The product of any three consecutive natural numbers is always divisible by:", ["6", "9", "4", "5"], "Among three consecutive numbers one is a multiple of 3 and at least one is even → 3! = 6."],
+["L6", "How many numbers from 1 to 1000 are divisible by 2, 3 or 5?", ["734", "700", "766", "733"], "500 + 333 + 200 − 166 − 100 − 66 + 33 = 734."],
+["L6", "How many numbers from 1 to 300 are divisible by 5 but not by 25?", ["48", "60", "12", "50"], "60 − 12 = 48."],
+["L6", "How many numbers from 1 to 120 are co-prime to 30 (divisible by none of 2, 3, 5)?", ["32", "40", "24", "30"], "120 × ½ × ⅔ × ⅘ = 32."],
+["L7", "On dividing a number by 38, the quotient is 24 and the remainder is 13. The number is:", ["925", "912", "950", "938"], "38 × 24 + 13 = 925."],
+["L7", "What is the remainder when (335 + 608 + 853) is divided by 13?", ["2", "5", "8", "10"], "10 + 10 + 8 = 28 → 2."],
+["L7", "What is the remainder when the sum of 47, 69 and 85 is divided by 9?", ["3", "1", "5", "0"], "2 + 6 + 4 = 12 → 3."],
+["L7", "Positive numbers x, y and z leave remainders 17, 24 and 27 on division by 31. The remainder when (4x − 2y + 3z) is divided by 31 is:", ["8", "6", "13", "25"], "68 − 48 + 81 = 101 → 8."],
+["L7", "Find the remainder when 179 × 172 × 173 is divided by 17.", ["3", "5", "1", "12"], "9 × 2 × 3 = 54 → 3."],
+["L7", "Find the remainder of 89 ÷ 9 using negative remainders.", ["8", "1", "9", "0"], "89 = 90 − 1 → −1 + 9 = 8."],
+["L7", "What is the remainder when 116 is divided by 8?", ["4", "2", "6", "0"], "116 = 120 − 4 → −4 + 8 = 4."],
+["L7", "What is the least number that must be added to 42072 to make it divisible by 93?", ["57", "36", "45", "93"], "Remainder 36 → 93 − 36 = 57."],
+["L7", "What is the least number that must be subtracted from 25809 to make it divisible by 139?", ["94", "45", "139", "85"], "25809 = 139 × 185 + 94 → subtract 94."],
+["L7", "A number is divided successively by 3, 4 and 7, leaving remainders 2, 1 and 4. Find the least such number.", ["53", "71", "17", "74"], "7 × 0 + 4 = 4 → 4 × 4 + 1 = 17 → 17 × 3 + 2 = 53."],
+["L7", "A number is divided successively by 3, 4 and 7, leaving remainders 2, 3 and 5. Find the least such number.", ["71", "53", "59", "23"], "5 → 4 × 5 + 3 = 23 → 3 × 23 + 2 = 71."],
+["L7", "A number divided successively by 2, 3 and 5 leaves remainders 1, 2 and 3, the last quotient being 1. What is the remainder when it is divided by 13?", ["1", "3", "0", "2"], "5 × 1 + 3 = 8 → 26 → 53; 53 ÷ 13 leaves 1."],
+["L7", "Find the largest 4-digit number exactly divisible by 88.", ["9944", "9988", "9900", "9856"], "9999 ÷ 88 leaves 55 → 9999 − 55 = 9944."],
+["L7", "Find the smallest 4-digit number exactly divisible by 88.", ["1056", "1000", "1064", "1144"], "1000 ÷ 88 leaves 32 → 1000 + 56 = 1056."],
+["L7", "What is the least number which leaves remainder 3 when divided by 4, 6 and 9?", ["39", "36", "33", "75"], "LCM 36 + 3 = 39."],
+["L7", "What is the least number which, divided by 3, 5 and 8, leaves remainders 2, 4 and 7 respectively?", ["119", "120", "121", "239"], "Each remainder is 1 less than its divisor → LCM 120 − 1 = 119."],
+["L7", "A number when divided by 5 leaves remainder 3. What is the remainder when the square of the number is divided by 5?", ["4", "3", "9", "1"], "3² = 9 → 4."],
+["L7", "A number divided by 296 leaves remainder 75. What is the remainder when the same number is divided by 37?", ["1", "2", "8", "38"], "296 = 37 × 8, so the remainder is 75 ÷ 37 → 1."],
+["L8", "Find the remainder when (8³⁷¹ + 5³⁷¹) is divided by 13.", ["0", "1", "3", "12"], "8 + 5 = 13 and the power is odd → 0."],
+["L8", "Find the remainder when (3⁶¹ + 2⁶¹ + 4⁶¹) is divided by 9.", ["6", "0", "3", "1"], "Not 0! 3⁶¹ → 0; 2⁶ → 1 so 2⁶¹ → 2; 4³ → 1 so 4⁶¹ → 4; 0 + 2 + 4 = 6. (The pair 2⁶¹ + 4⁶¹ is only divisible by 6.)"],
+["L8", "Find the remainder when (16⁷³ + 17⁷³ + 18⁷³ + 19⁷³) is divided by 70.", ["0", "1", "10", "35"], "16, 17, 18, 19 in AP, sum 70, odd power → 0."],
+["L8", "Find the remainder when (8³⁶ − 2³⁶) is divided by 6.", ["0", "2", "4", "1"], "aⁿ − bⁿ is always divisible by a − b = 6."],
+["L8", "Find the remainder when (7²⁴ − 4²⁴) is divided by 11.", ["0", "3", "7", "1"], "Even power → divisible by a + b = 11."],
+["L8", "Find the remainder when 16¹³ is divided by 15.", ["1", "0", "14", "13"], "(15 + 1)¹³ → 1."],
+["L8", "Find the remainder when 72²⁸² is divided by 73.", ["1", "72", "0", "2"], "(73 − 1)²⁸² with even power → 1."],
+["L8", "Find the remainder when 72²⁸¹ is divided by 73.", ["72", "1", "0", "71"], "(73 − 1)²⁸¹ with odd power → −1 → 72."],
+["L8", "Find the remainder when 82⁵⁴ is divided by 19.", ["1", "18", "0", "5"], "Fermat: 82¹⁸ → 1, so (82¹⁸)³ → 1."],
+["L8", "Find the remainder when 93⁵¹ is divided by 11.", ["5", "1", "4", "6"], "93 → 5; Fermat 5¹⁰ → 1; 5⁵¹ = (5¹⁰)⁵ × 5 → 5."],
+["L8", "Find the remainder when 9¹¹¹ is divided by 13.", ["1", "9", "3", "12"], "9³ = 729 leaves 1 → (9³)³⁷ → 1."],
+["L8", "Find the remainder when 96¹³² is divided by 97.", ["1", "96", "0", "2"], "(97 − 1)¹³² with even power → 1 (also Fermat)."],
+["L8", "Find the totient of 100.", ["40", "50", "60", "20"], "100 × ½ × ⅘ = 40."],
+["L8", "Find the value of φ(72).", ["24", "36", "18", "12"], "72 × ½ × ⅔ = 24."],
+["L8", "Find the remainder when 40! is divided by 41.", ["40", "1", "0", "39"], "Wilson: (p − 1)! → p − 1 = 40."],
+["L8", "Find the remainder when 2¹⁰⁰ is divided by 7.", ["2", "1", "4", "6"], "2³ → 1; 2¹⁰⁰ = (2³)³³ × 2 → 2."],
+["L8", "Find the remainder when 2³¹ is divided by 5.", ["3", "2", "1", "4"], "Cycle 2, 4, 3, 1; 31 ÷ 4 leaves 3 → 3."],
+["L8", "Find the remainder when 17²⁰⁰ is divided by 18.", ["1", "17", "0", "2"], "(18 − 1)²⁰⁰ → (−1)²⁰⁰ = 1."],
+["L8", "Find the remainder when 3²¹ is divided by 5.", ["3", "1", "2", "4"], "3 → cycle 3, 4, 2, 1; 21 ÷ 4 leaves 1 → 3."],
+["L9", "How many zeros are there at the end of 24 × 13 × 52 × 27?", ["0", "1", "2", "3"], "No factor 5 at all."],
+["L9", "How many zeros are there at the end of 8 × 15 × 24 × 13?", ["1", "2", "0", "3"], "Only one 5 → one zero."],
+["L9", "Find the number of zeros at the end of 47!.", ["10", "9", "11", "12"], "9 + 1 = 10."],
+["L9", "Find the number of zeros at the end of 300!.", ["74", "60", "72", "75"], "60 + 12 + 2 = 74."],
+["L9", "Find the number of zeros at the end of 100!.", ["24", "20", "25", "22"], "20 + 4 = 24."],
+["L9", "Find the number of zeros at the end of 1000!.", ["249", "200", "248", "250"], "200 + 40 + 8 + 1 = 249."],
+["L9", "Find the number of zeros at the end of 125!.", ["31", "25", "30", "28"], "25 + 5 + 1 = 31."],
+["L9", "Find the highest power of 3 in 50!.", ["22", "16", "24", "17"], "16 + 5 + 1 = 22."],
+["L9", "Find the highest power of 2 in 50!.", ["47", "25", "48", "43"], "25 + 12 + 6 + 3 + 1 = 47."],
+["L9", "Find the highest power of 12 in 50!.", ["22", "23", "47", "24"], "2s: 47 → 23 pairs (2²); 3s: 22 → limit 22."],
+["L9", "Find the highest power of 5 in 351 × 352 × … × 600.", ["62", "86", "148", "50"], "148 − 86 = 62."],
+["L9", "How many zeros are there at the end of 5 × 10 × 15 × 20 × … × 100?", ["18", "20", "24", "19"], "= 5²⁰ × 20!: 5s = 20 + 4 = 24, 2s = 18 → 18 zeros."],
+["L9", "How many zeros are there at the end of 25 × 125 × 4?", ["2", "5", "3", "4"], "5⁵ × 2² → only two 2s → 2 zeros."],
+["L9", "Find the highest power of 7 in 1000!.", ["164", "142", "143", "166"], "142 + 20 + 2 = 164."],
+["L10", "How many digits are needed to number a book of 428 pages?", ["1176", "1284", "1185", "1167"], "9 + 180 + 987 = 1176."],
+["L10", "A printer used 3189 digits to number the pages of a book. How many pages does the book have?", ["1074", "1075", "1063", "1097"], "2889 digits up to 999; 300 more digits = 75 pages → 1074."],
+["L10", "How many digits are used to write all numbers from 1 to 999?", ["2889", "2700", "2999", "2898"], "9 + 180 + 2700 = 2889."],
+["L10", "How many numbers from 400 to 700 contain the digit 6 exactly twice?", ["20", "18", "19", "21"], "466, 566, nine in 660–669, nine in 606–696 → 20."],
+["L10", "Find the sum of all digits of the numbers from 1 to 100.", ["901", "5050", "900", "946"], "45 + 450 + 405 + 1 = 901."],
+["L10", "How many times does the digit 7 appear when writing the numbers from 1 to 100?", ["20", "19", "21", "11"], "10 in units, 10 in tens → 20."],
+["L10", "How many numbers from 1 to 100 contain the digit 7 at least once?", ["19", "20", "18", "10"], "20 sevens, but 77 has two → 19 numbers."],
+["L10", "How many times does the digit 0 appear when writing the numbers from 1 to 100?", ["11", "10", "9", "20"], "10, 20, … 90 (9 zeros) + 100 (2 zeros) = 11."],
+["L10", "How many 3-digit numbers are there in all?", ["900", "999", "899", "1000"], "100 to 999 → 999 − 100 + 1 = 900."],
+["L10", "How many 3-digit numbers have all digits different?", ["648", "720", "729", "900"], "9 × 9 × 8 = 648."],
+["L10", "How many digits are used to write the numbers from 1 to 1000?", ["2893", "2889", "3000", "2890"], "2889 + 4 = 2893."],
+["L10", "How many key strokes are needed to type the numbers from 1 to 150?", ["342", "450", "351", "339"], "1–9: 9, 10–99: 180, 100–150: 51 × 3 = 153 → 342."],
+["L11", "How many pairs of natural numbers are there such that the difference of their squares is 35?", ["2", "1", "3", "4"], "35 × 1 → (18, 17); 7 × 5 → (6, 1)."],
+["L11", "How many pairs of natural numbers have the difference of their squares equal to 36?", ["1", "2", "3", "0"], "18 × 2 → (10, 8). 6 × 6 gives y = 0, which is not natural."],
+["L11", "How many pairs of natural numbers have the difference of their squares equal to 45?", ["3", "2", "4", "1"], "45 × 1, 15 × 3, 9 × 5 → (23, 22), (9, 6), (7, 2)."],
+["L11", "Which of the following can NOT be written as the difference of two perfect squares?", ["30", "32", "35", "45"], "30 = 4 × 7 + 2 is of the form 4k + 2."],
+["L11", "The sum of a two-digit number and the number obtained by interchanging its digits is 77. If the digits differ by 1, the number (tens digit larger) is:", ["43", "34", "52", "61"], "x + y = 7, x − y = 1 → 43."],
+["L11", "The sum of the digits of a two-digit number is 9. The number obtained by interchanging its digits exceeds the original by 45. The number is:", ["27", "72", "36", "18"], "y − x = 5, x + y = 9 → 27."],
+["L11", "If the hundreds and units digits of a three-digit number are interchanged, the number decreases by 198. The difference between the hundreds and units digits is:", ["2", "3", "1", "4"], "99(x − z) = 198 → 2."],
+["L11", "If the hundreds and tens digits of a three-digit number are interchanged, the number decreases by 360. The difference between the hundreds and tens digits is:", ["4", "3", "6", "2"], "90(x − y) = 360 → 4."],
+["L11", "The difference between a two-digit number and the number formed by reversing its digits is 36. What is the difference between its digits?", ["4", "3", "6", "9"], "9(x − y) = 36 → 4."],
+["L11", "The sum of a two-digit number and its reverse is always divisible by:", ["11", "9", "10", "2"], "11(x + y)."],
+["L11", "A two-digit number is 4 times the sum of its digits and the number formed by reversing it is 27 more. The number is:", ["36", "63", "24", "48"], "10x + y = 4(x + y) → y = 2x; 9(y − x) = 27 → x = 3 → 36."],
+["L11", "Express 15 as a difference of two squares of consecutive numbers.", ["8² − 7²", "4² − 1²", "9² − 6²", "7² − 6²"], "Odd N = ((N + 1)/2)² − ((N − 1)/2)² = 8² − 7². (4² − 1² also equals 15 but is not consecutive.)"],
+["L11", "If x² − y² = 101 for natural numbers x and y, then x + y is:", ["101", "100", "51", "1"], "101 is prime → x + y = 101, x − y = 1."],
+["L12", "Convert (101010)₂ to octal.", ["52", "42", "25", "62"], "101 | 010 → 5, 2."],
+["L12", "Convert (1010101)₂ to decimal.", ["85", "75", "95", "170"], "64 + 16 + 4 + 1 = 85."],
+["L12", "Convert (1010101)₂ to hexadecimal.", ["55", "45", "125", "A5"], "101 | 0101 → 5, 5."],
+["L12", "Convert (675)₈ to binary.", ["110111101", "110111110", "111011101", "110110101"], "6 = 110, 7 = 111, 5 = 101."],
+["L12", "Convert (175)₈ to decimal.", ["125", "175", "135", "117"], "64 + 56 + 5 = 125."],
+["L12", "Convert (675)₈ to hexadecimal.", ["1BD", "2BD", "1DB", "1AD"], "110111101 → 1 | 1011 | 1101 → 1BD."],
+["L12", "Convert (63)₁₀ to binary.", ["111111", "111110", "101111", "1111111"], "63 = 64 − 1 → six 1s."],
+["L12", "Convert (67)₁₀ to octal.", ["103", "130", "83", "107"], "67 = 8 × 8 + 3 → 1, 0, 3."],
+["L12", "Convert (425)₁₀ to hexadecimal.", ["1A9", "1A5", "19A", "2A9"], "425 = 1 × 256 + 10 × 16 + 9."],
+["L12", "Convert (D9)₁₆ to binary.", ["11011001", "11011101", "10011101", "11101001"], "D = 1101, 9 = 1001."],
+["L12", "Convert (6FD)₁₆ to octal.", ["3375", "3357", "3575", "6375"], "0110 1111 1101 → 011 011 111 101."],
+["L12", "Convert (1AD)₁₆ to decimal.", ["429", "413", "301", "4013"], "256 + 160 + 13 = 429."],
+["L12", "Convert (4AE)₁₆ to octal.", ["2256", "2265", "4256", "2556"], "0100 1010 1110 → 010 010 101 110 → 2256."],
+["L12", "Convert (10101)₂ to hexadecimal.", ["15", "21", "25", "51"], "1 | 0101 → 1, 5."],
+["L12", "(17.125)₁₀ in binary is:", ["10001.001", "10001.01", "10010.001", "10001.101"], "17 → 10001; 0.125 → .001."],
+["L13", "Find the sum 11² + 12² + … + 20².", ["2485", "2870", "2385", "2465"], "2870 − 385 = 2485."],
+["L13", "Find the sum of all multiples of 7 between 100 and 300.", ["5586", "5590", "5537", "5880"], "28 terms × (105 + 294)/2 = 5586."],
+["L13", "Find 1³ + 2³ + … + 15³.", ["14400", "1240", "3600", "14000"], "(15 × 16/2)² = 120² = 14400."],
+["L13", "Find the sum of all odd numbers from 1 to 99.", ["2500", "2550", "5000", "2450"], "50 odd numbers → 50² = 2500."],
+["L13", "Find the sum of all even numbers from 2 to 100.", ["2550", "2500", "5050", "2450"], "50 × 51 = 2550."],
+["L13", "Find 1 + 2 + 3 + … + 100.", ["5050", "5000", "5100", "4950"], "100 × 101/2 = 5050."],
+["L13", "Find 1² + 2² + … + 10².", ["385", "355", "505", "3025"], "10 × 11 × 21/6 = 385."],
+["L13", "How many perfect squares are there from 1 to 500?", ["22", "21", "23", "25"], "22² = 484 ≤ 500 < 23² = 529 → 22."],
+["L13", "How many terms are there in 7, 14, 21, …, 294?", ["42", "41", "43", "40"], "(294 − 7)/7 + 1 = 42."],
+["L13", "Find 1 + 2 + 4 + 8 + … + 512.", ["1023", "1024", "511", "1022"], "2¹⁰ − 1 = 1023."],
+["L13", "Find 2² + 4² + 6² + … + 20².", ["1540", "770", "1450", "3080"], "4 × 385 = 1540."],
+["L13", "Find 1² + 3² + 5² + … + 19².", ["1330", "1540", "1310", "1300"], "n = 10: 10 × 19 × 21/3 = 1330."],
+["L13", "How many numbers between 1 and 1000 are perfect cubes?", ["10", "9", "31", "100"], "1³ to 10³ → 10 (1 and 1000 included)."],
+["L13", "The sum of three consecutive odd numbers is 147. The largest of them is:", ["51", "49", "47", "53"], "Middle = 147/3 = 49 → largest 51."]
+//@@Q
+];
+const HEAT = [["Classification & primes", 8, "L1", "How many primes up to 100, which is irrational, recurring decimal → fraction, primes adding to a total"], ["Unit digit", 14, "L2", "Unit digit of a product/sum of big powers, factorial sums"], ["Number of factors", 12, "L3", "Total, even, odd, perfect-square and ‘divisible by k’ factors"], ["Sum & product of factors", 5, "L4", "Sum of even/odd factors, product N^(n/2)"], ["Divisibility & missing digit", 16, "L5", "Find x, y so that a number is divisible by 72, 88, 7-11-13"], ["Counting multiples", 6, "L6", "Divisible by both / either / neither in a range"], ["Remainder rules", 14, "L7", "Remainder of sums and products, least number to add, successive division"], ["Remainder of powers", 9, "L8", "(D ± 1)ⁿ, aⁿ ± bⁿ, Fermat, Wilson"], ["Trailing zeros", 6, "L9", "Zeros at the end of n!, highest power of a prime"], ["Digits & pages", 3, "L10", "Digits to number a book, how often a digit appears"], ["Reversed digits & x² − y²", 5, "L11", "Two-digit number and its reverse, pairs with a given difference of squares"], ["Number bases", 2, "L12", "Binary ↔ decimal ↔ octal ↔ hex"], ["Series sums", 8, "L13", "Σn, Σn², Σn³, odd/even sums, AP sums"]];
+const TILES = [["25", "primes from 1 to 100 (46 to 200, 168 to 1000)"], ["2", "only even prime; 1 is neither prime nor composite"], ["101 · 997", "smallest and largest 3-digit primes"], ["6k ± 1", "form of every prime above 3"], ["ab/99", "0.ababab… ;  (ab − a)/90 for 0.abbb…"], ["2, 4, 8, 6", "cycle of 2 (3: 3, 9, 7, 1; 7: 7, 9, 3, 1; 8: 8, 4, 2, 6)"], ["r = 0 → 4", "power ÷ 4 leaves 0: use the 4th term"], ["3", "unit digit of 1! + 2! + … + n! (n ≥ 4)"], ["(p+1)(q+1)(r+1)", "number of factors of aᵖbᵠcʳ"], ["N^(n/2)", "product of all factors"], ["σ(N)/N", "sum of reciprocals of factors"], ["6, 28, 496", "perfect numbers"], ["1001", "7 × 11 × 13 → abcabc"], ["10101", "3 × 7 × 13 × 37 → ababab"], ["+4 × last", "test for 13 (17: −5 × last)"], ["D − R", "least number to add (R to subtract)"], ["k·LCM + r", "same remainder r for every divisor"], ["(D − 1)ⁿ", "→ 1 if n even, D − 1 if n odd"], ["a^(p−1) → 1", "Fermat (p prime)"], ["(p − 1)! → p − 1", "Wilson"], ["φ(100) = 40", "Euler’s totient"], ["24 · 249", "zeros at the end of 100! and 1000!"], ["9, 189, 2889", "digits to write 1–9, 1–99, 1–999"], ["901", "sum of digits from 1 to 100"], ["11(x+y) · 9(x−y)", "two-digit number ± its reverse"], ["4k + 2", "never a difference of two squares"], ["8-4-2-1", "binary ↔ hex in groups of 4 (4-2-1 for octal)"], ["[n(n+1)/2]²", "1³ + 2³ + … + n³"]];
+const PAIRS = [["Prime vs co-prime", "prime: exactly 2 factors; co-prime: two numbers with HCF 1 (8 and 9)"], ["Power ÷ 4 leaves 0", "use the 4th term (2⁴ → 6), not 2⁰ = 1"], ["Odd factors vs even factors", "odd: drop the 2s; even: total − odd"], ["Composite factors", "total − prime factors − 1 (1 is neither)"], ["Divisible by 4 and 6 vs by 24", "24 needs co-prime parts 3 and 8; 12 is divisible by 4 and 6"], ["Least to add vs least to subtract", "D − R vs R"], ["(D − 1)ⁿ: n even vs n odd", "1 vs D − 1"], ["aⁿ + bⁿ vs aⁿ − bⁿ", "+ divisible by a + b for odd n; − divisible by a − b always and by a + b for even n"], ["Fermat vs Euler", "Fermat needs a prime divisor; Euler works for any co-prime N with φ(N)"], ["Zeros in n! vs in a product", "n!: count 5s; plain product: min(2s, 5s)"], ["⌊n/5⌋ only vs + ⌊n/25⌋ + …", "25 gives two 5s, 125 three — keep dividing"], ["Numbers with a 7 vs number of 7s", "19 numbers but 20 sevens from 1 to 100 (77)"], ["x² − y² = 36: 6 × 6", "gives y = 0 → not a pair of natural numbers"], ["(2⁶¹ + 3⁶¹ + 4⁶¹) ÷ 9", "remainder 6, not 0 — AP terms only pair up as first + last"], ["Binary grouping", "from the right in 3s (octal) or 4s (hex)"]];
+const COVERS = {"cyc": {"tab": "Unit-digit drill", "hideLabel": "Hide answers", "note": "Cover the answer and find each unit digit in your head with the cycle rule.", "head": ["Expression", "Rule", "Unit digit"], "hide": 2, "rows": [["2⁵⁷⁵", "75 ÷ 4 → 3", "8"], ["3²³⁶", "36 ÷ 4 → 0 → 4th", "1"], ["7²⁸²", "82 ÷ 4 → 2", "9"], ["8²⁵³", "53 ÷ 4 → 1", "8"], ["4¹⁹⁹⁷", "odd power", "4"], ["9¹⁰⁰⁰", "even power", "1"], ["2⁶⁴⁴", "44 ÷ 4 → 0 → 4th", "6"], ["7⁹⁵", "95 ÷ 4 → 3", "3"], ["13²⁰⁰³", "03 ÷ 4 → 3", "7"], ["1!+…+100!", "only 1!–4!", "3"], ["2383 − 1689", "13 − 9", "4"], ["odd × 5", "always", "5"]]}, "fac": {"tab": "Factor drill", "hideLabel": "Hide answers", "note": "Cover the answer: factorise, then apply the counting formula.", "head": ["Question", "Factorisation", "Answer"], "hide": 2, "rows": [["Factors of 360", "2³ × 3² × 5", "24"], ["Odd factors of 360", "3² × 5", "6"], ["Even factors of 360", "24 − 6", "18"], ["Factors of 720", "2⁴ × 3² × 5", "30"], ["Composite factors of 720", "30 − 3 − 1", "26"], ["Square factors of 720", "3 × 2 × 1", "6"], ["Cube factors of 720", "2 × 1 × 1", "2"], ["Factors of 720 divisible by 10", "72 = 2³ × 3²", "12"], ["Sum of factors of 360", "15 × 13 × 6", "1170"], ["Sum of odd factors of 720", "13 × 6", "78"], ["Sum of even factors of 720", "30 × 13 × 6", "2340"], ["Product of factors of 360", "24 factors", "360¹²"], ["Co-prime pairs of 56", "4 × 2 + 3", "11"], ["Co-prime pairs of 720", "30 + 14 + 24", "68"]]}, "rem": {"tab": "Remainder drill", "hideLabel": "Hide answers", "note": "Cover the answer and name the rule that gives it.", "head": ["Expression", "Rule", "Remainder"], "hide": 2, "rows": [["16¹³ ÷ 15", "(D + 1)ⁿ", "1"], ["72²⁸² ÷ 73", "(D − 1)^even", "1"], ["72²⁸¹ ÷ 73", "(D − 1)^odd", "72"], ["(8³⁷¹ + 5³⁷¹) ÷ 13", "odd n, a + b = 13", "0"], ["(7²⁴ − 4²⁴) ÷ 11", "even n, a + b = 11", "0"], ["(8³⁶ − 2³⁶) ÷ 6", "a − b = 6", "0"], ["82⁵⁴ ÷ 19", "Fermat (18)", "1"], ["93⁵¹ ÷ 11", "5⁵¹, Fermat (10)", "5"], ["40! ÷ 41", "Wilson", "40"], ["2¹⁰⁰ ÷ 7", "2³ → 1", "2"], ["89 ÷ 9", "90 − 1", "8"], ["(4x − 2y + 3z) ÷ 31, rem 17, 24, 27", "68 − 48 + 81 = 101", "8"]]}};
+const FIND = {"tab": "Formula finder", "ph": "Search a formula (e.g. factors, 13, zeros, hex)", "head": ["Topic", "Formula", "Lesson", "When to use"], "rows": [["Number types", "natural ⊂ whole ⊂ integer ⊂ rational ⊂ real", "L1", "Classify a number"], ["Prime count", "25 to 100, 46 to 200, 95 to 500, 168 to 1000", "L1", "How many primes"], ["Prime test", "test primes up to √N", "L1", "Is N prime?"], ["Prime form", "every prime > 3 is 6k ± 1", "L1", "Quick filter"], ["Recurring decimal", "0.abab… = ab/99; 0.abbb… = (ab − a)/90", "L1", "Decimal → fraction"], ["Terminating decimal", "denominator has only 2s and 5s", "L1", "Does P/Q end?"], ["Unit digit cycles", "2: 2486, 3: 3971, 7: 7931, 8: 8426; 4, 9 alternate", "L2", "Unit digit of a power"], ["Unit digit method", "power (last 2 digits) ÷ 4; remainder 0 → 4", "L2", "Big powers"], ["Factorial unit digit", "n! ends in 0 for n ≥ 5; 1! + … + n! ends in 3", "L2", "Factorial sums"], ["Last two digits", "base …1: tens = unit digit of (tens × power)", "L2", "Last two digits"], ["Number of factors", "(p + 1)(q + 1)(r + 1)", "L3", "Count factors"], ["Odd / even factors", "odd: drop 2s; even = total − odd", "L3", "Even/odd factors"], ["Composite factors", "total − primes − 1", "L3", "Composite count"], ["Square / cube factors", "⌊p/2⌋ + 1 / ⌊p/3⌋ + 1 per prime", "L3", "Special factors"], ["Factors divisible by k", "factors of N/k", "L3", "Divisible factors"], ["Co-prime factor pairs", "(p + 1)(q + 1) + pq", "L3", "Pairs with HCF 1"], ["Ways as product of two", "n/2 or (n + 1)/2 for squares", "L3", "N = A × B"], ["Sum of factors", "Π (a^(p+1) − 1)/(a − 1)", "L4", "Sum of all factors"], ["Sum of odd / even factors", "drop the 2-bracket / all − odd", "L4", "Odd/even sums"], ["Product of factors", "N^(n/2)", "L4", "Product"], ["Sum of reciprocals", "σ(N)/N", "L4", "Reciprocal sum"], ["Divisible by 2ⁿ", "last n digits divisible by 2ⁿ", "L5", "2, 4, 8, 16"], ["Divisible by 3, 9", "digit sum", "L5", "Missing digit"], ["Divisible by 11", "alternate digit sum difference 0 or 11k", "L5", "Missing digit"], ["Divisible by 7", "triplets alternately, or double last and subtract", "L5", "7 test"], ["Divisible by 13", "add 4 × last digit", "L5", "13 test"], ["Divisible by 17", "subtract 5 × last digit", "L5", "17 test"], ["7, 11, 13", "abcabc = abc × 1001", "L5", "Repeated triplets"], ["3, 7, 13, 37", "ababab = ab × 10101", "L5", "Repeated pairs"], ["Composite divisor", "split into co-prime parts (72 = 8 × 9)", "L5", "Divisible by 72, 88 …"], ["Multiples in A..B", "⌊B/k⌋ − ⌊(A − 1)/k⌋", "L6", "Count multiples"], ["Either / neither", "N(a) + N(b) − N(LCM); total − that", "L6", "Inclusion–exclusion"], ["Division", "N = DQ + R", "L7", "Find the number"], ["Remainder of sum/product", "combine remainders", "L7", "Big sums and products"], ["Negative remainder", "r − D, add D back at the end", "L7", "Near multiples"], ["Least to add / subtract", "D − R / R", "L7", "Make divisible"], ["Same remainder", "k × LCM + r", "L7", "Leaves r each time"], ["Constant gap", "k × LCM − d", "L7", "Remainders 1 less than divisors"], ["Successive division", "rebuild from the last: × divisor + remainder", "L7", "Find N"], ["(D ± 1)ⁿ", "+1 → 1; −1 → 1 (even n) or D − 1 (odd n)", "L8", "Big powers"], ["aⁿ ± bⁿ", "+: ÷ (a + b) for odd n; −: ÷ (a − b) always, ÷ (a + b) for even n", "L8", "Sum/difference of powers"], ["Fermat", "a^(p−1) → 1 (mod p)", "L8", "Prime divisor"], ["Euler", "a^φ(N) → 1; φ(N) = N Π(1 − 1/p)", "L8", "Any divisor"], ["Wilson", "(p − 1)! → p − 1; (p − 2)! → 1", "L8", "Factorial ÷ prime"], ["Trailing zeros of n!", "⌊n/5⌋ + ⌊n/25⌋ + …", "L9", "Zeros"], ["Power of p in n!", "Σ ⌊n/pᵏ⌋", "L9", "Highest power"], ["Composite base in n!", "limiting prime (12 = 2² × 3)", "L9", "Power of 12, 6 …"], ["Digits for 1..N", "n(N + 1) − 11…1", "L10", "Page numbering"], ["Digit frequency", "each 1–9: 20 times in 1–99, 300 in 1–999", "L10", "How often a digit appears"], ["Sum of digits", "1–100: 901; 1–999: 13500", "L10", "Digit sums"], ["Difference of squares", "N = (x + y)(x − y), same parity", "L11", "Pairs (x, y)"], ["Reversed 2-digit", "sum 11(x + y), difference 9(x − y)", "L11", "Digits interchanged"], ["Reversed 3-digit", "99(x − z), 90(x − y), 9(y − z)", "L11", "Digits interchanged"], ["To decimal", "Σ digit × baseᵖˡᵃᶜᵉ", "L12", "Any base → 10"], ["From decimal", "divide repeatedly, remainders bottom-up", "L12", "10 → any base"], ["Binary ↔ octal / hex", "groups of 3 (4-2-1) / 4 (8-4-2-1)", "L12", "Quick conversion"], ["Σn, Σn², Σn³", "n(n+1)/2, n(n+1)(2n+1)/6, [n(n+1)/2]²", "L13", "Series sums"], ["Odd / even sums", "n² / n(n + 1)", "L13", "1 + 3 + … , 2 + 4 + …"], ["AP", "n = (l − a)/d + 1, S = n(a + l)/2", "L13", "Terms and sum"]]};
+const APP = {"key": "number_system_workbook_v1", "brand": "Number System", "sub": "संख्या पद्धति · SSC maths workbook", "eyebrow": "SSC CGL Maths", "intro": "Thirteen lessons that cover every number-system type SSC asks: classification and primes, unit digits, number, sum and product of factors, divisibility and missing digits, counting multiples, remainders and the remainder theorems, trailing zeros, digit counting, reversed digits and difference of squares, number bases and series sums. Built from the Formula Book chapter with extra topics SSC also asks. Each lesson has formula cards, solved examples, tricks and traps, and a practice bank whose answers are checked by computer.", "foot": "Read a lesson’s formula cards and examples, then try its quick check and question bank. Use the drills to cover a column and recall it, and the formula finder to look anything up in seconds. Revisit the traps before a mock test.", "craft": "Most number-system questions fall to four moves. (1) Factorise first: factors, sums, zeros and HCF/LCM all start from N = aᵖbᵠcʳ. (2) Work with remainders, not numbers: replace every term by its remainder (or unit digit), allow negative remainders, and look for divisor ± 1. (3) Split a composite divisor into co-prime parts (72 = 8 × 9) for missing digits. (4) Use options: the answer to a reversed-digit question is a multiple of 9 or 11, a perfect square has an odd number of factors, and a remainder is always smaller than the divisor.", "heatNote": "Shares are approximate, estimated from recent SSC CGL and CHSL papers; they show where number-system questions usually come from, not exact counts."};
+
+/* ============================================================
+   HELPERS & STATE
+   ============================================================ */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const hash = s => { let h = 5381; for (let i=0;i<s.length;i++) h = ((h<<5)+h + s.charCodeAt(i))|0; return "q"+(h>>>0).toString(36); };
+const shuffle = a => { const b=a.slice(); for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]];} return b; };
+const L = id => LESSONS.find(l => l.id === id);
+const LNUM = id => LESSONS.findIndex(l => l.id === id) + 1;
+
+const QS = QB.map(r => {
+  const fixed = !!r[6];
+  return { t:r[0], q:r[1], o:r[2], e:r[3], p:(r[4]||"").includes("p"), a: fixed ? (r[5]||0) : 0, fixed, id:hash(r[1]) };
+});
+const byLesson = id => QS.filter(q => q.t === id);
+// order of options to show: array of original indexes
+const makePerm = q => q.fixed ? q.o.map((_,i)=>i) : shuffle(q.o.map((_,i)=>i));
+
+const KEY = APP.key;
+let S = { ans:{}, bm:{}, les:{}, mocks:[] };
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch(e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
+const record = (q, ok) => { S.ans[q.id] = ok ? 1 : 0; save(); renderTop(); };
+
+function renderTop(){
+  const ids = Object.keys(S.ans).filter(k => QS.some(q => q.id === k));
+  const right = ids.filter(k => S.ans[k] === 1).length;
+  const pct = ids.length ? Math.round(right*100/ids.length) : 0;
+  $("#topstat").innerHTML = `<b>${ids.length}</b>/${QS.length} tried<br><b>${pct}%</b> right now`;
+}
+
+/* ============================================================
+   ROUTING
+   ============================================================ */
+let TAB = "learn";
+let timerId = null;
+function go(tab){
+  TAB = tab;
+  document.querySelectorAll(".nav button").forEach(b => b.setAttribute("aria-current", b.dataset.tab===tab ? "page" : "false"));
+  if (tab === "learn") renderLearn();
+  if (tab === "practice") renderPractice();
+  if (tab === "mock") renderMock();
+  if (tab === "revise") renderRevise();
+  window.scrollTo(0,0);
+  try { history.replaceState(null, "", "#"+tab); } catch(e) {}
+}
+document.querySelectorAll(".nav button").forEach(b => b.addEventListener("click", () => {
+  if (TAB === "mock" && M && M.running && b.dataset.tab !== "mock") { go("mock"); showMockLeave(b.dataset.tab); return; }
+  go(b.dataset.tab);
+}));
+
+/* ============================================================
+   LEARN
+   ============================================================ */
+function renderLearn(){
+  const done = LESSONS.filter(l => S.les[l.id] && S.les[l.id].done).length;
+  const nextIdx = LESSONS.findIndex(l => !(S.les[l.id] && S.les[l.id].done));
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="hero">
+      <span class="eyebrow">${APP.eyebrow}</span>
+      <h1>Learn it, test it, revise it</h1>
+      <p>${APP.intro} ${QS.length} exam-style questions in all.</p>
+      <div class="meter" aria-label="Lessons done"><i style="width:${done/LESSONS.length*100}%"></i></div>
+      <div class="row between"><span class="muted num" style="font-size:13px">${done}/${LESSONS.length} lessons done</span>
+      ${nextIdx>=0 ? `<button class="btn pri sm" type="button" data-open="${LESSONS[nextIdx].id}">${done? "Continue" : "Start"}: Lesson ${nextIdx+1}</button>` : `<span class="muted" style="font-size:13px">All lessons done. Try a mock test.</span>`}</div>
+    </div>
+    <div class="lessons">${LESSONS.map((l,i) => {
+      const st = S.les[l.id] || {}; const n = byLesson(l.id).length;
+      return `<button type="button" class="les ${st.done?"done":""} ${i===nextIdx?"next":""}" data-open="${l.id}">
+        <span class="no">${st.done ? "✓" : i+1}</span>
+        <span class="t"><b>${esc(l.title)}<span class="heatb" title="Exam frequency">${"🔥".repeat(l.heat||1)}</span></b><span>${l.hi} · ${n} questions</span></span>
+        <span class="sc">${st.best!=null ? `best<br>${st.best}/${n}` : ""}</span></button>`;}).join("")}
+    </div>
+    <p class="foot">${APP.foot}</p>
+  </section>`;
+  $("#app").querySelectorAll("[data-open]").forEach(b => b.addEventListener("click", () => openLesson(b.dataset.open, "learn")));
+}
+
+function blockHTML(b){
+
+  if (b.k==="formula") return `<div class="block"><h3>${b.title}</h3><div class="fgrid">${b.rows.map(r=>`<div class="fcard"><span class="fn">${r[0]}</span><span class="fx">${r[1]}</span>${r[2]?`<span class="fnote">${r[2]}</span>`:""}</div>`).join("")}</div></div>`;
+  if (b.k==="ex") return `<div class="ex"><div class="exhead"><span class="lab">${b.src ? "PYQ" : "Solved example"}</span>${b.src?`<span class="src">${b.src}</span>`:""}</div><div class="exq">${b.q}</div>${b.fig?`<figure class="fig">${b.fig}</figure>`:""}<details><summary>Show solution</summary><ol>${b.steps.map(x=>`<li>${x}</li>`).join("")}</ol><div class="exans">Answer: ${b.ans}</div>${b.tip?`<div class="trick" style="margin-top:8px"><span class="lab">Shortcut</span>${b.tip}</div>`:""}</details></div>`;
+  if (b.k==="figs") return `<div class="block"><h3>${b.title}</h3><div class="figwrap">${b.items.map(it=>`<figure>${it.svg}<figcaption>${it.cap}</figcaption></figure>`).join("")}</div></div>`;
+  if (b.k==="p") return `<div class="plain"><p>${b.h}</p></div>`;
+  if (b.k==="trick") return `<div class="trick"><span class="lab">Trick</span>${b.h}</div>`;
+  if (b.k==="link") return `<div class="link"><span class="lab">Link · connect the dots</span>${b.h}</div>`;
+  if (b.k==="q") { const perm = shuffle(b.o.map((_,i)=>i)); return `<div class="icheck" data-ic><span class="lab">Quick check</span><p class="qt">${esc(b.q)}</p><div class="opts">${perm.map((oi,k)=>`<button type="button" class="opt" data-ioi="${oi}"><span class="k">${"ABCD"[k]}</span><span>${esc(b.o[oi])}</span></button>`).join("")}</div><div class="exp" hidden><b class="okl"></b> ${esc(b.e)}</div></div>`; }
+  if (b.k==="hot") return `<div class="hot"><span class="lab">🔥 Exam radar · how often it's asked</span>${b.h}</div>`;
+  if (b.k==="trap") return `<div class="trap"><span class="lab">Trap · correction</span>${b.h}</div>`;
+  if (b.k==="facts") return `<div class="block"><h3>${b.title}</h3><dl class="facts">${b.rows.map(r=>`<div><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join("")}</dl></div>`;
+  if (b.k==="tl") return `<div class="block"><h3>${b.title}</h3><ul class="tl">${b.rows.map(r=>`<li><span class="y">${r[0]}</span><span>${r[1]}</span></li>`).join("")}</ul></div>`;
+  if (b.k==="table") {
+    const isNum = (ci) => b.numcol==="all" ? ci>0 : (b.numcol===1 && ci===1) || (typeof b.numcol==="string" && b.numcol.includes(String(ci)));
+    return `<div class="block"><h3>${b.title}</h3><div class="tbl"><table><thead><tr>${b.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${b.rows.map(r=>`<tr>${r.map((c,ci)=>`<td class="${isNum(ci)?"n":""}">${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+  }
+  if (b.k==="fig") return `<div class="block"><h3>${b.title}</h3><figure class="fig">${b.svg}<figcaption>${b.cap}</figcaption></figure></div>`;
+  if (b.k==="pyr") return `<div class="block"><h3>${b.title}</h3><div class="pyr">${b.items.map(it=>`<div>${PYR(it.rows)}<b>${it.name}</b><span class="muted">${it.note}</span></div>`).join("")}</div><p class="muted" style="font-size:13px;margin-top:8px"><span style="color:var(--blue)">■</span> males · <span style="color:var(--accent)">■</span> females · top = old, base = young</p></div>`;
+  return "";
+}
+
+let LQ = null;
+function openLesson(id, step){
+  const l = L(id), i = LNUM(id);
+  if (step === "quiz") { LQ = { id, list: shuffle(byLesson(id)).map(q => ({q, perm:makePerm(q)})), i:0, score:0, picked:null }; }
+  const head = `<div class="lhead"><button class="back" type="button" id="lback">‹ Lessons</button></div>
+    <span class="eyebrow">Lesson ${i} of ${LESSONS.length} · ${l.hi}</span><h1>${esc(l.title)}</h1>
+    <div class="steps" role="tablist">
+      <button type="button" data-step="learn" aria-current="${step==="learn"?"step":"false"}">1 · Learn</button>
+      <button type="button" data-step="quiz" aria-current="${step==="quiz"?"step":"false"}">2 · Quiz</button>
+      <button type="button" data-step="sum" aria-current="${step==="sum"?"step":"false"}">3 · Summary</button>
+    </div>`;
+  let body = "";
+  if (step === "learn") {
+    body = `<div class="stack">${l.blocks.map(blockHTML).join("")}
+      <div class="row end"><button class="btn pri" type="button" id="toquiz">Take the lesson quiz · ${byLesson(id).length} questions</button></div></div>`;
+  } else if (step === "quiz") {
+    body = `<div id="lq"></div>`;
+  } else {
+    const nxt = LESSONS[i];
+    body = `<div class="stack"><div class="block"><h3>Remember these</h3><ul class="sum">${l.sum.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>
+      <div class="row between"><button class="btn" type="button" id="relearn">Read again</button>
+      ${nxt ? `<button class="btn pri" type="button" id="nextles">Next: ${esc(nxt.title)}</button>` : `<button class="btn pri" type="button" id="tomock">Take a mock test</button>`}</div></div>`;
+    S.les[id] = Object.assign(S.les[id]||{}, {done:1}); save();
+  }
+  $("#app").innerHTML = `<section class="view stack">${head}${body}</section>`;
+  $("#lback").onclick = () => renderLearn();
+  $("#app").querySelectorAll("[data-step]").forEach(b => b.onclick = () => openLesson(id, b.dataset.step));
+  if (step==="learn") { $("#toquiz").onclick = () => openLesson(id,"quiz");
+    const ics = l.blocks.filter(b=>b.k==="q");
+    $("#app").querySelectorAll("[data-ic]").forEach((box,n) => { const b = ics[n];
+      box.querySelectorAll("[data-ioi]").forEach(btn => btn.onclick = () => {
+        if (box.dataset.done) return; box.dataset.done = 1; const pick = +btn.dataset.ioi;
+        box.querySelectorAll("[data-ioi]").forEach(x => { const oi=+x.dataset.ioi; x.disabled = true; if (oi===0) x.classList.add("ok"); else if (oi===pick) x.classList.add("no"); });
+        const ex = box.querySelector(".exp"); ex.hidden = false; const lab = ex.querySelector("b");
+        if (pick===0) { lab.textContent = "Correct."; } else { lab.className = "nol"; lab.textContent = "Answer: " + b.o[0] + "."; }
+      }); }); }
+  if (step==="quiz") renderLQ();
+  if (step==="sum") {
+    $("#relearn").onclick = () => openLesson(id,"learn");
+    const n = $("#nextles"); if (n) n.onclick = () => openLesson(LESSONS[i].id,"learn");
+    const m = $("#tomock"); if (m) m.onclick = () => go("mock");
+  }
+  window.scrollTo(0,0);
+}
+
+function optsHTML(q, perm, state){
+  // state: {picked: originalIndex|null, reveal: bool, sel: originalIndex|null}
+  return perm.map((oi, k) => {
+    let cls = "opt";
+    if (state.reveal) { if (oi === q.a) cls += " ok"; else if (oi === state.picked) cls += " no"; }
+    else if (state.sel === oi) cls += " sel";
+    return `<button type="button" class="${cls}" data-oi="${oi}" ${state.reveal?"disabled":""}><span class="k">${"ABCD"[k]}</span><span>${esc(q.o[oi])}</span></button>`;
+  }).join("");
+}
+function expHTML(q, picked){
+  const ok = picked === q.a;
+  return `<div class="exp">${ok ? `<b class="okl">Correct.</b>` : `<b class="nol">Answer: ${esc(q.o[q.a])}.</b>`} ${esc(q.e)}</div>`;
+}
+function metaHTML(q, no){
+  return `<div class="qmeta"><span class="qno">${no}</span><span class="tag">L${LNUM(q.t)} · ${esc(L(q.t).title)}</span>${q.p?`<span class="tag pyq">High-yield</span>`:""}
+  <button type="button" class="bm" data-bm="${q.id}" aria-pressed="${S.bm[q.id]?"true":"false"}" aria-label="Bookmark">${S.bm[q.id]?"★":"☆"}</button></div>`;
+}
+
+function renderLQ(){
+  const box = $("#lq");
+  if (LQ.i >= LQ.list.length) {
+    const n = LQ.list.length, l = L(LQ.id);
+    const st = S.les[LQ.id] || {}; st.best = Math.max(st.best||0, LQ.score); S.les[LQ.id] = st; save();
+    box.innerHTML = `<div class="stack"><div class="block stack"><span class="eyebrow">Quiz done</span>
+      <div class="scorebig"><span class="num">${LQ.score}</span><span class="muted">/ ${n} correct</span></div>
+      <p class="muted">${LQ.score===n ? "Full marks." : LQ.score >= n*0.8 ? "Strong. Review the ones you missed in Practice → Mistakes." : "Read the lesson once more, then retry. Missed questions are saved under Practice → Mistakes."}</p></div>
+      <div class="row between"><button class="btn" type="button" id="retry">Retry quiz</button><button class="btn pri" type="button" id="tosum">See summary</button></div></div>`;
+    $("#retry").onclick = () => openLesson(LQ.id,"quiz");
+    $("#tosum").onclick = () => openLesson(LQ.id,"sum");
+    return;
+  }
+  const it = LQ.list[LQ.i], q = it.q;
+  const reveal = LQ.picked !== null;
+  box.innerHTML = `<div class="stack"><div class="meter"><i style="width:${LQ.i/LQ.list.length*100}%"></i></div>
+    <article class="qcard">${metaHTML(q, `Q${LQ.i+1}/${LQ.list.length}`)}
+    <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {picked:LQ.picked, reveal})}</div>
+    ${reveal ? expHTML(q, LQ.picked) : ""}</article>
+    ${reveal ? `<div class="row end"><button class="btn pri" type="button" id="lqnext">${LQ.i+1 < LQ.list.length ? "Next question" : "Finish"}</button></div>` : `<p class="muted" style="font-size:13px">Score so far: <span class="num">${LQ.score}</span></p>`}</div>`;
+  box.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    if (LQ.picked !== null) return;
+    LQ.picked = +b.dataset.oi; const ok = LQ.picked === q.a; if (ok) LQ.score++; record(q, ok); renderLQ();
+  });
+  bindBM(box);
+  const nx = $("#lqnext"); if (nx) nx.onclick = () => { LQ.i++; LQ.picked = null; renderLQ(); window.scrollTo(0,0); };
+}
+
+function bindBM(root){
+  root.querySelectorAll("[data-bm]").forEach(b => b.onclick = (ev) => {
+    ev.stopPropagation();
+    const id = b.dataset.bm; if (S.bm[id]) delete S.bm[id]; else S.bm[id] = 1; save();
+    b.setAttribute("aria-pressed", S.bm[id] ? "true":"false"); b.textContent = S.bm[id] ? "★" : "☆";
+  });
+}
+
+/* ============================================================
+   PRACTICE
+   ============================================================ */
+let PF = "all", PSHOW = 20, PORDER = null, PPERM = {}, PPICK = {};
+function practiceList(){
+  let list = QS;
+  if (PF === "pyq") list = QS.filter(q => q.p);
+  else if (PF === "hot") list = QS.filter(q => (L(q.t).heat||1) === 3);
+  else if (PF === "wrong") list = QS.filter(q => S.ans[q.id] === 0);
+  else if (PF === "new") list = QS.filter(q => S.ans[q.id] === undefined);
+  else if (PF === "bm") list = QS.filter(q => S.bm[q.id]);
+  else if (PF !== "all") list = QS.filter(q => q.t === PF);
+  if (PORDER) { const pos = new Map(PORDER.map((id,i)=>[id,i])); list = list.slice().sort((a,b)=>(pos.get(a.id)??0)-(pos.get(b.id)??0)); }
+  return list;
+}
+function renderPractice(){
+  const wrongN = QS.filter(q => S.ans[q.id] === 0).length, bmN = QS.filter(q=>S.bm[q.id]).length, pyqN = QS.filter(q=>q.p).length;
+  const chips = [["all",`All ${QS.length}`],["new","Not tried"],["wrong",`Mistakes ${wrongN}`],["hot",`🔥 Hot topics ${QS.filter(q=>(L(q.t).heat||1)===3).length}`],["pyq",`PYQ ${pyqN}`],["bm",`Starred ${bmN}`]].concat(LESSONS.map((l,i)=>[l.id,`L${i+1} ${l.title}`]));
+  const list = practiceList();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Question bank</span><h1>Practice</h1>
+    <p class="muted">Tap an option to check it. Wrong answers go to <b>Mistakes</b> until you get them right.</p></div>
+    <div class="chips" role="group" aria-label="Filter">${chips.map(c=>`<button type="button" class="chip" data-f="${c[0]}" aria-pressed="${PF===c[0]}">${esc(c[1])}</button>`).join("")}</div>
+    <div class="row between"><span class="muted num" style="font-size:13px">${list.length} questions</span>
+      <div class="row"><button class="btn sm ghost" type="button" id="pshuf">${PORDER?"In order":"Shuffle"}</button></div></div>
+    <div class="stack" id="plist"></div>
+  </section>`;
+  $("#app").querySelectorAll("[data-f]").forEach(b => b.onclick = () => { PF = b.dataset.f; PSHOW = 20; PPICK = {}; renderPractice(); });
+  $("#pshuf").onclick = () => { PORDER = PORDER ? null : shuffle(QS.map(q=>q.id)); PSHOW = 20; renderPractice(); };
+  const chipOn = $(`.chip[aria-pressed="true"]`); if (chipOn) chipOn.scrollIntoView({block:"nearest", inline:"center"});
+  drawPList();
+}
+function pCard(q, idx){
+  if (!PPERM[q.id]) PPERM[q.id] = makePerm(q);
+  const picked = PPICK[q.id]; const reveal = picked !== undefined;
+  return `<article class="qcard" data-q="${q.id}">${metaHTML(q, "Q"+(idx+1))}<p class="qt">${esc(q.q)}</p>
+    <div class="opts">${optsHTML(q, PPERM[q.id], {picked: reveal?picked:null, reveal})}</div>${reveal?expHTML(q,picked):""}</article>`;
+}
+function drawPList(){
+  const list = practiceList(), box = $("#plist");
+  if (!list.length) { box.innerHTML = `<p class="empty">${PF==="wrong"?"No mistakes saved. Answer some questions first, or you've cleared them all.":PF==="bm"?"Nothing starred yet. Tap ☆ on any question.":"Nothing here."}</p>`; return; }
+  box.innerHTML = list.slice(0, PSHOW).map((q,i)=>pCard(q,i)).join("") + (list.length > PSHOW ? `<button class="btn" type="button" id="pmore">Show 20 more (${list.length-PSHOW} left)</button>` : "");
+  bindP(box);
+  const more = $("#pmore"); if (more) more.onclick = () => { PSHOW += 20; drawPList(); };
+}
+function bindP(box){ box.querySelectorAll(".qcard").forEach(bindCard); }
+function bindCard(card){
+  card.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    const q = QS.find(x => x.id === card.dataset.q); if (PPICK[q.id] !== undefined) return;
+    PPICK[q.id] = +b.dataset.oi; record(q, PPICK[q.id] === q.a);
+    const idx = +card.querySelector(".qno").textContent.slice(1) - 1;
+    const tmp = document.createElement("div"); tmp.innerHTML = pCard(q, idx); const nc = tmp.firstElementChild;
+    card.replaceWith(nc); bindCard(nc);
+  });
+  bindBM(card);
+}
+
+/* ============================================================
+   MOCK TEST
+   ============================================================ */
+let M = null, MCFG = {n:25, scope:"all", neg:1}, LEAVE_TO = null;
+function renderMock(){
+  if (M && M.running) return drawMockRun();
+  if (M && M.done) return drawMockResult();
+  const hist = (S.mocks||[]).slice(-6).reverse();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Timed, SSC pattern</span><h1>Mock test</h1>
+    <p class="muted">+2 for a right answer, −0.5 for a wrong one, 36 seconds per question (CGL Tier-1 pace). Answers show only after you submit.</p></div>
+    <div class="block stack">
+      <fieldset><legend>Questions</legend><div class="radios">${[10,25,50,100].map(n=>`<label><input type="radio" name="mn" id="mn${n}" value="${n}" ${MCFG.n===n?"checked":""}><span>${n} · ${Math.round(n*36/60)} min</span></label>`).join("")}</div></fieldset>
+      <fieldset><legend>From</legend><select id="mscope" aria-label="Lessons to draw from"><option value="all">All lessons</option><option value="hot">🔥 Hot topics only</option><option value="pyq">PYQs only</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}" ${MCFG.scope===l.id?"selected":""}>L${i+1} · ${esc(l.title)}</option>`).join("")}</select></fieldset>
+      <label class="row" style="gap:8px;font-weight:600"><input type="checkbox" id="mneg" ${MCFG.neg?"checked":""}> Negative marking (−0.5)</label>
+      <div id="merr" class="muted" style="font-size:14px"></div>
+      <div class="row end"><button class="btn pri" type="button" id="mstart">Start test</button></div>
+    </div>
+    ${hist.length ? `<div class="block"><h3>Recent attempts</h3><div class="hist">${hist.map(h=>`<div><span>${esc(h.d)} · ${h.n} Q</span><span class="num">${h.score}/${h.max} · ${h.acc}%</span></div>`).join("")}</div></div>` : ""}
+  </section>`;
+  $("#mscope").value = MCFG.scope;
+  $("#mstart").onclick = () => {
+    MCFG.n = +(document.querySelector('input[name="mn"]:checked')||{value:25}).value;
+    MCFG.scope = $("#mscope").value; MCFG.neg = $("#mneg").checked ? 1 : 0;
+    let pool = MCFG.scope==="all" ? QS : MCFG.scope==="pyq" ? QS.filter(q=>q.p) : MCFG.scope==="hot" ? QS.filter(q=>(L(q.t).heat||1)===3) : MCFG.scope==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===MCFG.scope);
+    if (!pool.length) { $("#merr").textContent = "No questions in that set yet. Pick another source."; return; }
+    const qs = shuffle(pool).slice(0, MCFG.n);
+    M = { running:true, list: qs.map(q=>({q, perm:makePerm(q)})), ans: qs.map(()=>null), mark: qs.map(()=>false), i:0, neg:MCFG.neg, secs: qs.length*36, start: Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000;
+    startTimer(); drawMockRun();
+  };
+}
+function startTimer(){
+  clearInterval(timerId);
+  timerId = setInterval(() => {
+    if (!M || !M.running) { clearInterval(timerId); return; }
+    const left = Math.max(0, Math.round((M.end - Date.now())/1000));
+    const el = $("#mtime"); if (el) { el.textContent = fmt(left); el.classList.toggle("low", left <= 60); }
+    if (left <= 0) submitMock();
+  }, 1000);
+}
+const fmt = s => `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+function drawMockRun(){
+  const it = M.list[M.i], q = it.q, left = Math.max(0, Math.round((M.end-Date.now())/1000));
+  const answered = M.ans.filter(a=>a!==null).length;
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="mbar"><span class="timer num ${left<=60?"low":""}" id="mtime">${fmt(left)}</span>
+      <span class="muted num" style="font-size:13px;flex:1">Q ${M.i+1}/${M.list.length} · ${answered} answered</span>
+      <button class="btn sm" type="button" id="mpal">${M.showPal?"Hide":"All Qs"}</button></div>
+    ${LEAVE_TO ? `<div class="confirm"><b>Leave the test?</b><span>Your answers so far will be scored now.</span><div class="row"><button class="btn sm pri" type="button" id="lvy">Submit and leave</button><button class="btn sm" type="button" id="lvn">Stay</button></div></div>` : ""}
+    ${M.showPal ? `<div class="block"><div class="pal">${M.list.map((_,k)=>`<button type="button" data-j="${k}" class="${M.ans[k]!==null?"a":""} ${M.mark[k]?"m":""} ${k===M.i?"cur":""}" aria-label="Question ${k+1}">${k+1}</button>`).join("")}</div>
+      <p class="muted" style="font-size:12px;margin-top:8px">Filled = answered · orange line = marked for review</p></div>` : ""}
+    <article class="qcard"><div class="qmeta"><span class="qno">Q${M.i+1}</span><span class="tag">L${LNUM(q.t)}</span>${M.mark[M.i]?`<span class="tag pyq">Marked</span>`:""}</div>
+      <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {sel:M.ans[M.i], reveal:false})}</div></article>
+    <div class="row between"><button class="btn" type="button" id="mprev" ${M.i===0?"disabled":""}>‹ Prev</button>
+      <button class="btn ghost" type="button" id="mmark">${M.mark[M.i]?"Unmark":"Mark"}</button>
+      <button class="btn ghost" type="button" id="mclr" ${M.ans[M.i]===null?"disabled":""}>Clear</button>
+      <button class="btn ${M.i<M.list.length-1?"pri":""}" type="button" id="mnext" ${M.i===M.list.length-1?"disabled":""}>Next ›</button></div>
+    ${M.confirm ? `<div class="confirm"><b>Submit the test?</b><span>${M.list.length-answered} unanswered${M.mark.filter(Boolean).length?`, ${M.mark.filter(Boolean).length} marked for review`:""}.</span><div class="row"><button class="btn sm pri" type="button" id="msubY">Submit</button><button class="btn sm" type="button" id="msubN">Keep going</button></div></div>`
+      : `<button class="btn pri" type="button" id="msub">Submit test</button>`}
+  </section>`;
+  $("#app").querySelectorAll(".opt").forEach(b => b.onclick = () => { M.ans[M.i] = +b.dataset.oi; drawMockRun(); });
+  $("#mprev").onclick = () => { if (M.i>0){M.i--; drawMockRun();} };
+  $("#mnext").onclick = () => { if (M.i<M.list.length-1){M.i++; drawMockRun(); window.scrollTo(0,0);} };
+  $("#mmark").onclick = () => { M.mark[M.i] = !M.mark[M.i]; drawMockRun(); };
+  $("#mclr").onclick = () => { M.ans[M.i] = null; drawMockRun(); };
+  $("#mpal").onclick = () => { M.showPal = !M.showPal; drawMockRun(); };
+  $("#app").querySelectorAll("[data-j]").forEach(b => b.onclick = () => { M.i = +b.dataset.j; drawMockRun(); });
+  const s = $("#msub"); if (s) s.onclick = () => { M.confirm = true; drawMockRun(); };
+  const y = $("#msubY"); if (y) y.onclick = submitMock;
+  const n = $("#msubN"); if (n) n.onclick = () => { M.confirm = false; drawMockRun(); };
+  const lvy = $("#lvy"); if (lvy) lvy.onclick = () => { const t = LEAVE_TO; LEAVE_TO = null; submitMock(); go(t); };
+  const lvn = $("#lvn"); if (lvn) lvn.onclick = () => { LEAVE_TO = null; drawMockRun(); };
+}
+function showMockLeave(tab){ LEAVE_TO = tab; drawMockRun(); }
+function submitMock(){
+  if (!M || !M.running) return;
+  clearInterval(timerId);
+  M.running = false; M.done = true; M.confirm = false;
+  let c=0,w=0,sk=0; const per = {};
+  M.list.forEach((it,k) => {
+    const a = M.ans[k]; const t = it.q.t; per[t] = per[t] || {c:0,n:0}; per[t].n++;
+    if (a===null) sk++; else if (a===it.q.a) { c++; per[t].c++; S.ans[it.q.id]=1; } else { w++; S.ans[it.q.id]=0; }
+  });
+  const max = M.list.length*2, score = +(c*2 - (M.neg? w*0.5 : 0)).toFixed(1);
+  const used = Math.min(M.secs, Math.round((Date.now()-M.start)/1000));
+  M.res = {c,w,sk,score,max,used,per, acc: (c+w) ? Math.round(c*100/(c+w)) : 0};
+  const d = new Date(); const ds = d.toLocaleDateString("en-IN",{day:"numeric",month:"short"})+" "+d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
+  S.mocks = (S.mocks||[]).concat([{d:ds, n:M.list.length, score, max, acc:M.res.acc}]).slice(-20); save(); renderTop();
+  M.filter = "wrong";
+  if (TAB==="mock") drawMockResult();
+}
+function drawMockResult(){
+  const r = M.res;
+  const per = Object.keys(r.per).sort((a,b)=>LNUM(a)-LNUM(b)).map(t => `<div><span>L${LNUM(t)} · ${esc(L(t).title)}</span><span class="num">${r.per[t].c}/${r.per[t].n}</span></div>`).join("");
+  const rows = M.list.map((it,k)=>({it,k})).filter(({it,k}) => M.filter==="all" ? true : M.filter==="wrong" ? (M.ans[k]!==null && M.ans[k]!==it.q.a) : M.ans[k]===null);
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Result</span>
+    <div class="scorebig"><span class="num">${r.score}</span><span class="muted">/ ${r.max} marks</span></div></div>
+    <div class="kpis"><div class="kpi g"><span class="num">${r.c}</span><span>right</span></div><div class="kpi b"><span class="num">${r.w}</span><span>wrong</span></div><div class="kpi"><span class="num">${r.sk}</span><span>skipped</span></div><div class="kpi"><span class="num">${r.acc}%</span><span>accuracy</span></div></div>
+    <p class="muted num" style="font-size:13px">Time used ${fmt(r.used)} of ${fmt(M.secs)}</p>
+    <div class="block"><h3>By lesson</h3><div class="hist">${per}</div></div>
+    <div class="row between"><button class="btn" type="button" id="mnew">New test</button><button class="btn pri" type="button" id="mretry">Retake same questions</button></div>
+    <h2>Review</h2>
+    <div class="chips">${[["wrong",`Wrong ${r.w}`],["skip",`Skipped ${r.sk}`],["all",`All ${M.list.length}`]].map(c=>`<button class="chip" type="button" data-rf="${c[0]}" aria-pressed="${M.filter===c[0]}">${c[1]}</button>`).join("")}</div>
+    <div class="stack">${rows.length ? rows.map(({it,k}) => `<article class="qcard">${metaHTML(it.q, "Q"+(k+1))}<p class="qt">${esc(it.q.q)}</p><div class="opts">${optsHTML(it.q, it.perm, {picked:M.ans[k], reveal:true})}</div>${M.ans[k]===null?`<div class="exp"><b class="nol">Skipped. Answer: ${esc(it.q.o[it.q.a])}.</b> ${esc(it.q.e)}</div>`:expHTML(it.q, M.ans[k])}</article>`).join("") : `<p class="empty">Nothing in this list.</p>`}</div>
+  </section>`;
+  bindBM($("#app"));
+  $("#app").querySelectorAll("[data-rf]").forEach(b => b.onclick = () => { M.filter = b.dataset.rf; drawMockResult(); });
+  $("#mnew").onclick = () => { M = null; renderMock(); };
+  $("#mretry").onclick = () => {
+    const list = M.list.map(it=>({q:it.q, perm:makePerm(it.q)}));
+    M = { running:true, list, ans:list.map(()=>null), mark:list.map(()=>false), i:0, neg:MCFG.neg, secs:list.length*36, start:Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000; startTimer(); drawMockRun();
+  };
+}
+
+/* ============================================================
+   REVISE
+   ============================================================ */
+let RV = "heat", FC = null, FCSCOPE = "all";
+const HID = {}, REV = {};
+Object.keys(COVERS).forEach(k => { HID[k] = 1; REV[k] = {}; });
+function renderRevise(){
+  const tabs = [["heat","🔥 PYQ heat map"]].concat(Object.keys(COVERS).map(k=>[k, COVERS[k].tab]), [["dis",FIND.tab],["nums","Numbers & pairs"],["links","Connections"],["tricks","Tricks"],["traps","Traps"],["flash","Flashcards"]]);
+  if (!tabs.some(t=>t[0]===RV)) RV = "heat";
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Last-day revision</span><h1>Revise</h1></div>
+    <div class="seg" role="tablist">${tabs.map(t=>`<button type="button" role="tab" data-rv="${t[0]}" aria-selected="${RV===t[0]}">${t[1]}</button>`).join("")}</div>
+    <div id="rv" class="stack"></div></section>`;
+  $("#app").querySelectorAll("[data-rv]").forEach(b => b.onclick = () => { RV = b.dataset.rv; renderRevise(); });
+  const on = $(`.seg [aria-selected="true"]`); if (on) on.scrollIntoView({block:"nearest", inline:"center"});
+  const box = $("#rv");
+  const pk = (key, i, val) => (HID[key] && !REV[key][i]) ? `<button type="button" class="peek" data-pk="${key}:${i}">tap</button>` : val;
+  const coverChips = (key, label) => `<div class="chips"><button type="button" class="chip" data-hide="${key}" aria-pressed="${!!HID[key]}">${label}</button><button type="button" class="chip" data-cover="${key}">Cover all again</button></div>`;
+  const bindCover = () => {
+    box.querySelectorAll("[data-hide]").forEach(b => b.onclick = () => { const k=b.dataset.hide; HID[k] = HID[k]?0:1; renderRevise(); });
+    box.querySelectorAll("[data-cover]").forEach(b => b.onclick = () => { REV[b.dataset.cover] = {}; renderRevise(); });
+    box.querySelectorAll("[data-pk]").forEach(b => b.onclick = () => { const [k,i] = b.dataset.pk.split(":"); REV[k][i]=1; renderRevise(); });
+  };
+  if (RV === "heat") {
+    const max = Math.max(...HEAT.map(h=>h[1]));
+    box.innerHTML = `<p class="muted">${APP.heatNote}</p>
+      <div class="block"><div class="heat">${HEAT.map(h=>`<button type="button" class="hrow" data-open="${h[2]}"><span class="ht"><b>${esc(h[0])}</b><span class="muted">${esc(h[3])}</span></span><span class="hbar"><i style="width:${h[1]/max*100}%"></i></span><span class="num hp">${h[1]}%</span></button>`).join("")}</div></div>
+      <div class="block"><h3>Lessons by exam heat</h3><dl class="rk">${[3,2,1].map(n=>`<div><dt>${"🔥".repeat(n)} ${n===3?"Very frequent":n===2?"Regular":"Occasional"}</dt><dd>${LESSONS.map((l,i)=>[l,i]).filter(x=>(x[0].heat||1)===n).map(x=>`L${x[1]+1} ${esc(x[0].title)}`).join(" · ")}</dd></div>`).join("")}</dl></div>`;
+    box.querySelectorAll("[data-open]").forEach(b => b.onclick = () => openLesson(b.dataset.open, "learn"));
+  }
+  if (COVERS[RV]) {
+    const c = COVERS[RV];
+    box.innerHTML = `<p class="muted">${c.note}</p>${coverChips(RV, c.hideLabel)}
+      <div class="block"><div class="tbl"><table class="cover"><thead><tr>${c.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${c.rows.map((r,i)=>`<tr>${r.map((v,ci)=>`<td ${ci?`data-l="${c.head[ci]}"`:""}>${ci===0?`<b>${esc(v)}</b>`:ci===c.hide?pk(RV,i,esc(v)):esc(v)}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+    bindCover();
+  }
+  if (RV === "dis") {
+    box.innerHTML = `<input class="search" id="fs" type="search" placeholder="${FIND.ph}" aria-label="${FIND.tab}">
+      <div class="chips" id="dtype"></div>
+      <div class="block"><div class="tbl"><table class="cover"><thead><tr>${FIND.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody id="fb"></tbody></table></div></div>`;
+    const types = ["All"].concat([...new Set(FIND.rows.map(d=>d[2]))]);
+    let T = "All";
+    const draw = () => { const q = $("#fs").value.trim().toLowerCase();
+      $("#dtype").innerHTML = types.map(t=>`<button type="button" class="chip" data-t="${esc(t)}" aria-pressed="${T===t}">${esc(t)}</button>`).join("");
+      $("#dtype").querySelectorAll("[data-t]").forEach(b => b.onclick = () => { T = b.dataset.t; draw(); });
+      const rows = FIND.rows.filter(x => (T==="All"||x[2]===T) && (!q || x.join(" ").toLowerCase().includes(q)));
+      $("#fb").innerHTML = rows.length ? rows.map(a=>`<tr><td><b>${esc(a[0])}</b></td><td data-l="${FIND.head[1]}">${esc(a[1])}</td><td data-l="${FIND.head[2]}">${esc(a[2])}</td><td data-l="${FIND.head[3]}" class="muted">${esc(a[3])}</td></tr>`).join("") : `<tr><td colspan="4" class="muted">No match.</td></tr>`; };
+    $("#fs").oninput = draw; draw();
+  }
+  if (RV === "links") {
+    const items = LESSONS.flatMap((l,i) => l.blocks.filter(b=>b.k==="link").map(b=>({l:i+1, t:l.title, h:b.h})));
+    box.innerHTML = items.map(x => `<div class="link"><span class="lab">L${x.l} · ${esc(x.t)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "nums") {
+    box.innerHTML = `<div class="tiles">${TILES.map(t=>`<div class="tile"><span class="num">${t[0]}</span><span>${t[1]}</span></div>`).join("")}</div>
+    <div class="block"><h3>Look-alike pairs</h3><dl class="rk">${PAIRS.map(p=>`<div><dt>${esc(p[0])}</dt><dd>${esc(p[1])}</dd></div>`).join("")}</dl></div>`;
+  }
+  if (RV === "tricks" || RV === "traps") {
+    const kind = RV==="tricks" ? "trick" : "trap";
+    const items = LESSONS.flatMap((l,i) => l.blocks.filter(b=>b.k===kind).map(b=>({l:i+1, t:l.title, h:b.h})));
+    const extra = kind==="trick" ? `<div class="trick"><span class="lab">Exam craft</span>${APP.craft}</div>` : "";
+    box.innerHTML = extra + items.map(x => `<div class="${kind}"><span class="lab">L${x.l} · ${esc(x.t)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "flash") drawFlash(box);
+}
+
+
+function drawFlash(box){
+  if (!FC) { const pool = FCSCOPE==="all" ? QS : FCSCOPE==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===FCSCOPE); FC = {list: shuffle(pool), i:0, flip:false, known:0}; }
+  const sel = `<select id="fcs" aria-label="Flashcard set"><option value="all">All questions</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}">L${i+1} · ${esc(l.title)}</option>`).join("")}</select>`;
+  if (!FC.list.length || FC.i >= FC.list.length) {
+    box.innerHTML = `<div class="row">${sel}</div><div class="block stack"><h3>${FC.list.length ? "Deck finished" : "No cards in this set"}</h3>${FC.list.length?`<p class="muted">You knew ${FC.known} of ${FC.list.length} on first look.</p>`:""}<div class="row"><button class="btn pri" type="button" id="fcr">Shuffle and restart</button></div></div>`;
+    $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+    $("#fcr").onclick = () => { FC = null; drawFlash(box); }; return;
+  }
+  const q = FC.list[FC.i];
+  box.innerHTML = `<div class="row between">${sel}<span class="muted num" style="font-size:13px">${FC.i+1}/${FC.list.length}</span></div>
+    <button type="button" class="flash" id="fcard" aria-label="Flip card">
+      <span class="side">${FC.flip?"Answer":"Question · tap to flip"}</span>
+      <span class="front">${esc(q.q)}</span>
+      ${FC.flip ? `<span class="ans">${esc(q.o[q.a])}</span><span class="muted">${esc(q.e)}</span>` : ""}
+    </button>
+    <div class="row between"><button class="btn" type="button" id="fca" ${FC.flip?"":"disabled"}>Again later</button><button class="btn pri" type="button" id="fck" ${FC.flip?"":"disabled"}>Got it</button></div>`;
+  $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+  $("#fcard").onclick = () => { FC.flip = !FC.flip; drawFlash(box); };
+  $("#fca").onclick = () => { FC.list.push(q); FC.list.splice(FC.i,1); FC.flip=false; drawFlash(box); };
+  $("#fck").onclick = () => { FC.known++; FC.i++; FC.flip=false; drawFlash(box); };
+}
+
+/* boot */
+renderTop();
+const start = (location.hash||"").replace("#","");
+go(["learn","practice","mock","revise"].includes(start) ? start : "learn");
+</script>
+
+
+<style id="shabd-skin">
+/* ===== शब्दRegister skin: app colours + fonts (only when opened from the app) ===== */
+:root[data-skin="paper"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(150,128,90,.10) 31px, rgba(150,128,90,.10) 32px);--app-psize:auto;--app-card:#FFFCF6;--app-rule:#DCCFB2;--app-pri:#2F6F63;--app-ink:#221E17;--app-soft:#5E5547;--app-faint:#857B6A;--app-bg:#F3EEE3;--app-deep:#E9E1CF;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#F3EEE3;--sheet:#FFFCF6;--sunk:#E9E1CF;--ink:#221E17;--ink2:#5E5547;--rule:#DCCFB2;--blue:#2F6F63;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--accent:#A87E1F;--accent-bg:color-mix(in srgb, #A87E1F 16%, #FFFCF6);--good:#2F6F63;--good-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--bad:#8C2F39;--bad-bg:color-mix(in srgb, #8C2F39 14%, #FFFCF6);--warn-bg:color-mix(in srgb, #C99A2E 18%, #FFFCF6);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="paper"][data-theme="dark"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--sheet:#26211A;--sunk:#25201A;--ink:#EFE6D2;--ink2:#BDB195;--rule:#3B3429;--blue:#3F9A86;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3F9A86 22%, #26211A);--accent:#D9AE4B;--accent-bg:color-mix(in srgb, #D9AE4B 24%, #26211A);--good:#5FB9A3;--good-bg:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-bg:color-mix(in srgb, #D06B74 22%, #26211A);--warn-bg:color-mix(in srgb, #D9AE4B 26%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="paper"]:not([data-theme="light"]){--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--sheet:#26211A;--sunk:#25201A;--ink:#EFE6D2;--ink2:#BDB195;--rule:#3B3429;--blue:#3F9A86;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3F9A86 22%, #26211A);--accent:#D9AE4B;--accent-bg:color-mix(in srgb, #D9AE4B 24%, #26211A);--good:#5FB9A3;--good-bg:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-bg:color-mix(in srgb, #D06B74 22%, #26211A);--warn-bg:color-mix(in srgb, #D9AE4B 26%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin="indigo"]{--app-pattern:radial-gradient(rgba(61,92,240,.10) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#FFFFFF;--app-rule:#CBD3EC;--app-pri:#3D5CF0;--app-ink:#0F1B3D;--app-soft:#4A5680;--app-faint:#67739C;--app-bg:#EEF1FA;--app-deep:#E1E6F5;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#EEF1FA;--sheet:#FFFFFF;--sunk:#E1E6F5;--ink:#0F1B3D;--ink2:#4A5680;--rule:#CBD3EC;--blue:#3D5CF0;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3D5CF0 14%, #FFFFFF);--accent:#D9831A;--accent-bg:color-mix(in srgb, #D9831A 16%, #FFFFFF);--good:#147D53;--good-bg:color-mix(in srgb, #147D53 14%, #FFFFFF);--bad:#C8402F;--bad-bg:color-mix(in srgb, #C8402F 14%, #FFFFFF);--warn-bg:color-mix(in srgb, #F7C548 18%, #FFFFFF);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="indigo"][data-theme="dark"]{--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--sheet:#121D47;--sunk:#0E1839;--ink:#EEF2FF;--ink2:#A7B3DA;--rule:#22306A;--blue:#6F86FF;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #6F86FF 22%, #121D47);--accent:#F7B24D;--accent-bg:color-mix(in srgb, #F7B24D 24%, #121D47);--good:#45C08A;--good-bg:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-bg:color-mix(in srgb, #F07B6E 22%, #121D47);--warn-bg:color-mix(in srgb, #F7C548 26%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="indigo"]:not([data-theme="light"]){--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--sheet:#121D47;--sunk:#0E1839;--ink:#EEF2FF;--ink2:#A7B3DA;--rule:#22306A;--blue:#6F86FF;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #6F86FF 22%, #121D47);--accent:#F7B24D;--accent-bg:color-mix(in srgb, #F7B24D 24%, #121D47);--good:#45C08A;--good-bg:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-bg:color-mix(in srgb, #F07B6E 22%, #121D47);--warn-bg:color-mix(in srgb, #F7C548 26%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin] body{background-color:var(--app-bg);background-image:var(--app-pattern);background-size:var(--app-psize);background-attachment:fixed}
+:root[data-skin] h1,:root[data-skin] h2{letter-spacing:-.01em}
+
+/* ===== Desktop layout (PC / tablet landscape) ===== */
+@media (min-width: 1024px){
+  :root{--side:236px}
+  body{padding-left:var(--side);font-size:16.5px}
+  .top{border-bottom:1px solid var(--rule)}
+  .top-in{max-width:1320px;padding:16px 36px}
+  .brand{font-size:21px}
+  .brand small{font-size:13px}
+  .stat{font-size:13px}
+  .wrap{max-width:1320px;padding:0 36px 56px}
+  .view{padding-top:28px}
+  h1{font-size:34px} h2{font-size:22px} h3{font-size:17px}
+
+  /* bottom tab bar becomes a left sidebar */
+  .nav{top:0;bottom:0;left:0;right:auto;width:var(--side);height:auto;border-top:0;border-right:1px solid var(--rule);padding:84px 14px 20px;display:block;overflow:auto}
+  .nav-in{display:flex;flex-direction:column;gap:4px;height:auto;max-width:none;margin:0}
+  .nav-in::before{content:"Sections";display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);padding:0 14px 8px}
+  .nav button{flex-direction:row;justify-content:flex-start;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;font-size:15px;min-height:0;height:auto;width:100%;text-align:left}
+  .nav button svg{width:20px;height:20px;flex-shrink:0}
+  .nav button:hover{background:var(--sunk)}
+  .nav button[aria-current="page"]{background:var(--blue-bg)}
+  .nav button[aria-current="page"] span{border-bottom:0!important}
+
+  /* home: intro beside progress, lessons as a card grid */
+  .hero{grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);column-gap:48px;align-items:end;padding-bottom:10px}
+  .hero > .eyebrow,.hero > h1,.hero > p{grid-column:1}
+  .hero > .meter{grid-column:2;grid-row:3;align-self:center}
+  .hero > .row{grid-column:2;grid-row:2;align-self:end}
+  .lessons{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;border-top:0}
+  .les{background:var(--sheet);border:1px solid var(--rule);border-radius:16px;padding:16px 18px;transition:transform .15s ease,box-shadow .15s ease,border-color .15s}
+  .les:hover{transform:translateY(-2px);border-color:var(--blue);box-shadow:0 14px 30px -22px rgba(0,0,0,.45)}
+  .les.next{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
+
+  /* lesson reader: facts, timelines, tricks sit side by side */
+  .lhead{margin-bottom:0}
+  .steps{max-width:640px}
+  .steps + .stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+  .steps + .stack > .plain,.steps + .stack > .row,.steps + .stack > p,.steps + .stack > .fig,.steps + .stack > h2,.steps + .stack > .tbl{grid-column:1/-1}
+  .steps + .stack > .plain{max-width:86ch;font-size:17px}
+  .steps + .stack:not(:has(> .block ~ .block)) > .block{grid-column:1/-1}
+  .block,.qcard{padding:18px 20px;border-radius:14px}
+
+  /* quizzes and question bank */
+  #lq > .stack{display:grid;grid-template-columns:minmax(0,1fr);max-width:980px;gap:16px}
+  .opts{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .qt{font-size:18px}
+  #plist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #plist .opts{grid-template-columns:minmax(0,1fr)}
+  .chips{flex-wrap:wrap;overflow:visible}
+
+  /* mock test: question with the answer grid alongside */
+  .mbar{top:calc(env(safe-area-inset-top,0px) + 67px)}
+  .view > .qcard{max-width:1000px}
+  .view > .row.between{max-width:1000px}
+  .view > #msub{max-width:1000px;width:100%}
+  .view > .block.stack{max-width:760px}
+  .pal{grid-template-columns:repeat(auto-fill,minmax(46px,1fr))}
+  .kpis{max-width:760px}
+
+  /* revise: cards in columns */
+  #rkl,#rv > .stack:not(#rkl){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #rv > .search{max-width:520px}
+  .tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .flash{min-height:300px;max-width:760px;margin:0 auto;padding:32px 36px}
+  .flash .front{font-size:22px}
+}
+@media (min-width: 1500px){
+  #plist,#rkl{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+</style>
+<script id="shabd-deeplink">
+(function(){
+  var l; try{ l = new URLSearchParams(location.search).get('lesson'); }catch(e){}
+  if(!l) return;
+  function run(){
+    try{
+      if(typeof openLesson === 'function' && typeof LESSONS !== 'undefined'){ if(LESSONS.some(function(x){ return x.id === l; })) openLesson(l, 'learn'); }
+      else if(typeof openRule === 'function'){ var n = parseInt(String(l).replace(/\D/g, ''), 10); if(n) openRule(n, 'learn'); }
+      else if(typeof COURSE !== 'undefined' && typeof go === 'function'){ var i = COURSE.findIndex(function(c){ return c.id === l; }); if(i >= 0) go({ name: 'lesson', i: i, step: 0, ans: {}, score: 0 }); }
+    }catch(e){}
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(run, 30); }); else setTimeout(run, 30);
+})();
+</script>
+</body></html>
