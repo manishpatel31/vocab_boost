@@ -849,6 +849,8 @@
   @media (max-width: 860px){ .search-bar .sb-lab{ display:none; } .sr-go{ display:none; } }
   /* ---------- पाठShala home (default page) ---------- */
   body.on-home header.top, .main:has(#view-home.active) header.top{ display:none; }
+  .main:has(#view-tasks.active) header.top{ display:none; }
+  #view-tasks{ padding-top:8px; }
   .h1-sub{ font-family:var(--font-body); font-size:.42em; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint); margin-left:8px; vertical-align:middle; }
   @media (min-width: 861px){ .phone-only{ display:none !important; } }
   @media (max-width: 860px){ .desk-only{ display:none !important; } }
@@ -1100,6 +1102,101 @@
   .ss-mocks div{ flex:1; max-width:60px; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:4px; height:100%; }
   .ss-mocks i{ display:block; width:100%; background:var(--teal); border-radius:7px 7px 3px 3px; }
   .ss-mocks span{ font-size:12px; font-weight:700; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
+  /* ===== Tasks (to-do list; each task needs 1, 2 or 3 ticks) ===== */
+  .td{ max-width:860px; }
+  .td-head{ display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:16px; }
+  .td-head h2{ margin:0; }
+  .td-head .help{ margin:4px 0 0; }
+  .td-stats{ display:flex; align-items:center; gap:18px; }
+  .td-ring{ position:relative; width:58px; height:58px; flex:none; }
+  .td-ring svg{ width:58px; height:58px; transform:rotate(-90deg); }
+  .td-ring b{ position:absolute; inset:0; display:grid; place-items:center; font-size:13px; font-variant-numeric:tabular-nums; }
+  .td-stat small{ display:block; font-size:12px; color:var(--ink-faint); }
+  .td-stat strong{ font-size:14px; }
+  .td-week{ display:flex; align-items:flex-end; gap:4px; height:30px; margin-top:4px; }
+  .td-week i{ display:block; width:10px; background:var(--teal); border-radius:3px; min-height:3px; }
+  .td-week i.z{ background:var(--rule); }
+  .td-week i.t{ background:var(--mustard); }
+  .td-card{ background:var(--card); border:1px solid var(--rule); border-radius:var(--radius-lg); box-shadow:var(--shadow); padding:16px; }
+  .td-need{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
+  .td-need-l{ font-size:11.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); }
+  .td-seg{ display:inline-flex; background:var(--paper-deep); border-radius:var(--pill); padding:3px; gap:2px; }
+  .td-seg button{ border:none; background:transparent; color:var(--ink-soft); font:inherit; font-size:14px; font-weight:700; min-width:48px; padding:6px 12px; border-radius:var(--pill); cursor:pointer; letter-spacing:-.05em; }
+  .td-seg button.on{ background:var(--teal); color:#fff; }
+  .td-need small{ color:var(--ink-faint); font-size:12.5px; }
+  .td-add{ display:flex; gap:8px; }
+  .td-add input{ flex:1; min-width:0; font:inherit; font-size:16px; padding:13px 14px; border:1.5px solid var(--rule); border-radius:var(--radius); background:var(--paper); color:var(--ink); }
+  .td-add input:focus{ outline:none; border-color:var(--teal); box-shadow:0 0 0 3px color-mix(in srgb, var(--teal) 22%, transparent); }
+  .td-hint{ font-size:12.5px; color:var(--ink-faint); margin-top:8px; line-height:1.6; }
+  .td-hint code{ background:var(--paper-deep); color:var(--ink-soft); padding:1px 6px; border-radius:5px; font-size:12px; }
+  .td-sugg{ display:flex; gap:6px; flex-wrap:wrap; margin-top:12px; align-items:center; }
+  .td-sugg-l{ font-size:12px; color:var(--ink-faint); margin-right:2px; }
+  .td-chipbtn{ border:1px dashed var(--rule); background:transparent; color:var(--ink-soft); font:inherit; font-size:12.5px; padding:5px 10px; border-radius:var(--pill); cursor:pointer; }
+  .td-chipbtn:hover{ border-color:var(--teal); color:var(--teal); }
+  .td-chipbtn.due{ border-style:solid; border-color:color-mix(in srgb, var(--maroon) 45%, transparent); color:var(--maroon); }
+  .td-filters{ display:flex; gap:6px; flex-wrap:wrap; margin:18px 0 10px; }
+  .td-filters button{ border:1px solid var(--rule); background:var(--card); color:var(--ink-soft); font:inherit; font-size:13px; font-weight:600; padding:6px 12px; border-radius:var(--pill); cursor:pointer; }
+  .td-filters button.on{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .td-filters button b{ opacity:.65; margin-left:3px; }
+  .td-filters .td-tagf{ font-weight:500; }
+  .td-list{ display:flex; flex-direction:column; gap:8px; }
+  .td-item{ display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:12px; align-items:start; background:var(--card); border:1px solid var(--rule); border-radius:var(--radius); padding:12px 10px 12px 14px; }
+  .td-item.star{ box-shadow:inset 4px 0 0 var(--mustard); }
+  .td-item.done .td-text{ text-decoration:line-through; color:var(--ink-faint); }
+  .td-item.focus{ border-color:var(--teal); }
+  .td-item.pop{ animation:tdPop .6s ease; }
+  @keyframes tdPop{ 0%{ transform:scale(1); } 35%{ transform:scale(1.015); background:color-mix(in srgb, var(--teal) 14%, var(--card)); } 100%{ transform:scale(1); } }
+  .td-ticks{ display:flex; gap:5px; padding-top:1px; }
+  .td-tick{ width:28px; height:28px; border-radius:50%; border:2px solid var(--ink-faint); background:transparent; color:transparent; display:grid; place-items:center; cursor:pointer; padding:0; transition:background .15s, border-color .15s, transform .1s; }
+  .td-tick:hover{ border-color:var(--teal); color:color-mix(in srgb, var(--teal) 50%, transparent); }
+  .td-tick:active{ transform:scale(.88); }
+  .td-tick.on{ background:var(--teal); border-color:var(--teal); color:#fff; }
+  .td-tick svg{ width:15px; height:15px; }
+  .td-body{ min-width:0; }
+  .td-text{ font-size:15.5px; line-height:1.4; overflow-wrap:anywhere; cursor:text; }
+  .td-meta{ display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; align-items:center; font-size:12px; color:var(--ink-faint); }
+  .td-meta:empty{ display:none; }
+  .td-tag{ background:var(--paper-deep); color:var(--ink-soft); padding:2px 8px; border-radius:var(--pill); cursor:pointer; border:none; font:inherit; font-size:12px; }
+  .td-due{ padding:2px 8px; border-radius:var(--pill); background:var(--paper-deep); color:var(--ink-soft); }
+  .td-due.late{ background:color-mix(in srgb, var(--maroon) 15%, transparent); color:var(--maroon); font-weight:600; }
+  .td-due.now{ background:color-mix(in srgb, var(--mustard) 22%, transparent); color:var(--mustard-deep); font-weight:600; }
+  .td-app{ border:none; background:color-mix(in srgb, var(--teal) 15%, transparent); color:var(--teal); font:inherit; font-size:12px; font-weight:600; padding:2px 9px; border-radius:var(--pill); cursor:pointer; }
+  .td-acts{ display:flex; gap:2px; align-items:center; }
+  .td-ib{ width:34px; height:34px; border:none; background:transparent; color:var(--ink-faint); border-radius:9px; cursor:pointer; display:grid; place-items:center; font-size:17px; padding:0; }
+  .td-ib:hover{ background:var(--paper-deep); color:var(--ink); }
+  .td-ib.on{ color:var(--mustard); }
+  .td-ib svg{ width:17px; height:17px; }
+  .td-edit{ grid-column:1 / -1; display:grid; gap:12px; border-top:1px dashed var(--rule); padding-top:12px; }
+  .td-edit-row{ display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end; }
+  .td-edit label{ font-size:12px; color:var(--ink-faint); display:flex; flex-direction:column; gap:4px; }
+  .td-edit input, .td-edit select{ font:inherit; font-size:14px; padding:8px 10px; border:1px solid var(--rule); border-radius:9px; background:var(--paper); color:var(--ink); min-width:0; }
+  .td-edit .td-et{ width:100%; font-size:15px; }
+  .td-edit-btns{ display:flex; gap:8px; flex-wrap:wrap; }
+  .td-edit-btns .del{ margin-left:auto; color:var(--maroon); }
+  .td-empty{ text-align:center; color:var(--ink-faint); padding:30px 14px; border:1.5px dashed var(--rule); border-radius:var(--radius-lg); }
+  .td-empty b{ display:block; color:var(--ink-soft); font-size:16px; margin-bottom:4px; }
+  .td-donehead{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin:20px 0 8px; }
+  .td-donehead h3{ margin:0; font-size:15px; }
+  .td-undo{ position:fixed; left:50%; transform:translateX(-50%); bottom:calc(24px + env(safe-area-inset-bottom)); z-index:120; display:flex; align-items:center; gap:14px; background:var(--ink); color:var(--paper); padding:10px 12px 10px 16px; border-radius:var(--pill); box-shadow:var(--shadow-lg); font-size:14px; }
+  .td-undo button{ border:none; background:transparent; color:var(--mustard); font:inherit; font-weight:700; cursor:pointer; padding:4px 8px; }
+  .td-focus{ position:sticky; bottom:14px; z-index:5; margin-top:18px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; background:var(--ink); color:var(--paper); border-radius:var(--radius-lg); padding:12px 14px; box-shadow:var(--shadow-lg); }
+  .td-focus .tm{ font-family:var(--font-display); font-size:28px; font-variant-numeric:tabular-nums; line-height:1; }
+  .td-focus .tx{ flex:1; min-width:140px; }
+  .td-focus .tx b{ display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:14px; }
+  .td-focus .tx small{ opacity:.7; font-size:12px; }
+  .td-focus .fb{ display:flex; gap:6px; }
+  .td-focus button{ border:1px solid color-mix(in srgb, var(--paper) 30%, transparent); background:transparent; color:inherit; font:inherit; font-size:13px; font-weight:600; padding:7px 11px; border-radius:var(--pill); cursor:pointer; }
+  .td-focus button.pri{ background:var(--paper); color:var(--ink); border-color:var(--paper); }
+  @media (max-width: 860px){
+    .td-focus{ bottom:calc(84px + env(safe-area-inset-bottom)); }
+    .td-undo{ bottom:calc(92px + env(safe-area-inset-bottom)); }
+  }
+  @media (max-width: 560px){
+    .td-item{ grid-template-columns:auto minmax(0,1fr); gap:10px; padding:12px; }
+    .td-acts{ grid-column:2; margin:-4px 0 0 -8px; }
+    .td-stats{ width:100%; justify-content:space-between; }
+    .td-tick{ width:30px; height:30px; }
+  }
 </style>
 </head>
 <body>
@@ -1214,6 +1311,7 @@
         </div>
       </div>
       <button class="tab" data-tab="stats"><svg class="nav-ico" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7"></path></svg><span>Progress</span></button>
+      <button class="tab" data-tab="tasks"><svg class="nav-ico" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10"></path><path d="M3.5 6l1.5 1.5L7.5 5M3.5 12l1.5 1.5 2.5-2.5M3.5 18l1.5 1.5 2.5-2.5"></path></svg><span>Tasks</span></button>
       <div class="navgroup mod-only desk-only" data-group="manage" style="display:none;">
         <button class="nav-btn" aria-haspopup="true" aria-expanded="false"><svg class="nav-ico" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path></svg><span>Manage</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
         <div class="navmenu">
@@ -1568,6 +1666,8 @@
       </div>
     </section>
 
+    <section class="view" id="view-tasks"><div id="todoRoot"></div></section>
+
     <section class="view" id="view-admin">
       <div class="panel admin-only" style="max-width:700px;">
         <h2>Moderators</h2>
@@ -1900,7 +2000,8 @@
     return '<div class="home-card home-due"><div class="home-card-h">Waiting for you</div><div class="home-due-rows">' +
       row('revision', '🔁', due, 'Revision rounds', due ? 'Memorized words due back today' : 'Nothing due today', due ? 'hot' : '') +
       row('mistakes', '📕', mist, 'Mistakes book', mist ? 'Wrong answers from every subject' : 'No mistakes waiting', mist ? 'hot' : '') +
-      row('library', '📖', left, 'Words to master', mem + ' of ' + ve.length + ' memorized', '') + '</div></div>';
+      row('library', '📖', left, 'Words to master', mem + ' of ' + ve.length + ' memorized', '') +
+      (function(){ var tl = todoLeftToday(); return row('tasks', '✅', tl, 'Tasks', tl ? 'Left on today’s list' : 'Plan today — add a task', tl ? 'hot' : ''); })() + '</div></div>';
   }
   function homeWordCard(){
     var w = wordOfDay();
@@ -2009,7 +2110,7 @@
     else if(a === 'exam') setExamDate();
     else if(a === 'mistakes') openMistakes();
     else if(a === 'mock') openMock();
-    else if(a === 'revision' || a === 'library' || a === 'quiz' || a === 'add') switchTab(a);
+    else if(a === 'revision' || a === 'library' || a === 'quiz' || a === 'add' || a === 'tasks') switchTab(a);
     else if(a === 'word') openWordPreviewModal(el.dataset.id);
     else if(a === 'present') document.getElementById('presentBtn').click();
     else if(a === 'aod') document.getElementById('navAodBtn').click();
@@ -2225,8 +2326,9 @@
       if(!snap.exists) return;
       var r = snap.data() || {};
       if(r.key && mod.key && r.key !== mod.key) return; /* saved by an older version of this app */
-      if(id === 'tracker' && typeof r.data === 'string'){
-        var mine = lsGet(mod.key), merged = trackMerge(trackParse(mine), trackParse(r.data)), mj = JSON.stringify(merged);
+      if((id === 'tracker' || id === 'todo') && typeof r.data === 'string'){
+        var mine = lsGet(mod.key), merged = (id === 'todo' ? todoMerge : trackMerge)(trackParse(mine), trackParse(r.data)), mj = JSON.stringify(merged);
+        if(id === 'todo' && isActive('tasks')) setTimeout(renderTodo, 0);
         lsSet(mod.key, mj);
         if(mj !== r.data) setStudyMeta(id, { localAt: Date.now() }); else setStudyMeta(id, { syncedAt: r.updatedAt || Date.now(), localAt: r.updatedAt || Date.now() });
         return;
@@ -2360,7 +2462,7 @@
   function englishIds(){ return Object.keys(STUDY).filter(function(id){ return STUDY[id].subj === 'english'; }); }
   function mathIds(){ return Object.keys(STUDY).filter(function(id){ return STUDY[id].subj === 'maths'; }); }
   function mathQIds(){ return mathIds().filter(function(id){ return !STUDY[id].noq; }); }
-  var STUDY_EXTRA = { mocks: { key: 'shabdMockHistory', title: 'Mixed mock history' }, tracker: { key: 'shabdTracker', title: 'Study tracker' } };
+  var STUDY_EXTRA = { mocks: { key: 'shabdMockHistory', title: 'Mixed mock history' }, tracker: { key: 'shabdTracker', title: 'Study tracker' }, todo: { key: 'shabdTodo', title: 'Tasks' } };
   function studyMod(id){ return STUDY[id] || STUDY_EXTRA[id]; }
   // ================= Study tracker: one record per visit to a mini app =================
   // Stored in localStorage 'shabdTracker' and synced like the mini apps (users/{uid}/study/tracker).
@@ -3598,6 +3700,368 @@
     });
   }
 
+  // ================= Tasks: a to-do list where each task needs 1, 2 or 3 ticks =================
+  // Stored in localStorage 'shabdTodo' and synced like the mini apps (users/{uid}/study/todo).
+  // { v:1, def (ticks for new tasks), at, tasks:[{ id, t (text), n (ticks needed 1–3), k (ticks done), tk ([tick times]), star,
+  //   due ('YYYY-MM-DD' or ''), tag, app (mini app id), fm (focus minutes), c (created), u (updated), done (ms or 0), del (ms or 0) }] }
+  var TODO_KEY = 'shabdTodo', TODO_FOCUS = 'shabdTodoFocus', TODO_MIN = 25;
+  var todoView = 'today', todoTag = '', todoEdit = null, todoUndo = null, todoPop = null, todoFocusTimer = null;
+  var TODO_NEED = ['', 'Do it once', 'Do it, then revise once', 'Do it, then revise twice'];
+  var TODO_TICK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"></path></svg>';
+  var TODO_QUICK = ['Vocab quiz — 20 words', 'One mixed mock test', 'Clear the mistakes book', 'Read current affairs'];
+  function todoData(){
+    var d; try{ d = JSON.parse(lsGet(TODO_KEY) || '{}') || {}; }catch(e){ d = {}; }
+    d.v = 1; d.def = d.def || 1; d.tasks = Array.isArray(d.tasks) ? d.tasks : []; return d;
+  }
+  function todoSave(d){
+    d.at = Date.now();
+    var cut = Date.now() - 30 * DAY_MS;                        // deleted tasks are kept 30 days so other devices learn of the delete
+    d.tasks = d.tasks.filter(function(t){ return !t.del || t.del > cut; });
+    lsSet(TODO_KEY, JSON.stringify(d));
+    setStudyMeta('todo', { localAt: Date.now() });
+    clearTimeout(todoSave.timer);
+    todoSave.timer = setTimeout(function(){ studyPush('todo'); }, 1500);
+    renderHomeSoon();
+  }
+  /** Two devices' lists: every task from both, the newer edit of each task wins. */
+  function todoMerge(a, b){
+    var map = {};
+    (a.tasks || []).concat(b.tasks || []).forEach(function(t){ var o = map[t.id]; if(!o || (t.u || 0) > (o.u || 0)) map[t.id] = t; });
+    var newer = (a.at || 0) >= (b.at || 0) ? a : b;
+    return { v: 1, def: newer.def || a.def || b.def || 1, at: Math.max(a.at || 0, b.at || 0),
+      tasks: Object.keys(map).map(function(k){ return map[k]; }).sort(function(x, y){ return (x.c || 0) - (y.c || 0); }) };
+  }
+  function todoYmd(d){ return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function todoDay(off){ var d = new Date(); d.setDate(d.getDate() + (off || 0)); return todoYmd(d); }
+  function todoDueLabel(due){
+    if(!due) return null;
+    var today = todoDay(0);
+    if(due < today){ var dd = new Date(due + 'T00:00:00'); return ['late', 'Overdue · ' + dd.getDate() + ' ' + dd.toLocaleString('en-IN', { month: 'short' })]; }
+    if(due === today) return ['now', 'Today'];
+    if(due === todoDay(1)) return ['', 'Tomorrow'];
+    var d = new Date(due + 'T00:00:00'), diff = Math.round((d - new Date(today + 'T00:00:00')) / DAY_MS);
+    return ['', diff < 7 ? d.toLocaleString('en-IN', { weekday: 'long' }) : d.getDate() + ' ' + d.toLocaleString('en-IN', { month: 'short' })];
+  }
+  function todoFindApp(s){
+    var low = ' ' + String(s).toLowerCase().replace(/[^a-z0-9\s]+/g, ' ').replace(/\s+/g, ' ') + ' ', hit = '';
+    Object.keys(STUDY).some(function(id){
+      var ti = STUDY[id].title.toLowerCase().replace(/[^a-z0-9\s]+/g, ' ').replace(/\s+/g, ' ').trim();
+      if(low.indexOf(' ' + id + ' ') !== -1 || (ti.length > 4 && low.indexOf(' ' + ti + ' ') !== -1)){ hit = id; return true; }
+      return false;
+    });
+    return hit;
+  }
+  /** "Revise polity #gs ! tomorrow" → text "Revise polity", tag gs, important, due tomorrow, linked to the Polity app. */
+  function todoParse(raw){
+    var o = { star: false, due: '', tag: '', app: '' }, s = ' ' + String(raw).replace(/\s+/g, ' ') + ' ';
+    var days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    s = s.replace(/ !+(?= )/g, function(){ o.star = true; return ' '; });
+    s = s.replace(/ #([^\s#]{1,24})(?= )/g, function(m, t){ if(o.tag) return m; o.tag = t.toLowerCase(); return ' '; });
+    s = s.replace(/ (today|tonight|tomorrow|tmrw|sunday|monday|tuesday|wednesday|thursday|friday|saturday)(?= )/i, function(m, w){
+      w = w.toLowerCase();
+      if(w === 'today' || w === 'tonight') o.due = todoDay(0);
+      else if(w === 'tomorrow' || w === 'tmrw') o.due = todoDay(1);
+      else { var diff = (days.indexOf(w) - new Date().getDay() + 7) % 7; o.due = todoDay(diff || 7); }
+      return ' ';
+    });
+    o.t = s.replace(/\s+/g, ' ').trim() || String(raw).trim();
+    o.app = todoFindApp(o.t);
+    return o;
+  }
+  function todoNewId(){ return 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  function todoAdd(raw, extra){
+    var p = todoParse(raw);
+    if(!p.t) return null;
+    var d = todoData(), now = Date.now();
+    var t = Object.assign({ id: todoNewId(), t: p.t, n: d.def, k: 0, tk: [], star: p.star, due: p.due, tag: p.tag, app: p.app, fm: 0, c: now, u: now, done: 0, del: 0 }, extra || {});
+    d.tasks.push(t);
+    todoSave(d);
+    return t;
+  }
+  function todoUpd(id, fn){
+    var d = todoData(), t = d.tasks.filter(function(x){ return x.id === id; })[0];
+    if(!t) return null;
+    fn(t, d);
+    t.u = Date.now();
+    todoSave(d);
+    return t;
+  }
+  /** Set a task's ticks to k (clamped); returns true if this finished the task. */
+  function todoSetTicks(t, k){
+    k = Math.max(0, Math.min(t.n, k));
+    var tk = (t.tk || []).slice(0, k);
+    while(tk.length < k) tk.push(Date.now());
+    var was = !!t.done;
+    t.k = k; t.tk = tk; t.done = k >= t.n ? (t.done || Date.now()) : 0;
+    return !was && !!t.done;
+  }
+  function todoLists(d){
+    var today = todoDay(0), live = d.tasks.filter(function(t){ return !t.del; });
+    var open = live.filter(function(t){ return !t.done; }), done = live.filter(function(t){ return t.done; });
+    return {
+      live: live, open: open,
+      today: open.filter(function(t){ return !t.due || t.due <= today; }),
+      up: open.filter(function(t){ return t.due && t.due > today; }),
+      done: done.sort(function(a, b){ return b.done - a.done; }),
+      doneToday: done.filter(function(t){ return todoYmd(new Date(t.done)) === today; })
+    };
+  }
+  function todoSort(a, b){
+    if(!!a.star !== !!b.star) return a.star ? -1 : 1;
+    var ad = a.due || '9999', bd = b.due || '9999';
+    if(ad !== bd) return ad < bd ? -1 : 1;
+    if((a.k > 0) !== (b.k > 0)) return a.k > 0 ? -1 : 1;     // half-finished tasks first
+    return (a.c || 0) - (b.c || 0);
+  }
+  /** Tasks left for today, for the home page. */
+  function todoLeftToday(){ return todoLists(todoData()).today.length; }
+
+  function todoItem(t, focusId){
+    var ticks = '';
+    for(var i = 0; i < t.n; i++) ticks += '<button type="button" class="td-tick' + (i < t.k ? ' on' : '') + '" data-td-tick="' + i + '" aria-label="Tick ' + (i + 1) + ' of ' + t.n + (i < t.k ? ' (done — tap to undo)' : '') + '" title="' + (i < t.k ? 'Ticked ' + new Date((t.tk || [])[i] || t.u).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }) + ' — tap to undo' : 'Tick ' + (i + 1) + ' of ' + t.n) + '">' + TODO_TICK_SVG + '</button>';
+    var due = !t.done && todoDueLabel(t.due), meta = '';
+    if(t.n > 1 && !t.done) meta += '<span>' + t.k + ' of ' + t.n + ' ticks</span>';
+    if(due) meta += '<span class="td-due ' + due[0] + '">' + escapeHtml(due[1]) + '</span>';
+    if(t.tag) meta += '<button type="button" class="td-tag" data-td-tagf="' + escapeAttr(t.tag) + '">#' + escapeHtml(t.tag) + '</button>';
+    if(t.app && STUDY[t.app]) meta += '<button type="button" class="td-app" data-td-app="' + t.app + '">' + (STUDY[t.app].ico || '📘') + ' Open ' + escapeHtml(STUDY[t.app].title) + ' ›</button>';
+    if(t.fm) meta += '<span>⏱ ' + t.fm + ' min focused</span>';
+    if(t.done) meta += '<span>Done ' + new Date(t.done).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }) + '</span>';
+    var acts = '<div class="td-acts">' +
+      '<button type="button" class="td-ib' + (t.star ? ' on' : '') + '" data-td-star aria-label="' + (t.star ? 'Remove from important' : 'Mark important') + '" title="Important">' + (t.star ? '★' : '☆') + '</button>' +
+      (t.done ? '' : '<button type="button" class="td-ib" data-td-focus aria-label="Start a ' + TODO_MIN + '-minute focus session" title="Focus ' + TODO_MIN + ' min — adds a tick when it ends"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v4l2.5 2.5M9 2h6"></path></svg></button>') +
+      '<button type="button" class="td-ib" data-td-edit aria-label="Edit task" title="Edit">⋯</button></div>';
+    var edit = '';
+    if(todoEdit === t.id){
+      var opts = '<option value="">— none —</option>' + Object.keys(STUDY).map(function(id){ return '<option value="' + id + '"' + (t.app === id ? ' selected' : '') + '>' + escapeHtml(STUDY[id].title) + '</option>'; }).join('');
+      edit = '<div class="td-edit">' +
+        '<input type="text" class="td-et" id="tdeT" value="' + escapeAttr(t.t) + '" aria-label="Task text" maxlength="200">' +
+        '<div class="td-edit-row">' +
+          '<label>Ticks to finish<span class="td-seg">' + [1, 2, 3].map(function(n){ return '<button type="button" data-td-n="' + n + '" class="' + (t.n === n ? 'on' : '') + '">' + '✓'.repeat(n) + '</button>'; }).join('') + '</span></label>' +
+          '<label>Due<input type="date" id="tdeD" value="' + escapeAttr(t.due || '') + '"></label>' +
+          '<label>Tag<input type="text" id="tdeG" value="' + escapeAttr(t.tag || '') + '" placeholder="e.g. gs" maxlength="24" style="width:110px;"></label>' +
+          '<label>Linked app<select id="tdeA">' + opts + '</select></label>' +
+        '</div>' +
+        '<div class="td-edit-btns"><button type="button" class="btn sm" data-td-save>Save</button><button type="button" class="btn ghost sm" data-td-cancel>Cancel</button>' +
+          (t.k ? '<button type="button" class="btn ghost sm" data-td-reset>Clear ticks</button>' : '') +
+          '<button type="button" class="btn ghost sm del" data-td-del>Delete</button></div>' +
+      '</div>';
+    }
+    return '<div class="td-item' + (t.done ? ' done' : '') + (t.star ? ' star' : '') + (focusId === t.id ? ' focus' : '') + (todoPop === t.id ? ' pop' : '') + '" data-td-id="' + t.id + '">' +
+      '<div class="td-ticks">' + ticks + '</div>' +
+      '<div class="td-body"><div class="td-text" data-td-edit>' + escapeHtml(t.t) + '</div><div class="td-meta">' + meta + '</div></div>' +
+      acts + edit + '</div>';
+  }
+
+  function renderTodo(){
+    var root = document.getElementById('todoRoot');
+    if(!root) return;
+    var d = todoData(), L = todoLists(d), f = todoFocusGet();
+    var keepVal = (document.getElementById('tdIn') || {}).value || '';
+    var hadFocus = document.activeElement && document.activeElement.id === 'tdIn';
+    var list = todoView === 'up' ? L.up : todoView === 'all' ? L.open : todoView === 'done' ? L.done : L.today;
+    if(todoTag) list = list.filter(function(t){ return t.tag === todoTag; });
+    if(todoView !== 'done') list = list.slice().sort(todoSort);
+    var tags = []; L.live.forEach(function(t){ if(t.tag && tags.indexOf(t.tag) === -1) tags.push(t.tag); });
+    if(todoTag && tags.indexOf(todoTag) === -1) todoTag = '';
+    // today ring + ticks over the last 7 days
+    var tot = L.today.length + L.doneToday.length, dn = L.doneToday.length, pct = tot ? dn / tot : 0, C = 2 * Math.PI * 24;
+    var week = [], wk = 0;
+    for(var i = 6; i >= 0; i--) week.push({ day: todoDay(-i), n: 0 });
+    L.live.forEach(function(t){ (t.tk || []).forEach(function(ms){ var y = todoYmd(new Date(ms)); week.forEach(function(w){ if(w.day === y){ w.n++; wk++; } }); }); });
+    var wmax = Math.max.apply(null, week.map(function(w){ return w.n; }).concat([1]));
+    var head = '<div class="td-head"><div><h2>Tasks</h2><p class="help">Type a task and press Enter. Tick it off 1, 2 or 3 times — once to do it, again to revise it.</p></div>' +
+      '<div class="td-stats"><div class="td-ring" title="Today’s tasks done"><svg viewBox="0 0 58 58"><circle cx="29" cy="29" r="24" fill="none" stroke="var(--rule)" stroke-width="6"></circle><circle cx="29" cy="29" r="24" fill="none" stroke="var(--teal)" stroke-width="6" stroke-linecap="round" stroke-dasharray="' + (C * pct).toFixed(1) + ' ' + C.toFixed(1) + '"></circle></svg><b>' + dn + '/' + tot + '</b></div>' +
+      '<div class="td-stat"><small>Done today</small><strong>' + (tot ? (dn === tot ? 'All done 🎉' : (tot - dn) + ' left') : 'Nothing planned') + '</strong></div>' +
+      '<div class="td-stat"><small>' + wk + ' tick' + (wk === 1 ? '' : 's') + ' this week</small><div class="td-week" aria-hidden="true">' + week.map(function(w, j){ return '<i class="' + (w.n ? '' : 'z') + (j === 6 ? ' t' : '') + '" style="height:' + Math.max(3, Math.round(w.n / wmax * 30)) + 'px" title="' + w.day + ': ' + w.n + '"></i>'; }).join('') + '</div></div></div></div>';
+    // ticks selector + input + suggestions
+    var due = typeof trackDueList === 'function' ? trackDueList() : [];
+    var openApps = L.open.map(function(t){ return t.app; });
+    var sugg = due.filter(function(x){ return openApps.indexOf(x.id) === -1; }).slice(0, 4).map(function(x){ return '<button type="button" class="td-chipbtn due" data-td-sugg-app="' + x.id + '">+ Revise ' + escapeHtml(x.m.title) + '</button>'; }).join('');
+    var quick = TODO_QUICK.filter(function(q){ return !L.open.some(function(t){ return t.t === q; }); }).map(function(q){ return '<button type="button" class="td-chipbtn" data-td-quick="' + escapeAttr(q) + '">+ ' + escapeHtml(q) + '</button>'; }).join('');
+    var card = '<div class="td-card">' +
+      '<div class="td-need"><span class="td-need-l">Ticks to finish</span><span class="td-seg" role="group" aria-label="Ticks needed to finish a new task">' +
+        [1, 2, 3].map(function(n){ return '<button type="button" data-td-def="' + n + '" class="' + (d.def === n ? 'on' : '') + '" aria-pressed="' + (d.def === n) + '" title="' + TODO_NEED[n] + '">' + '✓'.repeat(n) + '</button>'; }).join('') +
+      '</span><small>' + TODO_NEED[d.def] + '</small></div>' +
+      '<div class="td-add"><input type="text" id="tdIn" placeholder="Add a task and press Enter…" aria-label="New task" maxlength="200" autocomplete="off" enterkeyhint="done"><button type="button" class="btn" data-td-addbtn>Add</button></div>' +
+      '<div class="td-hint">Shortcuts: <code>#tag</code> groups it · <code>!</code> marks it important · <code>today</code>, <code>tomorrow</code> or a day like <code>friday</code> sets the date · an app name (polity, bns, voice…) links the app.</div>' +
+      (sugg ? '<div class="td-sugg"><span class="td-sugg-l">Due for revision:</span>' + sugg + '</div>' : '') +
+      (quick && L.live.length < 6 ? '<div class="td-sugg"><span class="td-sugg-l">Quick add:</span>' + quick + '</div>' : '') +
+    '</div>';
+    var tabs = [['today', 'Today', L.today.length], ['up', 'Upcoming', L.up.length], ['all', 'All open', L.open.length], ['done', 'Done', L.done.length]];
+    var filters = '<div class="td-filters" role="tablist">' + tabs.map(function(x){ return '<button type="button" role="tab" data-td-view="' + x[0] + '" class="' + (todoView === x[0] ? 'on' : '') + '" aria-selected="' + (todoView === x[0]) + '">' + x[1] + '<b>' + x[2] + '</b></button>'; }).join('') +
+      tags.map(function(g){ return '<button type="button" class="td-tagf' + (todoTag === g ? ' on' : '') + '" data-td-tagf="' + escapeAttr(g) + '">#' + escapeHtml(g) + '</button>'; }).join('') + '</div>';
+    var empty = { today: ['Nothing for today', 'Add a task above — it lands here.'], up: ['Nothing upcoming', 'Add “tomorrow” or a day name to a task to plan ahead.'], all: ['No open tasks', 'Everything is ticked off.'], done: ['Nothing done yet', 'Finished tasks are kept here.'] }[todoView];
+    var focusId = f ? f.id : null;
+    var body = list.length ? '<div class="td-list">' + list.map(function(t){ return todoItem(t, focusId); }).join('') + '</div>'
+      : '<div class="td-empty"><b>' + (todoTag ? 'No #' + escapeHtml(todoTag) + ' tasks here' : empty[0]) + '</b>' + empty[1] + '</div>';
+    if(todoView === 'today' && L.doneToday.length){
+      var dt = todoTag ? L.doneToday.filter(function(t){ return t.tag === todoTag; }) : L.doneToday;
+      if(dt.length) body += '<div class="td-donehead"><h3>Done today · ' + dt.length + '</h3></div><div class="td-list">' + dt.map(function(t){ return todoItem(t, focusId); }).join('') + '</div>';
+    }
+    if(todoView === 'done' && L.done.length) body = '<div class="td-donehead"><span class="help" style="margin:0;">Newest first. Tap a filled tick to undo it.</span><button type="button" class="btn ghost sm" data-td-clear>Clear done</button></div>' + body;
+    var fbar = '';
+    if(f){
+      var ft = d.tasks.filter(function(t){ return t.id === f.id; })[0];
+      fbar = '<div class="td-focus" role="status"><span class="tm" id="tdFocusTm">' + todoClock(todoFocusLeft(f)) + '</span>' +
+        '<span class="tx"><b>' + escapeHtml(ft ? ft.t : 'Focus') + '</b><small>' + (f.left ? 'Paused' : 'Focus session · a tick is added when it ends') + '</small></span>' +
+        '<span class="fb"><button type="button" data-td-fadj="-5" aria-label="5 minutes less">−5</button><button type="button" data-td-fadj="5" aria-label="5 minutes more">+5</button>' +
+        '<button type="button" class="pri" data-td-fpause>' + (f.left ? 'Resume' : 'Pause') + '</button><button type="button" data-td-fstop>Stop</button></span></div>';
+    }
+    var undo = todoUndo ? '<div class="td-undo" role="status">Task deleted<button type="button" data-td-undo>Undo</button></div>' : '';
+    root.innerHTML = '<div class="td">' + head + card + filters + body + fbar + '</div>' + undo;
+    var inp = document.getElementById('tdIn');
+    if(inp){ inp.value = keepVal; if(hadFocus){ inp.focus(); inp.setSelectionRange(keepVal.length, keepVal.length); } }
+    if(todoEdit){ var et = document.getElementById('tdeT'); if(et && document.activeElement !== et){ et.focus(); et.setSelectionRange(et.value.length, et.value.length); } }
+    todoPop = null;
+  }
+  function todoAddFromInput(){
+    var inp = document.getElementById('tdIn');
+    if(!inp || !inp.value.trim()) return;
+    var t = todoAdd(inp.value);
+    inp.value = '';
+    if(!t) return;
+    if(todoTag && t.tag !== todoTag) todoTag = '';
+    if(todoView === 'done') todoView = 'today';
+    if(todoView === 'today' && t.due > todoDay(0)) todoView = 'up';
+    if(todoView === 'up' && (!t.due || t.due <= todoDay(0))) todoView = 'today';
+    todoPop = t.id;
+    renderTodo();
+    var again = document.getElementById('tdIn'); if(again) again.focus();
+  }
+  function todoTicked(id, i){
+    var fin = false, t = todoUpd(id, function(t){ fin = todoSetTicks(t, i < t.k ? i : i + 1); });
+    if(!t) return;
+    if(fin){
+      todoPop = id;
+      if(navigator.vibrate) try{ navigator.vibrate(30); }catch(e){}
+      var left = todoLeftToday();
+      showToast(left ? 'Done ' + '✓'.repeat(t.n) + ' — ' + left + ' left for today' : 'Done ' + '✓'.repeat(t.n) + ' — that’s everything for today 🎉');
+      var f = todoFocusGet(); if(f && f.id === id) todoFocusSet(null);
+    }
+    renderTodo();
+  }
+  function todoDelete(id){
+    todoUpd(id, function(t){ t.del = Date.now(); });
+    if(todoEdit === id) todoEdit = null;
+    var f = todoFocusGet(); if(f && f.id === id) todoFocusSet(null);
+    if(todoUndo) clearTimeout(todoUndo.timer);
+    todoUndo = { id: id, timer: setTimeout(function(){ todoUndo = null; if(isActive('tasks')) renderTodo(); }, 6000) };
+    renderTodo();
+  }
+
+  // focus timer: { id, min, end (ms), left (ms remaining while paused, else 0) }
+  function todoFocusGet(){ try{ return JSON.parse(lsGet(TODO_FOCUS) || 'null'); }catch(e){ return null; } }
+  function todoFocusSet(f){ lsSet(TODO_FOCUS, f ? JSON.stringify(f) : null); todoFocusLoop(); }
+  function todoFocusLeft(f){ return f.left ? f.left : Math.max(0, f.end - Date.now()); }
+  function todoClock(ms){ var s = Math.ceil(ms / 1000); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+  function todoFocusLoop(){
+    clearInterval(todoFocusTimer);
+    if(!todoFocusGet()) return;
+    todoFocusTimer = setInterval(todoFocusTick, 1000);
+    todoFocusTick();
+  }
+  function todoFocusTick(){
+    var f = todoFocusGet();
+    if(!f){ clearInterval(todoFocusTimer); return; }
+    if(!f.left && Date.now() >= f.end){ todoFocusDone(f); return; }
+    var el = document.getElementById('tdFocusTm');
+    if(el) el.textContent = todoClock(todoFocusLeft(f));
+  }
+  function todoFocusDone(f){
+    lsSet(TODO_FOCUS, null);
+    clearInterval(todoFocusTimer);
+    var fin = false, t = todoUpd(f.id, function(t){ t.fm = (t.fm || 0) + f.min; if(!t.done) fin = todoSetTicks(t, t.k + 1); });
+    try{
+      var ac = new (window.AudioContext || window.webkitAudioContext)(), o = ac.createOscillator(), g = ac.createGain();
+      o.frequency.value = 880; o.connect(g); g.connect(ac.destination);
+      g.gain.setValueAtTime(0.18, ac.currentTime); g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 1.4);
+      o.start(); o.stop(ac.currentTime + 1.4);
+    }catch(e){}
+    if(navigator.vibrate) try{ navigator.vibrate([200, 100, 200]); }catch(e){}
+    showToast('Focus session done — ' + f.min + ' min' + (t ? ' on “' + t.t + '”. ' + (fin ? 'Task finished ✓' : 'Tick added ✓') : '.'));
+    if(t) todoPop = t.id;
+    if(isActive('tasks')) renderTodo();
+  }
+
+  (function(){
+    var root = document.getElementById('todoRoot');
+    if(!root) return;
+    root.addEventListener('click', function(ev){
+      var el = ev.target.closest('button, [data-td-edit]');
+      if(!el || !root.contains(el)) return;
+      var item = el.closest('[data-td-id]'), id = item ? item.dataset.tdId : null, ds = el.dataset;
+      if(ds.tdDef){ var d = todoData(); d.def = +ds.tdDef; todoSave(d); renderTodo(); return; }
+      if('tdAddbtn' in ds){ todoAddFromInput(); return; }
+      if(ds.tdView){ todoView = ds.tdView; todoEdit = null; renderTodo(); return; }
+      if(ds.tdTagf){ todoTag = todoTag === ds.tdTagf ? '' : ds.tdTagf; renderTodo(); return; }
+      if(ds.tdSuggApp){ var m = STUDY[ds.tdSuggApp]; var t1 = todoAdd('Revise ' + m.title, { app: ds.tdSuggApp, due: todoDay(0) }); if(t1){ todoPop = t1.id; todoView = 'today'; } renderTodo(); return; }
+      if(ds.tdQuick){ var t2 = todoAdd(ds.tdQuick); if(t2){ todoPop = t2.id; if(todoView !== 'all') todoView = 'today'; } renderTodo(); return; }
+      if(ds.tdApp){ openStudy(ds.tdApp, false); return; }
+      if('tdUndo' in ds){ if(todoUndo){ var uid = todoUndo.id; clearTimeout(todoUndo.timer); todoUndo = null; todoUpd(uid, function(t){ t.del = 0; }); todoPop = uid; } renderTodo(); return; }
+      if('tdClear' in ds){
+        var dd = todoData(), now = Date.now(), n = 0;
+        dd.tasks.forEach(function(t){ if(t.done && !t.del){ t.del = now; t.u = now; n++; } });
+        if(n && confirm('Remove ' + n + ' finished task' + (n === 1 ? '' : 's') + '?')){ todoSave(dd); renderTodo(); }
+        return;
+      }
+      if('tdFpause' in ds){ var f = todoFocusGet(); if(f){ if(f.left){ f.end = Date.now() + f.left; f.left = 0; } else f.left = Math.max(1000, f.end - Date.now()); todoFocusSet(f); renderTodo(); } return; }
+      if('tdFstop' in ds){ todoFocusSet(null); renderTodo(); return; }
+      if(ds.tdFadj){
+        var fa = todoFocusGet(); if(!fa) return;
+        var dlt = +ds.tdFadj * 60000;
+        if(fa.left) fa.left = Math.max(60000, fa.left + dlt); else fa.end = Math.max(Date.now() + 60000, fa.end + dlt);
+        fa.min = Math.max(1, fa.min + +ds.tdFadj);
+        todoFocusSet(fa); return;
+      }
+      if(!id) return;
+      if(ds.tdTick !== undefined){ todoTicked(id, +ds.tdTick); return; }
+      if('tdStar' in ds){ todoUpd(id, function(t){ t.star = !t.star; }); renderTodo(); return; }
+      if('tdFocus' in ds){
+        var cur = todoFocusGet();
+        if(cur && cur.id !== id && !confirm('Stop the current focus session and start this one?')) return;
+        todoFocusSet({ id: id, min: TODO_MIN, end: Date.now() + TODO_MIN * 60000, left: 0 });
+        renderTodo();
+        var fb = root.querySelector('.td-focus'); if(fb && fb.scrollIntoView) fb.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        return;
+      }
+      if(ds.tdN){ todoUpd(id, function(t){ t.n = +ds.tdN; todoSetTicks(t, Math.min(t.k, t.n)); }); renderTodo(); return; }
+      if('tdSave' in ds){ todoSaveEdit(id); return; }
+      if('tdCancel' in ds){ todoEdit = null; renderTodo(); return; }
+      if('tdReset' in ds){ todoUpd(id, function(t){ todoSetTicks(t, 0); }); renderTodo(); return; }
+      if('tdDel' in ds){ todoDelete(id); return; }
+      if('tdEdit' in ds){ if(todoEdit !== id){ todoEdit = id; renderTodo(); } return; }
+    });
+    root.addEventListener('keydown', function(ev){
+      if(ev.target.id === 'tdIn'){
+        if(ev.key === 'Enter' && !ev.isComposing){ ev.preventDefault(); todoAddFromInput(); }
+        else if(ev.key === 'Escape'){ ev.target.value = ''; }
+        return;
+      }
+      var item = ev.target.closest('[data-td-id]');
+      if(item && ev.target.closest('.td-edit') && ev.target.tagName === 'INPUT'){
+        if(ev.key === 'Enter'){ ev.preventDefault(); todoSaveEdit(item.dataset.tdId); }
+        else if(ev.key === 'Escape'){ todoEdit = null; renderTodo(); }
+      }
+    });
+    document.addEventListener('keydown', function(ev){
+      if(ev.key !== '/' || !isActive('tasks')) return;
+      var tg = ev.target.tagName;
+      if(tg === 'INPUT' || tg === 'TEXTAREA' || tg === 'SELECT' || ev.target.isContentEditable) return;
+      var inp = document.getElementById('tdIn'); if(inp){ ev.preventDefault(); inp.focus(); }
+    });
+    todoFocusLoop();
+  })();
+  function todoSaveEdit(id){
+    var tx = (document.getElementById('tdeT') || {}).value || '';
+    if(!tx.trim()){ todoDelete(id); return; }
+    var due = (document.getElementById('tdeD') || {}).value || '';
+    var tag = ((document.getElementById('tdeG') || {}).value || '').trim().replace(/^#/, '').replace(/\s+/g, '-').toLowerCase().slice(0, 24);
+    var app = (document.getElementById('tdeA') || {}).value || '';
+    todoUpd(id, function(t){ t.t = tx.trim().replace(/\s+/g, ' '); t.due = /^\d{4}-\d{2}-\d{2}$/.test(due) ? due : ''; t.tag = tag; t.app = STUDY[app] ? app : ''; });
+    todoEdit = null;
+    renderTodo();
+  }
+
   // ---------------- tabs ----------------
   var tabs = document.querySelectorAll('.tab');
   var views = document.querySelectorAll('.view');
@@ -3620,6 +4084,7 @@
     if(name === 'admin') renderAdminPanel();
     if(name === 'spellbank') renderSpellBank();
     if(name === 'revision') renderRevision();
+    if(name === 'tasks') renderTodo();
   }
 
   function normalizeType(t){

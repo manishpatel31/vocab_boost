@@ -51,6 +51,7 @@ Each mini app is one self-contained page (`study-<name>.html`) with lessons, a q
 - Progress saved to your account (Firebase) and synced across devices
 - One unified daily goal and streak across vocab and all study apps
 - Study tracker: every visit to a mini app is saved as a session (active time, questions answered, score), with score trends, time estimates, last visited / studied / completed dates and a reminder to revise each app every 15 days (10–30, adjustable)
+- Tasks: a to-do list — type a task and press Enter; each task needs 1, 2 or 3 ticks to finish (do it, then revise it). Shortcuts for #tags, ! important and due dates (today, tomorrow, a weekday), app names become links, revision-due apps are suggested, a 25-minute focus timer adds a tick when it ends, Today / Upcoming / Done lists, undo delete, synced across devices
 - Deep links: Search results open the exact lesson
 - Companion Android app "Vocab Lock" shows words and GS/Maths facts on the lock screen
 
