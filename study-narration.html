@@ -339,7 +339,7 @@ sup,sub{font-size:.72em;line-height:0}
 const IS = "Select the option that expresses the given sentence in indirect speech. ";
 const DS = "Select the option that expresses the given sentence in direct speech. ";
 const LESSONS = [
-{ id:"L1", heat:3, title:"SSC CGL pattern & exam strategy", hi:"परीक्षा पैटर्न और रणनीति", blocks:[
+{ id:"L1", heat:3, title:"SSC CGL pattern & exam strategy", hi:"परीक्षा पैटर्न और रणनीति", sum:["About one narration question per CGL Tier 1 shift; one to three in Tier 2.", "Check RJPTW: reporting verb, joining word, pronouns, tense, time and place words.", "Most wrong options keep the original tense or time word."], blocks:[
  {k:"hot", h:"<b>Narration (direct–indirect speech) is asked in almost every SSC English section.</b> CGL Tier 1 (25 questions, +2 / −0.5) usually has <b>one</b> narration question in a shift. CGL Tier 2 (Paper 1, Module II: 45 questions, +3 / −1) has <b>one to three</b>. CHSL, CPO and Selection Post ask it in the same format. With the method below it takes 25–35 seconds."},
  {k:"table", title:"Where narration is asked in SSC exams", head:["Exam","English section","Narration questions (usual)","Marking"], rows:[
   ["CGL Tier 1","25 questions","0–1 per shift, mostly 1","+2 / −0.5"],
@@ -361,7 +361,7 @@ const LESSONS = [
  {k:"link", h:"Narration and active–passive voice appear side by side and both test tense control. Revise them together; the Voice mini app uses the same layout."},
  {k:"q", q:"Which check usually removes the most wrong options in a narration question?", o:["The tense and time words","The spelling of names","The length of the sentence","The full stop"], e:"Most distractors keep the original tense or time word."}
 ]},
-{ id:"L2", heat:3, title:"Basic rules: reporting verb & pronouns", hi:"मूल नियम · रिपोर्टिंग वर्ब और सर्वनाम", blocks:[
+{ id:"L2", heat:3, title:"Basic rules: reporting verb & pronouns", hi:"मूल नियम · रिपोर्टिंग वर्ब और सर्वनाम", sum:["said → said; said to + person → told + person.", "Statement → that; question → if / whether / wh-word; order → to.", "SON rule: 1st person → subject, 2nd person → object, 3rd person → no change."], blocks:[
  {k:"hot", h:"Every narration question uses these rules. Pronoun mistakes are the second most common SSC distractor after tense."},
  {k:"p", h:"In <b>direct speech</b> the exact words are inside inverted commas: <i>Ram said, “I am tired.”</i> In <b>indirect speech</b> we report them in our own words: <i>Ram said that he was tired.</i> The verb outside the commas (<i>said</i>) is the <b>reporting verb</b>; the words inside are the <b>reported speech</b>."},
  {k:"formula", title:"Five steps of direct → indirect", rows:[
@@ -379,7 +379,7 @@ const LESSONS = [
  {k:"trick", h:"Do pronouns before tense. Once <i>I</i> has become <i>he</i>, the verb agreement (<i>was</i>, not <i>were</i>) follows easily."},
  {k:"q", q:"He said to her, “I like your dress.” Indirect:", o:["He told her that he liked her dress.","He told her that I liked your dress.","He said her that he liked her dress.","He told her that he likes her dress."], e:"said to → told; I → he; your → her; like → liked."}
 ]},
-{ id:"L3", heat:3, title:"Tense change (backshift)", hi:"काल परिवर्तन", blocks:[
+{ id:"L3", heat:3, title:"Tense change (backshift)", hi:"काल परिवर्तन", sum:["Past reporting verb → one step back: is → was, has → had, will → would.", "Simple past → past perfect (saw → had seen); past perfect stays.", "Present reporting verb (says) → no tense change."], blocks:[
  {k:"hot", h:"Tense is tested in nearly every SSC narration question. If the reporting verb is in the <b>past</b> (said, told, asked), the tense inside goes <b>one step back</b>."},
  {k:"formula", title:"Backshift table", rows:[
   ["Simple present → simple past","V1 / V5 → V2","“I write” → he wrote"],
@@ -402,7 +402,7 @@ const LESSONS = [
  {k:"trick", h:"Think of each helping verb moving one step: is → was, has → had, was → had been, will → would, can → could, may → might. Past perfect is already at the back: it stays."},
  {k:"q", q:"She said, “I have finished my homework.” Indirect:", o:["She said that she had finished her homework.","She said that she has finished her homework.","She said that she finished her homework.","She said that I had finished my homework."], e:"has finished → had finished; I → she; my → her."}
 ]},
-{ id:"L4", heat:2, title:"Exceptions & modals", hi:"अपवाद और मॉडल", blocks:[
+{ id:"L4", heat:2, title:"Exceptions & modals", hi:"अपवाद और मॉडल", sum:["Universal truths, habitual facts and historical facts keep their tense.", "can → could, may → might, must → had to (deduction stays must).", "would, could, should, might, ought to, used to: no change."], blocks:[
  {k:"hot", h:"Exceptions are a <b>Tier 2 favourite</b> and appear in Tier 1 about once a month. The universal-truth exception is the one SSC asks most."},
  {k:"formula", title:"Modal changes", rows:[
   ["will / shall","→ would","“I shall go” → he would go"],
@@ -423,7 +423,7 @@ const LESSONS = [
  {k:"trick", h:"<b>Modals already in the past form never move:</b> would, could, might, should, ought to. If the option changes <i>should</i> to <i>should have</i>, it is wrong."},
  {k:"q", q:"He said, “You should take some rest.” Indirect (he said this to me):", o:["He told me that I should take some rest.","He told me that I should have taken some rest.","He told me that you should take some rest.","He told me that I shall take some rest."], e:"should does not change."}
 ]},
-{ id:"L5", heat:3, title:"Time & place words", hi:"समय और स्थान सूचक शब्द", blocks:[
+{ id:"L5", heat:3, title:"Time & place words", hi:"समय और स्थान सूचक शब्द", sum:["now → then, today → that day, tonight → that night.", "yesterday → the previous day, tomorrow → the next day, ago → before.", "this → that, these → those, here → there."], blocks:[
  {k:"hot", h:"Time words decide about one SSC narration question in three: often <b>two options are identical except for one time word</b>."},
  {k:"table", title:"Near → far words", head:["Direct","Indirect"], rows:[
   ["now","then"],["today","that day"],["tonight","that night"],["yesterday","the previous day / the day before"],["tomorrow","the next day / the following day"],
@@ -433,7 +433,7 @@ const LESSONS = [
  {k:"trick", h:"If the reporting verb is <b>present</b> (<i>says</i>) or the speech is reported the same day and place, time words need not change. SSC almost always uses <i>said</i>, so change them."},
  {k:"q", q:"She said, “I met him two days ago.” Indirect:", o:["She said that she had met him two days before.","She said that she met him two days ago.","She said that she had met him two days ago.","She said that she has met him two days before."], e:"met → had met; ago → before."}
 ]},
-{ id:"L6", heat:3, title:"Questions (interrogative)", hi:"प्रश्नवाचक वाक्य", blocks:[
+{ id:"L6", heat:3, title:"Questions (interrogative)", hi:"प्रश्नवाचक वाक्य", sum:["Reporting verb becomes ‘asked’.", "Yes/no question → if / whether; wh-question → wh-word.", "Use statement order and drop do / does / did and the question mark."], blocks:[
  {k:"hot", h:"Questions come up very often. SSC tests three things: <b>asked</b> (not said/told), <b>if / whether</b> or the wh-word, and <b>statement word order</b> without a question mark."},
  {k:"formula", title:"Question patterns", rows:[
   ["Reporting verb","said / said to → asked / enquired of","He said to me → He asked me"],
@@ -447,7 +447,7 @@ const LESSONS = [
  {k:"trick", h:"Look at the end of each option: one that still ends with <b>?</b> is wrong in indirect speech."},
  {k:"q", q:"He said to me, “Are you coming with us?” Indirect:", o:["He asked me if I was coming with them.","He asked me if I was coming with us.","He asked me that was I coming with them.","He told me if I was coming with them."], e:"asked + if; you → I; us → them; are → was."}
 ]},
-{ id:"L7", heat:3, title:"Commands, requests & suggestions", hi:"आज्ञा, अनुरोध और सुझाव", blocks:[
+{ id:"L7", heat:3, title:"Commands, requests & suggestions", hi:"आज्ञा, अनुरोध और सुझाव", sum:["Orders: ordered / told + (not) to + V1.", "Requests: Please → requested + to + V1.", "Let’s → suggested that … should."], blocks:[
  {k:"hot", h:"Imperatives appear often. The key is choosing the reporting verb from the tone and using <b>to + V1</b> (or <b>not to + V1</b>)."},
  {k:"formula", title:"Imperative patterns", rows:[
   ["Order","ordered / commanded + person + to V1","“Stand up.” → The teacher ordered the boy to stand up"],
@@ -463,7 +463,7 @@ const LESSONS = [
  {k:"trick", h:"<b>Please → requested. Don’t → not to. Let’s → suggested that … should.</b> Three patterns cover almost all imperatives."},
  {k:"q", q:"She said to me, “Please close the door.” Indirect:", o:["She requested me to close the door.","She requested me that I close the door please.","She ordered me to close the door.","She said me to close the door."], e:"Please → requested + to V1."}
 ]},
-{ id:"L8", heat:2, title:"Exclamations, wishes & greetings", hi:"विस्मयादिबोधक, शुभकामनाएँ", blocks:[
+{ id:"L8", heat:2, title:"Exclamations, wishes & greetings", hi:"विस्मयादिबोधक, शुभकामनाएँ", sum:["Exclamations: exclaimed (with joy / sorrow) that it was a very …", "Wishes and blessings: wished / prayed that … might.", "Greetings: wished good morning, thanked, bade goodbye."], blocks:[
  {k:"hot", h:"Asked regularly in Tier 1 and Tier 2. The trick is choosing the <b>reporting verb with an adverb</b> and turning the exclamation into a statement."},
  {k:"formula", title:"Exclamatory & optative patterns", rows:[
   ["What / How …!","exclaimed (with joy / wonder) that it was a very …","“What a lovely view!” → She exclaimed that it was a very lovely view"],
@@ -479,7 +479,7 @@ const LESSONS = [
  {k:"trick", h:"<b>May you …</b> is always a wish or prayer → <i>wished / prayed that … might</i>."},
  {k:"q", q:"The old man said to me, “May God bless you!” Indirect:", o:["The old man prayed that God might bless me.","The old man prayed that God may bless you.","The old man told me that God bless me.","The old man ordered that God might bless me."], e:"May … ! → prayed that … might; you → me."}
 ]},
-{ id:"L9", heat:2, title:"Mixed & multiple sentences", hi:"मिश्रित और अनेक वाक्य", blocks:[
+{ id:"L9", heat:2, title:"Mixed & multiple sentences", hi:"मिश्रित और अनेक वाक्य", sum:["Join two statements with ‘and added that’; a statement and a question with ‘and asked’.", "Yes / No → replied in the affirmative / negative.", "Sir / Madam → respectfully."], blocks:[
  {k:"hot", h:"Tier 2 likes longer speech: a statement plus a question, an answer with Yes/No, or two sentences. Each part gets its own reporting verb, joined by <b>and</b>."},
  {k:"formula", title:"Joining patterns", rows:[
   ["Statement + statement","said that … and added that …","“I am tired. I will rest.” → said that he was tired and added that he would rest"],
@@ -493,7 +493,7 @@ const LESSONS = [
  {k:"trick", h:"Split the speech at each full stop or question mark. Convert each piece with its own pattern, then join with <i>and added / and asked / and told</i>."},
  {k:"q", q:"“Yes,” she said, “I can drive.” Indirect:", o:["She replied that she could drive.","She replied in the negative that she could drive.","She said yes that I can drive.","She replied that she can drove."], e:"Yes + clause → replied that + backshifted clause."}
 ]},
-{ id:"L10", heat:2, title:"Indirect → direct", hi:"अप्रत्यक्ष से प्रत्यक्ष", blocks:[
+{ id:"L10", heat:2, title:"Indirect → direct", hi:"अप्रत्यक्ष से प्रत्यक्ष", sum:["Indirect → direct: told → said to, put the words in inverted commas.", "Move the tense forward and change then → now, that day → today.", "Restore question order and the question mark for questions."], blocks:[
  {k:"hot", h:"About one SSC narration question in four asks for the <b>direct</b> form. Reverse each step: put the words back in inverted commas and move tenses one step <b>forward</b>."},
  {k:"formula", title:"Reverse the steps", rows:[
   ["Reporting verb","told + person → said to + person; asked → said to + person","He told me → He said to me"],
@@ -507,7 +507,7 @@ const LESSONS = [
  {k:"trick", h:"Check punctuation in the options: a question must end with <b>?</b> inside the commas, a command must start with a bare verb, an exclamation with <b>What / How / Alas</b> and end with <b>!</b>."},
  {k:"q", q:"She asked me if I was hungry. Direct:", o:["She said to me, “Are you hungry?”","She said to me, “Was I hungry?”","She said to me, “Am I hungry?”","She told me, “Are you hungry.”"], e:"asked if → said to me + question; I → you; was → are."}
 ]},
-{ id:"L11", heat:2, title:"Tier 2 tricky sentences", hi:"टियर 2 के कठिन वाक्य", blocks:[
+{ id:"L11", heat:2, title:"Tier 2 tricky sentences", hi:"टियर 2 के कठिन वाक्य", sum:["Shall I / we → asked if … should.", "Question tags are dropped in indirect speech.", "Conditional type 1 backshifts both parts; types 2 and 3 do not change."], blocks:[
  {k:"hot", h:"Tier 2 uses longer, formal sentences: reporting verbs in the present tense, <i>must</i>, conditionals, <i>let</i> for permission, and questions with <i>shall I</i>."},
  {k:"formula", title:"Tricky types", rows:[
   ["Present reporting verb","says / tells → no backshift","He says, “I am busy.” → He says that he is busy"],
@@ -522,7 +522,7 @@ const LESSONS = [
  {k:"trick", h:"Before converting, look at the <b>reporting verb’s tense</b>. Present → keep tenses; past → backshift. That one glance decides two options."},
  {k:"q", q:"She says, “I am going to the market.” Indirect:", o:["She says that she is going to the market.","She says that she was going to the market.","She said that she was going to the market.","She says that I am going to the market."], e:"Present reporting verb → no tense change."}
 ]},
-{ id:"L12", heat:3, title:"Recent-pattern mixed set & last-day tips", hi:"नवीन पैटर्न अभ्यास · अंतिम दिन के सुझाव", blocks:[
+{ id:"L12", heat:3, title:"Recent-pattern mixed set & last-day tips", hi:"नवीन पैटर्न अभ्यास · अंतिम दिन के सुझाव", sum:["Compare the four options word by word — the difference is usually one tense or time word.", "Strike out any option that keeps a question mark or question order.", "Do the mixed set with a 35-second limit before every mock."], blocks:[
  {k:"hot", h:"This lesson’s question bank is a <b>mixed set modelled on recent CGL, CHSL and CPO shifts (2023–2025)</b>: office, school, family and travel sentences across every type, in both directions. Do it in one sitting with a 35-second limit per question."},
  {k:"p", h:"<b>What changed recently.</b> Sentences are longer, mix two kinds of speech, and more often ask for the direct form. Options now differ in a single word, so the five-step check from L1 matters more than ever."},
  {k:"facts", title:"Last-day checklist", rows:[
