@@ -1949,7 +1949,7 @@
   }
   // ================= पाठShala home: the app's front page =================
   var EXAM_DEFAULT = '2026-10-13';
-  function examDay(){ var v = lsGet('pathshalaExamDate'); return /^\d{4}-\d{2}-\d{2}$/.test(v || '') ? v : EXAM_DEFAULT; }
+  function examDay(){ var v = (myProfile && myProfile.examDate) || lsGet('pathshalaExamDate'); return /^\d{4}-\d{2}-\d{2}$/.test(v || '') ? v : EXAM_DEFAULT; }
   function daysToExam(){
     var p = examDay().split('-'), d = new Date(+p[0], +p[1] - 1, +p[2]), t = new Date();
     t.setHours(0, 0, 0, 0);
@@ -2123,6 +2123,7 @@
       var v = document.getElementById('examDateIn').value;
       if(!/^\d{4}-\d{2}-\d{2}$/.test(v)){ showToast('Pick a date.'); return; }
       lsSet('pathshalaExamDate', v);
+      if(currentUser) db.collection('users').doc(currentUser.uid).set({ examDate: v }, { merge: true }).catch(function(){});
       modalBgRef().classList.remove('open'); modalBodyRef().innerHTML = '';
       renderHub();
     });
@@ -2341,29 +2342,53 @@
 
   /** Before opening: take the account's copy if it is newer than this device's. */
   async function studyPull(id){
-    var mod = studyMod(id);
-    if(!currentUser) return;
+    if(!currentUser || !studyMod(id)) return;
     try{
       var snap = await studyDocRef(id).get();
-      if(!snap.exists) return;
-      var r = snap.data() || {};
-      if(r.key && mod.key && r.key !== mod.key) return; /* saved by an older version of this app */
-      if((id === 'tracker' || id === 'todo') && typeof r.data === 'string'){
-        var mine = lsGet(mod.key), merged = (id === 'todo' ? todoMerge : trackMerge)(trackParse(mine), trackParse(r.data)), mj = JSON.stringify(merged);
-        if(id === 'todo' && isActive('tasks')) setTimeout(renderTodo, 0);
-        lsSet(mod.key, mj);
-        if(mj !== r.data) setStudyMeta(id, { localAt: Date.now() }); else setStudyMeta(id, { syncedAt: r.updatedAt || Date.now(), localAt: r.updatedAt || Date.now() });
-        return;
-      }
-      var meta = studyMeta()[id] || {};
-      var local = lsGet(mod.key);
-      var localAt = meta.localAt || 0, syncedAt = meta.syncedAt || 0;
-      var localChanged = local !== null && localAt > syncedAt;
-      if(typeof r.data === 'string' && (local === null || (r.updatedAt || 0) > syncedAt) && (!localChanged || (r.updatedAt || 0) >= localAt)){
-        lsSet(mod.key, r.data);
-        setStudyMeta(id, { syncedAt: r.updatedAt || Date.now(), localAt: r.updatedAt || Date.now() });
-      }
+      if(snap.exists) studyApply(id, snap.data() || {});
     }catch(e){ /* offline or rules not added yet: keep this device's copy */ }
+  }
+  /** Bring one module's synced copy (from your account) into this device. Returns true if this device's copy changed. */
+  function studyApply(id, r){
+    var mod = studyMod(id);
+    if(!mod || typeof r.data !== 'string') return false;
+    if(r.key && mod.key && r.key !== mod.key) return false;   /* saved by an older version of this app */
+    var local = lsGet(mod.key);
+    if(id === 'tracker' || id === 'todo'){
+      // lists kept on several devices: merge both, then upload the merge if this device added anything
+      var merged = (id === 'todo' ? todoMerge : trackMerge)(trackParse(local), trackParse(r.data)), mj = JSON.stringify(merged);
+      if(mj !== local) lsSet(mod.key, mj);
+      if(mj !== r.data){ setStudyMeta(id, { localAt: Date.now() }); clearTimeout(studyApply['t' + id]); studyApply['t' + id] = setTimeout(function(){ studyPush(id); }, 1500); }
+      else setStudyMeta(id, { syncedAt: r.updatedAt || Date.now(), localAt: r.updatedAt || Date.now() });
+      return mj !== local;
+    }
+    var meta = studyMeta()[id] || {};
+    var localAt = meta.localAt || 0, syncedAt = meta.syncedAt || 0;
+    var localChanged = local !== null && localAt > syncedAt;
+    if((local === null || (r.updatedAt || 0) > syncedAt) && (!localChanged || (r.updatedAt || 0) >= localAt)){
+      lsSet(mod.key, r.data);
+      setStudyMeta(id, { syncedAt: r.updatedAt || Date.now(), localAt: r.updatedAt || Date.now() });
+      return r.data !== local;
+    }
+    return false;
+  }
+  /** Live sync: changes made on your other devices arrive here as they happen. */
+  var unsubStudy = null;
+  function studyListen(){
+    if(unsubStudy){ unsubStudy(); unsubStudy = null; }
+    if(!currentUser) return;
+    unsubStudy = db.collection('users').doc(currentUser.uid).collection('study').onSnapshot(function(snap){
+      var changed = [];
+      snap.docChanges().forEach(function(c){
+        if(c.type === 'removed' || c.doc.metadata.hasPendingWrites) return;   // our own unsent writes
+        var id = c.doc.id;
+        if(!studyMod(id) || id === studyOpen) return;                         // an open mini app keeps its own copy until closed
+        if(studyApply(id, c.doc.data() || {})) changed.push(id);
+      });
+      if(!changed.length) return;
+      if(changed.indexOf('todo') !== -1 && isActive('tasks')) renderTodo();
+      renderHomeSoon();
+    }, function(){ /* rules not added yet: pulls on opening still work */ });
   }
   function studyPush(id){
     var mod = studyMod(id);
@@ -3156,7 +3181,12 @@
   function refreshHubProgress(){
     if(!currentUser) return;
     hubPulledAt = Date.now();
-    Promise.all(Object.keys(STUDY).concat(Object.keys(STUDY_EXTRA)).map(function(id){ return studyPull(id); })).then(function(){ if(!trackLive) trackFinishStale(); renderHomeSoon(); });
+    var all = Object.keys(STUDY).concat(Object.keys(STUDY_EXTRA));
+    Promise.all(all.map(function(id){ return studyPull(id); })).then(function(){
+      if(!trackLive) trackFinishStale();
+      renderHomeSoon();
+      all.forEach(function(id){ if(id !== studyOpen) studyPush(id); });   // upload anything this device has not sent yet (made offline, or before signing in)
+    });
   }
 
   // ---------------- text-to-speech ----------------
@@ -3408,6 +3438,8 @@
       renderWhoBox();
       applyRoleUI();
       attachListeners();
+      studyListen();
+      setTimeout(refreshHubProgress, 1200);   // fetch every module's progress and upload anything not yet sent
       ensureUserProfile();
       lockSyncStart();
       checkModeratorRole().then(function(){ renderWhoBox(); applyRoleUI(); scheduleRender(); renderReview(); });
@@ -3627,6 +3659,9 @@
   function attachListeners(){
     unsubMe = db.collection('users').doc(currentUser.uid).onSnapshot(function(doc){
       myProfile = doc.exists ? (doc.data() || {}) : {};
+      var ed = lsGet('pathshalaExamDate');   // exam date: keep this device in step with the account (and upload one set before syncing existed)
+      if(myProfile.examDate && myProfile.examDate !== ed) lsSet('pathshalaExamDate', myProfile.examDate);
+      else if(!myProfile.examDate && /^\d{4}-\d{2}-\d{2}$/.test(ed || '')) db.collection('users').doc(currentUser.uid).set({ examDate: ed }, { merge: true }).catch(function(){});
       renderGoalWidget();
       if(isActive('stats')) renderStreakPanel();
       renderHomeSoon();
@@ -3714,6 +3749,7 @@
     if(unsubSpellSubs) unsubSpellSubs();
     if(unsubRootGroups) unsubRootGroups();
     if(unsubMe) unsubMe();
+    if(unsubStudy){ unsubStudy(); unsubStudy = null; }
     unsubMe = null; myProfile = null;
     var gwEl = document.getElementById('goalWidget'); if(gwEl) gwEl.style.display = 'none';
     unsubRootGroups = null; rootGroups = [];
@@ -4149,7 +4185,7 @@
     if(name === 'admin') renderAdminPanel();
     if(name === 'spellbank') renderSpellBank();
     if(name === 'revision') renderRevision();
-    if(name === 'tasks') renderTodo();
+    if(name === 'tasks'){ renderTodo(); studyPull('todo').then(function(){ if(isActive('tasks')) renderTodo(); }); }
   }
 
   function normalizeType(t){
