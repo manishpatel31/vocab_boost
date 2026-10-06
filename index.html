@@ -960,7 +960,7 @@
   .hub-sub-h .sub-prog{ margin-left:auto; display:flex; align-items:center; gap:8px; font-weight:600; color:var(--ink-soft); }
   .hub-sub-h .sub-prog i{ display:block; width:90px; height:5px; border-radius:5px; background:var(--rule); overflow:hidden; }
   .hub-sub-h .sub-prog i b{ display:block; height:100%; background:var(--teal); }
-  @media (min-width: 1100px){ .subj-tiles{ grid-template-columns:repeat(10, minmax(0, 1fr)); } .subj-tile{ padding:12px 11px 11px; } }
+  @media (min-width: 1100px){ .subj-tiles{ grid-template-columns:repeat(11, minmax(0, 1fr)); } .subj-tile{ padding:12px 11px 11px; } }
   @media (min-width: 1000px){ #homeBody .hub-grid{ grid-template-columns:repeat(3, minmax(0, 1fr)); } }
   @media (max-width: 860px){ .subj-tiles{ grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; } .subj-tile{ padding:10px; } .subj-tile em{ font-size:10.5px; } .hub-sub-h .sub-prog i{ width:60px; } }
   @media (max-width: 460px){ .subj-tile .ic{ font-size:19px; margin-bottom:3px; } .subj-tile b{ font-size:13px; } .subj-tile small{ font-size:10.5px; } .subj-tile .bar{ margin:6px 0 4px; } }
@@ -1866,6 +1866,7 @@
     economics:{ title: 'Indian Economy',               file: 'study-economics.html',    key: 'economics_pyq_workbook_v1' },
     formulas: { title: 'Maths Formula Book',           file: 'study-maths-formulas.html', key: 'maths_formula_book_v1' },
     numbersystem: { title: 'Number System',            file: 'study-number-system.html', key: 'number_system_workbook_v1' },
+    calendar: { title: 'Calendar',                     file: 'study-calendar.html',      key: 'calendar_workbook_v1' },
     geometry: { title: 'Geometry',                     file: 'study-geometry.html',     key: 'geometry_workbook_v1' },
     mensuration2d:{ title: 'Mensuration 2D',           file: 'study-mensuration2d.html', key: 'mensuration2d_workbook_v1' },
     mensuration3d:{ title: 'Mensuration 3D',           file: 'study-mensuration3d.html', key: 'mensuration3d_workbook_v1' },
@@ -1903,6 +1904,9 @@
    ['mensuration3d', '🧊', 'क्षेत्रमिति · 3D', 'Cube to frustum — volumes and surface areas, melting and recasting, water flow, combined solids and painted cubes.', 11, 179, '#7A4FB0'],
    ['trigonometry', '📏', 'त्रिकोणमिति', 'Ratios, standard values, identities, max–min, allied and compound angles, heights and distances, radians.', 11, 196, '#2F8F7A']
   ].forEach(function(x){ var m = STUDY[x[0]]; m.subj = 'maths'; m.ico = x[1]; m.hi = x[2]; m.desc = x[3]; m.meta = x[4] + ' lessons · ' + x[5] + ' questions'; m.color = x[6]; m.lessons = x[4]; m.unit = 'lessons'; });
+  // Reasoning section: one mini app per reasoning chapter
+  [['calendar', '📅', 'कैलेंडर · Reasoning', 'Leap years, odd days, the 10-second code method for any date, days-later puzzles, year shifts and repeating calendars.', 8, 114, '#3E6FA8']
+  ].forEach(function(x){ var m = STUDY[x[0]]; m.subj = 'reasoning'; m.ico = x[1]; m.hi = x[2]; m.desc = x[3]; m.meta = x[4] + ' lessons · ' + x[5] + ' questions'; m.color = x[6]; m.lessons = x[4]; m.unit = 'lessons'; });
   // General Studies is split by subject in पाठShala
   var GS_SUBJECTS = [
     ['history', 'History', 'इतिहास'], ['culture', 'Art & Culture', 'कला एवं संस्कृति'], ['polity', 'Polity', 'राजव्यवस्था'],
@@ -1947,8 +1951,8 @@
     return '<section class="hub-sec"><div class="hub-sec-h"><h2>Practice across subjects</h2><span>सभी विषय</span></div><div class="hub-grid hub-actions">' +
       '<button class="hub-card hub-act" data-hub-act="mistakes" style="--hub-c:var(--maroon);"><div class="hub-top"><div class="hub-ico">📕</div><div><h3>Mistakes book</h3><div class="hi">गलतियाँ · all subjects</div></div><div class="hub-big">' + totalWrong + '</div></div>' +
         '<p>Every question you got wrong in any mini app or mock — practise them until they’re gone.</p><div class="hub-meta"><span>' + (totalWrong ? totalWrong + ' waiting' : 'Nothing to fix yet') + '</span><b>Open ›</b></div></button>' +
-      '<button class="hub-card hub-act" data-hub-act="mock" style="--hub-c:var(--teal);"><div class="hub-top"><div class="hub-ico">⏱️</div><div><h3>Mixed mock test</h3><div class="hi">English + Maths + GS · timed</div></div>' + (last ? '<div class="hub-big">' + last.score + '<small>/' + last.max + '</small></div>' : '') + '</div>' +
-        '<p>Vocab, Grammar, ' + mathQIds().length + ' Maths apps and ' + gsIds().length + ' GS apps in one SSC-style paper, +2 / −0.5, with a subject-wise report.</p><div class="hub-meta"><span>' + (hist.length ? hist.length + ' taken · last ' + agoText(last.at).replace('Opened ', '') : 'Not taken yet') + '</span><b>Start ›</b></div></button>' +
+      '<button class="hub-card hub-act" data-hub-act="mock" style="--hub-c:var(--teal);"><div class="hub-top"><div class="hub-ico">⏱️</div><div><h3>Mixed mock test</h3><div class="hi">English + Maths + Reasoning + GS · timed</div></div>' + (last ? '<div class="hub-big">' + last.score + '<small>/' + last.max + '</small></div>' : '') + '</div>' +
+        '<p>Vocab, Grammar, ' + mathQIds().length + ' Maths, ' + reasoningIds().length + ' Reasoning and ' + gsIds().length + ' GS apps in one SSC-style paper, +2 / −0.5, with a subject-wise report.</p><div class="hub-meta"><span>' + (hist.length ? hist.length + ' taken · last ' + agoText(last.at).replace('Opened ', '') : 'Not taken yet') + '</span><b>Start ›</b></div></button>' +
       '</div></section>';
   }
   // ================= पाठShala home: the app's front page =================
@@ -2053,7 +2057,7 @@
       '<div class="hub-stats"><span><b>' + ve.length + '</b> words</span><span><b>' + mem + '</b> memorized</span>' + (due ? '<span class="hub-wrong"><b>' + due + '</b> due</span>' : '') + '</div>' +
       '<div class="hub-meta"><span>Library · Spelling Bank · Roots</span><b>Open ›</b></div></button>';
   }
-  var SUBJ_ICO = { maths: '➗', english: '🔤', history: '🏺', culture: '🎭', polity: '⚖️', geography: '🗺️', economy: '💰', science: '🔬', staticgk: '📚', current: '📰', other: '📘' };
+  var SUBJ_ICO = { maths: '➗', reasoning: '🧩', english: '🔤', history: '🏺', culture: '🎭', polity: '⚖️', geography: '🗺️', economy: '💰', science: '🔬', staticgk: '📚', current: '📰', other: '📘' };
   function subjIds(key){
     return gsIds().filter(function(id){ return (STUDY[id].gsub || 'other') === key; }).sort(function(a, b){ return (STUDY[b].core || 0) - (STUDY[a].core || 0); });
   }
@@ -2069,6 +2073,8 @@
     var mp = subjProgress(mathIds());
     var tiles = [{ key: 'english', name: 'English', hi: 'अंग्रेज़ी', n: en.length + 1, pct: Math.round((gp.pct + vocPct) / 2), acc: gp.acc, jump: 'english' },
       { key: 'maths', name: 'Maths', hi: 'गणित', n: mathIds().length, pct: mp.pct, acc: mp.acc, jump: 'maths' }];
+    var rp = subjProgress(reasoningIds());
+    tiles.push({ key: 'reasoning', name: 'Reasoning', hi: 'तर्कशक्ति', n: reasoningIds().length, pct: rp.pct, acc: rp.acc, jump: 'reasoning' });
     GS_SUBJECTS.forEach(function(g){
       var list = subjIds(g[0]);
       var sp = subjProgress(list);
@@ -2092,6 +2098,7 @@
       hubPracticeSection() +
       '<section class="hub-sec hub-sub" id="hubsub-english"><div class="hub-sec-h"><h2>English</h2><span>अंग्रेज़ी</span></div><div class="hub-grid">' + homeVocabCard() + ids.filter(function(id){ return STUDY[id].subj === 'english'; }).map(hubCard).join('') + '</div></section>' +
       '<section class="hub-sec hub-sub" id="hubsub-maths"><div class="hub-sec-h"><h2>Maths</h2><span>गणित · formulas, figures, tricks & PYQs</span></div><div class="hub-grid">' + mathIds().map(hubCard).join('') + '</div></section>' +
+      '<section class="hub-sec hub-sub" id="hubsub-reasoning"><div class="hub-sec-h"><h2>Reasoning</h2><span>तर्कशक्ति · rules, shortcuts & practice</span></div><div class="hub-grid">' + reasoningIds().map(hubCard).join('') + '</div></section>' +
       '<section class="hub-sec" id="homeGs"><div class="hub-sec-h"><h2>General Studies</h2><span>सामान्य अध्ययन · ' + gsIds().length + ' mini apps in ' + GS_SUBJECTS.filter(function(g){ return subjIds(g[0]).length; }).length + ' subjects</span></div>' +
         GS_SUBJECTS.concat([['other', 'More', 'अन्य']]).map(function(g){
           var list = subjIds(g[0]);
@@ -2323,7 +2330,7 @@
       var m = STUDY[id], pr = studyProgress(id), pct = pr.total ? Math.round(pr.done * 100 / pr.total) : 0;
       tq += pr.tried; tr += pr.right; tl += pr.done; tt += pr.total;
       return '<button class="ss-row" data-open-study="' + id + '" style="--hub-c:' + m.color + ';"><span class="hub-ring">' + ringSvg(pct, m.color, 44) + '<span>' + pct + '%</span></span>' +
-        '<span class="ss-name"><b>' + m.ico + ' ' + escapeHtml(m.title) + '</b><small>' + (m.subj === 'english' ? 'English' : m.subj === 'maths' ? 'Maths' : ((GS_SUBJECTS.filter(function(g){ return g[0] === m.gsub; })[0] || ['', 'GS'])[1])) + '</small></span>' +
+        '<span class="ss-name"><b>' + m.ico + ' ' + escapeHtml(m.title) + '</b><small>' + (m.subj === 'english' ? 'English' : m.subj === 'maths' ? 'Maths' : m.subj === 'reasoning' ? 'Reasoning' : ((GS_SUBJECTS.filter(function(g){ return g[0] === m.gsub; })[0] || ['', 'GS'])[1])) + '</small></span>' +
         '<span class="ss-num"><b>' + pr.done + '/' + pr.total + '</b><small>' + m.unit + '</small></span>' +
         '<span class="ss-num ss-acc"><b>' + (pr.acc === null ? '—' : pr.acc + '%') + '</b><small>' + pr.tried + ' tried</small></span>' +
         '<span class="ss-num' + (pr.wrong ? ' bad' : '') + '"><b>' + pr.wrong + '</b><small>mistakes</small></span></button>';
@@ -2533,6 +2540,7 @@
   function englishIds(){ return Object.keys(STUDY).filter(function(id){ return STUDY[id].subj === 'english'; }); }
   function mathIds(){ return Object.keys(STUDY).filter(function(id){ return STUDY[id].subj === 'maths'; }); }
   function mathQIds(){ return mathIds().filter(function(id){ return !STUDY[id].noq; }); }
+  function reasoningIds(){ return Object.keys(STUDY).filter(function(id){ return STUDY[id].subj === 'reasoning'; }); }
   var STUDY_EXTRA = { mocks: { key: 'shabdMockHistory', title: 'Mixed mock history' }, tracker: { key: 'shabdTracker', title: 'Study tracker' }, todo: { key: 'shabdTodo', title: 'Tasks' } };
   function studyMod(id){ return STUDY[id] || STUDY_EXTRA[id]; }
   // ================= Study tracker: one record per visit to a mini app =================
@@ -2924,7 +2932,7 @@
 
   // ---- the practice / mock screen ----
   var drill = null, drillOpen = false, drillTimer = null;
-  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments', polity: 'Polity', economics: 'Economy', space: 'Space', physics: 'Physics', biology: 'Biology', geometry: 'Geometry', mensuration2d: 'Mensuration 2D', mensuration3d: 'Mensuration 3D', trigonometry: 'Trigonometry', numbersystem: 'Number System', voice: 'Active & Passive Voice', narration: 'Narration', formulas: 'Formula Book' };
+  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments', polity: 'Polity', economics: 'Economy', space: 'Space', physics: 'Physics', biology: 'Biology', geometry: 'Geometry', mensuration2d: 'Mensuration 2D', mensuration3d: 'Mensuration 3D', trigonometry: 'Trigonometry', numbersystem: 'Number System', calendar: 'Calendar', voice: 'Active & Passive Voice', narration: 'Narration', formulas: 'Formula Book' };
   function openDrill(title){
     closeAllMenus();
     drillOpen = true;
@@ -3029,7 +3037,7 @@
 
   // Mixed mock test
   var mockCfg = (function(){
-    var def = { en: 25, gs: 25, mt: 0, vocab: true, grammar: true, voice: true, narration: true, gsMods: gsIds(), mtMods: mathQIds(), neg: true, known: gsIds() };
+    var def = { en: 25, gs: 25, mt: 0, rs: 0, vocab: true, grammar: true, voice: true, narration: true, gsMods: gsIds(), mtMods: mathQIds(), rsMods: reasoningIds(), neg: true, known: gsIds() };
     var c;
     try{ c = Object.assign({}, def, JSON.parse(lsGet('shabdMockCfg') || '{}')); }catch(e){ c = def; }
     var known = c.known || ['bns', 'schemes', 'census', 'intlorgs'];
@@ -3042,6 +3050,12 @@
     c.knownMt = mathQIds();
     c.mtMods = c.mtMods.filter(function(id){ return STUDY[id] && !STUDY[id].noq; });
     if(typeof c.mt !== 'number') c.mt = 0;
+    if(!Array.isArray(c.rsMods)) c.rsMods = reasoningIds();
+    var rk = c.knownRs || [];
+    reasoningIds().forEach(function(id){ if(rk.indexOf(id) === -1 && c.rsMods.indexOf(id) === -1) c.rsMods.push(id); });
+    c.knownRs = reasoningIds();
+    c.rsMods = c.rsMods.filter(function(id){ return STUDY[id] && !STUDY[id].noq; });
+    if(typeof c.rs !== 'number') c.rs = 0;
     return c;
   })();
   function mockHistory(){ var h = studyState('mocks'); return Array.isArray(h.list) ? h.list : []; }
@@ -3053,22 +3067,24 @@
     renderMockSetup();
   }
   function renderMockSetup(){
-    var c = mockCfg, n = c.en + c.gs + c.mt, mins = Math.round(n * 36 / 60);
+    var c = mockCfg, n = c.en + c.gs + c.mt + c.rs, mins = Math.round(n * 36 / 60);
     var seg = function(key, vals){ return '<div class="dq-seg">' + vals.map(function(v){ return '<button data-cfg="' + key + '" data-val="' + v + '" class="' + (c[key] === v ? 'on' : '') + '">' + v + '</button>'; }).join('') + '</div>'; };
     var tog = function(key, label){ return '<button class="dq-tog' + (c[key] ? ' on' : '') + '" data-tog="' + key + '">' + label + '</button>'; };
     var gsTog = function(m){ return '<button class="dq-tog' + (c.gsMods.indexOf(m) !== -1 ? ' on' : '') + '" data-gsmod="' + m + '">' + escapeHtml(MOD_NAME[m]) + '</button>'; };
     var mtTog = function(m){ return '<button class="dq-tog' + (c.mtMods.indexOf(m) !== -1 ? ' on' : '') + '" data-mtmod="' + m + '">' + escapeHtml(MOD_NAME[m]) + '</button>'; };
+    var rsTog = function(m){ return '<button class="dq-tog' + (c.rsMods.indexOf(m) !== -1 ? ' on' : '') + '" data-rsmod="' + m + '">' + escapeHtml(MOD_NAME[m]) + '</button>'; };
     var hist = mockHistory().slice(-5).reverse();
-    drillBody('<div class="dq-hero"><div class="eyebrow">English + Maths + General Studies · SSC pattern</div><h1>Mixed mock test</h1><p>Questions from your vocab register and every mini app, timed like Tier 1 (36 seconds a question), marked +2 / −0.5. Wrong answers go to your Mistakes book.</p></div>' +
+    drillBody('<div class="dq-hero"><div class="eyebrow">English + Maths + Reasoning + General Studies · SSC pattern</div><h1>Mixed mock test</h1><p>Questions from your vocab register and every mini app, timed like Tier 1 (36 seconds a question), marked +2 / −0.5. Wrong answers go to your Mistakes book.</p></div>' +
       '<div class="dq-setup">' +
         '<div class="dq-box"><h3>English</h3>' + seg('en', [0, 10, 25]) + '<div class="dq-tags">' + tog('vocab', 'Vocabulary (' + words.length + ' words)') + tog('grammar', 'Grammar 100') + tog('voice', 'Active & Passive Voice') + tog('narration', 'Narration') + '</div></div>' +
         '<div class="dq-box"><h3>General Studies</h3>' + seg('gs', [0, 10, 25]) + '<div class="dq-tags">' + GS_SUBJECTS.map(function(g){ var l = gsIds().filter(function(id){ return STUDY[id].gsub === g[0]; }); return l.length ? '<div class="dq-gsub"><span>' + g[1] + '</span>' + l.map(gsTog).join('') + '</div>' : ''; }).join('') + gsIds().filter(function(id){ return !STUDY[id].gsub; }).map(gsTog).join('') + '</div></div>' +
         '<div class="dq-box"><h3>Maths</h3>' + seg('mt', [0, 10, 25]) + '<div class="dq-tags">' + mathQIds().map(mtTog).join('') + '</div></div>' +
+        (reasoningIds().length ? '<div class="dq-box"><h3>Reasoning</h3>' + seg('rs', [0, 10, 25]) + '<div class="dq-tags">' + reasoningIds().map(rsTog).join('') + '</div></div>' : '') +
         '<div class="dq-box"><h3>Marking</h3><div class="dq-tags">' + tog('neg', 'Negative marking −0.5') + '</div><p class="help" style="margin:10px 0 0;">' + n + ' questions · ' + mins + ' minutes · maximum ' + (n * 2) + ' marks</p></div>' +
       '</div>' +
       '<div class="dq-actions"><button class="btn teal" id="mkStart"' + (n ? '' : ' disabled') + '>Start test ›</button></div>' +
       (hist.length ? '<h3 class="dq-h3">Recent tests</h3><div class="dq-hist">' + hist.map(function(h){
-        return '<div><b>' + h.score + ' / ' + h.max + '</b><span>' + new Date(h.at).toLocaleDateString([], { day: 'numeric', month: 'short' }) + ' · English ' + h.en.r + '/' + h.en.t + (h.mt && h.mt.t ? ' · Maths ' + h.mt.r + '/' + h.mt.t : '') + ' · GS ' + h.gs.r + '/' + h.gs.t + '</span></div>';
+        return '<div><b>' + h.score + ' / ' + h.max + '</b><span>' + new Date(h.at).toLocaleDateString([], { day: 'numeric', month: 'short' }) + ' · English ' + h.en.r + '/' + h.en.t + (h.mt && h.mt.t ? ' · Maths ' + h.mt.r + '/' + h.mt.t : '') + (h.rs && h.rs.t ? ' · Reasoning ' + h.rs.r + '/' + h.rs.t : '') + ' · GS ' + h.gs.r + '/' + h.gs.t + '</span></div>';
       }).join('') + '</div>' : ''));
     document.querySelectorAll('#drillBody [data-cfg]').forEach(function(b){ b.addEventListener('click', function(){ mockCfg[b.dataset.cfg] = +b.dataset.val; saveMockCfg(); renderMockSetup(); }); });
     document.querySelectorAll('#drillBody [data-tog]').forEach(function(b){ b.addEventListener('click', function(){ mockCfg[b.dataset.tog] = !mockCfg[b.dataset.tog]; saveMockCfg(); renderMockSetup(); }); });
@@ -3082,6 +3098,11 @@
       if(i === -1) mockCfg.mtMods.push(m); else if(mockCfg.mtMods.length > 1) mockCfg.mtMods.splice(i, 1);
       saveMockCfg(); renderMockSetup();
     }); });
+    document.querySelectorAll('#drillBody [data-rsmod]').forEach(function(b){ b.addEventListener('click', function(){
+      var m = b.dataset.rsmod, i = mockCfg.rsMods.indexOf(m);
+      if(i === -1) mockCfg.rsMods.push(m); else if(mockCfg.rsMods.length > 1) mockCfg.rsMods.splice(i, 1);
+      saveMockCfg(); renderMockSetup();
+    }); });
     document.getElementById('mkStart').addEventListener('click', startMock);
   }
   function saveMockCfg(){ lsSet('shabdMockCfg', JSON.stringify(mockCfg)); }
@@ -3091,7 +3112,7 @@
     return shuffleArr(pool).slice(0, n).map(prepQ);
   }
   function startMock(){
-    var c = mockCfg, en = [], gs = [], mt = [];
+    var c = mockCfg, en = [], gs = [], mt = [], rs = [];
     if(c.en){
       var enMods = ['grammar', 'voice', 'narration'].filter(function(m){ return c[m]; });
       var nv = c.vocab ? (enMods.length ? Math.round(c.en * 0.6) : c.en) : 0;
@@ -3102,7 +3123,8 @@
     }
     if(c.gs){ gs = pickFrom(c.gsMods, c.gs); gs.forEach(function(q){ q.sec = 'gs'; }); }
     if(c.mt){ mt = pickFrom(c.mtMods, c.mt); mt.forEach(function(q){ q.sec = 'mt'; }); }
-    var qs = shuffleArr(en).concat(shuffleArr(mt), shuffleArr(gs));
+    if(c.rs){ rs = pickFrom(c.rsMods, c.rs); rs.forEach(function(q){ q.sec = 'rs'; }); }
+    var qs = shuffleArr(en).concat(shuffleArr(mt), shuffleArr(rs), shuffleArr(gs));
     if(!qs.length){ showToast('No questions available for that choice.'); return; }
     drill = { kind: 'mock', phase: 'run', qs: qs, i: 0, secs: qs.length * 36, start: Date.now(), marked: {} };
     clearInterval(drillTimer);
@@ -3121,7 +3143,7 @@
   function renderMockRun(){
     var d = drill, q = d.qs[d.i], answered = d.qs.filter(function(x){ return x.pick !== null; }).length;
     drillBody('<div class="dq-run"><div class="dq-main">' +
-      '<div class="dq-card" style="--dq-c:' + (q.sec === 'en' ? 'var(--mustard)' : q.sec === 'mt' ? 'var(--accent)' : 'var(--teal)') + '"><div class="dq-meta"><span>Q ' + (d.i + 1) + ' / ' + d.qs.length + '</span><span>' + (q.sec === 'en' ? 'English' : q.sec === 'mt' ? 'Maths' : 'General Studies') + '</span><span>' + escapeHtml(MOD_NAME[q.mod]) + '</span></div>' +
+      '<div class="dq-card" style="--dq-c:' + (q.sec === 'en' ? 'var(--mustard)' : q.sec === 'mt' ? 'var(--accent)' : q.sec === 'rs' ? 'var(--maroon)' : 'var(--teal)') + '"><div class="dq-meta"><span>Q ' + (d.i + 1) + ' / ' + d.qs.length + '</span><span>' + (q.sec === 'en' ? 'English' : q.sec === 'mt' ? 'Maths' : q.sec === 'rs' ? 'Reasoning' : 'General Studies') + '</span><span>' + escapeHtml(MOD_NAME[q.mod]) + '</span></div>' +
       '<div class="dq-q">' + escapeHtml(q.q) + '</div><div class="dq-opts">' + q.o.map(function(_, i){ return optHtml(q, i, q.pick === i ? ' sel' : ''); }).join('') + '</div></div>' +
       '<div class="dq-nav"><button class="btn ghost" id="mkPrev"' + (d.i ? '' : ' disabled') + '>‹ Prev</button><button class="btn ghost" id="mkMark">' + (d.marked[d.i] ? '★ Marked' : '☆ Mark') + '</button><button class="btn ghost" id="mkClear"' + (q.pick === null ? ' disabled' : '') + '>Clear</button><button class="btn teal" id="mkNext">' + (d.i === d.qs.length - 1 ? 'Review' : 'Next ›') + '</button></div></div>' +
       '<aside class="dq-side"><div class="dq-side-h"><b>' + answered + '</b> of ' + d.qs.length + ' answered</div><div class="dq-pal">' +
@@ -3144,7 +3166,7 @@
     clearInterval(drillTimer);
     d.phase = 'result';
     document.getElementById('drillClock').textContent = '';
-    var neg = mockCfg.neg, sec = { en: { r: 0, w: 0, t: 0 }, gs: { r: 0, w: 0, t: 0 }, mt: { r: 0, w: 0, t: 0 } }, byMod = {}, score = 0;
+    var neg = mockCfg.neg, sec = { en: { r: 0, w: 0, t: 0 }, gs: { r: 0, w: 0, t: 0 }, mt: { r: 0, w: 0, t: 0 }, rs: { r: 0, w: 0, t: 0 } }, byMod = {}, score = 0;
     d.qs.forEach(function(q){
       var s = sec[q.sec], m = byMod[q.mod] = byMod[q.mod] || { r: 0, t: 0 };
       s.t++; m.t++;
@@ -3153,10 +3175,10 @@
       if(STUDY[q.mod]) studyMark(q.mod, q.id, q.pick === q.a);
       if(q.mod === 'vocab') logQuizAttempt(q.id, (words.find(function(w){ return w.id === q.id; }) || {}).term || '', q.pick === q.a);
     });
-    var right = sec.en.r + sec.gs.r + sec.mt.r, wrong = sec.en.w + sec.gs.w + sec.mt.w, skipped = d.qs.length - right - wrong;
+    var right = sec.en.r + sec.gs.r + sec.mt.r + sec.rs.r, wrong = sec.en.w + sec.gs.w + sec.mt.w + sec.rs.w, skipped = d.qs.length - right - wrong;
     addGoalExtra((right + wrong) * GOAL_PER_Q);
     var secsUsed = Math.min(d.secs, Math.round((Date.now() - d.start) / 1000));
-    var h = studyState('mocks'); h.list = (Array.isArray(h.list) ? h.list : []).concat([{ at: Date.now(), score: score, max: d.qs.length * 2, right: right, wrong: wrong, skipped: skipped, secs: secsUsed, en: { r: sec.en.r, t: sec.en.t }, gs: { r: sec.gs.r, t: sec.gs.t }, mt: { r: sec.mt.r, t: sec.mt.t } }]).slice(-50);
+    var h = studyState('mocks'); h.list = (Array.isArray(h.list) ? h.list : []).concat([{ at: Date.now(), score: score, max: d.qs.length * 2, right: right, wrong: wrong, skipped: skipped, secs: secsUsed, en: { r: sec.en.r, t: sec.en.t }, gs: { r: sec.gs.r, t: sec.gs.t }, mt: { r: sec.mt.r, t: sec.mt.t }, rs: { r: sec.rs.r, t: sec.rs.t } }]).slice(-50);
     setStudyState('mocks', h);
     var pct = function(r, t){ return t ? Math.round(r * 100 / t) + '%' : '—'; };
     var review = d.qs.filter(function(q){ return q.pick !== q.a; });
@@ -3166,6 +3188,7 @@
       '<div class="dq-kpis">' +
         (sec.en.t ? '<div><b>' + pct(sec.en.r, sec.en.t) + '</b><span>English · ' + sec.en.r + '/' + sec.en.t + '</span></div>' : '') +
         (sec.mt.t ? '<div><b>' + pct(sec.mt.r, sec.mt.t) + '</b><span>Maths · ' + sec.mt.r + '/' + sec.mt.t + '</span></div>' : '') +
+        (sec.rs.t ? '<div><b>' + pct(sec.rs.r, sec.rs.t) + '</b><span>Reasoning · ' + sec.rs.r + '/' + sec.rs.t + '</span></div>' : '') +
         (sec.gs.t ? '<div><b>' + pct(sec.gs.r, sec.gs.t) + '</b><span>General Studies · ' + sec.gs.r + '/' + sec.gs.t + '</span></div>' : '') +
         Object.keys(byMod).map(function(m){ return '<div style="--dq-c:' + (STUDY[m] ? STUDY[m].color : 'var(--mustard)') + '"><b>' + pct(byMod[m].r, byMod[m].t) + '</b><span>' + escapeHtml(MOD_NAME[m]) + ' · ' + byMod[m].r + '/' + byMod[m].t + '</span></div>'; }).join('') +
       '</div>' +
