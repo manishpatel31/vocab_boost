@@ -607,7 +607,7 @@
     var box = $('word');
     revealed = cfg.reveal === 'show';
     $('ghost').textContent = c.grp === 'maths' ? '∑' : '?';
-    var sub = '<span class="w-pill gs">' + esc(c.grp === 'maths' ? 'Maths' : c.grp === 'english' ? 'English' : 'GS') + '</span><span>' + esc(c.app) + '</span>' + (c.tag ? '<span class="w-dot">·</span><span>' + esc(c.tag) + '</span>' : '');
+    var sub = '<span class="w-pill gs">' + esc(c.grp === 'maths' ? 'Maths' : c.grp === 'reasoning' ? 'Reasoning' : c.grp === 'english' ? 'English' : 'GS') + '</span><span>' + esc(c.app) + '</span>' + (c.tag ? '<span class="w-dot">·</span><span>' + esc(c.tag) + '</span>' : '');
     box.innerHTML = '<div class="w-sub">' + sub + '</div>' +
       '<div class="w-q">' + esc(c.q) + '</div>' +
       '<div id="hid" class="' + (revealed ? '' : 'hidden-part') + '">' +
@@ -869,7 +869,7 @@
     words.forEach(function(w){ typeCount[w.type] = (typeCount[w.type] || 0) + 1; });
     var n = buildDeck(draft).length;
     var apps = bankApps();
-    var appGroups = [['gs', 'General Studies'], ['maths', 'Maths'], ['english', 'English']].map(function(g){
+    var appGroups = [['gs', 'General Studies'], ['maths', 'Maths'], ['reasoning', 'Reasoning'], ['english', 'English']].map(function(g){
       var list = apps.filter(function(a){ return a.g === g[0]; });
       return list.length ? '<div style="margin:8px 0 4px; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--faint); font-weight:700;">' + g[1] + '</div>' + chips('apps', list.map(function(a){ return [a.id, esc(a.t) + '<small>' + a.n + '</small>']; }), true) : '';
     }).join('');
@@ -877,7 +877,7 @@
     $('panel').innerHTML =
       '<h2>Choose what to study on your desktop</h2>' +
       '<p class="help">Pick a set like in Present mode. The cards play on your wallpaper; use ‹ › and the buttons at the bottom.</p>' +
-      '<div class="sec"><h3>What to show</h3>' + chips('src', [['words', 'Vocab words'], ['gs', 'GS & Maths facts'], ['mix', 'Mix of both']], false) + '</div>' +
+      '<div class="sec"><h3>What to show</h3>' + chips('src', [['words', 'Vocab words'], ['gs', 'GS, Maths & Reasoning facts'], ['mix', 'Mix of both']], false) + '</div>' +
       (draft.src !== 'words' ? '<div class="sec"><h3>Fact apps <span style="text-transform:none; letter-spacing:0;">(none = all General Studies)</span></h3>' +
         (apps.length ? '<div class="tagbox" style="max-height:190px;">' + appGroups + '</div>' : '<p class="help">Couldn’t load study-bank.json from the site — check the internet connection.</p>') + '</div>' : '') +
       '<div class="cols"' + (draft.src === 'gs' ? ' style="display:none;"' : '') + '>' +

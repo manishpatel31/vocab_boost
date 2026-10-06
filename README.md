@@ -11,7 +11,7 @@ Vocabulary, General Studies and Maths in one place, with one daily goal, one str
 |---|---|
 | **Home** | Today's goal, streak, revision due, and every subject as a card |
 | **Vocab** | Word of the day, all words, Spelling Bank, Roots, Add words, Present, AOD, Audio |
-| **Practice** | Mistakes book, Mixed mock (English + Maths + GS), Vocab quiz, Revision, Exam tomorrow |
+| **Practice** | Mistakes book, Mixed mock (English + Maths + Reasoning + GS), Vocab quiz, Revision, Exam tomorrow |
 | **Progress** | Study points, streak, per-subject progress |
 | **Search** | One box that searches lessons and notes across every mini app |
 
@@ -27,6 +27,8 @@ Each mini app is one self-contained page (`study-<name>.html`) with lessons, a q
 - Science: `study-physics`, `study-biology`
 - Current affairs & static GK: `study-appointments`, `study-reports-indices`, `study-intl-orgs`, `study-sports`, `study-space`, `study-census`
 - Culture: `study-festivals`, `study-folk-dances`
+
+**Reasoning:** `study-calendar` (Calendar: 8 lessons — leap years, odd days and the century rule, the code method for any date, given-day and days-later questions, year shifts, repeating calendars and counting weekdays — with 114 questions checked against a real calendar)
 
 **Maths:** `study-maths-formulas` (Formula Book: every formula and key concept in 24 chapters, with tricks, traps, exam heat map and a last-hour sheet — revision only, no questions), `study-number-system` (Number System: 13 lessons — primes, unit digits, factors, divisibility, remainders and theorems, trailing zeros, digit counting, reversed digits, bases and series sums — with 204 computer-checked questions), `study-geometry`, `study-mensuration2d`, `study-mensuration3d`, `study-trigonometry`
 
