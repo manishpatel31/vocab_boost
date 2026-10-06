@@ -7,7 +7,7 @@
 //   throw everything away and download it all again.
 // - Mini apps, the question bank and the search index are saved the first time they are used,
 //   and fetched quietly once the app is idle (see 'warm'), so they open offline too.
-var VERSION = 'shabd-v17';                 // bump on every deploy so browsers pick up this file
+var VERSION = 'shabd-v18';                 // bump on every deploy so browsers pick up this file
 var CACHE = 'shabd-files';                 // kept across versions
 var SHELL = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png',
   'https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js',
@@ -43,6 +43,14 @@ self.addEventListener('activate', function(event){
           });
         }).then(function(){ return caches.delete(k); });
       }));
+    });
+  }).then(function(){
+    // pages used to be saved once per address (?embed=1&theme=…), leaving stale copies behind: keep one copy per page
+    return caches.open(CACHE).then(function(c){
+      return c.keys().then(function(reqs){
+        return Promise.all(reqs.filter(function(r){ var u = new URL(r.url); return u.origin === self.location.origin && u.search && /(\.html|\/)$/.test(u.pathname); })
+          .map(function(r){ return c.delete(r); }));
+      });
     });
   }).catch(function(){}).then(function(){ return self.clients.claim(); }));
 });
@@ -92,12 +100,17 @@ self.addEventListener('fetch', function(event){
     event.respondWith(caches.match(req).then(function(hit){ return hit || fetch(req).then(function(res){ return save(req, res); }); }));
     return;
   }
+  // pages are saved once, without their ?query, so every open refreshes the same copy
+  var page = nav || /\.html$/.test(url.pathname);
+  var key = page ? url.origin + url.pathname : req;
+  // only the main app page offers "Reload": mini apps in the frame simply open fresh next time
+  var top = nav && req.destination === 'document';
   // saved copy now, fresh copy in the background (stale-while-revalidate)
-  event.respondWith(caches.match(req, { ignoreSearch: nav || /\.html$/.test(url.pathname) }).then(function(hit){
-    var oldTag = nav ? tagOf(hit) : '';
+  event.respondWith(caches.match(key).then(function(hit){
+    var oldTag = top ? tagOf(hit) : '';
     var net = fetch(req).then(function(res){
-      if(nav) announce(oldTag, res);
-      return save(req, res);
+      if(top) announce(oldTag, res);
+      return save(key, res);
     });
     if(hit){
       event.waitUntil(net.catch(function(){}));

@@ -3268,7 +3268,10 @@
       bar.id = 'updateBar'; bar.className = 'update-bar'; bar.setAttribute('role', 'status');
       bar.innerHTML = '<span>A new version of पाठShala is ready.</span><button type="button" id="updateReload">Reload</button><button type="button" id="updateLater" aria-label="Later">✕</button>';
       document.body.appendChild(bar);
-      document.getElementById('updateReload').addEventListener('click', function(){ location.reload(); });
+      document.getElementById('updateReload').addEventListener('click', function(){
+        // reload where you are: keep an open mini app, but don't reopen one you already closed
+        if(studyOpen || !location.hash) location.reload(); else location.replace(location.pathname + location.search);
+      });
       document.getElementById('updateLater').addEventListener('click', function(){ bar.remove(); });
     });
   }
