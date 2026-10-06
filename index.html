@@ -1867,6 +1867,7 @@
     formulas: { title: 'Maths Formula Book',           file: 'study-maths-formulas.html', key: 'maths_formula_book_v1' },
     numbersystem: { title: 'Number System',            file: 'study-number-system.html', key: 'number_system_workbook_v1' },
     calendar: { title: 'Calendar',                     file: 'study-calendar.html',      key: 'calendar_workbook_v1' },
+    clock:    { title: 'Clock',                        file: 'study-clock.html',         key: 'clock_workbook_v1' },
     geometry: { title: 'Geometry',                     file: 'study-geometry.html',     key: 'geometry_workbook_v1' },
     mensuration2d:{ title: 'Mensuration 2D',           file: 'study-mensuration2d.html', key: 'mensuration2d_workbook_v1' },
     mensuration3d:{ title: 'Mensuration 3D',           file: 'study-mensuration3d.html', key: 'mensuration3d_workbook_v1' },
@@ -1905,7 +1906,8 @@
    ['trigonometry', '📏', 'त्रिकोणमिति', 'Ratios, standard values, identities, max–min, allied and compound angles, heights and distances, radians.', 11, 196, '#2F8F7A']
   ].forEach(function(x){ var m = STUDY[x[0]]; m.subj = 'maths'; m.ico = x[1]; m.hi = x[2]; m.desc = x[3]; m.meta = x[4] + ' lessons · ' + x[5] + ' questions'; m.color = x[6]; m.lessons = x[4]; m.unit = 'lessons'; });
   // Reasoning section: one mini app per reasoning chapter
-  [['calendar', '📅', 'कैलेंडर · Reasoning', 'Leap years, odd days, the 10-second code method for any date, days-later puzzles, year shifts and repeating calendars.', 8, 114, '#3E6FA8']
+  [['calendar', '📅', 'कैलेंडर · Reasoning', 'Leap years, odd days, the 10-second code method for any date, days-later puzzles, year shifts and repeating calendars.', 8, 114, '#3E6FA8'],
+   ['clock', '🕰️', 'घड़ी · Reasoning', 'Hand speeds, the angle at any time, when the hands coincide or meet at right angles, mirror and water images, fast and slow clocks.', 7, 83, '#8A4FA0']
   ].forEach(function(x){ var m = STUDY[x[0]]; m.subj = 'reasoning'; m.ico = x[1]; m.hi = x[2]; m.desc = x[3]; m.meta = x[4] + ' lessons · ' + x[5] + ' questions'; m.color = x[6]; m.lessons = x[4]; m.unit = 'lessons'; });
   // General Studies is split by subject in पाठShala
   var GS_SUBJECTS = [
@@ -2932,7 +2934,7 @@
 
   // ---- the practice / mock screen ----
   var drill = null, drillOpen = false, drillTimer = null;
-  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments', polity: 'Polity', economics: 'Economy', space: 'Space', physics: 'Physics', biology: 'Biology', geometry: 'Geometry', mensuration2d: 'Mensuration 2D', mensuration3d: 'Mensuration 3D', trigonometry: 'Trigonometry', numbersystem: 'Number System', calendar: 'Calendar', voice: 'Active & Passive Voice', narration: 'Narration', formulas: 'Formula Book' };
+  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments', polity: 'Polity', economics: 'Economy', space: 'Space', physics: 'Physics', biology: 'Biology', geometry: 'Geometry', mensuration2d: 'Mensuration 2D', mensuration3d: 'Mensuration 3D', trigonometry: 'Trigonometry', numbersystem: 'Number System', calendar: 'Calendar', clock: 'Clock', voice: 'Active & Passive Voice', narration: 'Narration', formulas: 'Formula Book' };
   function openDrill(title){
     closeAllMenus();
     drillOpen = true;

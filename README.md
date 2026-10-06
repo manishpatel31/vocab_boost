@@ -28,7 +28,7 @@ Each mini app is one self-contained page (`study-<name>.html`) with lessons, a q
 - Current affairs & static GK: `study-appointments`, `study-reports-indices`, `study-intl-orgs`, `study-sports`, `study-space`, `study-census`
 - Culture: `study-festivals`, `study-folk-dances`
 
-**Reasoning:** `study-calendar` (Calendar: 8 lessons — leap years, odd days and the century rule, the code method for any date, given-day and days-later questions, year shifts, repeating calendars and counting weekdays — with 114 questions checked against a real calendar)
+**Reasoning:** `study-calendar` (Calendar: 8 lessons — leap years, odd days and the century rule, the code method for any date, given-day and days-later questions, year shifts, repeating calendars and counting weekdays — with 114 questions checked against a real calendar), `study-clock` (Clock: 7 lessons — hand speeds, angle at any time, time for a given angle, how often the hands coincide or meet at right angles, mirror and water images, fast and slow clocks, directions and clock strikes — with 83 computed questions)
 
 **Maths:** `study-maths-formulas` (Formula Book: every formula and key concept in 24 chapters, with tricks, traps, exam heat map and a last-hour sheet — revision only, no questions), `study-number-system` (Number System: 13 lessons — primes, unit digits, factors, divisibility, remainders and theorems, trailing zeros, digit counting, reversed digits, bases and series sums — with 204 computer-checked questions), `study-geometry`, `study-mensuration2d`, `study-mensuration3d`, `study-trigonometry`
 
