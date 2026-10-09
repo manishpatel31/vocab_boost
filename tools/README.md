@@ -5,13 +5,15 @@ These scripts make the chapter apps (`study-number-system.html`, `study-calendar
 Every app shares the page design of `study-trigonometry.html`; only the data block is swapped.
 The engine and styles themselves live in `study-core.js` and `study-core.css`, which the
 Maths, Reasoning, Physics, BNS, Voice and Narration pages load. A fix there reaches all of them.
-After changing either file, bump `?v=` where the pages load it (and in `sw.js`) so phones fetch the new copy.
+After changing either file (or the main app's `app.js`), run `node tools/stamp.js`: it updates the
+`?v=` stamps in the pages and `sw.js` so phones fetch the new copy.
 
 ```
 tools/
   build_app.py        data → study-<name>.html
   index_app.js        app → study-search.json (search) + study-bank.json (Mistakes, mocks, phone app)
   check_app.js        opens the app in a browser and reports errors
+  stamp.js            refreshes the ?v= stamps after app.js or study-core.* change
   lib/mathlib.py      maths helpers for writing questions (primes, factors, remainders, bases …)
   lib/idx.js          shared code for index_app.js
   apps/<name>/        one folder per app:
@@ -28,7 +30,8 @@ tools/
 3. `node tools/index_app.js study-<name>.html <module id> <subject>`
    (module ids: `numbersystem`, `calendar`, `clock`; subjects: `maths`, `reasoning`)
 4. `node tools/check_app.js study-<name>.html` – should end with “no errors”.
-5. Bump `VERSION` in `sw.js` so phones and browsers pick up the new files.
+5. Bump `VERSION` in `sw.js` so phones and browsers pick up the new files (`stamp.js` does this for you
+   when it changes a stamp).
 
 ## Make a new app
 

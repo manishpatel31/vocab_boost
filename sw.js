@@ -7,15 +7,15 @@
 //   throw everything away and download it all again.
 // - Mini apps, the question bank and the search index are saved the first time they are used,
 //   and fetched quietly once the app is idle (see 'warm'), so they open offline too.
-var VERSION = 'shabd-v23';                 // bump on every deploy so browsers pick up this file
+var VERSION = 'shabd-v24';                 // bump on every deploy so browsers pick up this file
 var CACHE = 'shabd-files';                 // kept across versions
-var SHELL = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png',
+var SHELL = ['./', './index.html', './app.js?v=91297ac7', './manifest.json', './icon-192.png', './icon-512.png',
   'https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js',
   'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js',
   'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js'];
 var WARM = [
   './study-bank.json', './study-search.json',
-  './study-core.css?v=1', './study-core.js?v=1',            // shared look and engine of the chapter apps (bump ?v= with them)
+  './study-core.css?v=989aafea', './study-core.js?v=d61eacb5',            // shared look and engine of the chapter apps (?v= set by tools/stamp.js)
   './study-grammar-100.html', './study-bns-bnss-bsa.html', './study-govt-schemes.html',
   './study-census.html', './study-intl-orgs.html', './study-reports-indices.html', './study-sports.html', './study-festivals.html', './study-ipr-plans.html', './study-folk-dances.html', './study-appointments.html', './study-polity.html', './study-economics.html', './study-space.html', './study-physics.html', './study-biology.html', './study-geometry.html', './study-mensuration2d.html', './study-mensuration3d.html', './study-trigonometry.html', './study-voice.html', './study-narration.html', './study-maths-formulas.html', './study-number-system.html', './study-calendar.html', './study-clock.html'
 ];
