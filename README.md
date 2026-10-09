@@ -38,6 +38,8 @@ Each mini app is one self-contained page (`study-<name>.html`) with lessons, a q
 |---|---|
 | `index.html` | The main app (Home, Vocab, Practice, Progress, Search, sign-in) |
 | `study-*.html` | The mini apps. Loaded inside `index.html`; each also works on its own |
+| `study-core.js`, `study-core.css` | Shared engine and look of the Maths, Reasoning, Physics, BNS, Voice and Narration apps (each of those pages holds only its own lessons and questions) |
+| `tools/` | Scripts that build the chapter apps and the question bank — see `tools/README.md` |
 | `study-bank.json` | Every practice question, tagged by app and lesson. Used by Mixed mock, Mistakes book, wallpaper and the phone app |
 | `study-search.json` | Lesson text index used by Search |
 | `wallpaper.html` | Live desktop wallpaper (works with Lively Wallpaper) showing words and GS/Maths fact cards |

@@ -3,6 +3,9 @@
 These scripts make the chapter apps (`study-number-system.html`, `study-calendar.html`,
 `study-clock.html`) from plain data files, so an app can be rebuilt or extended at any time.
 Every app shares the page design of `study-trigonometry.html`; only the data block is swapped.
+The engine and styles themselves live in `study-core.js` and `study-core.css`, which the
+Maths, Reasoning, Physics, BNS, Voice and Narration pages load. A fix there reaches all of them.
+After changing either file, bump `?v=` where the pages load it (and in `sw.js`) so phones fetch the new copy.
 
 ```
 tools/

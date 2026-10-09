@@ -4,7 +4,8 @@
 
 Each app folder has an app.py that sets FILE, NAME, HINDI, KIND and imports
 LESSONS, QB, HEAT, TILES, PAIRS, COVERS, FIND and APP from its other files.
-The page itself is study-trigonometry.html with its data block swapped out.
+The page itself is study-trigonometry.html with its data block swapped out; the shared
+engine and look come from study-core.js and study-core.css.
 """
 import json, os, sys
 
@@ -37,8 +38,8 @@ def build(name):
 
     src = open(os.path.join(ROOT, TEMPLATE), encoding="utf8").read()
     a = src.index("const LESSONS = [")
-    b = src.index("/* ============================================================\n   HELPERS & STATE")
-    html = src[:a] + data + "\n" + src[b:]
+    b = src.index('</script>\n<script src="study-core.js')
+    html = src[:a] + data + src[b:]
     html = html.replace("<title>Trigonometry</title>", "<title>%s</title>" % A.NAME)
     html = html.replace('<div class="brand">Trigonometry<small>त्रिकोणमिति · SSC maths workbook</small></div>',
                         '<div class="brand">%s<small>%s · SSC %s workbook</small></div>' % (A.NAME, A.HINDI, A.KIND))
