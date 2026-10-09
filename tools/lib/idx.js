@@ -4,7 +4,7 @@ const fs = require('fs'), vm = require('vm');
 const ROOT = require('path').join(__dirname, '..', '..') + '/';
 function appData(file){
   const src = fs.readFileSync(ROOT + file, 'utf8');
-  const a = src.indexOf('"use strict";'), b = src.indexOf('const $ = ');
+  const a = src.indexOf('"use strict";'), b = src.indexOf('</script>', a);
   const code = src.slice(a + 13, b).replace(/^const (\w+)/gm, 'var $1');
   const ctx = {}; vm.createContext(ctx); vm.runInContext(code, ctx);
   return ctx;

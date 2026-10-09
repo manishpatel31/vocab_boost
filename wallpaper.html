@@ -431,6 +431,28 @@
     }catch(e){ syncState = 'err'; }
   }
   function events(){ return lsGet('vw_events', []); }
+  /** Saves the chosen set here and, through the web app, under the link code — Lively can wipe
+      this page's storage on a reboot, and the wallpaper then picks the same set up from there. */
+  function saveCfg(){
+    cfg.at = Date.now();
+    lsSet('vw_cfg', cfg);
+    lsSet('vw_setup_seen', true);
+    var c = Object.assign({}, cfg); delete c.v2; delete c.v3;
+    record(JSON.stringify(c), 'wall', 0);
+  }
+  /** After a wipe (or a change made on another PC), take the set saved with the link code. */
+  function useSavedCfg(){
+    if(!summary || typeof summary.wall !== 'string') return false;
+    var w; try{ w = JSON.parse(summary.wall); }catch(e){ return false; }
+    if(!w || typeof w !== 'object' || (w.at || 0) <= (cfg.at || 0)) return false;
+    cfg = Object.assign({}, DEFAULT_CFG, w, { v2: 1, v3: 1 });
+    if(!Array.isArray(cfg.roots)) cfg.roots = [];
+    if(!Array.isArray(cfg.apps)) cfg.apps = [];
+    lsSet('vw_cfg', cfg);
+    lsSet('vw_setup_seen', true);
+    applyTheme(cfg.theme);
+    return true;
+  }
   function prune(){
     var last = summary.lastEventT || 0;
     lsSet('vw_events', events().filter(function(e){ return !(e.s && e.t <= last); }));
@@ -468,7 +490,7 @@
     var memMode = s.mode === 'memorized', t = today(), y = yesterday();
     var todayIds = {};
     if(s.goalDay === t) (s.goalIds || []).forEach(function(id){ todayIds[id] = true; });
-    events().filter(function(e){ return e.t > (s.lastEventT || 0); }).sort(function(a, b){ return a.t - b.t; }).forEach(function(e){
+    events().filter(function(e){ return e.t > (s.lastEventT || 0) && (e.k === 'rate' || e.k === 'rev'); }).sort(function(a, b){ return a.t - b.t; }).forEach(function(e){
       var cur = p[e.w] || { conf: 0, star: false, stage: -1, due: 0, done: false };
       var prev = cur.conf, nextConf = prev, nx = Object.assign({}, cur);
       if(e.k === 'rate') nextConf = e.c;
@@ -766,7 +788,7 @@
       '<button id="shufBtn" title="Shuffle this set">⤮<span class="lbl"> Shuffle</span></button><button class="primary" id="setBtn">⚙ Change set</button>';
     $('setBtn').addEventListener('click', openSetup);
     var db = $('dueBtn');
-    if(db) db.addEventListener('click', function(){ cfg.mode = 'due'; cfg.tags = []; cfg.types = []; lsSet('vw_cfg', cfg); startDeck(); render(); renderCard(); });
+    if(db) db.addEventListener('click', function(){ cfg.mode = 'due'; cfg.tags = []; cfg.types = []; saveCfg(); startDeck(); render(); renderCard(); });
     var sb = $('shufBtn');
     if(sb) sb.addEventListener('click', function(){ shuffle(deck); idx = 0; saveSession(); render(); say('Shuffled.'); });
     renderStrip(); tickClock();
@@ -931,7 +953,7 @@
     $('setupGo').addEventListener('click', function(){
       cfg = draft;
       if(!code && cfg.mode !== 'all') cfg.mode = 'levels';
-      lsSet('vw_cfg', cfg);
+      saveCfg();
       applyTheme(cfg.theme);
       startDeck();
       $('setup').classList.remove('open');
@@ -1002,14 +1024,16 @@
     try{ await loadFeed(false); }
     catch(e){ if(!words.length){ $('word').innerHTML = '<div class="empty"><h1>Couldn’t load words</h1>' + esc(e.message) + '</div>'; return; } }
     await pullSummary();
+    var fromCode = useSavedCfg();
     await flush();
     await loadBank();
-    if(!restoreSession()) startDeck();
+    if(fromCode || !restoreSession()) startDeck();
     render();
     renderCard();
     startDrift();
     startFacts();
-    if(!lsGet('vw_setup_seen', false)){ lsSet('vw_setup_seen', true); openSetup(); }
+    // ask only the very first time: after that the set saved here or with the link code starts by itself
+    if(!lsGet('vw_setup_seen', false) && !cfg.at){ lsSet('vw_setup_seen', true); openSetup(); }
     // keep fresh: progress every 5 min, new words every 30 min, resend anything unsent every 2 min
     setInterval(async function(){ await pullSummary(); renderCard(); var w = deck[idx]; if(w) renderControls(w, state()); }, 5 * 60000);
     setInterval(async function(){ try{ if(await loadFeed(false)){ say('New words arrived in the register.'); renderCard(); } }catch(e){} }, 30 * 60000);
