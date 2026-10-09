@@ -7933,6 +7933,14 @@ listBlock,
             facts++;
             if(ev.d === todayKey()) factsToday++;
           }
+        } else if(ev.k === 'wall' && typeof ev.w === 'string' && ev.w.length < 20000){
+          // the PC wallpaper's chosen set, kept with the account so it survives Lively wiping its storage
+          var wc = JSON.parse(ev.w), had = 0;
+          try{ had = myProfile && myProfile.wallCfg ? (JSON.parse(myProfile.wallCfg).at || 0) : 0; }catch(e2){}
+          if(wc && (wc.at || 0) > had){
+            if(myProfile) myProfile.wallCfg = ev.w;
+            db.collection('users').doc(currentUser.uid).set({ wallCfg: ev.w }, { merge: true }).catch(function(){});
+          }
         } else if(ev.k === 'task' && ev.w){
           var tk = todoUpd(ev.w, function(t){ if(!t.done && !t.del) todoSetTicks(t, t.k + 1); });
           if(tk) ticks++;
@@ -8002,7 +8010,7 @@ listBlock,
       goal: prof.dailyGoal || 0, mode: prof.goalMode || 'levelup',
       goalDay: prof.goalDay || '', goalIds: prof.goalDay === t ? lockGoalIds(prof) : [],
       streak: prof.streakCurrent || 0, lastMet: prof.lastMetDay || '', best: prof.streakBest || 0,
-      tasks: tasks, mistakes: mistakes,
+      tasks: tasks, mistakes: mistakes, wall: prof.wallCfg || '',
       site: location.origin + location.pathname.replace(/[^\/]*$/, ''),   // the phone downloads study-bank.json (GS facts) from here
       lastEventT: lockLastEventT, pushedAt: Date.now()
     });
