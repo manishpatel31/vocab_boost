@@ -433,6 +433,25 @@
   .dq-fb{ margin-top:14px; border-radius:12px; padding:12px 14px; font-size:14.5px; line-height:1.5; }
   .dq-fb.good{ background:color-mix(in srgb, var(--teal) 13%, transparent); } .dq-fb.good b{ color:var(--teal); }
   .dq-fb.bad{ background:color-mix(in srgb, var(--maroon) 11%, transparent); } .dq-fb.bad b{ color:var(--maroon); }
+  .wk-sum{ display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:10px; margin:4px 0 8px; }
+  .wk-subj{ background:var(--card); border:1px solid var(--rule); border-top:4px solid var(--dq-c); border-radius:var(--radius); padding:12px 14px; }
+  .wk-subj b{ display:block; font-family:var(--font-display); font-size:30px; line-height:1.1; color:var(--dq-c); }
+  .wk-subj span{ font-size:13px; color:var(--ink-soft); }
+  .wk-h{ font-family:var(--font-display); font-weight:var(--h-weight); font-size:21px; color:var(--ink); margin:22px 0 4px; }
+  .wk-note{ font-size:13.5px; color:var(--ink-faint); margin:0 0 10px; }
+  .wk-row{ display:grid; grid-template-columns:1fr auto; gap:6px 14px; align-items:center; background:var(--card); border:1px solid var(--rule); border-left:4px solid var(--dq-c); border-radius:var(--radius); padding:12px 14px; }
+  .wk-row .t{ font-weight:650; color:var(--ink); line-height:1.3; }
+  .wk-row .m{ font-size:12.5px; color:var(--ink-faint); margin-top:2px; }
+  .wk-bar{ grid-column:1 / -1; height:6px; border-radius:6px; background:var(--rule); overflow:hidden; }
+  .wk-bar i{ display:block; height:100%; border-radius:6px; }
+  .wk-btns{ display:flex; gap:6px; }
+  .wk-btns button{ border:1px solid var(--rule); background:var(--paper); color:var(--ink); border-radius:999px; padding:6px 12px; font:inherit; font-size:13px; font-weight:650; cursor:pointer; white-space:nowrap; }
+  .wk-btns button.go{ background:var(--dq-c); border-color:var(--dq-c); color:#fff; }
+  .wk-list{ display:grid; grid-template-columns:repeat(auto-fill, minmax(min(420px, 100%), 1fr)); gap:10px; }
+  .wk-app{ background:var(--card); border:1px solid var(--rule); border-radius:var(--radius); margin-bottom:8px; }
+  .wk-app summary{ cursor:pointer; padding:12px 14px; display:flex; gap:10px; align-items:center; font-weight:650; color:var(--ink); }
+  .wk-app summary span{ margin-left:auto; font-size:13px; color:var(--ink-faint); font-weight:600; }
+  .wk-app .wk-list{ padding:0 12px 12px; }
   .dq-progress{ height:6px; border-radius:6px; background:var(--rule); overflow:hidden; margin-bottom:14px; }
   .dq-progress i{ display:block; height:100%; background:var(--teal); }
   .dq-setup{ display:grid; grid-template-columns:repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap:14px; }
@@ -1326,6 +1345,7 @@
           <div class="menu-label">All subjects</div>
           <button id="navMistakesBtn"><b>Mistakes book</b><span>Every question you got wrong, in one place</span></button>
           <button id="navMockBtn"><b>Mixed mock test</b><span>English + GS, timed, +2 / −0.5</span></button>
+          <button id="navWeakBtn"><b>Weak spots</b><span>Accuracy by subject, chapter and topic</span></button>
           <div class="menu-label">Vocabulary</div>
           <button class="tab" data-tab="quiz"><b>Vocab quiz</b><span>Fill in the blank, confusables, spelling</span></button>
           <button class="tab" data-tab="revision"><b>Revision rounds</b><span>Memorized words come back after 7, 14 and 30 days</span></button>
@@ -1955,7 +1975,16 @@
         '<p>Every question you got wrong in any mini app or mock — practise them until they’re gone.</p><div class="hub-meta"><span>' + (totalWrong ? totalWrong + ' waiting' : 'Nothing to fix yet') + '</span><b>Open ›</b></div></button>' +
       '<button class="hub-card hub-act" data-hub-act="mock" style="--hub-c:var(--teal);"><div class="hub-top"><div class="hub-ico">⏱️</div><div><h3>Mixed mock test</h3><div class="hi">English + Maths + Reasoning + GS · timed</div></div>' + (last ? '<div class="hub-big">' + last.score + '<small>/' + last.max + '</small></div>' : '') + '</div>' +
         '<p>Vocab, Grammar, ' + mathQIds().length + ' Maths, ' + reasoningIds().length + ' Reasoning and ' + gsIds().length + ' GS apps in one SSC-style paper, +2 / −0.5, with a subject-wise report.</p><div class="hub-meta"><span>' + (hist.length ? hist.length + ' taken · last ' + agoText(last.at).replace('Opened ', '') : 'Not taken yet') + '</span><b>Start ›</b></div></button>' +
+      weakHubCard() +
       '</div></section>';
+  }
+  function weakHubCard(){
+    var tried = 0, right = 0;
+    Object.keys(STUDY).forEach(function(id){ if(STUDY[id].noq) return; var a = studyState(id).ans || {}; Object.keys(a).forEach(function(k){ tried++; if(a[k] === 1) right++; }); });
+    return '<button class="hub-card hub-act" data-hub-act="weak" style="--hub-c:var(--mustard);"><div class="hub-top"><div class="hub-ico">🎯</div><div><h3>Weak spots</h3><div class="hi">कमज़ोर विषय · accuracy by topic</div></div>' +
+      (tried ? '<div class="hub-big">' + Math.round(right * 100 / tried) + '<small>%</small></div>' : '') + '</div>' +
+      '<p>Your accuracy in every subject, chapter and topic, weakest first — practise a topic or add it to Tasks in one tap.</p>' +
+      '<div class="hub-meta"><span>' + (tried ? tried + ' questions answered' : 'Answer some questions first') + '</span><b>Open ›</b></div></button>';
   }
   // ================= पाठShala home: the app's front page =================
   var EXAM_DEFAULT = '2026-10-13';
@@ -2159,7 +2188,7 @@
     var jump = ev.target.closest('[data-hub-jump]');
     if(jump){ var t = document.getElementById('hubsub-' + jump.dataset.hubJump); if(t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
     var act = ev.target.closest('[data-hub-act]');
-    if(act){ if(act.dataset.hubAct === 'mistakes') openMistakes(); else openMock(); return; }
+    if(act){ if(act.dataset.hubAct === 'mistakes') openMistakes(); else if(act.dataset.hubAct === 'weak') openWeak(); else openMock(); return; }
     var h = ev.target.closest('[data-home-act]');
     if(h) homeAction(h.dataset.homeAct, h);
   }
@@ -2171,6 +2200,7 @@
   document.getElementById('homeBrand').addEventListener('click', function(ev){ ev.stopPropagation(); openHub(); });
   document.getElementById('navMistakesBtn').addEventListener('click', function(){ closeAllMenus(); openMistakes(); });
   document.getElementById('navMockBtn').addEventListener('click', function(){ closeAllMenus(); openMock(); });
+  document.getElementById('navWeakBtn').addEventListener('click', function(){ closeAllMenus(); openWeak(); });
 
   // ================= Search across everything: lesson notes, questions, words, spellings =================
   var searchIdx = null, searchKind = 'all', searchTimer = null, searchOpen = false, searchMore = {}, searchJson = null;
@@ -3004,13 +3034,20 @@
       startPractice(shuffleArr(list.slice()).slice(0, 30).map(prepQ));
     });
   }
-  function startPractice(qs){
-    drill = { kind: 'practice', phase: 'run', qs: qs, i: 0, cleared: 0 };
-    document.getElementById('drillTitle').textContent = 'Practise mistakes';
+  function startPractice(qs, from){
+    drill = { kind: 'practice', phase: 'run', qs: qs, i: 0, cleared: 0, from: from || null };
+    document.getElementById('drillTitle').textContent = from ? 'Practise · ' + from.title : 'Practise mistakes';
     renderPractice();
   }
   function renderPractice(){
     var d = drill;
+    if(d.i >= d.qs.length && d.from){
+      drillBody('<div class="dq-hero"><div class="eyebrow">Practice done · ' + escapeHtml(d.from.title) + '</div><h1>' + d.cleared + ' of ' + d.qs.length + ' right</h1><p>' +
+        (d.cleared === d.qs.length ? 'All right — this topic is getting stronger.' : 'Wrong ones went to the Mistakes book, and the topic’s accuracy is updated.') + '</p></div>' +
+        '<div class="dq-actions"><button class="btn teal" id="pdBack">Back to Weak spots</button></div>');
+      document.getElementById('pdBack').addEventListener('click', function(){ openWeak(); });
+      return;
+    }
     if(d.i >= d.qs.length){
       drillBody('<div class="dq-hero"><div class="eyebrow">Practice done</div><h1>' + d.cleared + ' of ' + d.qs.length + ' fixed</h1><p>' +
         (d.cleared === d.qs.length ? 'Clean sweep — all of them left the Mistakes book.' : 'The ones you missed stay in the book for next time.') + '</p></div>' +
@@ -3023,7 +3060,7 @@
       '<div class="dq-card" style="--dq-c:' + (STUDY[q.mod] ? STUDY[q.mod].color : 'var(--mustard)') + '"><div class="dq-meta"><span>Q ' + (d.i + 1) + ' / ' + d.qs.length + '</span><span>' + escapeHtml(MOD_NAME[q.mod]) + '</span>' + (q.tag ? '<span>' + escapeHtml(q.tag) + '</span>' : '') + '</div>' +
       '<div class="dq-q">' + escapeHtml(q.q) + '</div><div class="dq-opts">' +
       q.o.map(function(_, i){ return optHtml(q, i, !answered ? '' : (i === q.a ? ' ok' : (i === q.pick ? ' no' : ''))); }).join('') + '</div>' +
-      (answered ? '<div class="dq-fb ' + (q.pick === q.a ? 'good' : 'bad') + '"><b>' + (q.pick === q.a ? 'Right — removed from your Mistakes book.' : 'Not yet — it stays in the book.') + '</b>' + (q.e ? '<div>' + escapeHtml(q.e) + '</div>' : '') + '</div>' : '') +
+      (answered ? '<div class="dq-fb ' + (q.pick === q.a ? 'good' : 'bad') + '"><b>' + (d.from ? (q.pick === q.a ? 'Right.' : 'Not quite — added to your Mistakes book.') : (q.pick === q.a ? 'Right — removed from your Mistakes book.' : 'Not yet — it stays in the book.')) + '</b>' + (q.e ? '<div>' + escapeHtml(q.e) + '</div>' : '') + '</div>' : '') +
       '</div><div class="dq-actions">' + (answered ? '<button class="btn teal" id="pNext">' + (d.i === d.qs.length - 1 ? 'Finish' : 'Next ›') + '</button>' : '<span class="help">Tip: press 1–4 on a keyboard</span>') + '</div>');
     if(!answered) document.querySelectorAll('#drillBody [data-opt]').forEach(function(b){ b.addEventListener('click', function(){
       q.pick = +b.dataset.opt;
@@ -3035,6 +3072,93 @@
     }); });
     var nb = document.getElementById('pNext');
     if(nb) nb.addEventListener('click', function(){ d.i++; renderPractice(); });
+  }
+
+  // Weak spots: accuracy by subject → app → topic, from the last answer to every question
+  var WEAK_SUBJ = [['english', 'English', 'var(--teal)'], ['maths', 'Maths', 'var(--blue, #2f6db5)'], ['reasoning', 'Reasoning', 'var(--purple, #7a4fb0)'], ['gs', 'General Studies', 'var(--mustard)']];
+  function weakStats(){
+    var topics = [], apps = [];
+    Object.keys(studyBank.modules).forEach(function(mid){
+      if(!STUDY[mid] || STUDY[mid].noq) return;
+      var m = studyBank.modules[mid], ans = studyState(mid).ans || {}, byTag = {}, order = [];
+      var app = { mod: mid, g: m.g || 'gs', name: MOD_NAME[mid] || m.t, total: m.qs.length, tried: 0, right: 0, topics: [] };
+      m.qs.forEach(function(q){
+        var key = q.tag || 'Other';
+        var t = byTag[key];
+        if(!t){ t = byTag[key] = { mod: mid, g: app.g, app: app.name, tag: key, l: q.l, total: 0, tried: 0, right: 0, qs: [] }; order.push(key); }
+        t.total++; t.qs.push(q);
+        if(ans[q.id] === 1 || ans[q.id] === 0){ t.tried++; app.tried++; if(ans[q.id] === 1){ t.right++; app.right++; } }
+      });
+      order.forEach(function(k){ var t = byTag[k]; t.acc = t.tried ? t.right / t.tried : null; t.score = (t.right + 1) / (t.tried + 2); app.topics.push(t); topics.push(t); });
+      app.acc = app.tried ? app.right / app.tried : null;
+      apps.push(app);
+    });
+    return { topics: topics, apps: apps };
+  }
+  function weakColor(acc){ return acc === null ? 'var(--rule)' : acc < .5 ? 'var(--maroon)' : acc < .75 ? 'var(--mustard)' : 'var(--teal)'; }
+  function weakPct(x){ return x === null ? '—' : Math.round(x * 100) + '%'; }
+  function weakRow(t, showApp){
+    var c = STUDY[t.mod] ? STUDY[t.mod].color : 'var(--teal)';
+    return '<div class="wk-row" style="--dq-c:' + c + '"><div><div class="t">' + escapeHtml(t.tag) + '</div><div class="m">' + (showApp ? escapeHtml(t.app) + ' · ' : '') +
+      (t.tried ? weakPct(t.acc) + ' right · ' + (t.tried - t.right) + ' wrong · ' : '') + t.tried + ' of ' + t.total + ' tried</div></div>' +
+      '<div class="wk-btns"><button class="go" data-wk-go="' + escapeAttr(t.mod + '|' + t.tag) + '">Practise</button><button data-wk-task="' + escapeAttr(t.mod + '|' + t.tag) + '" title="Add “Revise ' + escapeAttr(t.tag) + '” to today’s tasks">+ Task</button></div>' +
+      '<div class="wk-bar"><i style="width:' + (t.tried ? Math.max(4, t.acc * 100) : 0) + '%; background:' + weakColor(t.acc) + '"></i></div></div>';
+  }
+  async function openWeak(){
+    openDrill('Weak spots');
+    drillBody('<p class="help">Working out your weak spots…</p>');
+    try{ await loadStudyBank(); }catch(e){ drillBody('<div class="dq-empty">Couldn’t load the question bank. Upload <b>study-bank.json</b> to your site and try again.</div>'); return; }
+    drill = { kind: 'weak', phase: 'list' };
+    renderWeak();
+  }
+  function renderWeak(){
+    var W = weakStats(), tried = 0, right = 0;
+    W.apps.forEach(function(a){ tried += a.tried; right += a.right; });
+    if(!tried){
+      drillBody('<div class="dq-hero"><div class="eyebrow">All subjects</div><h1>Weak spots</h1></div><div class="dq-empty">Nothing to analyse yet.<br>Answer questions in any mini app, the Mistakes book or a mixed mock, and your accuracy for every topic shows up here.</div>');
+      return;
+    }
+    var weak = W.topics.filter(function(t){ return t.tried >= 3 && t.acc < .8; }).sort(function(a, b){ return a.score - b.score || (b.tried - b.right) - (a.tried - a.right); }).slice(0, 12);
+    var strong = W.topics.filter(function(t){ return t.tried >= 5 && t.acc >= .9; }).length;
+    var untouched = W.apps.filter(function(a){ return !a.tried; });
+    var html = '<div class="dq-hero"><div class="eyebrow">All subjects · ' + tried + ' questions answered</div><h1>Weak spots</h1>' +
+      '<p>' + Math.round(right * 100 / tried) + '% right overall. Each question counts by your latest answer, so fixing a mistake raises the topic straight away.' + (strong ? ' ' + strong + ' topic' + (strong === 1 ? ' is' : 's are') + ' already 90%+.' : '') + '</p></div>';
+    html += '<div class="wk-sum">' + WEAK_SUBJ.map(function(g){
+      var A = W.apps.filter(function(a){ return a.g === g[0]; }), t = 0, r = 0, n = 0;
+      A.forEach(function(a){ t += a.tried; r += a.right; n += a.total; });
+      if(!n) return '';
+      return '<div class="wk-subj" style="--dq-c:' + g[2] + '"><b>' + (t ? Math.round(r * 100 / t) + '%' : '—') + '</b><span>' + g[1] + ' · ' + t + ' of ' + n + ' tried</span></div>';
+    }).join('') + '</div>';
+    html += '<div class="wk-h">Weakest topics</div><p class="wk-note">Topics with at least 3 answers and under 80% right, weakest first.</p>' +
+      (weak.length ? '<div class="wk-list">' + weak.map(function(t){ return weakRow(t, true); }).join('') + '</div>' : '<div class="dq-empty" style="padding:20px;">No weak topics right now — everything you’ve tried is 80% or better. 💪</div>');
+    if(untouched.length) html += '<div class="wk-h">Not started</div><p class="wk-note">Apps with no answers yet — even one quick practice shows where you stand.</p>' +
+      '<div class="dq-chips">' + untouched.map(function(a){ return '<button data-open-study="' + a.mod + '" style="--dq-c:' + STUDY[a.mod].color + '">' + escapeHtml(a.name) + ' · ' + a.total + ' Qs</button>'; }).join('') + '</div>';
+    html += '<div class="wk-h">Every app and topic</div><p class="wk-note">Open an app to see all its topics.</p>';
+    WEAK_SUBJ.forEach(function(g){
+      var A = W.apps.filter(function(a){ return a.g === g[0] && a.tried; }).sort(function(a, b){ return a.acc - b.acc; });
+      if(!A.length) return;
+      html += '<div class="wk-note" style="margin-top:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;">' + g[1] + '</div>' + A.map(function(a){
+        return '<details class="wk-app" style="--dq-c:' + STUDY[a.mod].color + '"><summary><span style="margin:0; width:10px; height:10px; border-radius:50%; background:' + weakColor(a.acc) + '"></span>' + escapeHtml(a.name) +
+          '<span>' + weakPct(a.acc) + ' · ' + a.tried + ' / ' + a.total + '</span></summary><div class="wk-list">' +
+          a.topics.slice().sort(function(x, y){ return (x.tried ? x.score : 2) - (y.tried ? y.score : 2); }).map(function(t){ return weakRow(t, false); }).join('') + '</div></details>';
+      }).join('');
+    });
+    drillBody(html);
+    var find = function(v){ var p = v.split('|'), mid = p[0], tag = p.slice(1).join('|'); return W.topics.filter(function(t){ return t.mod === mid && t.tag === tag; })[0]; };
+    document.querySelectorAll('#drillBody [data-wk-go]').forEach(function(b){ b.addEventListener('click', function(){
+      var t = find(b.dataset.wkGo); if(!t) return;
+      var ans = studyState(t.mod).ans || {};
+      var wrong = t.qs.filter(function(q){ return ans[q.id] === 0; }), fresh = t.qs.filter(function(q){ return ans[q.id] !== 0 && ans[q.id] !== 1; }), ok = t.qs.filter(function(q){ return ans[q.id] === 1; });
+      var pick = shuffleArr(wrong).concat(shuffleArr(fresh), shuffleArr(ok)).slice(0, 15);
+      startPractice(shuffleArr(pick).map(prepQ), { title: t.tag });
+    }); });
+    document.querySelectorAll('#drillBody [data-wk-task]').forEach(function(b){ b.addEventListener('click', function(){
+      var t = find(b.dataset.wkTask); if(!t) return;
+      var lesson = t.mod !== 'grammar' && t.l ? { mod: t.mod, id: t.l, t: t.tag } : null;
+      var task = todoAdd('Revise ' + t.app + ' — ' + t.tag, { app: t.mod, due: todoDay(0), lm: lesson ? lesson.mod : '', li: lesson ? lesson.id : '', lt: lesson ? lesson.t : '' });
+      if(task){ b.textContent = '✓ Added'; b.disabled = true; showToast('Added to today’s tasks.'); }
+    }); });
+    document.querySelectorAll('#drillBody [data-open-study]').forEach(function(b){ b.addEventListener('click', function(ev){ ev.stopPropagation(); closeDrill(false); openStudy(b.dataset.openStudy, false); }); });
   }
 
   // Mixed mock test
