@@ -6878,7 +6878,8 @@ listBlock,
   // ---- talking to the providers ----
   function aiFriendlyError(status, msg){
     msg = String(msg || '');
-    if(status === 429 || /quota|rate.?limit|resource.?exhausted/i.test(msg)) return 'Your free limit is used up for now. Wait a minute (or until tomorrow if it’s the daily limit), or switch to another provider in AI settings.';
+    if(/limit:\s*0\b/.test(msg)) return 'This model has no free allowance on your key. Open AI settings, press “Check key” (it finds a model that works), or switch provider.';
+    if(status === 429 || /resource.?exhausted/i.test(msg)) return /per.?day|daily|PerDay/i.test(msg) ? 'Today’s free limit for this model is used up. It resets tomorrow — or pick another model or provider in AI settings.' : 'Too many requests in a short time. Wait a minute and try again.';
     if(status === 401 || status === 403 || /api.?key|unauthori[sz]ed|permission/i.test(msg)) return 'The API key wasn’t accepted. Open AI settings and check the key (copy it again from the provider’s site).';
     if(status === 404 || /not found|does not exist|no endpoints|decommission/i.test(msg)) return 'This model isn’t available for your key. Open AI settings, press “Check key” and pick another model.';
     if(status >= 500) return 'The AI service is having trouble right now. Try again in a minute.';
@@ -6887,15 +6888,18 @@ listBlock,
   async function aiHttpError(res){
     var t = ''; try{ t = await res.text(); }catch(e){}
     var m = t; try{ var j = JSON.parse(t); m = (j.error && (j.error.message || j.error.status || j.error)) || j.message || t; }catch(e){}
-    var err = new Error(aiFriendlyError(res.status, typeof m === 'string' ? m : JSON.stringify(m)));
-    err.status = res.status;
+    m = typeof m === 'string' ? m : JSON.stringify(m);
+    var err = new Error(aiFriendlyError(res.status, m));
+    err.status = res.status; err.raw = m.slice(0, 400); err.zero = /limit:\s*0\b/.test(m);
+    var wait = /retry in ([\d.]+)\s*s/i.exec(m) || /"retryDelay"\s*:\s*"([\d.]+)s"/.exec(t);
+    if(wait) err.retryAfter = Math.ceil(+wait[1]);
     return err;
   }
   /** Stream an answer. msgs: [{ role: 'user' | 'assistant', text }]. Calls onText(full text so far). */
   async function aiStream(c, sys, msgs, opts){
     opts = opts || {};
     var key = c.keys[c.provider], model = aiModel(c), res;
-    var maxTok = c.len === 'detailed' ? 8192 : 6144;
+    var maxTok = opts.test ? 512 : c.len === 'detailed' ? 8192 : 6144;
     if(c.provider === 'gemini'){
       var body = {
         systemInstruction: { parts: [{ text: sys }] },
@@ -6907,7 +6911,8 @@ listBlock,
       res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':streamGenerateContent?alt=sse', {
         method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key }, body: JSON.stringify(body), signal: opts.signal
       });
-      if(!res.ok && opts.web && res.status === 400){ opts = Object.assign({}, opts, { web: false }); return aiStream(c, sys, msgs, opts); }   // model without web search
+      // web search not allowed for this model or not free on this key: ask again without it
+      if(!res.ok && opts.web && (res.status === 400 || res.status === 429)) return aiStream(c, sys, msgs, Object.assign({}, opts, { web: false, webDropped: true }));
     } else {
       var url = c.provider === 'groq' ? 'https://api.groq.com/openai/v1/chat/completions' : 'https://openrouter.ai/api/v1/chat/completions';
       var headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key };
@@ -6918,7 +6923,7 @@ listBlock,
       res = await fetch(url, { method: 'POST', headers: headers, body: JSON.stringify(obody), signal: opts.signal });
     }
     if(!res.ok) throw await aiHttpError(res);
-    var out = { text: '', web: [], finish: '' }, seen = {};
+    var out = { text: '', web: [], finish: '', model: model, webDropped: !!opts.webDropped }, seen = {};
     var reader = res.body.getReader(), dec = new TextDecoder(), buf = '';
     var take = function(line){
       line = line.trim();
@@ -6951,11 +6956,67 @@ listBlock,
     }
     take(buf);
     if(opts.onText) opts.onText(out.text);
-    if(!out.text.trim()){
+    if(!out.text.trim() && !opts.test){
       if(/SAFETY|PROHIBITED|BLOCK/i.test(out.finish)) throw new Error('The AI declined to answer this one. Try wording it differently.');
       throw new Error('The AI sent back an empty answer. Try again, or pick another model in AI settings.');
     }
     return out;
+  }
+  var AI_FALLBACK = {
+    gemini: ['gemini-2.5-flash', 'gemini-flash-lite-latest', 'gemini-2.5-flash-lite', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'],
+    groq: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'openai/gpt-oss-20b'],
+    openrouter: []
+  };
+  function aiSleep(ms, signal){
+    return new Promise(function(ok, no){
+      var t = setTimeout(ok, ms);
+      if(signal) signal.addEventListener('abort', function(){ clearTimeout(t); var e = new Error('Stopped'); e.name = 'AbortError'; no(e); });
+    });
+  }
+  /** aiStream, but recovers on its own: waits out a short per-minute limit once, and moves to another
+      free model when this one has no free allowance (or is used up / missing). The result says which model answered. */
+  async function aiCall(c, sys, msgs, opts){
+    opts = Object.assign({}, opts);
+    var p = c.provider, first = aiModel(c), model = first, tried = {}, waited = false, lastErr = null;
+    var list = (c.modelList && c.modelList[p]) || [];
+    var next = function(){
+      var cands = AI_FALLBACK[p].concat(list.filter(function(m){ return p === 'gemini' ? /flash/.test(m) : true; }));
+      return cands.filter(function(m){ return !tried[m] && (!list.length || list.indexOf(m) !== -1); })[0];
+    };
+    for(var n = 0; n < 5; n++){
+      tried[model] = 1;
+      try{
+        var cc = Object.assign({}, c, { models: Object.assign({}, c.models) });
+        cc.models[p] = model;
+        var r = await aiStream(cc, sys, msgs, opts);
+        r.switchedFrom = model !== first ? first : '';
+        return r;
+      }catch(e){
+        if(e && e.name === 'AbortError') throw e;
+        lastErr = e;
+        if(!e || !e.status) throw e;
+        opts.web = false;
+        if(e.status === 429 && !e.zero && !waited && e.retryAfter && e.retryAfter <= 25){
+          waited = true; tried[model] = 0;
+          if(opts.onWait) opts.onWait(e.retryAfter);
+          await aiSleep(e.retryAfter * 1000 + 500, opts.signal);
+          continue;
+        }
+        if(e.status === 429 || e.status === 404 || (e.status === 400 && /model/i.test(e.raw || ''))){
+          var m = next();
+          if(m){ model = m; continue; }
+        }
+        throw e;
+      }
+    }
+    throw lastErr;
+  }
+  /** After an answer: remember a model that worked, and pause web search if Google refused it. */
+  function aiLearn(r){
+    var c = aiCfg(), changed = false;
+    if(r.switchedFrom && r.model){ c.models[c.provider] = r.model; changed = true; }
+    if(r.webDropped){ c.webOffUntil = Date.now() + 6 * 3600 * 1000; changed = true; }
+    if(changed) aiSave(c);
   }
   /** Check a key and list the models it can use. */
   async function aiListModels(provider, key){
@@ -7163,7 +7224,9 @@ listBlock,
 
   function aiMsgHtml(m, i){
     if(m.r === 'u') return '<div class="ai-msg ai-u"><div class="ai-bub"><span class="ai-tag">' + aiModeInfo(m.mode)[1] + ' ' + escapeHtml(aiModeInfo(m.mode)[2]) + '</span>' + escapeHtml(m.t).replace(/\n/g, '<br>') + '</div></div>';
-    var body = m.err ? '<div class="ai-err">' + escapeHtml(m.err) + '</div>' : aiMd(m.t);
+    var who = AI_PROVIDERS[aiCfg().provider].name.replace(/^Google /, '');
+    var body = m.err ? '<div class="ai-err">' + escapeHtml(m.err) + '</div>' + (m.errRaw ? '<details class="ai-errd"><summary>What ' + escapeHtml(who) + ' said</summary>' + escapeHtml(m.errRaw) + '</details>' : '') : aiMd(m.t);
+    if(m.note && !m.err) body += '<div class="ai-note">ℹ️ ' + escapeHtml(m.note) + '</div>';
     var src = '';
     if(m.src && m.src.length) src += '<div class="ai-src"><span class="ai-badge ok">📖 Used your app’s notes</span>' + m.src.map(function(s){
       return '<button data-ai-open="' + escapeAttr(s.mod) + '" data-ai-lesson="' + escapeAttr(s.id) + '" style="--sr-c:' + (STUDY[s.mod] ? STUDY[s.mod].color : 'var(--teal)') + '">' + (STUDY[s.mod] ? STUDY[s.mod].ico + ' ' : '') + escapeHtml(MOD_NAME[s.mod] || s.mod) + ' › ' + escapeHtml(s.t) + '</button>';
@@ -7258,13 +7321,16 @@ listBlock,
       prior.forEach(function(m){ hist.push({ role: m.r === 'u' ? 'user' : 'assistant', text: m.t.slice(0, 4000) }); });
       while(hist.length && hist[0].role !== 'user') hist.shift();
       hist.push({ role: 'user', text: (extra ? extra + '\n\n' : '') + (ctxText ? ctxText + '\n\n[Question]\n' : '') + text });
-      var web = c.provider === 'gemini' && c.web && mode !== 'solve' && mode !== 'weak';
+      var web = c.provider === 'gemini' && c.web && !(c.webOffUntil > Date.now()) && mode !== 'solve' && mode !== 'weak';
       var t0 = 0;
-      var res = await aiStream(c, aiSystem(c, mode), hist, { web: web, signal: ctl.signal, onText: function(t){
+      var res = await aiCall(c, aiSystem(c, mode), hist, { web: web, signal: ctl.signal, onWait: function(s){ a.t = '*Free per-minute limit hit — waiting ' + s + ' s and trying again…*'; aiUpdateLast(false); }, onText: function(t){
         a.t = t;
         var now = Date.now(); if(now - t0 > 60){ t0 = now; aiUpdateLast(false); }
       } });
       a.t = res.text; a.web = res.web;
+      aiLearn(res);
+      a.note = [res.switchedFrom ? 'Switched to ' + res.model + ' — ' + res.switchedFrom + ' isn’t free on your key right now. It’s saved for next time.' : '',
+        res.webDropped ? 'Google Search isn’t free on your key right now, so this answer is without web search (it will try again in a few hours).' : ''].filter(Boolean).join(' ');
       if(/MAX_TOKENS|length/i.test(res.finish)) a.t += '\n\n*(Answer cut short — ask “continue” for the rest.)*';
     }catch(e){
       if(e && e.name === 'AbortError'){ if(!a.t) a.err = 'Stopped.'; }
@@ -7275,7 +7341,7 @@ listBlock,
         a.local = loc.qs.slice(0, 3);
         if(!a.src.length && !a.local.length) a.err = a.err.replace(/ Here’s what the app has on this:$/, ' Nothing in the app’s notes matches it either.');
       }
-      else a.err = (e && e.message) || 'Something went wrong.';
+      else { a.err = (e && e.message) || 'Something went wrong.'; a.errRaw = (e && e.raw) || ''; }
     }finally{
       a.pending = false;
       if(aiChat.msgs.indexOf(a) !== -1){ aiSaveChat(); aiUpdateLast(true); }
@@ -7298,7 +7364,8 @@ listBlock,
       ' Return ONLY JSON, no Markdown: {"questions":[{"q":"question","o":["A","B","C","D"],"a":0,"e":"one or two line explanation with the trick"}]} where "a" is the 0-based index of the correct option.';
     var user = (ctxText ? ctxText + '\n\n' : '') + 'Write 10 MCQs on: ' + topic;
     a.t = '';
-    var res = await aiStream(c, sys, [{ role: 'user', text: user }], { json: true, signal: ctl.signal, onText: function(){} });
+    var res = await aiCall(c, sys, [{ role: 'user', text: user }], { json: true, signal: ctl.signal, onText: function(){} });
+    aiLearn(res);
     var raw = res.text.replace(/^[\s\S]*?(\{[\s\S]*\})[\s\S]*$/, '$1'), data;
     try{ data = JSON.parse(raw); }catch(e){ throw new Error('The AI’s questions came back in a broken format. Press “Try again”.'); }
     var qs = (data.questions || data || []).filter(function(q){ return q && q.q && Array.isArray(q.o) && q.o.length >= 2 && q.o.length <= 5 && typeof q.a === 'number' && q.a >= 0 && q.a < q.o.length; })
@@ -7383,7 +7450,7 @@ listBlock,
       var c = aiCfg(), a = { r: 'a', t: '', mode: 'quiz', pending: true, ts: Date.now() }, ctl = new AbortController();
       aiChat.msgs.push(a); aiRender(); aiScrollEnd(); aiSetBusy(ctl);
       aiRetrieve(u.t, 'quiz').then(function(ctx){ ctx.q = u.t; return aiQuiz(c, m.quiz.title, ctx, a, ctl, true); })
-        .catch(function(e){ a.err = e && e.name === 'AbortError' ? 'Stopped.' : ((e && e.message) || 'Something went wrong.'); })
+        .catch(function(e){ a.err = e && e.name === 'AbortError' ? 'Stopped.' : ((e && e.message) || 'Something went wrong.'); a.errRaw = (e && e.raw) || ''; })
         .then(function(){ a.pending = false; aiSaveChat(); aiUpdateLast(true); aiSetBusy(null); });
       return;
     }
@@ -7455,8 +7522,14 @@ listBlock,
         var P = AI_PROVIDERS[p], cur = draft.models[p] || P.def;
         if(list.length && list.indexOf(cur) === -1) draft.models[p] = list.filter(function(m){ return m === P.def; })[0] || list.filter(function(m){ return /flash/.test(m); })[0] || list[0];
         fillProvider();
-        msg.innerHTML = '<span class="ai-good">✓ Key works.</span> ' + (list.length ? list.length + ' model' + (list.length === 1 ? '' : 's') + ' available — the list above is updated.' : 'No free models were listed; the default will be tried.') + ' Press Save.';
-      }catch(e){ msg.innerHTML = '<span class="ai-bad">' + escapeHtml(!navigator.onLine ? 'You’re offline — connect and try again.' : (e instanceof TypeError ? 'Couldn’t reach ' + AI_PROVIDERS[p].name + '. Check your connection (or an ad blocker) and try again.' : e.message)) + '</span>'; }
+        msg.textContent = 'Key accepted — asking ' + draft.models[p] + ' a test question…';
+        var probe = { provider: p, keys: {}, models: {}, modelList: {}, len: 'short' };
+        probe.keys[p] = k; probe.models[p] = draft.models[p]; probe.modelList[p] = list;
+        var r = await aiCall(probe, 'Reply with the single word OK.', [{ role: 'user', text: 'Say OK' }], { test: true });
+        draft.models[p] = r.model;
+        fillProvider();
+        msg.innerHTML = '<span class="ai-good">✓ Key works and ' + escapeHtml(r.model) + ' answered.</span> ' + (r.switchedFrom ? escapeHtml(r.switchedFrom) + ' isn’t free on your key, so ' + escapeHtml(r.model) + ' is picked instead. ' : '') + 'Press Save.';
+      }catch(e){ msg.innerHTML = '<span class="ai-bad">' + escapeHtml(!navigator.onLine ? 'You’re offline — connect and try again.' : (e instanceof TypeError ? 'Couldn’t reach ' + AI_PROVIDERS[p].name + '. Check your connection (or an ad blocker) and try again.' : e.message)) + '</span>' + (e && e.raw ? '<details class="ai-errd"><summary>What ' + escapeHtml(AI_PROVIDERS[p].name) + ' said</summary>' + escapeHtml(e.raw) + '</details>' : ''); }
       btn.disabled = false;
     });
     $('aiSaveBtn').addEventListener('click', function(){
