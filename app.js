@@ -6297,6 +6297,8 @@ listBlock,
         } else if(ev.k === 'task' && ev.w){
           var tk = todoUpd(ev.w, function(t){ if(!t.done && !t.del) todoSetTicks(t, t.k + 1); });
           if(tk) ticks++;
+        } else if(ev.k === 'todo' && typeof ev.w === 'string' && ev.w.length < 20000){
+          if(todoApplyPhoneOp(JSON.parse(ev.w), ev.t)) ticks++;
         } else if(ev.w && known[ev.w]){
           var cur = progressMap[ev.w];
           var prev = (cur && typeof cur.confidence === 'number') ? cur.confidence : null;
@@ -6321,13 +6323,66 @@ listBlock,
       var bits = [];
       if(applied) bits.push(applied + ' rating' + (applied === 1 ? '' : 's'));
       if(facts) bits.push(facts + ' answer' + (facts === 1 ? '' : 's'));
-      if(ticks) bits.push(ticks + ' task tick' + (ticks === 1 ? '' : 's'));
+      if(ticks) bits.push(ticks + ' task change' + (ticks === 1 ? '' : 's'));
       showToast('Synced ' + bits.join(', ') + ' from your phone.');
       scheduleRender();
       renderRevDueBtn();
       if(ticks && isActive('tasks')) renderTodo();
     }
     setTimeout(function(){ lockPushSummary(true); }, 1500);
+  }
+
+  /** A change to the Tasks list made in the phone app (k "todo", w = JSON). Returns true if it changed something. */
+  function todoApplyPhoneOp(o, at){
+    if(!o || typeof o.op !== 'string') return false;
+    var n3 = function(n){ return Math.max(1, Math.min(3, +n || 1)); };
+    var day = function(v){ return typeof v === 'string' && (v === '' || /^\d{4}-\d{2}-\d{2}$/.test(v)); };
+    var tagOf = function(v){ return String(v || '').trim().replace(/^#/, '').replace(/\s+/g, '-').toLowerCase().slice(0, 24); };
+    if(o.op === 'def'){ var dd = todoData(); dd.def = n3(o.n); todoSave(dd); return true; }
+    if(o.op === 'clear'){
+      var dc = todoData(), now = Date.now(), any = false, ids = Array.isArray(o.ids) ? o.ids : [];
+      dc.tasks.forEach(function(t){ if(ids.indexOf(t.id) !== -1 && t.done && !t.del){ t.del = now; t.u = now; any = true; } });
+      if(any) todoSave(dc);
+      return any;
+    }
+    if(typeof o.id !== 'string' || !o.id) return false;
+    if(o.op === 'add'){
+      if(todoData().tasks.some(function(t){ return t.id === o.id; })) return false;   // already added
+      var extra = { id: o.id, n: n3(o.n), c: at || Date.now() };
+      if(day(o.due) && o.due) extra.due = o.due;
+      if(o.tag) extra.tag = tagOf(o.tag);
+      if(o.star) extra.star = true;
+      if(o.app && STUDY[o.app]) extra.app = o.app;
+      return !!todoAdd(String(o.raw || '').slice(0, 200), extra);
+    }
+    var hit = todoUpd(o.id, function(t){
+      if(o.op === 'edit'){
+        if(typeof o.t === 'string' && o.t.trim()){
+          // read again like the web app's own edit box: #tag, !, a day and app / chapter names are picked up
+          var p = todoParse(o.t.slice(0, 200));
+          t.t = p.t;
+          if(p.due) t.due = p.due;
+          if(p.tag) t.tag = p.tag;
+          if(p.star) t.star = true;
+          if(!('app' in o) && p.app) t.app = p.app;
+          if(p.lesson) todoSetLesson(t, p.lesson);
+        }
+        if('n' in o){ t.n = n3(o.n); todoSetTicks(t, Math.min(t.k, t.n)); }
+        if('due' in o && day(o.due)) t.due = o.due;
+        if('tag' in o) t.tag = tagOf(o.tag);
+        if('star' in o) t.star = !!o.star;
+        if('app' in o){
+          t.app = STUDY[o.app] ? o.app : '';
+          if(t.lm && t.lm !== t.app) todoSetLesson(t, null);   // the chapter belonged to the old app
+        }
+      }
+      else if(o.op === 'ticks') todoSetTicks(t, +o.k || 0);
+      else if(o.op === 'focus'){ t.fm = (t.fm || 0) + Math.max(1, Math.min(240, +o.min || 25)); if(!t.done) todoSetTicks(t, t.k + 1); }
+      else if(o.op === 'del') t.del = Date.now();
+      else if(o.op === 'undel') t.del = 0;
+    });
+    if(hit && o.op === 'edit' && !todoLessons) todoLinkLater(o.id);
+    return !!hit;
   }
 
   function buildLockSummary(){
@@ -6351,6 +6406,24 @@ listBlock,
         tasks.push({ i: x.id, t: x.t, n: x.n || 1, k: x.k || 0, s: x.star ? 1 : 0, g: x.tag || '' });
       });
     }catch(e){}
+    // the whole Tasks list for the phone's Tasks tab: open tasks and those finished in the last 14 days
+    var todo = null;
+    try{
+      var td = todoData(), cutDone = Date.now() - 14 * DAY_MS, cutTick = Date.now() - 8 * DAY_MS;
+      todo = { def: td.def || 1, list: td.tasks.filter(function(x){ return !x.del && (!x.done || x.done > cutDone); }).slice(-400).map(function(x){
+        var o = { i: x.id, t: x.t, n: x.n || 1, k: x.k || 0, c: x.c || 0 };
+        if(x.due) o.due = x.due;
+        if(x.star) o.s = 1;
+        if(x.tag) o.g = x.tag;
+        if(x.app) o.a = x.app;
+        if(x.lm){ o.lm = x.lm; o.li = x.li || ''; o.lt = x.lt || ''; }
+        if(x.fm) o.fm = x.fm;
+        if(x.done) o.dn = x.done;
+        var tk = (x.tk || []).filter(function(ms){ return ms > cutTick; });
+        if(tk.length) o.tk = tk;
+        return o;
+      }) };
+    }catch(e){}
     // the Mistakes book, app by app, so the phone can replay the same questions
     var mistakes = {};
     Object.keys(STUDY).forEach(function(id){
@@ -6363,7 +6436,7 @@ listBlock,
       goal: prof.dailyGoal || 0, mode: prof.goalMode || 'levelup',
       goalDay: prof.goalDay || '', goalIds: prof.goalDay === t ? lockGoalIds(prof) : [],
       streak: prof.streakCurrent || 0, lastMet: prof.lastMetDay || '', best: prof.streakBest || 0,
-      tasks: tasks, mistakes: mistakes, wall: prof.wallCfg || '',
+      tasks: tasks, todo: todo, mistakes: mistakes, wall: prof.wallCfg || '',
       site: location.origin + location.pathname.replace(/[^\/]*$/, ''),   // the phone downloads study-bank.json (GS facts) from here
       lastEventT: lockLastEventT, pushedAt: Date.now()
     });
