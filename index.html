@@ -847,6 +847,87 @@
     .celebrate{ right:16px; bottom:96px; }
     .toast{ bottom:96px; }
   }
+  /* ---------- Ask AI (optional) ---------- */
+  .ask-page{ z-index:393; }
+  .ask-model{ font-weight:500; font-size:11.5px; color:var(--bar-muted); margin-left:6px; }
+  .ask-lang{ background:var(--bar-hover); color:var(--bar-fg); border:0; border-radius:10px; padding:6px 8px; font:inherit; font-size:13px; font-weight:600; max-width:110px; }
+  .ask-wrap{ max-width:820px; margin:0 auto; padding:18px 16px 24px; }
+  .ask-dock{ flex-shrink:0; border-top:1px solid var(--rule); background:var(--paper); padding-bottom:env(safe-area-inset-bottom); }
+  .ask-dock .ask-wrap{ padding:8px 16px 8px; }
+  .ask-modes{ display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; padding-bottom:8px; }
+  .ask-modes::-webkit-scrollbar{ display:none; }
+  .ask-modes button{ flex-shrink:0; border:1px solid var(--rule); background:var(--card); color:var(--ink); border-radius:999px; padding:6px 12px; font:inherit; font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap; }
+  .ask-modes button.on{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .ask-form{ display:flex; align-items:flex-end; gap:8px; background:var(--card); border:1px solid var(--rule); border-radius:18px; padding:6px 6px 6px 14px; }
+  .ask-form:focus-within{ border-color:var(--teal); }
+  .ask-form textarea{ flex:1; min-width:0; border:0; outline:0; background:transparent; color:var(--ink); font:inherit; font-size:16px; line-height:1.4; resize:none; padding:7px 0; min-height:0; max-height:180px; border-radius:0; box-shadow:none; }
+  .ask-form textarea:focus{ box-shadow:none; }
+  .ask-lang{ width:auto; }
+  .ask-form textarea::placeholder{ color:var(--ink-faint); }
+  .ask-form button{ flex-shrink:0; width:40px; height:40px; border-radius:50%; border:0; background:var(--teal); color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .ask-form button.stop{ background:var(--maroon); }
+  .ask-foot{ text-align:center; font-size:11.5px; color:var(--ink-faint); padding-top:6px; }
+  .ai-hero{ text-align:center; padding:24px 4px 8px; }
+  .ai-hero .eyebrow{ font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); }
+  .ai-hero h1{ font-family:var(--font-display); font-weight:var(--h-weight); font-size:clamp(32px, 6vw, 46px); margin:6px 0; color:var(--ink); line-height:1.05; }
+  .ai-hero h1 span{ color:var(--mustard); }
+  .ai-hero p{ color:var(--ink-soft); margin:0 auto; max-width:52ch; font-size:15px; }
+  .ai-modecards{ display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin:20px 0 4px; }
+  .ai-modecards button{ display:flex; flex-direction:column; align-items:center; gap:4px; padding:12px 6px; background:var(--card); color:var(--ink); border:1px solid var(--rule); border-radius:14px; font:inherit; cursor:pointer; }
+  .ai-modecards button span{ font-size:22px; }
+  .ai-modecards button b{ font-size:13.5px; }
+  .ai-modecards button.on{ border-color:var(--teal); box-shadow:inset 0 0 0 1px var(--teal); }
+  .ai-small{ font-size:12.5px !important; color:var(--ink-faint) !important; margin-top:14px !important; }
+  .ai-msg{ display:flex; margin:0 0 14px; }
+  .ai-u{ justify-content:flex-end; }
+  .ai-bub{ max-width:85%; background:var(--ink); color:var(--paper); padding:10px 14px; border-radius:18px 18px 4px 18px; font-size:15px; line-height:1.45; overflow-wrap:anywhere; }
+  .ai-tag{ display:block; font-size:11px; font-weight:700; letter-spacing:.04em; opacity:.7; margin-bottom:2px; }
+  .ai-card{ width:100%; background:var(--card); border:1px solid var(--rule); border-radius:4px 18px 18px 18px; padding:12px 16px; color:var(--ink); box-shadow:var(--shadow); }
+  .ai-md{ font-size:15px; line-height:1.6; overflow-wrap:anywhere; }
+  .ai-md > :first-child{ margin-top:0; }
+  .ai-md > :last-child{ margin-bottom:0; }
+  .ai-md p{ margin:0 0 10px; }
+  .ai-md h4, .ai-md h5{ margin:14px 0 6px; font-size:16px; color:var(--ink); }
+  .ai-md h5{ font-size:15px; }
+  .ai-md ul, .ai-md ol{ margin:0 0 10px; padding-left:22px; }
+  .ai-md li{ margin:3px 0; }
+  .ai-md li.sub{ margin-left:18px; list-style:circle; }
+  .ai-md b{ color:var(--ink); }
+  .ai-md code{ background:var(--paper-deep); border-radius:5px; padding:1px 5px; font-size:.92em; }
+  .ai-md pre{ background:var(--paper-deep); border-radius:10px; padding:10px 12px; overflow-x:auto; font-size:13.5px; }
+  .ai-md pre code{ background:none; padding:0; }
+  .ai-md blockquote{ margin:0 0 10px; padding:6px 12px; border-left:3px solid var(--mustard); color:var(--ink-soft); }
+  .ai-md hr{ border:0; border-top:1px dashed var(--rule); margin:12px 0; }
+  .ai-md a{ color:var(--teal); }
+  .ai-table{ overflow-x:auto; margin:0 0 10px; }
+  .ai-table table{ border-collapse:collapse; font-size:14px; min-width:100%; }
+  .ai-table th, .ai-table td{ border:1px solid var(--rule); padding:6px 9px; text-align:left; vertical-align:top; }
+  .ai-table th{ background:var(--paper-deep); }
+  .ai-err{ color:var(--maroon); font-weight:600; }
+  .ai-src{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:10px; }
+  .ai-src button, .ai-src a{ border:1px solid var(--rule); border-left:3px solid var(--sr-c, var(--teal)); background:var(--paper); color:var(--ink); border-radius:10px; padding:5px 10px; font:inherit; font-size:12.5px; font-weight:600; cursor:pointer; text-decoration:none; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .ai-badge{ font-size:11.5px; font-weight:700; color:var(--ink-faint); }
+  .ai-badge.ok{ color:var(--teal); }
+  .ai-badge.web{ color:var(--blue, #2f6db5); }
+  .ai-acts{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+  .ai-mini button{ border:0; background:none; color:var(--ink-faint); font:inherit; font-size:12.5px; font-weight:600; cursor:pointer; padding:2px 0; }
+  .ai-mini button:hover{ color:var(--ink); }
+  .ai-local{ margin-top:10px; }
+  .ai-dots{ display:inline-flex; gap:4px; padding:6px 0; }
+  .ai-dots i{ width:7px; height:7px; border-radius:50%; background:var(--ink-faint); animation:aiDot 1s infinite ease-in-out; }
+  .ai-dots i:nth-child(2){ animation-delay:.15s; } .ai-dots i:nth-child(3){ animation-delay:.3s; }
+  @keyframes aiDot{ 0%, 80%, 100%{ opacity:.25; transform:translateY(0); } 40%{ opacity:1; transform:translateY(-3px); } }
+  .ai-opt{ font-size:12px; font-weight:600; color:var(--ink-faint); border:1px solid var(--rule); border-radius:999px; padding:1px 8px; vertical-align:middle; }
+  .ai-switch{ display:flex; gap:10px; align-items:flex-start; cursor:pointer; }
+  .ai-switch input{ margin-top:3px; width:18px; height:18px; flex-shrink:0; }
+  .ai-switch small{ display:block; color:var(--ink-faint); font-size:12.5px; }
+  .ai-keyrow{ display:flex; gap:8px; }
+  .ai-keyrow input{ flex:1; min-width:0; }
+  .ai-good{ color:var(--teal); font-weight:700; }
+  .ai-bad{ color:var(--maroon); font-weight:700; }
+  .ai-privacy{ font-size:12.5px; }
+  @media (max-width: 860px){ .ask-page .sb-lab{ display:none; } .ask-model{ display:none; } }
+  @media (max-width: 420px){ .ai-modecards{ grid-template-columns:repeat(2, 1fr); } }
   /* ---------- search ---------- */
   .search-page{ z-index:395; }
   .search-bar{ gap:6px; }
@@ -1253,6 +1334,22 @@
   <div class="hub-scroll"><div class="hub-wrap" id="searchResults"></div></div>
 </div>
 
+<div class="hub-page ask-page" id="askPage" role="dialog" aria-label="Ask AI">
+  <div class="study-bar">
+    <button id="askBack" title="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg><span class="sb-lab">Back</span></button>
+    <span class="study-title">✨ Ask AI <small id="askModelLab" class="ask-model"></small></span>
+    <select id="askLang" class="ask-lang" aria-label="Reply language"><option value="en">English</option><option value="hinglish">Hinglish</option><option value="hi">हिन्दी</option></select>
+    <button id="askNew" title="New chat" aria-label="New chat"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg></button>
+    <button id="askSettings" title="AI settings" aria-label="AI settings"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></button>
+  </div>
+  <div class="hub-scroll" id="askScroll"><div class="ask-wrap" id="askLog"></div></div>
+  <div class="ask-dock"><div class="ask-wrap">
+    <div class="ask-modes" id="askModes"></div>
+    <form class="ask-form" id="askForm"><textarea id="askInput" rows="1" aria-label="Your question"></textarea><button type="submit" id="askSend" aria-label="Send"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"></path></svg></button></form>
+    <div class="ask-foot">AI can make mistakes — check facts that matter. Uses your own key.</div>
+  </div></div>
+</div>
+
 <div class="hub-page drill-page" id="drillPage" role="dialog" aria-label="Practice">
   <div class="study-bar">
     <button id="drillBack" title="Back to पाठShala"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg><span id="drillBackLabel">पाठShala</span></button>
@@ -1382,6 +1479,7 @@
           </div>
         </div>
       </div>
+      <button class="bar-icon" id="askBtn" aria-label="Ask AI" title="Ask AI — SSC doubts, topics, questions" style="display:none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"></path><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"></path></svg></button>
       <button class="bar-icon" id="searchBtn" aria-label="Search all apps" title="Search all apps (Ctrl + K)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg></button>
       <button class="bar-icon" id="notifBtn" aria-label="Notifications" style="display:none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg><span class="notif-count" id="notifCount" style="display:none;"></span></button>
       <div class="navgroup" data-group="account">
@@ -1390,6 +1488,7 @@
           <button id="alertsSettingsBtn"><b>Alerts</b><span>Evening streak nudge, word reminders, new words</span></button>
           <button id="goalSettingsBtn"><b>Daily goal</b><span>How much to study each day, and your streak</span></button>
           <button id="lockLinkBtn"><b>Phone app (Vocab Lock)</b><span>Link it so your phone knows your progress</span></button>
+          <button id="aiSettingsBtn"><b>AI tutor</b><span>Optional — ask any SSC doubt with your own free key</span></button>
           <button id="displaySettingsBtn"><b>Display</b><span>Text size and dyslexia-friendly font</span></button>
           <div class="mod-only phone-only" style="display:none;"><div class="menu-label">Manage</div>
           <button class="tab" data-tab="review"><b>Review</b><span>Approve pending submissions</span></button>
@@ -1791,6 +1890,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="app.js?v=8b99b318"></script>
+<script src="app.js?v=d23c2efc"></script>
 </body>
 </html>

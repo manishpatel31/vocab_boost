@@ -1272,8 +1272,8 @@
     if(d.i >= d.qs.length && d.from){
       drillBody('<div class="dq-hero"><div class="eyebrow">Practice done · ' + escapeHtml(d.from.title) + '</div><h1>' + d.cleared + ' of ' + d.qs.length + ' right</h1><p>' +
         (d.cleared === d.qs.length ? 'All right — this topic is getting stronger.' : 'Wrong ones went to the Mistakes book, and the topic’s accuracy is updated.') + '</p></div>' +
-        '<div class="dq-actions"><button class="btn teal" id="pdBack">Back to Weak spots</button></div>');
-      document.getElementById('pdBack').addEventListener('click', function(){ openWeak(); });
+        '<div class="dq-actions"><button class="btn teal" id="pdBack">' + escapeHtml(d.from.backLabel || 'Back to Weak spots') + '</button></div>');
+      document.getElementById('pdBack').addEventListener('click', function(){ if(d.from.back) d.from.back(); else openWeak(); });
       return;
     }
     if(d.i >= d.qs.length){
@@ -6824,5 +6824,656 @@ listBlock,
     if(isActive('roots')) renderRoots();
     if(isActive('revision') && !revSession) renderRevision();
   }
+
+  // ================= AI tutor (optional) =================
+  // Off until the user turns it on. Each user brings their own free API key (Gemini, Groq or OpenRouter);
+  // the key stays in this browser's storage and requests go straight from the browser to that company.
+  // Every answer is framed for SSC CGL, and the app's own lesson notes, questions and words are sent
+  // along as context when they match, so answers follow what the app teaches.
+  var AI_KEY = 'pathshalaAI', AI_CHAT_KEY = 'pathshalaAIChat';
+  var AI_PROVIDERS = {
+    gemini: { name: 'Google Gemini', note: 'Recommended — free, good at Hindi and English, can search the web for current affairs', keyUrl: 'https://aistudio.google.com/apikey', keyHint: 'starts with AIza…', def: 'gemini-flash-latest', web: true },
+    groq: { name: 'Groq', note: 'Free and very fast (Llama and other open models)', keyUrl: 'https://console.groq.com/keys', keyHint: 'starts with gsk_…', def: 'llama-3.3-70b-versatile' },
+    openrouter: { name: 'OpenRouter', note: 'Many models; only the ones marked “free” cost nothing', keyUrl: 'https://openrouter.ai/settings/keys', keyHint: 'starts with sk-or-…', def: 'meta-llama/llama-3.3-70b-instruct:free' }
+  };
+  var AI_LANGS = [['en', 'English'], ['hinglish', 'Hinglish'], ['hi', 'हिन्दी']];
+  var AI_LENS = [['short', 'Short'], ['normal', 'Normal'], ['detailed', 'Detailed']];
+  var AI_MODES = [
+    ['explain', '📚', 'Explain', 'Explain a topic for SSC (e.g. Chola administration)'],
+    ['solve', '🧮', 'Solve', 'Paste a question, with options if any…'],
+    ['vocab', '🔤', 'Vocab', 'A word, idiom or phrase…'],
+    ['quiz', '❓', 'Quiz me', 'A topic to be quizzed on…'],
+    ['plan', '🧠', 'Brainstorm', 'Plan, strategy or a doubt to talk through…'],
+    ['weak', '🎯', 'My weak spots', 'Anything to add? Or just press send']
+  ];
+  var AI_TRY = {
+    explain: ['Explain Article 370 for SSC', 'Boats and streams tricks', 'Chola administration', 'Difference between repo and reverse repo'],
+    solve: ['A train 240 m long passes a pole in 12 s. Find its speed in km/h.', 'If sin θ + cos θ = √2, find tan θ + cot θ'],
+    vocab: ['ubiquitous', 'To beat about the bush', 'One word for “a person who hates mankind”'],
+    quiz: ['Mughal Empire', 'Profit and loss', 'Vitamins and deficiency diseases'],
+    plan: ['Make a 30-day plan for CGL Tier 1', 'How should I attempt Tier 1 to avoid negative marking?'],
+    weak: ['What should I fix first this week?']
+  };
+  MOD_NAME.ai = 'AI quiz';
+  var aiOpen = false, aiMode = 'explain', aiChat = null, aiBusy = null;
+
+  function aiCfg(){
+    var c; try{ c = JSON.parse(lsGet(AI_KEY) || '{}') || {}; }catch(e){ c = {}; }
+    c.keys = c.keys || {}; c.models = c.models || {}; c.modelList = c.modelList || {};
+    if(!AI_PROVIDERS[c.provider]) c.provider = 'gemini';
+    if(!c.lang) c.lang = 'en';
+    if(!c.len) c.len = 'normal';
+    if(c.web === undefined) c.web = true;
+    return c;
+  }
+  function aiSave(c){ lsSet(AI_KEY, JSON.stringify(c)); aiRefreshEntry(); }
+  function aiReady(c){ c = c || aiCfg(); return !!(c.on && c.keys[c.provider]); }
+  function aiModel(c){ return c.models[c.provider] || AI_PROVIDERS[c.provider].def; }
+  function aiRefreshEntry(){
+    var b = document.getElementById('askBtn');
+    if(b) b.style.display = aiCfg().on ? '' : 'none';
+  }
+  aiRefreshEntry();
+
+  // ---- talking to the providers ----
+  function aiFriendlyError(status, msg){
+    msg = String(msg || '');
+    if(status === 429 || /quota|rate.?limit|resource.?exhausted/i.test(msg)) return 'Your free limit is used up for now. Wait a minute (or until tomorrow if it’s the daily limit), or switch to another provider in AI settings.';
+    if(status === 401 || status === 403 || /api.?key|unauthori[sz]ed|permission/i.test(msg)) return 'The API key wasn’t accepted. Open AI settings and check the key (copy it again from the provider’s site).';
+    if(status === 404 || /not found|does not exist|no endpoints|decommission/i.test(msg)) return 'This model isn’t available for your key. Open AI settings, press “Check key” and pick another model.';
+    if(status >= 500) return 'The AI service is having trouble right now. Try again in a minute.';
+    return msg ? 'The AI service said: ' + msg.slice(0, 300) : 'Something went wrong talking to the AI service.';
+  }
+  async function aiHttpError(res){
+    var t = ''; try{ t = await res.text(); }catch(e){}
+    var m = t; try{ var j = JSON.parse(t); m = (j.error && (j.error.message || j.error.status || j.error)) || j.message || t; }catch(e){}
+    var err = new Error(aiFriendlyError(res.status, typeof m === 'string' ? m : JSON.stringify(m)));
+    err.status = res.status;
+    return err;
+  }
+  /** Stream an answer. msgs: [{ role: 'user' | 'assistant', text }]. Calls onText(full text so far). */
+  async function aiStream(c, sys, msgs, opts){
+    opts = opts || {};
+    var key = c.keys[c.provider], model = aiModel(c), res;
+    var maxTok = c.len === 'detailed' ? 8192 : 6144;
+    if(c.provider === 'gemini'){
+      var body = {
+        systemInstruction: { parts: [{ text: sys }] },
+        contents: msgs.map(function(m){ return { role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.text }] }; }),
+        generationConfig: { temperature: opts.json ? 0.6 : 0.4, maxOutputTokens: maxTok }
+      };
+      if(opts.json) body.generationConfig.responseMimeType = 'application/json';
+      if(opts.web) body.tools = [{ google_search: {} }];
+      res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':streamGenerateContent?alt=sse', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key }, body: JSON.stringify(body), signal: opts.signal
+      });
+      if(!res.ok && opts.web && res.status === 400){ opts = Object.assign({}, opts, { web: false }); return aiStream(c, sys, msgs, opts); }   // model without web search
+    } else {
+      var url = c.provider === 'groq' ? 'https://api.groq.com/openai/v1/chat/completions' : 'https://openrouter.ai/api/v1/chat/completions';
+      var headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key };
+      if(c.provider === 'openrouter'){ headers['HTTP-Referer'] = location.origin + location.pathname; headers['X-Title'] = 'PaathShala'; }
+      var obody = { model: model, stream: true, temperature: opts.json ? 0.6 : 0.4, max_tokens: maxTok,
+        messages: [{ role: 'system', content: sys }].concat(msgs.map(function(m){ return { role: m.role, content: m.text }; })) };
+      if(opts.json && c.provider === 'groq') obody.response_format = { type: 'json_object' };
+      res = await fetch(url, { method: 'POST', headers: headers, body: JSON.stringify(obody), signal: opts.signal });
+    }
+    if(!res.ok) throw await aiHttpError(res);
+    var out = { text: '', web: [], finish: '' }, seen = {};
+    var reader = res.body.getReader(), dec = new TextDecoder(), buf = '';
+    var take = function(line){
+      line = line.trim();
+      if(line.indexOf('data:') !== 0) return;
+      var data = line.slice(5).trim();
+      if(!data || data === '[DONE]') return;
+      var j; try{ j = JSON.parse(data); }catch(e){ return; }
+      if(j.error) throw new Error(aiFriendlyError(j.error.code || 0, j.error.message || ''));
+      if(c.provider === 'gemini'){
+        var cand = j.candidates && j.candidates[0];
+        if(!cand) return;
+        ((cand.content && cand.content.parts) || []).forEach(function(p){ if(p.text && !p.thought) out.text += p.text; });
+        var gm = cand.groundingMetadata;
+        if(gm && gm.groundingChunks) gm.groundingChunks.forEach(function(g){ if(g.web && g.web.uri && !seen[g.web.uri]){ seen[g.web.uri] = 1; out.web.push({ uri: g.web.uri, title: g.web.title || g.web.uri }); } });
+        if(cand.finishReason) out.finish = cand.finishReason;
+      } else {
+        var ch = j.choices && j.choices[0];
+        if(!ch) return;
+        if(ch.delta && ch.delta.content) out.text += ch.delta.content;
+        if(ch.finish_reason) out.finish = ch.finish_reason;
+      }
+    };
+    for(;;){
+      var r = await reader.read();
+      if(r.done) break;
+      buf += dec.decode(r.value, { stream: true });
+      var lines = buf.split('\n'); buf = lines.pop();
+      lines.forEach(take);
+      if(opts.onText) opts.onText(out.text);
+    }
+    take(buf);
+    if(opts.onText) opts.onText(out.text);
+    if(!out.text.trim()){
+      if(/SAFETY|PROHIBITED|BLOCK/i.test(out.finish)) throw new Error('The AI declined to answer this one. Try wording it differently.');
+      throw new Error('The AI sent back an empty answer. Try again, or pick another model in AI settings.');
+    }
+    return out;
+  }
+  /** Check a key and list the models it can use. */
+  async function aiListModels(provider, key){
+    var res, list = [];
+    if(provider === 'gemini'){
+      res = await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=1000', { headers: { 'x-goog-api-key': key } });
+      if(!res.ok) throw await aiHttpError(res);
+      ((await res.json()).models || []).forEach(function(m){
+        var id = String(m.name || '').replace(/^models\//, '');
+        if((m.supportedGenerationMethods || []).indexOf('generateContent') === -1) return;
+        if(!/^gemini/.test(id) || /tts|image|embed|live|audio|vision|computer|robotics|native/i.test(id)) return;
+        list.push(id);
+      });
+      list.sort(function(a, b){ return (/latest/.test(b) - /latest/.test(a)) || (/flash/.test(b) - /flash/.test(a)) || b.localeCompare(a); });
+    } else if(provider === 'groq'){
+      res = await fetch('https://api.groq.com/openai/v1/models', { headers: { 'Authorization': 'Bearer ' + key } });
+      if(!res.ok) throw await aiHttpError(res);
+      ((await res.json()).data || []).forEach(function(m){ if(m.id && !/whisper|tts|guard|playai|distil|orpheus|prompt/i.test(m.id) && m.active !== false) list.push(m.id); });
+      list.sort();
+    } else {
+      res = await fetch('https://openrouter.ai/api/v1/key', { headers: { 'Authorization': 'Bearer ' + key } });
+      if(!res.ok) throw await aiHttpError(res);
+      res = await fetch('https://openrouter.ai/api/v1/models');
+      if(res.ok) ((await res.json()).data || []).forEach(function(m){ if(/:free$/.test(m.id || '')) list.push(m.id); });
+      list.sort();
+    }
+    return list;
+  }
+
+  // ---- what the app already knows: lesson notes, questions and words that match the question ----
+  var AI_STOP = {};
+  ('a an the of in on to for is are was were be been am what which who whom whose how why when where explain tell me about give please and or with by from at as it its this that these those ' +
+   'i you my your we our do does did can could should would will shall all any some tip tips trick tricks question questions solve meaning mean means ssc cgl chsl exam exams topic topics etc ' +
+   'detail details simple simply short notes note define definition describe difference between vs versus important imp also more than then so if not no yes find quiz make me plan help ' +
+   'kya hai hain ka ki ke ko kaise kyu kyun samjhao samjha batao bataiye mujhe mera meri aur ya se par pe').split(' ').forEach(function(w){ AI_STOP[w] = 1; });
+  function aiTokens(s){
+    var seen = {};
+    return srTokens(s).map(function(t){ return t.replace(/^[^a-z0-9ऀ-ॿ]+|[^a-z0-9ऀ-ॿ]+$/g, ''); })
+      .filter(function(t){ if(t.length < 2 || AI_STOP[t] || seen[t]) return false; seen[t] = 1; return true; }).slice(0, 12);
+  }
+  function aiCount(text, t){ var n = 0, i = -1; while((i = text.indexOf(t, i + 1)) !== -1 && n < 20){ if(!/[a-z0-9]/.test(t.charAt(0)) || i === 0 || !/[a-z0-9]/.test(text.charAt(i - 1))) n++; } return n; }
+  /** The ~900 characters of a lesson that hold the most of the asked words. */
+  function aiWindow(x, lx, toks){
+    var pos = [];
+    toks.forEach(function(t, ti){ var i = -1, n = 0; while((i = lx.indexOf(t, i + 1)) !== -1 && n++ < 30) pos.push([i, ti]); });
+    if(!pos.length) return x.slice(0, 900);
+    pos.sort(function(a, b){ return a[0] - b[0]; });
+    var best = pos[0][0], bestN = 0;
+    pos.forEach(function(p){ var have = {}; pos.forEach(function(q){ if(q[0] >= p[0] && q[0] < p[0] + 700) have[q[1]] = 1; }); var n = Object.keys(have).length; if(n > bestN){ bestN = n; best = p[0]; } });
+    var a = Math.max(0, best - 200), b = Math.min(x.length, a + 900);
+    return (a ? '…' : '') + x.slice(a, b) + (b < x.length ? '…' : '');
+  }
+  async function aiRetrieve(q, mode){
+    var out = { lessons: [], qs: [], words: [] }, toks = aiTokens(q);
+    if(!toks.length) return out;
+    var need = function(){ return toks.length <= 2 ? toks.length : Math.ceil(toks.length * 0.6); };
+    try{
+      var idx = await loadSearchIndex();
+      idx.lessons.forEach(function(l){
+        var have = 0, score = 0;
+        toks.forEach(function(t){
+          var inT = srHas(l.lt, t), c = aiCount(l.lx, t);
+          if(inT || c){ have++; score += (inT ? 4 : 0) + Math.min(c, 8) * 0.5 + (t.length > 4 ? 1 : 0); }
+        });
+        if(have >= need() && score >= 2) out.lessons.push({ l: l, score: score + have * 3 });
+      });
+      out.lessons.sort(function(a, b){ return b.score - a.score; });
+      out.lessons = out.lessons.slice(0, mode === 'quiz' ? 2 : 3);
+      idx.qs.forEach(function(x){
+        var have = 0; toks.forEach(function(t){ if(srHas(x.s, t)) have++; });
+        if(have >= need()) out.qs.push({ mod: x.mod, q: x.q, have: have });
+      });
+      out.qs.sort(function(a, b){ return b.have - a.have; });
+    }catch(e){ /* no index offline before first load: answer without notes */ }
+    words.forEach(function(w){
+      var term = (w.term || '').toLowerCase(), t = wordText(w), have = 0;
+      if(!term) return;
+      if(q.toLowerCase().indexOf(term) !== -1 && term.length > 2){ out.words.push({ w: w, s: 9 }); return; }
+      toks.forEach(function(k){ if(srHas(t, k)) have++; });
+      if(have >= need() && mode === 'vocab') out.words.push({ w: w, s: have });
+    });
+    out.words.sort(function(a, b){ return b.s - a.s; });
+    out.words = out.words.slice(0, 4).map(function(x){ return x.w; });
+    return out;
+  }
+  function aiContextText(ctx){
+    var parts = [], room = 7000;
+    var add = function(s){ if(room <= 0) return; s = s.slice(0, room); parts.push(s); room -= s.length; };
+    if(ctx.lessons.length){
+      add('[Notes from the पाठShala app — checked; use them first]');
+      ctx.lessons.forEach(function(r, i){ var l = r.l; add('(' + (i + 1) + ') ' + (MOD_NAME[l.mod] || l.mod) + ' › ' + l.t + '\n' + aiWindow(l.x, l.lx, aiTokens(ctx.q))); });
+    }
+    if(ctx.qs.length){
+      add('[Similar solved questions from the app]');
+      ctx.qs.slice(0, 4).forEach(function(x){ var q = x.q; add('Q: ' + q.q + (q.k === 'e' ? ' Parts: ' + q.o.join(' | ') : ' Options: ' + q.o.join(' | ')) + '\nAnswer: ' + q.o[q.a] + (q.e ? '\nWhy: ' + q.e : '')); });
+    }
+    if(ctx.words.length){
+      add('[From the student’s word register]');
+      ctx.words.forEach(function(w){ add(w.term + ' — ' + [w.english_meaning, w.hindi_meaning, w.synonyms ? 'syn: ' + asArray(w.synonyms).join(', ') : '', w.antonyms ? 'ant: ' + asArray(w.antonyms).join(', ') : '', w.example ? 'e.g. ' + w.example : ''].filter(Boolean).join(' · ')); });
+    }
+    return parts.join('\n\n');
+  }
+
+  // ---- the standing instructions every answer gets ----
+  function aiWeakSummary(){
+    if(!studyBank) return '';
+    var W = weakStats(), tried = 0, right = 0;
+    W.apps.forEach(function(a){ tried += a.tried; right += a.right; });
+    if(!tried) return '';
+    var apps = W.apps.filter(function(a){ return a.tried; }).sort(function(a, b){ return a.acc - b.acc; })
+      .map(function(a){ return a.name + ': ' + Math.round(a.acc * 100) + '% of ' + a.tried; });
+    var weak = W.topics.filter(function(t){ return t.tried >= 3 && t.acc < .8; }).sort(function(a, b){ return a.score - b.score; }).slice(0, 10)
+      .map(function(t){ return t.app + ' › ' + t.tag + ': ' + Math.round(t.acc * 100) + '% (' + (t.tried - t.right) + ' wrong of ' + t.tried + ')'; });
+    var none = W.apps.filter(function(a){ return !a.tried; }).map(function(a){ return a.name; });
+    return 'Overall: ' + Math.round(right * 100 / tried) + '% right of ' + tried + ' questions answered in the app.\nBy app (weakest first): ' + apps.join('; ') +
+      '\nWeakest topics: ' + (weak.join('; ') || 'none under 80% yet') + (none.length ? '\nNot started yet: ' + none.join(', ') : '') +
+      '\nIn the Mistakes book: ' + totalMistakes() + ' questions.';
+  }
+  function aiSystem(c, mode){
+    var days = daysToExam();
+    var lang = {
+      en: 'Reply in simple, clear English (Indian context).',
+      hinglish: 'Reply in Hinglish: conversational Hindi written in Roman (English) letters, mixed with English the way Indian students talk (e.g. “Iska shortcut yeh hai…”). Keep technical terms, names and formulas in English.',
+      hi: 'Reply in Hindi (Devanagari script). Keep formulas, technical terms and proper names the way they appear in the exam; English-language questions and word meanings stay in English with Hindi explanation.'
+    }[c.lang] || '';
+    var len = { short: 'Keep it short: about 150 words, unless a calculation needs more.', normal: 'Medium length: complete, no padding (about 200–450 words).', detailed: 'Be thorough: cover the topic fully, with examples (up to about 900 words).' }[c.len] || '';
+    var modes = {
+      explain: 'MODE — Explain. Structure: the core idea in 1–2 lines → key facts and concepts → how SSC asks it (question patterns, what is asked most) → memory tricks → “🎯 Quick revision” (3–5 bullets) → 2 practice MCQs with answers at the very end (“Answers: 1-b, 2-d”). Any topic is fine, even if the app has no notes on it.',
+      solve: 'MODE — Solve. Show: “⚡ Fast method” (the exam shortcut: options, approximation, a formula or a trick that takes under a minute) → “📝 Step by step” (clear working) → **Answer: …** on its own line (say the option if options are given) → “⚠️ Trap” (the mistake most students make). Double-check every calculation before you answer. If the question is ambiguous or seems wrong, say so.',
+      vocab: 'MODE — Vocabulary. For each word, idiom or phrase: meaning in English and in Hindi, part of speech, a memory trick, synonyms, antonyms, one exam-style sentence, confusing look-alikes, and how SSC tests it (synonym / antonym / idiom / one-word substitution / spelling / cloze).',
+      plan: 'MODE — Brainstorm like a mentor. Think it through with the student: give concrete, realistic plans (day-wise or hour-wise), strategies and priorities by SSC weightage; ask one clarifying question at the end if it would help. Be encouraging, practical and specific.',
+      weak: 'MODE — Weak spots. You are given the student’s real accuracy data from the app. Diagnose what to fix first and why (weightage × weakness), give a 7-day fix plan and specific tips for each weak topic. Mention apps they have not started if those are high-weightage.'
+    }[mode] || '';
+    return [
+      'You are “पाठShala AI”, a friendly, expert mentor for Indian SSC exams, mainly SSC CGL (also CHSL and CPO). You are inside the पाठShala study app.',
+      'The student is preparing for SSC CGL' + (days > 0 ? '; their exam is ' + days + ' day' + (days === 1 ? '' : 's') + ' away.' : '.') + ' Today is ' + new Date().toDateString() + '.',
+      'Exam frame: CGL Tier 1 is 100 MCQs in 60 minutes — General Intelligence & Reasoning, General Awareness, Quantitative Aptitude and English Comprehension, 25 each, 2 marks, −0.5 for a wrong answer. Tier 2 tests Maths, Reasoning, English, General Awareness and Computer, also with negative marking.',
+      'How to answer:',
+      '- Always connect the topic to the exam: what SSC asks about it, the usual question types, and how important it is (only claim frequency or previous-year questions when you are sure; never invent a year or shift).',
+      '- Lead with the answer or the key idea. Use short headings, bullet points, tables for comparisons, and **bold** for facts to remember. Markdown only.',
+      '- Write maths in plain text with Unicode (×, ÷, √, ², ³, π, θ, ≤) — never LaTeX or $ signs.',
+      '- Maths and reasoning: give the fastest exam method and a clear step-by-step method; verify the arithmetic.',
+      '- GK and GS: give exact facts (names, dates, articles, numbers) and one-line memory tricks. If a fact may have changed recently (appointments, schemes, rankings, records, current affairs), say how recent your information is and ask the student to verify.',
+      '- English: the rule plus the typical error SSC hides; for words give meaning (English + Hindi), a trick, synonyms and antonyms.',
+      '- When the message includes notes or questions from the पाठShala app, treat them as correct and prefer them over memory. When they don’t cover the question, answer from your own knowledge — keep the SSC focus.',
+      '- If asked something unrelated to studying, answer briefly and kindly steer back to preparation.',
+      lang, len, modes
+    ].filter(Boolean).join('\n');
+  }
+
+  // ---- a small, safe Markdown renderer for answers ----
+  function aiInline(s){
+    var codes = [];
+    s = s.replace(/`([^`]+)`/g, function(_, c){ codes.push(c); return '\u0000' + (codes.length - 1) + '\u0000'; });
+    s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, function(_, t, u){ return '<a href="' + u.replace(/"/g, '%22') + '" target="_blank" rel="noopener noreferrer">' + t + '</a>'; });
+    s = s.replace(/\*\*([^*]+?)\*\*/g, '<b>$1</b>').replace(/__([^_]+?)__/g, '<b>$1</b>');
+    s = s.replace(/(^|[\s(])\*(?!\s)([^*\n]+?)\*(?=[\s).,;:!?]|$)/g, '$1<i>$2</i>').replace(/(^|[\s(])_(?!\s)([^_\n]+?)_(?=[\s).,;:!?]|$)/g, '$1<i>$2</i>');
+    return s.replace(/\u0000(\d+)\u0000/g, function(_, i){ return '<code>' + codes[+i] + '</code>'; });
+  }
+  function aiMd(src){
+    var lines = escapeHtml(String(src || '').replace(/\r/g, '')).split('\n'), html = '', i = 0, para = [];
+    var flush = function(){ if(para.length){ html += '<p>' + para.map(aiInline).join('<br>') + '</p>'; para = []; } };
+    while(i < lines.length){
+      var ln = lines[i], m;
+      if(/^\s*```/.test(ln)){
+        flush(); var code = []; i++;
+        while(i < lines.length && !/^\s*```/.test(lines[i])) code.push(lines[i++]);
+        i++; html += '<pre><code>' + code.join('\n') + '</code></pre>'; continue;
+      }
+      if(/^\s*\|.*\|\s*$/.test(ln)){
+        flush(); var rows = [];
+        while(i < lines.length && /^\s*\|.*\|\s*$/.test(lines[i])) rows.push(lines[i++]);
+        var cells = function(r){ return r.trim().replace(/^\||\|$/g, '').split('|').map(function(x){ return aiInline(x.trim()); }); };
+        var hasHead = rows.length > 1 && /^[\s|:\-]+$/.test(rows[1]);
+        html += '<div class="ai-table"><table>' + (hasHead ? '<thead><tr>' + cells(rows[0]).map(function(x){ return '<th>' + x + '</th>'; }).join('') + '</tr></thead>' : '') + '<tbody>' +
+          rows.slice(hasHead ? 2 : 0).filter(function(r){ return !/^[\s|:\-]+$/.test(r); }).map(function(r){ return '<tr>' + cells(r).map(function(x){ return '<td>' + x + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table></div>';
+        continue;
+      }
+      if((m = /^\s*(#{1,6})\s+(.*)$/.exec(ln))){ flush(); html += '<h' + (m[1].length <= 2 ? 4 : 5) + '>' + aiInline(m[2].replace(/\s*#+\s*$/, '')) + '</h' + (m[1].length <= 2 ? 4 : 5) + '>'; i++; continue; }
+      if(/^\s*(-{3,}|\*{3,}|_{3,})\s*$/.test(ln)){ flush(); html += '<hr>'; i++; continue; }
+      if(/^\s*([-*•+]|\d+[.)])\s+/.test(ln)){
+        flush(); var ordered = /^\s*\d+[.)]\s+/.test(ln), items = [];
+        while(i < lines.length && /^\s*([-*•+]|\d+[.)])\s+/.test(lines[i]) && /^\s*\d+[.)]\s+/.test(lines[i]) === ordered){
+          var depth = /^(\s*)/.exec(lines[i])[1].length >= 2 ? ' class="sub"' : '';
+          var start = ordered ? +(/^\s*(\d+)/.exec(lines[i])[1]) : 0;
+          items.push([depth, aiInline(lines[i].replace(/^\s*([-*•+]|\d+[.)])\s+/, '')), start]); i++;
+          while(i < lines.length && lines[i].trim() && !/^\s*([-*•+]|\d+[.)])\s+|^\s*#|^\s*\||^\s*```/.test(lines[i])){ items[items.length - 1][1] += '<br>' + aiInline(lines[i].trim()); i++; }
+        }
+        html += ordered ? '<ol start="' + (items[0][2] || 1) + '">' : '<ul>';
+        html += items.map(function(it){ return '<li' + it[0] + '>' + it[1] + '</li>'; }).join('') + (ordered ? '</ol>' : '</ul>');
+        continue;
+      }
+      if((m = /^\s*&gt;\s?(.*)$/.exec(ln))){ flush(); var q = []; while(i < lines.length && (m = /^\s*&gt;\s?(.*)$/.exec(lines[i]))){ q.push(aiInline(m[1])); i++; } html += '<blockquote>' + q.join('<br>') + '</blockquote>'; continue; }
+      if(!ln.trim()){ flush(); i++; continue; }
+      para.push(ln); i++;
+    }
+    flush();
+    return html;
+  }
+
+  // ---- chat log, kept on this device ----
+  function aiLoadChat(){ if(aiChat) return aiChat; try{ aiChat = JSON.parse(lsGet(AI_CHAT_KEY) || '{}') || {}; }catch(e){ aiChat = {}; } if(!Array.isArray(aiChat.msgs)) aiChat.msgs = []; return aiChat; }
+  function aiSaveChat(){ aiChat.msgs = aiChat.msgs.slice(-60); lsSet(AI_CHAT_KEY, JSON.stringify(aiChat)); }
+  function aiModeInfo(id){ return AI_MODES.filter(function(m){ return m[0] === id; })[0] || AI_MODES[0]; }
+
+  function aiMsgHtml(m, i){
+    if(m.r === 'u') return '<div class="ai-msg ai-u"><div class="ai-bub"><span class="ai-tag">' + aiModeInfo(m.mode)[1] + ' ' + escapeHtml(aiModeInfo(m.mode)[2]) + '</span>' + escapeHtml(m.t).replace(/\n/g, '<br>') + '</div></div>';
+    var body = m.err ? '<div class="ai-err">' + escapeHtml(m.err) + '</div>' : aiMd(m.t);
+    var src = '';
+    if(m.src && m.src.length) src += '<div class="ai-src"><span class="ai-badge ok">📖 Used your app’s notes</span>' + m.src.map(function(s){
+      return '<button data-ai-open="' + escapeAttr(s.mod) + '" data-ai-lesson="' + escapeAttr(s.id) + '" style="--sr-c:' + (STUDY[s.mod] ? STUDY[s.mod].color : 'var(--teal)') + '">' + (STUDY[s.mod] ? STUDY[s.mod].ico + ' ' : '') + escapeHtml(MOD_NAME[s.mod] || s.mod) + ' › ' + escapeHtml(s.t) + '</button>';
+    }).join('') + '</div>';
+    if(m.web && m.web.length) src += '<div class="ai-src"><span class="ai-badge web">🌐 Checked on the web</span>' + m.web.slice(0, 6).map(function(w){
+      var host = w.title; try{ if(/^https?:/.test(w.title)) host = new URL(w.title).hostname; }catch(e){}
+      return '<a href="' + escapeAttr(w.uri) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(host) + '</a>';
+    }).join('') + '</div>';
+    if(!m.err && !m.local && !(m.src && m.src.length) && !(m.web && m.web.length) && m.t) src += '<div class="ai-src"><span class="ai-badge">🤖 From AI knowledge — double-check key facts</span></div>';
+    if(m.quiz) src += '<div class="ai-acts"><button class="btn teal sm" data-ai-quiz="' + i + '">▶ Start ' + m.quiz.qs.length + ' questions</button>' + (m.quiz.bank ? '<button class="btn ghost sm" data-ai-quizgen="' + i + '">✨ Make new ones with AI</button>' : '') + '</div>';
+    if(m.local && m.local.length) src += '<div class="ai-local">' + m.local.map(function(x){
+      return '<div class="sr-item sr-q" style="--sr-c:' + STUDY[x.mod].color + '"><span class="sr-ico">' + STUDY[x.mod].ico + '</span><span class="sr-body"><span class="sr-meta">' + escapeHtml(MOD_NAME[x.mod] || '') + (x.q.tag ? ' · ' + escapeHtml(x.q.tag) : '') + '</span><span class="sr-qq">' + escapeHtml(x.q.q) + '</span><span class="sr-ans">✓ ' + escapeHtml(x.q.o[x.q.a]) + '</span>' + (x.q.e ? '<span class="sr-snip">' + escapeHtml(x.q.e) + '</span>' : '') + '</span></div>';
+    }).join('') + '</div>';
+    var acts = m.pending ? '' : '<div class="ai-acts ai-mini">' + (m.t && !m.err ? '<button data-ai-copy="' + i + '">Copy</button>' : '') + (i === aiChat.msgs.length - 1 && i > 0 && aiChat.msgs[i - 1].r === 'u' ? '<button data-ai-retry="' + i + '">↻ Try again</button>' : '') + '</div>';
+    return '<div class="ai-msg ai-a"><div class="ai-card' + (m.pending ? ' typing' : '') + '"><div class="ai-md">' + (m.pending && !m.t ? '<span class="ai-dots"><i></i><i></i><i></i></span>' : body) + '</div>' + src + acts + '</div></div>';
+  }
+  function aiRender(){
+    var log = document.getElementById('askLog'), c = aiCfg();
+    if(!aiReady(c)){
+      log.innerHTML = '<div class="ai-hero"><div class="eyebrow">Optional · free with your own key</div><h1>Ask <span>AI</span></h1><p>' + (c.on ? 'Add your free API key to start.' : 'Turn on the AI tutor to start.') + ' Setup takes about a minute.</p>' +
+        '<div class="dq-actions" style="justify-content:center;"><button class="btn teal" data-ai-settings="1">Open AI settings</button></div></div>';
+      return;
+    }
+    aiLoadChat();
+    if(!aiChat.msgs.length){
+      var mi = aiModeInfo(aiMode);
+      log.innerHTML = '<div class="ai-hero"><div class="eyebrow">SSC CGL mentor · ' + escapeHtml(AI_PROVIDERS[c.provider].name) + '</div><h1>Ask <span>anything</span></h1>' +
+        '<p>Any topic, any doubt — explained the way SSC asks it. When the app has notes on it, the answer uses them and links to the lesson.</p>' +
+        '<div class="ai-modecards">' + AI_MODES.map(function(m){ return '<button data-ai-mode="' + m[0] + '" class="' + (m[0] === aiMode ? 'on' : '') + '"><span>' + m[1] + '</span><b>' + escapeHtml(m[2]) + '</b></button>'; }).join('') + '</div>' +
+        '<div class="sr-try">' + (AI_TRY[aiMode] || []).map(function(t){ return '<button data-ai-try="' + escapeAttr(t) + '">' + escapeHtml(t) + '</button>'; }).join('') + '</div>' +
+        '<p class="ai-small">' + mi[1] + ' ' + escapeHtml(mi[2]) + ' mode · replies in ' + escapeHtml((AI_LANGS.filter(function(l){ return l[0] === c.lang; })[0] || AI_LANGS[0])[1]) + '</p></div>';
+      return;
+    }
+    log.innerHTML = aiChat.msgs.map(aiMsgHtml).join('');
+  }
+  function aiScrollEnd(){ var s = document.getElementById('askScroll'); s.scrollTop = s.scrollHeight; }
+  function aiRenderModes(){
+    document.getElementById('askModes').innerHTML = AI_MODES.map(function(m){ return '<button type="button" data-ai-mode="' + m[0] + '" class="' + (m[0] === aiMode ? 'on' : '') + '">' + m[1] + ' ' + escapeHtml(m[2]) + '</button>'; }).join('');
+    document.getElementById('askInput').placeholder = aiModeInfo(aiMode)[3];
+    var c = aiCfg(), sel = document.getElementById('askLang');
+    sel.value = c.lang;
+    document.getElementById('askModelLab').textContent = aiReady(c) ? aiModel(c) : '';
+  }
+  function aiSetMode(id){ aiMode = id; aiRenderModes(); if(!aiLoadChat().msgs.length) aiRender(); }
+
+  // ---- asking ----
+  function aiUpdateLast(full){
+    var msgs = aiChat.msgs, i = msgs.length - 1, log = document.getElementById('askLog');
+    var s = document.getElementById('askScroll'), atEnd = s.scrollHeight - s.scrollTop - s.clientHeight < 80;
+    var last = log.lastElementChild;
+    if(full || !last){ aiRender(); }
+    else { var tmp = document.createElement('div'); tmp.innerHTML = aiMsgHtml(msgs[i], i); log.replaceChild(tmp.firstChild, last); }
+    if(atEnd) aiScrollEnd();
+  }
+  function aiSetBusy(b){
+    aiBusy = b;
+    var send = document.getElementById('askSend');
+    send.classList.toggle('stop', !!b);
+    send.setAttribute('aria-label', b ? 'Stop' : 'Send');
+    send.innerHTML = b ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"></rect></svg>'
+      : '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"></path></svg>';
+  }
+  async function aiAsk(text, mode, retry){
+    var c = aiCfg();
+    if(aiBusy) return;
+    if(!aiReady(c)){ aiOpenSettings(); return; }
+    aiLoadChat();
+    text = String(text || '').trim();
+    if(mode === 'weak' && !text) text = AI_TRY.weak[0];
+    if(!text) return;
+    if(!retry) aiChat.msgs.push({ r: 'u', t: text, mode: mode, ts: Date.now() });
+    var a = { r: 'a', t: '', mode: mode, pending: true, ts: Date.now() };
+    aiChat.msgs.push(a);
+    aiRender(); aiScrollEnd();
+    var ctl = new AbortController();
+    aiSetBusy(ctl);
+    try{
+      var ctx = await aiRetrieve(text, mode);
+      ctx.q = text;
+      if(mode === 'quiz') return await aiQuiz(c, text, ctx, a, ctl, false);
+      var extra = '';
+      if(mode === 'weak'){
+        try{ await loadStudyBank(); }catch(e){}
+        var ws = aiWeakSummary();
+        if(!ws){ a.pending = false; a.local = []; a.t = 'There’s nothing to analyse yet — answer some questions in any mini app, the Mistakes book or a mixed mock, then ask again. Meanwhile, try **🧠 Brainstorm** for a study plan.'; aiSaveChat(); aiUpdateLast(true); return; }
+        extra = '[The student’s accuracy data from the app]\n' + ws;
+      }
+      var ctxText = mode === 'weak' || mode === 'plan' ? '' : aiContextText(ctx);
+      if(ctxText) a.src = ctx.lessons.map(function(r){ return { mod: r.l.mod, id: r.l.id, t: r.l.t }; });
+      // the conversation so far (text only) + this question with its notes
+      var hist = [], prior = aiChat.msgs.slice(0, -2).filter(function(m){ return m.t && !m.err && !m.local; }).slice(-8);
+      prior.forEach(function(m){ hist.push({ role: m.r === 'u' ? 'user' : 'assistant', text: m.t.slice(0, 4000) }); });
+      while(hist.length && hist[0].role !== 'user') hist.shift();
+      hist.push({ role: 'user', text: (extra ? extra + '\n\n' : '') + (ctxText ? ctxText + '\n\n[Question]\n' : '') + text });
+      var web = c.provider === 'gemini' && c.web && mode !== 'solve' && mode !== 'weak';
+      var t0 = 0;
+      var res = await aiStream(c, aiSystem(c, mode), hist, { web: web, signal: ctl.signal, onText: function(t){
+        a.t = t;
+        var now = Date.now(); if(now - t0 > 60){ t0 = now; aiUpdateLast(false); }
+      } });
+      a.t = res.text; a.web = res.web;
+      if(/MAX_TOKENS|length/i.test(res.finish)) a.t += '\n\n*(Answer cut short — ask “continue” for the rest.)*';
+    }catch(e){
+      if(e && e.name === 'AbortError'){ if(!a.t) a.err = 'Stopped.'; }
+      else if(!navigator.onLine || (e instanceof TypeError)){
+        var loc = await aiRetrieve(text, mode).catch(function(){ return { lessons: [], qs: [] }; });
+        a.err = !navigator.onLine ? 'You’re offline, so the AI can’t answer. Here’s what the app has on this:' : 'Couldn’t reach the AI service (network or browser blocked it). Here’s what the app has on this:';
+        a.src = loc.lessons.map(function(r){ return { mod: r.l.mod, id: r.l.id, t: r.l.t }; });
+        a.local = loc.qs.slice(0, 3);
+        if(!a.src.length && !a.local.length) a.err = a.err.replace(/ Here’s what the app has on this:$/, ' Nothing in the app’s notes matches it either.');
+      }
+      else a.err = (e && e.message) || 'Something went wrong.';
+    }finally{
+      a.pending = false;
+      if(aiChat.msgs.indexOf(a) !== -1){ aiSaveChat(); aiUpdateLast(true); }
+      aiSetBusy(null);
+    }
+  }
+  /** Quiz me: questions from the app's bank when it has enough on the topic; otherwise the AI writes them. */
+  async function aiQuiz(c, topic, ctx, a, ctl, forceAi){
+    var bank = (ctx.qs || []).map(function(x){ return x.q; });
+    if(!forceAi && bank.length >= 5){
+      a.t = 'Found **' + bank.length + ' question' + (bank.length === 1 ? '' : 's') + '** in the app on “' + topic.replace(/[*_`]/g, '') + '”. Your answers count towards your progress, and wrong ones go to the Mistakes book.';
+      a.quiz = { title: topic, bank: true, qs: shuffleArr(bank.slice()).slice(0, 15).map(function(q){ return { mod: q.mod, id: q.id }; }) };
+      a.src = ctx.lessons.map(function(r){ return { mod: r.l.mod, id: r.l.id, t: r.l.t }; });
+      return;
+    }
+    var langNote = c.lang === 'hi' ? 'Write the questions in Hindi (keep English-language questions in English).' : c.lang === 'hinglish' ? 'Write the questions in simple English; explanations may be in Hinglish.' : 'Write in English.';
+    var ctxText = aiContextText(ctx);
+    var sys = 'You write SSC CGL Tier 1 practice MCQs. Exactly 4 options each, one correct; options must be plausible and distinct. Match real SSC difficulty and style (mix of easy, moderate and a few tricky). ' +
+      'For maths and reasoning, compute every answer carefully and double-check it. ' + langNote +
+      ' Return ONLY JSON, no Markdown: {"questions":[{"q":"question","o":["A","B","C","D"],"a":0,"e":"one or two line explanation with the trick"}]} where "a" is the 0-based index of the correct option.';
+    var user = (ctxText ? ctxText + '\n\n' : '') + 'Write 10 MCQs on: ' + topic;
+    a.t = '';
+    var res = await aiStream(c, sys, [{ role: 'user', text: user }], { json: true, signal: ctl.signal, onText: function(){} });
+    var raw = res.text.replace(/^[\s\S]*?(\{[\s\S]*\})[\s\S]*$/, '$1'), data;
+    try{ data = JSON.parse(raw); }catch(e){ throw new Error('The AI’s questions came back in a broken format. Press “Try again”.'); }
+    var qs = (data.questions || data || []).filter(function(q){ return q && q.q && Array.isArray(q.o) && q.o.length >= 2 && q.o.length <= 5 && typeof q.a === 'number' && q.a >= 0 && q.a < q.o.length; })
+      .map(function(q){ return { q: String(q.q), o: q.o.map(String), a: q.a, e: String(q.e || '') }; });
+    if(!qs.length) throw new Error('The AI didn’t return usable questions. Press “Try again”.');
+    a.t = 'Made **' + qs.length + ' new questions** on “' + topic.replace(/[*_`]/g, '') + '”. ' + (bank.length ? '' : 'The app has no questions on this, so these are written by AI — tell me if one looks wrong.');
+    a.quiz = { title: topic, ai: true, qs: qs };
+  }
+  function aiStartQuiz(m){
+    if(!m || !m.quiz) return;
+    var qs = [];
+    if(m.quiz.bank){
+      qs = m.quiz.qs.map(function(r){ return studyBankIdx && studyBankIdx[r.mod + ':' + r.id]; }).filter(Boolean).map(prepQ);
+      if(!qs.length){ loadStudyBank().then(function(){ aiStartQuiz(m); }).catch(function(){ showToast('Couldn’t load the question bank.'); }); return; }
+    } else {
+      qs = m.quiz.qs.map(function(q, i){ return prepQ({ mod: 'ai', id: 'ai' + i, q: q.q, o: q.o, a: q.a, e: q.e, tag: m.quiz.title, sh: 1 }); });
+    }
+    openDrill('Practise · ' + m.quiz.title);
+    document.getElementById('drillBackLabel').textContent = 'Ask AI';
+    startPractice(qs, { title: m.quiz.title, backLabel: 'Back to Ask AI', back: function(){ closeDrill(false); } });
+  }
+
+  // ---- the Ask page ----
+  function openAsk(prefill, mode){
+    closeAllMenus();
+    var c = aiCfg();
+    if(!c.on){ aiOpenSettings(); return; }
+    if(mode) aiMode = mode;
+    aiOpen = true;
+    document.getElementById('askPage').classList.add('open');
+    document.body.classList.add('study-on');
+    try{ history.pushState({ ask: 1 }, '', '#ask'); }catch(e){}
+    aiRenderModes(); aiRender(); aiScrollEnd();
+    var inp = document.getElementById('askInput');
+    if(typeof prefill === 'string'){ inp.value = prefill; aiGrow(); }
+    if(aiReady(c) && !matchMedia('(pointer: coarse)').matches) setTimeout(function(){ inp.focus(); }, 30);
+    loadSearchIndex().catch(function(){});
+  }
+  function closeAsk(fromHistory){
+    if(!aiOpen) return;
+    aiOpen = false;
+    document.getElementById('askPage').classList.remove('open');
+    if(!studyOpen && !drillOpen && !searchOpen) document.body.classList.remove('study-on');
+    if(!fromHistory && location.hash === '#ask'){ try{ history.back(); }catch(e){} }
+  }
+  function aiGrow(){ var t = document.getElementById('askInput'); t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 180) + 'px'; }
+  function aiSubmit(){
+    if(aiBusy){ aiBusy.abort(); return; }
+    var inp = document.getElementById('askInput'), v = inp.value;
+    if(!v.trim() && aiMode !== 'weak') { inp.focus(); return; }
+    inp.value = ''; aiGrow();
+    aiAsk(v, aiMode, false);
+  }
+  document.getElementById('askBtn').addEventListener('click', function(){ openAsk(); });
+  document.getElementById('askBack').addEventListener('click', function(){ closeAsk(false); });
+  document.getElementById('askSettings').addEventListener('click', function(){ aiOpenSettings(); });
+  document.getElementById('askNew').addEventListener('click', function(){
+    if(aiBusy) aiBusy.abort();
+    aiLoadChat();
+    if(aiChat.msgs.length && !confirm('Start a new chat? This one will be cleared.')) return;
+    aiChat.msgs = []; aiSaveChat(); aiRender();
+  });
+  document.getElementById('askLang').addEventListener('change', function(){ var c = aiCfg(); c.lang = this.value; aiSave(c); if(!aiLoadChat().msgs.length) aiRender(); showToast('Replies will be in ' + this.options[this.selectedIndex].text + '.'); });
+  document.getElementById('askForm').addEventListener('submit', function(ev){ ev.preventDefault(); aiSubmit(); });
+  document.getElementById('askInput').addEventListener('input', aiGrow);
+  document.getElementById('askInput').addEventListener('keydown', function(ev){
+    if(ev.key === 'Escape'){ ev.stopPropagation(); closeAsk(false); return; }
+    if(ev.key === 'Enter' && !ev.shiftKey && !ev.isComposing && !matchMedia('(pointer: coarse)').matches){ ev.preventDefault(); aiSubmit(); }
+  });
+  document.getElementById('askModes').addEventListener('click', function(ev){ var b = ev.target.closest('[data-ai-mode]'); if(b){ aiSetMode(b.dataset.aiMode); document.getElementById('askInput').focus(); } });
+  document.getElementById('askLog').addEventListener('click', function(ev){
+    var b;
+    if((b = ev.target.closest('[data-ai-settings]'))){ aiOpenSettings(); return; }
+    if((b = ev.target.closest('[data-ai-mode]'))){ aiSetMode(b.dataset.aiMode); return; }
+    if((b = ev.target.closest('[data-ai-try]'))){ aiAsk(b.dataset.aiTry, aiMode, false); return; }
+    if((b = ev.target.closest('[data-ai-open]'))){ openStudy(b.dataset.aiOpen, false, b.dataset.aiLesson); return; }
+    if((b = ev.target.closest('[data-ai-copy]'))){ copyTextToClipboard(aiChat.msgs[+b.dataset.aiCopy].t).then(function(){ showToast('Copied.'); }); return; }
+    if((b = ev.target.closest('[data-ai-quiz]'))){ aiStartQuiz(aiChat.msgs[+b.dataset.aiQuiz]); return; }
+    if((b = ev.target.closest('[data-ai-quizgen]'))){
+      var m = aiChat.msgs[+b.dataset.aiQuizgen], u = aiChat.msgs[+b.dataset.aiQuizgen - 1];
+      if(!u || aiBusy) return;
+      var c = aiCfg(), a = { r: 'a', t: '', mode: 'quiz', pending: true, ts: Date.now() }, ctl = new AbortController();
+      aiChat.msgs.push(a); aiRender(); aiScrollEnd(); aiSetBusy(ctl);
+      aiRetrieve(u.t, 'quiz').then(function(ctx){ ctx.q = u.t; return aiQuiz(c, m.quiz.title, ctx, a, ctl, true); })
+        .catch(function(e){ a.err = e && e.name === 'AbortError' ? 'Stopped.' : ((e && e.message) || 'Something went wrong.'); })
+        .then(function(){ a.pending = false; aiSaveChat(); aiUpdateLast(true); aiSetBusy(null); });
+      return;
+    }
+    if((b = ev.target.closest('[data-ai-retry]'))){
+      var i = +b.dataset.aiRetry, q = aiChat.msgs[i - 1];
+      aiChat.msgs.splice(i, 1);
+      aiAsk(q.t, q.mode, true);
+    }
+  });
+  if(location.hash === '#ask'){ try{ history.replaceState(null, '', location.pathname + location.search); }catch(e){} }
+  window.addEventListener('popstate', function(){ if(aiOpen && location.hash !== '#ask' && !studyOpen && !drillOpen) closeAsk(true); });
+
+  // ---- settings ----
+  function aiOpenSettings(){
+    closeAllMenus();
+    var c = aiCfg();
+    var draft = { provider: c.provider, keys: Object.assign({}, c.keys), models: Object.assign({}, c.models), modelList: Object.assign({}, c.modelList) };
+    var opt = function(list, v){ return list.map(function(x){ return '<option value="' + x[0] + '"' + (x[0] === v ? ' selected' : '') + '>' + escapeHtml(x[1]) + '</option>'; }).join(''); };
+    modalBodyRef().innerHTML = '<h3>AI tutor <small class="ai-opt">optional</small></h3>' +
+      '<p class="help" style="margin-top:0;">Ask any SSC doubt — topics, questions, words, plans — and get answers made for the exam, using the app’s notes where it has them. It uses <b>your own free API key</b>: the key is saved on this device only and goes straight from your browser to the AI company, never to पाठShala.</p>' +
+      '<div class="field"><label class="ai-switch"><input type="checkbox" id="aiOn"' + (c.on ? ' checked' : '') + '><span><b>Turn on the AI tutor</b><small>Adds an ✨ Ask AI button to the top bar</small></span></label></div>' +
+      '<div id="aiMore"' + (c.on ? '' : ' style="display:none;"') + '>' +
+        '<div class="field"><label class="field-label" for="aiProv">AI service</label><select id="aiProv">' + Object.keys(AI_PROVIDERS).map(function(p){ return '<option value="' + p + '"' + (p === c.provider ? ' selected' : '') + '>' + escapeHtml(AI_PROVIDERS[p].name) + '</option>'; }).join('') + '</select><p class="help" id="aiProvNote"></p></div>' +
+        '<div class="field"><label class="field-label" for="aiKeyIn">Your API key</label><div class="ai-keyrow"><input type="password" id="aiKeyIn" autocomplete="off" spellcheck="false" autocapitalize="off"><button type="button" class="btn ghost sm" id="aiKeyShow">Show</button></div>' +
+          '<p class="help" id="aiKeyHelp"></p></div>' +
+        '<div class="field"><label class="field-label" for="aiModel">Model</label><select id="aiModel"></select><p class="help">Press <b>Check key</b> to list every model your key can use.</p></div>' +
+        '<div class="field-2col"><div class="field"><label class="field-label" for="aiLang">Reply language</label><select id="aiLang">' + opt(AI_LANGS, c.lang) + '</select></div>' +
+          '<div class="field"><label class="field-label" for="aiLen">Answer length</label><select id="aiLen">' + opt(AI_LENS, c.len) + '</select></div></div>' +
+        '<div class="field" id="aiWebRow"><label class="ai-switch"><input type="checkbox" id="aiWeb"' + (c.web ? ' checked' : '') + '><span><b>Let Gemini search Google</b><small>Fresher answers for current affairs, with source links. Uses a separate, smaller free allowance.</small></span></label></div>' +
+        '<p class="help ai-privacy">Good to know: on free plans the AI company may use what you send to improve its models — don’t paste personal details. Answers can be wrong; check facts that matter against official sources.</p>' +
+        '<div id="aiCheckMsg" class="help" role="status"></div>' +
+      '</div>' +
+      '<div class="modal-actions"><button class="btn ghost" id="aiRemove" style="margin-right:auto;">Remove key</button><button class="btn ghost" id="aiCancel">Cancel</button><button class="btn ghost" id="aiCheck">Check key</button><button class="btn teal" id="aiSaveBtn">Save</button></div>';
+    modalBgRef().classList.add('open');
+    var $ = function(id){ return document.getElementById(id); };
+    var fillProvider = function(){
+      var p = draft.provider, P = AI_PROVIDERS[p];
+      $('aiProvNote').textContent = P.note;
+      $('aiKeyIn').value = draft.keys[p] || '';
+      $('aiKeyIn').placeholder = 'Paste your ' + P.name + ' key (' + P.keyHint + ')';
+      $('aiKeyHelp').innerHTML = '<a href="' + P.keyUrl + '" target="_blank" rel="noopener noreferrer">Get a free key from ' + escapeHtml(P.name) + ' ›</a> — sign in, create a key, copy it and paste it here.';
+      var list = (draft.modelList[p] || []).slice(), cur = draft.models[p] || P.def;
+      if(list.indexOf(cur) === -1) list.unshift(cur);
+      $('aiModel').innerHTML = list.map(function(m){ return '<option value="' + escapeAttr(m) + '"' + (m === cur ? ' selected' : '') + '>' + escapeHtml(m) + (m === P.def ? ' (default)' : '') + '</option>'; }).join('');
+      $('aiWebRow').style.display = P.web ? '' : 'none';
+      $('aiCheckMsg').textContent = '';
+      $('aiRemove').style.display = draft.keys[p] ? '' : 'none';
+    };
+    var keep = function(){ draft.keys[draft.provider] = $('aiKeyIn').value.trim(); draft.models[draft.provider] = $('aiModel').value; };
+    fillProvider();
+    $('aiOn').addEventListener('change', function(){ $('aiMore').style.display = this.checked ? '' : 'none'; });
+    $('aiProv').addEventListener('change', function(){ keep(); draft.provider = this.value; fillProvider(); });
+    $('aiKeyShow').addEventListener('click', function(){ var k = $('aiKeyIn'); k.type = k.type === 'password' ? 'text' : 'password'; this.textContent = k.type === 'password' ? 'Show' : 'Hide'; });
+    var close = function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML = ''; };
+    $('aiCancel').addEventListener('click', close);
+    $('aiRemove').addEventListener('click', function(){
+      if(!confirm('Remove the ' + AI_PROVIDERS[draft.provider].name + ' key from this device?')) return;
+      draft.keys[draft.provider] = ''; var cc = aiCfg(); delete cc.keys[draft.provider]; aiSave(cc); fillProvider(); showToast('Key removed from this device.');
+      if(aiOpen){ aiRenderModes(); aiRender(); }
+    });
+    $('aiCheck').addEventListener('click', async function(){
+      keep();
+      var p = draft.provider, k = draft.keys[p], msg = $('aiCheckMsg'), btn = this;
+      if(!k){ msg.innerHTML = '<span class="ai-bad">Paste a key first.</span>'; return; }
+      btn.disabled = true; msg.textContent = 'Checking…';
+      try{
+        var list = await aiListModels(p, k);
+        draft.modelList[p] = list;
+        var P = AI_PROVIDERS[p], cur = draft.models[p] || P.def;
+        if(list.length && list.indexOf(cur) === -1) draft.models[p] = list.filter(function(m){ return m === P.def; })[0] || list.filter(function(m){ return /flash/.test(m); })[0] || list[0];
+        fillProvider();
+        msg.innerHTML = '<span class="ai-good">✓ Key works.</span> ' + (list.length ? list.length + ' model' + (list.length === 1 ? '' : 's') + ' available — the list above is updated.' : 'No free models were listed; the default will be tried.') + ' Press Save.';
+      }catch(e){ msg.innerHTML = '<span class="ai-bad">' + escapeHtml(!navigator.onLine ? 'You’re offline — connect and try again.' : (e instanceof TypeError ? 'Couldn’t reach ' + AI_PROVIDERS[p].name + '. Check your connection (or an ad blocker) and try again.' : e.message)) + '</span>'; }
+      btn.disabled = false;
+    });
+    $('aiSaveBtn').addEventListener('click', function(){
+      keep();
+      var cc = aiCfg();
+      cc.on = $('aiOn').checked;
+      cc.provider = draft.provider;
+      Object.keys(draft.keys).forEach(function(p){ if(draft.keys[p]) cc.keys[p] = draft.keys[p]; else delete cc.keys[p]; });
+      cc.models = draft.models; cc.modelList = draft.modelList;
+      cc.lang = $('aiLang').value; cc.len = $('aiLen').value; cc.web = $('aiWeb').checked;
+      aiSave(cc);
+      close();
+      if(cc.on && !cc.keys[cc.provider]){ showToast('AI tutor is on — add a key to start asking.'); }
+      else showToast(cc.on ? 'AI tutor is ready — tap ✨ in the top bar.' : 'AI tutor is off.');
+      if(aiOpen){ if(!cc.on) closeAsk(false); else { aiRenderModes(); aiRender(); } }
+    });
+  }
+  document.getElementById('aiSettingsBtn').addEventListener('click', aiOpenSettings);
 
 })();
