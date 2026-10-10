@@ -1480,7 +1480,11 @@
     if(c.rs){ rs = pickFrom(c.rsMods, c.rs); rs.forEach(function(q){ q.sec = 'rs'; }); }
     var qs = shuffleArr(en).concat(shuffleArr(mt), shuffleArr(rs), shuffleArr(gs));
     if(!qs.length){ showToast('No questions available for that choice.'); return; }
-    drill = { kind: 'mock', phase: 'run', qs: qs, i: 0, secs: qs.length * 36, start: Date.now(), marked: {} };
+    beginMock(qs);
+  }
+  /** Run a timed mock on any list of questions (each with .sec). extra: { topic, back } for a one-topic mock. */
+  function beginMock(qs, extra){
+    drill = Object.assign({ kind: 'mock', phase: 'run', qs: qs, i: 0, secs: qs.length * 36, start: Date.now(), marked: {} }, extra || {});
     clearInterval(drillTimer);
     drillTimer = setInterval(tickMock, 1000);
     tickMock();
@@ -1532,11 +1536,11 @@
     var right = sec.en.r + sec.gs.r + sec.mt.r + sec.rs.r, wrong = sec.en.w + sec.gs.w + sec.mt.w + sec.rs.w, skipped = d.qs.length - right - wrong;
     addGoalExtra((right + wrong) * GOAL_PER_Q);
     var secsUsed = Math.min(d.secs, Math.round((Date.now() - d.start) / 1000));
-    var h = studyState('mocks'); h.list = (Array.isArray(h.list) ? h.list : []).concat([{ at: Date.now(), score: score, max: d.qs.length * 2, right: right, wrong: wrong, skipped: skipped, secs: secsUsed, en: { r: sec.en.r, t: sec.en.t }, gs: { r: sec.gs.r, t: sec.gs.t }, mt: { r: sec.mt.r, t: sec.mt.t }, rs: { r: sec.rs.r, t: sec.rs.t } }]).slice(-50);
-    setStudyState('mocks', h);
+    if(!d.topic){ var h = studyState('mocks'); h.list = (Array.isArray(h.list) ? h.list : []).concat([{ at: Date.now(), score: score, max: d.qs.length * 2, right: right, wrong: wrong, skipped: skipped, secs: secsUsed, en: { r: sec.en.r, t: sec.en.t }, gs: { r: sec.gs.r, t: sec.gs.t }, mt: { r: sec.mt.r, t: sec.mt.t }, rs: { r: sec.rs.r, t: sec.rs.t } }]).slice(-50);
+    setStudyState('mocks', h); }   // a one-topic mock stays out of the mixed-mock score history
     var pct = function(r, t){ return t ? Math.round(r * 100 / t) + '%' : '—'; };
     var review = d.qs.filter(function(q){ return q.pick !== q.a; });
-    drillBody('<div class="dq-hero"><div class="eyebrow">' + (timeUp ? 'Time up · ' : '') + 'Mixed mock result</div>' +
+    drillBody('<div class="dq-hero"><div class="eyebrow">' + (timeUp ? 'Time up · ' : '') + (d.topic ? 'Mock · ' + escapeHtml(d.topic) : 'Mixed mock result') + '</div>' +
       '<div class="dq-score"><b>' + score + '</b><span>/ ' + (d.qs.length * 2) + '</span></div>' +
       '<p>' + right + ' right · ' + wrong + ' wrong · ' + skipped + ' skipped · ' + Math.floor(secsUsed / 60) + ' min ' + (secsUsed % 60) + ' s</p></div>' +
       '<div class="dq-kpis">' +
@@ -1546,14 +1550,14 @@
         (sec.gs.t ? '<div><b>' + pct(sec.gs.r, sec.gs.t) + '</b><span>General Studies · ' + sec.gs.r + '/' + sec.gs.t + '</span></div>' : '') +
         Object.keys(byMod).map(function(m){ return '<div style="--dq-c:' + (STUDY[m] ? STUDY[m].color : 'var(--mustard)') + '"><b>' + pct(byMod[m].r, byMod[m].t) + '</b><span>' + escapeHtml(MOD_NAME[m]) + ' · ' + byMod[m].r + '/' + byMod[m].t + '</span></div>'; }).join('') +
       '</div>' +
-      '<div class="dq-actions"><button class="btn teal" id="mkAgain">New mock test</button><button class="btn ghost" id="mkMist">Open Mistakes book</button></div>' +
+      '<div class="dq-actions"><button class="btn teal" id="mkAgain">' + (d.back ? 'Back to Ask AI' : 'New mock test') + '</button><button class="btn ghost" id="mkMist">Open Mistakes book</button></div>' +
       (review.length ? '<h3 class="dq-h3">Review · ' + review.length + ' to learn</h3><div class="dq-list">' + review.map(function(q){
         return '<div class="dq-rev" style="--dq-c:' + (STUDY[q.mod] ? STUDY[q.mod].color : 'var(--mustard)') + '"><div class="dq-meta"><span>' + escapeHtml(MOD_NAME[q.mod]) + '</span>' + (q.tag ? '<span>' + escapeHtml(q.tag) + '</span>' : '') + '<span>' + (q.pick === null ? 'Skipped' : 'You chose ' + 'ABCD'.charAt(q.pick)) + '</span></div>' +
           '<div class="dq-q">' + escapeHtml(q.q) + '</div>' +
           (q.src && q.src.k === 'e' ? '<div class="dq-parts">' + q.o.map(function(o, i){ return '<span class="' + (i === q.a ? 'bad' : '') + '">' + escapeHtml(o) + '</span>'; }).join(' ') + '</div>' : '') +
           '<div class="dq-ans">' + (q.src && q.src.k === 'e' ? (/no error/i.test(q.o[q.a]) ? '✓ No error' : 'Error is in: ' + escapeHtml(q.o[q.a])) : '✓ ' + escapeHtml(q.o[q.a])) + '</div>' + (q.e ? '<div class="dq-exp">' + escapeHtml(q.e) + '</div>' : '') + '</div>';
       }).join('') + '</div>' : '<div class="dq-empty">Perfect paper. 🏆</div>'));
-    document.getElementById('mkAgain').addEventListener('click', function(){ drill = { kind: 'mock', phase: 'setup' }; renderMockSetup(); });
+    document.getElementById('mkAgain').addEventListener('click', function(){ if(d.back){ d.back(); return; } drill = { kind: 'mock', phase: 'setup' }; renderMockSetup(); });
     document.getElementById('mkMist').addEventListener('click', function(){ document.getElementById('drillTitle').textContent = 'Mistakes book'; drill = { kind: 'mistakes', phase: 'list', only: null }; renderMistakes(); });
   }
   document.addEventListener('keydown', function(ev){
@@ -6842,7 +6846,9 @@ listBlock,
     ['explain', '📚', 'Explain', 'Explain a topic for SSC (e.g. Chola administration)'],
     ['solve', '🧮', 'Solve', 'Paste a question, with options if any…'],
     ['vocab', '🔤', 'Vocab', 'A word, idiom or phrase…'],
+    ['pyq', '📜', 'PYQs', 'A topic — see its previous-year questions…'],
     ['quiz', '❓', 'Quiz me', 'A topic to be quizzed on…'],
+    ['mock', '📝', 'Mock test', 'A topic for a timed mock test…'],
     ['plan', '🧠', 'Brainstorm', 'Plan, strategy or a doubt to talk through…'],
     ['weak', '🎯', 'My weak spots', 'Anything to add? Or just press send']
   ];
@@ -6852,8 +6858,23 @@ listBlock,
     vocab: ['ubiquitous', 'To beat about the bush', 'One word for “a person who hates mankind”'],
     quiz: ['Mughal Empire', 'Profit and loss', 'Vitamins and deficiency diseases'],
     plan: ['Make a 30-day plan for CGL Tier 1', 'How should I attempt Tier 1 to avoid negative marking?'],
-    weak: ['What should I fix first this week?']
+    weak: ['What should I fix first this week?'],
+    pyq: ['Fundamental Rights', 'Percentage', 'Indian National Movement', 'One word substitution'],
+    mock: ['Polity', 'Time and work', 'Synonyms and antonyms', 'Physics: light']
   };
+  // how an answer should look; the chips sit under the mode chips for these modes
+  var AI_STYLES = [
+    ['auto', '✨', 'Auto', ''],
+    ['quick', '⚡', 'Quick answer', 'STYLE — Quick: only the answer or solution in a few lines (for a question: the answer and the fastest method in at most 5 lines). No headings, no quick-revision list, no practice MCQs.'],
+    ['steps', '🪜', 'Step by step', 'STYLE — Step by step: short numbered steps only, one idea per step, ending with the answer or the key takeaway. Skip long theory.'],
+    ['detail', '📖', 'In detail', 'STYLE — In detail: explain fully — the concept, why it works, every sub-point, exceptions, and exactly how SSC asks it.'],
+    ['examples', '🧩', 'Detail + examples', 'STYLE — Detail with examples: explain fully AND give at least 4 worked examples (SSC-level solved questions or real instances), from easy to hard, each with its solution.'],
+    ['basics', '🐣', 'From basics', 'STYLE — From basics: assume the student is new to this. Start from zero in simple language with everyday analogies, then build up to SSC level.'],
+    ['notes', '📝', 'Revision notes', 'STYLE — Revision notes: a crisp one-page revision sheet — bullet points and tables of facts to memorise, no long sentences.'],
+    ['tricks', '🎯', 'Tricks only', 'STYLE — Tricks only: only shortcuts, mnemonics, elimination tricks and traps, each with a one-line example.']
+  ];
+  var AI_STYLED = { explain: 1, solve: 1, vocab: 1, pyq: 1 };
+  function aiStyleInfo(id){ return AI_STYLES.filter(function(x){ return x[0] === id; })[0] || AI_STYLES[0]; }
   MOD_NAME.ai = 'AI quiz';
   var aiOpen = false, aiMode = 'explain', aiChat = null, aiBusy = null;
 
@@ -6899,7 +6920,7 @@ listBlock,
   async function aiStream(c, sys, msgs, opts){
     opts = opts || {};
     var key = c.keys[c.provider], model = aiModel(c), res;
-    var maxTok = opts.test ? 512 : c.len === 'detailed' ? 8192 : 6144;
+    var maxTok = opts.test ? 512 : (c.len === 'detailed' || opts.json) ? 8192 : 6144;
     if(c.provider === 'gemini'){
       var body = {
         systemInstruction: { parts: [{ text: sys }] },
@@ -7135,7 +7156,7 @@ listBlock,
       '\nWeakest topics: ' + (weak.join('; ') || 'none under 80% yet') + (none.length ? '\nNot started yet: ' + none.join(', ') : '') +
       '\nIn the Mistakes book: ' + totalMistakes() + ' questions.';
   }
-  function aiSystem(c, mode){
+  function aiSystem(c, mode, style){
     var days = daysToExam();
     var lang = {
       en: 'Reply in simple, clear English (Indian context).',
@@ -7148,6 +7169,7 @@ listBlock,
       solve: 'MODE — Solve. Show: “⚡ Fast method” (the exam shortcut: options, approximation, a formula or a trick that takes under a minute) → “📝 Step by step” (clear working) → **Answer: …** on its own line (say the option if options are given) → “⚠️ Trap” (the mistake most students make). Double-check every calculation before you answer. If the question is ambiguous or seems wrong, say so.',
       vocab: 'MODE — Vocabulary. For each word, idiom or phrase: meaning in English and in Hindi, part of speech, a memory trick, synonyms, antonyms, one exam-style sentence, confusing look-alikes, and how SSC tests it (synonym / antonym / idiom / one-word substitution / spelling / cloze).',
       plan: 'MODE — Brainstorm like a mentor. Think it through with the student: give concrete, realistic plans (day-wise or hour-wise), strategies and priorities by SSC weightage; ask one clarifying question at the end if it would help. Be encouraging, practical and specific.',
+      pyq: 'MODE — Previous-year questions (PYQs). Give 8–10 SSC previous-year questions on the topic (CGL first, then CHSL, CPO, MTS, Selection Post). Name the exam, year and shift ONLY when you are sure the question is real; otherwise label it “PYQ-style”. For each: the question, 4 options, **Answer**, and a one-line solution or fact. Finish with how often the topic appears and which pattern repeats. Use the app’s questions when they are given.',
       weak: 'MODE — Weak spots. You are given the student’s real accuracy data from the app. Diagnose what to fix first and why (weightage × weakness), give a 7-day fix plan and specific tips for each weak topic. Mention apps they have not started if those are high-weightage.'
     }[mode] || '';
     return [
@@ -7163,8 +7185,23 @@ listBlock,
       '- English: the rule plus the typical error SSC hides; for words give meaning (English + Hindi), a trick, synonyms and antonyms.',
       '- When the message includes notes or questions from the पाठShala app, treat them as correct and prefer them over memory. When they don’t cover the question, answer from your own knowledge — keep the SSC focus.',
       '- If asked something unrelated to studying, answer briefly and kindly steer back to preparation.',
-      lang, len, modes
+      lang, len, modes,
+      AI_STYLED[mode] && style && style !== 'auto' ? aiStyleInfo(style)[3] + ' The STYLE decides the length and shape of the answer; where it differs from the MODE structure, follow the STYLE.' : '',
+      AI_STYLED[mode] ? 'After the answer, end with exactly these two lines, plain text, no formatting:\nTOPIC: <the SSC topic of this answer in 2–5 words>\nRELATED: <3–4 closely related SSC topics to study next, separated by |>' : ''
     ].filter(Boolean).join('\n');
+  }
+
+  /** Take the TOPIC: and RELATED: lines off the end of an answer (also a half-written one while streaming). */
+  function aiSplitMeta(t){
+    var out = { body: String(t || ''), topic: '', related: [] };
+    out.body = out.body.replace(/^[ \t*_>#-]*(TOPIC|RELATED)[ \t*_]*:[ \t*_]*(.*)$/gm, function(_, k, v){
+      v = v.replace(/[*_`]/g, '').trim();
+      if(k === 'TOPIC') out.topic = v.slice(0, 80);
+      else out.related = v.split(/\s*[|;]\s*/).map(function(x){ return x.trim().slice(0, 60); }).filter(Boolean).slice(0, 5);
+      return '';
+    });
+    out.body = out.body.replace(/\n[ \t*_]*(T(O(P(IC?)?)?)?|R(E(L(A(T(ED?)?)?)?)?)?)$/, '').replace(/\s+$/, '');
+    return out;
   }
 
   // ---- a small, safe Markdown renderer for answers ----
@@ -7223,7 +7260,7 @@ listBlock,
   function aiModeInfo(id){ return AI_MODES.filter(function(m){ return m[0] === id; })[0] || AI_MODES[0]; }
 
   function aiMsgHtml(m, i){
-    if(m.r === 'u') return '<div class="ai-msg ai-u"><div class="ai-bub"><span class="ai-tag">' + aiModeInfo(m.mode)[1] + ' ' + escapeHtml(aiModeInfo(m.mode)[2]) + '</span>' + escapeHtml(m.t).replace(/\n/g, '<br>') + '</div></div>';
+    if(m.r === 'u') return '<div class="ai-msg ai-u"><div class="ai-bub"><span class="ai-tag">' + aiModeInfo(m.mode)[1] + ' ' + escapeHtml(aiModeInfo(m.mode)[2]) + (m.style && m.style !== 'auto' ? ' · ' + escapeHtml(aiStyleInfo(m.style)[2]) : '') + '</span>' + escapeHtml(m.t).replace(/\n/g, '<br>') + '</div></div>';
     var who = AI_PROVIDERS[aiCfg().provider].name.replace(/^Google /, '');
     var body = m.err ? '<div class="ai-err">' + escapeHtml(m.err) + '</div>' + (m.errRaw ? '<details class="ai-errd"><summary>What ' + escapeHtml(who) + ' said</summary>' + escapeHtml(m.errRaw) + '</details>' : '') : aiMd(m.t);
     if(m.note && !m.err) body += '<div class="ai-note">ℹ️ ' + escapeHtml(m.note) + '</div>';
@@ -7236,12 +7273,49 @@ listBlock,
       return '<a href="' + escapeAttr(w.uri) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(host) + '</a>';
     }).join('') + '</div>';
     if(!m.err && !m.local && !(m.src && m.src.length) && !(m.web && m.web.length) && m.t) src += '<div class="ai-src"><span class="ai-badge">🤖 From AI knowledge — double-check key facts</span></div>';
-    if(m.quiz) src += '<div class="ai-acts"><button class="btn teal sm" data-ai-quiz="' + i + '">▶ Start ' + m.quiz.qs.length + ' questions</button>' + (m.quiz.bank ? '<button class="btn ghost sm" data-ai-quizgen="' + i + '">✨ Make new ones with AI</button>' : '') + '</div>';
+    if(m.quiz) src += '<div class="ai-acts"><button class="btn teal sm" data-ai-quiz="' + i + '">▶ Start ' + (m.quiz.mock ? 'mock · ' + m.quiz.qs.length + ' Q · ' + Math.round(m.quiz.qs.length * 36 / 60) + ' min' : m.quiz.qs.length + ' questions') + '</button>' + (m.quiz.bank && !m.quiz.mock ? '<button class="btn ghost sm" data-ai-quizgen="' + i + '">✨ Make new ones with AI</button>' : '') + '</div>';
     if(m.local && m.local.length) src += '<div class="ai-local">' + m.local.map(function(x){
       return '<div class="sr-item sr-q" style="--sr-c:' + STUDY[x.mod].color + '"><span class="sr-ico">' + STUDY[x.mod].ico + '</span><span class="sr-body"><span class="sr-meta">' + escapeHtml(MOD_NAME[x.mod] || '') + (x.q.tag ? ' · ' + escapeHtml(x.q.tag) : '') + '</span><span class="sr-qq">' + escapeHtml(x.q.q) + '</span><span class="sr-ans">✓ ' + escapeHtml(x.q.o[x.q.a]) + '</span>' + (x.q.e ? '<span class="sr-snip">' + escapeHtml(x.q.e) + '</span>' : '') + '</span></div>';
     }).join('') + '</div>';
     var acts = m.pending ? '' : '<div class="ai-acts ai-mini">' + (m.t && !m.err ? '<button data-ai-copy="' + i + '">Copy</button>' : '') + (i === aiChat.msgs.length - 1 && i > 0 && aiChat.msgs[i - 1].r === 'u' ? '<button data-ai-retry="' + i + '">↻ Try again</button>' : '') + '</div>';
-    return '<div class="ai-msg ai-a"><div class="ai-card' + (m.pending ? ' typing' : '') + '"><div class="ai-md">' + (m.pending && !m.t ? '<span class="ai-dots"><i></i><i></i><i></i></span>' : body) + '</div>' + src + acts + '</div></div>';
+    return '<div class="ai-msg ai-a"><div class="ai-card' + (m.pending ? ' typing' : '') + '"><div class="ai-md">' + (m.pending && !m.t ? '<span class="ai-dots"><i></i><i></i><i></i></span>' : body) + '</div>' + src + acts + aiNextHtml(m, i) + '</div></div>';
+  }
+  // what to do next, under the latest answer
+  var AI_NEXT = {
+    pyq: ['📜', 'PYQs on this'], quiz: ['❓', 'Practice questions'], similar: ['🔁', 'Similar questions'], mock: ['📝', 'Mock test on this'],
+    simpler: ['🐣', 'Explain simpler'], examples: ['🧩', 'More examples'], tricks: ['🎯', 'Memory tricks'], notes: ['📋', 'Revision notes'],
+    concept: ['💡', 'Explain the concept'], another: ['⚡', 'Another method'], family: ['🔗', 'Word family & look-alikes'], more: ['📜', 'More PYQs']
+  };
+  var AI_NEXT_BY_MODE = {
+    explain: ['pyq', 'quiz', 'mock', 'simpler', 'examples', 'tricks', 'notes'],
+    solve: ['similar', 'concept', 'another', 'pyq', 'mock'],
+    vocab: ['quiz', 'family', 'pyq', 'mock'],
+    pyq: ['more', 'quiz', 'mock', 'tricks', 'notes']
+  };
+  function aiTopicOf(i){
+    var m = aiChat.msgs[i], u = aiChat.msgs[i - 1];
+    return (m && m.topic) || (u && u.r === 'u' ? u.t.replace(/\s+/g, ' ').slice(0, 80) : '');
+  }
+  function aiNextHtml(m, i){
+    if(m.pending || m.err || !m.t || !AI_NEXT_BY_MODE[m.mode] || i !== aiChat.msgs.length - 1 || !aiTopicOf(i)) return '';
+    return '<div class="ai-next"><div class="ai-next-h">Next on “' + escapeHtml(aiTopicOf(i)) + '”</div><div class="ai-next-row">' +
+      AI_NEXT_BY_MODE[m.mode].map(function(k){ return '<button data-ai-next="' + k + '" data-i="' + i + '">' + AI_NEXT[k][0] + ' ' + escapeHtml(AI_NEXT[k][1]) + '</button>'; }).join('') + '</div>' +
+      (m.related && m.related.length ? '<div class="ai-next-h">Related topics</div><div class="ai-next-row">' + m.related.map(function(t){ return '<button class="rel" data-ai-rel="' + escapeAttr(t) + '">🔗 ' + escapeHtml(t) + '</button>'; }).join('') + '</div>' : '') + '</div>';
+  }
+  function aiNext(k, i){
+    var t = aiTopicOf(i), q = '“' + t + '”';
+    var go = {
+      pyq: [t, 'pyq'], quiz: [t, 'quiz'], similar: [t, 'quiz'], mock: [t, 'mock'],
+      simpler: ['Explain ' + q + ' again more simply, from the basics.', 'explain', 'basics'],
+      examples: ['Give more solved examples on ' + q + ', from easy to hard.', 'explain', 'examples'],
+      tricks: ['Memory tricks and shortcuts for ' + q + '.', 'explain', 'tricks'],
+      notes: ['Revision notes on ' + q + '.', 'explain', 'notes'],
+      concept: ['Explain the concept behind this question: ' + q + '.', 'explain', 'detail'],
+      another: ['Solve the same question by a different, faster method.', 'solve', 'auto'],
+      family: ['Word family, look-alikes and confusables for ' + q + '.', 'vocab', 'auto'],
+      more: ['More previous-year questions on ' + q + ', different from the ones above.', 'pyq', 'auto']
+    }[k];
+    if(go) aiAsk(go[0], go[1], false, { style: go[2] });
   }
   function aiRender(){
     var log = document.getElementById('askLog'), c = aiCfg();
@@ -7266,7 +7340,9 @@ listBlock,
   function aiRenderModes(){
     document.getElementById('askModes').innerHTML = AI_MODES.map(function(m){ return '<button type="button" data-ai-mode="' + m[0] + '" class="' + (m[0] === aiMode ? 'on' : '') + '">' + m[1] + ' ' + escapeHtml(m[2]) + '</button>'; }).join('');
     document.getElementById('askInput').placeholder = aiModeInfo(aiMode)[3];
-    var c = aiCfg(), sel = document.getElementById('askLang');
+    var c = aiCfg(), sel = document.getElementById('askLang'), st = document.getElementById('askStyles');
+    st.style.display = AI_STYLED[aiMode] ? '' : 'none';
+    st.innerHTML = '<span>Answer:</span>' + AI_STYLES.map(function(x){ return '<button type="button" data-ai-style="' + x[0] + '" class="' + (x[0] === (c.style || 'auto') ? 'on' : '') + '">' + x[1] + ' ' + escapeHtml(x[2]) + '</button>'; }).join('');
     sel.value = c.lang;
     document.getElementById('askModelLab').textContent = aiReady(c) ? aiModel(c) : '';
   }
@@ -7289,16 +7365,17 @@ listBlock,
     send.innerHTML = b ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"></rect></svg>'
       : '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"></path></svg>';
   }
-  async function aiAsk(text, mode, retry){
+  async function aiAsk(text, mode, retry, opt){
     var c = aiCfg();
+    var style = AI_STYLED[mode] ? ((opt && opt.style) || c.style || 'auto') : '';
     if(aiBusy) return;
     if(!aiReady(c)){ aiOpenSettings(); return; }
     aiLoadChat();
     text = String(text || '').trim();
     if(mode === 'weak' && !text) text = AI_TRY.weak[0];
     if(!text) return;
-    if(!retry) aiChat.msgs.push({ r: 'u', t: text, mode: mode, ts: Date.now() });
-    var a = { r: 'a', t: '', mode: mode, pending: true, ts: Date.now() };
+    if(!retry) aiChat.msgs.push({ r: 'u', t: text, mode: mode, style: style, ts: Date.now() });
+    var a = { r: 'a', t: '', mode: mode, style: style, pending: true, ts: Date.now() };
     aiChat.msgs.push(a);
     aiRender(); aiScrollEnd();
     var ctl = new AbortController();
@@ -7307,6 +7384,7 @@ listBlock,
       var ctx = await aiRetrieve(text, mode);
       ctx.q = text;
       if(mode === 'quiz') return await aiQuiz(c, text, ctx, a, ctl, false);
+      if(mode === 'mock') return await aiMock(c, text, ctx, a, ctl);
       var extra = '';
       if(mode === 'weak'){
         try{ await loadStudyBank(); }catch(e){}
@@ -7323,11 +7401,12 @@ listBlock,
       hist.push({ role: 'user', text: (extra ? extra + '\n\n' : '') + (ctxText ? ctxText + '\n\n[Question]\n' : '') + text });
       var web = c.provider === 'gemini' && c.web && !(c.webOffUntil > Date.now()) && mode !== 'solve' && mode !== 'weak';
       var t0 = 0;
-      var res = await aiCall(c, aiSystem(c, mode), hist, { web: web, signal: ctl.signal, onWait: function(s){ a.t = '*Free per-minute limit hit — waiting ' + s + ' s and trying again…*'; aiUpdateLast(false); }, onText: function(t){
-        a.t = t;
+      var res = await aiCall(c, aiSystem(c, mode, style), hist, { web: web, signal: ctl.signal, onWait: function(s){ a.t = '*Free per-minute limit hit — waiting ' + s + ' s and trying again…*'; aiUpdateLast(false); }, onText: function(t){
+        a.t = aiSplitMeta(t).body;
         var now = Date.now(); if(now - t0 > 60){ t0 = now; aiUpdateLast(false); }
       } });
-      a.t = res.text; a.web = res.web;
+      var sp = aiSplitMeta(res.text);
+      a.t = sp.body; a.topic = sp.topic; a.related = sp.related; a.web = res.web;
       aiLearn(res);
       a.note = [res.switchedFrom ? 'Switched to ' + res.model + ' — ' + res.switchedFrom + ' isn’t free on your key right now. It’s saved for next time.' : '',
         res.webDropped ? 'Google Search isn’t free on your key right now, so this answer is without web search (it will try again in a few hours).' : ''].filter(Boolean).join(' ');
@@ -7357,35 +7436,63 @@ listBlock,
       a.src = ctx.lessons.map(function(r){ return { mod: r.l.mod, id: r.l.id, t: r.l.t }; });
       return;
     }
+    a.t = '';
+    var qs = await aiGenQs(c, topic, 10, ctx, ctl.signal);
+    a.t = 'Made **' + qs.length + ' new questions** on “' + topic.replace(/[*_`]/g, '') + '”. ' + (bank.length ? '' : 'The app has no questions on this, so these are written by AI — tell me if one looks wrong.');
+    a.quiz = { title: topic, ai: true, qs: qs };
+  }
+  /** n new MCQs on a topic, written by the AI: [{ q, o, a, e, s }] (s = section: en / mt / rs / gs). */
+  async function aiGenQs(c, topic, n, ctx, signal){
     var langNote = c.lang === 'hi' ? 'Write the questions in Hindi (keep English-language questions in English).' : c.lang === 'hinglish' ? 'Write the questions in simple English; explanations may be in Hinglish.' : 'Write in English.';
     var ctxText = aiContextText(ctx);
-    var sys = 'You write SSC CGL Tier 1 practice MCQs. Exactly 4 options each, one correct; options must be plausible and distinct. Match real SSC difficulty and style (mix of easy, moderate and a few tricky). ' +
+    var sys = 'You write SSC CGL Tier 1 practice MCQs. Exactly 4 options each, one correct; options must be plausible and distinct. Match real SSC difficulty and style (mix of easy, moderate and a few tricky), and cover different sub-topics instead of repeating one idea. ' +
       'For maths and reasoning, compute every answer carefully and double-check it. ' + langNote +
-      ' Return ONLY JSON, no Markdown: {"questions":[{"q":"question","o":["A","B","C","D"],"a":0,"e":"one or two line explanation with the trick"}]} where "a" is the 0-based index of the correct option.';
-    var user = (ctxText ? ctxText + '\n\n' : '') + 'Write 10 MCQs on: ' + topic;
-    a.t = '';
-    var res = await aiCall(c, sys, [{ role: 'user', text: user }], { json: true, signal: ctl.signal, onText: function(){} });
+      ' Return ONLY JSON, no Markdown: {"questions":[{"q":"question","o":["A","B","C","D"],"a":0,"e":"one or two line explanation with the trick","s":"gs"}]} where "a" is the 0-based index of the correct option and "s" is the Tier 1 section: "en" English, "mt" Maths, "rs" Reasoning or "gs" General Awareness.';
+    var user = (ctxText ? ctxText + '\n\n' : '') + 'Write ' + n + ' MCQs on: ' + topic;
+    var res = await aiCall(c, sys, [{ role: 'user', text: user }], { json: true, signal: signal, onText: function(){} });
     aiLearn(res);
     var raw = res.text.replace(/^[\s\S]*?(\{[\s\S]*\})[\s\S]*$/, '$1'), data;
     try{ data = JSON.parse(raw); }catch(e){ throw new Error('The AI’s questions came back in a broken format. Press “Try again”.'); }
     var qs = (data.questions || data || []).filter(function(q){ return q && q.q && Array.isArray(q.o) && q.o.length >= 2 && q.o.length <= 5 && typeof q.a === 'number' && q.a >= 0 && q.a < q.o.length; })
-      .map(function(q){ return { q: String(q.q), o: q.o.map(String), a: q.a, e: String(q.e || '') }; });
+      .map(function(q){ return { q: String(q.q), o: q.o.map(String), a: q.a, e: String(q.e || ''), s: /^(en|mt|rs|gs)$/.test(q.s) ? q.s : 'gs' }; });
     if(!qs.length) throw new Error('The AI didn’t return usable questions. Press “Try again”.');
-    a.t = 'Made **' + qs.length + ' new questions** on “' + topic.replace(/[*_`]/g, '') + '”. ' + (bank.length ? '' : 'The app has no questions on this, so these are written by AI — tell me if one looks wrong.');
-    a.quiz = { title: topic, ai: true, qs: qs };
+    return qs.slice(0, n);
+  }
+  /** Mock test on one topic: 20 questions, Tier 1 timing and marking. The app's questions first, the AI writes the rest. */
+  async function aiMock(c, topic, ctx, a, ctl){
+    var N = 20, bank = shuffleArr((ctx.qs || []).map(function(x){ return x.q; })).slice(0, N), ai = [], aiFail = '';
+    if(bank.length < N){
+      try{ ai = await aiGenQs(c, topic, N - bank.length, ctx, ctl.signal); }
+      catch(e){ if((e && e.name === 'AbortError') || bank.length < 5) throw e; aiFail = ' (The AI couldn’t write more just now.)'; }
+    }
+    var total = bank.length + ai.length, name = topic.replace(/[*_`]/g, '');
+    a.t = '**Mock test on “' + name + '”** — ' + total + ' questions · ' + Math.round(total * 36 / 60) + ' minutes · +2 / −0.5, like Tier 1.\n\n' +
+      (bank.length ? bank.length + ' from the app’s question bank' + (ai.length ? ' and ' + ai.length + ' written by AI.' : '.') + aiFail : 'All written by AI — tell me if a question looks wrong.') +
+      (bank.length ? ' Your answers to the app’s questions count towards your progress.' : '');
+    a.quiz = { title: name, mock: true, qs: bank.map(function(q){ return { mod: q.mod, id: q.id }; }).concat(ai) };
+    a.src = ctx.lessons.map(function(r){ return { mod: r.l.mod, id: r.l.id, t: r.l.t }; });
   }
   function aiStartQuiz(m){
     if(!m || !m.quiz) return;
-    var qs = [];
-    if(m.quiz.bank){
-      qs = m.quiz.qs.map(function(r){ return studyBankIdx && studyBankIdx[r.mod + ':' + r.id]; }).filter(Boolean).map(prepQ);
-      if(!qs.length){ loadStudyBank().then(function(){ aiStartQuiz(m); }).catch(function(){ showToast('Couldn’t load the question bank.'); }); return; }
-    } else {
-      qs = m.quiz.qs.map(function(q, i){ return prepQ({ mod: 'ai', id: 'ai' + i, q: q.q, o: q.o, a: q.a, e: q.e, tag: m.quiz.title, sh: 1 }); });
+    var items = m.quiz.qs || [];
+    if(items.some(function(r){ return !r.q; }) && !studyBank){
+      loadStudyBank().then(function(){ aiStartQuiz(m); }).catch(function(){ showToast('Couldn’t load the question bank.'); });
+      return;
     }
-    openDrill('Practise · ' + m.quiz.title);
+    var secOf = function(mod){ var s = STUDY[mod] && STUDY[mod].subj; return s === 'english' ? 'en' : s === 'maths' ? 'mt' : s === 'reasoning' ? 'rs' : 'gs'; };
+    var qs = items.map(function(r, i){
+      var q;
+      if(r.q){ q = prepQ({ mod: 'ai', id: 'ai' + i, q: r.q, o: r.o, a: r.a, e: r.e, tag: m.quiz.title, sh: 1 }); q.sec = r.s || 'gs'; return q; }
+      var src = studyBankIdx[r.mod + ':' + r.id];
+      if(!src) return null;
+      q = prepQ(src); q.sec = secOf(r.mod); return q;
+    }).filter(Boolean);
+    if(!qs.length){ showToast('Those questions aren’t in the app any more — ask again.'); return; }
+    var back = function(){ closeDrill(false); };
+    openDrill((m.quiz.mock ? 'Mock · ' : 'Practise · ') + m.quiz.title);
     document.getElementById('drillBackLabel').textContent = 'Ask AI';
-    startPractice(qs, { title: m.quiz.title, backLabel: 'Back to Ask AI', back: function(){ closeDrill(false); } });
+    if(m.quiz.mock) beginMock(qs, { topic: m.quiz.title, back: back });
+    else startPractice(qs, { title: m.quiz.title, backLabel: 'Back to Ask AI', back: back });
   }
 
   // ---- the Ask page ----
@@ -7435,6 +7542,10 @@ listBlock,
     if(ev.key === 'Escape'){ ev.stopPropagation(); closeAsk(false); return; }
     if(ev.key === 'Enter' && !ev.shiftKey && !ev.isComposing && !matchMedia('(pointer: coarse)').matches){ ev.preventDefault(); aiSubmit(); }
   });
+  document.getElementById('askStyles').addEventListener('click', function(ev){
+    var b = ev.target.closest('[data-ai-style]'); if(!b) return;
+    var c = aiCfg(); c.style = b.dataset.aiStyle; aiSave(c); aiRenderModes();
+  });
   document.getElementById('askModes').addEventListener('click', function(ev){ var b = ev.target.closest('[data-ai-mode]'); if(b){ aiSetMode(b.dataset.aiMode); document.getElementById('askInput').focus(); } });
   document.getElementById('askLog').addEventListener('click', function(ev){
     var b;
@@ -7454,10 +7565,12 @@ listBlock,
         .then(function(){ a.pending = false; aiSaveChat(); aiUpdateLast(true); aiSetBusy(null); });
       return;
     }
+    if((b = ev.target.closest('[data-ai-next]'))){ aiNext(b.dataset.aiNext, +b.dataset.i); return; }
+    if((b = ev.target.closest('[data-ai-rel]'))){ aiAsk(b.dataset.aiRel, 'explain', false); return; }
     if((b = ev.target.closest('[data-ai-retry]'))){
       var i = +b.dataset.aiRetry, q = aiChat.msgs[i - 1];
       aiChat.msgs.splice(i, 1);
-      aiAsk(q.t, q.mode, true);
+      aiAsk(q.t, q.mode, true, { style: q.style });
     }
   });
   if(location.hash === '#ask'){ try{ history.replaceState(null, '', location.pathname + location.search); }catch(e){} }
