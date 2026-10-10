@@ -2213,6 +2213,9 @@
     setStudyMeta('todo', { localAt: Date.now() });
     clearTimeout(todoSave.timer);
     todoSave.timer = setTimeout(function(){ studyPush('todo'); }, 1500);
+    // and to the phone app soon, rather than at the next 20-second round
+    clearTimeout(todoSave.phone);
+    todoSave.phone = setTimeout(function(){ lockPushSummary(false); }, 2000);
     renderHomeSoon();
   }
   /** Two devices' lists: every task from both, the newer edit of each task wins. */
