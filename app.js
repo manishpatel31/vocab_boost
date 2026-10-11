@@ -7266,7 +7266,7 @@ listBlock,
       'How to answer:',
       '- Always connect the topic to the exam: what SSC asks about it, the usual question types, and how important it is (only claim frequency or previous-year questions when you are sure; never invent a year or shift).',
       '- Lead with the answer or the key idea. Use short headings, bullet points, tables for comparisons, and **bold** for facts to remember. Markdown only.',
-      '- Write maths in plain text with Unicode (×, ÷, √, ², ³, π, θ, ≤) — never LaTeX or $ signs.',
+      '- Maths: write simple expressions with Unicode (×, ÷, √, ², π, θ). For fractions and formulas use LaTeX between $…$ (or $$…$$ on its own line) — the app typesets it. Never use $ for money; write ₹.',
       '- Maths and reasoning: give the fastest exam method and a clear step-by-step method; verify the arithmetic.',
       '- GK and GS: give exact facts (names, dates, articles, numbers) and one-line memory tricks. If a fact may have changed recently (appointments, schemes, rankings, records, current affairs), say how recent your information is and ask the student to verify.',
       '- English: the rule plus the typical error SSC hides; for words give meaning (English + Hindi), a trick, synonyms and antonyms.',
@@ -7301,7 +7301,86 @@ listBlock,
     s = s.replace(/(^|[\s(])\*(?!\s)([^*\n]+?)\*(?=[\s).,;:!?]|$)/g, '$1<i>$2</i>').replace(/(^|[\s(])_(?!\s)([^_\n]+?)_(?=[\s).,;:!?]|$)/g, '$1<i>$2</i>');
     return s.replace(/\u0000(\d+)\u0000/g, function(_, i){ return '<code>' + codes[+i] + '</code>'; });
   }
+  // ---- maths: LaTeX from the AI is typeset with KaTeX (loaded on first use); readable Unicode until then or offline ----
+  var AI_TEX_SYM = { times: '×', div: '÷', cdot: '·', pm: '±', mp: '∓', le: '≤', leq: '≤', ge: '≥', geq: '≥', ne: '≠', neq: '≠', approx: '≈', equiv: '≡', sim: '∼',
+    pi: 'π', theta: 'θ', alpha: 'α', beta: 'β', gamma: 'γ', delta: 'δ', Delta: 'Δ', phi: 'φ', lambda: 'λ', mu: 'μ', sigma: 'σ', Sigma: 'Σ', omega: 'ω', Omega: 'Ω', rho: 'ρ', eta: 'η',
+    infty: '∞', angle: '∠', triangle: '△', therefore: '∴', because: '∵', Rightarrow: '⇒', implies: '⇒', rightarrow: '→', to: '→', leftarrow: '←', Leftrightarrow: '⇔', iff: '⇔',
+    circ: '°', degree: '°', prime: '′', perp: '⊥', parallel: '∥', cong: '≅', propto: '∝', ldots: '…', cdots: '⋯', dots: '…', in: '∈', cup: '∪', cap: '∩', subset: '⊂', sum: 'Σ' };
+  var AI_SUP = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '+': '⁺', '-': '⁻', '−': '⁻', '=': '⁼', '(': '⁽', ')': '⁾', n: 'ⁿ', i: 'ⁱ', x: 'ˣ' };
+  var AI_SUB = { '0': '₀', '1': '₁', '2': '₂', '3': '₃', '4': '₄', '5': '₅', '6': '₆', '7': '₇', '8': '₈', '9': '₉', '+': '₊', '-': '₋', '=': '₌', '(': '₍', ')': '₎', a: 'ₐ', e: 'ₑ', h: 'ₕ', i: 'ᵢ', k: 'ₖ', m: 'ₘ', n: 'ₙ', o: 'ₒ', p: 'ₚ', r: 'ᵣ', s: 'ₛ', t: 'ₜ', x: 'ₓ' };
+  /** LaTeX → plain readable text: \frac{b×h}{b+h} → (b × h)/(b + h), x^2 → x², \sqrt{3} → √3. */
+  function aiTexText(tex){
+    var group = function(s, i){ var d = 0; for(var j = i; j < s.length; j++){ if(s[j] === '{') d++; else if(s[j] === '}'){ d--; if(!d) return [s.slice(i + 1, j), j + 1]; } } return [s.slice(i + 1), s.length]; };
+    var arg = function(s, i){ while(s[i] === ' ') i++; if(s[i] === '{') return group(s, i); if(s[i] === '\\'){ var m = /^\\([a-zA-Z]+|.)/.exec(s.slice(i)); if(m) return [m[0], i + m[0].length]; } return [s[i] || '', i + 1]; };
+    var map = function(v, tbl, mark){ v = v.replace(/\s+/g, ''); if(v === '°' || v === '′') return v; var ok = v.split('').every(function(ch){ return tbl[ch]; }); return ok ? v.split('').map(function(ch){ return tbl[ch]; }).join('') : mark + (v.length > 1 ? '(' + v + ')' : v); };
+    var wrap = function(x){ x = conv(x).trim(); return /^[\w.√²³¹⁰⁴-⁹′°πθ]+$/.test(x) || /^\([^()]*\)$/.test(x) ? x : '(' + x + ')'; };
+    function conv(s){
+      var out = '', i = 0;
+      while(i < s.length){
+        var ch = s[i];
+        if(ch === '\\'){
+          var m = /^\\([a-zA-Z]+|.)/.exec(s.slice(i)), name = m ? m[1] : ''; i += m ? m[0].length : 1;
+          if(/^[dt]?frac$/.test(name)){ var a = arg(s, i), b = arg(s, a[1]); i = b[1]; out += wrap(a[0]) + '/' + wrap(b[0]); continue; }
+          if(name === 'sqrt'){ var n = ''; if(s[i] === '['){ var e = s.indexOf(']', i); n = s.slice(i + 1, e); i = e + 1; } var r = arg(s, i); i = r[1]; out += (n ? map(n, AI_SUP, '^') : '') + '√' + wrap(r[0]); continue; }
+          if(/^(text|mathrm|textbf|mathbf|mathit|operatorname|boxed|overline|bar|vec|hat)$/.test(name)){ var t = arg(s, i); i = t[1]; out += conv(t[0]); continue; }
+          if(/^(left|right|displaystyle|limits|big|Big|bigg|Bigg)$/.test(name)) continue;
+          if(/^(quad|qquad)$/.test(name) || /^[,;: !]$/.test(name)){ out += ' '; continue; }
+          if(name === '\\'){ out += '\n'; continue; }
+          out += AI_TEX_SYM[name] !== undefined ? AI_TEX_SYM[name] : name;
+          continue;
+        }
+        if(ch === '^' || ch === '_'){ var p = arg(s, i + 1); i = p[1]; var v = conv(p[0]); out += ch === '^' ? map(v, AI_SUP, '^') : map(v, AI_SUB, '_'); continue; }
+        if(ch === '{' || ch === '}'){ i++; continue; }
+        out += ch; i++;
+      }
+      return out;
+    }
+    return conv(String(tex || '')).replace(/[ \t]+/g, ' ').trim();
+  }
+  /** Pull the formulas out of an answer: returns the text with placeholders, and the formulas. */
+  function aiTexPull(src){
+    var maths = [], put = function(tex, d){ maths.push({ tex: tex.trim(), d: d }); return '\u0002' + (maths.length - 1) + '\u0002'; };
+    var parts = String(src || '').split(/(```[\s\S]*?(?:```|$))/);   // leave code blocks alone
+    var out = parts.map(function(p, k){
+      if(k % 2) return p;
+      return p.replace(/\$\$([\s\S]+?)\$\$/g, function(_, t){ return put(t, true); })
+        .replace(/\\\[([\s\S]+?)\\\]/g, function(_, t){ return put(t, true); })
+        .replace(/\\\(([\s\S]+?)\\\)/g, function(_, t){ return put(t, false); })
+        .replace(/(^|[^\\$\w])\$(?!\s)([^$\n]+?)(?<!\s)\$(?![\w$])/g, function(all, pre, t){ return /[\\^_{}=]|^[a-zA-Z]$|[a-zA-Z]\s*[+\-*/]/.test(t) ? pre + put(t, false) : all; });
+    }).join('');
+    return { text: out, maths: maths };
+  }
+  /** A whole answer as plain text (for Copy): formulas turned readable. */
+  function aiPlain(src){ var p = aiTexPull(src); return p.text.replace(/\u0002(\d+)\u0002/g, function(_, n){ return aiTexText(p.maths[+n].tex); }); }
+  var aiKatexP = null;
+  function aiKatex(){
+    if(window.katex) return Promise.resolve(window.katex);
+    if(aiKatexP) return aiKatexP;
+    aiKatexP = new Promise(function(ok, no){
+      var base = 'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/';
+      var css = document.createElement('link'); css.rel = 'stylesheet'; css.href = base + 'katex.min.css'; document.head.appendChild(css);
+      var js = document.createElement('script'); js.src = base + 'katex.min.js'; js.async = true;
+      js.onload = function(){ window.katex ? ok(window.katex) : no(new Error('no katex')); };
+      js.onerror = function(){ aiKatexP = null; js.remove(); no(new Error('katex not loaded')); };
+      document.head.appendChild(js);
+    });
+    return aiKatexP;
+  }
+  /** Typeset every formula under el (keeps the readable text if KaTeX can't load). */
+  function aiTypeset(el){
+    var list = el ? el.querySelectorAll('.ai-math:not([data-ok])') : [];
+    if(!list.length) return;
+    aiKatex().then(function(k){
+      [].forEach.call(el.querySelectorAll('.ai-math:not([data-ok])'), function(m){
+        var tx = m.getAttribute('data-tex');
+        if(!m.classList.contains('d') && /\\[dt]?frac/.test(tx)) tx = '\\displaystyle ' + tx;   // fractions in a sentence: full size, readable on a phone
+        try{ k.render(tx, m, { displayMode: m.classList.contains('d'), throwOnError: false, output: 'html', strict: 'ignore' }); m.setAttribute('data-ok', '1'); }catch(e){}
+      });
+    }).catch(function(){});
+  }
   function aiMd(src){
+    var tex = aiTexPull(src);
+    src = tex.text;
     var lines = escapeHtml(String(src || '').replace(/\r/g, '')).split('\n'), html = '', i = 0, para = [];
     var flush = function(){ if(para.length){ html += '<p>' + para.map(aiInline).join('<br>') + '</p>'; para = []; } };
     while(i < lines.length){
@@ -7339,7 +7418,10 @@ listBlock,
       para.push(ln); i++;
     }
     flush();
-    return html;
+    return html.replace(/\u0002(\d+)\u0002/g, function(_, n){
+      var m = tex.maths[+n];
+      return m ? '<span class="ai-math' + (m.d ? ' d' : '') + '" data-tex="' + escapeAttr(m.tex) + '">' + escapeHtml(aiTexText(m.tex)) + '</span>' : '';
+    });
   }
 
   // ---- chat log, kept on this device ----
@@ -7482,6 +7564,7 @@ listBlock,
       return;
     }
     log.innerHTML = aiChat.msgs.map(aiMsgHtml).join('');
+    aiTypeset(log);
   }
   function aiScrollEnd(){ var s = document.getElementById('askScroll'); s.scrollTop = s.scrollHeight; }
   function aiRenderModes(){
@@ -7501,7 +7584,7 @@ listBlock,
     var s = document.getElementById('askScroll'), atEnd = s.scrollHeight - s.scrollTop - s.clientHeight < 80;
     var last = log.lastElementChild;
     if(full || !last){ aiRender(); }
-    else { var tmp = document.createElement('div'); tmp.innerHTML = aiMsgHtml(msgs[i], i); log.replaceChild(tmp.firstChild, last); }
+    else { var tmp = document.createElement('div'); tmp.innerHTML = aiMsgHtml(msgs[i], i); var node = tmp.firstChild; log.replaceChild(node, last); aiTypeset(node); }
     if(atEnd) aiScrollEnd();
   }
   function aiSetBusy(b){
@@ -7669,7 +7752,7 @@ listBlock,
     var langNote = c.lang === 'hi' ? 'Write the questions in Hindi (keep English-language questions in English).' : c.lang === 'hinglish' ? 'Write the questions in simple English; explanations may be in Hinglish.' : 'Write in English.';
     var ctxText = aiContextText(ctx);
     var sys = 'You write SSC CGL Tier 1 practice MCQs. Exactly 4 options each, one correct; options must be plausible and distinct. Match real SSC difficulty and style (mix of easy, moderate and a few tricky), and cover different sub-topics instead of repeating one idea. ' +
-      'For maths and reasoning, compute every answer carefully and double-check it. ' + langNote +
+      'No LaTeX: write maths with Unicode (×, ÷, √, ², π, θ, fractions as a/b). For maths and reasoning, compute every answer carefully and double-check it. ' + langNote +
       ' Return ONLY JSON, no Markdown: {"questions":[{"q":"question","o":["A","B","C","D"],"a":0,"e":"one or two line explanation with the trick","s":"gs"}]} where "a" is the 0-based index of the correct option and "s" is the Tier 1 section: "en" English, "mt" Maths, "rs" Reasoning or "gs" General Awareness.';
     var user = (ctxText ? ctxText + '\n\n' : '') + 'Write ' + n + ' MCQs on: ' + topic;
     var hk = (ctl && ctl.hooks) || {};
@@ -7679,7 +7762,7 @@ listBlock,
     var raw = res.text.replace(/^[\s\S]*?(\{[\s\S]*\})[\s\S]*$/, '$1'), data;
     try{ data = JSON.parse(raw); }catch(e){ throw new Error('The AI’s questions came back in a broken format. Press “Try again”.'); }
     var qs = (data.questions || data || []).filter(function(q){ return q && q.q && Array.isArray(q.o) && q.o.length >= 2 && q.o.length <= 5 && typeof q.a === 'number' && q.a >= 0 && q.a < q.o.length; })
-      .map(function(q){ return { q: String(q.q), o: q.o.map(String), a: q.a, e: String(q.e || ''), s: /^(en|mt|rs|gs)$/.test(q.s) ? q.s : 'gs' }; });
+      .map(function(q){ return { q: aiPlain(String(q.q)), o: q.o.map(function(o){ return aiPlain(String(o)); }), a: q.a, e: aiPlain(String(q.e || '')), s: /^(en|mt|rs|gs)$/.test(q.s) ? q.s : 'gs' }; });
     if(!qs.length) throw new Error('The AI didn’t return usable questions. Press “Try again”.');
     return qs.slice(0, n);
   }
@@ -7794,7 +7877,7 @@ listBlock,
     if((b = ev.target.closest('[data-ai-mode]'))){ aiSetMode(b.dataset.aiMode); return; }
     if((b = ev.target.closest('[data-ai-try]'))){ aiAsk(b.dataset.aiTry, aiMode, false); return; }
     if((b = ev.target.closest('[data-ai-open]'))){ document.body.classList.remove('ask-top'); openStudy(b.dataset.aiOpen, false, b.dataset.aiLesson); return; }
-    if((b = ev.target.closest('[data-ai-copy]'))){ copyTextToClipboard(aiChat.msgs[+b.dataset.aiCopy].t).then(function(){ showToast('Copied.'); }); return; }
+    if((b = ev.target.closest('[data-ai-copy]'))){ copyTextToClipboard(aiPlain(aiChat.msgs[+b.dataset.aiCopy].t)).then(function(){ showToast('Copied.'); }); return; }
     if((b = ev.target.closest('[data-ai-quiz]'))){ aiStartQuiz(aiChat.msgs[+b.dataset.aiQuiz]); return; }
     if((b = ev.target.closest('[data-ai-quizgen]'))){
       var m = aiChat.msgs[+b.dataset.aiQuizgen], u = aiChat.msgs[+b.dataset.aiQuizgen - 1];
