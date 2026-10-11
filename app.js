@@ -6898,7 +6898,44 @@ listBlock,
     return c;
   }
   function aiSave(c){ lsSet(AI_KEY, JSON.stringify(c)); aiRefreshEntry(); }
-  function aiReady(c){ c = c || aiCfg(); return !!(c.on && c.keys[c.provider]); }
+  function aiKeyed(c){ return Object.keys(AI_PROVIDERS).filter(function(p){ return !!c.keys[p]; }); }
+  function aiMulti(c){ return c.multi !== false && aiKeyed(c).length > 1; }
+  function aiReady(c){ c = c || aiCfg(); return !!(c.on && (c.keys[c.provider] || (c.multi !== false && aiKeyed(c).length))); }
+  /** Which service to ask first for this kind of request, then the others (only services with a saved key).
+      Gemini: web search, Hindi/Hinglish, long explanations and maths. Groq: very fast — quick answers, words, question lists. */
+  var AI_ROUTE = {
+    explain: ['gemini', 'groq', 'openrouter'], solve: ['gemini', 'groq', 'openrouter'], pyq: ['gemini', 'groq', 'openrouter'],
+    plan: ['gemini', 'groq', 'openrouter'], weak: ['gemini', 'groq', 'openrouter'], app: ['gemini', 'groq', 'openrouter'],
+    vocab: ['groq', 'gemini', 'openrouter'], questions: ['groq', 'gemini', 'openrouter']
+  };
+  function aiRoute(c, task, style){
+    if(!aiMulti(c)) return [c.keys[c.provider] ? c.provider : aiKeyed(c)[0]];
+    var order = (AI_ROUTE[task] || [c.provider]).slice();
+    if(style === 'quick' || style === 'tricks') order = ['groq'].concat(order);                 // short answers: the fastest first
+    if(c.lang === 'hi' && task !== 'questions') order = ['gemini'].concat(order);              // Devanagari: Gemini writes it best
+    order = order.concat([c.provider], Object.keys(AI_PROVIDERS));
+    order = order.filter(function(p, i){ return c.keys[p] && order.indexOf(p) === i; });
+    // a service whose every model failed lately (e.g. today's free limit is used up) goes to the back
+    var tired = function(p){ var cc = Object.assign({}, c, { provider: p }), all = aiRanked(Object.assign({}, cc, { bad: {} })); return all.every(function(m){ return aiBadRecently(c, m); }); };
+    return order.filter(function(p){ return !tired(p); }).concat(order.filter(tired));
+  }
+  /** aiCall across services: ask the best one for the task; if it fails (limit, no reply, key or network trouble), ask the next. */
+  async function aiCallAny(c, sys, msgs, opts, task, style){
+    var route = aiRoute(c, task, style), lastErr = null;
+    for(var i = 0; i < route.length; i++){
+      var p = route[i], cc = Object.assign({}, c, { provider: p });
+      try{
+        var r = await aiCall(cc, sys, msgs, Object.assign({}, opts, { web: opts.web && p === 'gemini', maxTries: route.length > 1 ? 2 : 0 }));
+        r.switchedService = i ? route[0] : '';
+        return r;
+      }catch(e){
+        if(e && e.name === 'AbortError') throw e;
+        lastErr = e;
+        if(i < route.length - 1 && opts.onStatus) opts.onStatus(aiProvName(p) + ' couldn’t answer just now' + (e && e.timeout ? ' (no reply)' : e && e.status === 429 ? ' (free limit)' : '') + ' — asking ' + aiProvName(route[i + 1]) + '…');
+      }
+    }
+    throw lastErr || new Error('No AI service with a saved key.');
+  }
   /** 'auto' (the default): the best model on the key's list that has worked lately. */
   function aiIsAuto(c){ var m = c.models[c.provider]; return !m || m === 'auto'; }
   function aiModel(c){
@@ -6926,7 +6963,7 @@ listBlock,
     var good = list.filter(function(m){ return !aiBadRecently(c, m); });
     return good.length ? good : list;
   }
-  function aiMarkBad(m){ var c = aiCfg(); c.bad = c.bad || {}; c.bad[m] = Date.now(); if(c.autoPick && c.autoPick[c.provider] === m) delete c.autoPick[c.provider]; aiSave(c); }
+  function aiMarkBad(m){ var c = aiCfg(); c.bad = c.bad || {}; c.bad[m] = Date.now(); Object.keys(c.autoPick || {}).forEach(function(p){ if(c.autoPick[p] === m) delete c.autoPick[p]; }); aiSave(c); }
   function aiRefreshEntry(){
     var on = aiCfg().on;
     ['askBtn', 'studyAskBtn'].forEach(function(id){ var b = document.getElementById(id); if(b) b.style.display = on ? '' : 'none'; });
@@ -7069,7 +7106,7 @@ listBlock,
       free model when this one has no free allowance (or is used up / missing). The result says which model answered. */
   async function aiCall(c, sys, msgs, opts){
     opts = Object.assign({}, opts);
-    var p = c.provider, first = aiModel(c), model = first, tried = {}, waited = false, lastErr = null, maxTries = opts.test ? 3 : 5;
+    var p = c.provider, first = aiModel(c), model = first, tried = {}, waited = false, lastErr = null, maxTries = opts.maxTries || (opts.test ? 3 : 5);
     var list = (c.modelList && c.modelList[p]) || [];
     var next = function(){
       var cands = aiIsAuto(c) ? aiRanked(Object.assign({}, c, { bad: aiCfg().bad })) : AI_FALLBACK[p].concat(list.filter(function(m){ return p === 'gemini' ? /flash/.test(m) : true; }));
@@ -7082,7 +7119,7 @@ listBlock,
         cc.models[p] = model;
         var r = await aiStream(cc, sys, msgs, opts);
         r.switchedFrom = model !== first ? first : '';
-        r.auto = aiIsAuto(c);
+        r.auto = aiIsAuto(c); r.provider = p;
         return r;
       }catch(e){
         if(e && e.name === 'AbortError') throw e;
@@ -7109,19 +7146,24 @@ listBlock,
     throw lastErr;
   }
   function aiRefreshModels(){
-    var c = aiCfg(), p = c.provider, k = c.keys[p];
-    if(!c.on || !k || (c.listAt[p] && Date.now() - c.listAt[p] < 24 * 3600 * 1000) || !navigator.onLine) return;
+    var c = aiCfg();
+    if(!c.on || !navigator.onLine) return;
+    aiKeyed(c).forEach(function(p){
+    var k = c.keys[p];
+    if(c.listAt[p] && Date.now() - c.listAt[p] < 24 * 3600 * 1000) return;
     aiListModels(p, k).then(function(list){
       var cc = aiCfg(); cc.modelList[p] = list; cc.listAt[p] = Date.now();
       var best = aiRanked(cc)[0];
       if(cc.autoPick[p] && best && best !== cc.autoPick[p]) delete cc.autoPick[p];   // a better model appeared: try it first
       aiSave(cc); if(aiOpen) aiRenderModes();
     }).catch(function(){});
+    });
   }
   /** After an answer: remember a model that worked, and pause web search if Google refused it. */
   function aiLearn(r){
     var c = aiCfg(), changed = false;
-    if(r.auto && r.model && c.autoPick[c.provider] !== r.model){ c.autoPick[c.provider] = r.model; changed = true; }
+    var rp = r.provider || c.provider;
+    if(r.auto && r.model && c.autoPick[rp] !== r.model){ c.autoPick[rp] = r.model; changed = true; }
     if(r.webDropped){ c.webOffUntil = Date.now() + 6 * 3600 * 1000; changed = true; }
     if(changed) aiSave(c);
   }
@@ -7488,7 +7530,7 @@ listBlock,
       onFirst: function(){ if(a.live.mode !== 'write'){ a.live.mode = 'write'; a.live.start = Date.now(); paint(); } },
       finish: function(res, err){
         clearInterval(tick);
-        if(res) a.by = { p: c.provider, m: res.model, s: Math.round((Date.now() - t0) / 100) / 10 };
+        if(res) a.by = { p: res.provider || c.provider, m: res.model, s: Math.round((Date.now() - t0) / 100) / 10 };
         else if(err && err.name !== 'AbortError' && last.model) a.by = { p: last.p, m: last.model, s: Math.round((Date.now() - t0) / 100) / 10, fail: true };
         delete a.live;
       }
@@ -7574,7 +7616,7 @@ listBlock,
     st.style.display = AI_STYLED[aiMode] ? '' : 'none';
     st.innerHTML = '<span>Answer:</span>' + AI_STYLES.map(function(x){ return '<button type="button" data-ai-style="' + x[0] + '" class="' + (x[0] === (c.style || 'auto') ? 'on' : '') + '">' + x[1] + ' ' + escapeHtml(x[2]) + '</button>'; }).join('');
     sel.value = c.lang;
-    document.getElementById('askModelLab').textContent = aiReady(c) ? (aiIsAuto(c) ? 'auto · ' : '') + aiModel(c) : '';
+    document.getElementById('askModelLab').textContent = !aiReady(c) ? '' : aiMulti(c) ? 'auto · ' + aiKeyed(c).map(function(p){ return aiProvName(p).replace(/^Google /, ''); }).join(' + ') : (aiIsAuto(c) ? 'auto · ' : '') + aiModel(c);
   }
   function aiSetMode(id){ aiMode = id; aiRenderModes(); if(!aiLoadChat().msgs.length) aiRender(); }
 
@@ -7641,17 +7683,17 @@ listBlock,
       hist.push({ role: 'user', text: (extra ? extra + '\n\n' : '') + (ctxText ? ctxText + '\n\n[Question]\n' : '') + text });
       var web = c.provider === 'gemini' && c.web && !(c.webOffUntil > Date.now()) && mode !== 'solve' && mode !== 'weak';
       var t0 = 0;
-      var res = await aiCall(c, aiSystem(c, mode, style, wctx ? aiCtxLabel(wctx) : ''), hist, { web: web, signal: ctl.signal, onAttempt: live.onAttempt, onStatus: live.onStatus, onWait: live.onWait, onText: function(t){
+      var res = await aiCallAny(c, aiSystem(c, mode, style, wctx ? aiCtxLabel(wctx) : ''), hist, { web: web, signal: ctl.signal, onAttempt: live.onAttempt, onStatus: live.onStatus, onWait: live.onWait, onText: function(t){
         var body = aiSplitMeta(t).body;
         if(body) live.onFirst();
         a.t = body;
         var now = Date.now(); if(now - t0 > 60){ t0 = now; aiUpdateLast(false); }
-      } });
+      } }, mode, style);
       var sp = aiSplitMeta(res.text);
       a.t = sp.body; a.topic = sp.topic; a.related = sp.related; a.web = res.web;
       liveRes = res;
       aiLearn(res);
-      a.note = [res.switchedFrom ? (res.auto ? 'Auto model: ' + res.switchedFrom + ' didn’t answer on your key just now, so ' + res.model + ' answered — it’s used from now on.' : 'Your chosen model ' + res.switchedFrom + ' didn’t answer just now, so ' + res.model + ' answered this one.') : '',
+      a.note = [res.switchedService ? aiProvName(res.switchedService) + ' couldn’t answer just now, so ' + aiProvName(res.provider) + ' answered.' : '', res.switchedFrom ? (res.auto ? 'Auto model: ' + res.switchedFrom + ' didn’t answer on your key just now, so ' + res.model + ' answered — it’s used from now on.' : 'Your chosen model ' + res.switchedFrom + ' didn’t answer just now, so ' + res.model + ' answered this one.') : '',
         res.webDropped ? 'Google Search isn’t free on your key right now, so this answer is without web search (it will try again in a few hours).' : ''].filter(Boolean).join(' ');
       if(/MAX_TOKENS|length/i.test(res.finish)) a.t += '\n\n*(Answer cut short — ask “continue” for the rest.)*';
     }catch(e){
@@ -7756,7 +7798,7 @@ listBlock,
       ' Return ONLY JSON, no Markdown: {"questions":[{"q":"question","o":["A","B","C","D"],"a":0,"e":"one or two line explanation with the trick","s":"gs"}]} where "a" is the 0-based index of the correct option and "s" is the Tier 1 section: "en" English, "mt" Maths, "rs" Reasoning or "gs" General Awareness.';
     var user = (ctxText ? ctxText + '\n\n' : '') + 'Write ' + n + ' MCQs on: ' + topic;
     var hk = (ctl && ctl.hooks) || {};
-    var res = await aiCall(c, sys, [{ role: 'user', text: user }], { json: true, signal: signal, onText: function(t){ if(t && hk.onFirst) hk.onFirst(); }, onAttempt: hk.onAttempt, onStatus: hk.onStatus, onWait: hk.onWait });
+    var res = await aiCallAny(c, sys, [{ role: 'user', text: user }], { json: true, signal: signal, onText: function(t){ if(t && hk.onFirst) hk.onFirst(); }, onAttempt: hk.onAttempt, onStatus: hk.onStatus, onWait: hk.onWait }, 'questions');
     if(ctl) ctl.res = res;
     aiLearn(res);
     var raw = res.text.replace(/^[\s\S]*?(\{[\s\S]*\})[\s\S]*$/, '$1'), data;
@@ -7915,12 +7957,13 @@ listBlock,
       '<p class="help" style="margin-top:0;">Ask any SSC doubt — topics, questions, words, plans — and get answers made for the exam, using the app’s notes where it has them. It uses <b>your own free API key</b>: the key is saved on this device only and goes straight from your browser to the AI company, never to पाठShala.</p>' +
       '<div class="field"><label class="ai-switch"><input type="checkbox" id="aiOn"' + (c.on ? ' checked' : '') + '><span><b>Turn on the AI tutor</b><small>Adds an ✨ Ask AI button to the top bar</small></span></label></div>' +
       '<div id="aiMore"' + (c.on ? '' : ' style="display:none;"') + '>' +
-        '<div class="field"><label class="field-label" for="aiProv">AI service</label><select id="aiProv">' + Object.keys(AI_PROVIDERS).map(function(p){ return '<option value="' + p + '"' + (p === c.provider ? ' selected' : '') + '>' + escapeHtml(AI_PROVIDERS[p].name) + '</option>'; }).join('') + '</select><p class="help" id="aiProvNote"></p></div>' +
+        '<div class="field"><label class="field-label" for="aiProv">AI service <small style="font-weight:500;">(pick one to add or change its key)</small></label><select id="aiProv">' + Object.keys(AI_PROVIDERS).map(function(p){ return '<option value="' + p + '"' + (p === c.provider ? ' selected' : '') + '>' + escapeHtml(AI_PROVIDERS[p].name) + '</option>'; }).join('') + '</select><p class="help" id="aiProvNote"></p></div>' +
         '<div class="field"><label class="field-label" for="aiKeyIn">Your API key</label><div class="ai-keyrow"><input type="password" id="aiKeyIn" autocomplete="off" spellcheck="false" autocapitalize="off"><button type="button" class="btn ghost sm" id="aiKeyShow">Show</button></div>' +
           '<p class="help" id="aiKeyHelp"></p></div>' +
         '<div class="field"><label class="field-label" for="aiModel">Model</label><select id="aiModel"></select><p class="help"><b>Auto</b> ranks every model your key can use, takes the best one that answers, and skips models that fail. Press <b>Check key</b> to refresh the list.</p></div>' +
         '<div class="field-2col"><div class="field"><label class="field-label" for="aiLang">Reply language</label><select id="aiLang">' + opt(AI_LANGS, c.lang) + '</select></div>' +
           '<div class="field"><label class="field-label" for="aiLen">Answer length</label><select id="aiLen">' + opt(AI_LENS, c.len) + '</select></div></div>' +
+        '<div class="field"><label class="ai-switch"><input type="checkbox" id="aiMultiChk"' + (c.multi !== false ? ' checked' : '') + '><span><b>Use all my saved keys</b><small>With keys for more than one service, each question goes to the best one for it — Gemini for current affairs, Hindi, maths and long explanations; Groq (very fast) for quick answers, words and quiz questions — and if one is busy or out of free limit, the next one answers. <span id="aiKeysNow"></span></small></span></label></div>' +
         '<div class="field" id="aiWebRow"><label class="ai-switch"><input type="checkbox" id="aiWeb"' + (c.web ? ' checked' : '') + '><span><b>Let Gemini search Google</b><small>Fresher answers for current affairs, with source links. Uses a separate, smaller free allowance.</small></span></label></div>' +
         '<p class="help ai-privacy">Good to know: on free plans the AI company may use what you send to improve its models — don’t paste personal details. Answers can be wrong; check facts that matter against official sources.</p>' +
         '<div id="aiCheckMsg" class="help" role="status"></div>' +
@@ -7942,9 +7985,15 @@ listBlock,
       $('aiWebRow').style.display = P.web ? '' : 'none';
       $('aiCheckMsg').textContent = '';
       $('aiRemove').style.display = draft.keys[p] ? '' : 'none';
+      if(typeof showKeys === 'function') showKeys();
     };
-    var keep = function(){ draft.keys[draft.provider] = $('aiKeyIn').value.trim(); draft.models[draft.provider] = $('aiModel').value; };
-    fillProvider();
+    var keep = function(){ draft.keys[draft.provider] = $('aiKeyIn').value.trim(); draft.models[draft.provider] = $('aiModel').value; showKeys(); };
+    var showKeys = function(){
+      var have = Object.keys(AI_PROVIDERS).filter(function(p){ return draft.keys[p]; });
+      $('aiKeysNow').innerHTML = have.length ? '<br>Saved keys: <b>' + have.map(function(p){ return escapeHtml(AI_PROVIDERS[p].name); }).join(', ') + '</b>' + (have.length < 2 ? ' — add another service’s free key above to use this.' : '.') : '';
+    };
+    fillProvider(); showKeys();
+    $('aiKeyIn').addEventListener('input', function(){ draft.keys[draft.provider] = this.value.trim(); showKeys(); });
     $('aiOn').addEventListener('change', function(){ $('aiMore').style.display = this.checked ? '' : 'none'; });
     $('aiProv').addEventListener('change', function(){ keep(); draft.provider = this.value; fillProvider(); });
     $('aiKeyShow').addEventListener('click', function(){ var k = $('aiKeyIn'); k.type = k.type === 'password' ? 'text' : 'password'; this.textContent = k.type === 'password' ? 'Show' : 'Hide'; });
@@ -7987,10 +8036,10 @@ listBlock,
       cc.provider = draft.provider;
       Object.keys(draft.keys).forEach(function(p){ if(draft.keys[p]) cc.keys[p] = draft.keys[p]; else delete cc.keys[p]; });
       cc.models = draft.models; cc.modelList = draft.modelList;
-      cc.lang = $('aiLang').value; cc.len = $('aiLen').value; cc.web = $('aiWeb').checked;
+      cc.lang = $('aiLang').value; cc.len = $('aiLen').value; cc.web = $('aiWeb').checked; cc.multi = $('aiMultiChk').checked;
       aiSave(cc);
       close();
-      if(cc.on && !cc.keys[cc.provider]){ showToast('AI tutor is on — add a key to start asking.'); }
+      if(cc.on && !aiReady(cc)){ showToast('AI tutor is on — add a key to start asking.'); }
       else showToast(cc.on ? 'AI tutor is ready — tap ✨ in the top bar.' : 'AI tutor is off.');
       if(aiOpen){ if(!cc.on) closeAsk(false); else { aiRenderModes(); aiRender(); } }
     });
