@@ -6916,9 +6916,36 @@ listBlock,
     if(wait) err.retryAfter = Math.ceil(+wait[1]);
     return err;
   }
-  /** Stream an answer. msgs: [{ role: 'user' | 'assistant', text }]. Calls onText(full text so far). */
+  /** An abort signal that also fires after `ms` without progress (arm() again on every bit of progress). */
+  function aiTimer(outer, ms){
+    var ctl = new AbortController(), t = null, fired = false;
+    if(outer){ if(outer.aborted) ctl.abort(); else outer.addEventListener('abort', function(){ ctl.abort(); }); }
+    return {
+      signal: ctl.signal,
+      arm: function(){ clearTimeout(t); t = setTimeout(function(){ fired = true; ctl.abort(); }, ms); },
+      stop: function(){ clearTimeout(t); },
+      fired: function(){ return fired; }
+    };
+  }
+  /** Stream an answer. msgs: [{ role: 'user' | 'assistant', text }]. Calls onText(full text so far).
+      Gives up when the service sends nothing for a while, so a stuck request never hangs the chat. */
   async function aiStream(c, sys, msgs, opts){
     opts = opts || {};
+    var secs = opts.test ? 25 : opts.json ? 90 : 60;
+    var tm = aiTimer(opts.signal, secs * 1000);
+    tm.arm();
+    try{ return await aiStreamOnce(c, sys, msgs, opts, tm); }
+    catch(e){
+      if(tm.fired()){
+        var err = new Error((AI_PROVIDERS[c.provider] || {}).name + ' (' + aiModel(c) + ') didn’t reply within ' + secs + ' seconds. Free models get slow at busy times — try again, or pick another model in AI settings.');
+        err.status = 'timeout'; err.timeout = true;
+        throw err;
+      }
+      throw e;
+    }
+    finally{ tm.stop(); }
+  }
+  async function aiStreamOnce(c, sys, msgs, opts, tm){
     var key = c.keys[c.provider], model = aiModel(c), res;
     var maxTok = opts.test ? 512 : (c.len === 'detailed' || opts.json) ? 8192 : 6144;
     if(c.provider === 'gemini'){
@@ -6929,11 +6956,14 @@ listBlock,
       };
       if(opts.json) body.generationConfig.responseMimeType = 'application/json';
       if(opts.web) body.tools = [{ google_search: {} }];
+      if(opts.test && !opts.thinkOn) body.generationConfig.thinkingConfig = { thinkingBudget: 0 };   // the key check needs no thinking; keeps it quick
       res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':streamGenerateContent?alt=sse', {
-        method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key }, body: JSON.stringify(body), signal: opts.signal
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key }, body: JSON.stringify(body), signal: tm.signal
       });
       // web search not allowed for this model or not free on this key: ask again without it
-      if(!res.ok && opts.web && (res.status === 400 || res.status === 429)) return aiStream(c, sys, msgs, Object.assign({}, opts, { web: false, webDropped: true }));
+      if(!res.ok && opts.web && (res.status === 400 || res.status === 429)){ tm.stop(); return aiStream(c, sys, msgs, Object.assign({}, opts, { web: false, webDropped: true })); }
+      // a model that can't switch thinking off
+      if(!res.ok && res.status === 400 && opts.test && !opts.thinkOn){ tm.stop(); return aiStream(c, sys, msgs, Object.assign({}, opts, { thinkOn: true })); }
     } else {
       var url = c.provider === 'groq' ? 'https://api.groq.com/openai/v1/chat/completions' : 'https://openrouter.ai/api/v1/chat/completions';
       var headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key };
@@ -6941,7 +6971,7 @@ listBlock,
       var obody = { model: model, stream: true, temperature: opts.json ? 0.6 : 0.4, max_tokens: maxTok,
         messages: [{ role: 'system', content: sys }].concat(msgs.map(function(m){ return { role: m.role, content: m.text }; })) };
       if(opts.json && c.provider === 'groq') obody.response_format = { type: 'json_object' };
-      res = await fetch(url, { method: 'POST', headers: headers, body: JSON.stringify(obody), signal: opts.signal });
+      res = await fetch(url, { method: 'POST', headers: headers, body: JSON.stringify(obody), signal: tm.signal });
     }
     if(!res.ok) throw await aiHttpError(res);
     var out = { text: '', web: [], finish: '', model: model, webDropped: !!opts.webDropped }, seen = {};
@@ -6967,9 +6997,11 @@ listBlock,
         if(ch.finish_reason) out.finish = ch.finish_reason;
       }
     };
+    tm.arm();
     for(;;){
       var r = await reader.read();
       if(r.done) break;
+      tm.arm();
       buf += dec.decode(r.value, { stream: true });
       var lines = buf.split('\n'); buf = lines.pop();
       lines.forEach(take);
@@ -6998,13 +7030,13 @@ listBlock,
       free model when this one has no free allowance (or is used up / missing). The result says which model answered. */
   async function aiCall(c, sys, msgs, opts){
     opts = Object.assign({}, opts);
-    var p = c.provider, first = aiModel(c), model = first, tried = {}, waited = false, lastErr = null;
+    var p = c.provider, first = aiModel(c), model = first, tried = {}, waited = false, lastErr = null, maxTries = opts.test ? 3 : 5;
     var list = (c.modelList && c.modelList[p]) || [];
     var next = function(){
       var cands = AI_FALLBACK[p].concat(list.filter(function(m){ return p === 'gemini' ? /flash/.test(m) : true; }));
       return cands.filter(function(m){ return !tried[m] && (!list.length || list.indexOf(m) !== -1); })[0];
     };
-    for(var n = 0; n < 5; n++){
+    for(var n = 0; n < maxTries; n++){
       tried[model] = 1;
       try{
         var cc = Object.assign({}, c, { models: Object.assign({}, c.models) });
@@ -7023,9 +7055,12 @@ listBlock,
           await aiSleep(e.retryAfter * 1000 + 500, opts.signal);
           continue;
         }
-        if(e.status === 429 || e.status === 404 || (e.status === 400 && /model/i.test(e.raw || ''))){
+        if(e.timeout || e.status === 429 || e.status === 404 || e.status >= 500 || (e.status === 400 && /model/i.test(e.raw || ''))){
           var m = next();
-          if(m){ model = m; continue; }
+          if(m){
+            if(opts.onStatus) opts.onStatus((e.timeout ? model + ' didn’t reply in time' : model + ' isn’t available right now') + ' — trying ' + m + '…');
+            model = m; continue;
+          }
         }
         throw e;
       }
@@ -7255,7 +7290,9 @@ listBlock,
   }
 
   // ---- chat log, kept on this device ----
-  function aiLoadChat(){ if(aiChat) return aiChat; try{ aiChat = JSON.parse(lsGet(AI_CHAT_KEY) || '{}') || {}; }catch(e){ aiChat = {}; } if(!Array.isArray(aiChat.msgs)) aiChat.msgs = []; return aiChat; }
+  function aiLoadChat(){ if(aiChat) return aiChat; try{ aiChat = JSON.parse(lsGet(AI_CHAT_KEY) || '{}') || {}; }catch(e){ aiChat = {}; } if(!Array.isArray(aiChat.msgs)) aiChat.msgs = [];
+    aiChat.msgs.forEach(function(m){ if(m.pending){ m.pending = false; if(m.status || !m.t){ m.t = ''; m.err = 'This answer was interrupted. Press “Try again”.'; } delete m.status; delete m.statusText; } });
+    return aiChat; }
   function aiSaveChat(){ aiChat.msgs = aiChat.msgs.slice(-60); lsSet(AI_CHAT_KEY, JSON.stringify(aiChat)); }
   function aiModeInfo(id){ return AI_MODES.filter(function(m){ return m[0] === id; })[0] || AI_MODES[0]; }
 
@@ -7380,6 +7417,8 @@ listBlock,
     aiRender(); aiScrollEnd();
     var ctl = new AbortController();
     aiSetBusy(ctl);
+    var showStatus = function(s){ if(a.pending && (!a.t || a.status)){ a.t = a.statusText = '*' + s + '*'; a.status = true; aiUpdateLast(false); } };
+    var slow = setTimeout(function(){ showStatus('Still waiting for ' + aiModel(c) + ' — free models can be slow at busy times. Press ■ to stop.'); }, 12000);
     try{
       var ctx = await aiRetrieve(text, mode);
       ctx.q = text;
@@ -7401,14 +7440,16 @@ listBlock,
       hist.push({ role: 'user', text: (extra ? extra + '\n\n' : '') + (ctxText ? ctxText + '\n\n[Question]\n' : '') + text });
       var web = c.provider === 'gemini' && c.web && !(c.webOffUntil > Date.now()) && mode !== 'solve' && mode !== 'weak';
       var t0 = 0;
-      var res = await aiCall(c, aiSystem(c, mode, style), hist, { web: web, signal: ctl.signal, onWait: function(s){ a.t = '*Free per-minute limit hit — waiting ' + s + ' s and trying again…*'; aiUpdateLast(false); }, onText: function(t){
-        a.t = aiSplitMeta(t).body;
+      var res = await aiCall(c, aiSystem(c, mode, style), hist, { web: web, signal: ctl.signal, onStatus: showStatus, onWait: function(s){ showStatus('Free per-minute limit hit — waiting ' + s + ' s and trying again…'); }, onText: function(t){
+        var body = aiSplitMeta(t).body;
+        if(!body && a.status) return;
+        a.t = body; a.status = false;
         var now = Date.now(); if(now - t0 > 60){ t0 = now; aiUpdateLast(false); }
       } });
       var sp = aiSplitMeta(res.text);
       a.t = sp.body; a.topic = sp.topic; a.related = sp.related; a.web = res.web;
       aiLearn(res);
-      a.note = [res.switchedFrom ? 'Switched to ' + res.model + ' — ' + res.switchedFrom + ' isn’t free on your key right now. It’s saved for next time.' : '',
+      a.note = [res.switchedFrom ? 'Switched to ' + res.model + ' — ' + res.switchedFrom + ' didn’t answer on your key just now (no free allowance, or too slow). The new one is saved for next time.' : '',
         res.webDropped ? 'Google Search isn’t free on your key right now, so this answer is without web search (it will try again in a few hours).' : ''].filter(Boolean).join(' ');
       if(/MAX_TOKENS|length/i.test(res.finish)) a.t += '\n\n*(Answer cut short — ask “continue” for the rest.)*';
     }catch(e){
@@ -7422,6 +7463,9 @@ listBlock,
       }
       else { a.err = (e && e.message) || 'Something went wrong.'; a.errRaw = (e && e.raw) || ''; }
     }finally{
+      clearTimeout(slow);
+      if(a.status && a.t === a.statusText){ a.t = ''; if(!a.err) a.err = 'No answer came back. Try again.'; }   // only a waiting note was left
+      delete a.status; delete a.statusText;
       a.pending = false;
       if(aiChat.msgs.indexOf(a) !== -1){ aiSaveChat(); aiUpdateLast(true); }
       aiSetBusy(null);
@@ -7442,14 +7486,14 @@ listBlock,
     a.quiz = { title: topic, ai: true, qs: qs };
   }
   /** n new MCQs on a topic, written by the AI: [{ q, o, a, e, s }] (s = section: en / mt / rs / gs). */
-  async function aiGenQs(c, topic, n, ctx, signal){
+  async function aiGenQs(c, topic, n, ctx, signal, onStatus){
     var langNote = c.lang === 'hi' ? 'Write the questions in Hindi (keep English-language questions in English).' : c.lang === 'hinglish' ? 'Write the questions in simple English; explanations may be in Hinglish.' : 'Write in English.';
     var ctxText = aiContextText(ctx);
     var sys = 'You write SSC CGL Tier 1 practice MCQs. Exactly 4 options each, one correct; options must be plausible and distinct. Match real SSC difficulty and style (mix of easy, moderate and a few tricky), and cover different sub-topics instead of repeating one idea. ' +
       'For maths and reasoning, compute every answer carefully and double-check it. ' + langNote +
       ' Return ONLY JSON, no Markdown: {"questions":[{"q":"question","o":["A","B","C","D"],"a":0,"e":"one or two line explanation with the trick","s":"gs"}]} where "a" is the 0-based index of the correct option and "s" is the Tier 1 section: "en" English, "mt" Maths, "rs" Reasoning or "gs" General Awareness.';
     var user = (ctxText ? ctxText + '\n\n' : '') + 'Write ' + n + ' MCQs on: ' + topic;
-    var res = await aiCall(c, sys, [{ role: 'user', text: user }], { json: true, signal: signal, onText: function(){} });
+    var res = await aiCall(c, sys, [{ role: 'user', text: user }], { json: true, signal: signal, onText: function(){}, onStatus: onStatus });
     aiLearn(res);
     var raw = res.text.replace(/^[\s\S]*?(\{[\s\S]*\})[\s\S]*$/, '$1'), data;
     try{ data = JSON.parse(raw); }catch(e){ throw new Error('The AI’s questions came back in a broken format. Press “Try again”.'); }
@@ -7638,11 +7682,13 @@ listBlock,
         msg.textContent = 'Key accepted — asking ' + draft.models[p] + ' a test question…';
         var probe = { provider: p, keys: {}, models: {}, modelList: {}, len: 'short' };
         probe.keys[p] = k; probe.models[p] = draft.models[p]; probe.modelList[p] = list;
-        var r = await aiCall(probe, 'Reply with the single word OK.', [{ role: 'user', text: 'Say OK' }], { test: true });
+        var r = await aiCall(probe, 'Reply with the single word OK.', [{ role: 'user', text: 'Say OK' }], { test: true, onStatus: function(s){ msg.textContent = s; } });
         draft.models[p] = r.model;
         fillProvider();
-        msg.innerHTML = '<span class="ai-good">✓ Key works and ' + escapeHtml(r.model) + ' answered.</span> ' + (r.switchedFrom ? escapeHtml(r.switchedFrom) + ' isn’t free on your key, so ' + escapeHtml(r.model) + ' is picked instead. ' : '') + 'Press Save.';
-      }catch(e){ msg.innerHTML = '<span class="ai-bad">' + escapeHtml(!navigator.onLine ? 'You’re offline — connect and try again.' : (e instanceof TypeError ? 'Couldn’t reach ' + AI_PROVIDERS[p].name + '. Check your connection (or an ad blocker) and try again.' : e.message)) + '</span>' + (e && e.raw ? '<details class="ai-errd"><summary>What ' + escapeHtml(AI_PROVIDERS[p].name) + ' said</summary>' + escapeHtml(e.raw) + '</details>' : ''); }
+        msg.innerHTML = '<span class="ai-good">✓ Key works and ' + escapeHtml(r.model) + ' answered.</span> ' + (r.switchedFrom ? escapeHtml(r.switchedFrom) + ' didn’t answer on your key (no free allowance, or too slow), so ' + escapeHtml(r.model) + ' is picked instead. ' : '') + 'Press Save.';
+      }catch(e){
+        if(e && e.timeout){ msg.innerHTML = '<span class="ai-bad">The key is accepted, but ' + escapeHtml(AI_PROVIDERS[p].name) + ' didn’t answer the test question in time.</span> It’s probably busy. You can still press Save and ask a question — or pick another model above and check again.'; btn.disabled = false; return; }
+        msg.innerHTML = '<span class="ai-bad">' + escapeHtml(!navigator.onLine ? 'You’re offline — connect and try again.' : (e instanceof TypeError ? 'Couldn’t reach ' + AI_PROVIDERS[p].name + '. Check your connection (or an ad blocker) and try again.' : e.message)) + '</span>' + (e && e.raw ? '<details class="ai-errd"><summary>What ' + escapeHtml(AI_PROVIDERS[p].name) + ' said</summary>' + escapeHtml(e.raw) + '</details>' : ''); }
       btn.disabled = false;
     });
     $('aiSaveBtn').addEventListener('click', function(){
