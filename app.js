@@ -167,6 +167,7 @@
         '<div class="hub-side"><div class="hub-tbs">' +
           '<button class="hub-tb" data-track-history="' + id + '" title="Your sessions, scores and mocks">🕘<span>History</span></button>' +
           '<button class="hub-tb' + (x.due ? ' due' : '') + '" data-track-revise="' + id + '" title="' + escapeAttr(revTitle) + '">🔁<span>' + (x.due ? 'Revise!' : 'Revise') + '</span></button>' +
+          (document.body.classList.contains('ai-on') ? '<button class="hub-tb ai" data-ai-app="' + id + '" title="AI: analyse my progress in this app, important topics, plan, mock">✨<span>AI</span></button>' : '') +
         '</div><div class="hub-ring" title="' + pct + '% done">' + ringSvg(pct, m.color, 50) + '<span>' + pct + '%</span></div></div></div>' +
       '<div class="hub-facts">' +
         '<div><b>' + (m.lessons || '—') + '</b><span>' + (m.unit || 'lessons') + '</span></div>' +
@@ -1255,7 +1256,7 @@
         return '<div class="dq-rev" style="--dq-c:' + STUDY[q.mod].color + '"><div class="dq-meta"><span>' + escapeHtml(MOD_NAME[q.mod]) + '</span>' + (q.tag ? '<span>' + escapeHtml(q.tag) + '</span>' : '') + '</div>' +
           '<div class="dq-q">' + escapeHtml(q.q) + '</div>' +
           (q.k === 'e' ? '<div class="dq-parts">' + q.o.map(function(o, i){ return '<span class="' + (i === q.a ? 'bad' : '') + '">' + escapeHtml(o) + '</span>'; }).join(' ') + '</div>' : '') +
-          '<div class="dq-ans">' + (q.k === 'e' ? (/no error/i.test(q.o[q.a]) ? '✓ No error' : 'Error is in: ' + escapeHtml(q.o[q.a])) : '✓ ' + escapeHtml(q.o[q.a])) + '</div>' + (q.e ? '<div class="dq-exp">' + escapeHtml(q.e) + '</div>' : '') + '</div>';
+          '<div class="dq-ans">' + (q.k === 'e' ? (/no error/i.test(q.o[q.a]) ? '✓ No error' : 'Error is in: ' + escapeHtml(q.o[q.a])) : '✓ ' + escapeHtml(q.o[q.a])) + '</div>' + (q.e ? '<div class="dq-exp">' + escapeHtml(q.e) + '</div>' : '') + aiQBtn(q) + '</div>';
       }).join('') + '</div>');
     document.querySelectorAll('#drillBody [data-only]').forEach(function(b){ b.addEventListener('click', function(){ drill.only = b.dataset.only || null; renderMistakes(); }); });
     document.getElementById('mbPractice').addEventListener('click', function(){
@@ -1288,7 +1289,7 @@
       '<div class="dq-card" style="--dq-c:' + (STUDY[q.mod] ? STUDY[q.mod].color : 'var(--mustard)') + '"><div class="dq-meta"><span>Q ' + (d.i + 1) + ' / ' + d.qs.length + '</span><span>' + escapeHtml(MOD_NAME[q.mod]) + '</span>' + (q.tag ? '<span>' + escapeHtml(q.tag) + '</span>' : '') + '</div>' +
       '<div class="dq-q">' + escapeHtml(q.q) + '</div><div class="dq-opts">' +
       q.o.map(function(_, i){ return optHtml(q, i, !answered ? '' : (i === q.a ? ' ok' : (i === q.pick ? ' no' : ''))); }).join('') + '</div>' +
-      (answered ? '<div class="dq-fb ' + (q.pick === q.a ? 'good' : 'bad') + '"><b>' + (d.from ? (q.pick === q.a ? 'Right.' : 'Not quite — added to your Mistakes book.') : (q.pick === q.a ? 'Right — removed from your Mistakes book.' : 'Not yet — it stays in the book.')) + '</b>' + (q.e ? '<div>' + escapeHtml(q.e) + '</div>' : '') + '</div>' : '') +
+      (answered ? '<div class="dq-fb ' + (q.pick === q.a ? 'good' : 'bad') + '"><b>' + (d.from ? (q.pick === q.a ? 'Right.' : 'Not quite — added to your Mistakes book.') : (q.pick === q.a ? 'Right — removed from your Mistakes book.' : 'Not yet — it stays in the book.')) + '</b>' + (q.e ? '<div>' + escapeHtml(q.e) + '</div>' : '') + aiQBtn(q) + '</div>' : '') +
       '</div><div class="dq-actions">' + (answered ? '<button class="btn teal" id="pNext">' + (d.i === d.qs.length - 1 ? 'Finish' : 'Next ›') + '</button>' : '<span class="help">Tip: press 1–4 on a keyboard</span>') + '</div>');
     if(!answered) document.querySelectorAll('#drillBody [data-opt]').forEach(function(b){ b.addEventListener('click', function(){
       q.pick = +b.dataset.opt;
@@ -1555,7 +1556,7 @@
         return '<div class="dq-rev" style="--dq-c:' + (STUDY[q.mod] ? STUDY[q.mod].color : 'var(--mustard)') + '"><div class="dq-meta"><span>' + escapeHtml(MOD_NAME[q.mod]) + '</span>' + (q.tag ? '<span>' + escapeHtml(q.tag) + '</span>' : '') + '<span>' + (q.pick === null ? 'Skipped' : 'You chose ' + 'ABCD'.charAt(q.pick)) + '</span></div>' +
           '<div class="dq-q">' + escapeHtml(q.q) + '</div>' +
           (q.src && q.src.k === 'e' ? '<div class="dq-parts">' + q.o.map(function(o, i){ return '<span class="' + (i === q.a ? 'bad' : '') + '">' + escapeHtml(o) + '</span>'; }).join(' ') + '</div>' : '') +
-          '<div class="dq-ans">' + (q.src && q.src.k === 'e' ? (/no error/i.test(q.o[q.a]) ? '✓ No error' : 'Error is in: ' + escapeHtml(q.o[q.a])) : '✓ ' + escapeHtml(q.o[q.a])) + '</div>' + (q.e ? '<div class="dq-exp">' + escapeHtml(q.e) + '</div>' : '') + '</div>';
+          '<div class="dq-ans">' + (q.src && q.src.k === 'e' ? (/no error/i.test(q.o[q.a]) ? '✓ No error' : 'Error is in: ' + escapeHtml(q.o[q.a])) : '✓ ' + escapeHtml(q.o[q.a])) + '</div>' + (q.e ? '<div class="dq-exp">' + escapeHtml(q.e) + '</div>' : '') + aiQBtn(q) + '</div>';
       }).join('') + '</div>' : '<div class="dq-empty">Perfect paper. 🏆</div>'));
     document.getElementById('mkAgain').addEventListener('click', function(){ if(d.back){ d.back(); return; } drill = { kind: 'mock', phase: 'setup' }; renderMockSetup(); });
     document.getElementById('mkMist').addEventListener('click', function(){ document.getElementById('drillTitle').textContent = 'Mistakes book'; drill = { kind: 'mistakes', phase: 'list', only: null }; renderMistakes(); });
@@ -6876,11 +6877,20 @@ listBlock,
   var AI_STYLED = { explain: 1, solve: 1, vocab: 1, pyq: 1 };
   function aiStyleInfo(id){ return AI_STYLES.filter(function(x){ return x[0] === id; })[0] || AI_STYLES[0]; }
   MOD_NAME.ai = 'AI quiz';
-  var aiOpen = false, aiMode = 'explain', aiChat = null, aiBusy = null;
+  var aiOpen = false, aiMode = 'explain', aiChat = null, aiBusy = null, aiFromHash = '', aiTopFrom = null;
+  var aiCtx = null;   // { mod, lesson: { id, t } | null, label } — the app or chapter the questions are about
+  function aiCtxLabel(x){ return x ? (MOD_NAME[x.mod] || (STUDY[x.mod] || {}).title || x.mod) + (x.lesson ? ' › ' + x.lesson.t : '') : ''; }
+  function aiRenderCtx(){
+    var el = document.getElementById('askCtx');
+    if(!aiCtx){ el.style.display = 'none'; el.innerHTML = ''; return; }
+    el.style.display = '';
+    el.innerHTML = '<span>' + ((STUDY[aiCtx.mod] || {}).ico || '📖') + ' Asking about <b>' + escapeHtml(aiCtxLabel(aiCtx)) + '</b></span><button type="button" id="askCtxX" aria-label="Ask about anything instead">✕</button>';
+  }
 
   function aiCfg(){
     var c; try{ c = JSON.parse(lsGet(AI_KEY) || '{}') || {}; }catch(e){ c = {}; }
-    c.keys = c.keys || {}; c.models = c.models || {}; c.modelList = c.modelList || {};
+    c.keys = c.keys || {}; c.models = c.models || {}; c.modelList = c.modelList || {}; c.autoPick = c.autoPick || {}; c.bad = c.bad || {}; c.listAt = c.listAt || {};
+    if(!c.autoV){ c.models = {}; c.autoV = 1; }   // earlier versions saved whichever model answered; start everyone on Auto
     if(!AI_PROVIDERS[c.provider]) c.provider = 'gemini';
     if(!c.lang) c.lang = 'en';
     if(!c.len) c.len = 'normal';
@@ -6889,10 +6899,38 @@ listBlock,
   }
   function aiSave(c){ lsSet(AI_KEY, JSON.stringify(c)); aiRefreshEntry(); }
   function aiReady(c){ c = c || aiCfg(); return !!(c.on && c.keys[c.provider]); }
-  function aiModel(c){ return c.models[c.provider] || AI_PROVIDERS[c.provider].def; }
+  /** 'auto' (the default): the best model on the key's list that has worked lately. */
+  function aiIsAuto(c){ var m = c.models[c.provider]; return !m || m === 'auto'; }
+  function aiModel(c){
+    if(!aiIsAuto(c)) return c.models[c.provider];
+    return (c.autoPick && c.autoPick[c.provider]) || aiRanked(c)[0] || AI_PROVIDERS[c.provider].def;
+  }
+  /** Score a model id: newer and stronger first; on Gemini's free tier the newest Flash is the best all-rounder. */
+  function aiScore(p, id){
+    if(p === 'gemini'){
+      var v = /gemini-(\d+(?:\.\d+)?)/.exec(id), sc = v ? +v[1] * 100 : 50;   // aliases like gemini-flash-latest sit below numbered models
+      sc += /flash-lite/.test(id) ? 10 : /flash/.test(id) ? 30 : /pro/.test(id) ? 20 : 0;
+      if(/preview|exp/.test(id)) sc -= 15;
+      return sc;
+    }
+    var size = /(\d+)b\b/i.exec(id), sc2 = size ? Math.min(+size[1], 250) / 5 : 10;
+    if(/gpt-oss-120b/.test(id)) sc2 += 60; else if(/llama-3\.3-70b/.test(id)) sc2 += 50; else if(/deepseek|qwen3|kimi|llama-4|gpt-oss/.test(id)) sc2 += 40;
+    if(/instant|mini|small|nano/.test(id)) sc2 -= 15;
+    return sc2;
+  }
+  function aiBadRecently(c, m){ var t = c.bad && c.bad[m]; return !!t && Date.now() - t < 12 * 3600 * 1000; }
+  function aiRanked(c){
+    var p = c.provider, list = ((c.modelList && c.modelList[p]) || []).slice();
+    if(!list.length) list = [AI_PROVIDERS[p].def].concat(AI_FALLBACK[p]);
+    list = list.filter(function(m, i){ return list.indexOf(m) === i; }).sort(function(a, b){ return aiScore(p, b) - aiScore(p, a); });
+    var good = list.filter(function(m){ return !aiBadRecently(c, m); });
+    return good.length ? good : list;
+  }
+  function aiMarkBad(m){ var c = aiCfg(); c.bad = c.bad || {}; c.bad[m] = Date.now(); if(c.autoPick && c.autoPick[c.provider] === m) delete c.autoPick[c.provider]; aiSave(c); }
   function aiRefreshEntry(){
-    var b = document.getElementById('askBtn');
-    if(b) b.style.display = aiCfg().on ? '' : 'none';
+    var on = aiCfg().on;
+    ['askBtn', 'studyAskBtn'].forEach(function(id){ var b = document.getElementById(id); if(b) b.style.display = on ? '' : 'none'; });
+    if(document.body.classList.contains('ai-on') !== on){ document.body.classList.toggle('ai-on', on); if(currentUser) renderHomeSoon(); }
   }
   aiRefreshEntry();
 
@@ -7033,7 +7071,7 @@ listBlock,
     var p = c.provider, first = aiModel(c), model = first, tried = {}, waited = false, lastErr = null, maxTries = opts.test ? 3 : 5;
     var list = (c.modelList && c.modelList[p]) || [];
     var next = function(){
-      var cands = AI_FALLBACK[p].concat(list.filter(function(m){ return p === 'gemini' ? /flash/.test(m) : true; }));
+      var cands = aiIsAuto(c) ? aiRanked(Object.assign({}, c, { bad: aiCfg().bad })) : AI_FALLBACK[p].concat(list.filter(function(m){ return p === 'gemini' ? /flash/.test(m) : true; }));
       return cands.filter(function(m){ return !tried[m] && (!list.length || list.indexOf(m) !== -1); })[0];
     };
     for(var n = 0; n < maxTries; n++){
@@ -7043,6 +7081,7 @@ listBlock,
         cc.models[p] = model;
         var r = await aiStream(cc, sys, msgs, opts);
         r.switchedFrom = model !== first ? first : '';
+        r.auto = aiIsAuto(c);
         return r;
       }catch(e){
         if(e && e.name === 'AbortError') throw e;
@@ -7055,6 +7094,7 @@ listBlock,
           await aiSleep(e.retryAfter * 1000 + 500, opts.signal);
           continue;
         }
+        if(e.timeout || e.zero || e.status === 404 || (e.status === 429 && /per.?day|PerDay|daily/i.test(e.raw || ''))) aiMarkBad(model);   // skip it for a while
         if(e.timeout || e.status === 429 || e.status === 404 || e.status >= 500 || (e.status === 400 && /model/i.test(e.raw || ''))){
           var m = next();
           if(m){
@@ -7067,10 +7107,20 @@ listBlock,
     }
     throw lastErr;
   }
+  function aiRefreshModels(){
+    var c = aiCfg(), p = c.provider, k = c.keys[p];
+    if(!c.on || !k || (c.listAt[p] && Date.now() - c.listAt[p] < 24 * 3600 * 1000) || !navigator.onLine) return;
+    aiListModels(p, k).then(function(list){
+      var cc = aiCfg(); cc.modelList[p] = list; cc.listAt[p] = Date.now();
+      var best = aiRanked(cc)[0];
+      if(cc.autoPick[p] && best && best !== cc.autoPick[p]) delete cc.autoPick[p];   // a better model appeared: try it first
+      aiSave(cc); if(aiOpen) aiRenderModes();
+    }).catch(function(){});
+  }
   /** After an answer: remember a model that worked, and pause web search if Google refused it. */
   function aiLearn(r){
     var c = aiCfg(), changed = false;
-    if(r.switchedFrom && r.model){ c.models[c.provider] = r.model; changed = true; }
+    if(r.auto && r.model && c.autoPick[c.provider] !== r.model){ c.autoPick[c.provider] = r.model; changed = true; }
     if(r.webDropped){ c.webOffUntil = Date.now() + 6 * 3600 * 1000; changed = true; }
     if(changed) aiSave(c);
   }
@@ -7191,7 +7241,7 @@ listBlock,
       '\nWeakest topics: ' + (weak.join('; ') || 'none under 80% yet') + (none.length ? '\nNot started yet: ' + none.join(', ') : '') +
       '\nIn the Mistakes book: ' + totalMistakes() + ' questions.';
   }
-  function aiSystem(c, mode, style){
+  function aiSystem(c, mode, style, where){
     var days = daysToExam();
     var lang = {
       en: 'Reply in simple, clear English (Indian context).',
@@ -7205,6 +7255,7 @@ listBlock,
       vocab: 'MODE — Vocabulary. For each word, idiom or phrase: meaning in English and in Hindi, part of speech, a memory trick, synonyms, antonyms, one exam-style sentence, confusing look-alikes, and how SSC tests it (synonym / antonym / idiom / one-word substitution / spelling / cloze).',
       plan: 'MODE — Brainstorm like a mentor. Think it through with the student: give concrete, realistic plans (day-wise or hour-wise), strategies and priorities by SSC weightage; ask one clarifying question at the end if it would help. Be encouraging, practical and specific.',
       pyq: 'MODE — Previous-year questions (PYQs). Give 8–10 SSC previous-year questions on the topic (CGL first, then CHSL, CPO, MTS, Selection Post). Name the exam, year and shift ONLY when you are sure the question is real; otherwise label it “PYQ-style”. For each: the question, 4 options, **Answer**, and a one-line solution or fact. Finish with how often the topic appears and which pattern repeats. Use the app’s questions when they are given.',
+      app: 'MODE — App coach. You get the student’s real progress in one app of पाठShala (lessons done and not done, accuracy by topic, mistakes, time left). Answer what they ask about that app; when asked to analyse, give: where they stand in one line → what is going well → the gaps that cost marks (weak topics, important lessons not done) → the app’s most important topics for SSC with rough weightage → a concrete plan for the days left.',
       weak: 'MODE — Weak spots. You are given the student’s real accuracy data from the app. Diagnose what to fix first and why (weightage × weakness), give a 7-day fix plan and specific tips for each weak topic. Mention apps they have not started if those are high-weightage.'
     }[mode] || '';
     return [
@@ -7220,6 +7271,7 @@ listBlock,
       '- English: the rule plus the typical error SSC hides; for words give meaning (English + Hindi), a trick, synonyms and antonyms.',
       '- When the message includes notes or questions from the पाठShala app, treat them as correct and prefer them over memory. When they don’t cover the question, answer from your own knowledge — keep the SSC focus.',
       '- If asked something unrelated to studying, answer briefly and kindly steer back to preparation.',
+      where ? 'Right now the student is studying ' + where + ' in the app; read the question in that light.' : '',
       lang, len, modes,
       AI_STYLED[mode] && style && style !== 'auto' ? aiStyleInfo(style)[3] + ' The STYLE decides the length and shape of the answer; where it differs from the MODE structure, follow the STYLE.' : '',
       AI_STYLED[mode] ? 'After the answer, end with exactly these two lines, plain text, no formatting:\nTOPIC: <the SSC topic of this answer in 2–5 words>\nRELATED: <3–4 closely related SSC topics to study next, separated by |>' : ''
@@ -7294,10 +7346,11 @@ listBlock,
     aiChat.msgs.forEach(function(m){ if(m.pending){ m.pending = false; if(m.status || !m.t){ m.t = ''; m.err = 'This answer was interrupted. Press “Try again”.'; } delete m.status; delete m.statusText; } });
     return aiChat; }
   function aiSaveChat(){ aiChat.msgs = aiChat.msgs.slice(-60); lsSet(AI_CHAT_KEY, JSON.stringify(aiChat)); }
-  function aiModeInfo(id){ return AI_MODES.filter(function(m){ return m[0] === id; })[0] || AI_MODES[0]; }
+  var AI_MODES_HIDDEN = [['app', '📊', 'App coach', 'Ask anything about this app…']];
+  function aiModeInfo(id){ return AI_MODES.concat(AI_MODES_HIDDEN).filter(function(m){ return m[0] === id; })[0] || AI_MODES[0]; }
 
   function aiMsgHtml(m, i){
-    if(m.r === 'u') return '<div class="ai-msg ai-u"><div class="ai-bub"><span class="ai-tag">' + aiModeInfo(m.mode)[1] + ' ' + escapeHtml(aiModeInfo(m.mode)[2]) + (m.style && m.style !== 'auto' ? ' · ' + escapeHtml(aiStyleInfo(m.style)[2]) : '') + '</span>' + escapeHtml(m.t).replace(/\n/g, '<br>') + '</div></div>';
+    if(m.r === 'u') return '<div class="ai-msg ai-u"><div class="ai-bub"><span class="ai-tag">' + aiModeInfo(m.mode)[1] + ' ' + escapeHtml(aiModeInfo(m.mode)[2]) + (m.style && m.style !== 'auto' ? ' · ' + escapeHtml(aiStyleInfo(m.style)[2]) : '') + (m.ctx ? ' · ' + escapeHtml(aiCtxLabel(m.ctx)) : '') + '</span>' + escapeHtml(m.t).replace(/\n/g, '<br>') + '</div></div>';
     var who = AI_PROVIDERS[aiCfg().provider].name.replace(/^Google /, '');
     var body = m.err ? '<div class="ai-err">' + escapeHtml(m.err) + '</div>' + (m.errRaw ? '<details class="ai-errd"><summary>What ' + escapeHtml(who) + ' said</summary>' + escapeHtml(m.errRaw) + '</details>' : '') : aiMd(m.t);
     if(m.note && !m.err) body += '<div class="ai-note">ℹ️ ' + escapeHtml(m.note) + '</div>';
@@ -7321,16 +7374,20 @@ listBlock,
   var AI_NEXT = {
     pyq: ['📜', 'PYQs on this'], quiz: ['❓', 'Practice questions'], similar: ['🔁', 'Similar questions'], mock: ['📝', 'Mock test on this'],
     simpler: ['🐣', 'Explain simpler'], examples: ['🧩', 'More examples'], tricks: ['🎯', 'Memory tricks'], notes: ['📋', 'Revision notes'],
-    concept: ['💡', 'Explain the concept'], another: ['⚡', 'Another method'], family: ['🔗', 'Word family & look-alikes'], more: ['📜', 'More PYQs']
+    concept: ['💡', 'Explain the concept'], another: ['⚡', 'Another method'], family: ['🔗', 'Word family & look-alikes'], more: ['📜', 'More PYQs'],
+    imp: ['⭐', 'Important topics'], weight: ['📈', 'Weightage in exam'], appmock: ['📝', 'Mock test on this app'], plan: ['🗓️', 'Make a study plan'],
+    weakfix: ['🎯', 'Fix my weak topics'], lastmin: ['⚡', 'Last-minute revision']
   };
   var AI_NEXT_BY_MODE = {
     explain: ['pyq', 'quiz', 'mock', 'simpler', 'examples', 'tricks', 'notes'],
     solve: ['similar', 'concept', 'another', 'pyq', 'mock'],
     vocab: ['quiz', 'family', 'pyq', 'mock'],
-    pyq: ['more', 'quiz', 'mock', 'tricks', 'notes']
+    pyq: ['more', 'quiz', 'mock', 'tricks', 'notes'],
+    app: ['imp', 'weight', 'appmock', 'plan', 'pyq', 'weakfix', 'lastmin']
   };
   function aiTopicOf(i){
     var m = aiChat.msgs[i], u = aiChat.msgs[i - 1];
+    if(m && m.mode === 'app' && m.ctx) return aiCtxLabel({ mod: m.ctx.mod });
     return (m && m.topic) || (u && u.r === 'u' ? u.t.replace(/\s+/g, ' ').slice(0, 80) : '');
   }
   function aiNextHtml(m, i){
@@ -7340,7 +7397,17 @@ listBlock,
       (m.related && m.related.length ? '<div class="ai-next-h">Related topics</div><div class="ai-next-row">' + m.related.map(function(t){ return '<button class="rel" data-ai-rel="' + escapeAttr(t) + '">🔗 ' + escapeHtml(t) + '</button>'; }).join('') + '</div>' : '') + '</div>';
   }
   function aiNext(k, i){
-    var t = aiTopicOf(i), q = '“' + t + '”';
+    var t = aiTopicOf(i), q = '“' + t + '”', m = aiChat.msgs[i], app = m && m.ctx && m.mode === 'app' ? { mod: m.ctx.mod, lesson: null } : undefined;
+    if(k === 'appmock' && app){ aiAppMock(app.mod); return; }
+    var appGo = app && {
+      imp: ['The most important topics of ' + t + ' for SSC CGL, ranked, with what is asked from each.', 'app'],
+      weight: ['How many questions come from ' + t + ' in SSC CGL Tier 1 and Tier 2, the trend in recent years, and which sub-topics carry them.', 'app'],
+      plan: ['Make a day-by-day plan to finish and revise ' + t + ' before my exam, using my progress.', 'app'],
+      pyq: [t, 'pyq'],
+      weakfix: ['Teach me my weak topics in ' + t + ', one by one, with tricks and 2 practice questions each.', 'app'],
+      lastmin: ['Last-minute revision sheet for ' + t + ': the facts and formulas most likely to be asked.', 'app']
+    }[k];
+    if(appGo){ aiAsk(appGo[0], appGo[1], false, { ctx: app, style: appGo[1] === 'pyq' ? 'auto' : undefined }); return; }
     var go = {
       pyq: [t, 'pyq'], quiz: [t, 'quiz'], similar: [t, 'quiz'], mock: [t, 'mock'],
       simpler: ['Explain ' + q + ' again more simply, from the basics.', 'explain', 'basics'],
@@ -7352,7 +7419,7 @@ listBlock,
       family: ['Word family, look-alikes and confusables for ' + q + '.', 'vocab', 'auto'],
       more: ['More previous-year questions on ' + q + ', different from the ones above.', 'pyq', 'auto']
     }[k];
-    if(go) aiAsk(go[0], go[1], false, { style: go[2] });
+    if(go) aiAsk(go[0], go[1], false, { style: go[2], ctx: m && m.ctx ? m.ctx : null });
   }
   function aiRender(){
     var log = document.getElementById('askLog'), c = aiCfg();
@@ -7381,7 +7448,7 @@ listBlock,
     st.style.display = AI_STYLED[aiMode] ? '' : 'none';
     st.innerHTML = '<span>Answer:</span>' + AI_STYLES.map(function(x){ return '<button type="button" data-ai-style="' + x[0] + '" class="' + (x[0] === (c.style || 'auto') ? 'on' : '') + '">' + x[1] + ' ' + escapeHtml(x[2]) + '</button>'; }).join('');
     sel.value = c.lang;
-    document.getElementById('askModelLab').textContent = aiReady(c) ? aiModel(c) : '';
+    document.getElementById('askModelLab').textContent = aiReady(c) ? (aiIsAuto(c) ? 'auto · ' : '') + aiModel(c) : '';
   }
   function aiSetMode(id){ aiMode = id; aiRenderModes(); if(!aiLoadChat().msgs.length) aiRender(); }
 
@@ -7405,14 +7472,17 @@ listBlock,
   async function aiAsk(text, mode, retry, opt){
     var c = aiCfg();
     var style = AI_STYLED[mode] ? ((opt && opt.style) || c.style || 'auto') : '';
+    var where = opt && 'ctx' in opt ? opt.ctx : (mode === 'weak' ? null : aiCtx);
+    if(mode === 'app' && !(where && where.mod)) mode = 'plan';
     if(aiBusy) return;
     if(!aiReady(c)){ aiOpenSettings(); return; }
     aiLoadChat();
     text = String(text || '').trim();
     if(mode === 'weak' && !text) text = AI_TRY.weak[0];
     if(!text) return;
-    if(!retry) aiChat.msgs.push({ r: 'u', t: text, mode: mode, style: style, ts: Date.now() });
-    var a = { r: 'a', t: '', mode: mode, style: style, pending: true, ts: Date.now() };
+    var wctx = where ? { mod: where.mod, lesson: where.lesson || null } : null;
+    if(!retry) aiChat.msgs.push({ r: 'u', t: text, mode: mode, style: style, ctx: wctx, ts: Date.now() });
+    var a = { r: 'a', t: '', mode: mode, style: style, ctx: wctx, pending: true, ts: Date.now() };
     aiChat.msgs.push(a);
     aiRender(); aiScrollEnd();
     var ctl = new AbortController();
@@ -7422,16 +7492,21 @@ listBlock,
     try{
       var ctx = await aiRetrieve(text, mode);
       ctx.q = text;
+      if(wctx) await aiAddWhere(ctx, wctx, mode);
       if(mode === 'quiz') return await aiQuiz(c, text, ctx, a, ctl, false);
       if(mode === 'mock') return await aiMock(c, text, ctx, a, ctl);
       var extra = '';
+      if(mode === 'app'){
+        try{ await loadStudyBank(); }catch(e){}
+        extra = '[The student’s progress in ' + aiCtxLabel({ mod: wctx.mod }) + ']\n' + await aiAppSummary(wctx.mod);
+      }
       if(mode === 'weak'){
         try{ await loadStudyBank(); }catch(e){}
         var ws = aiWeakSummary();
         if(!ws){ a.pending = false; a.local = []; a.t = 'There’s nothing to analyse yet — answer some questions in any mini app, the Mistakes book or a mixed mock, then ask again. Meanwhile, try **🧠 Brainstorm** for a study plan.'; aiSaveChat(); aiUpdateLast(true); return; }
         extra = '[The student’s accuracy data from the app]\n' + ws;
       }
-      var ctxText = mode === 'weak' || mode === 'plan' ? '' : aiContextText(ctx);
+      var ctxText = mode === 'weak' || mode === 'plan' || mode === 'app' ? '' : aiContextText(ctx);
       if(ctxText) a.src = ctx.lessons.map(function(r){ return { mod: r.l.mod, id: r.l.id, t: r.l.t }; });
       // the conversation so far (text only) + this question with its notes
       var hist = [], prior = aiChat.msgs.slice(0, -2).filter(function(m){ return m.t && !m.err && !m.local; }).slice(-8);
@@ -7440,7 +7515,7 @@ listBlock,
       hist.push({ role: 'user', text: (extra ? extra + '\n\n' : '') + (ctxText ? ctxText + '\n\n[Question]\n' : '') + text });
       var web = c.provider === 'gemini' && c.web && !(c.webOffUntil > Date.now()) && mode !== 'solve' && mode !== 'weak';
       var t0 = 0;
-      var res = await aiCall(c, aiSystem(c, mode, style), hist, { web: web, signal: ctl.signal, onStatus: showStatus, onWait: function(s){ showStatus('Free per-minute limit hit — waiting ' + s + ' s and trying again…'); }, onText: function(t){
+      var res = await aiCall(c, aiSystem(c, mode, style, wctx ? aiCtxLabel(wctx) : ''), hist, { web: web, signal: ctl.signal, onStatus: showStatus, onWait: function(s){ showStatus('Free per-minute limit hit — waiting ' + s + ' s and trying again…'); }, onText: function(t){
         var body = aiSplitMeta(t).body;
         if(!body && a.status) return;
         a.t = body; a.status = false;
@@ -7449,7 +7524,7 @@ listBlock,
       var sp = aiSplitMeta(res.text);
       a.t = sp.body; a.topic = sp.topic; a.related = sp.related; a.web = res.web;
       aiLearn(res);
-      a.note = [res.switchedFrom ? 'Switched to ' + res.model + ' — ' + res.switchedFrom + ' didn’t answer on your key just now (no free allowance, or too slow). The new one is saved for next time.' : '',
+      a.note = [res.switchedFrom ? (res.auto ? 'Auto model: ' + res.switchedFrom + ' didn’t answer on your key just now, so ' + res.model + ' answered — it’s used from now on.' : 'Your chosen model ' + res.switchedFrom + ' didn’t answer just now, so ' + res.model + ' answered this one.') : '',
         res.webDropped ? 'Google Search isn’t free on your key right now, so this answer is without web search (it will try again in a few hours).' : ''].filter(Boolean).join(' ');
       if(/MAX_TOKENS|length/i.test(res.finish)) a.t += '\n\n*(Answer cut short — ask “continue” for the rest.)*';
     }catch(e){
@@ -7470,6 +7545,65 @@ listBlock,
       if(aiChat.msgs.indexOf(a) !== -1){ aiSaveChat(); aiUpdateLast(true); }
       aiSetBusy(null);
     }
+  }
+  /** Asked from inside a chapter (or about an app): put that chapter's notes, and its questions, first. */
+  async function aiAddWhere(ctx, w, mode){
+    try{
+      var idx = await loadSearchIndex();
+      if(w.lesson){
+        var l = idx.lessons.filter(function(x){ return x.mod === w.mod && x.id === w.lesson.id; })[0];
+        if(l){ ctx.lessons = [{ l: l, score: 99 }].concat(ctx.lessons.filter(function(r){ return r.l !== l; })).slice(0, 3); }
+      }
+      if(mode === 'quiz' || mode === 'mock'){
+        // this chapter's questions first (or, for an app, its matching questions first)
+        var mine = w.lesson ? idx.qs.filter(function(x){ return x.mod === w.mod && x.q.l === w.lesson.id; }).map(function(x){ return { mod: x.mod, q: x.q, have: 99 }; })
+          : ctx.qs.filter(function(x){ return x.mod === w.mod; });
+        var seen = {};
+        ctx.qs = mine.concat(ctx.qs).filter(function(x){ var k = x.mod + ':' + x.q.id; if(seen[k]) return false; seen[k] = 1; return true; });
+      }
+    }catch(e){}
+  }
+  /** Everything the app knows about the student's progress in one mini app, as text for the AI. */
+  async function aiAppSummary(id){
+    var m = STUDY[id] || {}, pr = studyProgress(id), x = trackInfo(id), st = studyState(id), lines = [];
+    lines.push('App: ' + (m.title || id) + ' (' + (m.subj === 'gs' ? 'General Studies' : m.subj || '') + ')');
+    lines.push('Lessons done: ' + pr.done + ' of ' + pr.total + ' ' + (m.unit || 'lessons') + '.');
+    try{
+      var all = ((await loadSearchJson()).modules[id] || []);
+      var isDone = function(l){ return id === 'grammar' ? !!(st.done || {})[l.id] : !!((st.les || {})[l.id] && st.les[l.id].done); };
+      var done = all.filter(isDone).map(function(l){ return l.t; }), todo = all.filter(function(l){ return !isDone(l); }).map(function(l){ return l.t; });
+      if(done.length) lines.push('Done: ' + done.slice(0, 40).join('; ') + (done.length > 40 ? ' …' : ''));
+      if(todo.length) lines.push('Not done yet: ' + todo.slice(0, 40).join('; ') + (todo.length > 40 ? ' …' : ''));
+    }catch(e){}
+    if(!m.noq) lines.push('Questions answered: ' + pr.tried + ' of ' + trackTotalQ(id) + (pr.acc !== null ? ', ' + pr.acc + '% right' : '') + '; ' + pr.wrong + ' in the Mistakes book.');
+    if(studyBank){
+      var topics = weakStats().topics.filter(function(t){ return t.mod === id; });
+      var tried = topics.filter(function(t){ return t.tried; }).sort(function(a, b){ return a.score - b.score; });
+      if(tried.length) lines.push('Accuracy by topic (weakest first): ' + tried.slice(0, 15).map(function(t){ return t.tag + ' ' + Math.round(t.acc * 100) + '% (' + t.tried + ')'; }).join('; '));
+      var none = topics.filter(function(t){ return !t.tried; }).map(function(t){ return t.tag; });
+      if(none.length) lines.push('Topics with no questions tried: ' + none.slice(0, 20).join('; '));
+    }
+    lines.push(x.visited ? 'Last opened ' + trackAgo(x.visited) + '.' : 'Never opened.');
+    if(x.due) lines.push('Revision is due now.');
+    lines.push('Estimated time: ' + fmtMin(x.fullMin) + ' to do everything once, ' + fmtMin(x.revMin) + ' to revise.');
+    return lines.join('\n');
+  }
+  /** A mock from one app's own questions: the ones you got wrong and haven't tried first. */
+  async function aiAppMock(id){
+    try{ await loadStudyBank(); }catch(e){ showToast('Couldn’t load the question bank.'); return; }
+    var mod = studyBank.modules[id];
+    if(!mod || !mod.qs.length){ aiAsk((STUDY[id] || {}).title || id, 'mock', false, { ctx: null }); return; }
+    var ans = studyState(id).ans || {};
+    var wrong = mod.qs.filter(function(q){ return ans[q.id] === 0; }), fresh = mod.qs.filter(function(q){ return ans[q.id] !== 0 && ans[q.id] !== 1; }), ok = mod.qs.filter(function(q){ return ans[q.id] === 1; });
+    var pick = shuffleArr(wrong).slice(0, 10), rest = shuffleArr(fresh).concat(shuffleArr(ok));
+    pick = pick.concat(rest.slice(0, 25 - pick.length));
+    var name = (STUDY[id] || {}).title || id;
+    aiLoadChat();
+    aiChat.msgs.push({ r: 'u', t: 'Mock test on ' + name, mode: 'app', ctx: { mod: id, lesson: null }, ts: Date.now() });
+    aiChat.msgs.push({ r: 'a', mode: 'app', ctx: { mod: id, lesson: null }, ts: Date.now(),
+      t: '**Mock test on ' + name + '** — ' + pick.length + ' questions from the app · ' + Math.round(pick.length * 36 / 60) + ' minutes · +2 / −0.5.\n\n' + (wrong.length ? Math.min(wrong.length, 10) + ' are questions you got wrong before; the rest are mostly ones you haven’t tried.' : 'Mostly questions you haven’t tried yet.') + ' Your answers count towards this app’s progress.',
+      quiz: { title: name, mock: true, qs: shuffleArr(pick).map(function(q){ return { mod: id, id: q.id }; }) } });
+    aiSaveChat(); aiRender(); aiScrollEnd();
   }
   /** Quiz me: questions from the app's bank when it has enough on the topic; otherwise the AI writes them. */
   async function aiQuiz(c, topic, ctx, a, ctl, forceAi){
@@ -7518,6 +7652,8 @@ listBlock,
   }
   function aiStartQuiz(m){
     if(!m || !m.quiz) return;
+    if(drillOpen && drill && drill.kind === 'mock' && drill.phase === 'run'){ showToast('Finish or leave the mock test you’re in first.'); return; }
+    document.body.classList.remove('ask-top');
     var items = m.quiz.qs || [];
     if(items.some(function(r){ return !r.q; }) && !studyBank){
       loadStudyBank().then(function(){ aiStartQuiz(m); }).catch(function(){ showToast('Couldn’t load the question bank.'); });
@@ -7540,16 +7676,28 @@ listBlock,
   }
 
   // ---- the Ask page ----
-  function openAsk(prefill, mode){
+  /** opts: { ctx: { mod, lesson } | null } — keep asking about that app or chapter until ✕. */
+  function openAsk(prefill, mode, opts){
     closeAllMenus();
     var c = aiCfg();
     if(!c.on){ aiOpenSettings(); return; }
-    if(mode) aiMode = mode;
-    aiOpen = true;
-    document.getElementById('askPage').classList.add('open');
-    document.body.classList.add('study-on');
-    try{ history.pushState({ ask: 1 }, '', '#ask'); }catch(e){}
-    aiRenderModes(); aiRender(); aiScrollEnd();
+    if(mode && mode !== 'app') aiMode = mode;
+    aiCtx = opts && opts.ctx ? opts.ctx : null;
+    if(!aiOpen){
+      aiOpen = true;
+      aiFromHash = location.hash;
+      document.body.classList.toggle('ask-top', !!(studyOpen || drillOpen));   // above the chapter or practice it was opened from
+      document.getElementById('askPage').classList.add('open');
+      document.body.classList.add('study-on');
+      try{ history.pushState({ ask: 1 }, '', '#ask'); }catch(e){}
+    } else if((studyOpen || drillOpen) && !document.body.classList.contains('ask-top')){
+      // Ask is open underneath a practice round or chapter started from it: bring it back on top; Back returns there
+      aiTopFrom = location.hash;
+      document.body.classList.add('ask-top');
+      try{ history.pushState({ ask: 1 }, '', '#ask'); }catch(e){}
+    }
+    aiRenderCtx(); aiRenderModes(); aiRender(); aiScrollEnd();
+    aiRefreshModels();
     var inp = document.getElementById('askInput');
     if(typeof prefill === 'string'){ inp.value = prefill; aiGrow(); }
     if(aiReady(c) && !matchMedia('(pointer: coarse)').matches) setTimeout(function(){ inp.focus(); }, 30);
@@ -7557,7 +7705,9 @@ listBlock,
   }
   function closeAsk(fromHistory){
     if(!aiOpen) return;
-    aiOpen = false;
+    if(!fromHistory && aiTopFrom !== null && location.hash === '#ask'){ try{ history.back(); }catch(e){} return; }   // back to the round underneath
+    aiOpen = false; aiTopFrom = null;
+    document.body.classList.remove('ask-top');
     document.getElementById('askPage').classList.remove('open');
     if(!studyOpen && !drillOpen && !searchOpen) document.body.classList.remove('study-on');
     if(!fromHistory && location.hash === '#ask'){ try{ history.back(); }catch(e){} }
@@ -7596,7 +7746,7 @@ listBlock,
     if((b = ev.target.closest('[data-ai-settings]'))){ aiOpenSettings(); return; }
     if((b = ev.target.closest('[data-ai-mode]'))){ aiSetMode(b.dataset.aiMode); return; }
     if((b = ev.target.closest('[data-ai-try]'))){ aiAsk(b.dataset.aiTry, aiMode, false); return; }
-    if((b = ev.target.closest('[data-ai-open]'))){ openStudy(b.dataset.aiOpen, false, b.dataset.aiLesson); return; }
+    if((b = ev.target.closest('[data-ai-open]'))){ document.body.classList.remove('ask-top'); openStudy(b.dataset.aiOpen, false, b.dataset.aiLesson); return; }
     if((b = ev.target.closest('[data-ai-copy]'))){ copyTextToClipboard(aiChat.msgs[+b.dataset.aiCopy].t).then(function(){ showToast('Copied.'); }); return; }
     if((b = ev.target.closest('[data-ai-quiz]'))){ aiStartQuiz(aiChat.msgs[+b.dataset.aiQuiz]); return; }
     if((b = ev.target.closest('[data-ai-quizgen]'))){
@@ -7614,11 +7764,15 @@ listBlock,
     if((b = ev.target.closest('[data-ai-retry]'))){
       var i = +b.dataset.aiRetry, q = aiChat.msgs[i - 1];
       aiChat.msgs.splice(i, 1);
-      aiAsk(q.t, q.mode, true, { style: q.style });
+      aiAsk(q.t, q.mode, true, { style: q.style, ctx: q.ctx || null });
     }
   });
   if(location.hash === '#ask'){ try{ history.replaceState(null, '', location.pathname + location.search); }catch(e){} }
-  window.addEventListener('popstate', function(){ if(aiOpen && location.hash !== '#ask' && !studyOpen && !drillOpen) closeAsk(true); });
+  window.addEventListener('popstate', function(){
+    if(!aiOpen || location.hash === '#ask') return;
+    if(aiTopFrom !== null && location.hash === aiTopFrom){ aiTopFrom = null; document.body.classList.remove('ask-top'); return; }
+    if(location.hash === aiFromHash || (!studyOpen && !drillOpen)) closeAsk(true);
+  });
 
   // ---- settings ----
   function aiOpenSettings(){
@@ -7633,7 +7787,7 @@ listBlock,
         '<div class="field"><label class="field-label" for="aiProv">AI service</label><select id="aiProv">' + Object.keys(AI_PROVIDERS).map(function(p){ return '<option value="' + p + '"' + (p === c.provider ? ' selected' : '') + '>' + escapeHtml(AI_PROVIDERS[p].name) + '</option>'; }).join('') + '</select><p class="help" id="aiProvNote"></p></div>' +
         '<div class="field"><label class="field-label" for="aiKeyIn">Your API key</label><div class="ai-keyrow"><input type="password" id="aiKeyIn" autocomplete="off" spellcheck="false" autocapitalize="off"><button type="button" class="btn ghost sm" id="aiKeyShow">Show</button></div>' +
           '<p class="help" id="aiKeyHelp"></p></div>' +
-        '<div class="field"><label class="field-label" for="aiModel">Model</label><select id="aiModel"></select><p class="help">Press <b>Check key</b> to list every model your key can use.</p></div>' +
+        '<div class="field"><label class="field-label" for="aiModel">Model</label><select id="aiModel"></select><p class="help"><b>Auto</b> ranks every model your key can use, takes the best one that answers, and skips models that fail. Press <b>Check key</b> to refresh the list.</p></div>' +
         '<div class="field-2col"><div class="field"><label class="field-label" for="aiLang">Reply language</label><select id="aiLang">' + opt(AI_LANGS, c.lang) + '</select></div>' +
           '<div class="field"><label class="field-label" for="aiLen">Answer length</label><select id="aiLen">' + opt(AI_LENS, c.len) + '</select></div></div>' +
         '<div class="field" id="aiWebRow"><label class="ai-switch"><input type="checkbox" id="aiWeb"' + (c.web ? ' checked' : '') + '><span><b>Let Gemini search Google</b><small>Fresher answers for current affairs, with source links. Uses a separate, smaller free allowance.</small></span></label></div>' +
@@ -7649,9 +7803,11 @@ listBlock,
       $('aiKeyIn').value = draft.keys[p] || '';
       $('aiKeyIn').placeholder = 'Paste your ' + P.name + ' key (' + P.keyHint + ')';
       $('aiKeyHelp').innerHTML = '<a href="' + P.keyUrl + '" target="_blank" rel="noopener noreferrer">Get a free key from ' + escapeHtml(P.name) + ' ›</a> — sign in, create a key, copy it and paste it here.';
-      var list = (draft.modelList[p] || []).slice(), cur = draft.models[p] || P.def;
-      if(list.indexOf(cur) === -1) list.unshift(cur);
-      $('aiModel').innerHTML = list.map(function(m){ return '<option value="' + escapeAttr(m) + '"' + (m === cur ? ' selected' : '') + '>' + escapeHtml(m) + (m === P.def ? ' (default)' : '') + '</option>'; }).join('');
+      var list = aiRanked(Object.assign({}, aiCfg(), { provider: p, modelList: draft.modelList })), cur = draft.models[p] || 'auto';
+      if(cur !== 'auto' && list.indexOf(cur) === -1) list.unshift(cur);
+      var pick = aiCfg().autoPick[p];
+      $('aiModel').innerHTML = '<option value="auto"' + (cur === 'auto' ? ' selected' : '') + '>✨ Auto — best that works' + (pick ? ' (now ' + escapeHtml(pick) + ')' : '') + '</option>' +
+        list.map(function(m){ return '<option value="' + escapeAttr(m) + '"' + (m === cur ? ' selected' : '') + '>' + escapeHtml(m) + '</option>'; }).join('');
       $('aiWebRow').style.display = P.web ? '' : 'none';
       $('aiCheckMsg').textContent = '';
       $('aiRemove').style.display = draft.keys[p] ? '' : 'none';
@@ -7676,16 +7832,18 @@ listBlock,
       try{
         var list = await aiListModels(p, k);
         draft.modelList[p] = list;
-        var P = AI_PROVIDERS[p], cur = draft.models[p] || P.def;
-        if(list.length && list.indexOf(cur) === -1) draft.models[p] = list.filter(function(m){ return m === P.def; })[0] || list.filter(function(m){ return /flash/.test(m); })[0] || list[0];
+        var cur = draft.models[p] || 'auto';
+        if(cur !== 'auto' && list.length && list.indexOf(cur) === -1) cur = draft.models[p] = 'auto';
+        var saved = aiCfg(); saved.modelList[p] = list; saved.listAt[p] = Date.now(); delete saved.autoPick[p]; aiSave(saved);   // re-rank from the fresh list
         fillProvider();
-        msg.textContent = 'Key accepted — asking ' + draft.models[p] + ' a test question…';
-        var probe = { provider: p, keys: {}, models: {}, modelList: {}, len: 'short' };
-        probe.keys[p] = k; probe.models[p] = draft.models[p]; probe.modelList[p] = list;
+        var probe = { provider: p, keys: {}, models: {}, modelList: {}, autoPick: {}, bad: aiCfg().bad, len: 'short' };
+        probe.keys[p] = k; probe.models[p] = cur; probe.modelList[p] = list;
+        msg.textContent = 'Key accepted — asking ' + aiModel(probe) + ' a test question…';
         var r = await aiCall(probe, 'Reply with the single word OK.', [{ role: 'user', text: 'Say OK' }], { test: true, onStatus: function(s){ msg.textContent = s; } });
-        draft.models[p] = r.model;
+        if(cur === 'auto'){ saved = aiCfg(); saved.autoPick[p] = r.model; aiSave(saved); }
+        else draft.models[p] = r.model;
         fillProvider();
-        msg.innerHTML = '<span class="ai-good">✓ Key works and ' + escapeHtml(r.model) + ' answered.</span> ' + (r.switchedFrom ? escapeHtml(r.switchedFrom) + ' didn’t answer on your key (no free allowance, or too slow), so ' + escapeHtml(r.model) + ' is picked instead. ' : '') + 'Press Save.';
+        msg.innerHTML = '<span class="ai-good">✓ Key works and ' + escapeHtml(r.model) + ' answered.</span> ' + (cur === 'auto' ? 'Auto picked it as the best of ' + (list.length || 'the') + ' models your key can use. ' : '') + (cur !== 'auto' && r.switchedFrom ? escapeHtml(r.switchedFrom) + ' didn’t answer on your key (no free allowance, or too slow), so ' + escapeHtml(r.model) + ' is picked instead. ' : '') + 'Press Save.';
       }catch(e){
         if(e && e.timeout){ msg.innerHTML = '<span class="ai-bad">The key is accepted, but ' + escapeHtml(AI_PROVIDERS[p].name) + ' didn’t answer the test question in time.</span> It’s probably busy. You can still press Save and ask a question — or pick another model above and check again.'; btn.disabled = false; return; }
         msg.innerHTML = '<span class="ai-bad">' + escapeHtml(!navigator.onLine ? 'You’re offline — connect and try again.' : (e instanceof TypeError ? 'Couldn’t reach ' + AI_PROVIDERS[p].name + '. Check your connection (or an ad blocker) and try again.' : e.message)) + '</span>' + (e && e.raw ? '<details class="ai-errd"><summary>What ' + escapeHtml(AI_PROVIDERS[p].name) + ' said</summary>' + escapeHtml(e.raw) + '</details>' : ''); }
@@ -7707,5 +7865,68 @@ listBlock,
     });
   }
   document.getElementById('aiSettingsBtn').addEventListener('click', aiOpenSettings);
+
+  /** Which lesson the open mini app shows: its visible heading matched against the lesson list; plus any selected text. */
+  async function aiStudyWhere(mod){
+    var out = { mod: mod, lesson: null, sel: '' }, f = document.getElementById('studyFrame'), d = null;
+    try{ d = f.contentDocument; out.sel = String(f.contentWindow.getSelection() || '').replace(/\s+/g, ' ').trim().slice(0, 700); }catch(e){}
+    if(!d) return out;
+    var norm = function(t){ return String(t || '').toLowerCase().replace(/[^a-z0-9\u0900-\u097f]+/g, ' ').trim(); };
+    var heads = [].slice.call(d.querySelectorAll('h1, h2, h3')).filter(function(h){ return h.getClientRects().length && h.offsetParent !== null; }).map(function(h){ return norm(h.textContent); }).filter(Boolean);
+    try{
+      var lessons = (await loadSearchJson()).modules[mod] || [], best = null, bestS = 0;
+      lessons.forEach(function(l){
+        var t = norm(l.t); if(!t) return;
+        heads.forEach(function(h, i){
+          var sc = h === t ? 3 : (t.length > 5 && (h.indexOf(t) !== -1 || t.indexOf(h) !== -1) && h.length > 5) ? 2 : 0;
+          if(sc) sc += Math.max(0, 1 - i * 0.1);   // the first heading on screen counts most
+          if(sc > bestS){ bestS = sc; best = l; }
+        });
+      });
+      if(best) out.lesson = { id: best.id, t: best.t };
+    }catch(e){}
+    return out;
+  }
+  document.getElementById('studyAskBtn').addEventListener('click', async function(){
+    if(!studyOpen) return;
+    var w = await aiStudyWhere(studyOpen);
+    openAsk(w.sel ? 'Explain this: “' + w.sel + '”' : '', 'explain', { ctx: { mod: w.mod, lesson: w.lesson } });
+  });
+  /** A practice question → Ask AI, with the options, the right answer and what you picked. */
+  var aiQReg = [];
+  function aiQBtn(q){
+    if(!aiCfg().on) return '';
+    aiQReg.push(q);
+    if(aiQReg.length > 400) aiQReg.splice(0, 200);
+    return '<button type="button" class="ai-qbtn" data-ai-q="' + (aiQReg.length - 1) + '" data-ai-qn="' + aiQReg.length + '">✨ Ask AI why</button>';
+  }
+  function aiAskQuestion(q){
+    var L = 'ABCD', isErr = q.src ? q.src.k === 'e' : q.k === 'e';
+    var t = 'Explain this question' + (q.pick !== null && q.pick !== undefined && q.pick !== q.a ? ' — I got it wrong' : '') + ':\n' + q.q + '\n' +
+      q.o.map(function(o, i){ return L.charAt(i) + ') ' + o; }).join('\n') +
+      '\nCorrect: ' + L.charAt(q.a) + ') ' + q.o[q.a] + (q.pick !== null && q.pick !== undefined && q.pick !== q.a ? '\nI chose: ' + L.charAt(q.pick) + ') ' + q.o[q.pick] : '') +
+      (isErr ? '\n(Spot-the-error question: the correct option is the part with the error.)' : '') + '\nWhy is it right, why is mine wrong, and what is the trick to get it fast?';
+    var lesson = q.l || (q.src && q.src.l);
+    openAsk('', 'solve', { ctx: STUDY[q.mod] ? { mod: q.mod, lesson: null } : null });
+    aiAsk(t, 'solve', false, { ctx: STUDY[q.mod] ? { mod: q.mod, lesson: lesson ? aiLessonRef(q.mod, lesson) : null } : null });
+  }
+  function aiLessonRef(mod, id){
+    var t = id;
+    try{ if(searchIdx){ var l = searchIdx.lessons.filter(function(x){ return x.mod === mod && x.id === id; })[0]; if(l) t = l.t; } }catch(e){}
+    return { id: id, t: t };
+  }
+  document.addEventListener('click', function(ev){
+    var b = ev.target.closest('[data-ai-q]');
+    if(b){ ev.stopPropagation(); ev.preventDefault(); var q = aiQReg[+b.dataset.aiQ]; if(q) aiAskQuestion(q); return; }
+    var ap = ev.target.closest('[data-ai-app]');
+    if(ap){
+      ev.stopPropagation(); ev.preventDefault();
+      var id = ap.dataset.aiApp, name = (STUDY[id] || {}).title || id;
+      if(!aiReady()){ aiOpenSettings(); return; }
+      openAsk('', 'explain', { ctx: { mod: id, lesson: null } });
+      aiAsk('Analyse my progress in ' + name + '.', 'app', false, { ctx: { mod: id, lesson: null } });
+    }
+  }, true);
+  document.getElementById('askCtx').addEventListener('click', function(ev){ if(ev.target.closest('#askCtxX')){ aiCtx = null; aiRenderCtx(); } });
 
 })();
