@@ -6898,7 +6898,44 @@ listBlock,
     return c;
   }
   function aiSave(c){ lsSet(AI_KEY, JSON.stringify(c)); aiRefreshEntry(); }
-  function aiReady(c){ c = c || aiCfg(); return !!(c.on && c.keys[c.provider]); }
+  function aiKeyed(c){ return Object.keys(AI_PROVIDERS).filter(function(p){ return !!c.keys[p]; }); }
+  function aiMulti(c){ return c.multi !== false && aiKeyed(c).length > 1; }
+  function aiReady(c){ c = c || aiCfg(); return !!(c.on && (c.keys[c.provider] || (c.multi !== false && aiKeyed(c).length))); }
+  /** Which service to ask first for this kind of request, then the others (only services with a saved key).
+      Gemini: web search, Hindi/Hinglish, long explanations and maths. Groq: very fast — quick answers, words, question lists. */
+  var AI_ROUTE = {
+    explain: ['gemini', 'groq', 'openrouter'], solve: ['gemini', 'groq', 'openrouter'], pyq: ['gemini', 'groq', 'openrouter'],
+    plan: ['gemini', 'groq', 'openrouter'], weak: ['gemini', 'groq', 'openrouter'], app: ['gemini', 'groq', 'openrouter'],
+    vocab: ['groq', 'gemini', 'openrouter'], questions: ['groq', 'gemini', 'openrouter']
+  };
+  function aiRoute(c, task, style){
+    if(!aiMulti(c)) return [c.keys[c.provider] ? c.provider : aiKeyed(c)[0]];
+    var order = (AI_ROUTE[task] || [c.provider]).slice();
+    if(style === 'quick' || style === 'tricks') order = ['groq'].concat(order);                 // short answers: the fastest first
+    if(c.lang === 'hi' && task !== 'questions') order = ['gemini'].concat(order);              // Devanagari: Gemini writes it best
+    order = order.concat([c.provider], Object.keys(AI_PROVIDERS));
+    order = order.filter(function(p, i){ return c.keys[p] && order.indexOf(p) === i; });
+    // a service whose every model failed lately (e.g. today's free limit is used up) goes to the back
+    var tired = function(p){ var cc = Object.assign({}, c, { provider: p }), all = aiRanked(Object.assign({}, cc, { bad: {} })); return all.every(function(m){ return aiBadRecently(c, m); }); };
+    return order.filter(function(p){ return !tired(p); }).concat(order.filter(tired));
+  }
+  /** aiCall across services: ask the best one for the task; if it fails (limit, no reply, key or network trouble), ask the next. */
+  async function aiCallAny(c, sys, msgs, opts, task, style){
+    var route = aiRoute(c, task, style), lastErr = null;
+    for(var i = 0; i < route.length; i++){
+      var p = route[i], cc = Object.assign({}, c, { provider: p });
+      try{
+        var r = await aiCall(cc, sys, msgs, Object.assign({}, opts, { web: opts.web && p === 'gemini', maxTries: route.length > 1 ? 2 : 0 }));
+        r.switchedService = i ? route[0] : '';
+        return r;
+      }catch(e){
+        if(e && e.name === 'AbortError') throw e;
+        lastErr = e;
+        if(i < route.length - 1 && opts.onStatus) opts.onStatus(aiProvName(p) + ' couldn’t answer just now' + (e && e.timeout ? ' (no reply)' : e && e.status === 429 ? ' (free limit)' : '') + ' — asking ' + aiProvName(route[i + 1]) + '…');
+      }
+    }
+    throw lastErr || new Error('No AI service with a saved key.');
+  }
   /** 'auto' (the default): the best model on the key's list that has worked lately. */
   function aiIsAuto(c){ var m = c.models[c.provider]; return !m || m === 'auto'; }
   function aiModel(c){
@@ -6926,7 +6963,7 @@ listBlock,
     var good = list.filter(function(m){ return !aiBadRecently(c, m); });
     return good.length ? good : list;
   }
-  function aiMarkBad(m){ var c = aiCfg(); c.bad = c.bad || {}; c.bad[m] = Date.now(); if(c.autoPick && c.autoPick[c.provider] === m) delete c.autoPick[c.provider]; aiSave(c); }
+  function aiMarkBad(m){ var c = aiCfg(); c.bad = c.bad || {}; c.bad[m] = Date.now(); Object.keys(c.autoPick || {}).forEach(function(p){ if(c.autoPick[p] === m) delete c.autoPick[p]; }); aiSave(c); }
   function aiRefreshEntry(){
     var on = aiCfg().on;
     ['askBtn', 'studyAskBtn'].forEach(function(id){ var b = document.getElementById(id); if(b) b.style.display = on ? '' : 'none'; });
@@ -7069,7 +7106,7 @@ listBlock,
       free model when this one has no free allowance (or is used up / missing). The result says which model answered. */
   async function aiCall(c, sys, msgs, opts){
     opts = Object.assign({}, opts);
-    var p = c.provider, first = aiModel(c), model = first, tried = {}, waited = false, lastErr = null, maxTries = opts.test ? 3 : 5;
+    var p = c.provider, first = aiModel(c), model = first, tried = {}, waited = false, lastErr = null, maxTries = opts.maxTries || (opts.test ? 3 : 5);
     var list = (c.modelList && c.modelList[p]) || [];
     var next = function(){
       var cands = aiIsAuto(c) ? aiRanked(Object.assign({}, c, { bad: aiCfg().bad })) : AI_FALLBACK[p].concat(list.filter(function(m){ return p === 'gemini' ? /flash/.test(m) : true; }));
@@ -7082,7 +7119,7 @@ listBlock,
         cc.models[p] = model;
         var r = await aiStream(cc, sys, msgs, opts);
         r.switchedFrom = model !== first ? first : '';
-        r.auto = aiIsAuto(c);
+        r.auto = aiIsAuto(c); r.provider = p;
         return r;
       }catch(e){
         if(e && e.name === 'AbortError') throw e;
@@ -7109,19 +7146,24 @@ listBlock,
     throw lastErr;
   }
   function aiRefreshModels(){
-    var c = aiCfg(), p = c.provider, k = c.keys[p];
-    if(!c.on || !k || (c.listAt[p] && Date.now() - c.listAt[p] < 24 * 3600 * 1000) || !navigator.onLine) return;
+    var c = aiCfg();
+    if(!c.on || !navigator.onLine) return;
+    aiKeyed(c).forEach(function(p){
+    var k = c.keys[p];
+    if(c.listAt[p] && Date.now() - c.listAt[p] < 24 * 3600 * 1000) return;
     aiListModels(p, k).then(function(list){
       var cc = aiCfg(); cc.modelList[p] = list; cc.listAt[p] = Date.now();
       var best = aiRanked(cc)[0];
       if(cc.autoPick[p] && best && best !== cc.autoPick[p]) delete cc.autoPick[p];   // a better model appeared: try it first
       aiSave(cc); if(aiOpen) aiRenderModes();
     }).catch(function(){});
+    });
   }
   /** After an answer: remember a model that worked, and pause web search if Google refused it. */
   function aiLearn(r){
     var c = aiCfg(), changed = false;
-    if(r.auto && r.model && c.autoPick[c.provider] !== r.model){ c.autoPick[c.provider] = r.model; changed = true; }
+    var rp = r.provider || c.provider;
+    if(r.auto && r.model && c.autoPick[rp] !== r.model){ c.autoPick[rp] = r.model; changed = true; }
     if(r.webDropped){ c.webOffUntil = Date.now() + 6 * 3600 * 1000; changed = true; }
     if(changed) aiSave(c);
   }
@@ -7266,7 +7308,7 @@ listBlock,
       'How to answer:',
       '- Always connect the topic to the exam: what SSC asks about it, the usual question types, and how important it is (only claim frequency or previous-year questions when you are sure; never invent a year or shift).',
       '- Lead with the answer or the key idea. Use short headings, bullet points, tables for comparisons, and **bold** for facts to remember. Markdown only.',
-      '- Write maths in plain text with Unicode (×, ÷, √, ², ³, π, θ, ≤) — never LaTeX or $ signs.',
+      '- Maths: write simple expressions with Unicode (×, ÷, √, ², π, θ). For fractions and formulas use LaTeX between $…$ (or $$…$$ on its own line) — the app typesets it. Never use $ for money; write ₹.',
       '- Maths and reasoning: give the fastest exam method and a clear step-by-step method; verify the arithmetic.',
       '- GK and GS: give exact facts (names, dates, articles, numbers) and one-line memory tricks. If a fact may have changed recently (appointments, schemes, rankings, records, current affairs), say how recent your information is and ask the student to verify.',
       '- English: the rule plus the typical error SSC hides; for words give meaning (English + Hindi), a trick, synonyms and antonyms.',
@@ -7301,7 +7343,86 @@ listBlock,
     s = s.replace(/(^|[\s(])\*(?!\s)([^*\n]+?)\*(?=[\s).,;:!?]|$)/g, '$1<i>$2</i>').replace(/(^|[\s(])_(?!\s)([^_\n]+?)_(?=[\s).,;:!?]|$)/g, '$1<i>$2</i>');
     return s.replace(/\u0000(\d+)\u0000/g, function(_, i){ return '<code>' + codes[+i] + '</code>'; });
   }
+  // ---- maths: LaTeX from the AI is typeset with KaTeX (loaded on first use); readable Unicode until then or offline ----
+  var AI_TEX_SYM = { times: '×', div: '÷', cdot: '·', pm: '±', mp: '∓', le: '≤', leq: '≤', ge: '≥', geq: '≥', ne: '≠', neq: '≠', approx: '≈', equiv: '≡', sim: '∼',
+    pi: 'π', theta: 'θ', alpha: 'α', beta: 'β', gamma: 'γ', delta: 'δ', Delta: 'Δ', phi: 'φ', lambda: 'λ', mu: 'μ', sigma: 'σ', Sigma: 'Σ', omega: 'ω', Omega: 'Ω', rho: 'ρ', eta: 'η',
+    infty: '∞', angle: '∠', triangle: '△', therefore: '∴', because: '∵', Rightarrow: '⇒', implies: '⇒', rightarrow: '→', to: '→', leftarrow: '←', Leftrightarrow: '⇔', iff: '⇔',
+    circ: '°', degree: '°', prime: '′', perp: '⊥', parallel: '∥', cong: '≅', propto: '∝', ldots: '…', cdots: '⋯', dots: '…', in: '∈', cup: '∪', cap: '∩', subset: '⊂', sum: 'Σ' };
+  var AI_SUP = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '+': '⁺', '-': '⁻', '−': '⁻', '=': '⁼', '(': '⁽', ')': '⁾', n: 'ⁿ', i: 'ⁱ', x: 'ˣ' };
+  var AI_SUB = { '0': '₀', '1': '₁', '2': '₂', '3': '₃', '4': '₄', '5': '₅', '6': '₆', '7': '₇', '8': '₈', '9': '₉', '+': '₊', '-': '₋', '=': '₌', '(': '₍', ')': '₎', a: 'ₐ', e: 'ₑ', h: 'ₕ', i: 'ᵢ', k: 'ₖ', m: 'ₘ', n: 'ₙ', o: 'ₒ', p: 'ₚ', r: 'ᵣ', s: 'ₛ', t: 'ₜ', x: 'ₓ' };
+  /** LaTeX → plain readable text: \frac{b×h}{b+h} → (b × h)/(b + h), x^2 → x², \sqrt{3} → √3. */
+  function aiTexText(tex){
+    var group = function(s, i){ var d = 0; for(var j = i; j < s.length; j++){ if(s[j] === '{') d++; else if(s[j] === '}'){ d--; if(!d) return [s.slice(i + 1, j), j + 1]; } } return [s.slice(i + 1), s.length]; };
+    var arg = function(s, i){ while(s[i] === ' ') i++; if(s[i] === '{') return group(s, i); if(s[i] === '\\'){ var m = /^\\([a-zA-Z]+|.)/.exec(s.slice(i)); if(m) return [m[0], i + m[0].length]; } return [s[i] || '', i + 1]; };
+    var map = function(v, tbl, mark){ v = v.replace(/\s+/g, ''); if(v === '°' || v === '′') return v; var ok = v.split('').every(function(ch){ return tbl[ch]; }); return ok ? v.split('').map(function(ch){ return tbl[ch]; }).join('') : mark + (v.length > 1 ? '(' + v + ')' : v); };
+    var wrap = function(x){ x = conv(x).trim(); return /^[\w.√²³¹⁰⁴-⁹′°πθ]+$/.test(x) || /^\([^()]*\)$/.test(x) ? x : '(' + x + ')'; };
+    function conv(s){
+      var out = '', i = 0;
+      while(i < s.length){
+        var ch = s[i];
+        if(ch === '\\'){
+          var m = /^\\([a-zA-Z]+|.)/.exec(s.slice(i)), name = m ? m[1] : ''; i += m ? m[0].length : 1;
+          if(/^[dt]?frac$/.test(name)){ var a = arg(s, i), b = arg(s, a[1]); i = b[1]; out += wrap(a[0]) + '/' + wrap(b[0]); continue; }
+          if(name === 'sqrt'){ var n = ''; if(s[i] === '['){ var e = s.indexOf(']', i); n = s.slice(i + 1, e); i = e + 1; } var r = arg(s, i); i = r[1]; out += (n ? map(n, AI_SUP, '^') : '') + '√' + wrap(r[0]); continue; }
+          if(/^(text|mathrm|textbf|mathbf|mathit|operatorname|boxed|overline|bar|vec|hat)$/.test(name)){ var t = arg(s, i); i = t[1]; out += conv(t[0]); continue; }
+          if(/^(left|right|displaystyle|limits|big|Big|bigg|Bigg)$/.test(name)) continue;
+          if(/^(quad|qquad)$/.test(name) || /^[,;: !]$/.test(name)){ out += ' '; continue; }
+          if(name === '\\'){ out += '\n'; continue; }
+          out += AI_TEX_SYM[name] !== undefined ? AI_TEX_SYM[name] : name;
+          continue;
+        }
+        if(ch === '^' || ch === '_'){ var p = arg(s, i + 1); i = p[1]; var v = conv(p[0]); out += ch === '^' ? map(v, AI_SUP, '^') : map(v, AI_SUB, '_'); continue; }
+        if(ch === '{' || ch === '}'){ i++; continue; }
+        out += ch; i++;
+      }
+      return out;
+    }
+    return conv(String(tex || '')).replace(/[ \t]+/g, ' ').trim();
+  }
+  /** Pull the formulas out of an answer: returns the text with placeholders, and the formulas. */
+  function aiTexPull(src){
+    var maths = [], put = function(tex, d){ maths.push({ tex: tex.trim(), d: d }); return '\u0002' + (maths.length - 1) + '\u0002'; };
+    var parts = String(src || '').split(/(```[\s\S]*?(?:```|$))/);   // leave code blocks alone
+    var out = parts.map(function(p, k){
+      if(k % 2) return p;
+      return p.replace(/\$\$([\s\S]+?)\$\$/g, function(_, t){ return put(t, true); })
+        .replace(/\\\[([\s\S]+?)\\\]/g, function(_, t){ return put(t, true); })
+        .replace(/\\\(([\s\S]+?)\\\)/g, function(_, t){ return put(t, false); })
+        .replace(/(^|[^\\$\w])\$(?!\s)([^$\n]+?)(?<!\s)\$(?![\w$])/g, function(all, pre, t){ return /[\\^_{}=]|^[a-zA-Z]$|[a-zA-Z]\s*[+\-*/]/.test(t) ? pre + put(t, false) : all; });
+    }).join('');
+    return { text: out, maths: maths };
+  }
+  /** A whole answer as plain text (for Copy): formulas turned readable. */
+  function aiPlain(src){ var p = aiTexPull(src); return p.text.replace(/\u0002(\d+)\u0002/g, function(_, n){ return aiTexText(p.maths[+n].tex); }); }
+  var aiKatexP = null;
+  function aiKatex(){
+    if(window.katex) return Promise.resolve(window.katex);
+    if(aiKatexP) return aiKatexP;
+    aiKatexP = new Promise(function(ok, no){
+      var base = 'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/';
+      var css = document.createElement('link'); css.rel = 'stylesheet'; css.href = base + 'katex.min.css'; document.head.appendChild(css);
+      var js = document.createElement('script'); js.src = base + 'katex.min.js'; js.async = true;
+      js.onload = function(){ window.katex ? ok(window.katex) : no(new Error('no katex')); };
+      js.onerror = function(){ aiKatexP = null; js.remove(); no(new Error('katex not loaded')); };
+      document.head.appendChild(js);
+    });
+    return aiKatexP;
+  }
+  /** Typeset every formula under el (keeps the readable text if KaTeX can't load). */
+  function aiTypeset(el){
+    var list = el ? el.querySelectorAll('.ai-math:not([data-ok])') : [];
+    if(!list.length) return;
+    aiKatex().then(function(k){
+      [].forEach.call(el.querySelectorAll('.ai-math:not([data-ok])'), function(m){
+        var tx = m.getAttribute('data-tex');
+        if(!m.classList.contains('d') && /\\[dt]?frac/.test(tx)) tx = '\\displaystyle ' + tx;   // fractions in a sentence: full size, readable on a phone
+        try{ k.render(tx, m, { displayMode: m.classList.contains('d'), throwOnError: false, output: 'html', strict: 'ignore' }); m.setAttribute('data-ok', '1'); }catch(e){}
+      });
+    }).catch(function(){});
+  }
   function aiMd(src){
+    var tex = aiTexPull(src);
+    src = tex.text;
     var lines = escapeHtml(String(src || '').replace(/\r/g, '')).split('\n'), html = '', i = 0, para = [];
     var flush = function(){ if(para.length){ html += '<p>' + para.map(aiInline).join('<br>') + '</p>'; para = []; } };
     while(i < lines.length){
@@ -7339,7 +7460,10 @@ listBlock,
       para.push(ln); i++;
     }
     flush();
-    return html;
+    return html.replace(/\u0002(\d+)\u0002/g, function(_, n){
+      var m = tex.maths[+n];
+      return m ? '<span class="ai-math' + (m.d ? ' d' : '') + '" data-tex="' + escapeAttr(m.tex) + '">' + escapeHtml(aiTexText(m.tex)) + '</span>' : '';
+    });
   }
 
   // ---- chat log, kept on this device ----
@@ -7406,7 +7530,7 @@ listBlock,
       onFirst: function(){ if(a.live.mode !== 'write'){ a.live.mode = 'write'; a.live.start = Date.now(); paint(); } },
       finish: function(res, err){
         clearInterval(tick);
-        if(res) a.by = { p: c.provider, m: res.model, s: Math.round((Date.now() - t0) / 100) / 10 };
+        if(res) a.by = { p: res.provider || c.provider, m: res.model, s: Math.round((Date.now() - t0) / 100) / 10 };
         else if(err && err.name !== 'AbortError' && last.model) a.by = { p: last.p, m: last.model, s: Math.round((Date.now() - t0) / 100) / 10, fail: true };
         delete a.live;
       }
@@ -7482,6 +7606,7 @@ listBlock,
       return;
     }
     log.innerHTML = aiChat.msgs.map(aiMsgHtml).join('');
+    aiTypeset(log);
   }
   function aiScrollEnd(){ var s = document.getElementById('askScroll'); s.scrollTop = s.scrollHeight; }
   function aiRenderModes(){
@@ -7491,7 +7616,7 @@ listBlock,
     st.style.display = AI_STYLED[aiMode] ? '' : 'none';
     st.innerHTML = '<span>Answer:</span>' + AI_STYLES.map(function(x){ return '<button type="button" data-ai-style="' + x[0] + '" class="' + (x[0] === (c.style || 'auto') ? 'on' : '') + '">' + x[1] + ' ' + escapeHtml(x[2]) + '</button>'; }).join('');
     sel.value = c.lang;
-    document.getElementById('askModelLab').textContent = aiReady(c) ? (aiIsAuto(c) ? 'auto · ' : '') + aiModel(c) : '';
+    document.getElementById('askModelLab').textContent = !aiReady(c) ? '' : aiMulti(c) ? 'auto · ' + aiKeyed(c).map(function(p){ return aiProvName(p).replace(/^Google /, ''); }).join(' + ') : (aiIsAuto(c) ? 'auto · ' : '') + aiModel(c);
   }
   function aiSetMode(id){ aiMode = id; aiRenderModes(); if(!aiLoadChat().msgs.length) aiRender(); }
 
@@ -7501,7 +7626,7 @@ listBlock,
     var s = document.getElementById('askScroll'), atEnd = s.scrollHeight - s.scrollTop - s.clientHeight < 80;
     var last = log.lastElementChild;
     if(full || !last){ aiRender(); }
-    else { var tmp = document.createElement('div'); tmp.innerHTML = aiMsgHtml(msgs[i], i); log.replaceChild(tmp.firstChild, last); }
+    else { var tmp = document.createElement('div'); tmp.innerHTML = aiMsgHtml(msgs[i], i); var node = tmp.firstChild; log.replaceChild(node, last); aiTypeset(node); }
     if(atEnd) aiScrollEnd();
   }
   function aiSetBusy(b){
@@ -7558,17 +7683,17 @@ listBlock,
       hist.push({ role: 'user', text: (extra ? extra + '\n\n' : '') + (ctxText ? ctxText + '\n\n[Question]\n' : '') + text });
       var web = c.provider === 'gemini' && c.web && !(c.webOffUntil > Date.now()) && mode !== 'solve' && mode !== 'weak';
       var t0 = 0;
-      var res = await aiCall(c, aiSystem(c, mode, style, wctx ? aiCtxLabel(wctx) : ''), hist, { web: web, signal: ctl.signal, onAttempt: live.onAttempt, onStatus: live.onStatus, onWait: live.onWait, onText: function(t){
+      var res = await aiCallAny(c, aiSystem(c, mode, style, wctx ? aiCtxLabel(wctx) : ''), hist, { web: web, signal: ctl.signal, onAttempt: live.onAttempt, onStatus: live.onStatus, onWait: live.onWait, onText: function(t){
         var body = aiSplitMeta(t).body;
         if(body) live.onFirst();
         a.t = body;
         var now = Date.now(); if(now - t0 > 60){ t0 = now; aiUpdateLast(false); }
-      } });
+      } }, mode, style);
       var sp = aiSplitMeta(res.text);
       a.t = sp.body; a.topic = sp.topic; a.related = sp.related; a.web = res.web;
       liveRes = res;
       aiLearn(res);
-      a.note = [res.switchedFrom ? (res.auto ? 'Auto model: ' + res.switchedFrom + ' didn’t answer on your key just now, so ' + res.model + ' answered — it’s used from now on.' : 'Your chosen model ' + res.switchedFrom + ' didn’t answer just now, so ' + res.model + ' answered this one.') : '',
+      a.note = [res.switchedService ? aiProvName(res.switchedService) + ' couldn’t answer just now, so ' + aiProvName(res.provider) + ' answered.' : '', res.switchedFrom ? (res.auto ? 'Auto model: ' + res.switchedFrom + ' didn’t answer on your key just now, so ' + res.model + ' answered — it’s used from now on.' : 'Your chosen model ' + res.switchedFrom + ' didn’t answer just now, so ' + res.model + ' answered this one.') : '',
         res.webDropped ? 'Google Search isn’t free on your key right now, so this answer is without web search (it will try again in a few hours).' : ''].filter(Boolean).join(' ');
       if(/MAX_TOKENS|length/i.test(res.finish)) a.t += '\n\n*(Answer cut short — ask “continue” for the rest.)*';
     }catch(e){
@@ -7669,17 +7794,17 @@ listBlock,
     var langNote = c.lang === 'hi' ? 'Write the questions in Hindi (keep English-language questions in English).' : c.lang === 'hinglish' ? 'Write the questions in simple English; explanations may be in Hinglish.' : 'Write in English.';
     var ctxText = aiContextText(ctx);
     var sys = 'You write SSC CGL Tier 1 practice MCQs. Exactly 4 options each, one correct; options must be plausible and distinct. Match real SSC difficulty and style (mix of easy, moderate and a few tricky), and cover different sub-topics instead of repeating one idea. ' +
-      'For maths and reasoning, compute every answer carefully and double-check it. ' + langNote +
+      'No LaTeX: write maths with Unicode (×, ÷, √, ², π, θ, fractions as a/b). For maths and reasoning, compute every answer carefully and double-check it. ' + langNote +
       ' Return ONLY JSON, no Markdown: {"questions":[{"q":"question","o":["A","B","C","D"],"a":0,"e":"one or two line explanation with the trick","s":"gs"}]} where "a" is the 0-based index of the correct option and "s" is the Tier 1 section: "en" English, "mt" Maths, "rs" Reasoning or "gs" General Awareness.';
     var user = (ctxText ? ctxText + '\n\n' : '') + 'Write ' + n + ' MCQs on: ' + topic;
     var hk = (ctl && ctl.hooks) || {};
-    var res = await aiCall(c, sys, [{ role: 'user', text: user }], { json: true, signal: signal, onText: function(t){ if(t && hk.onFirst) hk.onFirst(); }, onAttempt: hk.onAttempt, onStatus: hk.onStatus, onWait: hk.onWait });
+    var res = await aiCallAny(c, sys, [{ role: 'user', text: user }], { json: true, signal: signal, onText: function(t){ if(t && hk.onFirst) hk.onFirst(); }, onAttempt: hk.onAttempt, onStatus: hk.onStatus, onWait: hk.onWait }, 'questions');
     if(ctl) ctl.res = res;
     aiLearn(res);
     var raw = res.text.replace(/^[\s\S]*?(\{[\s\S]*\})[\s\S]*$/, '$1'), data;
     try{ data = JSON.parse(raw); }catch(e){ throw new Error('The AI’s questions came back in a broken format. Press “Try again”.'); }
     var qs = (data.questions || data || []).filter(function(q){ return q && q.q && Array.isArray(q.o) && q.o.length >= 2 && q.o.length <= 5 && typeof q.a === 'number' && q.a >= 0 && q.a < q.o.length; })
-      .map(function(q){ return { q: String(q.q), o: q.o.map(String), a: q.a, e: String(q.e || ''), s: /^(en|mt|rs|gs)$/.test(q.s) ? q.s : 'gs' }; });
+      .map(function(q){ return { q: aiPlain(String(q.q)), o: q.o.map(function(o){ return aiPlain(String(o)); }), a: q.a, e: aiPlain(String(q.e || '')), s: /^(en|mt|rs|gs)$/.test(q.s) ? q.s : 'gs' }; });
     if(!qs.length) throw new Error('The AI didn’t return usable questions. Press “Try again”.');
     return qs.slice(0, n);
   }
@@ -7794,7 +7919,7 @@ listBlock,
     if((b = ev.target.closest('[data-ai-mode]'))){ aiSetMode(b.dataset.aiMode); return; }
     if((b = ev.target.closest('[data-ai-try]'))){ aiAsk(b.dataset.aiTry, aiMode, false); return; }
     if((b = ev.target.closest('[data-ai-open]'))){ document.body.classList.remove('ask-top'); openStudy(b.dataset.aiOpen, false, b.dataset.aiLesson); return; }
-    if((b = ev.target.closest('[data-ai-copy]'))){ copyTextToClipboard(aiChat.msgs[+b.dataset.aiCopy].t).then(function(){ showToast('Copied.'); }); return; }
+    if((b = ev.target.closest('[data-ai-copy]'))){ copyTextToClipboard(aiPlain(aiChat.msgs[+b.dataset.aiCopy].t)).then(function(){ showToast('Copied.'); }); return; }
     if((b = ev.target.closest('[data-ai-quiz]'))){ aiStartQuiz(aiChat.msgs[+b.dataset.aiQuiz]); return; }
     if((b = ev.target.closest('[data-ai-quizgen]'))){
       var m = aiChat.msgs[+b.dataset.aiQuizgen], u = aiChat.msgs[+b.dataset.aiQuizgen - 1];
@@ -7832,12 +7957,13 @@ listBlock,
       '<p class="help" style="margin-top:0;">Ask any SSC doubt — topics, questions, words, plans — and get answers made for the exam, using the app’s notes where it has them. It uses <b>your own free API key</b>: the key is saved on this device only and goes straight from your browser to the AI company, never to पाठShala.</p>' +
       '<div class="field"><label class="ai-switch"><input type="checkbox" id="aiOn"' + (c.on ? ' checked' : '') + '><span><b>Turn on the AI tutor</b><small>Adds an ✨ Ask AI button to the top bar</small></span></label></div>' +
       '<div id="aiMore"' + (c.on ? '' : ' style="display:none;"') + '>' +
-        '<div class="field"><label class="field-label" for="aiProv">AI service</label><select id="aiProv">' + Object.keys(AI_PROVIDERS).map(function(p){ return '<option value="' + p + '"' + (p === c.provider ? ' selected' : '') + '>' + escapeHtml(AI_PROVIDERS[p].name) + '</option>'; }).join('') + '</select><p class="help" id="aiProvNote"></p></div>' +
+        '<div class="field"><label class="field-label" for="aiProv">AI service <small style="font-weight:500;">(pick one to add or change its key)</small></label><select id="aiProv">' + Object.keys(AI_PROVIDERS).map(function(p){ return '<option value="' + p + '"' + (p === c.provider ? ' selected' : '') + '>' + escapeHtml(AI_PROVIDERS[p].name) + '</option>'; }).join('') + '</select><p class="help" id="aiProvNote"></p></div>' +
         '<div class="field"><label class="field-label" for="aiKeyIn">Your API key</label><div class="ai-keyrow"><input type="password" id="aiKeyIn" autocomplete="off" spellcheck="false" autocapitalize="off"><button type="button" class="btn ghost sm" id="aiKeyShow">Show</button></div>' +
           '<p class="help" id="aiKeyHelp"></p></div>' +
         '<div class="field"><label class="field-label" for="aiModel">Model</label><select id="aiModel"></select><p class="help"><b>Auto</b> ranks every model your key can use, takes the best one that answers, and skips models that fail. Press <b>Check key</b> to refresh the list.</p></div>' +
         '<div class="field-2col"><div class="field"><label class="field-label" for="aiLang">Reply language</label><select id="aiLang">' + opt(AI_LANGS, c.lang) + '</select></div>' +
           '<div class="field"><label class="field-label" for="aiLen">Answer length</label><select id="aiLen">' + opt(AI_LENS, c.len) + '</select></div></div>' +
+        '<div class="field"><label class="ai-switch"><input type="checkbox" id="aiMultiChk"' + (c.multi !== false ? ' checked' : '') + '><span><b>Use all my saved keys</b><small>With keys for more than one service, each question goes to the best one for it — Gemini for current affairs, Hindi, maths and long explanations; Groq (very fast) for quick answers, words and quiz questions — and if one is busy or out of free limit, the next one answers. <span id="aiKeysNow"></span></small></span></label></div>' +
         '<div class="field" id="aiWebRow"><label class="ai-switch"><input type="checkbox" id="aiWeb"' + (c.web ? ' checked' : '') + '><span><b>Let Gemini search Google</b><small>Fresher answers for current affairs, with source links. Uses a separate, smaller free allowance.</small></span></label></div>' +
         '<p class="help ai-privacy">Good to know: on free plans the AI company may use what you send to improve its models — don’t paste personal details. Answers can be wrong; check facts that matter against official sources.</p>' +
         '<div id="aiCheckMsg" class="help" role="status"></div>' +
@@ -7859,9 +7985,15 @@ listBlock,
       $('aiWebRow').style.display = P.web ? '' : 'none';
       $('aiCheckMsg').textContent = '';
       $('aiRemove').style.display = draft.keys[p] ? '' : 'none';
+      if(typeof showKeys === 'function') showKeys();
     };
-    var keep = function(){ draft.keys[draft.provider] = $('aiKeyIn').value.trim(); draft.models[draft.provider] = $('aiModel').value; };
-    fillProvider();
+    var keep = function(){ draft.keys[draft.provider] = $('aiKeyIn').value.trim(); draft.models[draft.provider] = $('aiModel').value; showKeys(); };
+    var showKeys = function(){
+      var have = Object.keys(AI_PROVIDERS).filter(function(p){ return draft.keys[p]; });
+      $('aiKeysNow').innerHTML = have.length ? '<br>Saved keys: <b>' + have.map(function(p){ return escapeHtml(AI_PROVIDERS[p].name); }).join(', ') + '</b>' + (have.length < 2 ? ' — add another service’s free key above to use this.' : '.') : '';
+    };
+    fillProvider(); showKeys();
+    $('aiKeyIn').addEventListener('input', function(){ draft.keys[draft.provider] = this.value.trim(); showKeys(); });
     $('aiOn').addEventListener('change', function(){ $('aiMore').style.display = this.checked ? '' : 'none'; });
     $('aiProv').addEventListener('change', function(){ keep(); draft.provider = this.value; fillProvider(); });
     $('aiKeyShow').addEventListener('click', function(){ var k = $('aiKeyIn'); k.type = k.type === 'password' ? 'text' : 'password'; this.textContent = k.type === 'password' ? 'Show' : 'Hide'; });
@@ -7904,10 +8036,10 @@ listBlock,
       cc.provider = draft.provider;
       Object.keys(draft.keys).forEach(function(p){ if(draft.keys[p]) cc.keys[p] = draft.keys[p]; else delete cc.keys[p]; });
       cc.models = draft.models; cc.modelList = draft.modelList;
-      cc.lang = $('aiLang').value; cc.len = $('aiLen').value; cc.web = $('aiWeb').checked;
+      cc.lang = $('aiLang').value; cc.len = $('aiLen').value; cc.web = $('aiWeb').checked; cc.multi = $('aiMultiChk').checked;
       aiSave(cc);
       close();
-      if(cc.on && !cc.keys[cc.provider]){ showToast('AI tutor is on — add a key to start asking.'); }
+      if(cc.on && !aiReady(cc)){ showToast('AI tutor is on — add a key to start asking.'); }
       else showToast(cc.on ? 'AI tutor is ready — tap ✨ in the top bar.' : 'AI tutor is off.');
       if(aiOpen){ if(!cc.on) closeAsk(false); else { aiRenderModes(); aiRender(); } }
     });

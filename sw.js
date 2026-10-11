@@ -7,9 +7,9 @@
 //   throw everything away and download it all again.
 // - Mini apps, the question bank and the search index are saved the first time they are used,
 //   and fetched quietly once the app is idle (see 'warm'), so they open offline too.
-var VERSION = 'shabd-v32';                 // bump on every deploy so browsers pick up this file
+var VERSION = 'shabd-v34';                 // bump on every deploy so browsers pick up this file
 var CACHE = 'shabd-files';                 // kept across versions
-var SHELL = ['./', './index.html', './app.js?v=51b5ef2f', './manifest.json', './icon-192.png', './icon-512.png',
+var SHELL = ['./', './index.html', './app.js?v=b94fba00', './manifest.json', './icon-192.png', './icon-512.png',
   'https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js',
   'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js',
   'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js'];
@@ -71,6 +71,7 @@ function kind(url){
   if(url.hostname === 'fonts.gstatic.com') return 'fixed';                                              // font files never change
   if(url.hostname === 'www.gstatic.com' && url.pathname.indexOf('/firebasejs/') === 0) return 'fixed';  // versioned library files
   if(url.hostname === 'fonts.googleapis.com') return 'app';
+  if(url.hostname === 'cdnjs.cloudflare.com' && url.pathname.indexOf('/ajax/libs/KaTeX/') === 0) return 'fixed';   // maths in AI answers (versioned)
   return '';
 }
 
