@@ -6971,6 +6971,7 @@ listBlock,
     opts = opts || {};
     var secs = opts.test ? 25 : opts.json ? 90 : 60;
     var tm = aiTimer(opts.signal, secs * 1000);
+    if(opts.onAttempt) opts.onAttempt({ provider: c.provider, model: aiModel(c), secs: secs, web: !!opts.web });
     tm.arm();
     try{ return await aiStreamOnce(c, sys, msgs, opts, tm); }
     catch(e){
@@ -7343,7 +7344,7 @@ listBlock,
 
   // ---- chat log, kept on this device ----
   function aiLoadChat(){ if(aiChat) return aiChat; try{ aiChat = JSON.parse(lsGet(AI_CHAT_KEY) || '{}') || {}; }catch(e){ aiChat = {}; } if(!Array.isArray(aiChat.msgs)) aiChat.msgs = [];
-    aiChat.msgs.forEach(function(m){ if(m.pending){ m.pending = false; if(m.status || !m.t){ m.t = ''; m.err = 'This answer was interrupted. Press “Try again”.'; } delete m.status; delete m.statusText; } });
+    aiChat.msgs.forEach(function(m){ if(m.pending){ m.pending = false; if(m.status || !m.t){ m.t = ''; m.err = 'This answer was interrupted. Press “Try again”.'; } delete m.status; delete m.statusText; } delete m.live; });
     return aiChat; }
   function aiSaveChat(){ aiChat.msgs = aiChat.msgs.slice(-60); lsSet(AI_CHAT_KEY, JSON.stringify(aiChat)); }
   var AI_MODES_HIDDEN = [['app', '📊', 'App coach', 'Ask anything about this app…']];
@@ -7368,7 +7369,49 @@ listBlock,
       return '<div class="sr-item sr-q" style="--sr-c:' + STUDY[x.mod].color + '"><span class="sr-ico">' + STUDY[x.mod].ico + '</span><span class="sr-body"><span class="sr-meta">' + escapeHtml(MOD_NAME[x.mod] || '') + (x.q.tag ? ' · ' + escapeHtml(x.q.tag) : '') + '</span><span class="sr-qq">' + escapeHtml(x.q.q) + '</span><span class="sr-ans">✓ ' + escapeHtml(x.q.o[x.q.a]) + '</span>' + (x.q.e ? '<span class="sr-snip">' + escapeHtml(x.q.e) + '</span>' : '') + '</span></div>';
     }).join('') + '</div>';
     var acts = m.pending ? '' : '<div class="ai-acts ai-mini">' + (m.t && !m.err ? '<button data-ai-copy="' + i + '">Copy</button>' : '') + (i === aiChat.msgs.length - 1 && i > 0 && aiChat.msgs[i - 1].r === 'u' ? '<button data-ai-retry="' + i + '">↻ Try again</button>' : '') + '</div>';
-    return '<div class="ai-msg ai-a"><div class="ai-card' + (m.pending ? ' typing' : '') + '"><div class="ai-md">' + (m.pending && !m.t ? '<span class="ai-dots"><i></i><i></i><i></i></span>' : body) + '</div>' + src + acts + aiNextHtml(m, i) + '</div></div>';
+    var live = m.pending && m.live ? '<div class="ai-live" data-ai-live="' + i + '">' + aiLiveHtml(m.live) + '</div>' : '';
+    return '<div class="ai-msg ai-a"><div class="ai-card' + (m.pending ? ' typing' : '') + '">' + live + '<div class="ai-md">' + (m.pending && !m.t ? '<span class="ai-dots"><i></i><i></i><i></i></span>' : body) + '</div>' + (m.pending ? '' : aiByHtml(m.by)) + src + acts + aiNextHtml(m, i) + '</div></div>';
+  }
+  // ---- who is answering: a live line while waiting, a footer on every answer ----
+  function aiProvName(p){ return (AI_PROVIDERS[p] || {}).name || p; }
+  function aiLiveHtml(l){
+    var now = Date.now(), e = Math.max(0, Math.floor((now - l.start) / 1000)), left = Math.max(0, Math.ceil((l.deadline - now) / 1000));
+    var who = '<b>' + escapeHtml(aiProvName(l.p)) + '</b>' + (l.model ? ' · <code>' + escapeHtml(l.model) + '</code>' : '');
+    var line = l.mode === 'wait' ? '⏸ Free per-minute limit on ' + who + ' — trying again in <b class="ai-cd">' + left + ' s</b>'
+      : l.mode === 'write' ? '✍️ ' + who + ' is writing… <b class="ai-cd">' + e + ' s</b>'
+      : l.model ? '⏳ Asking ' + who + (l.web ? ' with Google Search' : '') + ' — <b class="ai-cd">' + e + ' s</b><span class="ai-cdl"> · gives up in ' + left + ' s</span>'
+      : '⏳ Getting ready…';
+    return line + (l.note ? '<div class="ai-live-note">' + escapeHtml(l.note) + '</div>' : '');
+  }
+  function aiByHtml(b){
+    if(!b) return '';
+    if(b.local) return '<div class="ai-by">📦 From the app’s question bank — no AI used</div>';
+    return '<div class="ai-by' + (b.fail ? ' fail' : '') + '">🤖 ' + escapeHtml(aiProvName(b.p)) + (b.m ? ' · ' + escapeHtml(b.m) : '') + (b.fail ? ' — no answer' : '') + (typeof b.s === 'number' ? ' · ' + b.s + ' s' : '') + '</div>';
+  }
+  /** Hooks for aiCall that keep the pending answer's live line current, ticking every second. */
+  function aiLive(a, c){
+    var t0 = Date.now(), last = { p: c.provider, model: '' };
+    a.live = { p: c.provider, model: '', start: t0, deadline: t0, mode: 'ask', note: '' };
+    var paint = function(){
+      if(!a.live || !a.pending) return;
+      var i = aiChat.msgs.indexOf(a), el = i === -1 ? null : document.querySelector('#askLog [data-ai-live="' + i + '"]');
+      if(el) el.innerHTML = aiLiveHtml(a.live);
+      else if(aiOpen && i === aiChat.msgs.length - 1) aiUpdateLast(false);   // drawn before the live line existed
+    };
+    var tick = setInterval(paint, 1000);
+    var h = {
+      onAttempt: function(x){ last = { p: x.provider, model: x.model }; Object.assign(a.live, { p: x.provider, model: x.model, start: Date.now(), deadline: Date.now() + x.secs * 1000, mode: a.live.mode === 'write' ? 'write' : 'ask', web: x.web }); paint(); },
+      onWait: function(sec){ Object.assign(a.live, { mode: 'wait', deadline: Date.now() + sec * 1000 }); paint(); },
+      onStatus: function(msg){ a.live.note = msg; paint(); },
+      onFirst: function(){ if(a.live.mode !== 'write'){ a.live.mode = 'write'; a.live.start = Date.now(); paint(); } },
+      finish: function(res, err){
+        clearInterval(tick);
+        if(res) a.by = { p: c.provider, m: res.model, s: Math.round((Date.now() - t0) / 100) / 10 };
+        else if(err && err.name !== 'AbortError' && last.model) a.by = { p: last.p, m: last.model, s: Math.round((Date.now() - t0) / 100) / 10, fail: true };
+        delete a.live;
+      }
+    };
+    return h;
   }
   // what to do next, under the latest answer
   var AI_NEXT = {
@@ -7487,8 +7530,8 @@ listBlock,
     aiRender(); aiScrollEnd();
     var ctl = new AbortController();
     aiSetBusy(ctl);
-    var showStatus = function(s){ if(a.pending && (!a.t || a.status)){ a.t = a.statusText = '*' + s + '*'; a.status = true; aiUpdateLast(false); } };
-    var slow = setTimeout(function(){ showStatus('Still waiting for ' + aiModel(c) + ' — free models can be slow at busy times. Press ■ to stop.'); }, 12000);
+    var live = aiLive(a, c), liveRes = null, liveErr = null;
+    ctl.hooks = live;
     try{
       var ctx = await aiRetrieve(text, mode);
       ctx.q = text;
@@ -7515,14 +7558,15 @@ listBlock,
       hist.push({ role: 'user', text: (extra ? extra + '\n\n' : '') + (ctxText ? ctxText + '\n\n[Question]\n' : '') + text });
       var web = c.provider === 'gemini' && c.web && !(c.webOffUntil > Date.now()) && mode !== 'solve' && mode !== 'weak';
       var t0 = 0;
-      var res = await aiCall(c, aiSystem(c, mode, style, wctx ? aiCtxLabel(wctx) : ''), hist, { web: web, signal: ctl.signal, onStatus: showStatus, onWait: function(s){ showStatus('Free per-minute limit hit — waiting ' + s + ' s and trying again…'); }, onText: function(t){
+      var res = await aiCall(c, aiSystem(c, mode, style, wctx ? aiCtxLabel(wctx) : ''), hist, { web: web, signal: ctl.signal, onAttempt: live.onAttempt, onStatus: live.onStatus, onWait: live.onWait, onText: function(t){
         var body = aiSplitMeta(t).body;
-        if(!body && a.status) return;
-        a.t = body; a.status = false;
+        if(body) live.onFirst();
+        a.t = body;
         var now = Date.now(); if(now - t0 > 60){ t0 = now; aiUpdateLast(false); }
       } });
       var sp = aiSplitMeta(res.text);
       a.t = sp.body; a.topic = sp.topic; a.related = sp.related; a.web = res.web;
+      liveRes = res;
       aiLearn(res);
       a.note = [res.switchedFrom ? (res.auto ? 'Auto model: ' + res.switchedFrom + ' didn’t answer on your key just now, so ' + res.model + ' answered — it’s used from now on.' : 'Your chosen model ' + res.switchedFrom + ' didn’t answer just now, so ' + res.model + ' answered this one.') : '',
         res.webDropped ? 'Google Search isn’t free on your key right now, so this answer is without web search (it will try again in a few hours).' : ''].filter(Boolean).join(' ');
@@ -7538,7 +7582,8 @@ listBlock,
       }
       else { a.err = (e && e.message) || 'Something went wrong.'; a.errRaw = (e && e.raw) || ''; }
     }finally{
-      clearTimeout(slow);
+      live.finish(liveRes || ctl.res || null, a.err ? { name: a.err === 'Stopped.' ? 'AbortError' : 'Error' } : null);
+      if(a.quiz && !a.by && !ctl.res) a.by = { local: true };
       if(a.status && a.t === a.statusText){ a.t = ''; if(!a.err) a.err = 'No answer came back. Try again.'; }   // only a waiting note was left
       delete a.status; delete a.statusText;
       a.pending = false;
@@ -7602,7 +7647,7 @@ listBlock,
     aiChat.msgs.push({ r: 'u', t: 'Mock test on ' + name, mode: 'app', ctx: { mod: id, lesson: null }, ts: Date.now() });
     aiChat.msgs.push({ r: 'a', mode: 'app', ctx: { mod: id, lesson: null }, ts: Date.now(),
       t: '**Mock test on ' + name + '** — ' + pick.length + ' questions from the app · ' + Math.round(pick.length * 36 / 60) + ' minutes · +2 / −0.5.\n\n' + (wrong.length ? Math.min(wrong.length, 10) + ' are questions you got wrong before; the rest are mostly ones you haven’t tried.' : 'Mostly questions you haven’t tried yet.') + ' Your answers count towards this app’s progress.',
-      quiz: { title: name, mock: true, qs: shuffleArr(pick).map(function(q){ return { mod: id, id: q.id }; }) } });
+      quiz: { title: name, mock: true, qs: shuffleArr(pick).map(function(q){ return { mod: id, id: q.id }; }) }, by: { local: true } });
     aiSaveChat(); aiRender(); aiScrollEnd();
   }
   /** Quiz me: questions from the app's bank when it has enough on the topic; otherwise the AI writes them. */
@@ -7615,19 +7660,21 @@ listBlock,
       return;
     }
     a.t = '';
-    var qs = await aiGenQs(c, topic, 10, ctx, ctl.signal);
+    var qs = await aiGenQs(c, topic, 10, ctx, ctl.signal, ctl);
     a.t = 'Made **' + qs.length + ' new questions** on “' + topic.replace(/[*_`]/g, '') + '”. ' + (bank.length ? '' : 'The app has no questions on this, so these are written by AI — tell me if one looks wrong.');
     a.quiz = { title: topic, ai: true, qs: qs };
   }
   /** n new MCQs on a topic, written by the AI: [{ q, o, a, e, s }] (s = section: en / mt / rs / gs). */
-  async function aiGenQs(c, topic, n, ctx, signal, onStatus){
+  async function aiGenQs(c, topic, n, ctx, signal, ctl){
     var langNote = c.lang === 'hi' ? 'Write the questions in Hindi (keep English-language questions in English).' : c.lang === 'hinglish' ? 'Write the questions in simple English; explanations may be in Hinglish.' : 'Write in English.';
     var ctxText = aiContextText(ctx);
     var sys = 'You write SSC CGL Tier 1 practice MCQs. Exactly 4 options each, one correct; options must be plausible and distinct. Match real SSC difficulty and style (mix of easy, moderate and a few tricky), and cover different sub-topics instead of repeating one idea. ' +
       'For maths and reasoning, compute every answer carefully and double-check it. ' + langNote +
       ' Return ONLY JSON, no Markdown: {"questions":[{"q":"question","o":["A","B","C","D"],"a":0,"e":"one or two line explanation with the trick","s":"gs"}]} where "a" is the 0-based index of the correct option and "s" is the Tier 1 section: "en" English, "mt" Maths, "rs" Reasoning or "gs" General Awareness.';
     var user = (ctxText ? ctxText + '\n\n' : '') + 'Write ' + n + ' MCQs on: ' + topic;
-    var res = await aiCall(c, sys, [{ role: 'user', text: user }], { json: true, signal: signal, onText: function(){}, onStatus: onStatus });
+    var hk = (ctl && ctl.hooks) || {};
+    var res = await aiCall(c, sys, [{ role: 'user', text: user }], { json: true, signal: signal, onText: function(t){ if(t && hk.onFirst) hk.onFirst(); }, onAttempt: hk.onAttempt, onStatus: hk.onStatus, onWait: hk.onWait });
+    if(ctl) ctl.res = res;
     aiLearn(res);
     var raw = res.text.replace(/^[\s\S]*?(\{[\s\S]*\})[\s\S]*$/, '$1'), data;
     try{ data = JSON.parse(raw); }catch(e){ throw new Error('The AI’s questions came back in a broken format. Press “Try again”.'); }
@@ -7640,7 +7687,7 @@ listBlock,
   async function aiMock(c, topic, ctx, a, ctl){
     var N = 20, bank = shuffleArr((ctx.qs || []).map(function(x){ return x.q; })).slice(0, N), ai = [], aiFail = '';
     if(bank.length < N){
-      try{ ai = await aiGenQs(c, topic, N - bank.length, ctx, ctl.signal); }
+      try{ ai = await aiGenQs(c, topic, N - bank.length, ctx, ctl.signal, ctl); }
       catch(e){ if((e && e.name === 'AbortError') || bank.length < 5) throw e; aiFail = ' (The AI couldn’t write more just now.)'; }
     }
     var total = bank.length + ai.length, name = topic.replace(/[*_`]/g, '');
@@ -7753,10 +7800,11 @@ listBlock,
       var m = aiChat.msgs[+b.dataset.aiQuizgen], u = aiChat.msgs[+b.dataset.aiQuizgen - 1];
       if(!u || aiBusy) return;
       var c = aiCfg(), a = { r: 'a', t: '', mode: 'quiz', pending: true, ts: Date.now() }, ctl = new AbortController();
+      ctl.hooks = aiLive(a, c);
       aiChat.msgs.push(a); aiRender(); aiScrollEnd(); aiSetBusy(ctl);
       aiRetrieve(u.t, 'quiz').then(function(ctx){ ctx.q = u.t; return aiQuiz(c, m.quiz.title, ctx, a, ctl, true); })
-        .catch(function(e){ a.err = e && e.name === 'AbortError' ? 'Stopped.' : ((e && e.message) || 'Something went wrong.'); a.errRaw = (e && e.raw) || ''; })
-        .then(function(){ a.pending = false; aiSaveChat(); aiUpdateLast(true); aiSetBusy(null); });
+        .catch(function(e){ a.err = e && e.name === 'AbortError' ? 'Stopped.' : ((e && e.message) || 'Something went wrong.'); a.errRaw = (e && e.raw) || ''; ctl.err = e; })
+        .then(function(){ ctl.hooks.finish(ctl.res || null, ctl.err || null); a.pending = false; aiSaveChat(); aiUpdateLast(true); aiSetBusy(null); });
       return;
     }
     if((b = ev.target.closest('[data-ai-next]'))){ aiNext(b.dataset.aiNext, +b.dataset.i); return; }
