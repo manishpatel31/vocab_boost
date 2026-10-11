@@ -6921,6 +6921,13 @@ listBlock,
   }
   /** aiCall across services: ask the best one for the task; if it fails (limit, no reply, key or network trouble), ask the next. */
   async function aiCallAny(c, sys, msgs, opts, task, style){
+    if(opts.force && c.keys[opts.force.p]){   // "Try with…": exactly the model you picked
+      var fc = Object.assign({}, c, { provider: opts.force.p, models: Object.assign({}, c.models) });
+      fc.models[opts.force.p] = opts.force.m;
+      var fr = await aiCall(fc, sys, msgs, Object.assign({}, opts, { web: opts.web && opts.force.p === 'gemini', noFallback: true }));
+      fr.forced = true;
+      return fr;
+    }
     var route = aiRoute(c, task, style), lastErr = null;
     for(var i = 0; i < route.length; i++){
       var p = route[i], cc = Object.assign({}, c, { provider: p });
@@ -7133,6 +7140,7 @@ listBlock,
           continue;
         }
         if(e.timeout || e.zero || e.status === 404 || (e.status === 429 && /per.?day|PerDay|daily/i.test(e.raw || ''))) aiMarkBad(model);   // skip it for a while
+        if(opts.noFallback) throw e;
         if(e.timeout || e.status === 429 || e.status === 404 || e.status >= 500 || (e.status === 400 && /model/i.test(e.raw || ''))){
           var m = next();
           if(m){
@@ -7475,7 +7483,7 @@ listBlock,
   function aiModeInfo(id){ return AI_MODES.concat(AI_MODES_HIDDEN).filter(function(m){ return m[0] === id; })[0] || AI_MODES[0]; }
 
   function aiMsgHtml(m, i){
-    if(m.r === 'u') return '<div class="ai-msg ai-u"><div class="ai-bub"><span class="ai-tag">' + aiModeInfo(m.mode)[1] + ' ' + escapeHtml(aiModeInfo(m.mode)[2]) + (m.style && m.style !== 'auto' ? ' · ' + escapeHtml(aiStyleInfo(m.style)[2]) : '') + (m.ctx ? ' · ' + escapeHtml(aiCtxLabel(m.ctx)) : '') + '</span>' + escapeHtml(m.t).replace(/\n/g, '<br>') + '</div></div>';
+    if(m.r === 'u') return '<div class="ai-msg ai-u"><div class="ai-bub"><span class="ai-tag">' + aiModeInfo(m.mode)[1] + ' ' + escapeHtml(aiModeInfo(m.mode)[2]) + (m.style && m.style !== 'auto' ? ' · ' + escapeHtml(aiStyleInfo(m.style)[2]) : '') + (m.ctx ? ' · ' + escapeHtml(aiCtxLabel(m.ctx)) : '') + (m.force ? ' · ⇄ ' + escapeHtml(aiProvName(m.force.p).replace(/^Google /, '') + ' · ' + m.force.m) : m.again ? ' · ⇄ Auto' : '') + '</span>' + escapeHtml(m.t).replace(/\n/g, '<br>') + '</div></div>';
     var who = AI_PROVIDERS[aiCfg().provider].name.replace(/^Google /, '');
     var body = m.err ? '<div class="ai-err">' + escapeHtml(m.err) + '</div>' + (m.errRaw ? '<details class="ai-errd"><summary>What ' + escapeHtml(who) + ' said</summary>' + escapeHtml(m.errRaw) + '</details>' : '') : aiMd(m.t);
     if(m.note && !m.err) body += '<div class="ai-note">ℹ️ ' + escapeHtml(m.note) + '</div>';
@@ -7492,7 +7500,8 @@ listBlock,
     if(m.local && m.local.length) src += '<div class="ai-local">' + m.local.map(function(x){
       return '<div class="sr-item sr-q" style="--sr-c:' + STUDY[x.mod].color + '"><span class="sr-ico">' + STUDY[x.mod].ico + '</span><span class="sr-body"><span class="sr-meta">' + escapeHtml(MOD_NAME[x.mod] || '') + (x.q.tag ? ' · ' + escapeHtml(x.q.tag) : '') + '</span><span class="sr-qq">' + escapeHtml(x.q.q) + '</span><span class="sr-ans">✓ ' + escapeHtml(x.q.o[x.q.a]) + '</span>' + (x.q.e ? '<span class="sr-snip">' + escapeHtml(x.q.e) + '</span>' : '') + '</span></div>';
     }).join('') + '</div>';
-    var acts = m.pending ? '' : '<div class="ai-acts ai-mini">' + (m.t && !m.err ? '<button data-ai-copy="' + i + '">Copy</button>' : '') + (i === aiChat.msgs.length - 1 && i > 0 && aiChat.msgs[i - 1].r === 'u' ? '<button data-ai-retry="' + i + '">↻ Try again</button>' : '') + '</div>';
+    var acts = m.pending ? '' : '<div class="ai-acts ai-mini">' + (m.t && !m.err ? '<button data-ai-copy="' + i + '">Copy</button>' : '') + (i === aiChat.msgs.length - 1 && i > 0 && aiChat.msgs[i - 1].r === 'u' ? '<button data-ai-retry="' + i + '">↻ Try again</button>' : '') +
+      (i > 0 && aiChat.msgs[i - 1].r === 'u' && !(m.mode === 'app' && m.by && m.by.local) ? '<button data-ai-with="' + i + '">⇄ Try with…</button>' : '') + '</div>';
     var live = m.pending && m.live ? '<div class="ai-live" data-ai-live="' + i + '">' + aiLiveHtml(m.live) + '</div>' : '';
     return '<div class="ai-msg ai-a"><div class="ai-card' + (m.pending ? ' typing' : '') + '">' + live + '<div class="ai-md">' + (m.pending && !m.t ? '<span class="ai-dots"><i></i><i></i><i></i></span>' : body) + '</div>' + (m.pending ? '' : aiByHtml(m.by)) + src + acts + aiNextHtml(m, i) + '</div></div>';
   }
@@ -7510,7 +7519,7 @@ listBlock,
   function aiByHtml(b){
     if(!b) return '';
     if(b.local) return '<div class="ai-by">📦 From the app’s question bank — no AI used</div>';
-    return '<div class="ai-by' + (b.fail ? ' fail' : '') + '">🤖 ' + escapeHtml(aiProvName(b.p)) + (b.m ? ' · ' + escapeHtml(b.m) : '') + (b.fail ? ' — no answer' : '') + (typeof b.s === 'number' ? ' · ' + b.s + ' s' : '') + '</div>';
+    return '<div class="ai-by' + (b.fail ? ' fail' : '') + '">🤖 ' + escapeHtml(aiProvName(b.p)) + (b.m ? ' · ' + escapeHtml(b.m) : '') + (b.fail ? ' — no answer' : '') + (typeof b.s === 'number' ? ' · ' + b.s + ' s' : '') + (b.pick ? ' · your pick' : '') + '</div>';
   }
   /** Hooks for aiCall that keep the pending answer's live line current, ticking every second. */
   function aiLive(a, c){
@@ -7530,7 +7539,7 @@ listBlock,
       onFirst: function(){ if(a.live.mode !== 'write'){ a.live.mode = 'write'; a.live.start = Date.now(); paint(); } },
       finish: function(res, err){
         clearInterval(tick);
-        if(res) a.by = { p: res.provider || c.provider, m: res.model, s: Math.round((Date.now() - t0) / 100) / 10 };
+        if(res) a.by = { p: res.provider || c.provider, m: res.model, s: Math.round((Date.now() - t0) / 100) / 10, pick: !!res.forced };
         else if(err && err.name !== 'AbortError' && last.model) a.by = { p: last.p, m: last.model, s: Math.round((Date.now() - t0) / 100) / 10, fail: true };
         delete a.live;
       }
@@ -7649,20 +7658,21 @@ listBlock,
     if(mode === 'weak' && !text) text = AI_TRY.weak[0];
     if(!text) return;
     var wctx = where ? { mod: where.mod, lesson: where.lesson || null } : null;
-    if(!retry) aiChat.msgs.push({ r: 'u', t: text, mode: mode, style: style, ctx: wctx, ts: Date.now() });
+    var force = opt && opt.force ? opt.force : null;
+    if(!retry) aiChat.msgs.push({ r: 'u', t: text, mode: mode, style: style, ctx: wctx, force: force, again: !!(opt && opt.again), ts: Date.now() });
     var a = { r: 'a', t: '', mode: mode, style: style, ctx: wctx, pending: true, ts: Date.now() };
     aiChat.msgs.push(a);
     aiRender(); aiScrollEnd();
     var ctl = new AbortController();
     aiSetBusy(ctl);
     var live = aiLive(a, c), liveRes = null, liveErr = null;
-    ctl.hooks = live;
+    ctl.hooks = live; ctl.force = force;
     try{
       var ctx = await aiRetrieve(text, mode);
       ctx.q = text;
       if(wctx) await aiAddWhere(ctx, wctx, mode);
-      if(mode === 'quiz') return await aiQuiz(c, text, ctx, a, ctl, false);
-      if(mode === 'mock') return await aiMock(c, text, ctx, a, ctl);
+      if(mode === 'quiz') return await aiQuiz(c, text, ctx, a, ctl, !!force);
+      if(mode === 'mock'){ if(force) ctx.qs = []; return await aiMock(c, text, ctx, a, ctl); }
       var extra = '';
       if(mode === 'app'){
         try{ await loadStudyBank(); }catch(e){}
@@ -7688,7 +7698,7 @@ listBlock,
         if(body) live.onFirst();
         a.t = body;
         var now = Date.now(); if(now - t0 > 60){ t0 = now; aiUpdateLast(false); }
-      } }, mode, style);
+      }, force: force }, mode, style);
       var sp = aiSplitMeta(res.text);
       a.t = sp.body; a.topic = sp.topic; a.related = sp.related; a.web = res.web;
       liveRes = res;
@@ -7705,7 +7715,7 @@ listBlock,
         a.local = loc.qs.slice(0, 3);
         if(!a.src.length && !a.local.length) a.err = a.err.replace(/ Here’s what the app has on this:$/, ' Nothing in the app’s notes matches it either.');
       }
-      else { a.err = (e && e.message) || 'Something went wrong.'; a.errRaw = (e && e.raw) || ''; }
+      else { a.err = ((e && e.message) || 'Something went wrong.') + (force ? ' Pick another model with ⇄ Try with….' : ''); a.errRaw = (e && e.raw) || ''; }
     }finally{
       live.finish(liveRes || ctl.res || null, a.err ? { name: a.err === 'Stopped.' ? 'AbortError' : 'Error' } : null);
       if(a.quiz && !a.by && !ctl.res) a.by = { local: true };
@@ -7798,7 +7808,7 @@ listBlock,
       ' Return ONLY JSON, no Markdown: {"questions":[{"q":"question","o":["A","B","C","D"],"a":0,"e":"one or two line explanation with the trick","s":"gs"}]} where "a" is the 0-based index of the correct option and "s" is the Tier 1 section: "en" English, "mt" Maths, "rs" Reasoning or "gs" General Awareness.';
     var user = (ctxText ? ctxText + '\n\n' : '') + 'Write ' + n + ' MCQs on: ' + topic;
     var hk = (ctl && ctl.hooks) || {};
-    var res = await aiCallAny(c, sys, [{ role: 'user', text: user }], { json: true, signal: signal, onText: function(t){ if(t && hk.onFirst) hk.onFirst(); }, onAttempt: hk.onAttempt, onStatus: hk.onStatus, onWait: hk.onWait }, 'questions');
+    var res = await aiCallAny(c, sys, [{ role: 'user', text: user }], { json: true, signal: signal, onText: function(t){ if(t && hk.onFirst) hk.onFirst(); }, onAttempt: hk.onAttempt, onStatus: hk.onStatus, onWait: hk.onWait, force: ctl && ctl.force }, 'questions');
     if(ctl) ctl.res = res;
     aiLearn(res);
     var raw = res.text.replace(/^[\s\S]*?(\{[\s\S]*\})[\s\S]*$/, '$1'), data;
@@ -7934,6 +7944,7 @@ listBlock,
     }
     if((b = ev.target.closest('[data-ai-next]'))){ aiNext(b.dataset.aiNext, +b.dataset.i); return; }
     if((b = ev.target.closest('[data-ai-rel]'))){ aiAsk(b.dataset.aiRel, 'explain', false); return; }
+    if((b = ev.target.closest('[data-ai-with]'))){ aiPickModel(+b.dataset.aiWith); return; }
     if((b = ev.target.closest('[data-ai-retry]'))){
       var i = +b.dataset.aiRetry, q = aiChat.msgs[i - 1];
       aiChat.msgs.splice(i, 1);
@@ -7946,6 +7957,37 @@ listBlock,
     if(aiTopFrom !== null && location.hash === aiTopFrom){ aiTopFrom = null; document.body.classList.remove('ask-top'); return; }
     if(location.hash === aiFromHash || (!studyOpen && !drillOpen)) closeAsk(true);
   });
+
+  /** "Try with…": every model of every saved key; the same question is asked again with the one picked. */
+  function aiPickModel(i){
+    var a = aiChat.msgs[i], u = aiChat.msgs[i - 1];
+    if(!a || !u || u.r !== 'u') return;
+    if(aiBusy){ showToast('Wait for the current answer, or press ■ to stop it.'); return; }
+    var c = aiCfg(), used = a.by && !a.by.local && !a.by.fail ? a.by.p + '|' + a.by.m : '';
+    var html = '<h3 style="margin-bottom:4px;">Ask again with…</h3><p class="help" style="margin-top:0;">“' + escapeHtml(u.t.replace(/\s+/g, ' ').slice(0, 120)) + (u.t.length > 120 ? '…' : '') + '” — the new answer is added below, so you can compare.</p>' +
+      '<div class="ai-pick"><button data-ai-pick="auto"><b>✨ Auto</b><span>The best service and model for this question</span></button>';
+    Object.keys(AI_PROVIDERS).forEach(function(p){
+      if(!c.keys[p]){ html += '<div class="ai-pick-h">' + escapeHtml(AI_PROVIDERS[p].name) + '</div><button data-ai-pick="add:' + p + '" class="add"><span>No key saved — add a free ' + escapeHtml(AI_PROVIDERS[p].name) + ' key in AI settings ›</span></button>'; return; }
+      var list = aiRanked(Object.assign({}, c, { provider: p, bad: {} }));
+      html += '<div class="ai-pick-h">' + escapeHtml(AI_PROVIDERS[p].name) + '</div>' + list.map(function(m, k){
+        var tag = used === p + '|' + m ? 'wrote this answer' : aiBadRecently(c, m) ? 'failed lately' : k === 0 ? 'best ranked' : '';
+        return '<button data-ai-pick="' + escapeAttr(p + '|' + m) + '"' + (aiBadRecently(c, m) ? ' class="bad"' : '') + '><b>' + escapeHtml(m) + '</b>' + (tag ? '<span>' + tag + '</span>' : '') + '</button>';
+      }).join('');
+    });
+    html += '</div><div class="modal-actions"><button class="btn ghost" id="aiPickCancel">Cancel</button></div>';
+    modalBodyRef().innerHTML = html;
+    modalBgRef().classList.add('open');
+    var close = function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML = ''; };
+    document.getElementById('aiPickCancel').addEventListener('click', close);
+    modalBodyRef().querySelector('.ai-pick').addEventListener('click', function(ev){
+      var b = ev.target.closest('[data-ai-pick]'); if(!b) return;
+      var v = b.dataset.aiPick;
+      close();
+      if(v.indexOf('add:') === 0){ var cc = aiCfg(); cc.provider = v.slice(4); aiSave(cc); aiOpenSettings(); return; }
+      var force = v === 'auto' ? null : { p: v.split('|')[0], m: v.split('|').slice(1).join('|') };
+      aiAsk(u.t, u.mode, false, { style: u.style, ctx: u.ctx || null, force: force, again: true });
+    });
+  }
 
   // ---- settings ----
   function aiOpenSettings(){
