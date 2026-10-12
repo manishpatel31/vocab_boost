@@ -15,13 +15,14 @@ Vocabulary, General Studies and Maths in one place, with one daily goal, one str
 | **Progress** | Study points, streak, per-subject progress |
 | **Search** | One box that searches lessons and notes across every mini app |
 
-## Mini apps (23)
+## Mini apps (24)
 
-Each mini app is one self-contained page (`study-<name>.html`) with lessons, a quick-revise tab and practice questions. About 7,000 questions in total.
+Each mini app is one self-contained page (`study-<name>.html`) with lessons, a quick-revise tab and practice questions. About 7,500 questions in total.
 
 **English:** Grammar 100, `study-voice` (Active & Passive Voice), `study-narration` (Narration / direct–indirect speech) — both built around the SSC CGL pattern
 
 **General Studies**
+- History: `study-history` (Indian History: 30 lessons split by era — Ancient, Medieval, Modern, Art & Culture and World — with mnemonics, “trap” boxes for the pairs SSC swaps, a master timeline, revision layered as 30 days / 7 days / last moment, and a plan maker for 5, 7, 10, 15 or 30 days)
 - Polity: `study-polity`, `study-bns-bnss-bsa` (BNS · BNSS · BSA: 15 lessons on the three new criminal laws from recent SSC questions — numbers and dates, new offences, FIR, arrest, bail and timelines, electronic evidence, section finder and drills)
 - Economy: `study-economics`, `study-ipr-plans` (IPR & Five Year Plans), `study-govt-schemes`
 - Science: `study-physics`, `study-biology`

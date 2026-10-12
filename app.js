@@ -92,6 +92,7 @@
     iprplans: { title: 'IPR & Five Year Plans',        file: 'study-ipr-plans.html',    key: 'economy_ipr_plans_v1' },
     folkdances:{ title: 'Folk Dances of India',        file: 'study-folk-dances.html',  key: 'folk_dances_workbook_v1' },
     appointments:{ title: 'Appointments 2026',          file: 'study-appointments.html', key: 'appointments_workbook_v1' },
+    history:  { title: 'Indian History',               file: 'study-history.html',      key: 'history_workbook_v1' },
     polity:   { title: 'Indian Polity',                file: 'study-polity.html',       key: 'polity_pyq_workbook_v1' },
     economics:{ title: 'Indian Economy',               file: 'study-economics.html',    key: 'economics_pyq_workbook_v1' },
     formulas: { title: 'Maths Formula Book',           file: 'study-maths-formulas.html', key: 'maths_formula_book_v1' },
@@ -119,6 +120,7 @@
   STUDY.iprplans.subj = 'gs'; STUDY.iprplans.ico = '🏭'; STUDY.iprplans.hi = 'औद्योगिक नीति · पंचवर्षीय योजनाएँ'; STUDY.iprplans.desc = 'Industrial Policy Resolutions (1948, 1956, 1991 …) and the Five Year Plans — aims, models, highlights and NITI Aayog.'; STUDY.iprplans.meta = '12 lessons · 252 questions'; STUDY.iprplans.color = '#8C5A2B';
   STUDY.folkdances.subj = 'gs'; STUDY.folkdances.ico = '💃'; STUDY.folkdances.hi = 'भारत के लोक नृत्य'; STUDY.folkdances.desc = 'Folk and tribal dances state by state — who performs them, when, and the tricks to tell look-alikes apart.'; STUDY.folkdances.meta = '16 lessons · 444 questions'; STUDY.folkdances.color = '#B0306A';
   STUDY.appointments.subj = 'gs'; STUDY.appointments.ico = '🎖️'; STUDY.appointments.hi = 'नियुक्तियाँ · कौन कहाँ'; STUDY.appointments.desc = 'Who heads what in 2026 — constitutional posts, forces, RBI & regulators, international bodies and recent appointments.'; STUDY.appointments.meta = '13 lessons · 269 questions'; STUDY.appointments.color = '#2E6DA4';
+  STUDY.history.subj = 'gs'; STUDY.history.ico = '🏺'; STUDY.history.hi = 'भारतीय इतिहास'; STUDY.history.desc = 'Ancient, Medieval, Modern, Art & Culture and World — era by era, with tricks, traps, a timeline, layered revision and a 5 / 7 / 10 / 15 / 30-day plan maker.'; STUDY.history.meta = '30 lessons · 714 questions'; STUDY.history.color = '#7A2230';
   STUDY.polity.subj = 'gs'; STUDY.polity.ico = '📜'; STUDY.polity.hi = 'भारतीय राजव्यवस्था · PYQ'; STUDY.polity.desc = 'The whole Constitution the SSC way — Parts, Schedules, key Articles, President to Parliament, emergencies and amendments.'; STUDY.polity.meta = '20 lessons · 481 questions'; STUDY.polity.color = '#3A4F9A';
   STUDY.economics.subj = 'gs'; STUDY.economics.ico = '💹'; STUDY.economics.hi = 'भारतीय अर्थव्यवस्था · PYQ'; STUDY.economics.desc = 'Demand to GDP, inflation, RBI & banking, budget, GST, 1991 reforms and trade — built from past SSC questions.'; STUDY.economics.meta = '20 lessons · 530 questions'; STUDY.economics.color = '#1E7A8C';
   STUDY.space.subj = 'gs'; STUDY.space.ico = '🚀'; STUDY.space.hi = 'अंतरिक्ष मिशन · Science & Tech'; STUDY.space.desc = 'Orbits, rockets and ISRO centres; Chandrayaan, Aditya-L1, Gaganyaan, NISAR and the 2024–26 launches.'; STUDY.space.meta = '16 lessons · 374 questions'; STUDY.space.color = '#5B45B0';
@@ -151,6 +153,7 @@
   STUDY.polity.core = STUDY.economics.core = 1; STUDY.physics.core = 2; STUDY.biology.core = 1;
   STUDY.physics.gsub = 'science'; STUDY.biology.gsub = 'science';
   STUDY.polity.gsub = 'polity'; STUDY.economics.gsub = 'economy'; STUDY.space.gsub = 'science';
+  STUDY.history.gsub = 'history'; STUDY.history.core = 1;
   var studyOpen = null, studyWatch = null, studyPushTimer = null, studyLast = null;
   function agoText(ms){
     if(!ms) return 'Not started yet';
@@ -792,6 +795,7 @@
   STUDY.iprplans.lessons = 12; STUDY.iprplans.unit = 'lessons';
   STUDY.folkdances.lessons = 16; STUDY.folkdances.unit = 'lessons';
   STUDY.appointments.lessons = 13; STUDY.appointments.unit = 'lessons';
+  STUDY.history.lessons = 30; STUDY.history.unit = 'lessons';
   STUDY.polity.lessons = 20; STUDY.polity.unit = 'lessons';
   STUDY.economics.lessons = 20; STUDY.economics.unit = 'lessons';
   STUDY.space.lessons = 16; STUDY.space.unit = 'lessons';
@@ -1193,7 +1197,7 @@
 
   // ---- the practice / mock screen ----
   var drill = null, drillOpen = false, drillTimer = null;
-  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments', polity: 'Polity', economics: 'Economy', space: 'Space', physics: 'Physics', biology: 'Biology', geometry: 'Geometry', mensuration2d: 'Mensuration 2D', mensuration3d: 'Mensuration 3D', trigonometry: 'Trigonometry', numbersystem: 'Number System', calendar: 'Calendar', clock: 'Clock', voice: 'Active & Passive Voice', narration: 'Narration', formulas: 'Formula Book' };
+  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments', history: 'History', polity: 'Polity', economics: 'Economy', space: 'Space', physics: 'Physics', biology: 'Biology', geometry: 'Geometry', mensuration2d: 'Mensuration 2D', mensuration3d: 'Mensuration 3D', trigonometry: 'Trigonometry', numbersystem: 'Number System', calendar: 'Calendar', clock: 'Clock', voice: 'Active & Passive Voice', narration: 'Narration', formulas: 'Formula Book' };
   function openDrill(title){
     closeAllMenus();
     drillOpen = true;
@@ -2251,6 +2255,7 @@
     intlorgs: ['international organisations', 'international organizations', 'intl orgs'],
     reports: ['reports and indices', 'reports indices', 'indices reports'], iprplans: ['ipr', 'five year plans', 'industrial policy'],
     folkdances: ['folk dances', 'folk dance'], festivals: ['festivals'], appointments: ['appointments'],
+    history: ['history', 'itihas', 'ancient history', 'medieval history', 'modern history', 'art and culture', 'art culture', 'culture'],
     polity: ['polity'], economics: ['economy', 'economics'], census: ['census'], sports: ['sports'],
     mensuration2d: ['mensuration 2d', '2d mensuration'], mensuration3d: ['mensuration 3d', '3d mensuration'],
     trigonometry: ['trigonometry', 'trigo'], space: ['isro', 'space missions'], voice: ['active passive', 'active and passive', 'passive voice'],
