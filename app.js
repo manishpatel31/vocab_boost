@@ -1256,6 +1256,7 @@
   var PL_DAYS = [7, 15, 30, 45, 60], PL_MINS = [60, 120, 180, 240, 360];
   var PL_DOW = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'], PL_DOW_NAME = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   var PL_MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  var PL_ORDERS = { group: 'Related apps in order', seq: 'One app at a time', mix: 'Mix every app daily' };
   var PL_COLORS = ['#2F6F63', '#3D5CF0', '#B5651D', '#8C2F39', '#6B4FA0', '#1E7FA8'];
   var PL_NOTE_CHIPS = ['I am a working professional', '2 hours on working days, 4 hours on weekends', 'Saturday and Sunday off from office', 'Every Sunday, revise that week’s lessons', 'I am a full-time student', 'Weak in Maths', 'Weak in English', 'Exam is close — more revision'];
   // Gazetted holidays for central government offices at Delhi / New Delhi (DoPT O.M.s of 3 Jul 2025 and 16 Jul 2026;
@@ -1371,9 +1372,9 @@
       early — apps to finish in the first part; prio — apps, most important first;
       review — weekday of the weekly review (−1 none; default every 7th day); revMode — what a review day holds:
       'mock' (mixed mock, mistakes, weak spots), 'lessons' (revise that week's lessons) or 'both';
-      rev — revision days at the end.
-      Lessons from every app are packed in order of each app's own timeline, so each day mixes subjects, every app
-      moves forward together and each day's minutes follow the time that day has. */
+      order — 'group' (related apps, e.g. the History apps, one after another), 'seq' or 'mix'; rev — revision days at the end.
+      Lessons are packed along each chain's own timeline, so each day mixes subjects, related apps run in order,
+      and each day's minutes follow the time that day has. */
   function plBuild(apps, days, skipDone, o){
     o = o || {};
     var start = plMid(o.start || Date.now()), units = plUnits(apps, skipDone), qApps = apps.filter(function(id){ return !STUDY[id].noq; });
@@ -1397,10 +1398,23 @@
     if(!studyIdx.length && open.length) studyIdx = [open[0]];
     // every lesson gets a place on its app's own timeline (0..1, or 0..0.7 for an app to finish early); taken in that
     // order they are packed so the minutes fill the study days in proportion to the time each day has
-    var S = studyIdx.length, wTot = 0, cumW = [], items = [], early = o.early || [], prio = o.prio || [];
+    var S = studyIdx.length, wTot = 0, cumW = [], items = [], early = o.early || [], prio = o.prio || [], canon = Object.keys(STUDY);
     studyIdx.forEach(function(d){ wTot += caps[d]; cumW.push(wTot); });
-    units.forEach(function(u){ var span = early.indexOf(u.mod) !== -1 ? 0.7 : 1; u.lessons.forEach(function(l, j){ items.push({ u: u, l: l, at: (j + 0.5) / u.lessons.length * span }); }); });
     var pr = function(m){ var i = prio.indexOf(m); return i === -1 ? 99 : i; };
+    // apps on one chain run one after another (History: Ancient → Medieval → Modern …); chains run side by side.
+    // order 'group' (default): one chain per subject; 'seq': one app at a time; 'mix': every app side by side
+    var order = PL_ORDERS[o.order] ? o.order : 'group', chains = {}, chainKeys = [];
+    units.forEach(function(u){
+      var k = order === 'seq' ? 'all' : order === 'mix' ? u.mod : (STUDY[u.mod].gsub || STUDY[u.mod].subj || u.mod);
+      if(!chains[k]){ chains[k] = []; chainKeys.push(k); }
+      chains[k].push(u);
+    });
+    chainKeys.forEach(function(k){
+      var us = chains[k].slice().sort(function(a, b){ return (order === 'seq' ? pr(a.mod) - pr(b.mod) : 0) || canon.indexOf(a.mod) - canon.indexOf(b.mod); });
+      var T = us.reduce(function(s, u){ return s + u.lessons.length * u.per; }, 0) || 1, acc = 0;
+      var span = us.some(function(u){ return early.indexOf(u.mod) !== -1; }) ? 0.7 : 1;
+      us.forEach(function(u){ u.lessons.forEach(function(l){ items.push({ u: u, l: l, at: (acc + u.per / 2) / T * span }); acc += u.per; }); });
+    });
     items.sort(function(x, y){ return x.at - y.at || pr(x.u.mod) - pr(y.u.mod); });
     var total = items.reduce(function(a, x){ return a + x.u.per; }, 0), cum = 0, k = 0;
     if(S) items.forEach(function(x){
@@ -1493,8 +1507,8 @@
   function plStartSetup(editId){
     var p = editId ? plGet(editId) : null, dte = daysToExam(), today = plMid(Date.now());
     plAi = null; plMode = 'setup';
-    plSetup = p ? { edit: p.id, name: p.name, apps: (p.apps || []).filter(function(id){ return STUDY[id]; }), days: p.list.length, mins: p.mins || 120, skip: true, start: plMid(p.start), notes: (p.ai && p.ai.notes) || '', o: p.o || null }
-      : { apps: [], days: dte > 2 && dte <= 120 ? dte : 30, mins: 120, skip: true, start: today, notes: '' };
+    plSetup = p ? { edit: p.id, name: p.name, apps: (p.apps || []).filter(function(id){ return STUDY[id]; }), days: p.list.length, mins: p.mins || 120, skip: true, start: plMid(p.start), notes: (p.ai && p.ai.notes) || '', o: p.o || null, order: (p.o && p.o.order) || 'group' }
+      : { apps: [], days: dte > 2 && dte <= 120 ? dte : 30, mins: 120, skip: true, start: today, notes: '', order: 'group' };
     renderPlanTab();
     window.scrollTo(0, 0);
   }
@@ -1508,7 +1522,7 @@
       '<p>' + (base ? 'Change what it covers, its days or its time — ' + (started ? 'the days already gone stay as they are, and unfinished lessons move into the days ahead.' : 'the whole plan is laid out again.') :
         'Pick what you want to cover and how long you have, then tell the AI about your day — job, hours on working days and weekends, days off, weekly revision, weak subjects — and it shapes the plan around your life.') + '</p></div>';
     if(plAi && plAi.phase !== 'err'){ plBody(hero + plAiHtml()); plAiBind(); return; }
-    var b = plBuild(c.apps, c.days, c.skip, { start: c.start });
+    var b = plBuild(c.apps, c.days, c.skip, { start: c.start, order: c.order });
     var need = Math.ceil(b.perDay / 5) * 5, over = c.apps.length && b.perDay > c.mins * 1.15;
     var fitDays = over ? Math.ceil(c.days * b.perDay / c.mins) : 0;
     var left = function(id){ return plUnits([id], true)[0].lessons.length; };
@@ -1518,7 +1532,9 @@
         '<div class="dq-box"><h3>1 · What do you want to cover?</h3><div class="dq-tags">' +
           '<button class="dq-tog" data-plall="all">Everything not finished</button><button class="dq-tog" data-plall="none">Clear</button></div>' +
           plGroups().map(function(g){ return '<div class="dq-gsub pl-grp"><span>' + escapeHtml(g[0]) + ' <button class="pl-mini" data-plgrp="' + escapeAttr(g[0]) + '">all</button></span>' + g[1].map(tog).join('') + '</div>'; }).join('') +
-          '<p class="help" style="margin:10px 0 0;">The small number is lessons still to do in that app.</p></div>' +
+          '<p class="help" style="margin:10px 0 0;">The small number is lessons still to do in that app.</p>' +
+          '<div class="pl-order"><b>Order</b><div class="dq-seg">' + Object.keys(PL_ORDERS).map(function(k){ return '<button data-plorder="' + k + '" class="' + (c.order === k ? 'on' : '') + '">' + PL_ORDERS[k] + '</button>'; }).join('') + '</div>' +
+          '<p class="help" style="margin:0;">' + ({ group: 'Apps of one subject go one after another — History: Ancient → Medieval → Modern — while different subjects share each day.', seq: 'Finish one app before starting the next.', mix: 'Every app moves forward a little every day.' })[c.order] + '</p></div></div>' +
         '<div class="dq-box"><h3>2 · How many days?</h3><div class="dq-seg">' +
           PL_DAYS.map(function(d){ return '<button data-pldays="' + d + '" class="' + (c.days === d ? 'on' : '') + '">' + d + '</button>'; }).join('') + '</div>' +
           '<div class="pl-row">' + (toExam > 1 ? '<button class="dq-tog' + (c.days === toExam ? ' on' : '') + '" data-pldays="' + toExam + '">Until ' + escapeHtml(examName()) + ' · ' + toExam + ' days</button>' : '') +
@@ -1552,6 +1568,7 @@
     B('[data-pldays]', function(x){ c.days = +x.dataset.pldays; });
     B('[data-plmins]', function(x){ c.mins = +x.dataset.plmins; });
     B('[data-plskip]', function(){ c.skip = !c.skip; });
+    B('[data-plorder]', function(x){ c.order = x.dataset.plorder; });
     B('[data-plnote]', function(x){ var t = x.dataset.plnote, n = (c.notes || '').trim(); if(n.indexOf(t) === -1) c.notes = n ? n.replace(/[.\s]*$/, '') + '. ' + t + '.' : t + '.'; });
     var notes = document.getElementById('plNotes');
     notes.addEventListener('input', function(){ c.notes = notes.value; });
@@ -1562,8 +1579,8 @@
     document.getElementById('plBack').addEventListener('click', function(){ plMode = 'cal'; plAi = null; plSetup = null; renderPlanTab(); });
     document.getElementById('plAi').addEventListener('click', function(){ plAiRun(); });
     document.getElementById('plMake').addEventListener('click', function(){
-      var r = plCompose(base, c.apps, c.days, c.skip, {}, c.start);
-      plCommit(r, c.notes ? { notes: c.notes } : null, {}, c.name || plDefaultName(c.apps, c.days));
+      var r = plCompose(base, c.apps, c.days, c.skip, { order: c.order }, c.start);
+      plCommit(r, c.notes ? { notes: c.notes } : null, { order: c.order }, c.name || plDefaultName(c.apps, c.days));
     });
   }
   /** Save a plan (new, or the one being edited) and show it on the calendar. */
@@ -1588,7 +1605,7 @@
     return 'You plan study timetables inside an SSC exam-preparation app. The app is made of mini apps (subjects), each a list of lessons. ' +
       'You do NOT list lessons: the app places its real lessons on the days itself, using the schedule you return. Your job is to understand the learner\'s life and wishes from their details and turn them into that schedule.\n' +
       'Return ONLY JSON, no Markdown, in exactly this shape:\n' +
-      '{"questions":[{"q":"short question","options":["answer 1","answer 2"]}],"plan":{"name":"…","summary":"…","week":{"mon":120,"tue":120,"wed":120,"thu":120,"fri":120,"sat":240,"sun":240},"holidays":"normal","off":["YYYY-MM-DD"],"priority":["appId"],"early":["appId"],"reviewDay":"sun","reviewMode":"both","revisionDays":3,"days":30,"start":"YYYY-MM-DD","tips":["…"]}}\n' +
+      '{"questions":[{"q":"short question","options":["answer 1","answer 2"]}],"plan":{"name":"…","summary":"…","week":{"mon":120,"tue":120,"wed":120,"thu":120,"fri":120,"sat":240,"sun":240},"holidays":"normal","off":["YYYY-MM-DD"],"priority":["appId"],"early":["appId"],"reviewDay":"sun","reviewMode":"both","revisionDays":3,"order":"group","days":30,"start":"YYYY-MM-DD","tips":["…"]}}\n' +
       'Rules:\n' +
       '- "questions": ask only when the answer would clearly change the plan and the details don\'t already say it; at most 3, each with 2–4 short options. Typical case: a working professional (or anyone with office days) who has not said whether the central government gazetted holidays listed below are off for them — ask once, naming a few of those holidays. When you ask, set "plan" to null. When nothing important is unclear, return "questions":[] and the plan.\n' +
       '- "week": study minutes for each weekday, 0 = rest day. Follow any hours the learner gives exactly (e.g. "2 hours on working days, 4 hours at weekends" → 120 Mon–Fri, 240 Sat–Sun). Otherwise the daily time they picked is the normal day; shape the week from their details (office on weekdays: less on weekdays, more at weekends). Use multiples of 15.\n' +
@@ -1596,6 +1613,7 @@
       '- "off": other dates (within the plan\'s dates) with no study that the learner mentioned — travel, festivals at home, family functions.\n' +
       '- "priority": the chosen app ids, most important first (weakest, most marks, or what they asked for). "early": app ids to finish in the first part of the plan, or [].\n' +
       '- "reviewDay": weekday for a weekly review, usually their freest day, or "none" for plans under 2 weeks. "reviewMode": what that day holds — "lessons" = revise that week\'s lessons app by app, "mock" = mixed mock test + mistakes book + weak spots, "both". If they ask to revise previous lessons on a day, use that day with "lessons" or "both".\n' +
+      '- "order": "group" = apps of one subject one after another in their natural order (History: Ancient → Medieval → Modern), different subjects side by side; "seq" = one app at a time, in "priority" order; "mix" = every app a little every day. Keep the order the learner picked unless their details ask otherwise.\n' +
       '- "revisionDays": days at the end only for revision and a final mock (0–10, about 15% of the days, more when an exam is right after the plan).\n' +
       '- "days" and "start": give them only when the learner asks for a different length or start date than the one below (e.g. "make it 25 days", "start from 1 Nov"); otherwise leave them out.\n' +
       '- "name": a short name for the plan, 2–5 words (e.g. "History sprint before CGL"). "summary": 2–3 sentences to the learner on how the plan fits their life. "tips": up to 5 short, practical tips.\n' +
@@ -1610,11 +1628,11 @@
     });
     var hol = plHolidaysIn(c.start, Math.max(c.days, 60)), ex = examsUpcoming(), started = base && plIdx(base, Date.now()) > 0;
     var cur = prev ? JSON.stringify(prev) : base && base.o && base.o.week ? JSON.stringify({ name: base.name, week: PL_DOW.reduce(function(a, k, i){ a[k] = base.o.week[i]; return a; }, {}), holidays: base.o.hol, off: base.o.off, priority: base.o.prio, early: base.o.early,
-      reviewDay: base.o.review === -1 ? 'none' : base.o.review != null ? PL_DOW[base.o.review] : null, reviewMode: base.o.revMode, revisionDays: base.o.rev }) : '';
+      reviewDay: base.o.review === -1 ? 'none' : base.o.review != null ? PL_DOW[base.o.review] : null, reviewMode: base.o.revMode, revisionDays: base.o.rev, order: base.o.order || 'group' }) : '';
     return 'Today: ' + plDateText(Date.now(), true) + '.\n' +
       (base ? 'This is an existing plan the learner wants to change: "' + base.name + '", ' + plRange(base) + ' (' + base.list.length + ' days)' + (started ? ', now on day ' + (plToday(base) + 1) + ' — its start date cannot change; days already gone stay as they are' : '') + '.\n' : '') +
       'Plan dates: ' + plDateText(c.start, true) + ' to ' + plDateText(plAddDays(c.start, c.days - 1), true) + ' (' + c.days + ' days).\n' +
-      'Daily time the learner picked: ' + fmtMin(c.mins) + '.\n' +
+      'Daily time the learner picked: ' + fmtMin(c.mins) + '. Order they picked: "' + (c.order || 'group') + '" (' + PL_ORDERS[c.order || 'group'] + ').\n' +
       'Exams: ' + (ex.length ? ex.map(function(e){ return e.n + ' on ' + plDateText(plFromYmd(e.d), true); }).join('; ') : 'none set') + '.\n' +
       'Apps chosen (id · name · what is left · progress):\n' + apps.join('\n') + '\n' +
       'Total lesson time: ' + fmtMin(Math.max(5, total)) + '. The app adds the weekly reviews and revision days to this.\n' +
@@ -1630,6 +1648,7 @@
     var days = Math.round(+p.days), start = c.start;
     if(days >= 1 && days <= 365) c.days = days;
     if(!started && /^\d{4}-\d{2}-\d{2}$/.test(String(p.start || ''))){ var s = plFromYmd(p.start); if(s >= plMid(Date.now())) c.start = s; }
+    if(PL_ORDERS[p.order]) c.order = p.order;
     var wk = p.week || {}, week = PL_DOW.map(function(k){ var v = Math.round(+wk[k]); return v >= 0 && v <= 720 ? v : c.mins; });
     if(!week.some(Boolean)) week = PL_DOW.map(function(){ return c.mins; });
     var s0 = plYmd(c.start), end = plYmd(plAddDays(c.start, c.days - 1)), off = {};
@@ -1637,6 +1656,7 @@
     var ok = function(l){ return (Array.isArray(l) ? l : []).map(String).filter(function(id, i, a){ return c.apps.indexOf(id) !== -1 && a.indexOf(id) === i; }); };
     var rd = String(p.reviewDay || '').toLowerCase(), rv = PL_DOW.indexOf(rd.slice(0, 3)), rn = Math.round(+p.revisionDays);
     return { week: week, hol: /^(free|off|normal)$/.test(p.holidays) ? p.holidays : 'normal', off: off, early: ok(p.early), prio: ok(p.priority),
+      order: PL_ORDERS[p.order] ? p.order : c.order || 'group',
       review: rd === 'none' ? -1 : rv >= 0 ? rv : null, revMode: /^(lessons|mock|both)$/.test(p.reviewMode) ? p.reviewMode : 'both', rev: rn >= 0 && rn <= 10 ? rn : null };
   }
   /** Ask the AI. opt.fix: a change asked for on the preview. Works for a new plan and for the plan being edited. */
@@ -1698,7 +1718,7 @@
     return '<div class="dq-box pl-ai ready"><div class="pl-namerow"><label for="plNameIn">✨ Plan name</label><input type="text" id="plNameIn" maxlength="60" value="' + escapeAttr(a.name) + '"></div>' +
       (a.summary ? '<p>' + escapeHtml(a.summary) + '</p>' : '') +
       '<div class="pl-week">' + plWeekText(o.week) + '</div>' +
-      '<p class="help">' + plDateText(c.start, true) + ' → ' + plDateText(plAddDays(c.start, c.days - 1), true) + ' · ' + c.days + ' days · ' + revDay +
+      '<p class="help">' + plDateText(c.start, true) + ' → ' + plDateText(plAddDays(c.start, c.days - 1), true) + ' · ' + c.days + ' days · ' + PL_ORDERS[o.order].toLowerCase() + ' · ' + revDay +
         (hol.length ? ' · gazetted holidays: ' + ({ free: 'study days', off: 'rest days', normal: 'like any other day' })[o.hol] : '') + (offN ? ' · ' + offN + ' other day' + (offN > 1 ? 's' : '') + ' off' : '') + '</p>' +
       '<p><b>' + b.lessons + ' lessons</b> over <b>' + b.studyDays + ' study days</b>' + (b.reviews ? ', ' + b.reviews + ' review day' + (b.reviews > 1 ? 's' : '') : '') + ', ' + b.tail + ' revision day' + (b.tail === 1 ? '' : 's') + (b.offDays ? ' and ' + b.offDays + ' rest day' + (b.offDays > 1 ? 's' : '') : '') +
         (a.r.keep ? ' — after the ' + a.r.keep + ' day' + (a.r.keep > 1 ? 's' : '') + ' already gone, which stay as they are' : '') + '.</p>' +
