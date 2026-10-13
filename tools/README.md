@@ -54,7 +54,7 @@ tools/
 
 ## Workbook apps: History and Computer Knowledge
 
-The History pages and Computer Knowledge share one engine and look in `tools/workbook/`
+The History pages, Computer Knowledge and Chemistry share one engine and look in `tools/workbook/`
 (`head.html`, `engine.js`, `tail.html`, and `lib.js`, which loads a data folder, checks it and writes a page).
 Each family has its own data folder and build script. Edit the data, never the built pages.
 
@@ -99,4 +99,24 @@ tools/computer/
 After a change: `node tools/computer/build.js`, `node tools/index_app.js study-computer.html computer gs`,
 `node tools/check_app.js study-computer.html`.
 
-For either, bump `VERSION` in `sw.js` (or run `node tools/stamp.js` if `app.js` changed).
+### Chemistry (`tools/chemistry/`)
+
+```
+tools/chemistry/
+  build.js                    data + lab.js → study-chemistry.html
+  lab.js                      the Lab tab: periodic table (all 118 elements and their exam facts), Find it!,
+                              Memory Match and the quiz-game decks; scores are kept in the app's own state (S.lab)
+  data/10_basics.js           K1–K5, with their questions, last-moment cards and tiles
+  data/11_reactions.js        K6–K10
+  data/12_carbon_life.js      K11–K14
+  data/13_gases_env_nuclear.js  K15–K18
+  data/40_exam.js             heat map, exam pattern, tips, intro
+```
+
+A page can add its own tabs: `APP.tabs` lists them, and a tab the engine does not know (Chemistry's `lab`) is drawn
+by the page's script (`page.extra` in `writePage`) through `render<Tab>()`, with `leave<Tab>()` called on leaving it.
+
+After a change: `node tools/chemistry/build.js`, `node tools/index_app.js study-chemistry.html chemistry gs`,
+`node tools/check_app.js study-chemistry.html`.
+
+For any of these, bump `VERSION` in `sw.js` (or run `node tools/stamp.js` if `app.js` changed).

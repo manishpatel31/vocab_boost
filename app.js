@@ -110,6 +110,7 @@
     mensuration3d:{ title: 'Mensuration 3D',           file: 'study-mensuration3d.html', key: 'mensuration3d_workbook_v1' },
     trigonometry: { title: 'Trigonometry',             file: 'study-trigonometry.html', key: 'trigonometry_workbook_v1' },
     physics:  { title: 'Physics',                      file: 'study-physics.html',      key: 'physics_pyq_workbook_v1' },
+    chemistry:{ title: 'Chemistry',                    file: 'study-chemistry.html',    key: 'chemistry_v1' },
     biology:  { title: 'Biology',                      file: 'study-biology.html',      key: 'biology_pyq_workbook_v1' },
     space:    { title: 'Space & ISRO Missions',              file: 'study-space.html',        key: 'space_missions_workbook_v1' },
     voice:    { title: 'Active & Passive Voice',       file: 'study-voice.html',        key: 'voice_workbook_v1' },
@@ -166,6 +167,9 @@
   STUDY.reports.gsub = 'current'; STUDY.appointments.gsub = 'current';
   STUDY.polity.core = STUDY.economics.core = 1; STUDY.physics.core = 2; STUDY.biology.core = 1;
   STUDY.physics.gsub = 'science'; STUDY.biology.gsub = 'science';
+  STUDY.chemistry.subj = 'gs'; STUDY.chemistry.gsub = 'science'; STUDY.chemistry.core = 2; STUDY.chemistry.ico = '\u2697\ufe0f'; STUDY.chemistry.hi = 'रसायन विज्ञान · CGL · CHSL · NTPC · Group D';
+  STUDY.chemistry.desc = 'Atom to radioactivity told as stories — acids and pH, metals, common names and formulas, ores and alloys, carbon, polymers, everyday chemistry — with a Lab of games and a periodic table.';
+  STUDY.chemistry.meta = '18 lessons · 465 questions · Lab'; STUDY.chemistry.color = '#2E8A8A'; STUDY.chemistry.lessons = 18; STUDY.chemistry.unit = 'lessons';
   STUDY.polity.gsub = 'polity'; STUDY.economics.gsub = 'economy'; STUDY.space.gsub = 'science';
   STUDY.history.gsub = 'history'; STUDY.history.core = 5; STUDY.histancient.core = 4; STUDY.histmedieval.core = 3; STUDY.histmodern.core = 2; STUDY.worldhist.core = 1;
   STUDY.artculture.gsub = 'culture'; STUDY.artculture.core = 1;
@@ -1214,7 +1218,7 @@
 
   // ---- the practice / mock screen ----
   var drill = null, drillOpen = false, drillTimer = null;
-  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments', history: 'History', histancient: 'Ancient India', histmedieval: 'Medieval India', histmodern: 'Modern India', artculture: 'Art & Culture', worldhist: 'World History', computer: 'Computer Knowledge', polity: 'Polity', economics: 'Economy', space: 'Space', physics: 'Physics', biology: 'Biology', geometry: 'Geometry', mensuration2d: 'Mensuration 2D', mensuration3d: 'Mensuration 3D', trigonometry: 'Trigonometry', numbersystem: 'Number System', calendar: 'Calendar', clock: 'Clock', voice: 'Active & Passive Voice', narration: 'Narration', formulas: 'Formula Book' };
+  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments', history: 'History', histancient: 'Ancient India', histmedieval: 'Medieval India', histmodern: 'Modern India', artculture: 'Art & Culture', worldhist: 'World History', computer: 'Computer Knowledge', polity: 'Polity', economics: 'Economy', space: 'Space', physics: 'Physics', chemistry: 'Chemistry', biology: 'Biology', geometry: 'Geometry', mensuration2d: 'Mensuration 2D', mensuration3d: 'Mensuration 3D', trigonometry: 'Trigonometry', numbersystem: 'Number System', calendar: 'Calendar', clock: 'Clock', voice: 'Active & Passive Voice', narration: 'Narration', formulas: 'Formula Book' };
   function openDrill(title){
     closeAllMenus();
     drillOpen = true;
@@ -2966,7 +2970,7 @@
     polity: ['polity'], economics: ['economy', 'economics'], census: ['census'], sports: ['sports'],
     mensuration2d: ['mensuration 2d', '2d mensuration'], mensuration3d: ['mensuration 3d', '3d mensuration'],
     trigonometry: ['trigonometry', 'trigo'], space: ['isro', 'space missions'], voice: ['active passive', 'active and passive', 'passive voice'],
-    narration: ['narration', 'direct indirect', 'reported speech'], grammar: ['grammar'], geometry: ['geometry'], physics: ['physics'], biology: ['biology']
+    narration: ['narration', 'direct indirect', 'reported speech'], grammar: ['grammar'], geometry: ['geometry'], physics: ['physics'], chemistry: ['chemistry', 'chem', 'periodic table', 'acids', 'acid base', 'common names', 'ores', 'alloys', 'polymers'], biology: ['biology']
   };
   // words that say what to do, not what to study ("revise", "chapter"…) — ignored when matching a lesson
   var TODO_FILLER = ' revise revision revisit read reread study learn practice practise do done complete finish solve test tests quiz mock questions question qs pyq pyqs chapter chapters chap ch lesson lessons topic topics part notes note formula formulas book again once twice full all whole the a an of and in on for to from with my me app maths math ssc cgl min mins minutes hour hours hr hrs ';
