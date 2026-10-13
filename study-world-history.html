@@ -457,11 +457,13 @@ const HEATMAP = null;
    APP.mode "era": a subject app with its own lessons and questions (Learn · Practice · Mock · Revise · Plan).
    APP.mode "hub": start here, a plan across a family of apps, and revision across all of them (no questions of its own).
    Optional data: APP.hub (a family hub to link to), HEATMAP (where the marks come from, by exam),
-   a question's 8th field (the paper it was reported from).
+   a question's 8th field (the paper it was reported from), APP.tabs (the tabs, in order) — a tab the engine
+   does not know (e.g. Chemistry's "lab") is drawn by the page's own script: render<Tab>() and, when you
+   leave it, leave<Tab>().
    ============================================================ */
 const HUB = APP.mode === "hub";
 const EMBED = (() => { try { return window.parent !== window; } catch(e) { return true; } })();
-const TABS = HUB ? ["start","plan","revise"] : ["learn","practice","mock","revise","plan"];
+const TABS = HUB ? ["start","plan","revise"] : (APP.tabs || ["learn","practice","mock","revise","plan"]);
 
 /* ============================================================
    HELPERS & STATE
@@ -544,6 +546,8 @@ let TAB = TABS[0];
 let timerId = null;
 function go(tab){
   if (!TABS.includes(tab)) tab = TABS[0];
+  const own = t => t.charAt(0).toUpperCase() + t.slice(1);
+  if (TAB !== tab && typeof window["leave" + own(TAB)] === "function") window["leave" + own(TAB)]();
   TAB = tab;
   document.querySelectorAll(".nav button").forEach(b => b.setAttribute("aria-current", b.dataset.tab===tab ? "page" : "false"));
   if (tab === "start") renderStart();
@@ -552,6 +556,7 @@ function go(tab){
   if (tab === "mock") renderMock();
   if (tab === "revise") renderRevise();
   if (tab === "plan") renderPlan();
+  if (!["start","learn","practice","mock","revise","plan"].includes(tab) && typeof window["render" + own(tab)] === "function") window["render" + own(tab)]();
   window.scrollTo(0,0);
   try { history.replaceState(null, "", location.pathname + location.search + "#" + tab); } catch(e) {}
 }
@@ -645,6 +650,7 @@ function blockHTML(b){
   if (b.k==="trick") return `<div class="trick"><span class="lab">Trick</span>${b.h}</div>`;
   if (b.k==="trap") return `<div class="trap"><span class="lab">Trap · don't mix these up</span>${b.h}</div>`;
   if (b.k==="link") return `<div class="link"><span class="lab">Link it up</span>${b.h}</div>`;
+  if (b.k==="ex") return `<div class="link"><span class="lab">Worked example</span>${b.h}</div>`;
   if (b.k==="facts") return `<div class="block"><h3>${b.title}</h3><dl class="facts">${b.rows.map(r=>`<div><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join("")}</dl></div>`;
   if (b.k==="tl") return `<div class="block"><h3>${b.title}</h3><ul class="tl">${b.rows.map(r=>`<li><span class="y">${r[0]}</span><span>${r[1]}</span></li>`).join("")}</ul></div>`;
   if (b.k==="table") return `<div class="block"><h3>${b.title}</h3><div class="tbl"><table><thead><tr>${b.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${b.rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
