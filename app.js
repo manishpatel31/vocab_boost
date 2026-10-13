@@ -7660,13 +7660,16 @@ listBlock,
   function aiIsAuto(c){ var m = c.models[c.provider]; return !m || m === 'auto'; }
   function aiModel(c){
     if(!aiIsAuto(c)) return c.models[c.provider];
-    return (c.autoPick && c.autoPick[c.provider]) || aiRanked(c)[0] || AI_PROVIDERS[c.provider].def;
+    var pick = c.autoPick && c.autoPick[c.provider];
+    if(pick && (aiBadRecently(c, pick) || (c.provider === 'gemini' && !/flash/.test(pick)))) pick = '';   // saved before Pro / codename models were ranked last
+    return pick || aiRanked(c)[0] || AI_PROVIDERS[c.provider].def;
   }
   /** Score a model id: newer and stronger first; on Gemini's free tier the newest Flash is the best all-rounder. */
   function aiScore(p, id){
     if(p === 'gemini'){
       var v = /gemini-(\d+(?:\.\d+)?)/.exec(id), sc = v ? +v[1] * 100 : 50;   // aliases like gemini-flash-latest sit below numbered models
-      sc += /flash-lite/.test(id) ? 10 : /flash/.test(id) ? 30 : /pro/.test(id) ? 20 : 0;
+      // the free tier gives Flash and Flash Lite a daily allowance; Pro and codename models (e.g. gemini-4-argon) usually have none
+      sc += /flash-lite/.test(id) ? 10 : /flash/.test(id) ? 30 : -250;
       if(/preview|exp/.test(id)) sc -= 15;
       return sc;
     }
@@ -7683,7 +7686,8 @@ listBlock,
     var good = list.filter(function(m){ return !aiBadRecently(c, m); });
     return good.length ? good : list;
   }
-  function aiMarkBad(m){ var c = aiCfg(); c.bad = c.bad || {}; c.bad[m] = Date.now(); Object.keys(c.autoPick || {}).forEach(function(p){ if(c.autoPick[p] === m) delete c.autoPick[p]; }); aiSave(c); }
+  /** Skip a model for a while: 12 hours, or 14 days when the key has no free allowance for it at all (limit: 0). */
+  function aiMarkBad(m, zero){ var c = aiCfg(); c.bad = c.bad || {}; c.bad[m] = Date.now() + (zero ? 14 * 24 * 3600 * 1000 : 0); Object.keys(c.autoPick || {}).forEach(function(p){ if(c.autoPick[p] === m) delete c.autoPick[p]; }); aiSave(c); }
   function aiRefreshEntry(){
     var on = aiCfg().on;
     ['askBtn', 'studyAskBtn'].forEach(function(id){ var b = document.getElementById(id); if(b) b.style.display = on ? '' : 'none'; });
@@ -7832,7 +7836,7 @@ listBlock,
       var cands = aiIsAuto(c) ? aiRanked(Object.assign({}, c, { bad: aiCfg().bad })) : AI_FALLBACK[p].concat(list.filter(function(m){ return p === 'gemini' ? /flash/.test(m) : true; }));
       return cands.filter(function(m){ return !tried[m] && (!list.length || list.indexOf(m) !== -1); })[0];
     };
-    for(var n = 0; n < maxTries; n++){
+    for(var n = 0, skips = 0; n < maxTries; n++){
       tried[model] = 1;
       try{
         var cc = Object.assign({}, c, { models: Object.assign({}, c.models) });
@@ -7852,8 +7856,11 @@ listBlock,
           await aiSleep(e.retryAfter * 1000 + 500, opts.signal);
           continue;
         }
-        if(e.timeout || e.zero || e.status === 404 || (e.status === 429 && /per.?day|PerDay|daily/i.test(e.raw || ''))) aiMarkBad(model);   // skip it for a while
+        var dead = e.zero || e.status === 404 || (e.status === 429 && /per.?day|PerDay|daily/i.test(e.raw || ''));
+        if(e.timeout || dead) aiMarkBad(model, e.zero);   // skip it for a while
         if(opts.noFallback) throw e;
+        // a model with no allowance, today's allowance used up, or missing fails at once: don't let it use up a try
+        if(dead && skips < 12){ skips++; n--; }
         if(e.timeout || e.status === 429 || e.status === 404 || e.status >= 500 || (e.status === 400 && /model/i.test(e.raw || ''))){
           var m = next();
           if(m){
