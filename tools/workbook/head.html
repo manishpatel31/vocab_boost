@@ -180,6 +180,7 @@ td.n{font-family:var(--f-num);font-variant-numeric:tabular-nums;white-space:nowr
 .qno{font-family:var(--f-num);font-weight:600;color:var(--ink2)}
 .tag{background:var(--sunk);color:var(--ink2);border-radius:99px;padding:1px 9px;font-weight:600}
 .tag.pyq{background:var(--accent-bg);color:var(--accent)}
+.tag.src{background:var(--good-bg);color:var(--good)}
 .bm{margin-left:auto;background:none;border:0;cursor:pointer;color:var(--ink2);font-size:20px;line-height:1;padding:4px}
 .bm[aria-pressed="true"]{color:var(--accent)}
 .qt{font-weight:600;font-size:16px}
@@ -297,6 +298,22 @@ select{font:inherit;border:1px solid var(--rule);background:var(--sheet);color:v
 .ptask-row .btn{margin-top:2px}
 .autotag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--good);background:var(--good-bg);border-radius:99px;padding:0 7px;margin-left:6px;text-decoration:none!important;vertical-align:1px}
 .revdone{justify-self:start}
+/* exam heat map: lessons × exams */
+.hmwrap > summary{list-style:none;cursor:pointer;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.hmwrap > summary::-webkit-details-marker{display:none}
+.hmwrap > summary h3{margin:0}
+.hmwrap[open] > summary{margin-bottom:10px}
+.hmt th small{display:block;font-weight:500;text-transform:none;letter-spacing:0;font-size:11px}
+.hmt th[scope=row]{font-size:14px;font-weight:600;text-transform:none;letter-spacing:0;color:var(--ink)}
+.hmt th[scope=row] .golink{text-decoration:none;color:var(--ink);text-align:left}
+.hm{text-align:center;font-size:12px;letter-spacing:1px;white-space:nowrap}
+.hm span{display:inline-block;min-width:46px;border-radius:6px;padding:3px 6px;font-weight:700}
+.hm.h3 span{background:var(--bad);color:#fff}
+.hm.h2 span{background:color-mix(in srgb, var(--accent) 70%, var(--sheet));color:#fff}
+.hm.h1 span{background:var(--accent-bg);color:var(--accent)}
+.hm.h0 span{background:var(--sunk);color:var(--ink2)}
+.hmkey{font-size:12.5px;color:var(--ink2);display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.hmkey .hm span{min-width:0}
 @media (prefers-reduced-motion: no-preference){ .opt,.chip,.btn{transition:background-color .15s, border-color .15s} }
 </style>
 <style>[hidden]{display:none!important}img{max-width:100%}:root{padding-top:env(safe-area-inset-top,0px)}</style>
