@@ -14,7 +14,7 @@ function blockText(b){
   const out = [];
   const add = s => { s = strip(s); if (s) out.push(s); };
   switch(b.k){
-    case 'hot': case 'p': case 'trick': case 'trap': case 'link': add(b.h); break;
+    case 'hot': case 'p': case 'story': case 'trick': case 'trap': case 'link': add(b.h); break;
     case 'formula': add(b.title); b.rows.forEach(r => r.forEach(add)); break;
     case 'table': add(b.title); b.head.forEach(add); b.rows.forEach(r => r.forEach(add)); break;
     case 'facts': case 'tl': add(b.title); b.rows.forEach(r => r.forEach(add)); break;

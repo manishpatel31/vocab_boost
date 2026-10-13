@@ -1,0 +1,1301 @@
+<!doctype html><html><head><meta charset=utf8>
+<script>
+/* शब्दRegister bridge: follows the app's look (Paper / Indigo) and Light / Dark / Auto choice. */
+(function(){
+  var root = document.documentElement;
+  function theme(t){ if(t === 'dark' || t === 'light') root.setAttribute('data-theme', t); else root.removeAttribute('data-theme'); }
+  function skin(s){ if(s === 'paper' || s === 'indigo') root.setAttribute('data-skin', s); }
+  try{
+    var q = new URLSearchParams(location.search);
+    theme(q.get('theme'));
+    skin(q.get('skin') || (q.get('embed') ? 'paper' : ''));
+    if(q.get('embed')) root.classList.add('in-shabd');
+  }catch(e){}
+  window.addEventListener('message', function(e){
+    if(e.origin !== location.origin || !e.data || e.data.type !== 'shabd-theme') return;
+    theme(e.data.theme);
+    if(e.data.skin) skin(e.data.skin);
+  });
+})();
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap">
+
+<meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>World History &amp; Who’s Who</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<style>
+/* Shared by every History page (built by tools/history/build.js).
+   Layout: a manuscript folio — parchment paper, maroon ink, gold figures; one-column app with a bottom tab bar. */
+:root{
+  --paper:#f3efe4; --sheet:#fffdf6; --sunk:#e8e1cf;
+  --ink:#241c14; --ink2:#5d5141; --rule:#d8cdb4;
+  --blue:#7a2230; --on-blue:#ffffff; --blue-bg:#f4e2e1;
+  --accent:#9a6a12; --accent-bg:#f8ecc9;
+  --good:#1b6b4a; --good-bg:#ddefe4; --bad:#a8291f; --bad-bg:#f8e0dc;
+  --warn-bg:#fcf0cf;
+  --f-display:"Fraunces", Georgia, "Times New Roman", serif;
+  --f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-num:ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --r:10px; --nav-h:64px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#15110d; --sheet:#1f1a14; --sunk:#2a231a;
+  --ink:#f0e7d6; --ink2:#b6a991; --rule:#3a3125;
+  --blue:#e8929a; --on-blue:#1b120f; --blue-bg:#3a1f22;
+  --accent:#e6b85c; --accent-bg:#3a2d12;
+  --good:#63cfa0; --good-bg:#14331f; --bad:#ff9288; --bad-bg:#3c1b17;
+  --warn-bg:#352c14; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#15110d; --sheet:#1f1a14; --sunk:#2a231a;
+  --ink:#f0e7d6; --ink2:#b6a991; --rule:#3a3125;
+  --blue:#e8929a; --on-blue:#1b120f; --blue-bg:#3a1f22;
+  --accent:#e6b85c; --accent-bg:#3a2d12;
+  --good:#63cfa0; --good-bg:#14331f; --bad:#ff9288; --bad-bg:#3c1b17;
+  --warn-bg:#352c14; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
+.wrap{max-width:640px;margin:0 auto;padding-inline:16px;padding-block:0 calc(var(--nav-h) + 28px + env(safe-area-inset-bottom,0px))}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);border-bottom:1px solid var(--rule)}
+.top-in{max-width:640px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px}
+.brand{font-family:var(--f-display);font-weight:800;font-size:17px;line-height:1.2;flex:1;min-width:0}
+.brand small{display:block;font-family:var(--f-body);font-weight:500;font-size:12px;color:var(--ink2);letter-spacing:.02em}
+.stat{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right;white-space:nowrap}
+.stat b{color:var(--ink);font-weight:600}
+
+/* bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--sheet);border-top:1px solid var(--rule);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-in{max-width:640px;margin:0 auto;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;height:var(--nav-h)}
+.nav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;font-weight:600;color:var(--ink2);cursor:pointer}
+.nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav button[aria-current="page"]{color:var(--blue)}
+.nav button[aria-current="page"] span{border-bottom:2px solid var(--blue)}
+
+/* type */
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.25;margin:0}
+h1{font-size:24px;font-weight:800}
+h2{font-size:19px;font-weight:800}
+h3{font-size:16px;font-weight:700}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--ink2)}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+p{margin:0}
+.stack{display:flex;flex-direction:column;gap:14px}
+.view{padding-top:18px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--rule);background:var(--sheet);font-weight:600;cursor:pointer;text-decoration:none}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:var(--on-blue)}
+.btn.ghost{background:transparent}
+.btn.sm{min-height:36px;padding:0 14px;font-size:14px}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.end{justify-content:flex-end}
+.row.between{justify-content:space-between}
+
+/* hero */
+.hero{display:grid;gap:10px;padding:4px 0 6px}
+.hero p{color:var(--ink2)}
+.meter{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--blue);border-radius:99px}
+
+/* era groups on the Learn screen */
+.eras{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.erac{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px;text-align:left;cursor:pointer;display:grid;gap:6px}
+.erac b{font-family:var(--f-display);font-size:15px;font-weight:700;line-height:1.25}
+.erac .hi{font-size:12px;color:var(--ink2)}
+.erac .mt{font-family:var(--f-num);font-size:11px;color:var(--ink2)}
+.erac .meter{height:6px}
+.erac[aria-pressed="true"]{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
+.grph{display:flex;align-items:baseline;gap:8px;padding:14px 2px 4px;border-top:2px solid var(--ink);margin-top:4px}
+.grph h2{font-size:17px}
+.grph span{font-size:12px;color:var(--ink2);margin-left:auto;font-family:var(--f-num)}
+
+/* lesson list */
+.lessons{display:flex;flex-direction:column;border-top:1px solid var(--rule)}
+.les{display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;padding:14px 2px;border-bottom:1px solid var(--rule);background:none;border-left:0;border-right:0;border-top:0;text-align:left;cursor:pointer;width:100%}
+.les .no{font-family:var(--f-num);font-weight:600;font-size:15px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--rule);color:var(--ink2)}
+.les.done .no{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.les .t{min-width:0}
+.les .t b{display:block;font-weight:700;font-size:16px;line-height:1.3}
+.les .t span{font-size:13px;color:var(--ink2)}
+.les .sc{font-family:var(--f-num);font-size:12px;color:var(--ink2);text-align:right}
+.les.next .no{border-color:var(--blue);color:var(--blue)}
+.dots{display:inline-flex;gap:2px;vertical-align:middle;margin-left:6px}
+.dots i{width:5px;height:5px;border-radius:50%;background:var(--rule);display:block}
+.dots i.on{background:var(--accent)}
+
+/* lesson reader */
+.lhead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.back{background:none;border:0;padding:8px 8px 8px 0;cursor:pointer;color:var(--blue);font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0 4px}
+.steps button{border:1px solid var(--rule);background:var(--sheet);border-radius:8px;padding:8px 4px;font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer}
+.steps button[aria-current="step"]{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.block{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;min-width:0}
+.block h3{margin-bottom:8px}
+.block p + p{margin-top:8px}
+.plain{padding:0 2px}
+.hot{background:var(--blue-bg);border-radius:var(--r);padding:12px 14px;font-size:15px}
+.hot .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;color:var(--blue)}
+.facts{display:grid;gap:0}
+.facts div{display:grid;grid-template-columns:minmax(0,42%) minmax(0,1fr);gap:10px;padding:7px 0;border-top:1px dashed var(--rule)}
+.facts div:first-child{border-top:0}
+.facts dt{font-size:14px;color:var(--ink2);margin:0}
+.facts dd{margin:0;font-weight:600;min-width:0}
+.facts.prose dd{font-weight:400;line-height:1.55}
+.tl{display:grid;gap:0;margin:0;padding:0;list-style:none}
+.tl li{display:grid;grid-template-columns:104px 1fr;gap:10px;padding:8px 0;border-top:1px dashed var(--rule)}
+.tl li:first-child{border-top:0}
+.tl .y{font-family:var(--f-num);font-weight:600;font-size:13px;color:var(--accent);padding-top:2px}
+.trick,.trap,.link{border-radius:var(--r);padding:12px 14px;border:1px solid var(--rule)}
+.trick{background:var(--accent-bg);border-color:transparent}
+.trap{background:var(--bad-bg);border-color:transparent}
+.link{background:var(--sunk);border-color:transparent}
+.trick .lab,.trap .lab,.link .lab{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.trick .lab{color:var(--accent)}
+.trap .lab{color:var(--bad)}
+.link .lab{color:var(--ink2)}
+.mn{font-family:var(--f-num);font-weight:600;background:var(--sheet);border-radius:6px;padding:1px 6px;white-space:nowrap}
+.tbl{overflow-x:auto;margin:0 -2px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);font-weight:700}
+td.n{font-family:var(--f-num);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fig{margin:0}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-size:13px;color:var(--ink2);margin-top:6px}
+.sum{margin:0;padding-left:20px;display:grid;gap:6px}
+
+/* questions */
+.qcard{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px;min-width:0}
+.qmeta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}
+.qno{font-family:var(--f-num);font-weight:600;color:var(--ink2)}
+.tag{background:var(--sunk);color:var(--ink2);border-radius:99px;padding:1px 9px;font-weight:600}
+.tag.pyq{background:var(--accent-bg);color:var(--accent)}
+.bm{margin-left:auto;background:none;border:0;cursor:pointer;color:var(--ink2);font-size:20px;line-height:1;padding:4px}
+.bm[aria-pressed="true"]{color:var(--accent)}
+.qt{font-weight:600;font-size:16px}
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:start;text-align:left;width:100%;border:1.5px solid var(--rule);background:var(--paper);border-radius:9px;padding:10px 12px;cursor:pointer;min-height:44px}
+.opt .k{font-family:var(--f-num);font-weight:600;color:var(--ink2);font-size:14px;padding-top:1px}
+.opt.sel{border-color:var(--blue);background:var(--blue-bg)}
+.opt.ok{border-color:var(--good);background:var(--good-bg)}
+.opt.no{border-color:var(--bad);background:var(--bad-bg)}
+.opt.ok .k{color:var(--good)} .opt.no .k{color:var(--bad)}
+.opt:disabled{cursor:default;color:inherit}
+.exp{font-size:15px;border-left:3px solid var(--blue);padding:4px 0 4px 12px;color:var(--ink)}
+.exp b.okl{color:var(--good)} .exp b.nol{color:var(--bad)}
+
+/* chips */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 13px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.seg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--rule)}
+.seg::-webkit-scrollbar{display:none}
+.seg button{flex:none;background:none;border:0;border-bottom:2px solid transparent;padding:10px 8px;font-weight:600;color:var(--ink2);cursor:pointer}
+.seg button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+
+/* score panel */
+.scorebig{display:flex;align-items:baseline;gap:8px}
+.scorebig .num{font-size:44px;font-weight:600;line-height:1;color:var(--blue)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.kpi{background:var(--sunk);border-radius:8px;padding:8px;text-align:center}
+.kpi .num{display:block;font-size:20px;font-weight:600}
+.kpi span{font-size:12px;color:var(--ink2)}
+.kpi.g .num{color:var(--good)} .kpi.b .num{color:var(--bad)}
+
+/* mock */
+.mbar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 57px);z-index:10;background:var(--paper);padding:10px 0;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--rule)}
+.timer{font-family:var(--f-num);font-weight:600;font-size:18px;padding:4px 10px;border-radius:8px;background:var(--sunk)}
+.timer.low{background:var(--bad-bg);color:var(--bad)}
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px}
+.pal button{height:40px;border-radius:8px;border:1px solid var(--rule);background:var(--sheet);font-family:var(--f-num);font-weight:600;font-size:13px;cursor:pointer}
+.pal button.a{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.pal button.m{box-shadow:inset 0 -4px 0 var(--accent)}
+.pal button.cur{outline:2px solid var(--ink);outline-offset:1px}
+.confirm{background:var(--warn-bg);border-radius:var(--r);padding:12px 14px;display:grid;gap:10px}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}
+legend{font-weight:700;margin-bottom:6px;padding:0}
+.radios{display:flex;gap:8px;flex-wrap:wrap}
+.radios label{border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 14px;font-weight:600;cursor:pointer;font-size:14px}
+.radios input{position:absolute;opacity:0;pointer-events:none}
+.radios input:checked + span{color:var(--blue)}
+.radios label:has(input:checked){border-color:var(--blue);background:var(--blue-bg)}
+.radios label:has(input:focus-visible){outline:2px solid var(--blue);outline-offset:2px}
+select{font:inherit;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:8px;padding:8px 10px;max-width:100%}
+.hist{display:grid;gap:0}
+.hist div{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:14px}
+
+/* revise */
+.search{width:100%;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:10px;padding:10px 12px;font:inherit}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px}
+.tile .num{display:block;font-size:22px;font-weight:600;color:var(--accent);line-height:1.2}
+.tile span{font-size:13px;color:var(--ink2)}
+.flash{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;min-height:240px;padding:20px 18px;display:grid;align-content:center;gap:12px;cursor:pointer;text-align:left;width:100%}
+.flash .side{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.flash .front{font-size:18px;font-weight:600}
+.flash .ans{font-size:20px;font-weight:700;color:var(--good)}
+.empty{padding:24px 4px;color:var(--ink2);text-align:center}
+.foot{font-size:13px;color:var(--ink2);padding-top:10px}
+/* one-line revision rows (last week / last moment) */
+.lines{display:grid;gap:0}
+.lines div{display:grid;grid-template-columns:minmax(0,38%) minmax(0,1fr);gap:10px;padding:6px 0;border-top:1px dashed var(--rule);font-size:15px}
+.lines div:first-child{border-top:0}
+.lines b{font-weight:700}
+.lines span{color:var(--ink2)}
+.callout{background:var(--sheet);border:1px solid var(--rule);border-left:4px solid var(--accent);border-radius:var(--r);padding:12px 14px;font-size:15px}
+
+/* plan maker */
+.plancfg{display:grid;gap:12px}
+.pday{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);overflow:hidden}
+.pday > summary{list-style:none;cursor:pointer;padding:12px 14px;display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center}
+.pday > summary::-webkit-details-marker{display:none}
+.pday .dno{font-family:var(--f-num);font-weight:700;font-size:13px;background:var(--sunk);border-radius:99px;padding:2px 10px;white-space:nowrap}
+.pday.cur .dno{background:var(--blue);color:var(--on-blue)}
+.pday.allgood .dno{background:var(--good-bg);color:var(--good)}
+.pday .dt{min-width:0;font-weight:600;font-size:15px}
+.pday .dt small{display:block;font-weight:500;font-size:12px;color:var(--ink2)}
+.pday .dp{font-family:var(--f-num);font-size:12px;color:var(--ink2);white-space:nowrap}
+.pday .body{padding:0 14px 12px;display:grid;gap:8px;border-top:1px dashed var(--rule);margin-top:2px;padding-top:10px}
+.ptask{display:grid;grid-template-columns:24px 1fr;gap:10px;align-items:start;background:none;border:0;padding:6px 0;text-align:left;cursor:pointer;width:100%;font-size:15px}
+.ptask .box{width:22px;height:22px;border-radius:6px;border:1.6px solid var(--rule);display:grid;place-items:center;font-size:14px;color:var(--on-blue);margin-top:1px}
+.ptask[aria-pressed="true"] .box{background:var(--good);border-color:var(--good);color:#fff}
+.ptask[aria-pressed="true"] .lbl{text-decoration:line-through;color:var(--ink2)}
+.ptask .lbl small{display:block;font-size:12px;color:var(--ink2);text-decoration:none}
+/* the story first: plain-language opener for beginners */
+.story{background:var(--sheet);border:1px solid var(--rule);border-left:4px solid var(--blue);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px;font-size:16.5px;line-height:1.65}
+.story .lab{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue)}
+.story p{margin:0}
+.story .key{background:var(--blue-bg);border-radius:8px;padding:8px 12px;font-size:15px;line-height:1.5}
+.story .key b{color:var(--blue)}
+/* hub: app cards and the beginner path */
+.appcs{display:grid;gap:12px}
+.appc{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;display:grid;gap:8px;text-align:left;width:100%;cursor:pointer}
+.appc:hover{border-color:var(--blue)}
+.appc .hd{display:flex;align-items:center;gap:10px}
+.appc .ic{font-size:26px;line-height:1}
+.appc .hd b{font-family:var(--f-display);font-size:17px;font-weight:700;display:block}
+.appc .hd small{font-size:12px;color:var(--ink2)}
+.appc .hd .go{margin-left:auto;font-weight:700;color:var(--blue);white-space:nowrap}
+.appc p{margin:0;font-size:14.5px;color:var(--ink2)}
+.appc .meta{font-family:var(--f-num);font-size:12px;color:var(--ink2)}
+.steps-list{margin:0;padding-left:22px;display:grid;gap:8px}
+.steps-list li::marker{font-family:var(--f-num);font-weight:700;color:var(--accent)}
+.golink{background:none;border:0;padding:0;color:var(--blue);font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px;font:inherit}
+/* plan: a task can open its lesson; ticks found from your progress are marked */
+.ptask-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start}
+.ptask-row .btn{margin-top:2px}
+.autotag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--good);background:var(--good-bg);border-radius:99px;padding:0 7px;margin-left:6px;text-decoration:none!important;vertical-align:1px}
+.revdone{justify-self:start}
+@media (prefers-reduced-motion: no-preference){ .opt,.chip,.btn{transition:background-color .15s, border-color .15s} }
+</style>
+<style>[hidden]{display:none!important}img{max-width:100%}:root{padding-top:env(safe-area-inset-top,0px)}</style>
+</head>
+<body>
+
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">World History &amp; Who’s Who<small>विश्व इतिहास · कौन क्या · SSC CGL workbook</small></div>
+    <div class="stat" id="topstat"></div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<nav class="nav" aria-label="Sections">
+  <div class="nav-in">
+    <button type="button" id="nav-learn" data-tab="learn"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg><span>Learn</span></button>
+    <button type="button" id="nav-practice" data-tab="practice"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span>Practice</span></button>
+    <button type="button" id="nav-mock" data-tab="mock"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6M12 2v3"/></svg><span>Mock</span></button>
+    <button type="button" id="nav-revise" data-tab="revise"><svg viewBox="0 0 24 24"><path d="M12 3 2 8l10 5 10-5z"/><path d="m2 13 10 5 10-5"/></svg><span>Revise</span></button>
+    <button type="button" id="nav-plan" data-tab="plan"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 15l2 2 4-4"/></svg><span>Plan</span></button>
+  </div>
+</nav>
+<script>
+"use strict";
+/* data: generated by tools/history/build.js from tools/history/data — edit there, not here */
+const APP = {"id":"worldhist","key":"world_history_v1","mode":"era","era":"wld","title":"World History & Who’s Who","hi":"विश्व इतिहास · कौन क्या","ico":"🌍","plans":[2,3,5],"hub":{"id":"history","file":"study-history.html","title":"History: Start here"},"apps":[{"id":"histancient","file":"study-history-ancient.html","key":"history_ancient_v1","title":"Ancient India","hi":"प्राचीन भारत","ico":"🏺","era":"anc","lessons":["L1","L2","L3","L4","L5","L6","L7","L8"]},{"id":"histmedieval","file":"study-history-medieval.html","key":"history_medieval_v1","title":"Medieval India","hi":"मध्यकालीन भारत","ico":"🕌","era":"med","lessons":["L9","L10","L11","L12","L13","L14","L15","L16"]},{"id":"histmodern","file":"study-history-modern.html","key":"history_modern_v1","title":"Modern India","hi":"आधुनिक भारत","ico":"🇮🇳","era":"mod","lessons":["L17","L18","L19","L20","L21","L31","L22","L23","L32","L24","L25","L33"]},{"id":"artculture","file":"study-art-culture.html","key":"art_culture_v1","title":"Art & Culture","hi":"कला एवं संस्कृति","ico":"🎨","era":"art","lessons":["L26","L27","L35","L28","L34"]},{"id":"worldhist","file":"study-world-history.html","key":"world_history_v1","title":"World History & Who’s Who","hi":"विश्व इतिहास · कौन क्या","ico":"🌍","era":"wld","lessons":["L36","L29","L30"]}]};
+const GROUPS = [
+{"id":"anc","name":"Ancient India","hi":"प्राचीन भारत","note":"Stone Age to Harsha · ~6–8 marks of GS in CGL Tier-1"},
+{"id":"med","name":"Medieval India","hi":"मध्यकालीन भारत","note":"Rajputs to the Marathas · Sultanate + Mughals dominate"},
+{"id":"mod","name":"Modern India","hi":"आधुनिक भारत","note":"Plassey to 1947 · the single heaviest slice of History"},
+{"id":"art","name":"Art & Culture","hi":"कला एवं संस्कृति","note":"Dances, music, architecture, painting · 1–2 sure questions"},
+{"id":"wld","name":"World & Misc","hi":"विश्व इतिहास · विविध","note":"Revolutions, wars, travellers, titles and books"}
+];
+const LESSONS = [
+{"id":"L36","g":"wld","heat":1,"title":"The ancient world to the Age of Discovery","hi":"प्राचीन विश्व से खोज-यात्राओं के युग तक","blocks":[{"k":"hot","h":"An occasional one-mark question: <b>which river ↔ which civilisation<\/b>, <b>Alexander and Porus<\/b>, <b>Magna Carta 1215<\/b>, <b>Martin Luther 1517<\/b> or <b>who discovered what<\/b>. Learn the dates in the timeline and you are covered."},{"k":"story","h":"<p>The first cities grew up beside big rivers, because rivers gave water, fertile mud and an easy road for trade. In <b>Mesopotamia<\/b> ('land between the rivers' — the Tigris and Euphrates, today's Iraq) people pressed wedge-shaped <b>cuneiform<\/b> marks into clay, and King <b>Hammurabi<\/b> of Babylon carved one of the first written law codes. <b>Egypt<\/b> grew along the <b>Nile<\/b>, wrote in picture-signs called <b>hieroglyphics<\/b> and built the <b>pyramids<\/b>. China began on the <b>Huang He<\/b>, and India on the <b>Indus<\/b>.<\/p><p>Next came <b>Greece<\/b>, a land of small city-states. Athens tried <b>democracy<\/b>, and three teachers followed one another: <b>Socrates → Plato → Aristotle<\/b>. Aristotle taught <b>Alexander<\/b>, who reached India in <b>326 BCE<\/b> and fought <b>Porus<\/b> on the Jhelum. Then <b>Rome<\/b> rose: <b>Julius Caesar<\/b> was a general, and <b>Augustus<\/b> became the first emperor.<\/p><p>Jump to Europe after 1200: <b>Magna Carta (1215)<\/b> limited the king; Constantinople fell to the Turks (<b>1453<\/b>); the <b>Renaissance<\/b> and the printing press spread new ideas; <b>Luther<\/b> challenged the Church (<b>1517<\/b>); and sailors went looking for a sea route to India — <b>Columbus<\/b> found America instead (1492), <b>Vasco da Gama<\/b> reached Calicut (1498).<\/p>"},{"k":"table","title":"River-valley civilisations","head":["Civilisation","River","Writing","Famous for"],"rows":[["<b>Mesopotamia<\/b> (Sumer, Babylon) — Iraq","<b>Tigris and Euphrates<\/b>","<b>Cuneiform<\/b> (wedge marks on clay)","<b>Code of Hammurabi<\/b> (c. 1750 BCE); ziggurats; Epic of Gilgamesh; counting in 60s (hence 60 minutes); traded with the Indus people, whom they called Meluhha"],["<b>Egypt<\/b>","<b>Nile<\/b> — 'the gift of the Nile' (Herodotus)","<b>Hieroglyphics<\/b> on papyrus","<b>Pyramids<\/b> (Great Pyramid of Giza for Khufu), the Sphinx, mummies, pharaohs; the <b>Rosetta Stone<\/b> let Champollion read hieroglyphs (1822)"],["<b>China<\/b>","<b>Huang He<\/b> (Yellow River) — 'China's Sorrow'","Characters on oracle bones (Shang dynasty)","Silk; later the Great Wall (Qin Shi Huang) and paper (Han period)"],["<b>Indus / Harappan<\/b>","<b>Indus<\/b>","Indus script — undeciphered","Planned cities, drains, Great Bath (see the Harappan lesson)"]]},{"k":"facts","title":"Greece and Rome","rows":[["City-state (<i>polis<\/i>)","Athens (democracy) and Sparta (military state) were the two leaders"],["Athenian democracy","<b>Cleisthenes<\/b> (508 BCE) is its father; it peaked under <b>Pericles<\/b>"],["<b>Socrates<\/b>","Taught by questioning; sentenced to drink hemlock (399 BCE)"],["<b>Plato<\/b>","Pupil of Socrates; wrote <i>The Republic<\/i>; founded the Academy"],["<b>Aristotle<\/b>","Pupil of Plato; tutor of Alexander; wrote <i>Politics<\/i>; founded the Lyceum"],["Other 'fathers'","<b>Herodotus<\/b> — history; <b>Hippocrates<\/b> — medicine"],["<b>Alexander<\/b>","Son of Philip II of Macedon; Ambhi of Taxila submitted; beat <b>Porus<\/b> at the <b>Battle of the Hydaspes (Jhelum), 326 BCE<\/b>; his army refused to cross the <b>Beas<\/b>; died at Babylon, 323 BCE"],["<b>Julius Caesar<\/b>","Crossed the Rubicon (49 BCE); 'Veni, vidi, vici'; Julian calendar; killed on the Ides of March, 44 BCE; July is named after him"],["<b>Augustus<\/b> (Octavian)","<b>First Roman emperor<\/b>, 27 BCE; began the Pax Romana; August is named after him"],["Later Rome","<b>Constantine<\/b> — first Christian emperor, founded Constantinople (330 CE); the Western Empire fell in <b>476 CE<\/b>"]]},{"k":"table","title":"Founders of religions","head":["Founder","Faith","Place","Book · fact"],"rows":[["<b>Zoroaster<\/b> (Zarathustra)","Zoroastrianism","Persia (Iran)","<i>Avesta<\/i>; god Ahura Mazda; fire temples; followers in India are the Parsis"],["<b>Confucius<\/b> (551–479 BCE)","Confucianism","China","<i>Analects<\/i>; a contemporary of the Buddha and Mahavira"],["<b>Lao Tzu<\/b>","Taoism","China","<i>Tao Te Ching<\/i>"],["<b>Moses<\/b>","Judaism","Israel","<i>Torah<\/i>"],["<b>Jesus Christ<\/b>","Christianity","Born at Bethlehem; crucified at Jerusalem","<i>Bible<\/i>; born in the reign of Augustus"],["<b>Prophet Muhammad<\/b>","Islam","Born at Mecca (c. 570 CE); died at Medina (632 CE)","<i>Quran<\/i>; the <b>Hijra<\/b>, his migration from Mecca to Medina in <b>622 CE<\/b>, begins the Islamic calendar"]]},{"k":"facts","title":"Renaissance and Reformation","rows":[["Renaissance","'Rebirth' of learning; began in <b>Italy<\/b> (Florence) in the 14th century; patrons the Medici family"],["<b>Petrarch<\/b> / <b>Dante<\/b>","Father of humanism / <i>Divine Comedy<\/i>"],["<b>Leonardo da Vinci<\/b>","<i>Mona Lisa<\/i>, <i>The Last Supper<\/i>"],["<b>Michelangelo<\/b>","<i>David<\/i>, <i>Pieta<\/i>, the <b>Sistine Chapel<\/b> ceiling"],["<b>Raphael<\/b> / <b>Machiavelli<\/b>","<i>School of Athens<\/i> / <i>The Prince<\/i>"],["<b>Johannes Gutenberg<\/b>","Movable-type printing press, <b>c. 1440<\/b>, Mainz, Germany; Gutenberg Bible c. 1455"],["<b>Copernicus<\/b>","The Sun, not the Earth, is the centre (1543)"],["<b>Martin Luther<\/b>","<b>Ninety-five Theses<\/b> against the sale of indulgences, Wittenberg, <b>1517<\/b> — the Reformation and Protestantism"],["Others","<b>John Calvin<\/b> (Geneva); <b>Henry VIII<\/b> founded the Church of England (1534)"],["Counter-Reformation","<b>Jesuits<\/b> founded by <b>Ignatius Loyola<\/b> (1540); the Jesuit <b>Francis Xavier<\/b> reached Goa in 1542"]]},{"k":"tl","title":"From Magna Carta to Magellan","rows":[["1215","<b>Magna Carta<\/b> — King <b>John<\/b> of England, at Runnymede, accepts limits on royal power"],["c. 1440","<b>Gutenberg's<\/b> printing press"],["1453","<b>Fall of Constantinople<\/b> to the Ottoman Turks under <b>Mehmed II<\/b>; end of the Byzantine Empire; the old land route to the East is blocked"],["1488","<b>Bartolomeu Dias<\/b> rounds the Cape of Good Hope"],["1492","<b>Columbus<\/b>, sailing for <b>Spain<\/b>, reaches the Bahamas — the 'West Indies'; America is later named after Amerigo Vespucci"],["1494","Treaty of Tordesillas divides new lands between Spain and Portugal"],["1498","<b>Vasco da Gama<\/b> reaches <b>Calicut<\/b> (see the European companies lesson)"],["1500","<b>Pedro Alvares Cabral<\/b> reaches <b>Brazil<\/b> for Portugal, then sails on to Calicut"],["1517","<b>Martin Luther<\/b>'s Ninety-five Theses"],["1519–22","<b>Magellan's<\/b> expedition makes the first voyage round the world; he names the <b>Pacific<\/b>, is killed in the Philippines (1521), and <b>Elcano<\/b> brings the ship <i>Victoria<\/i> home"]]},{"k":"trick","h":"<b>River ↔ civilisation<\/b>: <span class=\"mn\">TE-M, N-E, H-C<\/span> — Tigris–Euphrates = Mesopotamia, Nile = Egypt, Huang He = China.<br><b>Greek chain<\/b>: <span class=\"mn\">S → P → A → A<\/span> — Socrates taught Plato, Plato taught Aristotle, Aristotle taught Alexander.<br><b>Explorers in order<\/b>: <span class=\"mn\">D-C-V-C-M<\/span> — 'Dear Children, Visit Calicut by Map' = Dias 1488, Columbus 1492, Vasco 1498, Cabral 1500, Magellan 1519."},{"k":"trap","h":"<b>Columbus sailed for Spain<\/b>, not Portugal, and never reached India. <b>Magellan died on the way<\/b> — the voyage was finished by <b>Elcano<\/b>. <b>Julius Caesar was never emperor<\/b>; <b>Augustus<\/b> was the first. The <b>Hydaspes is the Jhelum<\/b>, but the river where Alexander's army <b>stopped<\/b> is the <b>Beas<\/b>. <b>Cuneiform = Mesopotamia<\/b>, <b>hieroglyphics = Egypt<\/b>. <b>Magna Carta<\/b> is 1215 (King John), not the 1689 Bill of Rights."}],"sum":["Mesopotamia grew on the Tigris and Euphrates with cuneiform writing and Hammurabi's code; Egypt on the Nile with hieroglyphics and pyramids; China on the Huang He.","Socrates taught Plato, Plato taught Aristotle, and Aristotle taught Alexander, who defeated Porus on the Hydaspes (Jhelum) in 326 BCE and turned back at the Beas.","Julius Caesar was killed in 44 BCE and Augustus became the first Roman emperor in 27 BCE; the Prophet's Hijra to Medina in 622 CE begins the Islamic calendar.","Magna Carta came in 1215, Constantinople fell in 1453, Gutenberg built his press around 1440, and Martin Luther posted his Ninety-five Theses in 1517.","Dias rounded the Cape in 1488, Columbus reached America in 1492, Vasco da Gama reached Calicut in 1498, Cabral reached Brazil in 1500, and Magellan's voyage of 1519 to 1522 was the first round the world."]},
+{"id":"L29","g":"wld","heat":2,"title":"World revolutions & the World Wars","hi":"विश्व क्रांतियाँ एवं विश्व युद्ध","blocks":[{"k":"hot","h":"Usually one question — most often the French Revolution's slogan/date, the Russian Revolution's year and leader, or a World War treaty. Dates and \"who said what\" are enough."},{"k":"story","h":"<p>Indian history did not happen alone, and the exam asks about a few big world events. Start with the revolutions, which share one idea: people, not kings alone, should decide how they are ruled. In England (1688) Parliament became supreme. In America (1776) colonists refused taxes without a say and declared independence. In <b>France (1789)<\/b> people stormed the Bastille under the slogan Liberty, Equality, Fraternity. In <b>Russia (1917)<\/b> the Tsar fell and Lenin's Bolsheviks took power. Meanwhile the Industrial Revolution in England brought machines and factories.<\/p><p>In 1914 an assassination at Sarajevo set off the <b>First World War<\/b>. It ended in 1918, and the Treaty of Versailles punished Germany hard. The League of Nations was set up to keep the peace, but it failed. Germany's anger at Versailles helped <b>Hitler<\/b> rise. In 1939 Germany invaded Poland, and the <b>Second World War<\/b> began. The USA joined after Japan attacked Pearl Harbor in 1941. The war ended in 1945, after atom bombs fell on Hiroshima and Nagasaki.<\/p><p>To stop another such war, the United Nations was set up in 1945, with India among its founding members. The tables list the dates, slogans and treaties to remember.<\/p>","key":"Revolutions spread the idea of rule by the people, and two World Wars, linked by the harsh Treaty of Versailles, ended with the founding of the UN."},{"k":"facts","title":"Revolutions","rows":[["<b>Glorious Revolution<\/b>","<b>1688<\/b>, England — bloodless; the Bill of Rights (1689) made Parliament supreme"],["<b>American Revolution<\/b>","<b>1775–83<\/b>; Boston Tea Party <b>1773<\/b>; <b>Declaration of Independence 4 July 1776<\/b> (drafted by <b>Thomas Jefferson<\/b>); slogan \"<b>No taxation without representation<\/b>\"; Treaty of Paris 1783; first President <b>George Washington<\/b>"],["<b>French Revolution<\/b>","<b>1789<\/b> — fall of the <b>Bastille, 14 July 1789<\/b>; slogan \"<b>Liberty, Equality, Fraternity<\/b>\"; thinkers <b>Rousseau<\/b> (<i>Social Contract<\/i>), <b>Voltaire<\/b>, <b>Montesquieu<\/b> (separation of powers); the Reign of Terror (Robespierre); Napoleon took over in 1799"],["<b>Industrial Revolution<\/b>","Began in <b>England<\/b>, ~1760; <b>James Watt<\/b> — steam engine; Hargreaves — spinning jenny; Arkwright — water frame; Crompton — mule; Cartwright — power loom; Stephenson — railway engine (Rocket)"],["<b>Russian Revolution<\/b>","<b>1917<\/b> — the <b>February (March) Revolution<\/b> ended Tsar <b>Nicholas II<\/b>; the <b>October (November) Revolution<\/b> brought the <b>Bolsheviks<\/b> under <b>Lenin<\/b> to power; slogan \"<b>Peace, Land and Bread<\/b>\"; Treaty of Brest-Litovsk 1918; USSR formed 1922"],["<b>Chinese Revolution<\/b>","1911 — Sun Yat-sen ends the Manchu dynasty; <b>1949<\/b> — <b>Mao Zedong<\/b> founds the People's Republic; Long March 1934–35"],["<b>Meiji Restoration<\/b>","1868, Japan — modernisation under the Emperor"],["Unifications","<b>Italy<\/b> — Mazzini, <b>Garibaldi<\/b>, Cavour, 1870; <b>Germany<\/b> — <b>Bismarck<\/b> (\"blood and iron\"), 1871"]]},{"k":"facts","title":"First World War (1914–18)","rows":[["Immediate cause","Assassination of <b>Archduke Franz Ferdinand<\/b> at <b>Sarajevo, 28 June 1914<\/b>, by Gavrilo Princip"],["Sides","<b>Allies<\/b> — Britain, France, Russia, later Italy, Japan, USA (1917) · <b>Central Powers<\/b> — Germany, Austria-Hungary, Ottoman Turkey, Bulgaria"],["Ended","<b>11 November 1918<\/b>; <b>Treaty of Versailles, 28 June 1919<\/b> — punished Germany (war guilt clause, reparations, loss of colonies)"],["<b>League of Nations<\/b>","Set up <b>1920<\/b>, HQ <b>Geneva<\/b>, proposed by US President <b>Woodrow Wilson<\/b> (his <b>Fourteen Points<\/b>); the USA never joined; it failed and was dissolved in 1946"]]},{"k":"facts","title":"Second World War (1939–45)","rows":[["Cause","Germany's invasion of <b>Poland, 1 September 1939<\/b>; the harshness of Versailles and the rise of <b>Hitler<\/b> (Nazi), <b>Mussolini<\/b> (Fascist) and Japan"],["Sides","<b>Allies<\/b> — Britain, France, USSR, USA, China · <b>Axis<\/b> — Germany, Italy, Japan"],["Turning points","Pearl Harbor (<b>7 Dec 1941<\/b>) brought in the USA; Stalingrad (1942–43); <b>D-Day, 6 June 1944<\/b>"],["End","Germany surrendered <b>8 May 1945<\/b> (VE Day); atom bombs on <b>Hiroshima (6 Aug 1945, \"Little Boy\")<\/b> and <b>Nagasaki (9 Aug 1945, \"Fat Man\")<\/b>; Japan surrendered <b>2 September 1945<\/b>"],["<b>United Nations<\/b>","Charter signed <b>26 June 1945<\/b> at San Francisco; came into force <b>24 October 1945<\/b> — <b>UN Day<\/b>; HQ <b>New York<\/b>; 51 founding members, India among them"],["After","<b>Cold War<\/b>; NATO 1949, Warsaw Pact 1955; Berlin Wall 1961–1989; USSR dissolved 1991"]]},{"k":"trick","h":"<b>War dates<\/b> — \"<b>14 to 18, 39 to 45<\/b>\"; each war ends with a treaty town: WWI → <b>Versailles<\/b>, WWII → <b>no single treaty<\/b> (Potsdam/Yalta conferences instead).<br><b>League vs UN<\/b>: <b>League = Geneva, 1920, after WWI<\/b>; <b>UN = New York, 1945, after WWII<\/b>."},{"k":"trap","h":"The <b>October Revolution<\/b> of 1917 is the one that brought the Bolsheviks to power (it falls in November by the modern calendar). <b>Woodrow Wilson proposed the League of Nations but the USA never joined it.<\/b> <b>Hiroshima<\/b> came first (6 Aug), Nagasaki second (9 Aug)."}],"sum":["American Revolution: Boston Tea Party 1773, Declaration of Independence 4 July 1776 (Jefferson), 'no taxation without representation'.","French Revolution 1789: Bastille fell 14 July 1789; 'Liberty, Equality, Fraternity'; Rousseau, Voltaire, Montesquieu.","Russian Revolution 1917: February ended Tsar Nicholas II; October brought Lenin's Bolsheviks; slogan 'Peace, Land and Bread'.","WWI 1914–18: triggered at Sarajevo 28 June 1914; Treaty of Versailles 28 June 1919; League of Nations 1920 at Geneva (Woodrow Wilson's idea; USA never joined).","WWII 1939–45: began with Poland 1 Sept 1939; Pearl Harbor 7 Dec 1941; D-Day 6 June 1944; Hiroshima 6 Aug & Nagasaki 9 Aug 1945; UN came into force 24 Oct 1945."]},
+{"id":"L30","g":"wld","heat":3,"title":"Travellers, titles, books & slogans","hi":"यात्री · उपाधियाँ · पुस्तकें · नारे","blocks":[{"k":"hot","h":"This is a pure-marks lesson: SSC loves \"who was called X\", \"who wrote Y\", \"who gave the slogan Z\". Nothing to understand — only to recall. Read it last before the exam."},{"k":"story","h":"<p>This lesson has no story of its own. It collects who-is-who facts from every other lesson: travellers, titles, slogans and books. The best way to learn it is to hang each item on a story you already know.<\/p><p><b>Travellers<\/b>: put them on the line of kings. Megasthenes comes to Chandragupta Maurya, Fa-Hien to Chandragupta II, Hiuen Tsang to Harsha, Al-Beruni with Mahmud of Ghazni, Ibn Battuta to Muhammad bin Tughlaq, Domingo Paes to Krishnadeva Raya, and Englishmen like Thomas Roe to Jahangir. If you can say the kings in order, the travellers follow.<\/p><p><b>Titles<\/b>: group them by era. Older ones: Indian Napoleon (Samudragupta), Parrot of India (Amir Khusrau), Tiger of Mysore (Tipu). Freedom-era ones: Grand Old Man (Naoroji), Lokmanya (Tilak), Netaji (Bose), Sardar (Patel). <b>Slogans<\/b>: link each to its movement. Swaraj is my birthright goes with Tilak and the Extremists, Do or Die with Gandhi and Quit India, Give me blood with Bose and the INA. <b>Books<\/b>: pair each writer with his age, from Kautilya's Arthashastra and Abul Fazl's Ain-i-Akbari to Gandhi's Hind Swaraj. Read this lesson last, as revision before the exam.<\/p>","key":"Hang every traveller, title, slogan and book on a king or a movement you already know, and revise this lesson last."},{"k":"table","title":"Foreign travellers — who, when, under whom","head":["Traveller","From","Came under","Book"],"rows":[["<b>Megasthenes<\/b>","Greece","Chandragupta Maurya","<i>Indica<\/i>"],["Deimachus","Greece","Bindusara","—"],["Dionysius","Greece (Ptolemy's envoy)","Ashoka","—"],["<b>Fa-Hien<\/b>","China","Chandragupta II","<i>Fo-Kuo-Ki<\/i>"],["<b>Hiuen Tsang<\/b>","China","Harshavardhana","<i>Si-Yu-Ki<\/i>"],["<b>I-tsing<\/b>","China","late 7th c.","—"],["<b>Al-Beruni<\/b>","Persia","came with Mahmud of Ghazni","<i>Kitab-ul-Hind / Tahqiq-i-Hind<\/i>"],["<b>Marco Polo<\/b>","Venice","Pandya kingdom, 13th c.","<i>The Book of Ser Marco Polo<\/i>"],["<b>Ibn Battuta<\/b>","Morocco","Muhammad bin Tughlaq","<i>Rehla / Kitab-ul-Rehla<\/i>"],["<b>Nicolo Conti<\/b>","Italy","Devaraya I (Vijayanagara)","—"],["<b>Abdur Razzaq<\/b>","Persia","Devaraya II","—"],["<b>Athanasius Nikitin<\/b>","Russia","Bahmani kingdom","—"],["<b>Domingo Paes<\/b> &amp; Nuniz","Portugal","Krishnadeva Raya","—"],["<b>Ralph Fitch<\/b>","England","Akbar","—"],["<b>William Hawkins<\/b> / <b>Thomas Roe<\/b>","England","Jahangir","—"],["<b>Bernier<\/b> / <b>Tavernier<\/b> / <b>Manucci<\/b>","France / France / Italy","Shah Jahan (&amp; Aurangzeb)","<i>Travels in the Mogul Empire<\/i> / <i>Travels in India<\/i> / <i>Storia do Mogor<\/i>"]]},{"k":"facts","title":"Titles and nicknames","rows":[["Grand Old Man of India","<b>Dadabhai Naoroji<\/b>"],["Father of the Nation","<b>Mahatma Gandhi<\/b> (title given by Subhas Chandra Bose)"],["Mahatma","Gandhi — from <b>Rabindranath Tagore<\/b>"],["Gurudev","<b>Rabindranath Tagore<\/b> — from Gandhi"],["Netaji","<b>Subhas Chandra Bose<\/b>"],["Iron Man of India / Sardar","<b>Vallabhbhai Patel<\/b> (\"Sardar\" from the women of Bardoli)"],["Lokmanya","<b>Bal Gangadhar Tilak<\/b> — also \"Father of Indian unrest\" (Valentine Chirol)"],["Punjab Kesari / Sher-e-Punjab","<b>Lala Lajpat Rai<\/b>"],["Deshbandhu","<b>Chittaranjan Das<\/b>"],["Rajaji","<b>C. Rajagopalachari<\/b>"],["Frontier Gandhi / Badshah Khan","<b>Khan Abdul Ghaffar Khan<\/b>"],["Nightingale of India","<b>Sarojini Naidu<\/b>"],["Loknayak","<b>Jayaprakash Narayan<\/b>"],["Babasaheb","<b>B. R. Ambedkar<\/b>"],["Indian Napoleon","<b>Samudragupta<\/b>"],["Tiger of Mysore","<b>Tipu Sultan<\/b>"],["Parrot of India (Tuti-i-Hind)","<b>Amir Khusrau<\/b>"],["Prince of Pilgrims","<b>Hiuen Tsang<\/b>"],["Akbar of Kashmir","<b>Zain-ul-Abidin<\/b>"],["Napoleon of the East / Lakh Baksh","Muhammad bin Tughlaq-era usage / <b>Qutb-ud-din Aibak<\/b>"],["Maker of modern India","<b>Lord Dalhousie<\/b> (also said of Ram Mohan Roy)"],["Father of local self-government","<b>Lord Ripon<\/b>"],["Father of the Indian civil services","<b>Lord Cornwallis<\/b>"],["Father of the Indian Renaissance","<b>Raja Ram Mohan Roy<\/b>"],["Mother of the Indian Revolution","<b>Madam Bhikaji Cama<\/b>"]]},{"k":"facts","title":"Slogans — who said it","rows":[["\"Swaraj is my birthright and I shall have it\"","<b>Bal Gangadhar Tilak<\/b>"],["\"Do or Die\" (Karo ya Maro)","<b>Mahatma Gandhi<\/b> (Quit India, 1942)"],["\"Give me blood and I will give you freedom\"","<b>Subhas Chandra Bose<\/b>"],["\"Jai Hind\"","<b>Subhas Chandra Bose<\/b> (coined by Abid Hasan)"],["\"Inquilab Zindabad\"","<b>Bhagat Singh<\/b> (coined by <b>Hasrat Mohani<\/b>)"],["\"Sarfaroshi ki tamanna ab hamare dil mein hai\"","<b>Bismil Azimabadi<\/b>, made famous by <b>Ramprasad Bismil<\/b>"],["\"Vande Mataram\"","<b>Bankim Chandra Chatterjee<\/b> — in <i>Anandamath<\/i> (1882)"],["\"Jai Jawan Jai Kisan\"","<b>Lal Bahadur Shastri<\/b>"],["\"Aram Haram Hai\"","<b>Jawaharlal Nehru<\/b>"],["\"Satyameva Jayate\"","<b>Mundaka Upanishad<\/b>"],["\"Delhi Chalo\"","<b>Subhas Chandra Bose<\/b>"],["\"Swaraj for me means freedom for the meanest of my countrymen\"","<b>Mahatma Gandhi<\/b>"],["\"Simon Go Back\"","<b>Yusuf Meherally<\/b>, 1928 (he also coined \"Quit India\")"],["\"Who lives if India dies?\"","<b>Jawaharlal Nehru<\/b>"]]},{"k":"facts","title":"Books & their authors (most asked)","rows":[["Arthashastra","Kautilya"],["Indica","Megasthenes"],["Rajatarangini","Kalhana"],["Harshacharita &amp; Kadambari","Banabhatta"],["Mudrarakshasa","Vishakhadatta"],["Baburnama","Babur"],["Humayun-nama","Gulbadan Begum"],["Akbarnama &amp; Ain-i-Akbari","Abul Fazl"],["Tuzuk-i-Jahangiri","Jahangir"],["Tarikh-i-Firozshahi","Ziauddin Barani"],["Rehla","Ibn Battuta"],["Amuktamalyada","Krishnadeva Raya"],["Padmavat","Malik Muhammad Jayasi"],["Ramcharitmanas","Tulsidas"],["Gita Govinda","Jayadeva"],["Satyarth Prakash","Dayanand Saraswati"],["Gulamgiri","Jyotiba Phule"],["Anandamath","Bankim Chandra Chatterjee"],["Gitanjali","Rabindranath Tagore (Nobel 1913)"],["Poverty and Un-British Rule in India","Dadabhai Naoroji"],["Hind Swaraj &amp; My Experiments with Truth","Mahatma Gandhi"],["Discovery of India &amp; Glimpses of World History","Jawaharlal Nehru"],["Indian War of Independence 1857","V. D. Savarkar"],["Why I am an Atheist","Bhagat Singh"],["The Indian Struggle","Subhas Chandra Bose"],["Annihilation of Caste","B. R. Ambedkar"],["India Wins Freedom","Maulana Abul Kalam Azad"],["Gita Rahasya","Bal Gangadhar Tilak"],["Unhappy India","Lala Lajpat Rai"],["Nil Darpan","Dinabandhu Mitra"]]},{"k":"trick","h":"<b>Traveller ↔ king, by initials<\/b>: <b>M<\/b>egasthenes–<b>M<\/b>aurya, <b>F<\/b>a-Hien–<b>F<\/b>irst Chandragupta II (gold age), <b>H<\/b>iuen Tsang–<b>H<\/b>arsha, <b>I<\/b>bn Battuta–<b>I<\/b>bn under Muhammad bin <b>T<\/b>ughlaq (<i>Battuta brought a Rehla to the Tughlaq<\/i>), <b>B<\/b>ernier–<b>B<\/b>uilder Shah Jahan."},{"k":"trap","h":"<b>Ibn Battuta → Muhammad bin Tughlaq<\/b> and <b>Al-Beruni → Mahmud of Ghazni<\/b> — never swap them. <b>Hawkins came to Jahangir<\/b>, not Akbar; <b>Ralph Fitch<\/b> was Akbar's English visitor. \"Quit India\" and \"Simon Go Back\" were both coined by <b>Yusuf Meherally<\/b>, not Gandhi."}],"sum":["Megasthenes–Chandragupta Maurya; Fa-Hien–Chandragupta II; Hiuen Tsang–Harsha; Al-Beruni–Mahmud of Ghazni; Ibn Battuta–Muhammad bin Tughlaq; Marco Polo–Pandya; Nicolo Conti & Abdur Razzaq–Vijayanagara; Hawkins & Thomas Roe–Jahangir; Bernier & Tavernier–Shah Jahan.","Titles: Grand Old Man–Naoroji; Netaji–Bose; Sardar–Patel; Lokmanya–Tilak; Deshbandhu–C. R. Das; Frontier Gandhi–Ghaffar Khan; Indian Napoleon–Samudragupta; Tiger of Mysore–Tipu; Parrot of India–Amir Khusrau.","Slogans: 'Swaraj is my birthright'–Tilak; 'Do or Die'–Gandhi; 'Give me blood…' & 'Jai Hind'–Bose; 'Inquilab Zindabad'–Bhagat Singh (Hasrat Mohani); 'Jai Jawan Jai Kisan'–Shastri; 'Quit India' & 'Simon Go Back'–Yusuf Meherally.","Books: Arthashastra–Kautilya; Rajatarangini–Kalhana; Ain-i-Akbari–Abul Fazl; Padmavat–Jayasi; Gulamgiri–Phule; Anandamath–Bankim Chandra; India Wins Freedom–Azad; Gita Rahasya–Tilak.","Vande Mataram comes from Bankim Chandra Chatterjee's Anandamath (1882)."]}
+];
+const QB = [
+["L29","The Bastille fell on:",["14 July 1789","4 July 1776","26 August 1789","1 September 1939"],"The fall of the Bastille is treated as the start of the French Revolution.",""],
+["L29","'Liberty, Equality, Fraternity' was the slogan of the:",["French Revolution","American Revolution","Russian Revolution","Glorious Revolution"],"The French Revolution of 1789 gave the world this slogan.","p"],
+["L29","The Social Contract was written by:",["Jean-Jacques Rousseau","Voltaire","Montesquieu","John Locke"],"Montesquieu wrote The Spirit of the Laws, setting out the separation of powers.","p"],
+["L29","The American Declaration of Independence was adopted on:",["4 July 1776","14 July 1789","1 September 1783","16 December 1773"],"Thomas Jefferson drafted it; the Boston Tea Party was in 1773.","p"],
+["L29","'No taxation without representation' was the slogan of the:",["American Revolution","French Revolution","Chinese Revolution","Russian Revolution"],"The American colonists objected to being taxed without seats in Parliament.",""],
+["L29","The steam engine was improved and made practical by:",["James Watt","James Hargreaves","Richard Arkwright","Edmund Cartwright"],"Hargreaves made the spinning jenny, Arkwright the water frame and Cartwright the power loom.","p"],
+["L29","The Bolshevik Revolution took place in:",["October (November) 1917","February (March) 1917","1905","1921"],"The February Revolution ended the Tsar; the October Revolution brought Lenin to power.","p"],
+["L29","'Peace, Land and Bread' was the slogan of:",["Lenin and the Bolsheviks","the French revolutionaries","Mao Zedong","Mussolini"],"It summed up the Bolshevik promise in 1917.",""],
+["L29","The last Tsar of Russia was:",["Nicholas II","Alexander III","Peter the Great","Kerensky"],"Nicholas II abdicated in March 1917 and was later executed.",""],
+["L29","The First World War was triggered by the assassination of Archduke Franz Ferdinand at:",["Sarajevo","Vienna","Berlin","Belgrade"],"He was shot on 28 June 1914 by Gavrilo Princip.","p"],
+["L29","The Treaty of Versailles was signed on:",["28 June 1919","11 November 1918","26 June 1945","2 September 1945"],"It punished Germany with the war-guilt clause, reparations and loss of colonies.",""],
+["L29","The League of Nations had its headquarters at:",["Geneva","New York","Paris","The Hague"],"It was set up in 1920 on Woodrow Wilson's proposal, though the USA never joined.",""],
+["L29","The Fourteen Points were put forward by:",["Woodrow Wilson","Lloyd George","Clemenceau","Winston Churchill"],"The US President's Fourteen Points included the idea of a League of Nations.",""],
+["L29","The Second World War began with Germany's invasion of:",["Poland","France","Russia","Czechoslovakia"],"Germany invaded Poland on 1 September 1939.","p"],
+["L29","The atomic bomb was dropped on Hiroshima on:",["6 August 1945","9 August 1945","2 September 1945","8 May 1945"],"Hiroshima came first (Little Boy) and Nagasaki on 9 August (Fat Man).",""],
+["L29","The United Nations came into existence on:",["24 October 1945","26 June 1945","2 September 1945","1 January 1942"],"The Charter was signed on 26 June at San Francisco and came into force on 24 October — UN Day.","p"],
+["L29","The unification of Germany in 1871 was achieved under:",["Otto von Bismarck","Garibaldi","Cavour","Mazzini"],"Bismarck's 'blood and iron' policy unified Germany; Garibaldi, Cavour and Mazzini unified Italy.",""],
+["L29","The People's Republic of China was proclaimed in 1949 by:",["Mao Zedong","Sun Yat-sen","Chiang Kai-shek","Zhou Enlai"],"Sun Yat-sen had ended the Manchu dynasty in 1911.",""],
+["L29","The Meiji Restoration of 1868 took place in:",["Japan","China","Korea","Vietnam"],"It began Japan's rapid modernisation under imperial rule.",""],
+["L29","D-Day, the Allied landing in Normandy, took place on:",["6 June 1944","7 December 1941","8 May 1945","1 September 1939"],"Pearl Harbor was attacked on 7 December 1941; Germany surrendered on 8 May 1945.",""],
+["L30","The traveller who wrote the 'Rehla' and served as Qazi of Delhi came from:",["Morocco","Persia","Italy","Russia"],"Ibn Battuta of Morocco came under Muhammad bin Tughlaq and wrote the Rehla (Kitab-ul-Rehla).",""],
+["L30","Marco Polo visited which Indian kingdom?",["Pandya","Vijayanagara","Bahmani","Chola"],"He visited the Pandya kingdom in the late 13th century.",""],
+["L30","'Kitab-ul-Hind' was written by:",["Al-Beruni","Ibn Battuta","Abdur Razzaq","Minhaj-us-Siraj"],"Al-Beruni came with Mahmud of Ghazni; the work is also called Tahqiq-i-Hind.","p"],
+["L30","Abdur Razzaq, the Persian envoy, visited the court of:",["Devaraya II of Vijayanagara","Krishnadeva Raya","Akbar","Muhammad bin Tughlaq"],"Nicolo Conti came under Devaraya I and Abdur Razzaq under Devaraya II.",""],
+["L30","Domingo Paes visited the court of:",["Krishnadeva Raya","Devaraya II","Akbar","Shivaji"],"The Portuguese traveller left a vivid description of Vijayanagara at its height.",""],
+["L30","Who is called the 'Grand Old Man of India'?",["Dadabhai Naoroji","Gokhale","Surendranath Banerjee","Madan Mohan Malaviya"],"Naoroji was also the first Indian to be elected to the British Parliament.","p"],
+["L30","Who gave Gandhi the title 'Father of the Nation'?",["Subhas Chandra Bose","Rabindranath Tagore","Jawaharlal Nehru","Sardar Patel"],"Tagore called him Mahatma; Bose called him Father of the Nation.","p"],
+["L30","Lala Lajpat Rai was known as:",["Sher-e-Punjab","Deshbandhu","Lokmanya","Loknayak"],"Deshbandhu was C. R. Das, Lokmanya was Tilak and Loknayak was Jayaprakash Narayan.","p"],
+["L30","Khan Abdul Ghaffar Khan was popularly called:",["Frontier Gandhi","Deshbandhu","Netaji","Rajaji"],"He was also known as Badshah Khan and led the Khudai Khidmatgars.","p"],
+["L30","Samudragupta is called the:",["Indian Napoleon","Tiger of Mysore","Parrot of India","Akbar of Kashmir"],"V. A. Smith gave him the title for his wide conquests.","p"],
+["L30","Amir Khusrau was called:",["Tuti-i-Hind (Parrot of India)","Prince of Pilgrims","Zinda Pir","Lakh Baksh"],"Hiuen Tsang was the Prince of Pilgrims and Aurangzeb the Zinda Pir.","p"],
+["L30","'Jai Jawan Jai Kisan' was the slogan of:",["Lal Bahadur Shastri","Jawaharlal Nehru","Indira Gandhi","Sardar Patel"],"Shastri gave it during the 1965 war.","p"],
+["L30","The slogan 'Inquilab Zindabad' is associated with:",["Bhagat Singh","Subhas Chandra Bose","Tilak","Gandhi"],"It was coined by the poet Hasrat Mohani and made famous by Bhagat Singh.","p"],
+["L30","'Vande Mataram' first appeared in which work?",["Anandamath","Gitanjali","Gita Rahasya","Hind Swaraj"],"Bankim Chandra Chatterjee included it in Anandamath (1882).","p"],
+["L30","Who coined the slogans 'Quit India' and 'Simon Go Back'?",["Yusuf Meherally","Gandhi","Nehru","Aruna Asaf Ali"],"The Bombay socialist Yusuf Meherally coined both.",""],
+["L30","'India Wins Freedom' was written by:",["Maulana Abul Kalam Azad","Jawaharlal Nehru","Rajendra Prasad","C. Rajagopalachari"],"It is Azad's account of the years before Partition.",""],
+["L30","'Gita Rahasya' was written by:",["Bal Gangadhar Tilak","Mahatma Gandhi","Aurobindo Ghosh","Vinoba Bhave"],"Tilak wrote it while imprisoned at Mandalay.",""],
+["L30","'Why I am an Atheist' was written by:",["Bhagat Singh","Chandra Shekhar Azad","Savarkar","Ambedkar"],"Bhagat Singh wrote it in jail in 1930.",""],
+["L30","'The Indian Struggle' was written by:",["Subhas Chandra Bose","V. D. Savarkar","Jawaharlal Nehru","Lala Lajpat Rai"],"Savarkar wrote The Indian War of Independence 1857 and Lajpat Rai Unhappy India.",""],
+["L30","Rabindranath Tagore won the Nobel Prize for Literature in 1913 for:",["Gitanjali","Gora","Chokher Bali","Ghare Baire"],"He was the first Asian to win the Nobel Prize for Literature.","p"],
+["L30","'Annihilation of Caste' was written by:",["B. R. Ambedkar","Jyotiba Phule","Periyar","Sree Narayana Guru"],"It was written in 1936 as an undelivered speech.",""],
+["L30","Lord Ripon is called the Father of:",["Local self-government in India","the Indian civil services","the Indian Renaissance","Indian railways"],"Cornwallis is the father of the Indian civil services and Dalhousie is called the maker of modern India.",""],
+["L29","The Glorious Revolution of 1688 took place in:",["England","France","Russia","America"],"The bloodless revolution of 1688 in England led to the Bill of Rights of 1689 and the supremacy of Parliament.",""],
+["L29","The Reign of Terror during the French Revolution is associated with:",["Robespierre","Napoleon Bonaparte","Jean-Jacques Rousseau","Georges Danton"],"Robespierre led the Jacobin Reign of Terror; Napoleon seized power in 1799.",""],
+["L29","The spinning jenny was invented by:",["James Hargreaves","James Watt","Richard Arkwright","Samuel Crompton"],"Hargreaves made the spinning jenny, Arkwright the water frame, Crompton the mule and Watt improved the steam engine.",""],
+["L29","Japan formally surrendered in the Second World War on:",["2 September 1945","8 May 1945","6 August 1945","15 August 1947"],"Germany surrendered on 8 May 1945 and Japan on 2 September 1945, after the atom bombs of 6 and 9 August.",""],
+["L29","The Treaty of Brest-Litovsk of 1918 was signed between Germany and:",["Soviet Russia","France","Britain","Poland"],"Lenin's government signed it to take Russia out of the First World War.",""],
+["L30","Which Chinese pilgrim visited India in the late seventh century, after Hiuen Tsang?",["I-tsing","Fa-Hien","Marco Polo","Megasthenes"],"I-tsing came in the late 7th century. Fa-Hien had come under Chandragupta II and Hiuen Tsang under Harsha.",""],
+["L30","Who is known as the 'Mother of the Indian Revolution'?",["Madam Bhikaji Cama","Sarojini Naidu","Annie Besant","Aruna Asaf Ali"],"Bhikaji Cama unfurled an early version of the Indian flag at Stuttgart in 1907. Sarojini Naidu was the Nightingale of India.",""],
+["L30","Rabindranath Tagore was given the title 'Gurudev' by:",["Mahatma Gandhi","Subhas Chandra Bose","Jawaharlal Nehru","Swami Vivekananda"],"Gandhi called Tagore 'Gurudev', and Tagore in turn called Gandhi 'Mahatma'.",""],
+["L30","The slogan 'Aram Haram Hai' was given by:",["Jawaharlal Nehru","Lal Bahadur Shastri","Mahatma Gandhi","Sardar Patel"],"Nehru coined it, and also asked 'Who lives if India dies?'; Shastri gave 'Jai Jawan Jai Kisan'.",""],
+["L30","'Gita Govinda' was written by:",["Jayadeva","Tulsidas","Surdas","Jnaneshwar"],"Jayadeva's Sanskrit Gita Govinda celebrates Radha and Krishna; Jnaneshwar wrote the Marathi Jnaneshwari.","p"],
+["L30","'Glimpses of World History' was written by:",["Jawaharlal Nehru","Maulana Abul Kalam Azad","Rajendra Prasad","Rabindranath Tagore"],"Nehru wrote it as letters to his daughter, and also wrote The Discovery of India.",""],
+["L36","The Code of Hammurabi, one of the earliest written law codes, belongs to:",["Babylon in Mesopotamia","Ancient Egypt","Shang China","Persia"],"Hammurabi of Babylon issued his code around 1750 BCE in Mesopotamia, between the Tigris and the Euphrates.","p"],
+["L36","The wedge-shaped cuneiform script was developed in:",["Mesopotamia","Egypt","China","the Indus valley"],"The Sumerians of Mesopotamia pressed cuneiform into clay. Egypt used hieroglyphics.",""],
+["L36","Egyptian hieroglyphics were deciphered with the help of the Rosetta Stone by:",["Jean-Francois Champollion","Howard Carter","James Prinsep","Heinrich Schliemann"],"Champollion read the hieroglyphs in 1822. Prinsep deciphered India's Brahmi script.",""],
+["L36","Which river is called 'China's Sorrow'?",["Huang He","Yangtze","Mekong","Amur"],"The Huang He (Yellow River), the cradle of Chinese civilisation, floods often, hence 'China's Sorrow'.","p"],
+["L36","Alexander defeated Porus in 326 BCE at the Battle of the Hydaspes, fought on the banks of the:",["Jhelum","Chenab","Beas","Indus"],"The Hydaspes is the Greek name for the Jhelum. The Beas is where Alexander's army refused to go further.","p"],
+["L36","Alexander's army refused to march further east at the banks of the:",["Beas","Jhelum","Ravi","Sutlej"],"At the Beas (Hyphasis) his tired soldiers refused to go on, and he turned back. He died at Babylon in 323 BCE.",""],
+["L36","Who was the tutor of Alexander the Great?",["Aristotle","Plato","Socrates","Pythagoras"],"Aristotle, Plato's pupil, taught the young Alexander in Macedon.","p"],
+["L36","Arrange in order of teacher to pupil:",["Socrates, Plato, Aristotle, Alexander","Plato, Socrates, Aristotle, Alexander","Socrates, Aristotle, Plato, Alexander","Aristotle, Plato, Socrates, Alexander"],"Socrates taught Plato, Plato taught Aristotle, and Aristotle taught Alexander.",""],
+["L36","Who was the first emperor of Rome?",["Augustus","Julius Caesar","Nero","Constantine"],"Octavian took the title Augustus in 27 BCE. Julius Caesar was a dictator but never emperor.","p"],
+["L36","'Veni, vidi, vici' (I came, I saw, I conquered) is a saying of:",["Julius Caesar","Augustus","Alexander","Napoleon"],"Julius Caesar reported his quick victory with these words. He was killed in 44 BCE.",""],
+["L36","Confucius, whose sayings are collected in the Analects, was a thinker from:",["China","Japan","Persia","Tibet"],"Confucius (551–479 BCE) lived in China around the same time as the Buddha and Mahavira.",""],
+["L36","The holy book of Zoroastrianism is the:",["Avesta","Torah","Analects","Tripitaka"],"Zoroaster's teachings are in the Avesta. The Torah is Jewish and the Analects are Confucian.",""],
+["L36","The Hijra of 622 CE, from which the Islamic calendar begins, refers to the Prophet's migration from:",["Mecca to Medina","Medina to Mecca","Mecca to Jerusalem","Medina to Damascus"],"Prophet Muhammad moved from Mecca to Medina in 622 CE; he died at Medina in 632 CE.","p"],
+["L36","The Magna Carta of 1215 was accepted by which English king?",["King John","Henry VIII","Charles I","Richard I"],"King John accepted it at Runnymede under pressure from his barons. The 1689 Bill of Rights is a different document.","p"],
+["L36","The Renaissance began in the 14th century in:",["Italy","France","England","Germany"],"It began in Italian cities such as Florence, with patrons like the Medici family.",""],
+["L36","The ceiling of the Sistine Chapel was painted by:",["Michelangelo","Leonardo da Vinci","Raphael","Botticelli"],"Michelangelo painted the Sistine ceiling and carved David. Leonardo painted the Mona Lisa.",""],
+["L36","'Mona Lisa' and 'The Last Supper' were painted by:",["Leonardo da Vinci","Michelangelo","Raphael","Titian"],"Both are Leonardo's. Raphael painted the School of Athens.",""],
+["L36","Johannes Gutenberg, who built a movable-type printing press around 1440, came from:",["Germany","Italy","England","the Netherlands"],"Gutenberg worked at Mainz in Germany; his printed Bible appeared around 1455.",""],
+["L36","The Protestant Reformation began in 1517 when the Ninety-five Theses were posted by:",["Martin Luther","John Calvin","Ignatius Loyola","Henry VIII"],"Luther protested against the sale of indulgences. Loyola founded the Jesuits of the Counter-Reformation.","p"],
+["L36","Constantinople fell in 1453 to the:",["Ottoman Turks under Mehmed II","Mongols under Genghis Khan","Arabs under the Umayyads","Seljuks under Alp Arslan"],"Mehmed II took the city, ending the Byzantine Empire; the blocked land route pushed Europeans to look for a sea route to India.",""],
+["L36","The first voyage around the world (1519–22) was led by:",["Ferdinand Magellan","Christopher Columbus","Vasco da Gama","Francis Drake"],"Magellan's expedition went round the world, though he was killed in the Philippines in 1521 and Elcano finished the voyage.","p"],
+["L36","Brazil was reached for Portugal in 1500 by:",["Pedro Alvares Cabral","Bartolomeu Dias","Amerigo Vespucci","Hernan Cortes"],"Cabral reached Brazil on his way to India, which is why Brazil speaks Portuguese.",""],
+["L36","Arrange these voyages in chronological order.",["Dias rounds the Cape, Columbus reaches America, Vasco da Gama reaches Calicut, Magellan sets out","Columbus reaches America, Dias rounds the Cape, Vasco da Gama reaches Calicut, Magellan sets out","Dias rounds the Cape, Vasco da Gama reaches Calicut, Columbus reaches America, Magellan sets out","Vasco da Gama reaches Calicut, Dias rounds the Cape, Columbus reaches America, Magellan sets out"],"Dias 1488, Columbus 1492, Vasco da Gama 1498, Magellan 1519.",""],
+["L36","Christopher Columbus made his voyage of 1492 on behalf of:",["Spain","Portugal","England","France"],"Columbus, from Genoa in Italy, sailed for Ferdinand and Isabella of Spain. Vasco da Gama sailed for Portugal.",""]
+];
+const TIMELINE = [
+{"era":"wld","rows":[["1688","Glorious Revolution in England"],["1776","American Declaration of Independence on 4 July"],["1789","French Revolution; the Bastille falls on 14 July"],["1799","Napoleon Bonaparte seizes power in France"],["1815","Battle of Waterloo - Napoleon's final defeat"],["1861-1865","American Civil War; slavery abolished in 1865"],["1871","Unification of Germany; Bismarck becomes Chancellor"],["1911","Chinese Revolution - Sun Yat-sen and the fall of the Manchus"],["1914","First World War begins after the Sarajevo assassination"],["1917","Russian Revolution - Lenin and the Bolsheviks in November"],["1919","Treaty of Versailles; League of Nations founded"],["1922","Mussolini takes power in Italy"],["1929","Great Depression begins with the Wall Street crash"],["1933","Hitler becomes Chancellor of Germany"],["1939","Second World War begins with Germany's invasion of Poland"],["1941","Pearl Harbor attacked; USA enters the war"],["1945","Hiroshima and Nagasaki bombed; war ends; United Nations founded on 24 October"],["1949","Chinese Revolution - Mao Zedong proclaims the People's Republic; NATO formed"],["1955","Warsaw Pact signed; Bandung Conference of Afro-Asian nations"],["1991","Disintegration of the USSR ends the Cold War"]]}
+];
+const LASTMOMENT = [
+{"t":"Traveller to king","era":["wld"],"rows":[["Megasthenes - Indica","Chandragupta Maurya"],["Fa-Hien","Chandragupta II"],["Hiuen Tsang - Si-yu-ki","Harshavardhana"],["I-tsing","Late 7th century, Nalanda"],["Al-Beruni - Kitab-ul-Hind","Came with Mahmud of Ghazni"],["Marco Polo","Pandyas of Madurai"],["Ibn Battuta - Rehla","Muhammad bin Tughlaq"],["Nicolo Conti","Devaraya I of Vijayanagara"],["Abdur Razzaq","Devaraya II of Vijayanagara"],["Domingo Paes and Nuniz","Krishnadeva Raya"],["Bernier and Tavernier","Shah Jahan and Aurangzeb's time"]]},
+{"t":"Slogan to person","era":["wld"],"rows":[["Swaraj is my birthright","Bal Gangadhar Tilak"],["Do or Die","Mahatma Gandhi, 1942"],["Jai Hind; Delhi Chalo; Give me blood","Subhas Chandra Bose"],["Inquilab Zindabad","Bhagat Singh"],["Vande Mataram","Bankim Chandra Chatterjee"],["Jai Jawan Jai Kisan","Lal Bahadur Shastri"],["Satyameva Jayate (popularised)","Madan Mohan Malaviya"],["Aram Haram Hai","Jawaharlal Nehru"],["Sare Jahan Se Achha","Muhammad Iqbal"],["Swaraj for me means Swaraj for the masses","Mahatma Gandhi"]]},
+{"t":"Book to author","era":["wld"],"rows":[["Arthashastra","Kautilya"],["Indica","Megasthenes"],["Mudrarakshasa","Vishakhadatta"],["Rajatarangini","Kalhana"],["Harshacharita and Kadambari","Banabhatta"],["Tuzuk-i-Baburi (Baburnama)","Babur"],["Ain-i-Akbari and Akbarnama","Abul Fazl"],["Tuzuk-i-Jahangiri","Jahangir"],["Tarikh-i-Firozshahi","Ziauddin Barani"],["Gitanjali","Rabindranath Tagore"],["Discovery of India","Jawaharlal Nehru"],["Poverty and Un-British Rule in India","Dadabhai Naoroji"]]}
+];
+const TILES = [
+
+];
+const ERANOTE = {"wld":"Skim the World Wars, the French and Russian revolutions and the traveller-slogan-book lists - these miscellaneous one-liners add up to roughly 1 mark."};
+const INTROS = {"worldhist":{"lead":"World History covers the big events outside India that the exam asks about: early civilisations, the Age of Discovery, the great revolutions and the two World Wars. Who's Who collects the famous travellers, titles, slogans and books from all of Indian history.","tip":"For world events, learn a few key dates and one slogan or treaty per event; for Who's Who, link each name to a king or movement you already know.","order":"Read the lesson on ancient civilisations to the Age of Discovery first, then L29 on revolutions and the World Wars, so events stay in time order, and keep L30 for last as quick revision."}};
+</script>
+
+<script>
+"use strict";
+/* ============================================================
+   History engine — shared by every History page (tools/history/build.js puts it in each one).
+   APP.mode "era": a subject app with its own lessons and questions (Learn · Practice · Mock · Revise · Plan).
+   APP.mode "hub": start here, a plan across all of history, and revision across every era (no questions of its own).
+   ============================================================ */
+const HUB = APP.mode === "hub";
+const EMBED = (() => { try { return window.parent !== window; } catch(e) { return true; } })();
+const TABS = HUB ? ["start","plan","revise"] : ["learn","practice","mock","revise","plan"];
+
+/* ============================================================
+   HELPERS & STATE
+   ============================================================ */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const hash = s => { let h = 5381; for (let i=0;i<s.length;i++) h = ((h<<5)+h + s.charCodeAt(i))|0; return "q"+(h>>>0).toString(36); };
+const shuffle = a => { const b=a.slice(); for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]];} return b; };
+const L = id => LESSONS.find(l => l.id === id);
+const LNUM = id => LESSONS.findIndex(l => l.id === id) + 1;
+const G = id => GROUPS.find(g => g.id === id) || GROUPS[0];
+const A = id => APP.apps.find(a => a.id === id);
+const appOf = id => (L(id) && L(id).app) || APP.id;       // in the hub, each lesson carries the app it lives in
+
+const QS = QB.map(r => {
+  const fixed = !!r[6];
+  return { t:r[0], q:r[1], o:r[2], e:r[3], p:(r[4]||"").includes("p"), a: fixed ? (r[5]||0) : 0, fixed, id:hash(r[1]) };
+});
+const byLesson = id => QS.filter(q => q.t === id);
+const makePerm = q => q.fixed ? q.o.map((_,i)=>i) : shuffle(q.o.map((_,i)=>i));
+const qCount = id => HUB ? null : byLesson(id).length;
+const pCount = id => HUB ? ((APP.pcount||{})[id] || 0) : byLesson(id).filter(q=>q.p).length;
+
+const KEY = APP.key;
+let S = { ans:{}, bm:{}, les:{}, mocks:[], plan:null };
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch(e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
+const record = (q, ok) => { S.ans[q.id] = ok ? 1 : 0; save(); renderTop(); };
+
+/* Another History app's saved progress. Every page is on the same site, so the hub (and a
+   plan) can see which lessons you have read and quizzed in the subject apps. */
+function appState(a){ try { return JSON.parse(localStorage.getItem(a.key) || "{}") || {}; } catch(e) { return {}; } }
+function lessonState(id){
+  const owner = appOf(id);
+  if (owner === APP.id) return S.les[id] || {};
+  const a = A(owner); return a ? ((appState(a).les || {})[id] || {}) : {};
+}
+const lesDone = l => !!lessonState(l.id).done;
+const heatDots = n => `<span class="dots" aria-label="Asked ${n===3?"almost every shift":n===2?"often":"now and then"}">${[1,2,3].map(i=>`<i class="${i<=n?"on":""}"></i>`).join("")}</span>`;
+
+/* Open a lesson or a tab, here or in the History app it lives in. Inside पाठShala the
+   app is asked to switch (so your session is tracked); on its own the page just navigates. */
+function openApp(appId, lesson, tab){
+  if (appId === APP.id) {
+    if (lesson) openLesson(lesson, "learn"); else go(tab || TABS[0]);
+    return;
+  }
+  const a = appId === APP.hub.id ? APP.hub : A(appId);
+  if (!a) return;
+  const here = () => { location.href = a.file + (lesson ? "?lesson=" + encodeURIComponent(lesson) : "") + (tab ? "#" + tab : ""); };
+  if (!EMBED) return here();
+  let ok = false;
+  const onAck = e => { if (e.origin === location.origin && e.data && e.data.type === "shabd-open-ok") ok = true; };
+  window.addEventListener("message", onAck);
+  try { window.parent.postMessage({ type:"shabd-open", mod:a.id, lesson: lesson || null, tab: tab || null }, location.origin); } catch(e) {}
+  setTimeout(() => { window.removeEventListener("message", onAck); if (!ok) here(); }, 700);
+}
+const goLink = (label, appId, lesson, tab) => `<button type="button" class="golink" data-go="${esc(JSON.stringify([appId, lesson||null, tab||null]))}">${label}</button>`;
+function bindGo(root){
+  root.querySelectorAll("[data-go]").forEach(b => b.onclick = ev => { ev.stopPropagation(); const g = JSON.parse(b.dataset.go); openApp(g[0], g[1], g[2]); });
+}
+
+function renderTop(){
+  if (HUB) {
+    const done = LESSONS.filter(lesDone).length;
+    $("#topstat").innerHTML = `<b>${done}</b>/${LESSONS.length} lessons<br>in ${APP.apps.length} apps`;
+    return;
+  }
+  const ids = Object.keys(S.ans).filter(k => QS.some(q => q.id === k));
+  const right = ids.filter(k => S.ans[k] === 1).length;
+  const pct = ids.length ? Math.round(right*100/ids.length) : 0;
+  $("#topstat").innerHTML = `<b>${ids.length}</b>/${QS.length} tried<br><b>${pct}%</b> right now`;
+}
+
+/* ============================================================
+   ROUTING
+   ============================================================ */
+let TAB = TABS[0];
+let timerId = null;
+function go(tab){
+  if (!TABS.includes(tab)) tab = TABS[0];
+  TAB = tab;
+  document.querySelectorAll(".nav button").forEach(b => b.setAttribute("aria-current", b.dataset.tab===tab ? "page" : "false"));
+  if (tab === "start") renderStart();
+  if (tab === "learn") renderLearn();
+  if (tab === "practice") renderPractice();
+  if (tab === "mock") renderMock();
+  if (tab === "revise") renderRevise();
+  if (tab === "plan") renderPlan();
+  window.scrollTo(0,0);
+  try { history.replaceState(null, "", location.pathname + location.search + "#" + tab); } catch(e) {}
+}
+document.querySelectorAll(".nav button").forEach(b => b.addEventListener("click", () => {
+  if (TAB === "mock" && M && M.running && b.dataset.tab !== "mock") { go("mock"); showMockLeave(b.dataset.tab); return; }
+  go(b.dataset.tab);
+}));
+
+/* ============================================================
+   START HERE (hub)
+   ============================================================ */
+function renderStart(){
+  const done = LESSONS.filter(lesDone).length;
+  const cards = APP.apps.map(a => {
+    const ls = LESSONS.filter(l => l.app === a.id), d = ls.filter(lesDone).length, it = INTROS[a.id] || {};
+    return `<button type="button" class="appc" data-go="${esc(JSON.stringify([a.id,null,null]))}">
+      <div class="hd"><span class="ic" aria-hidden="true">${a.ico}</span><span><b>${esc(a.title)}</b><small>${esc(a.hi)}</small></span><span class="go">Open ›</span></div>
+      ${it.lead ? `<p>${esc(it.lead)}</p>` : ""}
+      <div class="meter"><i style="width:${ls.length ? d/ls.length*100 : 0}%"></i></div>
+      <span class="meta">${d}/${ls.length} lessons done · ${(APP.qcount||{})[a.id] || 0} questions</span></button>`;
+  }).join("");
+  const tips = APP.apps.filter(a => INTROS[a.id]).map(a => `<div><dt>${esc(a.title)}</dt><dd>${esc(INTROS[a.id].tip)} ${esc(INTROS[a.id].order)}</dd></div>`).join("");
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="hero">
+      <span class="eyebrow">New to history? Start here</span>
+      <h1>History, from zero to exam-ready</h1>
+      <p>SSC splits history into five subjects, so these are five apps &mdash; Ancient, Medieval, Modern, Art &amp; Culture, and World &mdash; with ${LESSONS.length} lessons between them. You do not need to know anything before you begin: every lesson opens with a two-minute story that explains what happened and why, and only then gives you the tables, tricks and traps the exam asks about.</p>
+      <div class="meter" aria-label="Lessons done in every History app"><i style="width:${done/LESSONS.length*100}%"></i></div>
+      <div class="row between"><span class="muted num" style="font-size:13px">${done}/${LESSONS.length} lessons done across the apps</span>
+        <button class="btn pri sm" type="button" id="toplan">${S.plan ? "Open my plan" : "Make a study plan"}</button></div>
+    </div>
+    <div class="block"><h3>How to use these apps</h3><ol class="steps-list">
+      <li><b>Pick a plan</b> in the Plan tab &mdash; 5, 7, 10, 15 or 30 days. It tells you exactly what to read each day, and ticks itself as you finish lessons in the apps.</li>
+      <li><b>Read the story first</b> in every lesson, then the tables. The <b>Trick</b> boxes help you remember; the <b>Trap</b> boxes are the pairs SSC swaps to catch you.</li>
+      <li><b>Take the quiz</b> at the end of each lesson. Anything you get wrong waits for you under Practice &rarr; Mistakes until you get it right.</li>
+      <li><b>Revise in layers</b> in the Revise tab here: 30 days out read every summary, in the last week only the most-asked lessons, and in the final hour the Last moment sheet.</li>
+    </ol></div>
+    <h2>The five apps</h2>
+    <div class="appcs">${cards}</div>
+    ${tips ? `<div class="block"><h3>How to study each one</h3><dl class="facts prose">${tips}</dl></div>` : ""}
+    <div class="block"><h3>Where the marks are</h3><dl class="facts prose">${GROUPS.filter(g=>ERANOTE[g.id]).map(g=>`<div><dt>${esc(g.name)}</dt><dd>${ERANOTE[g.id]}</dd></div>`).join("")}</dl>
+      <p class="muted" style="font-size:13px;margin-top:8px">The dots next to each lesson show how often its topic comes up: three dots means almost every shift.</p></div>
+  </section>`;
+  bindGo($("#app"));
+  $("#toplan").onclick = () => go("plan");
+}
+
+/* ============================================================
+   LEARN (subject app)
+   ============================================================ */
+function lessonRow(l, nextL){
+  const st = lessonState(l.id), n = byLesson(l.id).length;
+  return `<button type="button" class="les ${lesDone(l)?"done":""} ${nextL&&l.id===nextL.id?"next":""}" data-open="${l.id}">
+    <span class="no">${lesDone(l) ? "✓" : LNUM(l.id)}</span>
+    <span class="t"><b>${esc(l.title)}${heatDots(l.heat)}</b><span>${l.hi} · ${n} questions</span></span>
+    <span class="sc">${st.best!=null ? `best<br>${st.best}/${n}` : ""}</span></button>`;
+}
+function renderLearn(){
+  const done = LESSONS.filter(lesDone).length;
+  const nextL = LESSONS.find(l => !lesDone(l));
+  const it = INTROS[APP.id] || {};
+  const parts = [];
+  LESSONS.forEach(l => {
+    const name = l.part ? l.part[0] : "";
+    if (!parts.length || parts[parts.length-1].name !== name) parts.push({ name, hi: l.part ? l.part[1] : "", ls: [] });
+    parts[parts.length-1].ls.push(l);
+  });
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="hero">
+      <span class="eyebrow">${esc(APP.hi)} · History for SSC</span>
+      <h1>${esc(APP.title)}</h1>
+      <p>${it.lead ? esc(it.lead) + " " : ""}${LESSONS.length} lessons and ${QS.length} exam-style questions. Each lesson starts with a short story, then the tables, tricks and traps, a quiz and a one-screen summary.</p>
+      <div class="meter" aria-label="Lessons done"><i style="width:${done/LESSONS.length*100}%"></i></div>
+      <div class="row between"><span class="muted num" style="font-size:13px">${done}/${LESSONS.length} lessons done</span>
+      ${nextL ? `<button class="btn pri sm" type="button" data-open="${nextL.id}">${done? "Continue" : "Start"}: ${esc(nextL.title)}</button>` : `<span class="muted" style="font-size:13px">All lessons done. Try a mock test.</span>`}</div>
+    </div>
+    ${it.tip ? `<div class="callout"><b>How to study it.</b> ${esc(it.tip)} ${esc(it.order || "")}</div>` : ""}
+    ${parts.map(p => `${p.name ? `<div class="grph"><h2>${esc(p.name)}</h2><span>${p.ls.length} lessons</span></div>${p.hi?`<p class="muted" style="font-size:13px;margin:-8px 0 2px">${p.hi}</p>`:""}` : ""}
+      <div class="lessons">${p.ls.map(l => lessonRow(l, nextL)).join("")}</div>`).join("")}
+    <p class="foot">The dots show how often a topic is asked in CGL &mdash; three dots means almost every shift. A plan for all of history, and revision across every era, is in ${goLink("History: Start here", APP.hub.id)}.</p>
+  </section>`;
+  $("#app").querySelectorAll("[data-open]").forEach(b => b.addEventListener("click", () => openLesson(b.dataset.open, "learn")));
+  bindGo($("#app"));
+}
+
+function blockHTML(b){
+  if (b.k==="p") return `<div class="plain"><p>${b.h}</p></div>`;
+  if (b.k==="hot") return `<div class="hot"><span class="lab">Why it is asked</span>${b.h}</div>`;
+  if (b.k==="story") return `<div class="story"><span class="lab">The story first · two minutes</span>${b.h}${b.key?`<p class="key"><b>Carry this into the tables:</b> ${esc(b.key)}</p>`:""}</div>`;
+  if (b.k==="trick") return `<div class="trick"><span class="lab">Trick</span>${b.h}</div>`;
+  if (b.k==="trap") return `<div class="trap"><span class="lab">Trap · don't mix these up</span>${b.h}</div>`;
+  if (b.k==="link") return `<div class="link"><span class="lab">Link it up</span>${b.h}</div>`;
+  if (b.k==="facts") return `<div class="block"><h3>${b.title}</h3><dl class="facts">${b.rows.map(r=>`<div><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join("")}</dl></div>`;
+  if (b.k==="tl") return `<div class="block"><h3>${b.title}</h3><ul class="tl">${b.rows.map(r=>`<li><span class="y">${r[0]}</span><span>${r[1]}</span></li>`).join("")}</ul></div>`;
+  if (b.k==="table") return `<div class="block"><h3>${b.title}</h3><div class="tbl"><table><thead><tr>${b.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${b.rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+  if (b.k==="fig") return `<div class="block"><h3>${b.title}</h3><figure class="fig">${b.svg}<figcaption>${b.cap}</figcaption></figure></div>`;
+  return "";
+}
+
+let LQ = null;
+function openLesson(id, step){
+  if (HUB || !L(id) || appOf(id) !== APP.id) { openApp(appOf(id), id); return; }   // the hub shows lessons in their own app
+  const l = L(id), i = LNUM(id);
+  if (step === "quiz") { LQ = { id, list: shuffle(byLesson(id)).map(q => ({q, perm:makePerm(q)})), i:0, score:0, picked:null }; }
+  const head = `<div class="lhead"><button class="back" type="button" id="lback">‹ Lessons</button></div>
+    <span class="eyebrow">${esc(APP.title)} · Lesson ${i} of ${LESSONS.length} · ${l.hi}</span><h1>${esc(l.title)}</h1>
+    <p class="muted" style="font-size:13px">Asked in CGL ${heatDots(l.heat)} ${l.heat===3?"— almost every shift":l.heat===2?"— often":"— now and then"}</p>
+    <div class="steps" role="tablist">
+      <button type="button" data-step="learn" aria-current="${step==="learn"?"step":"false"}">1 · Learn</button>
+      <button type="button" data-step="quiz" aria-current="${step==="quiz"?"step":"false"}">2 · Quiz</button>
+      <button type="button" data-step="sum" aria-current="${step==="sum"?"step":"false"}">3 · Summary</button>
+    </div>`;
+  let body = "";
+  if (step === "learn") {
+    body = `<div class="stack">${l.blocks.map(blockHTML).join("")}
+      <div class="row end"><button class="btn pri" type="button" id="toquiz">Take the quiz · ${byLesson(id).length} questions</button></div></div>`;
+  } else if (step === "quiz") {
+    body = `<div id="lq"></div>`;
+  } else {
+    const nxt = LESSONS[i];
+    body = `<div class="stack"><div class="block"><h3>Remember these</h3><ul class="sum">${l.sum.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>
+      <div class="row between"><button class="btn" type="button" id="relearn">Read again</button>
+      ${nxt ? `<button class="btn pri" type="button" id="nextles">Next: ${esc(nxt.title)}</button>` : `<button class="btn pri" type="button" id="tomock">Take a mock test</button>`}</div></div>`;
+    S.les[id] = Object.assign(S.les[id]||{}, {done:1}); save(); renderTop();
+  }
+  $("#app").innerHTML = `<section class="view stack">${head}${body}</section>`;
+  $("#lback").onclick = () => go("learn");
+  $("#app").querySelectorAll("[data-step]").forEach(b => b.onclick = () => openLesson(id, b.dataset.step));
+  if (step==="learn") $("#toquiz").onclick = () => openLesson(id,"quiz");
+  if (step==="quiz") renderLQ();
+  if (step==="sum") {
+    $("#relearn").onclick = () => openLesson(id,"learn");
+    const n = $("#nextles"); if (n) n.onclick = () => openLesson(LESSONS[i].id,"learn");
+    const m = $("#tomock"); if (m) m.onclick = () => go("mock");
+  }
+  window.scrollTo(0,0);
+}
+
+function optsHTML(q, perm, state){
+  return perm.map((oi, k) => {
+    let cls = "opt";
+    if (state.reveal) { if (oi === q.a) cls += " ok"; else if (oi === state.picked) cls += " no"; }
+    else if (state.sel === oi) cls += " sel";
+    return `<button type="button" class="${cls}" data-oi="${oi}" ${state.reveal?"disabled":""}><span class="k">${"ABCD"[k]}</span><span>${esc(q.o[oi])}</span></button>`;
+  }).join("");
+}
+function expHTML(q, picked){
+  const ok = picked === q.a;
+  return `<div class="exp">${ok ? `<b class="okl">Correct.</b>` : `<b class="nol">Answer: ${esc(q.o[q.a])}.</b>`} ${esc(q.e)}</div>`;
+}
+function metaHTML(q, no){
+  return `<div class="qmeta"><span class="qno">${no}</span><span class="tag">L${LNUM(q.t)} · ${esc(L(q.t).title)}</span>${q.p?`<span class="tag pyq" title="This fact comes up again and again in SSC papers">Repeatedly asked</span>`:""}
+  <button type="button" class="bm" data-bm="${q.id}" aria-pressed="${S.bm[q.id]?"true":"false"}" aria-label="Bookmark">${S.bm[q.id]?"★":"☆"}</button></div>`;
+}
+
+function renderLQ(){
+  const box = $("#lq");
+  if (LQ.i >= LQ.list.length) {
+    const n = LQ.list.length;
+    const st = S.les[LQ.id] || {}; st.best = Math.max(st.best||0, LQ.score); S.les[LQ.id] = st; save();
+    box.innerHTML = `<div class="stack"><div class="block stack"><span class="eyebrow">Quiz done</span>
+      <div class="scorebig"><span class="num">${LQ.score}</span><span class="muted">/ ${n} correct</span></div>
+      <p class="muted">${LQ.score===n ? "Full marks." : LQ.score >= n*0.8 ? "Strong. Review the ones you missed under Practice → Mistakes." : "Read the story and the Trap boxes once more, then retry. Missed questions are saved under Practice → Mistakes."}</p></div>
+      <div class="row between"><button class="btn" type="button" id="retry">Retry quiz</button><button class="btn pri" type="button" id="tosum">See summary</button></div></div>`;
+    $("#retry").onclick = () => openLesson(LQ.id,"quiz");
+    $("#tosum").onclick = () => openLesson(LQ.id,"sum");
+    return;
+  }
+  const it = LQ.list[LQ.i], q = it.q;
+  const reveal = LQ.picked !== null;
+  box.innerHTML = `<div class="stack"><div class="meter"><i style="width:${LQ.i/LQ.list.length*100}%"></i></div>
+    <article class="qcard">${metaHTML(q, `Q${LQ.i+1}/${LQ.list.length}`)}
+    <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {picked:LQ.picked, reveal})}</div>
+    ${reveal ? expHTML(q, LQ.picked) : ""}</article>
+    ${reveal ? `<div class="row end"><button class="btn pri" type="button" id="lqnext">${LQ.i+1 < LQ.list.length ? "Next question" : "Finish"}</button></div>` : `<p class="muted" style="font-size:13px">Score so far: <span class="num">${LQ.score}</span></p>`}</div>`;
+  box.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    if (LQ.picked !== null) return;
+    LQ.picked = +b.dataset.oi; const ok = LQ.picked === q.a; if (ok) LQ.score++; record(q, ok); renderLQ();
+  });
+  bindBM(box);
+  const nx = $("#lqnext"); if (nx) nx.onclick = () => { LQ.i++; LQ.picked = null; renderLQ(); window.scrollTo(0,0); };
+}
+
+function bindBM(root){
+  root.querySelectorAll("[data-bm]").forEach(b => b.onclick = (ev) => {
+    ev.stopPropagation();
+    const id = b.dataset.bm; if (S.bm[id]) delete S.bm[id]; else S.bm[id] = 1; save();
+    b.setAttribute("aria-pressed", S.bm[id] ? "true":"false"); b.textContent = S.bm[id] ? "★" : "☆";
+  });
+}
+
+/* ============================================================
+   PRACTICE
+   ============================================================ */
+let PF = "all", PSHOW = 20, PORDER = null, PPERM = {}, PPICK = {};
+const hasHot = () => LESSONS.some(l => l.heat === 3) && LESSONS.some(l => l.heat !== 3);
+function practiceList(){
+  let list = QS;
+  if (PF === "pyq") list = QS.filter(q => q.p);
+  else if (PF === "hot") list = QS.filter(q => L(q.t).heat === 3);
+  else if (PF === "wrong") list = QS.filter(q => S.ans[q.id] === 0);
+  else if (PF === "new") list = QS.filter(q => S.ans[q.id] === undefined);
+  else if (PF === "bm") list = QS.filter(q => S.bm[q.id]);
+  else if (PF !== "all") list = QS.filter(q => q.t === PF);
+  if (PORDER) { const pos = new Map(PORDER.map((id,i)=>[id,i])); list = list.slice().sort((a,b)=>(pos.get(a.id)??0)-(pos.get(b.id)??0)); }
+  return list;
+}
+function renderPractice(){
+  const wrongN = QS.filter(q => S.ans[q.id] === 0).length, bmN = QS.filter(q=>S.bm[q.id]).length;
+  const pyqN = QS.filter(q=>q.p).length, hotN = QS.filter(q=>L(q.t).heat===3).length;
+  const chips = [["all",`All ${QS.length}`],["new","Not tried"],["wrong",`Mistakes ${wrongN}`]]
+    .concat(hasHot() ? [["hot",`Most-asked topics ${hotN}`]] : [])
+    .concat([["pyq",`Repeatedly asked ${pyqN}`],["bm",`Starred ${bmN}`]])
+    .concat(LESSONS.map(l=>[l.id,`L${LNUM(l.id)} ${l.title}`]));
+  const list = practiceList();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Question bank · ${QS.length} questions</span><h1>Practice</h1>
+    <p class="muted">Tap an option to check it. Wrong answers go to <b>Mistakes</b> until you get them right. <b>Repeatedly asked</b> marks the facts that come up again and again in SSC papers${hasHot() ? "; <b>Most-asked topics</b> is every question from the three-dot lessons" : ""}.</p></div>
+    <div class="chips" role="group" aria-label="Filter">${chips.map(c=>`<button type="button" class="chip" data-f="${c[0]}" aria-pressed="${PF===c[0]}">${esc(c[1])}</button>`).join("")}</div>
+    <div class="row between"><span class="muted num" style="font-size:13px">${list.length} questions</span>
+      <div class="row"><button class="btn sm ghost" type="button" id="pshuf">${PORDER?"In order":"Shuffle"}</button></div></div>
+    <div class="stack" id="plist"></div>
+  </section>`;
+  $("#app").querySelectorAll("[data-f]").forEach(b => b.onclick = () => { PF = b.dataset.f; PSHOW = 20; PPICK = {}; renderPractice(); });
+  $("#pshuf").onclick = () => { PORDER = PORDER ? null : shuffle(QS.map(q=>q.id)); PSHOW = 20; renderPractice(); };
+  const chipOn = $(`.chip[aria-pressed="true"]`); if (chipOn) chipOn.scrollIntoView({block:"nearest", inline:"center"});
+  drawPList();
+}
+function pCard(q, idx){
+  if (!PPERM[q.id]) PPERM[q.id] = makePerm(q);
+  const picked = PPICK[q.id]; const reveal = picked !== undefined;
+  return `<article class="qcard" data-q="${q.id}">${metaHTML(q, "Q"+(idx+1))}<p class="qt">${esc(q.q)}</p>
+    <div class="opts">${optsHTML(q, PPERM[q.id], {picked: reveal?picked:null, reveal})}</div>${reveal?expHTML(q,picked):""}</article>`;
+}
+function drawPList(){
+  const list = practiceList(), box = $("#plist");
+  if (!list.length) { box.innerHTML = `<p class="empty">${PF==="wrong"?"No mistakes saved. Answer some questions first, or you've cleared them all.":PF==="bm"?"Nothing starred yet. Tap ☆ on any question.":"Nothing here."}</p>`; return; }
+  box.innerHTML = list.slice(0, PSHOW).map((q,i)=>pCard(q,i)).join("") + (list.length > PSHOW ? `<button class="btn" type="button" id="pmore">Show 20 more (${list.length-PSHOW} left)</button>` : "");
+  box.querySelectorAll(".qcard").forEach(bindCard);
+  const more = $("#pmore"); if (more) more.onclick = () => { PSHOW += 20; drawPList(); };
+}
+function bindCard(card){
+  card.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    const q = QS.find(x => x.id === card.dataset.q); if (PPICK[q.id] !== undefined) return;
+    PPICK[q.id] = +b.dataset.oi; record(q, PPICK[q.id] === q.a);
+    const idx = +card.querySelector(".qno").textContent.slice(1) - 1;
+    const tmp = document.createElement("div"); tmp.innerHTML = pCard(q, idx); const nc = tmp.firstElementChild;
+    card.replaceWith(nc); bindCard(nc);
+  });
+  bindBM(card);
+}
+
+/* ============================================================
+   MOCK TEST
+   ============================================================ */
+let M = null, MCFG = {n:25, scope:"all", neg:1}, LEAVE_TO = null;
+function mockPool(scope){
+  if (scope === "all") return QS;
+  if (scope === "pyq") return QS.filter(q=>q.p);
+  if (scope === "hot") return QS.filter(q=>L(q.t).heat===3);
+  if (scope === "wrong") return QS.filter(q=>S.ans[q.id]===0);
+  return QS.filter(q=>q.t===scope);
+}
+function renderMock(){
+  if (M && M.running) return drawMockRun();
+  if (M && M.done) return drawMockResult();
+  const hist = (S.mocks||[]).slice(-6).reverse();
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Timed, SSC pattern</span><h1>Mock test</h1>
+    <p class="muted">+2 for a right answer, &minus;0.5 for a wrong one, 36 seconds a question (CGL Tier-1 pace). Answers show only after you submit.</p></div>
+    <div class="block stack">
+      <fieldset><legend>Questions</legend><div class="radios">${[10,25,50,100].map(n=>`<label><input type="radio" name="mn" id="mn${n}" value="${n}" ${MCFG.n===n?"checked":""}><span>${n} · ${Math.round(n*36/60)} min</span></label>`).join("")}</div></fieldset>
+      <fieldset><legend>From</legend><select id="mscope" aria-label="Topics to draw from">
+        <option value="all">Everything (${QS.length} Q)</option>
+        ${hasHot() ? `<option value="hot">Most-asked topics only</option>` : ""}
+        <option value="pyq">Repeatedly asked only</option>
+        <option value="wrong">My mistakes</option>
+        ${LESSONS.map(l=>`<option value="${l.id}">L${LNUM(l.id)} · ${esc(l.title)}</option>`).join("")}
+      </select></fieldset>
+      <label class="row" style="gap:8px;font-weight:600"><input type="checkbox" id="mneg" ${MCFG.neg?"checked":""}> Negative marking (&minus;0.5)</label>
+      <div id="merr" class="muted" style="font-size:14px"></div>
+      <div class="row end"><button class="btn pri" type="button" id="mstart">Start test</button></div>
+    </div>
+    ${hist.length ? `<div class="block"><h3>Recent attempts</h3><div class="hist">${hist.map(h=>`<div><span>${esc(h.d)} · ${h.n} Q</span><span class="num">${h.score}/${h.max} · ${h.acc}%</span></div>`).join("")}</div></div>` : ""}
+  </section>`;
+  if ([...$("#mscope").options].some(o => o.value === MCFG.scope)) $("#mscope").value = MCFG.scope;
+  $("#mstart").onclick = () => {
+    MCFG.n = +(document.querySelector('input[name="mn"]:checked')||{value:25}).value;
+    MCFG.scope = $("#mscope").value; MCFG.neg = $("#mneg").checked ? 1 : 0;
+    const pool = mockPool(MCFG.scope);
+    if (!pool.length) { $("#merr").textContent = "No questions in that set yet. Pick another source."; return; }
+    const qs = shuffle(pool).slice(0, MCFG.n);
+    M = { running:true, list: qs.map(q=>({q, perm:makePerm(q)})), ans: qs.map(()=>null), mark: qs.map(()=>false), i:0, neg:MCFG.neg, secs: qs.length*36, start: Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000;
+    startTimer(); drawMockRun();
+  };
+}
+function startTimer(){
+  clearInterval(timerId);
+  timerId = setInterval(() => {
+    if (!M || !M.running) { clearInterval(timerId); return; }
+    const left = Math.max(0, Math.round((M.end - Date.now())/1000));
+    const el = $("#mtime"); if (el) { el.textContent = fmt(left); el.classList.toggle("low", left <= 60); }
+    if (left <= 0) submitMock();
+  }, 1000);
+}
+const fmt = s => `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+function drawMockRun(){
+  const it = M.list[M.i], q = it.q, left = Math.max(0, Math.round((M.end-Date.now())/1000));
+  const answered = M.ans.filter(a=>a!==null).length;
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="mbar"><span class="timer num ${left<=60?"low":""}" id="mtime">${fmt(left)}</span>
+      <span class="muted num" style="font-size:13px;flex:1">Q ${M.i+1}/${M.list.length} · ${answered} answered</span>
+      <button class="btn sm" type="button" id="mpal">${M.showPal?"Hide":"All Qs"}</button></div>
+    ${LEAVE_TO ? `<div class="confirm"><b>Leave the test?</b><span>Your answers so far will be scored now.</span><div class="row"><button class="btn sm pri" type="button" id="lvy">Submit and leave</button><button class="btn sm" type="button" id="lvn">Stay</button></div></div>` : ""}
+    ${M.showPal ? `<div class="block"><div class="pal">${M.list.map((_,k)=>`<button type="button" data-j="${k}" class="${M.ans[k]!==null?"a":""} ${M.mark[k]?"m":""} ${k===M.i?"cur":""}" aria-label="Question ${k+1}">${k+1}</button>`).join("")}</div>
+      <p class="muted" style="font-size:12px;margin-top:8px">Filled = answered · gold line = marked for review</p></div>` : ""}
+    <article class="qcard"><div class="qmeta"><span class="qno">Q${M.i+1}</span><span class="tag">L${LNUM(q.t)}</span>${M.mark[M.i]?`<span class="tag pyq">Marked</span>`:""}</div>
+      <p class="qt">${esc(q.q)}</p><div class="opts">${optsHTML(q, it.perm, {sel:M.ans[M.i], reveal:false})}</div></article>
+    <div class="row between"><button class="btn" type="button" id="mprev" ${M.i===0?"disabled":""}>‹ Prev</button>
+      <button class="btn ghost" type="button" id="mmark">${M.mark[M.i]?"Unmark":"Mark"}</button>
+      <button class="btn ghost" type="button" id="mclr" ${M.ans[M.i]===null?"disabled":""}>Clear</button>
+      <button class="btn ${M.i<M.list.length-1?"pri":""}" type="button" id="mnext" ${M.i===M.list.length-1?"disabled":""}>Next ›</button></div>
+    ${M.confirm ? `<div class="confirm"><b>Submit the test?</b><span>${M.list.length-answered} unanswered${M.mark.filter(Boolean).length?`, ${M.mark.filter(Boolean).length} marked for review`:""}.</span><div class="row"><button class="btn sm pri" type="button" id="msubY">Submit</button><button class="btn sm" type="button" id="msubN">Keep going</button></div></div>`
+      : `<button class="btn pri" type="button" id="msub">Submit test</button>`}
+  </section>`;
+  $("#app").querySelectorAll(".opt").forEach(b => b.onclick = () => { M.ans[M.i] = +b.dataset.oi; drawMockRun(); });
+  $("#mprev").onclick = () => { if (M.i>0){M.i--; drawMockRun();} };
+  $("#mnext").onclick = () => { if (M.i<M.list.length-1){M.i++; drawMockRun(); window.scrollTo(0,0);} };
+  $("#mmark").onclick = () => { M.mark[M.i] = !M.mark[M.i]; drawMockRun(); };
+  $("#mclr").onclick = () => { M.ans[M.i] = null; drawMockRun(); };
+  $("#mpal").onclick = () => { M.showPal = !M.showPal; drawMockRun(); };
+  $("#app").querySelectorAll("[data-j]").forEach(b => b.onclick = () => { M.i = +b.dataset.j; drawMockRun(); });
+  const s = $("#msub"); if (s) s.onclick = () => { M.confirm = true; drawMockRun(); };
+  const y = $("#msubY"); if (y) y.onclick = submitMock;
+  const n = $("#msubN"); if (n) n.onclick = () => { M.confirm = false; drawMockRun(); };
+  const lvy = $("#lvy"); if (lvy) lvy.onclick = () => { const t = LEAVE_TO; LEAVE_TO = null; submitMock(); go(t); };
+  const lvn = $("#lvn"); if (lvn) lvn.onclick = () => { LEAVE_TO = null; drawMockRun(); };
+}
+function showMockLeave(tab){ LEAVE_TO = tab; drawMockRun(); }
+function submitMock(){
+  if (!M || !M.running) return;
+  clearInterval(timerId);
+  M.running = false; M.done = true; M.confirm = false;
+  let c=0,w=0,sk=0; const per = {};
+  M.list.forEach((it,k) => {
+    const a = M.ans[k], t = it.q.t; per[t] = per[t] || {c:0,n:0}; per[t].n++;
+    if (a===null) sk++; else if (a===it.q.a) { c++; per[t].c++; S.ans[it.q.id]=1; } else { w++; S.ans[it.q.id]=0; }
+  });
+  const max = M.list.length*2, score = +(c*2 - (M.neg? w*0.5 : 0)).toFixed(1);
+  const used = Math.min(M.secs, Math.round((Date.now()-M.start)/1000));
+  M.res = {c,w,sk,score,max,used,per, acc: (c+w) ? Math.round(c*100/(c+w)) : 0};
+  const d = new Date(); const ds = d.toLocaleDateString("en-IN",{day:"numeric",month:"short"})+" "+d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
+  S.mocks = (S.mocks||[]).concat([{d:ds, n:M.list.length, score, max, acc:M.res.acc}]).slice(-20); save(); renderTop();
+  M.filter = "wrong";
+  if (TAB==="mock") drawMockResult();
+}
+function drawMockResult(){
+  const r = M.res;
+  const per = Object.keys(r.per).sort((a,b)=>LNUM(a)-LNUM(b)).map(t => `<div><span>L${LNUM(t)} · ${esc(L(t).title)}</span><span class="num">${r.per[t].c}/${r.per[t].n}</span></div>`).join("");
+  const rows = M.list.map((it,k)=>({it,k})).filter(({it,k}) => M.filter==="all" ? true : M.filter==="wrong" ? (M.ans[k]!==null && M.ans[k]!==it.q.a) : M.ans[k]===null);
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Result</span>
+    <div class="scorebig"><span class="num">${r.score}</span><span class="muted">/ ${r.max} marks</span></div></div>
+    <div class="kpis"><div class="kpi g"><span class="num">${r.c}</span><span>right</span></div><div class="kpi b"><span class="num">${r.w}</span><span>wrong</span></div><div class="kpi"><span class="num">${r.sk}</span><span>skipped</span></div><div class="kpi"><span class="num">${r.acc}%</span><span>accuracy</span></div></div>
+    <p class="muted num" style="font-size:13px">Time used ${fmt(r.used)} of ${fmt(M.secs)}</p>
+    <div class="block"><h3>By lesson</h3><div class="hist">${per}</div></div>
+    <div class="row between"><button class="btn" type="button" id="mnew">New test</button><button class="btn pri" type="button" id="mretry">Retake same questions</button></div>
+    <h2>Review</h2>
+    <div class="chips">${[["wrong",`Wrong ${r.w}`],["skip",`Skipped ${r.sk}`],["all",`All ${M.list.length}`]].map(c=>`<button class="chip" type="button" data-rf="${c[0]}" aria-pressed="${M.filter===c[0]}">${c[1]}</button>`).join("")}</div>
+    <div class="stack">${rows.length ? rows.map(({it,k}) => `<article class="qcard">${metaHTML(it.q, "Q"+(k+1))}<p class="qt">${esc(it.q.q)}</p><div class="opts">${optsHTML(it.q, it.perm, {picked:M.ans[k], reveal:true})}</div>${M.ans[k]===null?`<div class="exp"><b class="nol">Skipped. Answer: ${esc(it.q.o[it.q.a])}.</b> ${esc(it.q.e)}</div>`:expHTML(it.q, M.ans[k])}</article>`).join("") : `<p class="empty">Nothing in this list.</p>`}</div>
+  </section>`;
+  bindBM($("#app"));
+  $("#app").querySelectorAll("[data-rf]").forEach(b => b.onclick = () => { M.filter = b.dataset.rf; drawMockResult(); });
+  $("#mnew").onclick = () => { M = null; renderMock(); };
+  $("#mretry").onclick = () => {
+    const list = M.list.map(it=>({q:it.q, perm:makePerm(it.q)}));
+    M = { running:true, list, ans:list.map(()=>null), mark:list.map(()=>false), i:0, neg:MCFG.neg, secs:list.length*36, start:Date.now(), showPal:false, confirm:false };
+    M.end = M.start + M.secs*1000; startTimer(); drawMockRun();
+  };
+}
+
+/* ============================================================
+   REVISE — layered: a month out, a week out, the last hour
+   ============================================================ */
+let RV = "month", FC = null, FCSCOPE = "all";
+function reviseTabs(){
+  const t = [["month","30 days"],["week","7 days"],["last","Last moment"]];
+  if (TIMELINE.some(x => x.rows.length)) t.push(["time","Timeline"]);
+  t.push(["tricks","Tricks"],["traps","Traps"]);
+  if (TILES.length) t.push(["nums","Numbers"]);
+  if (!HUB) t.push(["flash","Flashcards"]);
+  return t;
+}
+function renderRevise(){
+  const tabs = reviseTabs();
+  if (!tabs.some(t => t[0] === RV)) RV = "month";
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="stack" style="gap:6px"><span class="eyebrow">Revision, layered by how long you have${HUB ? " · every era" : ""}</span><h1>Revise</h1>
+    <p class="muted">Start at <b>30 days</b> for every summary, drop to <b>7 days</b> for the most-asked lessons only, and open <b>Last moment</b> in the hour before the paper.</p></div>
+    <div class="seg" role="tablist">${tabs.map(t=>`<button type="button" role="tab" data-rv="${t[0]}" aria-selected="${RV===t[0]}">${t[1]}</button>`).join("")}</div>
+    <div id="rv" class="stack"></div>
+    ${HUB && RV !== "flash" ? `<div class="row">${S.les["rv:"+RV] ? `<span class="muted" style="font-size:14px">✓ You marked this sheet as revised.</span> <button class="btn sm ghost" type="button" id="rvundo">Undo</button>` : `<button class="btn sm revdone" type="button" id="rvdone">Mark this sheet as revised</button>`}</div>` : ""}
+  </section>`;
+  $("#app").querySelectorAll("[data-rv]").forEach(b => b.onclick = () => { RV = b.dataset.rv; renderRevise(); });
+  const rd = $("#rvdone"); if (rd) rd.onclick = () => { S.les["rv:"+RV] = {done:1}; save(); renderRevise(); };
+  const ru = $("#rvundo"); if (ru) ru.onclick = () => { delete S.les["rv:"+RV]; save(); renderRevise(); };
+  const box = $("#rv");
+  if (RV === "month") drawDigest(box, LESSONS, "Every lesson's summary in one scroll — " + (HUB ? "all of history" : "the whole app") + " in about " + Math.max(1, Math.round(LESSONS.length * 4 / 60)) + " hour" + (LESSONS.length * 4 >= 90 ? "s" : "") + ".");
+  if (RV === "week") { const w = LESSONS.filter(l=>l.heat===3); drawDigest(box, w.length ? w : LESSONS.filter(l=>l.heat>=2), "Only the three-dot lessons — what the paper asks almost every shift."); }
+  if (RV === "last") drawLastMoment(box);
+  if (RV === "time") drawTimeline(box);
+  if (RV === "tricks" || RV === "traps") {
+    const kind = RV==="tricks" ? "trick" : "trap";
+    const items = LESSONS.flatMap(l => l.blocks.filter(b=>b.k===kind).map(b=>({l, h:b.h})));
+    box.innerHTML = `<p class="muted" style="font-size:14px">${items.length} ${kind==="trick"?"memory tricks and mnemonics":"traps — the pairs SSC deliberately swaps"} from ${LESSONS.length} lessons.</p>`
+      + items.map(x => `<div class="${kind}"><span class="lab">${HUB ? esc(A(x.l.app).title) + " · " : ""}${esc(x.l.title)}</span>${x.h}</div>`).join("");
+  }
+  if (RV === "nums") box.innerHTML = `<div class="tiles">${TILES.map(t=>`<div class="tile"><span class="num">${t[0]}</span><span>${t[1]}</span></div>`).join("")}</div>`;
+  if (RV === "flash") drawFlash(box);
+}
+function digestGroups(list){
+  if (HUB) return APP.apps.map(a => ({ name: a.title, note: ERANOTE[a.era] || "", ls: list.filter(l => l.app === a.id) }));
+  const out = [];
+  list.forEach(l => {
+    const name = l.part ? l.part[0] : APP.title;
+    if (!out.length || out[out.length-1].name !== name) out.push({ name, note: out.length ? "" : (ERANOTE[APP.era] || ""), ls: [] });
+    out[out.length-1].ls.push(l);
+  });
+  return out;
+}
+function drawDigest(box, list, note){
+  box.innerHTML = `<input class="search" id="dgs" type="search" placeholder="Search the summaries (e.g. Lothal, jizya, Dandi)" aria-label="Search summaries">
+    <p class="muted" style="font-size:14px">${note}</p><div id="dgl" class="stack"></div>`;
+  const draw = () => {
+    const s = $("#dgs").value.trim().toLowerCase();
+    const html = digestGroups(list).map(g => {
+      const ls = g.ls.map(l => {
+        const pts = l.sum.filter(p => !s || p.toLowerCase().includes(s) || l.title.toLowerCase().includes(s));
+        if (!pts.length) return "";
+        return `<div class="block"><h3>${esc(l.title)} ${heatDots(l.heat)}</h3><ul class="sum">${pts.map(p=>`<li>${esc(p)}</li>`).join("")}</ul>
+          <p style="margin-top:8px;font-size:14px">${goLink("Open the lesson ›", appOf(l.id), l.id)}</p></div>`;
+      }).filter(Boolean);
+      if (!ls.length) return "";
+      return `<div class="grph"><h2>${esc(g.name)}</h2><span>${ls.length} lessons</span></div>
+        ${g.note && !s ? `<p class="muted" style="font-size:13px;margin:-8px 0 2px">${g.note}</p>` : ""}${ls.join("")}`;
+    }).join("");
+    $("#dgl").innerHTML = html || `<p class="empty">Nothing matches that.</p>`;
+    bindGo($("#dgl"));
+  };
+  $("#dgs").oninput = draw; draw();
+}
+function drawLastMoment(box){
+  box.innerHTML = `<div class="callout"><b>Read this, nothing else.</b> These are the pairings that decide marks — the ones candidates lose because two names got swapped.</div>
+    <input class="search" id="lms" type="search" placeholder="Search a name or term" aria-label="Search the last-moment sheet">
+    <div id="lml" class="stack"></div>`;
+  const draw = () => {
+    const s = $("#lms").value.trim().toLowerCase();
+    const html = LASTMOMENT.map(c => {
+      const rows = c.rows.filter(r => !s || (r[0]+" "+r[1]).toLowerCase().includes(s) || c.t.toLowerCase().includes(s));
+      if (!rows.length) return "";
+      return `<div class="block"><h3>${esc(c.t)}</h3><div class="lines">${rows.map(r=>`<div><span>${r[0]}</span><b>${r[1]}</b></div>`).join("")}</div></div>`;
+    }).filter(Boolean).join("");
+    $("#lml").innerHTML = html || `<p class="empty">Nothing matches that.</p>`;
+  };
+  $("#lms").oninput = draw; draw();
+}
+function drawTimeline(box){
+  box.innerHTML = `<input class="search" id="tls" type="search" placeholder="Search a year or an event (e.g. 1857, Panipat)" aria-label="Search the timeline"><div id="tll" class="stack"></div>`;
+  const draw = () => {
+    const s = $("#tls").value.trim().toLowerCase();
+    const html = TIMELINE.map(t => {
+      const rows = t.rows.filter(r => !s || (r[0]+" "+r[1]).toLowerCase().includes(s));
+      if (!rows.length) return "";
+      return `<div class="grph"><h2>${esc(G(t.era).name)}</h2><span>${rows.length} dates</span></div>
+        <div class="block"><ul class="tl">${rows.map(r=>`<li><span class="y">${r[0]}</span><span>${r[1]}</span></li>`).join("")}</ul></div>`;
+    }).filter(Boolean).join("");
+    $("#tll").innerHTML = html || `<p class="empty">No date matches that.</p>`;
+  };
+  $("#tls").oninput = draw; draw();
+}
+function drawFlash(box){
+  if (!FC) { const pool = FCSCOPE==="all" ? QS : FCSCOPE==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===FCSCOPE); FC = {list: shuffle(pool), i:0, flip:false, known:0}; }
+  const sel = `<select id="fcs" aria-label="Flashcard set"><option value="all">All questions</option><option value="wrong">My mistakes</option>${LESSONS.map(l=>`<option value="${l.id}">L${LNUM(l.id)} · ${esc(l.title)}</option>`).join("")}</select>`;
+  if (!FC.list.length || FC.i >= FC.list.length) {
+    box.innerHTML = `<div class="row">${sel}</div><div class="block stack"><h3>${FC.list.length ? "Deck finished" : "No cards in this set"}</h3>${FC.list.length?`<p class="muted">You knew ${FC.known} of ${FC.list.length} on first look.</p>`:""}<div class="row"><button class="btn pri" type="button" id="fcr">Shuffle and restart</button></div></div>`;
+    $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+    $("#fcr").onclick = () => { FC = null; drawFlash(box); }; return;
+  }
+  const q = FC.list[FC.i];
+  box.innerHTML = `<div class="row between">${sel}<span class="muted num" style="font-size:13px">${FC.i+1}/${FC.list.length}</span></div>
+    <button type="button" class="flash" id="fcard" aria-label="Flip card">
+      <span class="side">${FC.flip?"Answer":"Question · tap to flip"}</span>
+      <span class="front">${esc(q.q)}</span>
+      ${FC.flip ? `<span class="ans">${esc(q.o[q.a])}</span><span class="muted">${esc(q.e)}</span>` : ""}
+    </button>
+    <div class="row between"><button class="btn" type="button" id="fca" ${FC.flip?"":"disabled"}>Again later</button><button class="btn pri" type="button" id="fck" ${FC.flip?"":"disabled"}>Got it</button></div>`;
+  $("#fcs").value = FCSCOPE; $("#fcs").onchange = e => { FCSCOPE = e.target.value; FC = null; drawFlash(box); };
+  $("#fcard").onclick = () => { FC.flip = !FC.flip; drawFlash(box); };
+  $("#fca").onclick = () => { FC.list.push(q); FC.list.splice(FC.i,1); FC.flip=false; drawFlash(box); };
+  $("#fck").onclick = () => { FC.known++; FC.i++; FC.flip=false; drawFlash(box); };
+}
+
+/* ============================================================
+   PLAN MAKER
+   A plan is generated, never stored: only its length, the start date and your own ticks
+   live in localStorage, so it survives changes to the lessons. Reading a lesson or taking
+   its quiz in the app ticks that task by itself.
+   ============================================================ */
+const DAYMS = 86400000, MAXPD = 4;     // at most four new lessons a day, unless the must-do lessons need more
+const label = d => d + " day" + (d === 1 ? "" : "s");
+
+/* the closing revision days, built first so a plan is always exactly `days` long */
+function planTailDays(days){
+  const t = [];
+  const rv = (rv, l, s) => ({ k:"rev", label:l, sub:s, go:[APP.id, null, "revise"], rv });
+  if (HUB && days >= 30) APP.apps.filter(a => ["anc","med","mod"].includes(a.era)).forEach(a => t.push({ title:"Revision", sub:a.title, tasks:[
+    { k:"rev", label:`${a.title}: Revise → 30 days`, sub:"Every summary in the app", go:[a.id, null, "revise"] },
+    { k:"prac", label:`${a.title}: practise your mistakes`, sub:"Practice → Mistakes", go:[a.id, null, "practice"] },
+    { k:"mock", label:`${a.title}: a 25-question mock`, sub:"Mock tab", go:[a.id, null, "mock"] }]}));
+  if (days >= 15) t.push({ title:"Revision", sub:"Timeline, tricks and traps", tasks:[
+    rv("time", "Revise → Timeline, top to bottom", "Be able to place every date"),
+    rv("tricks", "Revise → Tricks, all of them", "The mnemonics"),
+    rv("traps", "Revise → Traps, all of them", "The pairs SSC swaps")]});
+  if (days >= 10) t.push({ title:"Revision", sub:"Full-length test", tasks: HUB
+    ? APP.apps.filter(a => ["anc","med","mod"].includes(a.era)).map(a => ({ k:"mock", label:`${a.title}: a 50-question mock, timed`, sub:"Then go through every mistake", go:[a.id, null, "mock"] }))
+    : [{ k:"mock", label:"A 50-question mock, timed", sub:"Mock tab · 30 min", go:[APP.id, null, "mock"] },
+       { k:"prac", label:"Go through every mistake it throws up", sub:"Practice → Mistakes", go:[APP.id, null, "practice"] }]});
+  t.push({ title:"The day before", sub:"and the hour before", tasks:[
+    rv("week", "Revise → 7 days: the most-asked lessons only", "About an hour"),
+    HUB ? rv("tricks", "Revise → Traps once more", "The swaps cost the most marks")
+        : { k:"flash", label:"Flashcards from your mistakes", sub:"Revise → Flashcards → My mistakes", go:[APP.id, null, "revise"], rv:"flash" },
+    rv("last", "Revise → Last moment, in the final hour", "The pairings sheet — nothing new today")]});
+  return t;
+}
+/* which lessons fit: every three-dot lesson always; then the rest, most-asked first, while there is room */
+function planPool(days){
+  const studyDays = Math.max(1, days - planTailDays(days).length), room = studyDays * MAXPD;
+  const must = LESSONS.filter(l => l.heat === 3);
+  const rest = LESSONS.filter(l => l.heat !== 3).slice().sort((a,b) => (b.heat - a.heat) || (pCount(b.id) - pCount(a.id)));
+  const pick = new Set(must.map(l => l.id));
+  rest.forEach(l => { if (pick.size < room) pick.add(l.id); });
+  return LESSONS.filter(l => pick.has(l.id));
+}
+function buildPlan(days){
+  const pool = planPool(days), tail = planTailDays(days);
+  const studyDays = Math.max(1, days - tail.length);
+  const out = [];
+  for (let d = 0; d < studyDays; d++) {   // spread evenly: one or two a day in a long plan, not a rush and then nothing
+    const mine = pool.slice(Math.round(d * pool.length / studyDays), Math.round((d+1) * pool.length / studyDays));
+    const prev = d > 0 ? out[d-1].lessons : null;
+    const tasks = [];
+    mine.forEach(l => tasks.push({ k:"read", id:l.id, label:`Read: ${l.title}`, sub:`${HUB ? A(l.app).title + " · " : ""}story first, then the tables`, go:[appOf(l.id), l.id, null] }));
+    mine.forEach(l => tasks.push({ k:"quiz", id:l.id, label:`Quiz: ${l.title}`, sub:"The lesson's step 2", go:[appOf(l.id), l.id, null] }));
+    if (prev && prev.length) tasks.push({ k:"recap", label:"Re-read yesterday's summaries", sub:prev.map(l=>l.title).join(" · "), go:[appOf(prev[0].id), prev[0].id, null] });
+    if (mine.length) tasks.push({ k:"prac", label:`Practise ${mine.length > 1 ? 30 : 20} questions on today's lessons`, sub:"Practice → pick the lesson", go:[appOf(mine[0].id), null, "practice"] });
+    else tasks.push({ k:"prac", label:"Catch up, then clear your Mistakes list", sub:"Practice → Mistakes", go:[HUB ? APP.apps[0].id : APP.id, null, "practice"] });
+    out.push({ title:"Day", sub: mine.length ? [...new Set(mine.map(l => HUB ? A(l.app).title : (l.part ? l.part[0] : APP.title)))].join(" + ") : "Catch-up", lessons: mine, tasks });
+  }
+  tail.forEach(x => out.push(x));
+  return { days, list: out, pool, dropped: LESSONS.filter(l => !pool.includes(l)) };
+}
+function planNote(days){
+  const p = buildPlan(days), per = p.pool.length / Math.max(1, days - planTailDays(days).length);
+  const pace = per <= 1.05 ? "about one lesson a day" : per <= 2.05 ? "one or two lessons a day" : "about " + Math.round(per) + " lessons a day";
+  return p.dropped.length
+    ? `Crash course: the ${p.pool.length} most-asked lessons, ${pace}. Leaves out ${p.dropped.length}.`
+    : `All ${p.pool.length} lessons, ${pace}, then ${planTailDays(days).length} revision day${planTailDays(days).length>1?"s":""}.`;
+}
+const autoDone = t => (t.k === "read" && !!lessonState(t.id).done) || (t.k === "quiz" && lessonState(t.id).best != null);
+function planState(){ return S.plan && APP.plans.includes(S.plan.days) ? S.plan : null; }
+
+function renderPlan(){
+  const st = planState();
+  if (!st) {
+    $("#app").innerHTML = `<section class="view stack">
+      <div class="stack" style="gap:6px"><span class="eyebrow">Plan maker${HUB ? " · all of history" : " · " + esc(APP.title)}</span><h1>How long do you have?</h1>
+      <p class="muted">Pick a length and you get what to read, quiz and practise each day, with revision days at the end. Tick the boxes as you go &mdash; lessons you finish ${HUB ? "in the History apps" : "here"} tick themselves.</p></div>
+      <div class="plancfg">${APP.plans.map(d => {
+        const pl = buildPlan(d);
+        return `<button type="button" class="pday" data-days="${d}" style="text-align:left;cursor:pointer;width:100%;border-width:1px">
+          <div style="padding:12px 14px;display:grid;gap:6px">
+            <div class="row between"><b style="font-family:var(--f-display);font-size:17px">${label(d)}</b>
+            <span class="num muted" style="font-size:12px">${pl.pool.length} lessons</span></div>
+            <span class="muted" style="font-size:13px">${planNote(d)}</span>
+            ${pl.dropped.length ? `<span style="font-size:12px;color:var(--bad)">Leaves out: ${pl.dropped.map(l=>esc(l.title)).join(" · ")}</span>` : `<span style="font-size:12px;color:var(--good)">Covers everything</span>`}
+          </div></button>`;
+      }).join("")}</div>
+      <p class="foot">A shorter plan does not squeeze the syllabus &mdash; it keeps every lesson that is asked almost every shift and drops the least-asked ones, and says which.${HUB ? "" : " For a plan across all of history, open " + goLink("History: Start here", APP.hub.id, null, "plan") + "."}</p>
+    </section>`;
+    $("#app").querySelectorAll("[data-days]").forEach(b => b.onclick = () => { S.plan = { days:+b.dataset.days, start: Date.now(), done:{} }; save(); renderPlan(); });
+    bindGo($("#app"));
+    return;
+  }
+  const pl = buildPlan(st.days), total = pl.list.length;
+  const today = Math.min(Math.max(Math.floor((Date.now() - st.start) / DAYMS), 0), total - 1);
+  const isDone = (t, key) => autoDone(t) || !!st.done[key];
+  const allTasks = pl.list.reduce((a,d)=>a+d.tasks.length, 0);
+  const doneTasks = pl.list.reduce((a,d,i)=>a + d.tasks.filter((t,j)=>isDone(t, `d${i}t${j}`)).length, 0);
+  $("#app").innerHTML = `<section class="view stack">
+    <div class="hero"><span class="eyebrow">${label(st.days)} plan · started ${new Date(st.start).toLocaleDateString("en-IN",{day:"numeric",month:"short"})}</span>
+      <h1>Day ${today+1} of ${total}</h1>
+      <p>${planNote(st.days)}</p>
+      <div class="meter" aria-label="Plan progress"><i style="width:${allTasks?doneTasks/allTasks*100:0}%"></i></div>
+      <div class="row between"><span class="muted num" style="font-size:13px">${doneTasks}/${allTasks} tasks done</span>
+        <button class="btn sm ghost" type="button" id="pchg">Change plan</button></div></div>
+    ${pl.dropped.length ? `<div class="trap"><span class="lab">Left out of this plan</span>${pl.dropped.map(l=>esc(l.title)).join(" · ")}. Open them if you find time.</div>` : ""}
+    ${pl.list.map((d,i) => {
+      const dn = d.tasks.filter((t,j)=>isDone(t, `d${i}t${j}`)).length, all = dn === d.tasks.length;
+      return `<details class="pday ${i===today?"cur":""} ${all?"allgood":""}" ${i===today?"open":""}>
+        <summary><span class="dno">${all?"✓ ":""}Day ${i+1}</span>
+          <span class="dt">${esc(d.title==="Day" ? d.sub : d.title + " · " + d.sub)}<small>${d.tasks.length} task${d.tasks.length>1?"s":""}${i===today?" · today":""}</small></span>
+          <span class="dp">${dn}/${d.tasks.length}</span></summary>
+        <div class="body">${d.tasks.map((t,j) => {
+          const key = `d${i}t${j}`, auto = autoDone(t), done = auto || !!st.done[key];
+          return `<div class="ptask-row"><button type="button" class="ptask" data-k="${key}" aria-pressed="${done}" ${auto?"disabled":""}>
+            <span class="box">${done?"✓":""}</span>
+            <span class="lbl">${esc(t.label)}${auto?`<span class="autotag">done in the lesson</span>`:""}<small>${esc(t.sub||"")}</small></span></button>
+            ${t.go ? `<button type="button" class="btn sm ghost" data-ptgo="${i}:${j}">Open</button>` : ""}</div>`;
+        }).join("")}</div></details>`;
+    }).join("")}
+    <p class="foot">“Today” is counted from the day you started, so a missed day stays visible instead of quietly disappearing.${HUB ? "" : " A plan for all of history is in " + goLink("History: Start here", APP.hub.id, null, "plan") + "."}</p>
+  </section>`;
+  $("#pchg").onclick = () => { if (confirm("Change the plan? Your ticks on this plan will be cleared.")) { S.plan = null; save(); renderPlan(); } };
+  $("#app").querySelectorAll("[data-k]").forEach(b => b.onclick = () => {
+    const k = b.dataset.k; if (st.done[k]) delete st.done[k]; else st.done[k] = 1; save(); renderPlan();
+  });
+  $("#app").querySelectorAll("[data-ptgo]").forEach(b => b.onclick = () => {
+    const [i, j] = b.dataset.ptgo.split(":").map(Number), t = pl.list[i].tasks[j];
+    if (t.rv) RV = t.rv;
+    if (t.k === "quiz" && t.go[0] === APP.id) { openLesson(t.id, "quiz"); return; }
+    openApp(t.go[0], t.go[1], t.go[2]);
+  });
+  bindGo($("#app"));
+  const cur = $(".pday.cur"); if (cur && cur.scrollIntoView) cur.scrollIntoView({block:"center"});
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+renderTop();
+const hashTab = () => (location.hash||"").replace("#","");
+go(TABS.includes(hashTab()) ? hashTab() : TABS[0]);
+/* the back button, or a link that only changes the fragment, should move tabs */
+window.addEventListener("hashchange", () => {
+  const t = hashTab();
+  if (TABS.includes(t) && t !== TAB && !(M && M.running)) go(t);
+});
+/* progress made in another History app (another tab, or synced from your account) */
+window.addEventListener("storage", e => { if (e.key && e.key !== KEY && APP.apps.some(a => a.key === e.key) && (TAB === "plan" || TAB === "start")) go(TAB); });
+
+</script>
+<style id="shabd-skin">
+/* ===== शब्दRegister skin: app colours + fonts (only when opened from the app) ===== */
+:root[data-skin="paper"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(150,128,90,.10) 31px, rgba(150,128,90,.10) 32px);--app-psize:auto;--app-card:#FFFCF6;--app-rule:#DCCFB2;--app-pri:#2F6F63;--app-ink:#221E17;--app-soft:#5E5547;--app-faint:#857B6A;--app-bg:#F3EEE3;--app-deep:#E9E1CF;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#F3EEE3;--sheet:#FFFCF6;--sunk:#E9E1CF;--ink:#221E17;--ink2:#5E5547;--rule:#DCCFB2;--blue:#2F6F63;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--accent:#A87E1F;--accent-bg:color-mix(in srgb, #A87E1F 16%, #FFFCF6);--good:#2F6F63;--good-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--bad:#8C2F39;--bad-bg:color-mix(in srgb, #8C2F39 14%, #FFFCF6);--warn-bg:color-mix(in srgb, #C99A2E 18%, #FFFCF6);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="paper"][data-theme="dark"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--sheet:#26211A;--sunk:#25201A;--ink:#EFE6D2;--ink2:#BDB195;--rule:#3B3429;--blue:#3F9A86;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3F9A86 22%, #26211A);--accent:#D9AE4B;--accent-bg:color-mix(in srgb, #D9AE4B 24%, #26211A);--good:#5FB9A3;--good-bg:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-bg:color-mix(in srgb, #D06B74 22%, #26211A);--warn-bg:color-mix(in srgb, #D9AE4B 26%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="paper"]:not([data-theme="light"]){--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,240,200,.035) 31px, rgba(255,240,200,.035) 32px);--app-psize:auto;--app-card:#26211A;--app-rule:#3B3429;--app-pri:#3F9A86;--app-ink:#EFE6D2;--app-soft:#BDB195;--app-faint:#968C75;--app-bg:#1B1813;--app-deep:#25201A;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#1B1813;--sheet:#26211A;--sunk:#25201A;--ink:#EFE6D2;--ink2:#BDB195;--rule:#3B3429;--blue:#3F9A86;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3F9A86 22%, #26211A);--accent:#D9AE4B;--accent-bg:color-mix(in srgb, #D9AE4B 24%, #26211A);--good:#5FB9A3;--good-bg:color-mix(in srgb, #5FB9A3 22%, #26211A);--bad:#D06B74;--bad-bg:color-mix(in srgb, #D06B74 22%, #26211A);--warn-bg:color-mix(in srgb, #D9AE4B 26%, #26211A);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin="indigo"]{--app-pattern:radial-gradient(rgba(61,92,240,.10) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#FFFFFF;--app-rule:#CBD3EC;--app-pri:#3D5CF0;--app-ink:#0F1B3D;--app-soft:#4A5680;--app-faint:#67739C;--app-bg:#EEF1FA;--app-deep:#E1E6F5;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#EEF1FA;--sheet:#FFFFFF;--sunk:#E1E6F5;--ink:#0F1B3D;--ink2:#4A5680;--rule:#CBD3EC;--blue:#3D5CF0;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #3D5CF0 14%, #FFFFFF);--accent:#D9831A;--accent-bg:color-mix(in srgb, #D9831A 16%, #FFFFFF);--good:#147D53;--good-bg:color-mix(in srgb, #147D53 14%, #FFFFFF);--bad:#C8402F;--bad-bg:color-mix(in srgb, #C8402F 14%, #FFFFFF);--warn-bg:color-mix(in srgb, #F7C548 18%, #FFFFFF);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}
+:root[data-skin="indigo"][data-theme="dark"]{--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--sheet:#121D47;--sunk:#0E1839;--ink:#EEF2FF;--ink2:#A7B3DA;--rule:#22306A;--blue:#6F86FF;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #6F86FF 22%, #121D47);--accent:#F7B24D;--accent-bg:color-mix(in srgb, #F7B24D 24%, #121D47);--good:#45C08A;--good-bg:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-bg:color-mix(in srgb, #F07B6E 22%, #121D47);--warn-bg:color-mix(in srgb, #F7C548 26%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}
+@media (prefers-color-scheme: dark){:root[data-skin="indigo"]:not([data-theme="light"]){--app-pattern:radial-gradient(rgba(140,160,255,.08) 1px, transparent 1.4px);--app-psize:24px 24px;--app-card:#121D47;--app-rule:#22306A;--app-pri:#6F86FF;--app-ink:#EEF2FF;--app-soft:#A7B3DA;--app-faint:#8A97C4;--app-bg:#0B1433;--app-deep:#0E1839;--app-display:"Bricolage Grotesque", system-ui, sans-serif;--app-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#0B1433;--sheet:#121D47;--sunk:#0E1839;--ink:#EEF2FF;--ink2:#A7B3DA;--rule:#22306A;--blue:#6F86FF;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #6F86FF 22%, #121D47);--accent:#F7B24D;--accent-bg:color-mix(in srgb, #F7B24D 24%, #121D47);--good:#45C08A;--good-bg:color-mix(in srgb, #45C08A 22%, #121D47);--bad:#F07B6E;--bad-bg:color-mix(in srgb, #F07B6E 22%, #121D47);--warn-bg:color-mix(in srgb, #F7C548 26%, #121D47);--f-display:"Bricolage Grotesque", system-ui, sans-serif;--f-body:"Figtree", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:dark;}}
+:root[data-skin] body{background-color:var(--app-bg);background-image:var(--app-pattern);background-size:var(--app-psize);background-attachment:fixed}
+:root[data-skin] h1,:root[data-skin] h2{letter-spacing:-.01em}
+
+/* ===== Desktop layout (PC / tablet landscape) ===== */
+@media (min-width: 1024px){
+  :root{--side:236px}
+  body{padding-left:var(--side);font-size:16.5px}
+  .top{border-bottom:1px solid var(--rule)}
+  .top-in{max-width:1320px;padding:16px 36px}
+  .brand{font-size:21px}
+  .brand small{font-size:13px}
+  .stat{font-size:13px}
+  .wrap{max-width:1320px;padding:0 36px 56px}
+  .view{padding-top:28px}
+  h1{font-size:34px} h2{font-size:22px} h3{font-size:17px}
+
+  /* bottom tab bar becomes a left sidebar */
+  .nav{top:0;bottom:0;left:0;right:auto;width:var(--side);height:auto;border-top:0;border-right:1px solid var(--rule);padding:84px 14px 20px;display:block;overflow:auto}
+  .nav-in{display:flex;flex-direction:column;gap:4px;height:auto;max-width:none;margin:0}
+  .nav-in::before{content:"Sections";display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);padding:0 14px 8px}
+  .nav button{flex-direction:row;justify-content:flex-start;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;font-size:15px;min-height:0;height:auto;width:100%;text-align:left}
+  .nav button svg{width:20px;height:20px;flex-shrink:0}
+  .nav button:hover{background:var(--sunk)}
+  .nav button[aria-current="page"]{background:var(--blue-bg)}
+  .nav button[aria-current="page"] span{border-bottom:0!important}
+
+  /* home: intro beside progress */
+  .hero{grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);column-gap:48px;align-items:end;padding-bottom:10px}
+  .hero > .eyebrow,.hero > h1,.hero > p{grid-column:1}
+  .hero > .meter{grid-column:2;grid-row:3;align-self:center}
+  .hero > .row{grid-column:2;grid-row:2;align-self:end}
+
+  /* lesson reader: facts, timelines, tricks sit side by side */
+  .lhead{margin-bottom:0}
+  .steps{max-width:640px}
+  .steps + .stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+  .steps + .stack > .plain,.steps + .stack > .row,.steps + .stack > p,.steps + .stack > .fig,.steps + .stack > h2,.steps + .stack > .tbl{grid-column:1/-1}
+  .steps + .stack > .plain{max-width:86ch;font-size:17px}
+  .steps + .stack > .hot,.steps + .stack > .story{grid-column:1/-1}
+  .steps + .stack > .story{max-width:none;padding:20px 24px;font-size:17.5px}
+  .steps + .stack > .story p{max-width:80ch}
+  .steps + .stack:not(:has(> .block ~ .block)) > .block{grid-column:1/-1}
+  .block,.qcard{padding:18px 20px;border-radius:14px}
+
+  /* quizzes and question bank */
+  #lq > .stack{display:grid;grid-template-columns:minmax(0,1fr);max-width:980px;gap:16px}
+  .opts{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .qt{font-size:18px}
+  #plist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #plist .opts{grid-template-columns:minmax(0,1fr)}
+  .chips{flex-wrap:wrap;overflow:visible}
+
+  /* mock test: question with the answer grid alongside */
+  .mbar{top:calc(env(safe-area-inset-top,0px) + 67px)}
+  .view > .qcard{max-width:1000px}
+  .view > .row.between{max-width:1000px}
+  .view > #msub{max-width:1000px;width:100%}
+  .view > .block.stack{max-width:760px}
+  .pal{grid-template-columns:repeat(auto-fill,minmax(46px,1fr))}
+  .kpis{max-width:760px}
+
+  /* revise: summary cards and sheets in columns */
+  #rv > .stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #rv > .stack > .grph,#rv > .stack > p,#rv > .stack > .search,#rv > .stack > .callout{grid-column:1/-1}
+  #dgl,#lml,#tll{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  #dgl > .grph,#dgl > p,#lml > p,#tll > .grph{grid-column:1/-1}
+  #rv .search,#rv > #dgl ~ .search{max-width:520px}
+  .tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .flash{min-height:300px;max-width:760px;margin:0 auto;padding:32px 36px}
+  .flash .front{font-size:22px}
+
+  /* learn: era cards across the top */
+  .eras{grid-template-columns:repeat(5,minmax(0,1fr))}
+  .lessons{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;border-top:0}
+  .les{background:var(--sheet);border:1px solid var(--rule);border-radius:16px;padding:16px 18px;transition:transform .15s ease,box-shadow .15s ease,border-color .15s}
+  .les:hover{transform:translateY(-2px);border-color:var(--blue);box-shadow:0 14px 30px -22px rgba(0,0,0,.45)}
+  .les.next{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
+
+  /* hub: the five apps in two columns */
+  .appcs{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  /* plan: day cards in two columns, the open one full width */
+  .plancfg{grid-template-columns:repeat(2,minmax(0,1fr));display:grid;gap:12px}
+  .view > .pday{max-width:none}
+  .pday .body{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pday .body > .row{grid-column:1/-1}
+}
+@media (min-width: 1500px){
+  #plist,#dgl,#lml,#tll{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .plancfg{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+</style>
+<script id="shabd-deeplink">
+(function(){
+  var l; try{ l = new URLSearchParams(location.search).get('lesson'); }catch(e){}
+  if(!l) return;
+  function run(){
+    try{
+      if(typeof openLesson === 'function' && typeof LESSONS !== 'undefined'){ if(LESSONS.some(function(x){ return x.id === l; })) openLesson(l, 'learn'); }
+      else if(typeof openRule === 'function'){ var n = parseInt(String(l).replace(/\D/g, ''), 10); if(n) openRule(n, 'learn'); }
+      else if(typeof COURSE !== 'undefined' && typeof go === 'function'){ var i = COURSE.findIndex(function(c){ return c.id === l; }); if(i >= 0) go({ name: 'lesson', i: i, step: 0, ans: {}, score: 0 }); }
+    }catch(e){}
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(run, 30); }); else setTimeout(run, 30);
+})();
+</script>
+</body>
+</html>
