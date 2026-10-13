@@ -461,6 +461,38 @@
   .dq-seg button{ flex:1; border:1px solid var(--rule); background:var(--paper); color:var(--ink); border-radius:10px; padding:9px 0; font:inherit; font-weight:700; cursor:pointer; }
   .dq-seg button.on{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
   .dq-tags{ display:flex; flex-wrap:wrap; gap:8px; }
+  /* study planner */
+  .pl-grp > span{ display:flex; align-items:center; gap:6px; }
+  .pl-mini{ border:0; background:none; color:var(--teal, #2F6F63); font:inherit; font-size:12px; font-weight:700; cursor:pointer; padding:0 2px; text-decoration:underline; }
+  .dq-tog small{ font-weight:700; opacity:.65; margin-left:2px; }
+  .pl-row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:10px; }
+  .pl-num{ display:inline-flex; align-items:center; gap:6px; font-size:14px; color:var(--ink-soft); }
+  .pl-num input{ width:72px; padding:6px 8px; border:1px solid var(--rule); border-radius:10px; background:var(--paper); color:var(--ink); font:inherit; }
+  .pl-sum p{ margin:6px 0 0; }
+  .pl-warn{ color:var(--maroon, #8C2F39); font-weight:600; }
+  .pl-ok{ color:var(--teal, #2F6F63); font-weight:600; }
+  .pl-meter{ height:8px; border-radius:99px; background:var(--rule); overflow:hidden; margin:10px 0 4px; }
+  .pl-meter i{ display:block; height:100%; background:var(--teal, #2F6F63); border-radius:99px; }
+  .pl-acts{ justify-content:flex-start; flex-wrap:wrap; }
+  .pl-days{ display:grid; gap:10px; margin:14px 0; }
+  .pl-day{ background:var(--card); border:1px solid var(--rule); border-radius:var(--radius-lg); overflow:hidden; }
+  .pl-day > summary{ list-style:none; cursor:pointer; display:grid; grid-template-columns:auto 1fr auto; gap:10px; align-items:center; padding:12px 14px; }
+  .pl-day > summary::-webkit-details-marker{ display:none; }
+  .pl-dno{ font-weight:800; font-size:13px; background:var(--paper); border:1px solid var(--rule); border-radius:99px; padding:2px 10px; white-space:nowrap; }
+  .pl-day.cur .pl-dno{ background:var(--teal, #2F6F63); color:#fff; border-color:transparent; }
+  .pl-day.full .pl-dno{ color:var(--teal, #2F6F63); }
+  .pl-dt{ font-weight:700; min-width:0; }
+  .pl-dt small{ display:block; font-weight:500; font-size:12px; color:var(--ink-soft); }
+  .pl-dp{ font-size:12px; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
+  .pl-body{ border-top:1px dashed var(--rule); padding:8px 14px 12px; display:grid; gap:6px; }
+  .pl-task{ display:grid; grid-template-columns:26px 1fr auto; gap:10px; align-items:center; }
+  .pl-tick{ width:24px; height:24px; border-radius:7px; border:1.6px solid var(--rule); background:var(--paper); color:#fff; font-weight:800; cursor:pointer; padding:0; }
+  .pl-tick.on{ background:var(--teal, #2F6F63); border-color:var(--teal, #2F6F63); }
+  .pl-tick:disabled{ cursor:default; }
+  .pl-lbl b{ font-weight:600; }
+  .pl-lbl em{ font-style:normal; font-size:11px; font-weight:700; color:var(--teal, #2F6F63); }
+  .pl-lbl small{ display:block; font-size:12px; color:var(--ink-soft); }
+  .pl-go{ padding:4px 12px; font-size:13px; }
   .dq-tog{ border:1px solid var(--rule); background:var(--paper); color:var(--ink-soft); border-radius:999px; padding:6px 12px; font:inherit; font-size:13.5px; font-weight:600; cursor:pointer; }
   .dq-tog.on{ border-color:var(--teal); background:color-mix(in srgb, var(--teal) 14%, var(--card)); color:var(--ink); }
   .dq-tog.on::before{ content:'✓ '; color:var(--teal); }
@@ -1934,6 +1966,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="app.js?v=80a1a0ca"></script>
+<script src="app.js?v=23dae5ec"></script>
 </body>
 </html>

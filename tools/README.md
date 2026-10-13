@@ -52,11 +52,22 @@ tools/
 - Question ids come from the question text, so **don't give two questions the same wording**, and
   rewording a question resets its Mistakes history. `build_app.py` stops if two questions match.
 
-## History apps (`tools/history/`)
+## Workbook apps: History and Computer Knowledge
+
+The History pages and Computer Knowledge share one engine and look in `tools/workbook/`
+(`head.html`, `engine.js`, `tail.html`, and `lib.js`, which loads a data folder, checks it and writes a page).
+Each family has its own data folder and build script. Edit the data, never the built pages.
+
+A lesson is the usual object, plus a `story` block (`h`, and a one-line `key`) that opens it in plain words.
+A question may carry an 8th field: the paper candidates reported it from (shown as a 📜 tag and a
+"Reported in papers" filter). An app may have a `HEATMAP` (lessons × exams, 0–3, with the exam pattern and
+tips), shown on Learn and as the first Revise tab. Plans are worked out from the lessons' `heat`, so a new
+lesson joins the plans by itself.
+
+### History (`tools/history/`)
 
 The six History pages — `study-history.html` (the hub) and `study-history-ancient`, `-medieval`, `-modern`,
-`study-art-culture`, `study-world-history` — are built from one data set by `tools/history/build.js`.
-Edit the files in `tools/history/`, never the built pages.
+`study-art-culture`, `study-world-history`.
 
 ```
 tools/history/
@@ -67,17 +78,25 @@ tools/history/
   data/40_revise.js   timeline, last-moment cards, number tiles (each tagged with its era)
   data/41_stories.js  the two-minute story that opens each of L1–L30, and the hub's app intros
   data/flags.json     which of the 2x questions are marked "repeatedly asked"
-  src/head.html, src/engine.js, src/tail.html   the look and the engine every page shares
 ```
 
-After a change:
+After a change: `node tools/history/build.js`, then for each subject app
+`node tools/index_app.js <file> <id> gs` (ids `histancient`, `histmedieval`, `histmodern`, `artculture`,
+`worldhist`; the hub has no questions and is not indexed), then `node tools/check_app.js <file>`.
 
-1. `node tools/history/build.js`
-2. For each subject app: `node tools/index_app.js <file> <id> gs` — ids `histancient`, `histmedieval`,
-   `histmodern`, `artculture`, `worldhist` (the hub has no questions and is not indexed).
-3. `node tools/check_app.js <file>` for each subject app.
-4. Bump `VERSION` in `sw.js` (or run `node tools/stamp.js` if `app.js` changed).
+### Computer Knowledge (`tools/computer/`)
 
-A lesson is the same object as in the other apps, plus a `story` block (`h`, and a one-line `key`).
-A plan needs nothing from the data: it is worked out from the lessons' `heat`, so a new lesson joins the plans by itself.
+```
+tools/computer/
+  build.js                    data → study-computer.html
+  data/10_hardware.js         C1–C6, with their questions, last-moment cards and tiles
+  data/11_software_office.js  C7–C11
+  data/12_internet_network_security.js  C12–C17
+  data/20_reported.js         questions candidates reported after a paper, each with that paper
+  data/40_exam.js             heat map, exam pattern, tips, intro
+```
 
+After a change: `node tools/computer/build.js`, `node tools/index_app.js study-computer.html computer gs`,
+`node tools/check_app.js study-computer.html`.
+
+For either, bump `VERSION` in `sw.js` (or run `node tools/stamp.js` if `app.js` changed).

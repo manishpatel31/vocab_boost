@@ -98,6 +98,7 @@
     histmodern:   { title: 'Modern India',             file: 'study-history-modern.html',   key: 'history_modern_v1' },
     artculture:   { title: 'Art & Culture',            file: 'study-art-culture.html',      key: 'art_culture_v1' },
     worldhist:    { title: 'World History & Who\u2019s Who', file: 'study-world-history.html', key: 'world_history_v1' },
+    computer: { title: 'Computer Knowledge',           file: 'study-computer.html',     key: 'computer_knowledge_v1' },
     polity:   { title: 'Indian Polity',                file: 'study-polity.html',       key: 'polity_pyq_workbook_v1' },
     economics:{ title: 'Indian Economy',               file: 'study-economics.html',    key: 'economics_pyq_workbook_v1' },
     formulas: { title: 'Maths Formula Book',           file: 'study-maths-formulas.html', key: 'maths_formula_book_v1' },
@@ -132,6 +133,7 @@
    ['histmodern', '🇮🇳', 'आधुनिक भारत', 'Plassey to 1947 and after — the Company, Viceroys, 1857, reformers, the press, the Congress, Gandhi, revolutionaries, unsung heroes and the integration of India.', 12, 296, '#B5487A'],
    ['worldhist', '🌍', 'विश्व इतिहास · कौन क्या', 'Ancient civilisations to the Age of Discovery, revolutions and the World Wars, plus travellers, titles, books and slogans.', 3, 77, '#3E6FA8']
   ].forEach(function(x){ var m = STUDY[x[0]]; m.subj = 'gs'; m.gsub = 'history'; m.ico = x[1]; m.hi = x[2]; m.desc = x[3]; m.meta = x[4] + ' lessons · ' + x[5] + ' questions'; m.color = x[6]; m.lessons = x[4]; m.unit = 'lessons'; });
+  STUDY.computer.subj = 'gs'; STUDY.computer.gsub = 'computer'; STUDY.computer.core = 1; STUDY.computer.ico = '\ud83d\udcbb'; STUDY.computer.hi = 'कंप्यूटर ज्ञान · CGL · CHSL · NTPC'; STUDY.computer.desc = 'Hardware to cyber security for the SSC CGL and CHSL Tier 2 computer module and RRB NTPC — plain-words lessons, shortcuts, full forms, an exam heat map and questions reported from past papers.'; STUDY.computer.meta = '17 lessons · 408 questions'; STUDY.computer.color = '#2E6DA4'; STUDY.computer.lessons = 17; STUDY.computer.unit = 'lessons';
   STUDY.artculture.subj = 'gs'; STUDY.artculture.ico = '🎨'; STUDY.artculture.hi = 'कला एवं संस्कृति'; STUDY.artculture.desc = 'Classical dance and music, temples and caves, painting, crafts, theatre and puppets, literature and languages, and India\u2019s UNESCO heritage.'; STUDY.artculture.meta = '5 lessons · 120 questions'; STUDY.artculture.color = '#C2571A'; STUDY.artculture.lessons = 5; STUDY.artculture.unit = 'lessons';
   STUDY.polity.subj = 'gs'; STUDY.polity.ico = '📜'; STUDY.polity.hi = 'भारतीय राजव्यवस्था · PYQ'; STUDY.polity.desc = 'The whole Constitution the SSC way — Parts, Schedules, key Articles, President to Parliament, emergencies and amendments.'; STUDY.polity.meta = '20 lessons · 481 questions'; STUDY.polity.color = '#3A4F9A';
   STUDY.economics.subj = 'gs'; STUDY.economics.ico = '💹'; STUDY.economics.hi = 'भारतीय अर्थव्यवस्था · PYQ'; STUDY.economics.desc = 'Demand to GDP, inflation, RBI & banking, budget, GST, 1991 reforms and trade — built from past SSC questions.'; STUDY.economics.meta = '20 lessons · 530 questions'; STUDY.economics.color = '#1E7A8C';
@@ -157,7 +159,7 @@
   var GS_SUBJECTS = [
     ['history', 'History', 'इतिहास'], ['culture', 'Art & Culture', 'कला एवं संस्कृति'], ['polity', 'Polity', 'राजव्यवस्था'],
     ['geography', 'Geography', 'भूगोल'], ['economy', 'Economy', 'अर्थव्यवस्था'], ['science', 'Science', 'विज्ञान'],
-    ['staticgk', 'Static GK', 'स्थैतिक सामान्य ज्ञान'], ['current', 'Current Affairs', 'समसामयिकी']
+    ['staticgk', 'Static GK', 'स्थैतिक सामान्य ज्ञान'], ['computer', 'Computer', 'कंप्यूटर'], ['current', 'Current Affairs', 'समसामयिकी']
   ];
   STUDY.bns.gsub = 'polity'; STUDY.schemes.gsub = 'economy'; STUDY.iprplans.gsub = 'economy'; STUDY.census.gsub = 'geography';
   STUDY.festivals.gsub = 'culture'; STUDY.folkdances.gsub = 'culture'; STUDY.sports.gsub = 'staticgk'; STUDY.intlorgs.gsub = 'staticgk';
@@ -202,7 +204,7 @@
         '<p>Every question you got wrong in any mini app or mock — practise them until they’re gone.</p><div class="hub-meta"><span>' + (totalWrong ? totalWrong + ' waiting' : 'Nothing to fix yet') + '</span><b>Open ›</b></div></button>' +
       '<button class="hub-card hub-act" data-hub-act="mock" style="--hub-c:var(--teal);"><div class="hub-top"><div class="hub-ico">⏱️</div><div><h3>Mixed mock test</h3><div class="hi">English + Maths + Reasoning + GS · timed</div></div>' + (last ? '<div class="hub-big">' + last.score + '<small>/' + last.max + '</small></div>' : '') + '</div>' +
         '<p>Vocab, Grammar, ' + mathQIds().length + ' Maths, ' + reasoningIds().length + ' Reasoning and ' + gsQIds().length + ' GS apps in one SSC-style paper, +2 / −0.5, with a subject-wise report.</p><div class="hub-meta"><span>' + (hist.length ? hist.length + ' taken · last ' + agoText(last.at).replace('Opened ', '') : 'Not taken yet') + '</span><b>Start ›</b></div></button>' +
-      weakHubCard() +
+      weakHubCard() + plannerHubCard() +
       '</div></section>';
   }
   function weakHubCard(){
@@ -325,7 +327,7 @@
       '<div class="hub-stats"><span><b>' + ve.length + '</b> words</span><span><b>' + mem + '</b> memorized</span>' + (due ? '<span class="hub-wrong"><b>' + due + '</b> due</span>' : '') + '</div>' +
       '<div class="hub-meta"><span>Library · Spelling Bank · Roots</span><b>Open ›</b></div></button>';
   }
-  var SUBJ_ICO = { maths: '➗', reasoning: '🧩', english: '🔤', history: '🏺', culture: '🎭', polity: '⚖️', geography: '🗺️', economy: '💰', science: '🔬', staticgk: '📚', current: '📰', other: '📘' };
+  var SUBJ_ICO = { maths: '➗', reasoning: '🧩', english: '🔤', history: '🏺', culture: '🎭', polity: '⚖️', geography: '🗺️', economy: '💰', science: '🔬', staticgk: '📚', computer: '💻', current: '📰', other: '📘' };
   function subjIds(key){
     return gsIds().filter(function(id){ return (STUDY[id].gsub || 'other') === key; }).sort(function(a, b){ return (STUDY[b].core || 0) - (STUDY[a].core || 0); });
   }
@@ -433,7 +435,7 @@
     var jump = ev.target.closest('[data-hub-jump]');
     if(jump){ var t = document.getElementById('hubsub-' + jump.dataset.hubJump); if(t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
     var act = ev.target.closest('[data-hub-act]');
-    if(act){ if(act.dataset.hubAct === 'mistakes') openMistakes(); else if(act.dataset.hubAct === 'weak') openWeak(); else openMock(); return; }
+    if(act){ if(act.dataset.hubAct === 'mistakes') openMistakes(); else if(act.dataset.hubAct === 'weak') openWeak(); else if(act.dataset.hubAct === 'planner') openPlanner(); else openMock(); return; }
     var h = ev.target.closest('[data-home-act]');
     if(h) homeAction(h.dataset.homeAct, h);
   }
@@ -831,7 +833,7 @@
   function mathIds(){ return Object.keys(STUDY).filter(function(id){ return STUDY[id].subj === 'maths'; }); }
   function mathQIds(){ return mathIds().filter(function(id){ return !STUDY[id].noq; }); }
   function reasoningIds(){ return Object.keys(STUDY).filter(function(id){ return STUDY[id].subj === 'reasoning'; }); }
-  var STUDY_EXTRA = { mocks: { key: 'shabdMockHistory', title: 'Mixed mock history' }, tracker: { key: 'shabdTracker', title: 'Study tracker' }, todo: { key: 'shabdTodo', title: 'Tasks' } };
+  var STUDY_EXTRA = { mocks: { key: 'shabdMockHistory', title: 'Mixed mock history' }, tracker: { key: 'shabdTracker', title: 'Study tracker' }, todo: { key: 'shabdTodo', title: 'Tasks' }, planner: { key: 'shabdPlanner', title: 'Study planner' } };
   function studyMod(id){ return STUDY[id] || STUDY_EXTRA[id]; }
   // ================= Study tracker: one record per visit to a mini app =================
   // Stored in localStorage 'shabdTracker' and synced like the mini apps (users/{uid}/study/tracker).
@@ -1222,7 +1224,7 @@
 
   // ---- the practice / mock screen ----
   var drill = null, drillOpen = false, drillTimer = null;
-  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments', history: 'History', histancient: 'Ancient India', histmedieval: 'Medieval India', histmodern: 'Modern India', artculture: 'Art & Culture', worldhist: 'World History', polity: 'Polity', economics: 'Economy', space: 'Space', physics: 'Physics', biology: 'Biology', geometry: 'Geometry', mensuration2d: 'Mensuration 2D', mensuration3d: 'Mensuration 3D', trigonometry: 'Trigonometry', numbersystem: 'Number System', calendar: 'Calendar', clock: 'Clock', voice: 'Active & Passive Voice', narration: 'Narration', formulas: 'Formula Book' };
+  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments', history: 'History', histancient: 'Ancient India', histmedieval: 'Medieval India', histmodern: 'Modern India', artculture: 'Art & Culture', worldhist: 'World History', computer: 'Computer Knowledge', polity: 'Polity', economics: 'Economy', space: 'Space', physics: 'Physics', biology: 'Biology', geometry: 'Geometry', mensuration2d: 'Mensuration 2D', mensuration3d: 'Mensuration 3D', trigonometry: 'Trigonometry', numbersystem: 'Number System', calendar: 'Calendar', clock: 'Clock', voice: 'Active & Passive Voice', narration: 'Narration', formulas: 'Formula Book' };
   function openDrill(title){
     closeAllMenus();
     drillOpen = true;
@@ -1250,6 +1252,224 @@
   function drillBody(html){ var b = document.getElementById('drillBody'); b.innerHTML = html; document.getElementById('drillScroll').scrollTop = 0; }
   function optHtml(q, i, state){
     return '<button class="dq-opt' + (state || '') + '" data-opt="' + i + '"><span class="k">' + 'ABCD'.charAt(i) + '</span><span>' + escapeHtml(q.o[i]) + '</span></button>';
+  }
+
+  // ================= Study planner: any mini apps, any number of days =================
+  // You pick the apps, the days (or "until my exam") and the time you have a day; it lays out a day-by-day
+  // timetable that mixes subjects, adds weekly review days and revision days at the end, and ticks a lesson
+  // off by itself once you finish it in its app. The plan is saved (localStorage 'shabdPlanner', synced like
+  // the mini apps) so later progress never reshuffles it. ✨ AI can suggest or review a plan.
+  var PL_DAYS = [7, 15, 30, 45, 60], PL_MINS = [60, 120, 180, 240, 360];
+  var plSetup = null;                              // the choices on the setup screen, until a plan is made
+  function plState(){ return studyState('planner'); }
+  function plSave(st){ setStudyState('planner', st); }
+  function plLessonDone(mod, id){
+    var st = studyState(mod);
+    if(mod === 'grammar') return !!(st.done && st.done[+String(id).replace(/\D/g, '')]);
+    return !!(st.les && st.les[id] && st.les[id].done);
+  }
+  function plPerLesson(id){ var m = STUDY[id], x = trackInfo(id); return m.lessons ? Math.max(5, Math.round(x.fullMin / m.lessons)) : 10; }
+  function plGroups(){
+    var g = [['English', englishIds()], ['Maths', mathIds()], ['Reasoning', reasoningIds()]];
+    GS_SUBJECTS.forEach(function(s){ var l = gsIds().filter(function(id){ return STUDY[id].gsub === s[0]; }); if(l.length) g.push([s[1], l]); });
+    var other = gsIds().filter(function(id){ return !STUDY[id].gsub; }); if(other.length) g.push(['General Studies', other]);
+    return g.filter(function(x){ return x[1].length; });
+  }
+  /** What is left in each chosen app: [{mod, lessons:[{id,t}], per}] (apps without lessons, like a revision hub, get revision days only). */
+  function plUnits(apps, skipDone){
+    return apps.map(function(mod){
+      var ls = (searchIdx ? searchIdx.lessons : []).filter(function(l){ return l.mod === mod; }).map(function(l){ return { id: l.id, t: l.t }; });
+      if(skipDone) ls = ls.filter(function(l){ return !plLessonDone(mod, l.id); });
+      return { mod: mod, lessons: ls, per: plPerLesson(mod) };
+    });
+  }
+  /** The timetable. Lessons from every app are spread evenly over the study days, so each day mixes subjects
+      and every app finishes together; every 7th day is a review day; the last days are for revision. */
+  function plBuild(apps, days, skipDone){
+    var units = plUnits(apps, skipDone), qApps = apps.filter(function(id){ return !STUDY[id].noq; });
+    var tail = days <= 2 ? 1 : Math.min(7, Math.max(1, Math.round(days * 0.15)));
+    var studyIdx = [], review = {};
+    for(var d = 0; d < days - tail; d++){ if(days >= 14 && (d + 1) % 7 === 0) review[d] = 1; else studyIdx.push(d); }
+    var S = Math.max(1, studyIdx.length), list = [];
+    for(var i = 0; i < days; i++) list.push({ kind: i >= days - tail ? 'rev' : review[i] ? 'review' : 'study', tasks: [] });
+    // every lesson gets a place on its app's own timeline (0..1); taken in that order, they are packed so the
+    // minutes grow evenly day by day — each app stays in order, spread out, and no day is much heavier than another
+    var items = [];
+    units.forEach(function(u){ u.lessons.forEach(function(l, j){ items.push({ u: u, l: l, at: (j + 0.5) / u.lessons.length }); }); });
+    items.sort(function(x, y){ return x.at - y.at; });
+    var total = items.reduce(function(a, x){ return a + x.u.per; }, 0), cum = 0;
+    items.forEach(function(x){
+      var k = Math.min(S - 1, Math.floor((cum + x.u.per / 2) / Math.max(1, total) * S));
+      list[studyIdx[k]].tasks.push({ k: 'les', m: x.u.mod, id: x.l.id, t: x.l.t, min: x.u.per });
+      cum += x.u.per;
+    });
+    studyIdx.forEach(function(d, k){ if(k % 2 === 1 && qApps.length) list[d].tasks.push({ k: 'mist', min: 10 }); });
+    Object.keys(review).forEach(function(d){ list[d].tasks.push({ k: 'mock', min: 15 }, { k: 'mist', min: 20 }, { k: 'weak', min: 15 }); });
+    // revision days: every chosen app's Revise tab, shared out over the tail; the last day ends with a full mock
+    var revDays = list.filter(function(x){ return x.kind === 'rev'; });
+    apps.forEach(function(mod, i){ revDays[i % revDays.length].tasks.push({ k: 'rev', m: mod, min: Math.max(15, Math.round(trackInfo(mod).revMin)) }); });
+    revDays[revDays.length - 1].tasks.push({ k: 'mock', min: 15 }, { k: 'mist', min: 20 });
+    var totalMin = 0, studyMin = 0;
+    list.forEach(function(x){ x.tasks.forEach(function(t){ totalMin += t.min; if(x.kind === 'study') studyMin += t.min; }); });
+    return { list: list, tail: tail, studyDays: S, lessons: units.reduce(function(a, u){ return a + u.lessons.length; }, 0), totalMin: totalMin, perDay: studyMin / S };
+  }
+  function plTaskText(t){
+    if(t.k === 'les') return { label: t.t, sub: (MOD_NAME[t.m] || STUDY[t.m].title) + ' · read the lesson and take its quiz' };
+    if(t.k === 'rev') return { label: 'Revise ' + (MOD_NAME[t.m] || STUDY[t.m].title), sub: STUDY[t.m].noq ? 'Read it through' : 'Its Revise tab · then its mistakes' };
+    if(t.k === 'mock') return { label: 'Mixed mock test', sub: 'Practice across subjects · 25 questions or more' };
+    if(t.k === 'mist') return { label: 'Mistakes book', sub: 'Clear what you got wrong · ' + t.min + ' min' };
+    return { label: 'Weak spots', sub: 'Practise your weakest topic' };
+  }
+  function plTaskDone(st, d, j, t){ return (t.k === 'les' && plLessonDone(t.m, t.id)) || !!(st.done && st.done[d + ':' + j]); }
+  function plToday(st){ return Math.min(Math.max(Math.floor((Date.now() - st.start) / DAY_MS), 0), st.list.length - 1); }
+
+  async function openPlanner(){
+    openDrill('Study planner');
+    drillBody('<p class="help">Loading your apps…</p>');
+    try{ await loadSearchIndex(); }catch(e){}
+    drill = { kind: 'planner' };
+    var st = plState();
+    if(st.list && st.list.length) renderPlan(); else renderPlanSetup();
+  }
+  function renderPlanSetup(){
+    var st = plState(), dte = daysToExam();
+    if(!plSetup){
+      var prev = st.apps && st.apps.length ? st.apps : [];
+      plSetup = { apps: prev.filter(function(id){ return STUDY[id]; }), days: st.days || (dte > 2 && dte <= 120 ? dte : 30), mins: st.mins || 120, skip: st.skip !== false };
+    }
+    var c = plSetup, b = plBuild(c.apps, c.days, c.skip), ai = document.body.classList.contains('ai-on');
+    var need = Math.ceil(b.perDay / 5) * 5, over = c.apps.length && b.perDay > c.mins * 1.15;
+    var fitDays = over ? Math.ceil(b.lessons * (b.perDay * b.studyDays / Math.max(1, b.lessons)) / c.mins) + b.tail + Math.floor(c.days / 7) : 0;
+    var left = function(id){ return plUnits([id], true)[0].lessons.length; };
+    var tog = function(id){ var n = left(id); return '<button class="dq-tog' + (c.apps.indexOf(id) !== -1 ? ' on' : '') + '" data-plapp="' + id + '" title="' + escapeAttr(n + ' lessons left') + '">' + escapeHtml(MOD_NAME[id] || STUDY[id].title) + (STUDY[id].noq ? '' : ' <small>' + n + '</small>') + '</button>'; };
+    drillBody('<div class="dq-hero"><div class="eyebrow">Any subjects · any number of days</div><h1>Study planner</h1>' +
+      '<p>Pick what you want to cover and how long you have. You get a day-by-day timetable that mixes subjects every day, a review day each week and revision days at the end. A lesson ticks itself off when you finish it in its app.</p></div>' +
+      '<div class="dq-setup">' +
+        '<div class="dq-box"><h3>1 · What do you want to cover?</h3><div class="dq-tags">' +
+          '<button class="dq-tog" data-plall="all">Everything not finished</button><button class="dq-tog" data-plall="none">Clear</button></div>' +
+          plGroups().map(function(g){ return '<div class="dq-gsub pl-grp"><span>' + escapeHtml(g[0]) + ' <button class="pl-mini" data-plgrp="' + escapeAttr(g[0]) + '">all</button></span>' + g[1].map(tog).join('') + '</div>'; }).join('') +
+          '<p class="help" style="margin:10px 0 0;">The small number is lessons still to do in that app.</p></div>' +
+        '<div class="dq-box"><h3>2 · How many days?</h3><div class="dq-seg">' +
+          PL_DAYS.map(function(d){ return '<button data-pldays="' + d + '" class="' + (c.days === d ? 'on' : '') + '">' + d + '</button>'; }).join('') + '</div>' +
+          '<div class="pl-row">' + (dte > 1 ? '<button class="dq-tog' + (c.days === dte ? ' on' : '') + '" data-pldays="' + dte + '">Until my exam · ' + dte + ' days</button>' : '') +
+          '<label class="pl-num">or <input type="number" min="1" max="365" id="plDaysIn" value="' + c.days + '" inputmode="numeric"> days</label></div></div>' +
+        '<div class="dq-box"><h3>3 · Time you can give each day</h3><div class="dq-seg">' +
+          PL_MINS.map(function(m){ return '<button data-plmins="' + m + '" class="' + (c.mins === m ? 'on' : '') + '">' + (m / 60) + ' h</button>'; }).join('') + '</div>' +
+          '<div class="dq-tags" style="margin-top:10px;"><button class="dq-tog' + (c.skip ? ' on' : '') + '" data-plskip="1">Skip lessons I have already finished</button></div></div>' +
+        '<div class="dq-box pl-sum">' + (c.apps.length
+          ? '<h3>Your plan in short</h3><p><b>' + b.lessons + ' lessons</b> in ' + c.apps.length + ' app' + (c.apps.length > 1 ? 's' : '') + ' over <b>' + b.studyDays + ' study days</b>, ' +
+            (Math.floor(c.days / 7) && c.days >= 14 ? Math.floor((c.days - b.tail) / 7) + ' weekly review day' + (Math.floor((c.days - b.tail) / 7) > 1 ? 's' : '') + ' and ' : '') + b.tail + ' revision day' + (b.tail > 1 ? 's' : '') + ' at the end.</p>' +
+            '<p>That is about <b>' + fmtMin(need) + '</b> of study a day.</p>' +
+            (over ? '<p class="pl-warn">That is more than the ' + fmtMin(c.mins) + ' a day you have. Give it about <b>' + fitDays + ' days</b>, or leave out an app.</p>' : '<p class="pl-ok">✓ Fits the time you have.</p>')
+          : '<p class="help" style="margin:0;">Pick at least one app above.</p>') + '</div>' +
+      '</div>' +
+      '<div class="dq-actions">' + (st.list && st.list.length ? '<button class="btn" id="plBack">Back to my plan</button>' : '') +
+        (ai ? '<button class="btn" id="plAi"' + (c.apps.length ? '' : ' disabled') + '>✨ Ask AI to suggest a plan</button>' : '') +
+        '<button class="btn teal" id="plMake"' + (c.apps.length ? '' : ' disabled') + '>' + (st.list && st.list.length ? 'Replace my plan ›' : 'Make my plan ›') + '</button></div>' +
+      (ai ? '' : '<p class="help" style="text-align:right;">Turn on the AI tutor under Account to have AI suggest or review a plan.</p>'));
+    var B = function(sel, fn){ document.querySelectorAll('#drillBody ' + sel).forEach(function(x){ x.addEventListener('click', function(){ fn(x); renderPlanSetup(); }); }); };
+    B('[data-plapp]', function(x){ var i = c.apps.indexOf(x.dataset.plapp); if(i === -1) c.apps.push(x.dataset.plapp); else c.apps.splice(i, 1); });
+    B('[data-plall]', function(x){ c.apps = x.dataset.plall === 'none' ? [] : Object.keys(STUDY).filter(function(id){ return STUDY[id].subj && (STUDY[id].noq || left(id) > 0); }); });
+    B('[data-plgrp]', function(x){ var g = plGroups().filter(function(y){ return y[0] === x.dataset.plgrp; })[0]; if(g) g[1].forEach(function(id){ if(c.apps.indexOf(id) === -1) c.apps.push(id); }); });
+    B('[data-pldays]', function(x){ c.days = +x.dataset.pldays; });
+    B('[data-plmins]', function(x){ c.mins = +x.dataset.plmins; });
+    B('[data-plskip]', function(){ c.skip = !c.skip; });
+    var inp = document.getElementById('plDaysIn');
+    inp.addEventListener('change', function(){ var v = Math.round(+inp.value); if(v >= 1 && v <= 365){ c.days = v; renderPlanSetup(); } });
+    var bk = document.getElementById('plBack'); if(bk) bk.addEventListener('click', renderPlan);
+    var aib = document.getElementById('plAi'); if(aib) aib.addEventListener('click', function(){ plAskAi(null); });
+    document.getElementById('plMake').addEventListener('click', function(){
+      var cur = plState();
+      if(cur.list && cur.list.length && !confirm('Replace your current plan? Its ticks will be cleared.')) return;
+      var built = plBuild(c.apps, c.days, c.skip);
+      plSave({ apps: c.apps.slice(), days: c.days, mins: c.mins, skip: c.skip, start: Date.now(), list: built.list, done: {}, sent: -1 });
+      plSetup = null;
+      renderPlan();
+    });
+  }
+  function renderPlan(){
+    var st = plState(), today = plToday(st), all = 0, done = 0, behind = 0;
+    st.list.forEach(function(x, d){ x.tasks.forEach(function(t, j){ all++; var ok = plTaskDone(st, d, j, t); if(ok) done++; else if(d < today && t.k === 'les') behind++; }); });
+    var ai = document.body.classList.contains('ai-on');
+    var kindName = { study: '', review: 'Weekly review', rev: 'Revision' };
+    var days = st.list.map(function(x, d){
+      var n = x.tasks.filter(function(t, j){ return plTaskDone(st, d, j, t); }).length, full = n === x.tasks.length && x.tasks.length;
+      var mins = x.tasks.reduce(function(a, t){ return a + t.min; }, 0);
+      var apps = []; x.tasks.forEach(function(t){ if(t.m && apps.indexOf(t.m) === -1) apps.push(t.m); });
+      var date = new Date(st.start + d * DAY_MS).toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' });
+      return '<details class="pl-day' + (d === today ? ' cur' : '') + (full ? ' full' : '') + '"' + (d === today ? ' open' : '') + '><summary>' +
+        '<span class="pl-dno">' + (full ? '✓ ' : '') + 'Day ' + (d + 1) + '</span><span class="pl-dt">' + escapeHtml(kindName[x.kind] || apps.map(function(m){ return MOD_NAME[m] || STUDY[m].title; }).join(' + ') || 'Catch-up') +
+        '<small>' + date + ' · ' + fmtMin(mins) + (d === today ? ' · today' : '') + '</small></span><span class="pl-dp">' + n + '/' + x.tasks.length + '</span></summary><div class="pl-body">' +
+        x.tasks.map(function(t, j){
+          var tx = plTaskText(t), auto = t.k === 'les' && plLessonDone(t.m, t.id), ok = plTaskDone(st, d, j, t);
+          return '<div class="pl-task"><button class="pl-tick' + (ok ? ' on' : '') + '" data-pltick="' + d + ':' + j + '"' + (auto ? ' disabled title="Finished in the app"' : '') + ' aria-pressed="' + ok + '">' + (ok ? '✓' : '') + '</button>' +
+            '<span class="pl-lbl"><b>' + escapeHtml(tx.label) + '</b>' + (auto ? ' <em>done in the app</em>' : '') + '<small>' + escapeHtml(tx.sub) + '</small></span>' +
+            '<button class="btn pl-go" data-plgo="' + d + ':' + j + '">Open</button></div>';
+        }).join('') + '</div></details>';
+    }).join('');
+    drillBody('<div class="dq-hero"><div class="eyebrow">Study planner · ' + st.apps.length + ' app' + (st.apps.length > 1 ? 's' : '') + ' · ' + fmtMin(st.mins) + ' a day</div>' +
+      '<h1>Day ' + (today + 1) + ' of ' + st.list.length + '</h1>' +
+      '<div class="pl-meter"><i style="width:' + (all ? done * 100 / all : 0) + '%"></i></div>' +
+      '<p>' + done + ' of ' + all + ' tasks done.' + (behind ? ' <b class="pl-warn">' + behind + ' lesson' + (behind > 1 ? 's' : '') + ' from earlier days still open</b> — do them first, or make a new plan.' : '') + '</p></div>' +
+      '<div class="dq-actions pl-acts"><button class="btn" id="plToTasks"' + (st.sent === today ? ' disabled' : '') + '>' + (st.sent === today ? '✓ Today is in Tasks' : 'Add today to Tasks') + '</button>' +
+        (ai ? '<button class="btn" id="plAiRev">✨ Ask AI to review my plan</button>' : '') +
+        '<button class="btn" id="plNew">New plan</button></div>' +
+      '<div class="pl-days">' + days + '</div>' +
+      '<p class="help">Lessons tick themselves once you finish them in their app; tick the rest yourself. “Today” counts from the day you made the plan, so a missed day stays visible.</p>');
+    document.querySelectorAll('#drillBody [data-pltick]').forEach(function(b){ b.addEventListener('click', function(){
+      var s = plState(); s.done = s.done || {}; var k = b.dataset.pltick; if(s.done[k]) delete s.done[k]; else s.done[k] = 1; plSave(s); renderPlan();
+    }); });
+    document.querySelectorAll('#drillBody [data-plgo]').forEach(function(b){ b.addEventListener('click', function(){
+      var p = b.dataset.plgo.split(':'), t = plState().list[+p[0]].tasks[+p[1]];
+      // leave the planner without a queued Back (it would land after the next page opens and close it again):
+      // its history entry becomes the plain Home entry, and the page we open pushes its own
+      try{ history.replaceState(null, '', location.pathname + location.search); }catch(e){}
+      if(t.k === 'mock'){ openMock(); return; }
+      if(t.k === 'mist'){ openMistakes(); return; }
+      if(t.k === 'weak'){ openWeak(); return; }
+      closeDrill(true);
+      openStudy(t.m, false, t.k === 'les' ? t.id : null, t.k === 'rev' && !STUDY[t.m].noq ? 'revise' : null);
+    }); });
+    document.getElementById('plNew').addEventListener('click', function(){ plSetup = null; renderPlanSetup(); });
+    document.getElementById('plToTasks').addEventListener('click', function(){
+      var s = plState(), d = plToday(s);
+      s.list[d].tasks.forEach(function(t, j){
+        if(plTaskDone(s, d, j, t)) return;
+        var tx = plTaskText(t);
+        todoAdd(tx.label, t.k === 'les' ? { app: t.m, due: todoDay(0), lm: t.m, li: t.id, lt: t.t } : { app: t.m || '', due: todoDay(0) });
+      });
+      s.sent = d; plSave(s); renderPlan();
+    });
+    var rv = document.getElementById('plAiRev'); if(rv) rv.addEventListener('click', function(){ plAskAi(plState()); });
+  }
+  /** Ask the AI tutor for a plan (or to review the current one), giving it the apps, the days and real progress. */
+  function plAskAi(st){
+    if(!aiReady()){ aiOpenSettings(); return; }
+    var c = st ? { apps: st.apps, days: st.list.length, mins: st.mins } : plSetup;
+    var line = function(id){
+      var pr = studyProgress(id), m = STUDY[id];
+      return '- ' + (m.title) + ': ' + (m.noq ? 'revision only' : pr.done + '/' + pr.total + ' lessons done' + (pr.tried ? ', ' + pr.acc + '% right in ' + pr.tried + ' questions' : '') + (pr.wrong ? ', ' + pr.wrong + ' in the Mistakes book' : ''));
+    };
+    var dte = daysToExam(), b = plBuild(c.apps, c.days, true);
+    var text = (st ? 'Review my study plan and tell me how to adjust it.' : 'Suggest a study plan for me.') + '\n' +
+      '• Days: ' + c.days + (dte > 0 ? ' (my exam is in ' + dte + ' days)' : '') + ' · time: about ' + fmtMin(c.mins) + ' a day\n' +
+      '• What I want to cover, with my progress:\n' + c.apps.map(line).join('\n') + '\n' +
+      (st ? '• I am on day ' + (plToday(st) + 1) + ' of ' + st.list.length + '; ' + st.list.reduce(function(a, x, d){ return a + x.tasks.filter(function(t, j){ return !plTaskDone(st, d, j, t) && d < plToday(st); }).length; }, 0) + ' tasks from earlier days are still open.\n'
+          : '• The app\'s own timetable: ' + b.lessons + ' lessons over ' + b.studyDays + ' study days (about ' + fmtMin(b.perDay) + ' a day) and ' + b.tail + ' revision days.\n') +
+      'Give me a week-by-week outline, then a day-by-day plan for the next 7 days, when to take mixed mocks, and how to use the last week. Put my weakest subjects earlier and keep it realistic for the time I have.';
+    openAsk('', 'plan');
+    aiAsk(text, 'plan', false, { ctx: null });
+  }
+  function plannerHubCard(){
+    var st = plState(), on = st.list && st.list.length, sub = 'Plan any subjects for any number of days';
+    if(on){
+      var t = plToday(st), all = 0, done = 0;
+      st.list.forEach(function(x, d){ x.tasks.forEach(function(k, j){ all++; if(plTaskDone(st, d, j, k)) done++; }); });
+      sub = 'Day ' + (t + 1) + ' of ' + st.list.length + ' · ' + done + '/' + all + ' tasks done';
+    }
+    return '<button class="hub-card hub-act" data-hub-act="planner" style="--hub-c:var(--indigo, #3D5CF0);"><div class="hub-top"><div class="hub-ico">🗓️</div><div><h3>Study planner</h3><div class="hi">अध्ययन योजना · any apps, any days</div></div></div>' +
+      '<p>Say what you want to cover and in how many days — get a day-by-day timetable that mixes subjects, ticks itself as you finish lessons, and can ask AI for advice.</p>' +
+      '<div class="hub-meta"><span>' + escapeHtml(sub) + '</span><b>' + (on ? 'Open ›' : 'Make a plan ›') + '</b></div></button>';
   }
 
   // Mistakes book
@@ -2284,6 +2504,7 @@
     histancient: ['ancient history', 'ancient india', 'ancient'], histmedieval: ['medieval history', 'medieval india', 'medieval'],
     histmodern: ['modern history', 'modern india', 'freedom struggle', 'national movement'], artculture: ['art and culture', 'art culture', 'culture'],
     worldhist: ['world history', 'whos who'],
+    computer: ['computer', 'computer knowledge', 'computer awareness', 'ms office', 'ms excel', 'ms word', 'shortcuts', 'networking', 'cyber security'],
     polity: ['polity'], economics: ['economy', 'economics'], census: ['census'], sports: ['sports'],
     mensuration2d: ['mensuration 2d', '2d mensuration'], mensuration3d: ['mensuration 3d', '3d mensuration'],
     trigonometry: ['trigonometry', 'trigo'], space: ['isro', 'space missions'], voice: ['active passive', 'active and passive', 'passive voice'],
