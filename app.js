@@ -92,7 +92,12 @@
     iprplans: { title: 'IPR & Five Year Plans',        file: 'study-ipr-plans.html',    key: 'economy_ipr_plans_v1' },
     folkdances:{ title: 'Folk Dances of India',        file: 'study-folk-dances.html',  key: 'folk_dances_workbook_v1' },
     appointments:{ title: 'Appointments 2026',          file: 'study-appointments.html', key: 'appointments_workbook_v1' },
-    history:  { title: 'Indian History',               file: 'study-history.html',      key: 'history_workbook_v1' },
+    history:  { title: 'History: Start here',          file: 'study-history.html',      key: 'history_hub_v1' },
+    histancient:  { title: 'Ancient India',            file: 'study-history-ancient.html',  key: 'history_ancient_v1' },
+    histmedieval: { title: 'Medieval India',           file: 'study-history-medieval.html', key: 'history_medieval_v1' },
+    histmodern:   { title: 'Modern India',             file: 'study-history-modern.html',   key: 'history_modern_v1' },
+    artculture:   { title: 'Art & Culture',            file: 'study-art-culture.html',      key: 'art_culture_v1' },
+    worldhist:    { title: 'World History & Who\u2019s Who', file: 'study-world-history.html', key: 'world_history_v1' },
     polity:   { title: 'Indian Polity',                file: 'study-polity.html',       key: 'polity_pyq_workbook_v1' },
     economics:{ title: 'Indian Economy',               file: 'study-economics.html',    key: 'economics_pyq_workbook_v1' },
     formulas: { title: 'Maths Formula Book',           file: 'study-maths-formulas.html', key: 'maths_formula_book_v1' },
@@ -120,7 +125,14 @@
   STUDY.iprplans.subj = 'gs'; STUDY.iprplans.ico = '🏭'; STUDY.iprplans.hi = 'औद्योगिक नीति · पंचवर्षीय योजनाएँ'; STUDY.iprplans.desc = 'Industrial Policy Resolutions (1948, 1956, 1991 …) and the Five Year Plans — aims, models, highlights and NITI Aayog.'; STUDY.iprplans.meta = '12 lessons · 252 questions'; STUDY.iprplans.color = '#8C5A2B';
   STUDY.folkdances.subj = 'gs'; STUDY.folkdances.ico = '💃'; STUDY.folkdances.hi = 'भारत के लोक नृत्य'; STUDY.folkdances.desc = 'Folk and tribal dances state by state — who performs them, when, and the tricks to tell look-alikes apart.'; STUDY.folkdances.meta = '16 lessons · 444 questions'; STUDY.folkdances.color = '#B0306A';
   STUDY.appointments.subj = 'gs'; STUDY.appointments.ico = '🎖️'; STUDY.appointments.hi = 'नियुक्तियाँ · कौन कहाँ'; STUDY.appointments.desc = 'Who heads what in 2026 — constitutional posts, forces, RBI & regulators, international bodies and recent appointments.'; STUDY.appointments.meta = '13 lessons · 269 questions'; STUDY.appointments.color = '#2E6DA4';
-  STUDY.history.subj = 'gs'; STUDY.history.ico = '🏺'; STUDY.history.hi = 'भारतीय इतिहास'; STUDY.history.desc = 'Ancient, Medieval, Modern, Art & Culture and World — era by era, with tricks, traps, a timeline, layered revision and a 5 / 7 / 10 / 15 / 30-day plan maker.'; STUDY.history.meta = '30 lessons · 714 questions'; STUDY.history.color = '#7A2230';
+  // History is split like Maths: one app per period, plus a hub (start here, a plan across all of history, revision) — built by tools/history/build.js
+  STUDY.history.subj = 'gs'; STUDY.history.ico = '🧭'; STUDY.history.hi = 'इतिहास · शुरुआत यहीं से'; STUDY.history.desc = 'New to history? Start here — how to study it from zero, a 5 / 7 / 10 / 15 / 30-day plan across every History app that ticks itself as you finish lessons, and revision in layers: 30 days, 7 days, last moment. Revision only, no questions.'; STUDY.history.meta = 'Plan · revise · 6 apps'; STUDY.history.color = '#7A2230'; STUDY.history.noq = true; STUDY.history.noqStat = ['5', 'apps'];
+  [['histancient', '🏺', 'प्राचीन भारत', 'Stone Age and Harappa to Harsha and the southern kingdoms — each lesson starts with a two-minute story, then tables, tricks and traps.', 8, 177, '#9A5B1F'],
+   ['histmedieval', '🕌', 'मध्यकालीन भारत', 'Turkish invasions, the Delhi Sultanate, Vijayanagara, Bhakti and Sufi saints, the Mughals, Marathas and Sikhs — story first, then the facts SSC asks.', 8, 187, '#2F6F63'],
+   ['histmodern', '🇮🇳', 'आधुनिक भारत', 'Plassey to 1947 and after — the Company, Viceroys, 1857, reformers, the press, the Congress, Gandhi, revolutionaries, unsung heroes and the integration of India.', 12, 296, '#B5487A'],
+   ['worldhist', '🌍', 'विश्व इतिहास · कौन क्या', 'Ancient civilisations to the Age of Discovery, revolutions and the World Wars, plus travellers, titles, books and slogans.', 3, 77, '#3E6FA8']
+  ].forEach(function(x){ var m = STUDY[x[0]]; m.subj = 'gs'; m.gsub = 'history'; m.ico = x[1]; m.hi = x[2]; m.desc = x[3]; m.meta = x[4] + ' lessons · ' + x[5] + ' questions'; m.color = x[6]; m.lessons = x[4]; m.unit = 'lessons'; });
+  STUDY.artculture.subj = 'gs'; STUDY.artculture.ico = '🎨'; STUDY.artculture.hi = 'कला एवं संस्कृति'; STUDY.artculture.desc = 'Classical dance and music, temples and caves, painting, crafts, theatre and puppets, literature and languages, and India\u2019s UNESCO heritage.'; STUDY.artculture.meta = '5 lessons · 120 questions'; STUDY.artculture.color = '#C2571A'; STUDY.artculture.lessons = 5; STUDY.artculture.unit = 'lessons';
   STUDY.polity.subj = 'gs'; STUDY.polity.ico = '📜'; STUDY.polity.hi = 'भारतीय राजव्यवस्था · PYQ'; STUDY.polity.desc = 'The whole Constitution the SSC way — Parts, Schedules, key Articles, President to Parliament, emergencies and amendments.'; STUDY.polity.meta = '20 lessons · 481 questions'; STUDY.polity.color = '#3A4F9A';
   STUDY.economics.subj = 'gs'; STUDY.economics.ico = '💹'; STUDY.economics.hi = 'भारतीय अर्थव्यवस्था · PYQ'; STUDY.economics.desc = 'Demand to GDP, inflation, RBI & banking, budget, GST, 1991 reforms and trade — built from past SSC questions.'; STUDY.economics.meta = '20 lessons · 530 questions'; STUDY.economics.color = '#1E7A8C';
   STUDY.space.subj = 'gs'; STUDY.space.ico = '🚀'; STUDY.space.hi = 'अंतरिक्ष मिशन · Science & Tech'; STUDY.space.desc = 'Orbits, rockets and ISRO centres; Chandrayaan, Aditya-L1, Gaganyaan, NISAR and the 2024–26 launches.'; STUDY.space.meta = '16 lessons · 374 questions'; STUDY.space.color = '#5B45B0';
@@ -153,7 +165,8 @@
   STUDY.polity.core = STUDY.economics.core = 1; STUDY.physics.core = 2; STUDY.biology.core = 1;
   STUDY.physics.gsub = 'science'; STUDY.biology.gsub = 'science';
   STUDY.polity.gsub = 'polity'; STUDY.economics.gsub = 'economy'; STUDY.space.gsub = 'science';
-  STUDY.history.gsub = 'history'; STUDY.history.core = 1;
+  STUDY.history.gsub = 'history'; STUDY.history.core = 5; STUDY.histancient.core = 4; STUDY.histmedieval.core = 3; STUDY.histmodern.core = 2; STUDY.worldhist.core = 1;
+  STUDY.artculture.gsub = 'culture'; STUDY.artculture.core = 1;
   var studyOpen = null, studyWatch = null, studyPushTimer = null, studyLast = null;
   function agoText(ms){
     if(!ms) return 'Not started yet';
@@ -163,7 +176,7 @@
   function hubCard(id){
     var m = STUDY[id], pr = studyProgress(id), x = trackInfo(id);
     var pct = pr.total ? Math.round(pr.done * 100 / pr.total) : 0;
-    var qn = trackTotalQ(id), fm = m.noq ? (/([\d,]+)\s+formulas/.exec(m.meta || '') || [])[1] : 0;
+    var qn = trackTotalQ(id), nq = m.noq ? (m.noqStat || [(/([\d,]+)\s+formulas/.exec(m.meta || '') || [])[1], 'formulas']) : null;
     var revTitle = !x.started ? 'Plan revision' : x.off ? 'Revision reminders are off' : x.due ? 'Revision due now' : 'Next revision ' + trackDate(x.nextAt);
     return '<div class="hub-card" role="button" tabindex="0" data-open-study="' + id + '" style="--hub-c:' + m.color + ';">' +
       '<div class="hub-top"><div class="hub-ico">' + m.ico + '</div><div style="flex:1; min-width:0;"><h3>' + escapeHtml(m.title) + '</h3><div class="hi">' + escapeHtml(m.hi) + '</div></div>' +
@@ -174,7 +187,7 @@
         '</div><div class="hub-ring" title="' + pct + '% done">' + ringSvg(pct, m.color, 50) + '<span>' + pct + '%</span></div></div></div>' +
       '<div class="hub-facts">' +
         '<div><b>' + (m.lessons || '—') + '</b><span>' + (m.unit || 'lessons') + '</span></div>' +
-        '<div><b>' + (m.noq ? (fm || '—') : (qn || '—')) + '</b><span>' + (m.noq ? 'formulas' : 'questions') + '</span></div>' +
+        '<div><b>' + (nq ? (nq[0] || '—') : (qn || '—')) + '</b><span>' + (nq ? nq[1] : 'questions') + '</span></div>' +
         '<div title="' + escapeAttr('About ' + fmtMin(x.fullMin) + ' to do every lesson and question') + '"><b>' + fmtShort(x.fullMin) + '</b><span>to finish</span></div>' +
         '<div title="' + escapeAttr('About ' + fmtMin(x.revMin) + ': skim the lessons + one 25-question mock') + '"><b>' + fmtShort(x.revMin) + '</b><span>to revise</span></div>' +
       '</div>' +
@@ -188,7 +201,7 @@
       '<button class="hub-card hub-act" data-hub-act="mistakes" style="--hub-c:var(--maroon);"><div class="hub-top"><div class="hub-ico">📕</div><div><h3>Mistakes book</h3><div class="hi">गलतियाँ · all subjects</div></div><div class="hub-big">' + totalWrong + '</div></div>' +
         '<p>Every question you got wrong in any mini app or mock — practise them until they’re gone.</p><div class="hub-meta"><span>' + (totalWrong ? totalWrong + ' waiting' : 'Nothing to fix yet') + '</span><b>Open ›</b></div></button>' +
       '<button class="hub-card hub-act" data-hub-act="mock" style="--hub-c:var(--teal);"><div class="hub-top"><div class="hub-ico">⏱️</div><div><h3>Mixed mock test</h3><div class="hi">English + Maths + Reasoning + GS · timed</div></div>' + (last ? '<div class="hub-big">' + last.score + '<small>/' + last.max + '</small></div>' : '') + '</div>' +
-        '<p>Vocab, Grammar, ' + mathQIds().length + ' Maths, ' + reasoningIds().length + ' Reasoning and ' + gsIds().length + ' GS apps in one SSC-style paper, +2 / −0.5, with a subject-wise report.</p><div class="hub-meta"><span>' + (hist.length ? hist.length + ' taken · last ' + agoText(last.at).replace('Opened ', '') : 'Not taken yet') + '</span><b>Start ›</b></div></button>' +
+        '<p>Vocab, Grammar, ' + mathQIds().length + ' Maths, ' + reasoningIds().length + ' Reasoning and ' + gsQIds().length + ' GS apps in one SSC-style paper, +2 / −0.5, with a subject-wise report.</p><div class="hub-meta"><span>' + (hist.length ? hist.length + ' taken · last ' + agoText(last.at).replace('Opened ', '') : 'Not taken yet') + '</span><b>Start ›</b></div></button>' +
       weakHubCard() +
       '</div></section>';
   }
@@ -710,7 +723,7 @@
   }
   window.addEventListener('storage', function(ev){ if(studyOpen && ev.key === STUDY[studyOpen].key) studyCheckChange(); });
 
-  async function openStudy(id, fromHistory, lesson){
+  async function openStudy(id, fromHistory, lesson, tab){
     var mod = STUDY[id];
     if(!mod) return;
     closeAllMenus();
@@ -729,7 +742,7 @@
     studyLast = lsGet(mod.key);
     trackStart(id);
     Object.keys(STUDY).concat(Object.keys(STUDY_EXTRA)).forEach(function(k){ studyPush(k); });   // this device's unsaved progress (incl. from before syncing existed)
-    var frameUrl = mod.file + '?embed=1&skin=' + studySkinValue() + '&theme=' + studyThemeValue() + (lesson ? '&lesson=' + encodeURIComponent(lesson) : '');
+    var frameUrl = mod.file + '?embed=1&skin=' + studySkinValue() + '&theme=' + studyThemeValue() + (lesson ? '&lesson=' + encodeURIComponent(lesson) : '') + (tab ? '#' + encodeURIComponent(tab) : '');
     setStudyFrame(frameUrl);
     if(!pulled){   // progress from your account arrived after the app opened: reopen it with the newer copy
       var shown = lsGet(mod.key);
@@ -767,8 +780,19 @@
     if(location.hash === '#drill') return;
     if(drillOpen){ closeDrill(true); if(drillOpen) return; }
     var m = /^#study-(\w+)/.exec(location.hash);
-    if(m && STUDY[m[1]]){ if(studyOpen !== m[1]) openStudy(m[1], true); return; }
+    if(m && STUDY[m[1]]){ if(studyOpen !== m[1]){ if(studyOpen) closeStudy(true); openStudy(m[1], true); } return; }
     if(studyOpen) closeStudy(true);
+  });
+  // A mini app asks to open another one: { type: 'shabd-open', mod, lesson, tab }. Only the open study frame may ask.
+  window.addEventListener('message', function(e){
+    var f = document.getElementById('studyFrame');
+    if(e.origin !== location.origin || !e.data || e.data.type !== 'shabd-open' || !f || e.source !== f.contentWindow) return;
+    var to = String(e.data.mod || ''); if(!STUDY[to]) return;
+    var lesson = typeof e.data.lesson === 'string' && /^[\w-]{1,20}$/.test(e.data.lesson) ? e.data.lesson : null;
+    var tab = typeof e.data.tab === 'string' && /^[a-z]{1,12}$/.test(e.data.tab) ? e.data.tab : null;
+    try{ e.source.postMessage({ type: 'shabd-open-ok' }, location.origin); }catch(err){}
+    if(studyOpen && studyOpen !== to) closeStudy(true);
+    openStudy(to, false, lesson, tab);
   });
   window.addEventListener('pagehide', function(){ if(studyOpen){ studyCheckChange(); trackTick(); studyPush(studyOpen); } });
   // keep an open module in step with the app's Light / Dark / Auto choice
@@ -795,13 +819,14 @@
   STUDY.iprplans.lessons = 12; STUDY.iprplans.unit = 'lessons';
   STUDY.folkdances.lessons = 16; STUDY.folkdances.unit = 'lessons';
   STUDY.appointments.lessons = 13; STUDY.appointments.unit = 'lessons';
-  STUDY.history.lessons = 30; STUDY.history.unit = 'lessons';
+  STUDY.history.lessons = 7; STUDY.history.unit = 'sheets';
   STUDY.polity.lessons = 20; STUDY.polity.unit = 'lessons';
   STUDY.economics.lessons = 20; STUDY.economics.unit = 'lessons';
   STUDY.space.lessons = 16; STUDY.space.unit = 'lessons';
   STUDY.physics.lessons = 16; STUDY.physics.unit = 'lessons';
   STUDY.biology.lessons = 24; STUDY.biology.unit = 'lessons';
   function gsIds(){ return Object.keys(STUDY).filter(function(id){ return STUDY[id].subj === 'gs'; }); }
+  function gsQIds(){ return gsIds().filter(function(id){ return !STUDY[id].noq; }); }
   function englishIds(){ return Object.keys(STUDY).filter(function(id){ return STUDY[id].subj === 'english'; }); }
   function mathIds(){ return Object.keys(STUDY).filter(function(id){ return STUDY[id].subj === 'maths'; }); }
   function mathQIds(){ return mathIds().filter(function(id){ return !STUDY[id].noq; }); }
@@ -1197,7 +1222,7 @@
 
   // ---- the practice / mock screen ----
   var drill = null, drillOpen = false, drillTimer = null;
-  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments', history: 'History', polity: 'Polity', economics: 'Economy', space: 'Space', physics: 'Physics', biology: 'Biology', geometry: 'Geometry', mensuration2d: 'Mensuration 2D', mensuration3d: 'Mensuration 3D', trigonometry: 'Trigonometry', numbersystem: 'Number System', calendar: 'Calendar', clock: 'Clock', voice: 'Active & Passive Voice', narration: 'Narration', formulas: 'Formula Book' };
+  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments', history: 'History', histancient: 'Ancient India', histmedieval: 'Medieval India', histmodern: 'Modern India', artculture: 'Art & Culture', worldhist: 'World History', polity: 'Polity', economics: 'Economy', space: 'Space', physics: 'Physics', biology: 'Biology', geometry: 'Geometry', mensuration2d: 'Mensuration 2D', mensuration3d: 'Mensuration 3D', trigonometry: 'Trigonometry', numbersystem: 'Number System', calendar: 'Calendar', clock: 'Clock', voice: 'Active & Passive Voice', narration: 'Narration', formulas: 'Formula Book' };
   function openDrill(title){
     closeAllMenus();
     drillOpen = true;
@@ -1396,13 +1421,13 @@
 
   // Mixed mock test
   var mockCfg = (function(){
-    var def = { en: 25, gs: 25, mt: 0, rs: 0, vocab: true, grammar: true, voice: true, narration: true, gsMods: gsIds(), mtMods: mathQIds(), rsMods: reasoningIds(), neg: true, known: gsIds() };
+    var def = { en: 25, gs: 25, mt: 0, rs: 0, vocab: true, grammar: true, voice: true, narration: true, gsMods: gsQIds(), mtMods: mathQIds(), rsMods: reasoningIds(), neg: true, known: gsQIds() };
     var c;
     try{ c = Object.assign({}, def, JSON.parse(lsGet('shabdMockCfg') || '{}')); }catch(e){ c = def; }
     var known = c.known || ['bns', 'schemes', 'census', 'intlorgs'];
-    gsIds().forEach(function(id){ if(known.indexOf(id) === -1 && c.gsMods.indexOf(id) === -1) c.gsMods.push(id); });
-    c.known = gsIds();
-    c.gsMods = c.gsMods.filter(function(id){ return STUDY[id]; });
+    gsQIds().forEach(function(id){ if(known.indexOf(id) === -1 && c.gsMods.indexOf(id) === -1) c.gsMods.push(id); });
+    c.known = gsQIds();
+    c.gsMods = c.gsMods.filter(function(id){ return STUDY[id] && !STUDY[id].noq; });
     if(!Array.isArray(c.mtMods)) c.mtMods = mathQIds();
     var mk = c.knownMt || [];
     mathQIds().forEach(function(id){ if(mk.indexOf(id) === -1 && c.mtMods.indexOf(id) === -1) c.mtMods.push(id); });
@@ -1436,7 +1461,7 @@
     drillBody('<div class="dq-hero"><div class="eyebrow">English + Maths + Reasoning + General Studies · SSC pattern</div><h1>Mixed mock test</h1><p>Questions from your vocab register and every mini app, timed like Tier 1 (36 seconds a question), marked +2 / −0.5. Wrong answers go to your Mistakes book.</p></div>' +
       '<div class="dq-setup">' +
         '<div class="dq-box"><h3>English</h3>' + seg('en', [0, 10, 25]) + '<div class="dq-tags">' + tog('vocab', 'Vocabulary (' + words.length + ' words)') + tog('grammar', 'Grammar 100') + tog('voice', 'Active & Passive Voice') + tog('narration', 'Narration') + '</div></div>' +
-        '<div class="dq-box"><h3>General Studies</h3>' + seg('gs', [0, 10, 25]) + '<div class="dq-tags">' + GS_SUBJECTS.map(function(g){ var l = gsIds().filter(function(id){ return STUDY[id].gsub === g[0]; }); return l.length ? '<div class="dq-gsub"><span>' + g[1] + '</span>' + l.map(gsTog).join('') + '</div>' : ''; }).join('') + gsIds().filter(function(id){ return !STUDY[id].gsub; }).map(gsTog).join('') + '</div></div>' +
+        '<div class="dq-box"><h3>General Studies</h3>' + seg('gs', [0, 10, 25]) + '<div class="dq-tags">' + GS_SUBJECTS.map(function(g){ var l = gsQIds().filter(function(id){ return STUDY[id].gsub === g[0]; }); return l.length ? '<div class="dq-gsub"><span>' + g[1] + '</span>' + l.map(gsTog).join('') + '</div>' : ''; }).join('') + gsQIds().filter(function(id){ return !STUDY[id].gsub; }).map(gsTog).join('') + '</div></div>' +
         '<div class="dq-box"><h3>Maths</h3>' + seg('mt', [0, 10, 25]) + '<div class="dq-tags">' + mathQIds().map(mtTog).join('') + '</div></div>' +
         (reasoningIds().length ? '<div class="dq-box"><h3>Reasoning</h3>' + seg('rs', [0, 10, 25]) + '<div class="dq-tags">' + reasoningIds().map(rsTog).join('') + '</div></div>' : '') +
         '<div class="dq-box"><h3>Marking</h3><div class="dq-tags">' + tog('neg', 'Negative marking −0.5') + '</div><p class="help" style="margin:10px 0 0;">' + n + ' questions · ' + mins + ' minutes · maximum ' + (n * 2) + ' marks</p></div>' +
@@ -2255,7 +2280,10 @@
     intlorgs: ['international organisations', 'international organizations', 'intl orgs'],
     reports: ['reports and indices', 'reports indices', 'indices reports'], iprplans: ['ipr', 'five year plans', 'industrial policy'],
     folkdances: ['folk dances', 'folk dance'], festivals: ['festivals'], appointments: ['appointments'],
-    history: ['history', 'itihas', 'ancient history', 'medieval history', 'modern history', 'art and culture', 'art culture', 'culture'],
+    history: ['history', 'itihas', 'history plan', 'history hub', 'history revision'],
+    histancient: ['ancient history', 'ancient india', 'ancient'], histmedieval: ['medieval history', 'medieval india', 'medieval'],
+    histmodern: ['modern history', 'modern india', 'freedom struggle', 'national movement'], artculture: ['art and culture', 'art culture', 'culture'],
+    worldhist: ['world history', 'whos who'],
     polity: ['polity'], economics: ['economy', 'economics'], census: ['census'], sports: ['sports'],
     mensuration2d: ['mensuration 2d', '2d mensuration'], mensuration3d: ['mensuration 3d', '3d mensuration'],
     trigonometry: ['trigonometry', 'trigo'], space: ['isro', 'space missions'], voice: ['active passive', 'active and passive', 'passive voice'],

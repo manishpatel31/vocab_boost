@@ -51,3 +51,33 @@ tools/
   repeated or missing options, and can check the answer against a calculation.
 - Question ids come from the question text, so **don't give two questions the same wording**, and
   rewording a question resets its Mistakes history. `build_app.py` stops if two questions match.
+
+## History apps (`tools/history/`)
+
+The six History pages — `study-history.html` (the hub) and `study-history-ancient`, `-medieval`, `-modern`,
+`study-art-culture`, `study-world-history` — are built from one data set by `tools/history/build.js`.
+Edit the files in `tools/history/`, never the built pages.
+
+```
+tools/history/
+  apps.js        which lessons go in which app, in what order (and Modern India's parts)
+  build.js       data → the six pages; stops on a missing lesson, a repeated question or bad options
+  data/1x_*.js   lessons L1–L30          data/2x_*.js   their questions
+  data/3x_*.js   newer lessons, with their questions
+  data/40_revise.js   timeline, last-moment cards, number tiles (each tagged with its era)
+  data/41_stories.js  the two-minute story that opens each of L1–L30, and the hub's app intros
+  data/flags.json     which of the 2x questions are marked "repeatedly asked"
+  src/head.html, src/engine.js, src/tail.html   the look and the engine every page shares
+```
+
+After a change:
+
+1. `node tools/history/build.js`
+2. For each subject app: `node tools/index_app.js <file> <id> gs` — ids `histancient`, `histmedieval`,
+   `histmodern`, `artculture`, `worldhist` (the hub has no questions and is not indexed).
+3. `node tools/check_app.js <file>` for each subject app.
+4. Bump `VERSION` in `sw.js` (or run `node tools/stamp.js` if `app.js` changed).
+
+A lesson is the same object as in the other apps, plus a `story` block (`h`, and a one-line `key`).
+A plan needs nothing from the data: it is worked out from the lessons' `heat`, so a new lesson joins the plans by itself.
+
