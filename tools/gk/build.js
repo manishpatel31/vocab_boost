@@ -1,6 +1,6 @@
 // Build the Static GK apps from tools/gk/<app>/data and tools/gk/<app>/lab.js.
 //
-//   node tools/gk/build.js            (all five)
+//   node tools/gk/build.js            (all of them)
 //   node tools/gk/build.js books      (one)
 //
 // Pages share the workbook engine (tools/workbook/) and the Lab games (tools/workbook/games.js).
@@ -22,6 +22,9 @@ const APPS = [
   { dir: 'parks', id: 'parks', file: 'study-protected-areas.html', key: 'protected_areas_v1', era: 'pa', title: 'Protected Areas', hi: 'संरक्षित क्षेत्र',
     parts: [['Part 1 · Parks and sanctuaries', 'राष्ट्रीय उद्यान और अभयारण्य', 1, 4], ['Part 2 · Reserves and wetlands', 'आरक्षित क्षेत्र और आर्द्रभूमि', 5, 7], ['Part 3 · Heritage and wildlife', 'धरोहर और वन्यजीव', 8, 99]] }
 ];
+// Newer apps keep their config next to their data: tools/gk/<dir>/app.json, same fields as above ("dir" is the folder).
+fs.readdirSync(__dirname).filter(d => fs.existsSync(path.join(__dirname, d, 'app.json')))
+  .forEach(d => APPS.push(Object.assign({ dir: d }, JSON.parse(fs.readFileSync(path.join(__dirname, d, 'app.json'), 'utf8')))));
 
 /** pairQs(lesson, rows, o): one question per row, and (with o.rq) the reverse question for answers that occur once.
     rows: [prompt, answer, note?, tag?] — tag "p" = repeatedly asked, or "p|SSC CGL · 7 Mar 2020 (Shift 2)" for a question

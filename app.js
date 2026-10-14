@@ -115,6 +115,10 @@
     days:     { title: 'Important Days',               file: 'study-important-days.html', key: 'important_days_v1' },
     defence:  { title: 'Defence',                      file: 'study-defence.html',      key: 'defence_v1' },
     awards:   { title: 'Awards & Honours',             file: 'study-awards.html',       key: 'awards_honours_v1' },
+    environment:{ title: 'Environment & Ecology', file: 'study-environment.html', key: 'environment_ecology_v1' },
+    bodies:   { title: 'Constitutional & Statutory Bodies', file: 'study-const-bodies.html', key: 'const_bodies_v1' },
+    music:    { title: 'Musical Instruments & Musicians', file: 'study-music-instruments.html', key: 'music_instruments_v1' },
+    classical:{ title: 'Classical Dances & Dancers', file: 'study-classical-dances.html', key: 'classical_dances_v1' },
     parks:    { title: 'Protected Areas',              file: 'study-protected-areas.html', key: 'protected_areas_v1' },
     biology:  { title: 'Biology',                      file: 'study-biology.html',      key: 'biology_pyq_workbook_v1' },
     space:    { title: 'Space & ISRO Missions',              file: 'study-space.html',        key: 'space_missions_workbook_v1' },
@@ -180,6 +184,10 @@
     ['days', 'staticgk', '\ud83d\udcc5', 'महत्वपूर्ण दिवस', 'National and international days month by month, who they honour, UN days, environment days, international years and the 2025–26 themes.', 9, 443, '#C0662E'],
     ['defence', 'staticgk', '\ud83c\udf96\ufe0f', 'रक्षा', 'Mottos, academies, commands, ranks and gallantry awards, paramilitary forces, missiles and ships, operations up to Sindoor, and every joint exercise with its partner.', 9, 373, '#4E6B3A'],
     ['awards', 'staticgk', '\ud83c\udfc5', 'पुरस्कार और सम्मान', 'Bharat Ratna, Padma, Jnanpith, Phalke, sports awards, the Nobel and its Indian laureates, world awards and their nicknames, and the 2025–26 winners.', 8, 306, '#B08A1E'],
+    ['environment', 'geography', "\ud83c\udf3f", 'पर्यावरण और पारिस्थितिकी', "Ecology, food chains, biodiversity and hotspots, pollution and its diseases, greenhouse gases and ozone, every environment treaty and COP, and India's green laws and movements.", 10, 471, '#3E8E5A'],
+    ['bodies', 'polity', "\ud83c\udfdb\ufe0f", 'संवैधानिक और वैधानिक निकाय', "Election Commission, UPSC, Finance Commission, CAG, Attorney General, SC/ST/BC commissions, NHRC, CVC, Lokpal, CIC and regulators \u2014 Articles, appointment, tenure and removal.", 10, 394, '#5A4E8C'],
+    ['music', 'culture', "\ud83c\udfbb", 'वाद्य यंत्र और संगीतकार', "The four classes of instruments, instrument and maestro pairs, Hindustani and Carnatic music, gharanas and ragas, singers, Bharat Ratna musicians and folk instruments by state.", 9, 359, '#9A4E6E'],
+    ['classical', 'culture', "\ud83d\udc83", 'शास्त्रीय नृत्य और नर्तक', "The eight classical dances and Chhau \u2014 states, texts, terms and features \u2014 their great dancers and gurus, dance festivals, awards, and classical vs folk.", 9, 363, '#B0503A'],
     ['parks', 'geography', '\ud83d\udc05', 'संरक्षित क्षेत्र', 'National parks, sanctuaries, all 58 tiger reserves, the 18 biosphere reserves, Ramsar wetlands, UNESCO heritage sites and which animal lives where.', 8, 458, '#2E7D4F']
   ].forEach(function(x){ var m = STUDY[x[0]]; m.subj = 'gs'; m.gsub = x[1]; m.ico = x[2]; m.hi = x[3] + ' · CGL · CHSL · MTS · NTPC'; m.desc = x[4] + ' With tricks, traps, questions from past papers and a Lab of games.'; m.meta = x[5] + ' lessons · ' + x[6] + ' questions · Lab'; m.color = x[7]; m.lessons = x[5]; m.unit = 'lessons'; });
   STUDY.polity.gsub = 'polity'; STUDY.economics.gsub = 'economy'; STUDY.space.gsub = 'science';
@@ -333,7 +341,7 @@
   }
   function homeTools(){
     var t = [['present', '🖥️', 'Present', 'Flash cards'], ['aod', '🌙', 'AOD mode', 'Always-on revision'], ['audio', '🎧', 'Audio', 'Hands-free'],
-      ['quiz', '🧩', 'Vocab quiz', 'Blanks · spellings'], ['revision', '🔁', 'Revision', '7 · 14 · 30 days'], ['panic', '⚡', 'Exam tomorrow', '30 weakest words']];
+      ['quiz', '🧩', 'Vocab quiz', 'Blanks · spellings'], ['revision', '🔁', 'Revision', '7 · 14 · 30 days'], ['panic', '⚡', 'Exam tomorrow', '30 weakest words'], ['typing', '⌨️', 'Typing test', 'SSC 35 w.p.m.']];
     return '<div class="home-tools" aria-label="Vocab tools">' +
       t.map(function(x){ return '<button data-home-act="' + x[0] + '"><span class="ic">' + x[1] + '</span><b>' + x[2] + '</b><small>' + x[3] + '</small></button>'; }).join('') + '</div>';
   }
@@ -428,7 +436,7 @@
     else if(a === 'exam') examsModal();
     else if(a === 'mistakes') openMistakes();
     else if(a === 'mock') openMock();
-    else if(a === 'revision' || a === 'library' || a === 'quiz' || a === 'add' || a === 'tasks' || a === 'plan') switchTab(a);
+    else if(a === 'revision' || a === 'library' || a === 'quiz' || a === 'add' || a === 'tasks' || a === 'plan' || a === 'typing') switchTab(a);
     else if(a === 'word') openWordPreviewModal(el.dataset.id);
     else if(a === 'present') document.getElementById('presentBtn').click();
     else if(a === 'aod') document.getElementById('navAodBtn').click();
@@ -839,7 +847,7 @@
   function mathIds(){ return Object.keys(STUDY).filter(function(id){ return STUDY[id].subj === 'maths'; }); }
   function mathQIds(){ return mathIds().filter(function(id){ return !STUDY[id].noq; }); }
   function reasoningIds(){ return Object.keys(STUDY).filter(function(id){ return STUDY[id].subj === 'reasoning'; }); }
-  var STUDY_EXTRA = { mocks: { key: 'shabdMockHistory', title: 'Mixed mock history' }, tracker: { key: 'shabdTracker', title: 'Study tracker' }, todo: { key: 'shabdTodo', title: 'Tasks' }, planner: { key: 'shabdPlanner', title: 'Study planner' }, exams: { key: 'shabdExams', title: 'Exams' } };
+  var STUDY_EXTRA = { mocks: { key: 'shabdMockHistory', title: 'Mixed mock history' }, tracker: { key: 'shabdTracker', title: 'Study tracker' }, todo: { key: 'shabdTodo', title: 'Tasks' }, planner: { key: 'shabdPlanner', title: 'Study planner' }, exams: { key: 'shabdExams', title: 'Exams' }, typing: { key: 'shabdTyping', title: 'Typing tests' } };
   function studyMod(id){ return STUDY[id] || STUDY_EXTRA[id]; }
   // ================= Study tracker: one record per visit to a mini app =================
   // Stored in localStorage 'shabdTracker' and synced like the mini apps (users/{uid}/study/tracker).
@@ -1230,7 +1238,7 @@
 
   // ---- the practice / mock screen ----
   var drill = null, drillOpen = false, drillTimer = null;
-  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments', history: 'History', histancient: 'Ancient India', histmedieval: 'Medieval India', histmodern: 'Modern India', artculture: 'Art & Culture', worldhist: 'World History', computer: 'Computer Knowledge', polity: 'Polity', economics: 'Economy', space: 'Space', physics: 'Physics', chemistry: 'Chemistry', books: 'Books & Authors', days: 'Important Days', defence: 'Defence', awards: 'Awards & Honours', parks: 'Protected Areas', biology: 'Biology', geometry: 'Geometry', mensuration2d: 'Mensuration 2D', mensuration3d: 'Mensuration 3D', trigonometry: 'Trigonometry', numbersystem: 'Number System', calendar: 'Calendar', clock: 'Clock', voice: 'Active & Passive Voice', narration: 'Narration', formulas: 'Formula Book' };
+  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments', history: 'History', histancient: 'Ancient India', histmedieval: 'Medieval India', histmodern: 'Modern India', artculture: 'Art & Culture', worldhist: 'World History', computer: 'Computer Knowledge', polity: 'Polity', economics: 'Economy', space: 'Space', physics: 'Physics', chemistry: 'Chemistry', books: 'Books & Authors', days: 'Important Days', defence: 'Defence', awards: 'Awards & Honours', parks: 'Protected Areas', environment: 'Environment & Ecology', biology: 'Biology', geometry: 'Geometry', mensuration2d: 'Mensuration 2D', mensuration3d: 'Mensuration 3D', trigonometry: 'Trigonometry', numbersystem: 'Number System', calendar: 'Calendar', clock: 'Clock', voice: 'Active & Passive Voice', narration: 'Narration', formulas: 'Formula Book' };
   function openDrill(title){
     closeAllMenus();
     drillOpen = true;
@@ -2986,6 +2994,10 @@
     books: ['books and authors', 'books & authors', 'authors', 'pen names'], days: ['important days', 'days and dates', 'important dates'],
     defence: ['defence', 'defense', 'military exercises', 'defence exercises', 'joint exercises', 'missiles'],
     awards: ['awards', 'awards and honours', 'honours', 'nobel', 'bharat ratna', 'padma'],
+    environment: ['environment', 'ecology', 'environment and ecology', 'pollution', 'climate change', 'biodiversity'],
+    bodies: ['constitutional bodies', 'statutory bodies', 'constitutional and statutory bodies', 'election commission', 'cag', 'upsc'],
+    music: ['musical instruments', 'music', 'musicians', 'instruments', 'gharanas'],
+    classical: ['classical dances', 'classical dance', 'dancers', 'bharatanatyam', 'kathak'],
     parks: ['protected areas', 'national parks', 'wildlife sanctuaries', 'sanctuaries', 'tiger reserves', 'biosphere reserves', 'ramsar', 'ramsar sites', 'wetlands', 'world heritage', 'heritage sites'], biology: ['biology']
   };
   // words that say what to do, not what to study ("revise", "chapter"…) — ignored when matching a lesson
@@ -3440,6 +3452,7 @@
   var views = document.querySelectorAll('.view');
   tabs.forEach(function(tab){ tab.addEventListener('click', function(){ switchTab(tab.dataset.tab); }); });
   function switchTab(name){
+    if(name !== 'typing' && window.shabdTyping) window.shabdTyping.leave();
     tabs.forEach(function(t){ t.classList.toggle('active', t.dataset.tab === name); });
     views.forEach(function(v){ v.classList.toggle('active', v.id === 'view-' + name); });
     refreshNavActive();
@@ -3458,6 +3471,7 @@
     if(name === 'spellbank') renderSpellBank();
     if(name === 'revision') renderRevision();
     if(name === 'tasks'){ renderTodo(); studyPull('todo').then(function(){ if(isActive('tasks')) renderTodo(); }); }
+    if(name === 'typing' && window.shabdTyping){ window.shabdTyping.render(); studyPull('typing'); }
     if(name === 'plan'){ renderPlanTab(); Promise.all([studyPull('planner'), studyPull('exams')]).then(function(){ if(isActive('plan') && plMode !== 'setup') renderPlanTab(); }); }
   }
 
@@ -7676,6 +7690,14 @@ listBlock,
     }
     throw lastErr || new Error('No AI service with a saved key.');
   }
+  // typing.js (a separate file) reaches the AI and its synced record only through this
+  window.shabdBridge = {
+    aiReady: function(){ return aiReady(); },
+    aiSettings: function(){ aiOpenSettings(); },
+    ai: async function(sys, user, opts){ var r = await aiCallAny(aiCfg(), sys, [{ role: 'user', text: user }], Object.assign({ json: true }, opts || {}), 'questions'); aiLearn(r); return r.text; },
+    load: function(){ return studyState('typing'); },
+    save: function(st){ setStudyState('typing', st); }
+  };
   /** 'auto' (the default): the best model on the key's list that has worked lately. */
   function aiIsAuto(c){ var m = c.models[c.provider]; return !m || m === 'auto'; }
   function aiModel(c){

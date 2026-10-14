@@ -1163,7 +1163,7 @@
   @media (max-width: 860px){ .search-bar .sb-lab{ display:none; } .sr-go{ display:none; } }
   /* ---------- पाठShala home (default page) ---------- */
   body.on-home header.top, .main:has(#view-home.active) header.top{ display:none; }
-  .main:has(#view-tasks.active) header.top, .main:has(#view-plan.active) header.top{ display:none; }
+  .main:has(#view-tasks.active) header.top, .main:has(#view-plan.active) header.top, .main:has(#view-typing.active) header.top{ display:none; }
   /* sections below the first screen are laid out only when scrolled near */
   #homeBody > .hub-sec{ content-visibility:auto; contain-intrinsic-size:auto 900px; }
   .update-bar{ position:fixed; left:50%; transform:translateX(-50%); top:calc(12px + env(safe-area-inset-top)); z-index:200; display:flex; align-items:center; gap:10px; max-width:calc(100% - 24px); background:var(--ink); color:var(--paper); padding:8px 8px 8px 16px; border-radius:var(--pill); box-shadow:var(--shadow-lg); font-size:14px; }
@@ -1644,6 +1644,7 @@
           <div class="menu-label">All subjects</div>
           <button id="navMistakesBtn"><b>Mistakes book</b><span>Every question you got wrong, in one place</span></button>
           <button id="navMockBtn"><b>Mixed mock test</b><span>English + GS, timed, +2 / −0.5</span></button>
+          <button class="tab" data-tab="typing"><b>Typing test</b><span>SSC CHSL / CGL · 35 w.p.m. · full &amp; half mistakes · AI passages</span></button>
           <button id="navWeakBtn"><b>Weak spots</b><span>Accuracy by subject, chapter and topic</span></button>
           <div class="menu-label">Vocabulary</div>
           <button class="tab" data-tab="quiz"><b>Vocab quiz</b><span>Fill in the blank, confusables, spelling</span></button>
@@ -2012,6 +2013,7 @@
 
     <section class="view" id="view-plan"><div id="planRoot" class="pc-root"></div></section>
     <section class="view" id="view-tasks"><div id="todoRoot"></div></section>
+    <section class="view" id="view-typing"><div id="typingRoot"></div></section>
 
     <section class="view" id="view-admin">
       <div class="panel admin-only" style="max-width:700px;">
@@ -2094,6 +2096,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="app.js?v=6324fc5e"></script>
+<script src="app.js?v=bb3bec5b"></script>
+<script src="typing-passages.js?v=df4bd310"></script>
+<script src="typing.js?v=02ff18bc"></script>
 </body>
 </html>
