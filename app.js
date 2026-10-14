@@ -127,6 +127,7 @@
     agri:     { title: 'Agriculture', file: 'study-agriculture.html', key: 'agriculture_v1' },
     states:   { title: 'States & UTs at a Glance', file: 'study-states-uts.html', key: 'states_uts_v1' },
     worldgeo: { title: 'World Geography', file: 'study-world-geography.html', key: 'world_geography_v1' },
+    indgeo:   { title: 'Indian Geography', file: 'study-indian-geography.html', key: 'indian_geography_v1' },
     parks:    { title: 'Protected Areas',              file: 'study-protected-areas.html', key: 'protected_areas_v1' },
     biology:  { title: 'Biology',                      file: 'study-biology.html',      key: 'biology_pyq_workbook_v1' },
     space:    { title: 'Space & ISRO Missions',              file: 'study-space.html',        key: 'space_missions_workbook_v1' },
@@ -204,6 +205,7 @@
     ['agri', 'geography', "\ud83c\udf3e", 'कृषि', "Kharif, rabi and zaid crops, leading states, plantation crops and spices, types of farming, the Green, White and other revolutions, irrigation, livestock breeds, agricultural institutions, MSP and farm schemes.", 10, 496, '#7A8C2E'],
     ['states', 'geography', "\ud83d\uddfa\ufe0f", 'राज्य और केंद्रशासित प्रदेश', "All 28 states and 8 UTs: capitals, formation years and what they were carved from, zonal councils, high courts and benches, official languages, nicknames, records, borders, state animals and birds.", 10, 486, '#8C3A5A'],
     ['worldgeo', 'geography', "\ud83c\udf0d", 'विश्व भूगोल', "Continents and oceans, capitals, currencies and parliaments, mountains, rivers and cities on them, lakes, waterfalls, deserts and grasslands, straits and canals, boundary lines and nicknames of places.", 10, 500, '#2E6DA4'],
+    ['indgeo', 'geography', "\ud83c\uddee\ud83c\uddf3", 'भारत का भूगोल', "India's location and borders, Himalaya and passes, plains, plateaus, coasts and islands, Himalayan and Peninsular rivers, dams, lakes and falls, monsoon and climate, soils and forests, minerals, mines and power plants.", 12, 639, '#B0662E'],
     ['parks', 'geography', '\ud83d\udc05', 'संरक्षित क्षेत्र', 'National parks, sanctuaries, all 58 tiger reserves, the 18 biosphere reserves, Ramsar wetlands, UNESCO heritage sites and which animal lives where.', 8, 458, '#2E7D4F']
   ].forEach(function(x){ var m = STUDY[x[0]]; m.subj = 'gs'; m.gsub = x[1]; m.ico = x[2]; m.hi = x[3] + ' · CGL · CHSL · MTS · NTPC'; m.desc = x[4] + ' With tricks, traps, questions from past papers and a Lab of games.'; m.meta = x[5] + ' lessons · ' + x[6] + ' questions · Lab'; m.color = x[7]; m.lessons = x[5]; m.unit = 'lessons'; });
   STUDY.polity.gsub = 'polity'; STUDY.economics.gsub = 'economy'; STUDY.space.gsub = 'science';
@@ -3022,6 +3024,7 @@
     agri: ['agriculture', 'crops', 'kharif', 'rabi', 'green revolution', 'white revolution', 'farming', 'msp'],
     states: ['states and uts', 'states', 'union territories', 'state capitals', 'capitals', 'high courts', 'state animals'],
     worldgeo: ['world geography', 'world capitals', 'currencies', 'capitals and currencies', 'straits', 'boundary lines', 'deserts', 'grasslands'],
+    indgeo: ['indian geography', 'geography of india', 'rivers', 'himalaya', 'mountain passes', 'dams', 'soils', 'minerals', 'monsoon'],
     parks: ['protected areas', 'national parks', 'wildlife sanctuaries', 'sanctuaries', 'tiger reserves', 'biosphere reserves', 'ramsar', 'ramsar sites', 'wetlands', 'world heritage', 'heritage sites'], biology: ['biology']
   };
   // words that say what to do, not what to study ("revise", "chapter"…) — ignored when matching a lesson
