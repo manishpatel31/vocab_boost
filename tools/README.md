@@ -119,4 +119,26 @@ by the page's script (`page.extra` in `writePage`) through `render<Tab>()`, with
 After a change: `node tools/chemistry/build.js`, `node tools/index_app.js study-chemistry.html chemistry gs`,
 `node tools/check_app.js study-chemistry.html`.
 
+### Static GK (`tools/gk/`)
+
+Five apps from one build: Books & Authors, Important Days, Defence, Awards & Honours and Protected Areas.
+
+```
+tools/gk/
+  build.js                    APPS (file, storage key, parts) → study-books-authors, study-important-days,
+                              study-defence, study-awards, study-protected-areas; pairQs() turns fact tables into questions
+  <app>/data/1x_*.js          lessons, their tables and questions, last-moment cards and tiles
+  <app>/data/40_exam.js       group, heat map, exam pattern, tips, intro
+  <app>/lab.js                the Lab decks (built from lesson tables with labRows) for tools/workbook/games.js
+```
+
+A table row is `[prompt, answer, note, tag]`; tag `"p"` marks a repeatedly asked fact and `"p|SSC CGL · 7 Mar 2020 (Shift 2)"`
+a question verified from that paper. The build stops on a lesson with fewer than 12 questions or a repeated question.
+
+`tools/workbook/games.js` is the shared Lab engine (60-second decks, combos, XP ranks, Memory Match), set up by each
+page's `LAB_CONF`; Chemistry uses it too.
+
+After a change: `node tools/gk/build.js [app]`, `node tools/index_app.js study-<file>.html <id> gs`,
+`node tools/check_app.js study-<file>.html`.
+
 For any of these, bump `VERSION` in `sw.js` (or run `node tools/stamp.js` if `app.js` changed).

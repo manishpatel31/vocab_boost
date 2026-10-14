@@ -17,7 +17,7 @@ Vocabulary, General Studies and Maths in one place, with one daily goal, one str
 
 ## Mini apps (30)
 
-Each mini app is one self-contained page (`study-<name>.html`) with lessons, a quick-revise tab and practice questions. About 8,700 questions in total.
+Each mini app is one self-contained page (`study-<name>.html`) with lessons, a quick-revise tab and practice questions. About 10,800 questions in total.
 
 **English:** Grammar 100, `study-voice` (Active & Passive Voice), `study-narration` (Narration / direct–indirect speech) — both built around the SSC CGL pattern
 
@@ -28,6 +28,12 @@ Each mini app is one self-contained page (`study-<name>.html`) with lessons, a q
 - Science: `study-physics`, `study-chemistry`, `study-biology`
   - Chemistry: 18 lessons in four parts (matter and the atom; reactions, acids, metals, common names, ores and alloys; carbon, polymers, everyday chemistry and fuels; gases, environment and radioactivity) for SSC CGL, CHSL, MTS, RRB NTPC and Group D — each opens with a short story, then tables, tricks and traps; 465 questions, an exam heat map, mocks, revision cards and plans. Its **Lab** tab makes it a game: an interactive periodic table of all 118 elements (tap for the exam facts, highlight a family) with a *Find it!* race, a Memory Match of names and formulas, and eight 60-second quiz games with combos and XP ranks (symbols, formulas, acids in food, pH, ores, alloys, discoverers, gases, medicines)
 - Current affairs & static GK: `study-appointments`, `study-reports-indices`, `study-intl-orgs`, `study-sports`, `study-space`, `study-census`
+- Static GK mini apps, built from `tools/gk/`, each with stories, tables, tricks, traps, a heat map, questions tagged with their paper only when verified (the rest marked as exam-style practice) and a **Lab** of 60-second games and Memory Match:
+  - `study-books-authors` (Books & Authors: 9 lessons, 520 questions — classics, Indian and world authors, autobiographies, pen names)
+  - `study-important-days` (Important Days: 9 lessons, 443 questions — national, UN and environment days, years, decades and 2025–26 themes)
+  - `study-defence` (Defence: 9 lessons, 373 questions — forces, ranks, gallantry awards, missiles, operations and joint exercises with their partners)
+  - `study-awards` (Awards & Honours: 8 lessons, 306 questions — national, literary, film, sports and world awards with their significance, Nobel and 2025–26 winners)
+  - `study-protected-areas` (Protected Areas: 8 lessons, 458 questions — national parks, sanctuaries, tiger and biosphere reserves, Ramsar and World Heritage sites, animals); recent counts are dated "as of" 2025–26
 - Computer: `study-computer` (Computer Knowledge: 17 lessons in plain words for the SSC CGL and CHSL Tier 2 computer module and RRB NTPC — hardware, Windows and MS Office, shortcuts, internet, networking, cyber security — with an exam heat map, the exam pattern, questions reported from past papers tagged with their paper, tricks, traps and a plan)
 - Culture: `study-art-culture` (Art & Culture: dance and music, architecture, painting and crafts, literature and languages, UNESCO heritage), `study-festivals`, `study-folk-dances`
 

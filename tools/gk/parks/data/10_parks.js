@@ -1,0 +1,248 @@
+/* Part 1 · P1 laws, projects and counts; P2 national parks; P3 wildlife sanctuaries; P4 tiger reserves and Project Tiger (as of October 2026). */
+const P1 = [
+  ["Wildlife (Protection) Act","1972","Gives legal protection to national parks, sanctuaries and listed species; Schedules rationalised to four in 2022.","p"],
+  ["Project Tiger","1973","Launched on 1 April 1973 at Jim Corbett National Park with 9 reserves.","p"],
+  ["Crocodile Conservation Project","1975","Started in Odisha with help from the UNDP and FAO.",""],
+  ["Forest (Conservation) Act","1980","Renamed the Van (Sanrakshan Evam Samvardhan) Adhiniyam in 2023.","p"],
+  ["Environment (Protection) Act","1986","Passed after the Bhopal gas tragedy (1984).","p"],
+  ["Project Elephant","1992","For elephants, their habitats and corridors.","p"],
+  ["Biological Diversity Act","2002","Set up the National Biodiversity Authority (Chennai).","p"],
+  ["Scheduled Tribes and Other Traditional Forest Dwellers (Forest Rights) Act","2006","",""],
+  ["Project Snow Leopard","2009","Covers the Himalayan states and Ladakh.",""],
+  ["Project Dolphin","2020","Announced on Independence Day 2020; the Gangetic dolphin is India's national aquatic animal.",""],
+  ["Project Cheetah","2022","Cheetahs from Namibia released at Kuno on 17 September 2022.","p"],
+  ["First national park — Hailey (now Jim Corbett)","1936","Set up in the United Provinces, now Uttarakhand.","p"],
+  ["International Big Cat Alliance","2023","Launched in April 2023 for seven big cats; HQ in India.",""]
+];
+const P2 = [
+  ["Jim Corbett","Uttarakhand","India's first national park (1936, as Hailey National Park).","p"],
+  ["Kaziranga","Assam","Home of the one-horned rhinoceros; UNESCO site.","p|SSC GD · 18 Feb 2019 (Shift 1)"],
+  ["Ranthambore","Rajasthan","Famous for tigers among old fort ruins.","p|SSC JE · 24 Mar 2021 (Evening)"],
+  ["Gir","Gujarat","The only wild home of the Asiatic lion.","p"],
+  ["Kanha","Madhya Pradesh","Saved the barasingha; inspired The Jungle Book.","p"],
+  ["Bandhavgarh","Madhya Pradesh","Highest density of tigers in India.","p"],
+  ["Kuno","Madhya Pradesh","Cheetahs reintroduced here in 2022.","p"],
+  ["Panna","Madhya Pradesh","Known for diamonds and the Ken river.",""],
+  ["Satpura","Madhya Pradesh","",""],
+  ["Sundarbans","West Bengal","Largest mangrove forest; Royal Bengal tiger.","p"],
+  ["Keibul Lamjao","Manipur","The only floating national park — on Loktak Lake; home of the sangai.","p"],
+  ["Silent Valley","Kerala","Lion-tailed macaque; saved from a dam in the 1980s.","p"],
+  ["Eravikulam","Kerala","Nilgiri tahr; Neelakurinji blooms every 12 years.","p"],
+  ["Periyar","Kerala","Elephants and tigers around Periyar lake.","p"],
+  ["Bandipur","Karnataka","",""],
+  ["Nagarhole (Rajiv Gandhi)","Karnataka","",""],
+  ["Kudremukh","Karnataka","",""],
+  ["Dachigam","Jammu and Kashmir","Last home of the hangul (Kashmir stag).","p"],
+  ["Hemis","Ladakh","India's largest national park; snow leopards.","p"],
+  ["Great Himalayan","Himachal Pradesh","UNESCO World Heritage site (2014).","p"],
+  ["Pin Valley","Himachal Pradesh","Cold desert park in Lahaul and Spiti.",""],
+  ["Valley of Flowers","Uttarakhand","UNESCO site, with Nanda Devi.","p"],
+  ["Rajaji","Uttarakhand","",""],
+  ["Gangotri","Uttarakhand","",""],
+  ["Namdapha","Arunachal Pradesh","Has all four big cats: tiger, leopard, clouded leopard, snow leopard.","p"],
+  ["Mouling","Arunachal Pradesh","",""],
+  ["Manas","Assam","UNESCO site; pygmy hog and golden langur.","p"],
+  ["Nameri","Assam","",""],
+  ["Dibru-Saikhowa","Assam","Feral horses.",""],
+  ["Dudhwa","Uttar Pradesh","Swamp deer; rhinos reintroduced in 1984.","p"],
+  ["Simlipal","Odisha","Melanistic (black) tigers.","p"],
+  ["Bhitarkanika","Odisha","Mangroves and saltwater crocodiles.","p"],
+  ["Sanjay Gandhi (Borivali)","Maharashtra","Inside the city of Mumbai.","p"],
+  ["Tadoba","Maharashtra","Maharashtra's oldest national park.",""],
+  ["Desert","Rajasthan","Great Indian bustard; near Jaisalmer.","p"],
+  ["Keoladeo (Bharatpur)","Rajasthan","Bird paradise; UNESCO site.","p"],
+  ["Betla","Jharkhand","",""],
+  ["Valmiki","Bihar","Bihar's only national park.",""],
+  ["Khangchendzonga","Sikkim","India's first 'mixed' UNESCO site (2016).","p"],
+  ["Guindy","Tamil Nadu","Inside the city of Chennai.",""],
+  ["Mudumalai","Tamil Nadu","",""],
+  ["Gulf of Mannar Marine","Tamil Nadu","Coral reefs and dugongs.","p"],
+  ["Marine National Park, Gulf of Kutch","Gujarat","India's first marine national park (1982).","p"],
+  ["Velavadar (Blackbuck)","Gujarat","",""],
+  ["Mahatma Gandhi Marine (Wandoor)","Andaman and Nicobar Islands","",""],
+  ["Indravati","Chhattisgarh","Wild water buffalo.",""],
+  ["Kanger Valley","Chhattisgarh","Limestone caves.",""],
+  ["Sultanpur","Haryana","Bird park near Gurugram.",""],
+  ["Kasu Brahmananda Reddy","Telangana","Inside Hyderabad.",""],
+  ["Papikonda","Andhra Pradesh","",""],
+  ["Balphakram","Meghalaya","",""],
+  ["Murlen","Mizoram","",""],
+  ["Clouded Leopard","Tripura","",""],
+  ["Neora Valley","West Bengal","Red pandas.",""],
+  ["Bhagwan Mahavir (Mollem)","Goa","",""]
+];
+const P3 = [
+  ["Pakhui (Pakke)","Arunachal Pradesh","Hornbills; now a tiger reserve.",""],
+  ["Sariska","Rajasthan","Tigers were wiped out by 2005 and brought back in 2008.","p"],
+  ["Kumbhalgarh","Rajasthan","",""],
+  ["Mount Abu","Rajasthan","",""],
+  ["Tal Chhapar","Rajasthan","Blackbuck.",""],
+  ["Indian Wild Ass Sanctuary (Little Rann of Kutch)","Gujarat","India's largest wildlife sanctuary.","p"],
+  ["Jessore Sloth Bear","Gujarat","",""],
+  ["Pobitora","Assam","Highest density of one-horned rhinos in the world.","p"],
+  ["Chakrashila","Assam","Golden langur.",""],
+  ["Hollongapar Gibbon","Assam","India's only ape — the hoolock gibbon.","p"],
+  ["Chinnar","Kerala","",""],
+  ["Thattekad (Salim Ali Bird Sanctuary)","Kerala","Kerala's first bird sanctuary.",""],
+  ["Neyyar","Kerala","",""],
+  ["Bhimashankar","Maharashtra","Indian giant squirrel (shekru).","p"],
+  ["Great Indian Bustard (Nannaj)","Maharashtra","",""],
+  ["Koyna","Maharashtra","",""],
+  ["Dalma","Jharkhand","Elephants; near Jamshedpur.","p"],
+  ["Hazaribagh","Jharkhand","",""],
+  ["Kaimur","Bihar","Bihar's largest sanctuary.",""],
+  ["Coringa","Andhra Pradesh","Mangroves of the Godavari delta.",""],
+  ["Pocharam","Telangana","",""],
+  ["Eturnagaram","Telangana","",""],
+  ["Chandra Prabha","Uttar Pradesh","Where Asiatic lions were tried out in the 1950s.",""],
+  ["Sohagi Barwa","Uttar Pradesh","",""],
+  ["Okhla Bird Sanctuary","Uttar Pradesh","",""],
+  ["Asola Bhatti","Delhi","",""],
+  ["Binsar","Uttarakhand","",""],
+  ["Askot","Uttarakhand","Musk deer.",""],
+  ["Gahirmatha Marine","Odisha","World's largest nesting beach of Olive Ridley turtles.","p"],
+  ["Debrigarh","Odisha","On the Hirakud reservoir.",""],
+  ["Daroji Bear","Karnataka","Sloth bears near Hampi.","p"],
+  ["Dandeli","Karnataka","",""],
+  ["Mahananda","West Bengal","",""],
+  ["Barnawapara","Chhattisgarh","",""],
+  ["Fambong Lho","Sikkim","",""],
+  ["Changthang Cold Desert","Ladakh","Highest wildlife sanctuary in India.",""],
+  ["Karakoram (Nubra Shyok)","Ladakh","",""],
+  ["Overa-Aru","Jammu and Kashmir","",""],
+  ["Gandhi Sagar","Madhya Pradesh","India's second home for cheetahs (2025).","p"],
+  ["National Chambal","Madhya Pradesh, Rajasthan and Uttar Pradesh","Gharials and Gangetic dolphins on the Chambal river.","p"],
+  ["Cotigao","Goa","",""],
+  ["Shikari Devi","Himachal Pradesh","",""],
+  ["Nongkhyllem","Meghalaya","",""],
+  ["Sepahijala","Tripura","Spectacled monkey (Phayre's leaf monkey).",""],
+  ["Yangoupokpi-Lokchao","Manipur","",""],
+  ["Fakim","Nagaland","",""],
+  ["Kyongnosla Alpine","Sikkim","",""]
+];
+const P4 = [
+  ["Nagarjunasagar-Srisailam","Andhra Pradesh","India's largest tiger reserve.","p"],
+  ["Bor","Maharashtra","India's smallest tiger reserve.","p"],
+  ["Corbett","Uttarakhand","The most tigers of any reserve (2022 census).","p"],
+  ["Mukundra Hills","Rajasthan","",""],
+  ["Ramgarh Vishdhari","Rajasthan","India's 52nd tiger reserve (2022).",""],
+  ["Dholpur-Karauli","Rajasthan","India's 54th tiger reserve (2023).",""],
+  ["Sunderbans","West Bengal","",""],
+  ["Buxa","West Bengal","",""],
+  ["Palamau","Jharkhand","One of the first nine (1973); first-ever tiger census by pugmarks (1932).","p"],
+  ["Satkosia","Odisha","",""],
+  ["Pilibhit","Uttar Pradesh","Won the first TX2 award (2020) for doubling tigers.","p"],
+  ["Amangarh","Uttar Pradesh","",""],
+  ["Ranipur","Uttar Pradesh","India's 53rd tiger reserve (2022).",""],
+  ["Orang","Assam","",""],
+  ["Kamlang","Arunachal Pradesh","",""],
+  ["Dampa","Mizoram","",""],
+  ["Parambikulam","Kerala","",""],
+  ["Bhadra","Karnataka","",""],
+  ["Kali (Dandeli-Anshi)","Karnataka","",""],
+  ["Anamalai","Tamil Nadu","",""],
+  ["Kalakad-Mundanthurai","Tamil Nadu","",""],
+  ["Sathyamangalam","Tamil Nadu","",""],
+  ["Srivilliputhur-Megamalai","Tamil Nadu","India's 51st tiger reserve (2021).",""],
+  ["Kawal","Telangana","",""],
+  ["Amrabad","Telangana","",""],
+  ["Achanakmar","Chhattisgarh","",""],
+  ["Udanti-Sitanadi","Chhattisgarh","",""],
+  ["Guru Ghasidas–Tamor Pingla","Chhattisgarh","India's 56th tiger reserve (November 2024).",""],
+  ["Melghat","Maharashtra","One of the first nine (1973).",""],
+  ["Sahyadri","Maharashtra","",""],
+  ["Navegaon-Nagzira","Maharashtra","",""],
+  ["Sanjay-Dubri","Madhya Pradesh","",""],
+  ["Veerangana Durgavati","Madhya Pradesh","India's 55th tiger reserve (2023).",""],
+  ["Ratapani","Madhya Pradesh","India's 57th tiger reserve (December 2024), near Bhopal.","p"],
+  ["Madhav","Madhya Pradesh","India's 58th tiger reserve (March 2025), Shivpuri.","p"]
+];
+
+LESSONS.push(
+{id:"P1", heat:2, title:"Protected areas: laws, types and projects", hi:"संरक्षित क्षेत्र: क़ानून, प्रकार और परियोजनाएँ", blocks:[
+  {k:"hot", h:"Asked again and again: the <b>year of each Act and Project</b> (Wildlife Act 1972, Project Tiger 1973, Project Elephant 1992), <b>national park vs sanctuary</b>, India's <b>first national park</b> (Hailey/Corbett, 1936) and the <b>counts</b> of each kind."},
+  {k:"story", h:"<p>Indian wildlife law begins with the <b>Wildlife (Protection) Act, 1972</b>. It lets states declare two main kinds of protected area. A <b>national park</b> is the strictest: no grazing, no private rights, and its boundary can be changed only by the state legislature. A <b>wildlife sanctuary</b> is looser: some human activity is allowed if it doesn't harm wildlife. In 2002 the Act added <b>conservation reserves</b> and <b>community reserves</b>.</p><p>Big species got their own missions: <b>Project Tiger</b> (1973), crocodiles (1975), <b>Project Elephant</b> (1992), snow leopards (2009), dolphins (2020) and <b>Project Cheetah</b> (2022). India's oldest park is <b>Jim Corbett</b>, set up as Hailey National Park in <b>1936</b>.</p>", key:"National park = strictest; sanctuary = some activity allowed; first park Hailey (Corbett) 1936; Wildlife Act 1972."},
+  {k:"facts", title:"India's protected areas (approximate, as of 2025–26)", rows:[
+    ["National parks","About 106 — largest Hemis (Ladakh), smallest South Button Island (Andaman)"],
+    ["Wildlife sanctuaries","About 570+ — largest the Indian Wild Ass Sanctuary (Gujarat)"],
+    ["Tiger reserves","58 — the latest Madhav (MP, March 2025)"],
+    ["Biosphere reserves","18 — 13 of them in UNESCO's world network"],
+    ["Ramsar sites","98 as of January 2026; about 100 reported by mid-2026"],
+    ["UNESCO World Heritage sites","44 as of 2025 (Sarnath reported as the 45th in July 2026)"],
+    ["Most national parks","Madhya Pradesh and Andaman & Nicobar Islands"],
+    ["Protected area share","About 5–6% of India's land"]
+  ]},
+  {k:"table", title:"Laws and projects by year", head:["Law / project","Year","Note"], rows: P1.map(r => [r[0], r[1], r[2]])},
+  {k:"table", title:"National park vs wildlife sanctuary", head:["","National park","Wildlife sanctuary"], rows:[
+    ["Human activity","Not allowed (no grazing, no private rights)","Some allowed if it doesn't harm wildlife"],
+    ["Who declares","State or Centre","State or Centre"],
+    ["Changing the boundary","Only by the state legislature","Needs the State Board for Wildlife's advice"],
+    ["Protects","A whole ecosystem","Mostly a particular species"]
+  ]},
+  {k:"trick", h:"Years in a chain: <b>72 Act → 73 Tiger → 75 Croc → 80 Forest → 86 Environment → 92 Elephant → 2002 Biodiversity</b>. Think <b>“Tigers Come First, Elephants Behind”</b>."},
+  {k:"trap", h:"The <b>Wildlife Act is 1972</b> — the <b>Environment Act is 1986</b> (after Bhopal). India's <b>first marine national park</b> is in the <b>Gulf of Kutch</b>, not the Gulf of Mannar."}
+], sum:["The Wildlife (Protection) Act, 1972 creates national parks and sanctuaries; conservation and community reserves were added in 2002.","National parks are the strictest; sanctuaries allow some activity.","India's first national park: Hailey (now Jim Corbett), 1936, Uttarakhand.","Project Tiger 1973, Crocodile 1975, Elephant 1992, Snow Leopard 2009, Dolphin 2020, Cheetah 2022.","About 106 national parks, about 570+ sanctuaries, 58 tiger reserves, 18 biosphere reserves (as of 2025–26)."]},
+
+{id:"P2", heat:3, title:"National parks and their states", hi:"राष्ट्रीय उद्यान और राज्य", blocks:[
+  {k:"hot", h:"The most common question in this whole app: <b>“X National Park is in which state?”</b> Learn the famous ones with their animal — Kaziranga (rhino, Assam), Gir (lion, Gujarat), Keibul Lamjao (floating, Manipur), Hemis (largest, Ladakh)."},
+  {k:"story", h:"<p>Think of a journey around India. In the north, <b>Hemis</b> in Ladakh is the largest park, home to the snow leopard; <b>Dachigam</b> near Srinagar shelters the last hangul. In Uttarakhand, <b>Jim Corbett</b> was the first park, and <b>Valley of Flowers</b> and <b>Nanda Devi</b> are UNESCO sites.</p><p>In the east, <b>Kaziranga</b> and <b>Manas</b> (Assam) guard rhinos; <b>Keibul Lamjao</b> floats on Loktak Lake in Manipur. The heart of India — <b>Madhya Pradesh</b> — has Kanha, Bandhavgarh, Panna, Satpura and <b>Kuno</b> (cheetahs). In the south, Kerala has <b>Silent Valley</b>, <b>Eravikulam</b> and <b>Periyar</b>; Gujarat has <b>Gir</b> for lions and India's first <b>marine park</b>.</p>", key:"Link park + animal + state: Kaziranga–rhino–Assam; Gir–lion–Gujarat; Hemis–snow leopard–Ladakh; Keibul Lamjao–sangai–Manipur."},
+  {k:"table", title:"National parks", head:["Park","State / UT","Remember"], rows: P2.map(r => [r[0], r[1], r[2]])},
+  {k:"trick", h:"<b>“Silent Eravi Periyar”</b> — three Kerala parks. <b>“KBP-SK”</b> — Kanha, Bandhavgarh, Panna, Satpura, Kuno — all Madhya Pradesh, the 'Tiger State'."},
+  {k:"trap", h:"<b>Sanjay Gandhi NP</b> is in Mumbai (Maharashtra), not Delhi. <b>Rajiv Gandhi NP</b> is Nagarhole (Karnataka). <b>Dudhwa</b> is in UP, not Uttarakhand. <b>Valmiki</b> is in Bihar."}
+], sum:["Jim Corbett (Uttarakhand) — first; Hemis (Ladakh) — largest.","Kaziranga and Manas — Assam; Keibul Lamjao — Manipur (floating).","Kanha, Bandhavgarh, Panna, Satpura, Kuno — Madhya Pradesh.","Silent Valley, Eravikulam, Periyar — Kerala; Bandipur, Nagarhole — Karnataka.","Gir and Marine NP (Gulf of Kutch) — Gujarat; Ranthambore, Desert, Keoladeo — Rajasthan."]},
+
+{id:"P3", heat:2, title:"Wildlife sanctuaries", hi:"वन्यजीव अभयारण्य", blocks:[
+  {k:"hot", h:"Sanctuary questions usually pair a <b>famous animal</b> with a sanctuary: wild ass (Little Rann of Kutch), Olive Ridley turtles (Gahirmatha), hoolock gibbon (Hollongapar), giant squirrel (Bhimashankar), sloth bear (Daroji)."},
+  {k:"story", h:"<p>Sanctuaries often exist to protect one special animal. On the salt flats of Gujarat, the <b>Indian Wild Ass Sanctuary</b> — India's largest — keeps the khur alive. Each winter, lakhs of <b>Olive Ridley</b> turtles crawl ashore at <b>Gahirmatha</b> in Odisha. In Assam's <b>Hollongapar</b> forest you hear India's only ape, the hoolock gibbon, and at <b>Pobitora</b> rhinos live more densely than anywhere on Earth.</p><p>In Maharashtra, <b>Bhimashankar</b> is the home of the giant squirrel (shekru), Maharashtra's state animal. <b>Gandhi Sagar</b> in Madhya Pradesh became the second home of India's cheetahs in 2025.</p>", key:"Wild ass — Little Rann (Gujarat); Olive Ridley — Gahirmatha (Odisha); gibbon — Hollongapar (Assam); giant squirrel — Bhimashankar (Maharashtra)."},
+  {k:"table", title:"Wildlife sanctuaries", head:["Sanctuary","State / UT","Remember"], rows: P3.map(r => [r[0], r[1], r[2]])},
+  {k:"trick", h:"<b>“Pobitora = Plenty of rhinos”</b> (highest density). <b>“Gahirmatha = Gathering of turtles”</b>."},
+  {k:"trap", h:"<b>Sariska</b> and <b>Pakke</b> started as sanctuaries and are now tiger reserves too. The <b>National Chambal Sanctuary</b> spans three states — MP, Rajasthan and UP."}
+], sum:["Indian Wild Ass Sanctuary (Little Rann of Kutch, Gujarat) is India's largest sanctuary.","Gahirmatha (Odisha) — Olive Ridley turtles; Pobitora (Assam) — densest rhinos.","Hollongapar (Assam) — hoolock gibbon; Bhimashankar (Maharashtra) — giant squirrel.","Daroji (Karnataka) — sloth bear; Dalma (Jharkhand) — elephants.","National Chambal Sanctuary (MP, Rajasthan, UP) — gharials; Gandhi Sagar (MP) — cheetahs since 2025."]},
+
+{id:"P4", heat:3, title:"Tiger reserves and Project Tiger", hi:"बाघ अभयारण्य और प्रोजेक्ट टाइगर", blocks:[
+  {k:"hot", h:"Always asked: <b>Project Tiger 1973</b>, the <b>number of tiger reserves (58)</b> and the <b>newest</b> ones, the <b>largest</b> (Nagarjunasagar-Srisailam) and <b>smallest</b> (Bor), and the state with the most tigers (Madhya Pradesh)."},
+  {k:"story", h:"<p>In 1973 India had fewer than 2,000 tigers left. <b>Project Tiger</b> began on 1 April 1973 at Jim Corbett with <b>nine</b> reserves. In 2005 the <b>National Tiger Conservation Authority (NTCA)</b> was set up to run it. The tiger census held every four years counted at least <b>3,167</b> tigers in 2022 (estimated <b>3,682</b>) — about three-quarters of the world's wild tigers.</p><p>New reserves keep coming: <b>Srivilliputhur-Megamalai</b> (51st, TN, 2021), <b>Ramgarh Vishdhari</b> (52nd, Rajasthan), <b>Ranipur</b> (53rd, UP), <b>Dholpur-Karauli</b> (54th), <b>Veerangana Durgavati</b> (55th, MP), <b>Guru Ghasidas–Tamor Pingla</b> (56th, Chhattisgarh), <b>Ratapani</b> (57th, MP) and <b>Madhav</b> (58th, MP, March 2025). Madhya Pradesh now has 9 — the most.</p>", key:"Project Tiger 1973; NTCA 2005; 58 reserves; largest Nagarjunasagar-Srisailam, smallest Bor; 2022 census 3,682 (estimate)."},
+  {k:"facts", title:"Tiger numbers (2022 census, released 2023)", rows:[
+    ["India's tigers","3,682 (estimate); 3,167 counted"],
+    ["Most tigers","Madhya Pradesh (785), then Karnataka (563) and Uttarakhand (560)"],
+    ["Reserve with most tigers","Corbett"],
+    ["Most tiger reserves","Madhya Pradesh — 9"],
+    ["Largest reserve","Nagarjunasagar-Srisailam (Andhra Pradesh)"],
+    ["Smallest reserve","Bor (Maharashtra)"],
+    ["Run by","National Tiger Conservation Authority (NTCA), set up 2005"],
+    ["International Tiger Day","29 July — agreed at the St Petersburg summit, 2010"]
+  ]},
+  {k:"table", title:"Tiger reserves", head:["Reserve","State","Remember"], rows: P4.map(r => [r[0], r[1], r[2]])},
+  {k:"trick", h:"The newest four, in order — <b>“Very Good Rats Munch”</b>: <b>V</b>eerangana Durgavati (55), <b>G</b>uru Ghasidas (56), <b>R</b>atapani (57), <b>M</b>adhav (58)."},
+  {k:"trap", h:"Most <b>tigers</b> = Madhya Pradesh, but the single reserve with the most tigers is <b>Corbett</b> (Uttarakhand). The <b>largest</b> reserve is in <b>Andhra Pradesh</b>, not MP."}
+], sum:["Project Tiger began 1 April 1973 at Jim Corbett with nine reserves; NTCA set up in 2005.","India has 58 tiger reserves (as of March 2025); Madhya Pradesh has the most (9).","Latest: Ratapani (57th, Dec 2024) and Madhav (58th, Mar 2025), both in MP.","Largest: Nagarjunasagar-Srisailam (AP); smallest: Bor (Maharashtra).","2022 census: 3,682 tigers (estimate); MP has the most tigers, Corbett the most of any reserve."]}
+);
+
+pairQs("P1", P1, { q: t => `${t} — in which year?`, rq: a => `Which of these came in ${a}?` });
+pairQs("P2", P2, { q: t => `${t} National Park is in:`, rq: a => `Which national park is in ${a}?` });
+pairQs("P3", P3, { q: t => `${t} Wildlife Sanctuary is in:`, rq: a => `Which wildlife sanctuary is in ${a}?` });
+pairQs("P4", P4, { q: t => `${t} Tiger Reserve is in:`, rq: a => `Which tiger reserve is in ${a}?` });
+
+QB.push(
+["P1","Which is India's first national park?",["Jim Corbett (Hailey)","Kaziranga","Gir","Kanha"],"Set up in 1936 as Hailey National Park.","p"],
+["P1","In a national park, which of these is NOT allowed?",["Grazing and private rights","Scientific research","Tourism with permits","Patrolling by forest staff"],"Sanctuaries may allow some grazing; national parks do not.","p"],
+["P1","Conservation reserves and community reserves were added to the Wildlife Act in:",["2002","1972","1991","2006"],"By the 2002 amendment.",""],
+["P1","Project Cheetah brought cheetahs to Kuno from:",["Namibia (and later South Africa)","Kenya","Iran","Botswana"],"Released on 17 September 2022.","p"],
+["P1","India's largest national park is:",["Hemis","Kaziranga","Jim Corbett","Sundarbans"],"In Ladakh.","p"],
+["P2","Which is India's only floating national park?",["Keibul Lamjao","Sundarbans","Bhitarkanika","Silent Valley"],"On Loktak Lake, Manipur.","p"],
+["P2","India's first marine national park is in the:",["Gulf of Kutch","Gulf of Mannar","Andaman Islands","Lakshadweep"],"Set up in 1982, Gujarat.","p"],
+["P3","India's largest wildlife sanctuary is:",["Indian Wild Ass Sanctuary","Gir Sanctuary","Sariska","Periyar"],"In the Little Rann of Kutch, Gujarat.","p"],
+["P4","Project Tiger was launched in:",["1973","1972","1980","1992"],"On 1 April 1973 at Jim Corbett.","p"],
+["P4","Which is India's largest tiger reserve?",["Nagarjunasagar-Srisailam","Corbett","Sunderbans","Kanha"],"In Andhra Pradesh.","p"],
+["P4","Which state has the most tiger reserves (as of 2025)?",["Madhya Pradesh","Karnataka","Maharashtra","Uttarakhand"],"Nine, after Ratapani and Madhav.","p"],
+["P4","The estimated tiger population of India in the 2022 census was:",["3,682","2,967","2,226","4,500"],"The minimum counted was 3,167.","p"],
+["P4","India's 58th tiger reserve (March 2025) is:",["Madhav","Ratapani","Guru Ghasidas–Tamor Pingla","Dholpur-Karauli"],"In Shivpuri, Madhya Pradesh.","p"],
+["P4","Project Tiger is run by the:",["National Tiger Conservation Authority","Wildlife Institute of India","Zoological Survey of India","Central Zoo Authority"],"The NTCA was set up in 2005.",""]
+);
+
+LASTMOMENT.push(
+{t:"Laws and projects", era:["pa"], rows:[["Wildlife Act","1972"],["Project Tiger","1973"],["Crocodile project","1975"],["Forest Act","1980"],["Environment Act","1986"],["Project Elephant","1992"],["Biodiversity Act","2002"],["Project Cheetah","2022"]]},
+{t:"Park ↔ state", era:["pa"], rows:[["Kaziranga, Manas","Assam"],["Gir","Gujarat"],["Keibul Lamjao","Manipur"],["Hemis","Ladakh"],["Dachigam","J&K"],["Silent Valley, Eravikulam","Kerala"],["Kanha, Kuno","Madhya Pradesh"],["Simlipal, Bhitarkanika","Odisha"]]},
+{t:"Tiger reserves", era:["pa"], rows:[["Total","58"],["Largest","Nagarjunasagar-Srisailam"],["Smallest","Bor"],["Most tigers (reserve)","Corbett"],["Most reserves (state)","MP — 9"],["57th","Ratapani"],["58th","Madhav"],["Census 2022","3,682"]]}
+);
+TILES.push(["1936","First national park","pa"],["1972","Wildlife Act","pa"],["1973","Project Tiger","pa"],["58","Tiger reserves","pa"],["3,682","Tigers, 2022","pa"],["2022","Cheetahs to Kuno","pa"]);

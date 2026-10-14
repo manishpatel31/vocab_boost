@@ -111,6 +111,11 @@
     trigonometry: { title: 'Trigonometry',             file: 'study-trigonometry.html', key: 'trigonometry_workbook_v1' },
     physics:  { title: 'Physics',                      file: 'study-physics.html',      key: 'physics_pyq_workbook_v1' },
     chemistry:{ title: 'Chemistry',                    file: 'study-chemistry.html',    key: 'chemistry_v1' },
+    books:    { title: 'Books & Authors',              file: 'study-books-authors.html', key: 'books_authors_v1' },
+    days:     { title: 'Important Days',               file: 'study-important-days.html', key: 'important_days_v1' },
+    defence:  { title: 'Defence',                      file: 'study-defence.html',      key: 'defence_v1' },
+    awards:   { title: 'Awards & Honours',             file: 'study-awards.html',       key: 'awards_honours_v1' },
+    parks:    { title: 'Protected Areas',              file: 'study-protected-areas.html', key: 'protected_areas_v1' },
     biology:  { title: 'Biology',                      file: 'study-biology.html',      key: 'biology_pyq_workbook_v1' },
     space:    { title: 'Space & ISRO Missions',              file: 'study-space.html',        key: 'space_missions_workbook_v1' },
     voice:    { title: 'Active & Passive Voice',       file: 'study-voice.html',        key: 'voice_workbook_v1' },
@@ -170,6 +175,13 @@
   STUDY.chemistry.subj = 'gs'; STUDY.chemistry.gsub = 'science'; STUDY.chemistry.core = 2; STUDY.chemistry.ico = '\u2697\ufe0f'; STUDY.chemistry.hi = 'रसायन विज्ञान · CGL · CHSL · NTPC · Group D';
   STUDY.chemistry.desc = 'Atom to radioactivity told as stories — acids and pH, metals, common names and formulas, ores and alloys, carbon, polymers, everyday chemistry — with a Lab of games and a periodic table.';
   STUDY.chemistry.meta = '18 lessons · 465 questions · Lab'; STUDY.chemistry.color = '#2E8A8A'; STUDY.chemistry.lessons = 18; STUDY.chemistry.unit = 'lessons';
+  [ // the static GK apps built from tools/gk/ — each has a Lab of games
+    ['books', 'staticgk', '\ud83d\udcda', 'पुस्तकें और लेखक', 'Classics to 2026: ancient and medieval works, Indian writers in English and Hindi, autobiographies, sports and political books, pen names and world classics.', 9, 520, '#8A5A2E'],
+    ['days', 'staticgk', '\ud83d\udcc5', 'महत्वपूर्ण दिवस', 'National and international days month by month, who they honour, UN days, environment days, international years and the 2025–26 themes.', 9, 443, '#C0662E'],
+    ['defence', 'staticgk', '\ud83c\udf96\ufe0f', 'रक्षा', 'Mottos, academies, commands, ranks and gallantry awards, paramilitary forces, missiles and ships, operations up to Sindoor, and every joint exercise with its partner.', 9, 373, '#4E6B3A'],
+    ['awards', 'staticgk', '\ud83c\udfc5', 'पुरस्कार और सम्मान', 'Bharat Ratna, Padma, Jnanpith, Phalke, sports awards, the Nobel and its Indian laureates, world awards and their nicknames, and the 2025–26 winners.', 8, 306, '#B08A1E'],
+    ['parks', 'geography', '\ud83d\udc05', 'संरक्षित क्षेत्र', 'National parks, sanctuaries, all 58 tiger reserves, the 18 biosphere reserves, Ramsar wetlands, UNESCO heritage sites and which animal lives where.', 8, 458, '#2E7D4F']
+  ].forEach(function(x){ var m = STUDY[x[0]]; m.subj = 'gs'; m.gsub = x[1]; m.ico = x[2]; m.hi = x[3] + ' · CGL · CHSL · MTS · NTPC'; m.desc = x[4] + ' With tricks, traps, questions from past papers and a Lab of games.'; m.meta = x[5] + ' lessons · ' + x[6] + ' questions · Lab'; m.color = x[7]; m.lessons = x[5]; m.unit = 'lessons'; });
   STUDY.polity.gsub = 'polity'; STUDY.economics.gsub = 'economy'; STUDY.space.gsub = 'science';
   STUDY.history.gsub = 'history'; STUDY.history.core = 5; STUDY.histancient.core = 4; STUDY.histmedieval.core = 3; STUDY.histmodern.core = 2; STUDY.worldhist.core = 1;
   STUDY.artculture.gsub = 'culture'; STUDY.artculture.core = 1;
@@ -1218,7 +1230,7 @@
 
   // ---- the practice / mock screen ----
   var drill = null, drillOpen = false, drillTimer = null;
-  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments', history: 'History', histancient: 'Ancient India', histmedieval: 'Medieval India', histmodern: 'Modern India', artculture: 'Art & Culture', worldhist: 'World History', computer: 'Computer Knowledge', polity: 'Polity', economics: 'Economy', space: 'Space', physics: 'Physics', chemistry: 'Chemistry', biology: 'Biology', geometry: 'Geometry', mensuration2d: 'Mensuration 2D', mensuration3d: 'Mensuration 3D', trigonometry: 'Trigonometry', numbersystem: 'Number System', calendar: 'Calendar', clock: 'Clock', voice: 'Active & Passive Voice', narration: 'Narration', formulas: 'Formula Book' };
+  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments', history: 'History', histancient: 'Ancient India', histmedieval: 'Medieval India', histmodern: 'Modern India', artculture: 'Art & Culture', worldhist: 'World History', computer: 'Computer Knowledge', polity: 'Polity', economics: 'Economy', space: 'Space', physics: 'Physics', chemistry: 'Chemistry', books: 'Books & Authors', days: 'Important Days', defence: 'Defence', awards: 'Awards & Honours', parks: 'Protected Areas', biology: 'Biology', geometry: 'Geometry', mensuration2d: 'Mensuration 2D', mensuration3d: 'Mensuration 3D', trigonometry: 'Trigonometry', numbersystem: 'Number System', calendar: 'Calendar', clock: 'Clock', voice: 'Active & Passive Voice', narration: 'Narration', formulas: 'Formula Book' };
   function openDrill(title){
     closeAllMenus();
     drillOpen = true;
@@ -2970,7 +2982,11 @@
     polity: ['polity'], economics: ['economy', 'economics'], census: ['census'], sports: ['sports'],
     mensuration2d: ['mensuration 2d', '2d mensuration'], mensuration3d: ['mensuration 3d', '3d mensuration'],
     trigonometry: ['trigonometry', 'trigo'], space: ['isro', 'space missions'], voice: ['active passive', 'active and passive', 'passive voice'],
-    narration: ['narration', 'direct indirect', 'reported speech'], grammar: ['grammar'], geometry: ['geometry'], physics: ['physics'], chemistry: ['chemistry', 'chem', 'periodic table', 'acids', 'acid base', 'common names', 'ores', 'alloys', 'polymers'], biology: ['biology']
+    narration: ['narration', 'direct indirect', 'reported speech'], grammar: ['grammar'], geometry: ['geometry'], physics: ['physics'], chemistry: ['chemistry', 'chem', 'periodic table', 'acids', 'acid base', 'common names', 'ores', 'alloys', 'polymers'],
+    books: ['books and authors', 'books & authors', 'authors', 'pen names'], days: ['important days', 'days and dates', 'important dates'],
+    defence: ['defence', 'defense', 'military exercises', 'defence exercises', 'joint exercises', 'missiles'],
+    awards: ['awards', 'awards and honours', 'honours', 'nobel', 'bharat ratna', 'padma'],
+    parks: ['protected areas', 'national parks', 'wildlife sanctuaries', 'sanctuaries', 'tiger reserves', 'biosphere reserves', 'ramsar', 'ramsar sites', 'wetlands', 'world heritage', 'heritage sites'], biology: ['biology']
   };
   // words that say what to do, not what to study ("revise", "chapter"…) — ignored when matching a lesson
   var TODO_FILLER = ' revise revision revisit read reread study learn practice practise do done complete finish solve test tests quiz mock questions question qs pyq pyqs chapter chapters chap ch lesson lessons topic topics part notes note formula formulas book again once twice full all whole the a an of and in on for to from with my me app maths math ssc cgl min mins minutes hour hours hr hrs ';
