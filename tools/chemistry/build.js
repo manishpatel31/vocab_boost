@@ -24,7 +24,7 @@ const qb = ctx.QB.slice().sort((a, b) => num(a[0]) - num(b[0]));
 
 // the atom's timeline (K3) and the periodic table's (K4) also show on the Revise tab
 const tls = ['K3', 'K4', 'K18'].map(id => (byId.get(id).blocks.find(b => b.k === 'tl') || {}).rows || []).flat();
-const lab = fs.readFileSync(path.join(__dirname, 'lab.js'), 'utf8');
+const lab = fs.readFileSync(path.join(__dirname, 'lab.js'), 'utf8') + '\n' + fs.readFileSync(path.join(__dirname, '..', 'workbook', 'games.js'), 'utf8');
 const size = writePage({ file: 'study-chemistry.html', title: 'Chemistry', brand: 'Chemistry',
   small: 'रसायन विज्ञान · SSC CGL · CHSL · RRB NTPC · Group D', tabs: ['learn', 'practice', 'mock', 'lab', 'revise', 'plan'],
   source: 'tools/chemistry/build.js from tools/chemistry/data and lab.js', extra: lab }, {
