@@ -121,6 +121,7 @@
     classical:{ title: 'Classical Dances & Dancers', file: 'study-classical-dances.html', key: 'classical_dances_v1' },
     hq:       { title: 'Headquarters & Founders', file: 'study-hq-founders.html', key: 'hq_founders_v1' },
     inventions:{ title: 'Inventions & Discoveries', file: 'study-inventions.html', key: 'inventions_v1' },
+    industry: { title: 'Industries & Transport', file: 'study-industries-transport.html', key: 'industries_transport_v1' },
     parks:    { title: 'Protected Areas',              file: 'study-protected-areas.html', key: 'protected_areas_v1' },
     biology:  { title: 'Biology',                      file: 'study-biology.html',      key: 'biology_pyq_workbook_v1' },
     space:    { title: 'Space & ISRO Missions',              file: 'study-space.html',        key: 'space_missions_workbook_v1' },
@@ -192,6 +193,7 @@
     ['classical', 'culture', "\ud83d\udc83", 'शास्त्रीय नृत्य और नर्तक', "The eight classical dances and Chhau \u2014 states, texts, terms and features \u2014 their great dancers and gurus, dance festivals, awards, and classical vs folk.", 9, 363, '#B0503A'],
     ['hq', 'staticgk', "\ud83c\udfe2", 'मुख्यालय और संस्थापक', "Headquarters of world and Indian organisations, sports bodies, research institutes and banks; founders of companies, reform movements and newspapers; mottos and taglines.", 10, 499, '#3A5F8C'],
     ['inventions', 'science', "\ud83d\udca1", 'आविष्कार और खोजें', "Inventions and inventors, discoveries in physics, chemistry, biology and medicine, laws and who gave them, units named after scientists, instruments and what they measure, and Indian scientists.", 10, 498, '#C98A1E'],
+    ['industry', 'geography', "\ud83c\udfed", 'उद्योग और परिवहन', "Steel plants and their foreign partners, textiles, refineries, industrial city nicknames, railway zones and milestones, highways and tunnels, seaports, airports, waterways and pipelines.", 10, 448, '#6B5A3E'],
     ['parks', 'geography', '\ud83d\udc05', 'संरक्षित क्षेत्र', 'National parks, sanctuaries, all 58 tiger reserves, the 18 biosphere reserves, Ramsar wetlands, UNESCO heritage sites and which animal lives where.', 8, 458, '#2E7D4F']
   ].forEach(function(x){ var m = STUDY[x[0]]; m.subj = 'gs'; m.gsub = x[1]; m.ico = x[2]; m.hi = x[3] + ' · CGL · CHSL · MTS · NTPC'; m.desc = x[4] + ' With tricks, traps, questions from past papers and a Lab of games.'; m.meta = x[5] + ' lessons · ' + x[6] + ' questions · Lab'; m.color = x[7]; m.lessons = x[5]; m.unit = 'lessons'; });
   STUDY.polity.gsub = 'polity'; STUDY.economics.gsub = 'economy'; STUDY.space.gsub = 'science';
@@ -3004,6 +3006,7 @@
     classical: ['classical dances', 'classical dance', 'dancers', 'bharatanatyam', 'kathak'],
     hq: ['headquarters', 'hq', 'founders', 'headquarters and founders', 'taglines', 'mottos'],
     inventions: ['inventions', 'discoveries', 'inventions and discoveries', 'inventors', 'scientists', 'instruments', 'father of'],
+    industry: ['industries', 'transport', 'industries and transport', 'railway zones', 'seaports', 'ports', 'steel plants', 'refineries', 'national waterways'],
     parks: ['protected areas', 'national parks', 'wildlife sanctuaries', 'sanctuaries', 'tiger reserves', 'biosphere reserves', 'ramsar', 'ramsar sites', 'wetlands', 'world heritage', 'heritage sites'], biology: ['biology']
   };
   // words that say what to do, not what to study ("revise", "chapter"…) — ignored when matching a lesson
