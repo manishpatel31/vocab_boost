@@ -952,7 +952,7 @@ function labOptions(it){
   if (d.opts) return d.opts.slice();
   if (d.options) return d.options(it);
   // wrong options come from the same side of the deck as the answer (names with names, dates with dates)
-  const answers = [...new Set(LG.items.filter(x => x.pool === it.pool).map(x => x.a))].filter(a => a !== it.a);
+  const answers = [...new Set(it.all || LG.items.filter(x => x.pool === it.pool).map(x => x.a))].filter(a => a !== it.a);
   const pool = shuffle(answers).slice(0, 3);
   return shuffle([it.a].concat(pool));
 }
@@ -1049,7 +1049,9 @@ function labRows(lessonId, n){
 }
 /** A "grand mix" deck: a few rows from every listed deck, with each deck's own question wording. */
 function labMix(decks){
-  return shuffle(decks.flatMap(d => d.pairs.map(p => ({ p: d.q ? `${d.q} ${p[0]}${/[?:]$/.test(d.q) ? "" : "?"}` : p[0], a: p[1], note: p[2] || "", pool: d.id })))).slice(0, 80);
+  // wrong options come from the whole deck (all), so a deck drawn only once or twice in the 80 still has enough
+  return shuffle(decks.flatMap(d => { const all = [...new Set(d.pairs.map(p => p[1]))];
+    return d.pairs.map(p => ({ p: d.q ? `${d.q} ${p[0]}${/[?:]$/.test(d.q) ? "" : "?"}` : p[0], a: p[1], note: p[2] || "", pool: d.id, all })); })).slice(0, 80);
 }
 
 </script>

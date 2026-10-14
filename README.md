@@ -17,7 +17,7 @@ Vocabulary, General Studies and Maths in one place, with one daily goal, one str
 
 ## Mini apps (30)
 
-Each mini app is one self-contained page (`study-<name>.html`) with lessons, a quick-revise tab and practice questions. About 10,800 questions in total.
+Each mini app is one self-contained page (`study-<name>.html`) with lessons, a quick-revise tab and practice questions. About 17,000 questions in total.
 
 **English:** Grammar 100, `study-voice` (Active & Passive Voice), `study-narration` (Narration / direct–indirect speech) — both built around the SSC CGL pattern
 
@@ -34,6 +34,9 @@ Each mini app is one self-contained page (`study-<name>.html`) with lessons, a q
   - `study-defence` (Defence: 9 lessons, 373 questions — forces, ranks, gallantry awards, missiles, operations and joint exercises with their partners)
   - `study-awards` (Awards & Honours: 8 lessons, 306 questions — national, literary, film, sports and world awards with their significance, Nobel and 2025–26 winners)
   - `study-protected-areas` (Protected Areas: 8 lessons, 458 questions — national parks, sanctuaries, tiger and biosphere reserves, Ramsar and World Heritage sites, animals); recent counts are dated "as of" 2025–26
+  - `study-environment` (Environment & Ecology: 10 lessons, 471 questions), `study-const-bodies` (Constitutional & Statutory Bodies: 10 lessons, 394), `study-states-uts` (States & UTs: 10 lessons, 486), `study-banking` (Banking & Finance: 10 lessons, 500), `study-hq-founders` (Headquarters & Founders: 10 lessons, 499), `study-inventions` (Inventions & Discoveries: 10 lessons, 498), `study-music-instruments` (Musical Instruments & Musicians: 9 lessons, 359), `study-classical-dances` (Classical Dances & Dancers: 9 lessons, 363)
+- Geography (same build, `tools/gk/`): `study-indian-geography` (12 lessons, 639 questions), `study-world-geography` (10, 500), `study-physical-geography` (10, 497), `study-agriculture` (10, 496), `study-industries-transport` (10, 448)
+- **Typing test** (Practice → Typing test; `typing.js`, `typing-passages.js`): the SSC CHSL/CGL skill test — 35 w.p.m. (1,750 key depressions in 10 minutes), marked word by word with SSC's full and half mistakes, error % = (full + half ÷ 2) × 100 ÷ words, an allowed-error setting, backspace on/off, built-in passages, AI-written passages on any topic or from your weak words, finger-guided drills, history and weak keys (synced as `typing`)
 - Computer: `study-computer` (Computer Knowledge: 17 lessons in plain words for the SSC CGL and CHSL Tier 2 computer module and RRB NTPC — hardware, Windows and MS Office, shortcuts, internet, networking, cyber security — with an exam heat map, the exam pattern, questions reported from past papers tagged with their paper, tricks, traps and a plan)
 - Culture: `study-art-culture` (Art & Culture: dance and music, architecture, painting and crafts, literature and languages, UNESCO heritage), `study-festivals`, `study-folk-dances`
 

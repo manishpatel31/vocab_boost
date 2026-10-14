@@ -121,7 +121,9 @@ After a change: `node tools/chemistry/build.js`, `node tools/index_app.js study-
 
 ### Static GK (`tools/gk/`)
 
-Five apps from one build: Books & Authors, Important Days, Defence, Awards & Honours and Protected Areas.
+Static GK and geography apps from one build. The first five (Books & Authors, Important Days, Defence, Awards & Honours,
+Protected Areas) are listed in `APPS` in build.js; later ones keep their config in `tools/gk/<dir>/app.json`
+(id, file, key, era, title, hi, parts) and are picked up automatically.
 
 ```
 tools/gk/
