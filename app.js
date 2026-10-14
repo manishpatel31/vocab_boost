@@ -124,6 +124,9 @@
     industry: { title: 'Industries & Transport', file: 'study-industries-transport.html', key: 'industries_transport_v1' },
     physgeo:  { title: 'Physical Geography', file: 'study-physical-geography.html', key: 'physical_geography_v1' },
     banking:  { title: 'Banking & Finance', file: 'study-banking.html', key: 'banking_finance_v1' },
+    agri:     { title: 'Agriculture', file: 'study-agriculture.html', key: 'agriculture_v1' },
+    states:   { title: 'States & UTs at a Glance', file: 'study-states-uts.html', key: 'states_uts_v1' },
+    worldgeo: { title: 'World Geography', file: 'study-world-geography.html', key: 'world_geography_v1' },
     parks:    { title: 'Protected Areas',              file: 'study-protected-areas.html', key: 'protected_areas_v1' },
     biology:  { title: 'Biology',                      file: 'study-biology.html',      key: 'biology_pyq_workbook_v1' },
     space:    { title: 'Space & ISRO Missions',              file: 'study-space.html',        key: 'space_missions_workbook_v1' },
@@ -198,6 +201,9 @@
     ['industry', 'geography', "\ud83c\udfed", 'उद्योग और परिवहन', "Steel plants and their foreign partners, textiles, refineries, industrial city nicknames, railway zones and milestones, highways and tunnels, seaports, airports, waterways and pipelines.", 10, 448, '#6B5A3E'],
     ['physgeo', 'geography', "\ud83c\udf0b", 'भौतिक भूगोल', "Solar system and Earth's motions, time and eclipses, Earth's interior and rocks, plates, earthquakes and volcanoes, landforms, atmosphere, winds, cyclones, oceans, currents and climate zones.", 10, 497, '#8C5A2E'],
     ['banking', 'economy', "\ud83c\udfe6", 'बैंकिंग और वित्त', "RBI and its history, repo, CRR and other policy tools, nationalisation and mergers, types of banks, headquarters and taglines, regulators, UPI and payments, stock exchanges, inclusion schemes and currency.", 10, 500, '#2E6D5A'],
+    ['agri', 'geography', "\ud83c\udf3e", 'कृषि', "Kharif, rabi and zaid crops, leading states, plantation crops and spices, types of farming, the Green, White and other revolutions, irrigation, livestock breeds, agricultural institutions, MSP and farm schemes.", 10, 496, '#7A8C2E'],
+    ['states', 'geography', "\ud83d\uddfa\ufe0f", 'राज्य और केंद्रशासित प्रदेश', "All 28 states and 8 UTs: capitals, formation years and what they were carved from, zonal councils, high courts and benches, official languages, nicknames, records, borders, state animals and birds.", 10, 486, '#8C3A5A'],
+    ['worldgeo', 'geography', "\ud83c\udf0d", 'विश्व भूगोल', "Continents and oceans, capitals, currencies and parliaments, mountains, rivers and cities on them, lakes, waterfalls, deserts and grasslands, straits and canals, boundary lines and nicknames of places.", 10, 500, '#2E6DA4'],
     ['parks', 'geography', '\ud83d\udc05', 'संरक्षित क्षेत्र', 'National parks, sanctuaries, all 58 tiger reserves, the 18 biosphere reserves, Ramsar wetlands, UNESCO heritage sites and which animal lives where.', 8, 458, '#2E7D4F']
   ].forEach(function(x){ var m = STUDY[x[0]]; m.subj = 'gs'; m.gsub = x[1]; m.ico = x[2]; m.hi = x[3] + ' · CGL · CHSL · MTS · NTPC'; m.desc = x[4] + ' With tricks, traps, questions from past papers and a Lab of games.'; m.meta = x[5] + ' lessons · ' + x[6] + ' questions · Lab'; m.color = x[7]; m.lessons = x[5]; m.unit = 'lessons'; });
   STUDY.polity.gsub = 'polity'; STUDY.economics.gsub = 'economy'; STUDY.space.gsub = 'science';
@@ -3013,6 +3019,9 @@
     industry: ['industries', 'transport', 'industries and transport', 'railway zones', 'seaports', 'ports', 'steel plants', 'refineries', 'national waterways'],
     physgeo: ['physical geography', 'geomorphology', 'rocks', 'volcanoes', 'earthquakes', 'winds', 'ocean currents', 'atmosphere', 'climatology'],
     banking: ['banking', 'banking and finance', 'rbi', 'finance', 'monetary policy', 'banks', 'upi', 'stock exchange', 'sensex'],
+    agri: ['agriculture', 'crops', 'kharif', 'rabi', 'green revolution', 'white revolution', 'farming', 'msp'],
+    states: ['states and uts', 'states', 'union territories', 'state capitals', 'capitals', 'high courts', 'state animals'],
+    worldgeo: ['world geography', 'world capitals', 'currencies', 'capitals and currencies', 'straits', 'boundary lines', 'deserts', 'grasslands'],
     parks: ['protected areas', 'national parks', 'wildlife sanctuaries', 'sanctuaries', 'tiger reserves', 'biosphere reserves', 'ramsar', 'ramsar sites', 'wetlands', 'world heritage', 'heritage sites'], biology: ['biology']
   };
   // words that say what to do, not what to study ("revise", "chapter"…) — ignored when matching a lesson
