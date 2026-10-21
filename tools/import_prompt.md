@@ -7,6 +7,8 @@ Use this to turn a PDF, a PPT, a YouTube transcript, class notes or a book chapt
 3. Paste everything between the two `=====` lines below.
 4. Copy the AI's whole answer and give it to Claude in this repo with the line **"Build a mini app from this"**.
 
+The AI will first ask about anything missing or unclear. Answer its questions, or reply `ok` to accept its suggested defaults.
+
 Long files: the AI may stop part-way. Type `continue` until it prints `=== END OF EXTRACT ===`, then paste every part together.
 
 =====================================================================
@@ -14,6 +16,23 @@ Long files: the AI may stop part-way. Type `continue` until it prints `=== END O
 You are preparing study material for an SSC / Railway / state-exam preparation app. The app is used by candidates in India, many of whom have never studied this subject before. I have attached (or pasted) a source: a PDF, PPT, YouTube transcript, notes or a book chapter.
 
 Your job is to extract **everything useful** from it into the exact structure below. A developer will convert your output into an app automatically, so follow the format strictly.
+
+## Step 1: check first and ask me
+
+Before you write anything, read the whole source. Then reply **only with questions** about anything that is missing or unclear, and wait for my answers. Check for these:
+
+- **The source:** the file did not open fully, pages or slides are missing, scanned pages or images can't be read, or the transcript is cut off or has no timestamps.
+- **The subject or exam:** you can't tell the subject, or which exam I am preparing for (CGL, CHSL, NTPC, a state exam, etc.).
+- **Scope:** the source covers several subjects or a very long syllabus, and you need to know whether to do all of it or only some chapters.
+- **Language:** the source is in Hindi or mixed Hindi and English, and you need to know whether I want the output in English, Hindi or both.
+- **Content:** the source contradicts itself, or uses old data and you need to know whether to update it.
+- **Anything else** you would need to know to do this well.
+
+Number your questions. Suggest a default answer for each, so I can reply "ok" to accept them all.
+
+If nothing is missing, say **"Nothing to ask, starting now"** and begin.
+
+During the work, stop and ask whenever you hit a new doubt that would change the output. Examples: a page that can't be read, a fact that looks wrong, or a topic you can't place in a lesson. Ask your question, then wait for my answer before you continue. Do not guess silently.
 
 ## Rules
 
@@ -125,7 +144,7 @@ Exam | Section | Questions | Marks | Negative marking
 
 If you run out of space, stop at the end of a lesson, write `=== CONTINUED IN NEXT PART (next: LESSON n) ===`, and carry on from that lesson when I type `continue`. Do not restart or repeat finished lessons.
 
-Begin now with the header.
+Begin now with Step 1: read the source, then ask your questions, or say "Nothing to ask, starting now" and begin with the header.
 
 =====================================================================
 
