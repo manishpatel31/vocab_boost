@@ -1677,14 +1677,15 @@ function drawFlash(box){
    page itself; the service worker keeps the photos already seen for offline use.
    ============================================================ */
 const WIKI = "https://en.wikipedia.org/api/rest_v1/page/summary/";
-const PH_KEY = "festivals_photos_v2", PH_DAYS = 30;
+const PH_KEY = "festivals_photos_v3", PH_DAYS = 30;
 let PHC = {}; try { PHC = JSON.parse(localStorage.getItem(PH_KEY) || "{}"); } catch(e) {}
 const phAsk = {};
 /* Wikimedia serves hotlinked thumbnails only at its standard widths (20, 40, 60, 120, 250, 330, 500, 960, 1280, 1920, 3840):
    any other width is refused. So ask for standard widths, smaller than the original, then the API's own thumbnail, then the original. */
 const PH_STD = { grid: [500, 330, 250], big: [960, 1280, 500] };
 function phUrls(d, kind){
-  const out = [], sized = w => String(d.t).replace(/\/(\d+)px-([^/]+)$/, `/${w}px-$2`);
+  const std = !/\/thumb\//.test(d.t) || /\/(250|330|500)px-[^/]+$/.test(d.t);
+  const out = kind === "grid" && std ? [d.t] : [], sized = w => String(d.t).replace(/\/(\d+)px-([^/]+)$/, `/${w}px-$2`);
   if (/\/thumb\//.test(d.t)) PH_STD[kind].forEach(w => { if (!d.w || w < d.w) out.push(sized(w)); });
   out.push(d.t); if (d.o) out.push(d.o);
   return [...new Set(out)];
@@ -1702,19 +1703,58 @@ function phLoad(img, urls, cb){
 }
 /** {t: thumbnail, o: original, w: original width, x: extract, u: page} for an article, or null when it has no picture.
     Network errors are not remembered. */
-function wikiPhoto(t){
-  const c = PHC[t]; if (c && c.at > Date.now() - PH_DAYS * 864e5) return Promise.resolve(c.d);
-  if (phAsk[t]) return phAsk[t];
-  return phAsk[t] = fetch(WIKI + encodeURIComponent(t)).then(r => {
+let PH_WHY = "";                                                     // why the last request failed, shown on the photo
+/* Articles are asked for in batches through Wikipedia's Action API (pageimages + extracts, CORS via origin=*), which hands
+   back a thumbnail at an allowed width. If that API cannot be reached, each article falls back to the REST summary. */
+const WAPI = "https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&origin=*&redirects=1" +
+  "&prop=pageimages%7Cextracts%7Cinfo&inprop=url&piprop=thumbnail%7Coriginal&pithumbsize=500&pilimit=50&exintro=1&explaintext=1&exsentences=3&exlimit=20&titles=";
+let phQueue = [], phTimer = null;
+function phRemember(t, d){ PHC[t] = { d, at: Date.now() }; try { localStorage.setItem(PH_KEY, JSON.stringify(PHC)); } catch(e) {} }
+function phSummary(t){                     // the REST summary for one article (the fallback)
+  return fetch(WIKI + encodeURIComponent(t)).then(r => {
     if (r.status === 404) return null;
-    if (!r.ok) throw new Error("wiki " + r.status);
+    if (!r.ok) { PH_WHY = "Wikipedia answered " + r.status; throw new Error(PH_WHY); }
     return r.json().then(j => {
       if (!j || j.type !== "standard" || !j.thumbnail) return null;
       const o = j.originalimage || {};
       return { t: j.thumbnail.source, o: o.source || "", w: o.width || 0, x: j.extract || "", u: (j.content_urls && j.content_urls.desktop && j.content_urls.desktop.page) || "https://en.wikipedia.org/wiki/" + t };
     });
-  }).then(d => { PHC[t] = { d, at: Date.now() }; try { localStorage.setItem(PH_KEY, JSON.stringify(PHC)); } catch(e) {} return d; })
-    .catch(() => { delete phAsk[t]; return undefined; });            // offline or blocked: try again next time
+  });
+}
+function phFlush(){
+  phTimer = null;
+  const batch = phQueue.splice(0, 20); if (phQueue.length) phTimer = setTimeout(phFlush, 0);
+  const titles = batch.map(x => x.t.replace(/_/g, " "));
+  fetch(WAPI + encodeURIComponent(titles.join("|"))).then(r => {
+    if (!r.ok) { PH_WHY = "Wikipedia answered " + r.status; throw new Error(PH_WHY); }
+    return r.json();
+  }).then(j => {
+    PH_WHY = "";
+    const q = (j && j.query) || {}, to = {};
+    (q.normalized || []).concat(q.redirects || []).forEach(m => { to[m.from] = m.to; });
+    const pages = {}; (q.pages || []).forEach(p => { pages[p.title] = p; });
+    batch.forEach(x => {
+      let name = x.t.replace(/_/g, " "); for (let k = 0; k < 3 && to[name]; k++) name = to[name];
+      const p = pages[name];
+      if (!p || p.missing || p.invalid) { phRemember(x.t, null); return x.ok(null); }
+      if (!p.thumbnail) {                  // no free lead image on the page: try the summary, which can pick another
+        return phSummary(x.t).then(d => { phRemember(x.t, d); x.ok(d); }).catch(() => x.ok(null));
+      }
+      const o = p.original || {};
+      const d = { t: p.thumbnail.source, o: o.source || "", w: o.width || 0, x: p.extract || "", u: p.fullurl || "https://en.wikipedia.org/wiki/" + x.t };
+      phRemember(x.t, d); x.ok(d);
+    });
+  }).catch(e => {
+    if (!PH_WHY) PH_WHY = navigator.onLine === false ? "offline" : "can't reach Wikipedia";
+    batch.forEach(x => phSummary(x.t).then(d => { phRemember(x.t, d); x.ok(d); }).catch(() => { delete phAsk[x.t]; x.ok(undefined); }));
+  });
+}
+/** {t: thumbnail, o: original, w: original width, x: extract, u: page} for an article, null when it has no picture,
+    undefined when Wikipedia could not be reached (not remembered, so it is tried again). */
+function wikiPhoto(t){
+  const c = PHC[t]; if (c && c.at > Date.now() - PH_DAYS * 864e5) return Promise.resolve(c.d);
+  if (phAsk[t]) return phAsk[t];
+  return phAsk[t] = new Promise(ok => { phQueue.push({ t, ok }); if (!phTimer) phTimer = setTimeout(phFlush, 30); });
 }
 const PHOTO_ITEMS = LESSONS.flatMap(l => l.blocks.filter(b => b.k === "photos").flatMap(b => b.items.map(it => ({ w: it[0], n: it[1], c: it[2], l: l.id }))));
 function photosHTML(b){
@@ -1726,16 +1766,16 @@ function photosHTML(b){
 function phFill(fig){
   if (fig.dataset.h) return; fig.dataset.h = 1;
   const t = fig.dataset.wiki, box = fig.querySelector(".ph-img");
-  const failed = () => {
-    box.innerHTML = `<span class="ph-wait">${navigator.onLine === false ? "Photo needs internet" : "Photo didn't load · tap to try again"}</span>`;
+  const failed = why => {
+    box.innerHTML = `<span class="ph-wait">${navigator.onLine === false ? "Photo needs internet" : "Photo didn't load · tap to try again"}${why ? `<br><small>(${esc(why)})</small>` : ""}</span>`;
     box.onclick = () => { box.onclick = null; box.innerHTML = `<span class="ph-wait" aria-hidden="true">📷</span>`; fig.dataset.h = ""; phFill(fig); };
   };
   wikiPhoto(t).then(d => {
-    if (d === undefined) return failed();
+    if (d === undefined) return failed(PH_WHY || "can't reach Wikipedia");
     if (!d) { fig.classList.add("ph-none"); box.innerHTML = `<span class="ph-wait">No photo</span>`; box.disabled = true; return; }
     const img = new Image(); img.decoding = "async"; img.alt = fig.querySelector("b").textContent;
     phLoad(img, phUrls(d, "grid"), ok => {
-      if (!ok) return failed();
+      if (!ok) return failed("the image server refused the picture");
       box.innerHTML = ""; box.appendChild(img); fig.classList.add("ph-ok");
       box.onclick = () => phOpen(t, img.alt, fig.querySelector("figcaption span").textContent);
     });
