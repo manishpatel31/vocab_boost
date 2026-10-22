@@ -209,6 +209,9 @@
   body.theme-indigo .step-badge{ background:var(--accent); }
   .row-actions{ display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; align-items:center; }
   .copy-note{ font-size:12.5px; color:var(--teal); font-weight:600; }
+  .mab-checks{ display:flex; flex-wrap:wrap; gap:6px 16px; }
+  .mab-checks label{ display:flex; align-items:center; gap:6px; font-size:13.5px; margin:0; }
+  .mab-checks input{ width:16px; height:16px; }
   pre.prompt-preview{ background:var(--code-bg); color:var(--code-fg); padding:16px; border-radius:var(--radius); font-size:12.5px; line-height:1.6; overflow:auto; max-height:340px; white-space:pre-wrap; }
 
   .toolbar{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px; align-items:center; }
@@ -2026,6 +2029,66 @@
         <div id="moderatorsList" style="margin-top:14px;"></div>
       </div>
 
+      <div class="panel admin-only" id="mabPanel" style="max-width:900px;">
+        <h2>Mini app builder prompt</h2>
+        <p class="help" style="margin-top:0;">Turn a PDF, PPT, set of notes or a video transcript into everything a new mini app needs. Fill this in, copy the prompt, and paste it into ChatGPT, Gemini or Claude <b>with your file attached</b> (or the transcript pasted under the prompt). The AI replies in one fixed format: lessons, stories, facts, tables, tricks, traps, questions, revision cards, tiles, Lab game ideas. Save the reply as a .txt file and give it to Claude Code to build the app or add it to an existing one.</p>
+        <div class="field-2col">
+          <div class="field"><label class="field-label">Subject or topic</label><input type="text" id="mabSubject" placeholder="e.g. Computer Awareness, Indian Polity, Static GK: Dams"></div>
+          <div class="field"><label class="field-label">What you are attaching</label>
+            <select id="mabSource">
+              <option value="pdf">PDF (book, notes or slides)</option>
+              <option value="ppt">PPT / PowerPoint slides</option>
+              <option value="video">Video transcript (YouTube or class)</option>
+              <option value="notes">Typed or handwritten notes</option>
+              <option value="web">Web pages or articles</option>
+              <option value="mixed">Several files of different kinds</option>
+            </select></div>
+        </div>
+        <div class="field-2col">
+          <div class="field"><label class="field-label">This is for</label>
+            <select id="mabTarget"><option value="">A new mini app</option></select></div>
+          <div class="field"><label class="field-label">Questions per lesson</label>
+            <select id="mabQs">
+              <option value="all">Every question in the source, plus 20–30 more</option>
+              <option value="30">About 30</option>
+              <option value="50" selected>About 50</option>
+              <option value="80">80 or more</option>
+            </select></div>
+        </div>
+        <div class="field"><label class="field-label">Exams</label>
+          <div class="mab-checks" id="mabExams">
+            <label><input type="checkbox" value="SSC CGL" checked> SSC CGL</label>
+            <label><input type="checkbox" value="SSC CHSL" checked> SSC CHSL</label>
+            <label><input type="checkbox" value="SSC MTS"> SSC MTS</label>
+            <label><input type="checkbox" value="SSC CPO"> SSC CPO</label>
+            <label><input type="checkbox" value="SSC Steno"> SSC Steno</label>
+            <label><input type="checkbox" value="RRB NTPC" checked> RRB NTPC</label>
+            <label><input type="checkbox" value="RRB Group D"> RRB Group D</label>
+          </div></div>
+        <div class="field"><label class="field-label">Also ask the AI to</label>
+          <div class="mab-checks" id="mabOpts">
+            <label><input type="checkbox" value="gaps" checked> Add topics the exam asks that the source misses</label>
+            <label><input type="checkbox" value="pyq" checked> Find past-paper questions online, with exam and date (needs an AI with web search)</label>
+            <label><input type="checkbox" value="keys" checked> Check and correct wrong answer keys in the source</label>
+            <label><input type="checkbox" value="hindi" checked> Give Hindi titles and key terms</label>
+            <label><input type="checkbox" value="lab" checked> Suggest Lab games (quick quiz decks)</label>
+            <label><input type="checkbox" value="current"> Update facts that change (counts, holders, latest editions)</label>
+          </div></div>
+        <div class="field"><label class="field-label">Anything else (optional)</label>
+          <textarea id="mabExtra" style="min-height:70px;" placeholder="e.g. Only chapters 3 to 7. Keep the teacher's tricks. Split Modern History into two lessons."></textarea></div>
+        <div class="row-actions">
+          <button class="btn teal" id="mabCopy">Copy prompt</button>
+          <button class="btn ghost" id="mabGpt">Open ChatGPT</button>
+          <button class="btn ghost" id="mabGem">Open Gemini</button>
+          <button class="btn ghost" id="mabClaude">Open Claude</button>
+          <button class="btn ghost" id="mabShow">Show prompt</button>
+        </div>
+        <pre class="prompt-preview" id="mabPreview" style="display:none;"></pre>
+        <h3 style="margin:18px 0 6px;">If the reply stops half-way</h3>
+        <p class="help" style="margin-top:0;">Long sources don't fit in one reply. When the AI stops, send this in the same chat, and repeat until it writes <code>=== END OF EXTRACT ===</code>. Then put all the replies together in one .txt file.</p>
+        <div class="row-actions"><button class="btn ghost sm" id="mabCont">Copy “continue” prompt</button><button class="btn ghost sm" id="mabCheck">Copy “check your work” prompt</button></div>
+      </div>
+
       <div class="panel" style="max-width:700px;">
         <h2>Lock-screen app</h2>
         <p class="help" style="margin-top:0;">Publishes your whole library (word, meaning, Hindi, synonyms, sentence, trick, tags…) for the Vocab Lock Android app to download. Publish again whenever you add or edit words, then tap “Refresh words” in the app.</p>
@@ -2096,7 +2159,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="app.js?v=dc46dcf2"></script>
+<script src="app.js?v=b69f1365"></script>
 <script src="typing-passages.js?v=df4bd310"></script>
 <script src="typing.js?v=02ff18bc"></script>
 </body>

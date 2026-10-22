@@ -7,9 +7,9 @@
 //   throw everything away and download it all again.
 // - Mini apps, the question bank and the search index are saved the first time they are used,
 //   and fetched quietly once the app is idle (see 'warm'), so they open offline too.
-var VERSION = 'shabd-v59';                 // bump on every deploy so browsers pick up this file
+var VERSION = 'shabd-v62';                 // bump on every deploy so browsers pick up this file
 var CACHE = 'shabd-files';                 // kept across versions
-var SHELL = ['./', './index.html', './app.js?v=dc46dcf2', './manifest.json', './icon-192.png', './icon-512.png',
+var SHELL = ['./', './index.html', './app.js?v=b69f1365', './manifest.json', './icon-192.png', './icon-512.png',
   'https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js',
   'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js',
   'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js'];
@@ -72,6 +72,8 @@ function kind(url){
   if(url.hostname === 'www.gstatic.com' && url.pathname.indexOf('/firebasejs/') === 0) return 'fixed';  // versioned library files
   if(url.hostname === 'fonts.googleapis.com') return 'app';
   if(url.hostname === 'cdnjs.cloudflare.com' && url.pathname.indexOf('/ajax/libs/KaTeX/') === 0) return 'fixed';   // maths in AI answers (versioned)
+  if(url.hostname === 'upload.wikimedia.org') return 'fixed';                                           // festival photos, kept once seen
+  if(url.hostname === 'en.wikipedia.org' && url.pathname.indexOf('/api/rest_v1/page/summary/') === 0) return 'app';   // which photo an article has
   return '';
 }
 
