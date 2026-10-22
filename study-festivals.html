@@ -1677,7 +1677,7 @@ function drawFlash(box){
    page itself; the service worker keeps the photos already seen for offline use.
    ============================================================ */
 const WIKI = "https://en.wikipedia.org/api/rest_v1/page/summary/";
-const PH_KEY = "festivals_photos_v3", PH_DAYS = 30;
+const PH_KEY = "festivals_photos_v4", PH_DAYS = 30;
 let PHC = {}; try { PHC = JSON.parse(localStorage.getItem(PH_KEY) || "{}"); } catch(e) {}
 const phAsk = {};
 /* Wikimedia serves hotlinked thumbnails only at its standard widths (20, 40, 60, 120, 250, 330, 500, 960, 1280, 1920, 3840):
@@ -1736,9 +1736,9 @@ function phFlush(){
     batch.forEach(x => {
       let name = x.t.replace(/_/g, " "); for (let k = 0; k < 3 && to[name]; k++) name = to[name];
       const p = pages[name];
-      if (!p || p.missing || p.invalid) { phRemember(x.t, null); return x.ok(null); }
+      if (!p || p.missing || p.invalid) return phFind(x.t).then(d => { if (d !== undefined) phRemember(x.t, d); x.ok(d); });
       if (!p.thumbnail) {                  // no free lead image on the page: try the summary, which can pick another
-        return phSummary(x.t).then(d => { phRemember(x.t, d); x.ok(d); }).catch(() => x.ok(null));
+        return phSummary(x.t).catch(() => null).then(d => d || phFind(x.t)).then(d => { if (d !== undefined) phRemember(x.t, d); x.ok(d); });
       }
       const o = p.original || {};
       const d = { t: p.thumbnail.source, o: o.source || "", w: o.width || 0, x: p.extract || "", u: p.fullurl || "https://en.wikipedia.org/wiki/" + x.t };
@@ -1748,6 +1748,36 @@ function phFlush(){
     if (!PH_WHY) PH_WHY = navigator.onLine === false ? "offline" : "can't reach Wikipedia";
     batch.forEach(x => phSummary(x.t).then(d => { phRemember(x.t, d); x.ok(d); }).catch(() => { delete phAsk[x.t]; x.ok(undefined); }));
   });
+}
+/* When the named article is missing or has no free lead picture, search for the festival by name: first Wikipedia
+   (a page whose title shares a word with the name, e.g. "Behdienkhlam festival"), then Wikimedia Commons photos.
+   Resolves to a photo, null when nothing matches, or undefined when the search could not be made. */
+const PH_GENERIC = /^(festival|festivals|mela|fair|puja|parba|parab|jatra|yatra|utsav|day|feast|the|of|and|india|indian)$/;
+const phWords = s => String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().split(/[^a-z0-9]+/).filter(w => w.length > 2 && !PH_GENERIC.test(w));
+const phMatch = (title, name) => { const t = phWords(title); return phWords(name).some(w => t.includes(w)); };
+function phInfo(t){ const it = PHOTO_ITEMS.find(x => x.w === t) || { n: t.replace(/_/g, " "), c: "" }; return { name: it.n.replace(/\s*\(.*\)$/, ""), place: String(it.c).split(" · ")[0] }; }
+function phJSON(url){ return fetch(url).then(r => { if (!r.ok) { PH_WHY = "Wikipedia answered " + r.status; throw new Error(PH_WHY); } return r.json(); }); }
+function phFind(t){
+  const { name, place } = phInfo(t);
+  const wq = "https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&origin=*&generator=search&gsrlimit=6" +
+    "&prop=pageimages%7Cextracts%7Cinfo&inprop=url&piprop=thumbnail%7Coriginal&pithumbsize=500&exintro=1&explaintext=1&exsentences=3&exlimit=6&gsrsearch=" +
+    encodeURIComponent(`${name} ${/^[A-Z][A-Za-z&,' ]{2,40}$/.test(place) && !/^All India|^Marks|^\d/.test(place) ? place : ""}`.trim());
+  const cq = "https://commons.wikimedia.org/w/api.php?action=query&format=json&formatversion=2&origin=*&generator=search&gsrnamespace=6&gsrlimit=12" +
+    "&prop=imageinfo&iiprop=url%7Csize%7Cmime&iiurlwidth=500&gsrsearch=" + encodeURIComponent(`${name} filetype:bitmap`);
+  return phJSON(wq).then(j => {
+    const pages = ((j.query || {}).pages || []).slice().sort((a, b) => (a.index || 0) - (b.index || 0));
+    const p = pages.find(p => p.thumbnail && phMatch(p.title, name));
+    if (p) { const o = p.original || {}; return { t: p.thumbnail.source, o: o.source || "", w: o.width || 0, x: p.extract || "", u: p.fullurl || "" }; }
+    return phJSON(cq).then(j => {
+      const files = ((j.query || {}).pages || []).slice().sort((a, b) => (a.index || 0) - (b.index || 0));
+      for (const f of files) {
+        const ii = (f.imageinfo || [])[0];
+        if (ii && /image\/(jpeg|png|webp)/.test(ii.mime) && ii.width >= 320 && phMatch(f.title, name))
+          return { t: ii.thumburl || ii.url, o: ii.url, w: ii.width, x: "", u: ii.descriptionurl || "", src: "commons" };
+      }
+      return null;
+    });
+  }).catch(() => undefined);
 }
 /** {t: thumbnail, o: original, w: original width, x: extract, u: page} for an article, null when it has no picture,
     undefined when Wikipedia could not be reached (not remembered, so it is tried again). */
@@ -1791,7 +1821,7 @@ function phOpen(t, name, note){
     const ov = document.createElement("div"); ov.className = "ph-over"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", name);
     ov.innerHTML = `<div class="ph-card"><button type="button" class="ph-x" aria-label="Close">✕</button><img alt="${esc(name)}">
       <div class="ph-body"><h3>${esc(name)}</h3><p class="muted" style="margin:0 0 8px">${esc(note)}</p>${d.x ? `<p style="margin:0 0 10px">${esc(d.x)}</p>` : ""}
-      <a href="${esc(d.u)}" target="_blank" rel="noopener">Read on Wikipedia ↗</a></div></div>`;
+      ${d.u ? `<a href="${esc(d.u)}" target="_blank" rel="noopener">${d.src === "commons" ? "See the photo on Wikimedia Commons ↗" : "Read on Wikipedia ↗"}</a>` : ""}</div></div>`;
     const close = () => { ov.remove(); document.removeEventListener("keydown", key); };
     const key = e => { if (e.key === "Escape") close(); };
     ov.onclick = e => { if (e.target === ov || e.target.closest(".ph-x")) close(); };
