@@ -1677,11 +1677,31 @@ function drawFlash(box){
    page itself; the service worker keeps the photos already seen for offline use.
    ============================================================ */
 const WIKI = "https://en.wikipedia.org/api/rest_v1/page/summary/";
-const PH_KEY = "festivals_photos_v1", PH_DAYS = 30;
+const PH_KEY = "festivals_photos_v2", PH_DAYS = 30;
 let PHC = {}; try { PHC = JSON.parse(localStorage.getItem(PH_KEY) || "{}"); } catch(e) {}
 const phAsk = {};
-const phSize = (src, want, full) => full && full < want ? src : String(src).replace(/\/(\d+)px-([^/]+)$/, `/${want}px-$2`);
-/** {s: thumb, b: big, x: extract, u: page} for an article, or null when it has no picture. Network errors are not remembered. */
+/* Wikimedia serves hotlinked thumbnails only at its standard widths (20, 40, 60, 120, 250, 330, 500, 960, 1280, 1920, 3840):
+   any other width is refused. So ask for standard widths, smaller than the original, then the API's own thumbnail, then the original. */
+const PH_STD = { grid: [500, 330, 250], big: [960, 1280, 500] };
+function phUrls(d, kind){
+  const out = [], sized = w => String(d.t).replace(/\/(\d+)px-([^/]+)$/, `/${w}px-$2`);
+  if (/\/thumb\//.test(d.t)) PH_STD[kind].forEach(w => { if (!d.w || w < d.w) out.push(sized(w)); });
+  out.push(d.t); if (d.o) out.push(d.o);
+  return [...new Set(out)];
+}
+/** Try each address in turn; cb(true) once one loads, cb(false) when none does. */
+function phLoad(img, urls, cb){
+  // CORS first, so the service worker can keep a normal copy; one last plain try in case a server leaves out the CORS header
+  let i = 0; img.crossOrigin = "anonymous";
+  const next = () => {
+    if (i < urls.length) { img.src = urls[i++]; return; }
+    if (img.crossOrigin) { img.removeAttribute("crossorigin"); i = urls.length; img.src = urls[0]; return; }
+    cb(false);
+  };
+  img.onload = () => cb(true); img.onerror = next; next();
+}
+/** {t: thumbnail, o: original, w: original width, x: extract, u: page} for an article, or null when it has no picture.
+    Network errors are not remembered. */
 function wikiPhoto(t){
   const c = PHC[t]; if (c && c.at > Date.now() - PH_DAYS * 864e5) return Promise.resolve(c.d);
   if (phAsk[t]) return phAsk[t];
@@ -1690,8 +1710,8 @@ function wikiPhoto(t){
     if (!r.ok) throw new Error("wiki " + r.status);
     return r.json().then(j => {
       if (!j || j.type !== "standard" || !j.thumbnail) return null;
-      const full = j.originalimage ? j.originalimage.width : 0;
-      return { s: phSize(j.thumbnail.source, 480, full), b: phSize(j.thumbnail.source, 1024, full), x: j.extract || "", u: (j.content_urls && j.content_urls.desktop && j.content_urls.desktop.page) || "https://en.wikipedia.org/wiki/" + t };
+      const o = j.originalimage || {};
+      return { t: j.thumbnail.source, o: o.source || "", w: o.width || 0, x: j.extract || "", u: (j.content_urls && j.content_urls.desktop && j.content_urls.desktop.page) || "https://en.wikipedia.org/wiki/" + t };
     });
   }).then(d => { PHC[t] = { d, at: Date.now() }; try { localStorage.setItem(PH_KEY, JSON.stringify(PHC)); } catch(e) {} return d; })
     .catch(() => { delete phAsk[t]; return undefined; });            // offline or blocked: try again next time
@@ -1706,14 +1726,19 @@ function photosHTML(b){
 function phFill(fig){
   if (fig.dataset.h) return; fig.dataset.h = 1;
   const t = fig.dataset.wiki, box = fig.querySelector(".ph-img");
+  const failed = () => {
+    box.innerHTML = `<span class="ph-wait">${navigator.onLine === false ? "Photo needs internet" : "Photo didn't load · tap to try again"}</span>`;
+    box.onclick = () => { box.onclick = null; box.innerHTML = `<span class="ph-wait" aria-hidden="true">📷</span>`; fig.dataset.h = ""; phFill(fig); };
+  };
   wikiPhoto(t).then(d => {
-    if (d === undefined) { fig.dataset.h = ""; box.innerHTML = `<span class="ph-wait">Photo needs internet</span>`; return; }
+    if (d === undefined) return failed();
     if (!d) { fig.classList.add("ph-none"); box.innerHTML = `<span class="ph-wait">No photo</span>`; box.disabled = true; return; }
-    const img = new Image(); img.crossOrigin = "anonymous"; img.decoding = "async"; img.alt = fig.querySelector("b").textContent;
-    img.onload = () => { box.innerHTML = ""; box.appendChild(img); fig.classList.add("ph-ok"); };
-    img.onerror = () => { fig.dataset.h = ""; box.innerHTML = `<span class="ph-wait">Photo needs internet</span>`; };
-    img.src = d.s;
-    box.onclick = () => phOpen(t, img.alt, fig.querySelector("figcaption span").textContent);
+    const img = new Image(); img.decoding = "async"; img.alt = fig.querySelector("b").textContent;
+    phLoad(img, phUrls(d, "grid"), ok => {
+      if (!ok) return failed();
+      box.innerHTML = ""; box.appendChild(img); fig.classList.add("ph-ok");
+      box.onclick = () => phOpen(t, img.alt, fig.querySelector("figcaption span").textContent);
+    });
   });
 }
 const phSeen = "IntersectionObserver" in window ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { phSeen.unobserve(e.target); phFill(e.target); } }), { rootMargin: "300px" }) : null;
@@ -1724,13 +1749,14 @@ function phOpen(t, name, note){
   wikiPhoto(t).then(d => {
     if (!d) return;
     const ov = document.createElement("div"); ov.className = "ph-over"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", name);
-    ov.innerHTML = `<div class="ph-card"><button type="button" class="ph-x" aria-label="Close">✕</button><img src="${esc(d.b)}" alt="${esc(name)}" crossorigin="anonymous">
+    ov.innerHTML = `<div class="ph-card"><button type="button" class="ph-x" aria-label="Close">✕</button><img alt="${esc(name)}">
       <div class="ph-body"><h3>${esc(name)}</h3><p class="muted" style="margin:0 0 8px">${esc(note)}</p>${d.x ? `<p style="margin:0 0 10px">${esc(d.x)}</p>` : ""}
       <a href="${esc(d.u)}" target="_blank" rel="noopener">Read on Wikipedia ↗</a></div></div>`;
     const close = () => { ov.remove(); document.removeEventListener("keydown", key); };
     const key = e => { if (e.key === "Escape") close(); };
     ov.onclick = e => { if (e.target === ov || e.target.closest(".ph-x")) close(); };
     document.addEventListener("keydown", key); document.body.appendChild(ov); ov.querySelector(".ph-x").focus();
+    phLoad(ov.querySelector("img"), phUrls(d, "big"), () => {});
   });
 }
 /* Revise → Photo quiz: name the festival from its picture */
@@ -1749,7 +1775,8 @@ function pqNext(){
     PQ.fails = 0; PQ.cur = pick;
     const names = [...new Set(PHOTO_ITEMS.map(x => x.n))].filter(n => n !== pick.n);
     const opts = shuffle([pick.n].concat(shuffle(names).slice(0, 3)));
-    $("#pqi").innerHTML = `<img src="${esc(d.s)}" alt="A festival photo" crossorigin="anonymous">`;
+    const img = new Image(); img.alt = "A festival photo"; $("#pqi").innerHTML = ""; $("#pqi").appendChild(img);
+    phLoad(img, phUrls(d, "grid"), ok => { if (!ok && $("#pqi") && $("#pqi").contains(img)) { $("#pqi").innerHTML = `<span class="ph-wait">This photo didn't load — tap Next photo after answering.</span>`; } });
     $("#pqe").innerHTML = "";
     $("#pqo").innerHTML = opts.map((o, k) => `<button type="button" class="opt" data-o="${esc(o)}"><span class="k">${"ABCD"[k]}</span><span>${esc(o)}</span></button>`).join("");
     $("#pqo").querySelectorAll("[data-o]").forEach(b => b.onclick = () => {
