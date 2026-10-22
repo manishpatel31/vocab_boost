@@ -14,7 +14,7 @@ const CITY = {
   'Hisar': [75.72, 29.15], 'Bareilly': [79.43, 28.37], 'Kottayam': [76.52, 9.59], 'Guntur': [80.44, 16.31], 'Anand': [72.95, 22.56],
   'Vadodara': [73.18, 22.31], 'Noida': [77.39, 28.54], 'Gurugram': [77.03, 28.46], 'Haridwar': [78.16, 29.95], 'Ghaziabad': [77.44, 28.67],
   'Patiala': [76.39, 30.34], 'Gwalior': [78.18, 26.22], 'Imphal': [93.94, 24.81], 'Amritsar': [74.87, 31.63], 'Bhubaneswar': [85.82, 20.29],
-  'Guwahati': [91.74, 26.14], 'Belagavi': [74.5, 15.85], 'Aligarh': [78.08, 27.88], 'Santiniketan': [87.68, 23.68], 'Amalner': [75.06, 21.04], 'Ludhiana': [75.86, 30.9], 'Bhopal': [77.41, 23.26], 'Indore': [75.86, 22.72], 'Kanyakumari': [77.54, 8.08], 'Srinagar': [74.8, 34.08],
+  'Guwahati': [91.74, 26.14], 'Belagavi': [74.5, 15.85], 'Aligarh': [78.08, 27.88], 'Santiniketan': [87.68, 23.68], 'Amalner': [75.06, 21.04], 'Ludhiana': [75.86, 30.9], 'Patna': [85.14, 25.6], 'Surat': [72.83, 21.17], 'Nashik': [73.79, 20.0], 'Haridwar': [78.16, 29.95], 'Srinagar': [74.8, 34.08], 'Bhopal': [77.41, 23.26], 'Indore': [75.86, 22.72], 'Kanyakumari': [77.54, 8.08], 'Srinagar': [74.8, 34.08],
   // the world
   'New York': [-74.0, 40.71], 'Washington, D.C.': [-77.04, 38.9], 'Geneva': [6.14, 46.2], 'Paris': [2.35, 48.86], 'Bern': [7.45, 46.95],
   'Rome': [12.5, 41.9], 'Vienna': [16.37, 48.21], 'Nairobi': [36.82, -1.29], 'The Hague': [4.3, 52.08], 'London': [-0.13, 51.51],

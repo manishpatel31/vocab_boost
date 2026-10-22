@@ -257,7 +257,7 @@ function mapSVG(o = {}){
   let vx0 = 0, vx1 = INDIA_MAP.w;
   (o.pins || []).forEach(([n, lo, la, note, side]) => { const [x] = MAP_PROJ(lo, la), w = Math.max(n.length * 7.6, (note || "").length * 5.6) + 12;
     if (side === "n") return; if (side === "l") vx0 = Math.min(vx0, x - w); else vx1 = Math.max(vx1, x + w); });
-  return `<svg class="imap${o.faint ? " faint" : ""}" viewBox="${o.vb || `${vx0.toFixed(0)} 0 ${(vx1 - vx0).toFixed(0)} ${INDIA_MAP.h}`}" role="img" aria-label="Map of India with its states">${paths}${hits}${labels}${marks}${pins}</svg>`;
+  return `<svg class="imap${o.faint ? " faint" : ""}" viewBox="${o.vb || `${vx0.toFixed(0)} 0 ${(vx1 - vx0).toFixed(0)} ${INDIA_MAP.h}`}" role="img" aria-label="Map of India with its states">${paths}${o.under || ""}${hits}${labels}${marks}${pins}</svg>`;
 }
 const MAP_CREDIT = `<p class="map-credit">Map data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a> (ODbL), drawn in India's official outline; simplified, not to scale.</p>`;
 /** What one state holds: its festivals in this app, with links to their lessons. */
@@ -364,7 +364,7 @@ function visPlace(list){
 }
 function visBlock(b){
   const f = { photos: photosHTML, indiamap: indiaMapHTML, mapfig: mapFigHTML, statechart: stateChartHTML, info: infoHTML, tlfig: tlFigHTML,
-    bars: barsHTML, calendar: calendarHTML, shelf: shelfHTML, cards: cardsHTML, worldfig: typeof worldFigHTML === "function" ? worldFigHTML : null }[b.k];
+    bars: barsHTML, calendar: calendarHTML, shelf: shelfHTML, cards: cardsHTML, rivermap: riverMapHTML, worldfig: typeof worldFigHTML === "function" ? worldFigHTML : null }[b.k];
   return f ? f(b) : "";
 }
 /* A shelf of book covers: rows [title, author, badge]. */
@@ -410,6 +410,76 @@ function mapQuiz(box){
 }
 
 
+/* ============================================================
+   RIVERS — needs study-rivers.js (RIVERS). Block {k:"rivermap", title, show?: [rivers] (default all), hl?: [rivers drawn bold],
+   label?: true | [rivers], pins?, marks?, vb?, info?: {river: "what to remember"}, chips?: true, cap}
+   Rivers are coloured by system; white dashes run downstream along the highlighted ones. Tap a river for its card.
+   ============================================================ */
+const RV_SYS = { indus: ["Indus system", "#2f6db5"], ganga: ["Ganga system", "#1c8aa6"], brahmaputra: ["Brahmaputra system", "#6a5acd"],
+  barak: ["Barak", "#6a5acd"], east: ["East-flowing (peninsula)", "#2a9d6f"], west: ["West-flowing", "#c46a1c"] };
+function riverSVG(b){
+  if (typeof RIVERS === "undefined") return "";
+  const show = b.show || Object.keys(RIVERS), hl = new Set(b.hl || []), lab = b.label === true ? (b.hl || show) : (b.label || []);
+  const under = show.filter(n => RIVERS[n]).map(n => { const r = RIVERS[n], c = RV_SYS[r.s][1], on = !hl.size || hl.has(n);
+    return `<path d="${r.d}" class="rv${on ? "" : " dim"}${hl.has(n) ? " hl" : ""}" style="stroke:${c}" data-rv="${esc(n)}" data-sys="${r.s}"/>` +
+      (on ? `<path d="${r.d}" class="rvf${hl.has(n) ? " hl" : ""}" data-rvf="${esc(n)}" data-sys="${r.s}"/>` : "") +
+      `<path d="${r.d}" class="rvhit" data-rv="${esc(n)}"><title>${esc(n)}</title></path>`; }).join("") +
+    lab.filter(n => RIVERS[n]).map(n => { const r = RIVERS[n], [x, y] = (b.at && b.at[n]) || r.m;
+      return `<text x="${x}" y="${y}" class="rvl" style="fill:${RV_SYS[r.s][1]}" data-rvl="${esc(n)}">${esc(n)}</text>`; }).join("");
+  return mapSVG({ faint: 1, under, pins: b.pins, marks: b.marks, vb: b.vb });
+}
+function riverMapHTML(b){
+  const sys = [...new Set((b.show || Object.keys(typeof RIVERS === "undefined" ? {} : RIVERS)).map(n => RIVERS[n] && RIVERS[n].s).filter(Boolean))].filter(s => s !== "barak");
+  const chips = b.chips ? `<div class="rvchips" role="group" aria-label="Show a river system"><button type="button" class="chip" data-rsys="" aria-pressed="true">All</button>${sys.map(s => `<button type="button" class="chip" data-rsys="${s}" aria-pressed="false"><i style="background:${RV_SYS[s][1]}"></i>${RV_SYS[s][0].replace(" system", "")}</button>`).join("")}</div>` : "";
+  const side = b.info ? `<div class="map-side" data-rside><p class="muted" style="margin:0">Tap a river to see what to remember.</p></div>` : "";
+  return `<div class="block phblock"><h3>${b.title}</h3>${chips}<div class="map-wrap${side ? "" : " one"}" data-rmap='${esc(JSON.stringify(b.info || {})).replace(/'/g, "&#39;")}'>${riverSVG(b)}${side}</div>
+    <p class="map-cap">${b.cap || ""}</p><p class="map-credit">Rivers: Natural Earth (public domain), some drawn simplified. ${MAP_CREDIT.replace(/<\/?p[^>]*>/g, "")}</p></div>`;
+}
+function rvScan(root){
+  (root || document).querySelectorAll("[data-rmap]:not([data-wired])").forEach(w => { w.dataset.wired = 1;
+    const info = JSON.parse(w.dataset.rmap || "{}"), side = w.querySelector("[data-rside]"), svg = w.querySelector("svg");
+    const pick = n => { svg.querySelectorAll(".rv.sel,.rvf.sel").forEach(e => e.classList.remove("sel"));
+      svg.querySelectorAll(`[data-rv="${CSS.escape(n)}"].rv, [data-rvf="${CSS.escape(n)}"]`).forEach(e => e.classList.add("sel"));
+      if (side) { const r = RIVERS[n]; side.innerHTML = `<div class="map-panel"><h3 style="color:${RV_SYS[r.s][1]}">${esc(n)}</h3><p class="muted" style="margin:0 0 6px">${RV_SYS[r.s][0]}</p><p style="margin:0">${info[n] || ""}</p></div>`; } };
+    svg.querySelectorAll(".rvhit").forEach(h => h.addEventListener("click", e => { e.stopPropagation(); pick(h.dataset.rv); }));
+    const blk = w.closest(".block");
+    blk.querySelectorAll("[data-rsys]").forEach(c => c.onclick = () => { const s0 = c.dataset.rsys;
+      blk.querySelectorAll("[data-rsys]").forEach(x => x.setAttribute("aria-pressed", x === c));
+      svg.querySelectorAll("[data-sys]").forEach(e => e.classList.toggle("off", !!s0 && e.dataset.sys !== s0 && !(s0 === "brahmaputra" && e.dataset.sys === "barak")));
+      svg.querySelectorAll("[data-rvl]").forEach(e => { const r = RIVERS[e.dataset.rvl]; e.classList.toggle("off", !!s0 && r.s !== s0); }); });
+  });
+}
+/* Revise → River quiz: tap the river that is named (VIS.riverQuiz lists them; VIS.riverInfo gives the note after). */
+let RQ = { score: 0, tried: 0, streak: 0, cur: null, done: false };
+function riverQuiz(box){
+  if (typeof RIVERS === "undefined") return;
+  const pool = (VIS.riverQuiz || Object.keys(RIVERS)).filter(n => RIVERS[n]), n = RQ.cur && !RQ.done ? RQ.cur : pool[Math.floor(Math.random() * pool.length)];
+  RQ.cur = n; RQ.done = false; const sc = () => `${RQ.score}/${RQ.tried}${RQ.streak > 1 ? " · 🔥 " + RQ.streak : ""}`;
+  box.innerHTML = `<p class="muted">Tap the river on the map. Rivers are coloured by system; use ＋ or ⛶ to zoom in.</p>
+    <div class="block"><div class="row between"><span class="eyebrow">River quiz</span><span class="num" id="rqs">${sc()}</span></div>
+    <p class="qt" style="margin:8px 0 4px">Tap the <b>${esc(n)}</b></p><div class="map-wrap one">${riverSVG({ show: Object.keys(RIVERS) })}</div><div id="rqe"></div></div>`;
+  const svg = box.querySelector("svg");
+  const lab = m => { const r = RIVERS[m]; svg.insertAdjacentHTML("beforeend", `<text x="${r.m[0]}" y="${r.m[1]}" class="rvl" style="fill:${RV_SYS[r.s][1]}">${esc(m)}</text>`);
+    svg.querySelectorAll(`.rv[data-rv="${CSS.escape(m)}"], [data-rvf="${CSS.escape(m)}"]`).forEach(e => e.classList.add("sel")); };
+  svg.querySelectorAll(".rvhit").forEach(h => h.addEventListener("click", e => { e.stopPropagation(); if (RQ.done) return;
+    RQ.done = true; RQ.tried++; const got = h.dataset.rv, ok = got === n; if (ok) { RQ.score++; RQ.streak++; } else RQ.streak = 0;
+    lab(n); if (!ok) lab(got); $("#rqs").textContent = sc();
+    const info = (VIS.riverInfo || {})[n];
+    $("#rqe").innerHTML = `<div class="exp"><b class="${ok ? "okl" : "nol"}">${ok ? "Correct." : "That was the " + esc(got) + "."}</b> ${info ? esc(n) + " — " + info : ""}</div>
+      <div class="row end" style="margin-top:10px"><button type="button" class="btn pri" id="rqn">Next river</button></div>`;
+    $("#rqn").onclick = () => { RQ.cur = null; riverQuiz(box); }; }));
+}
+const RV_CSS = `.imap .rv{fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;transition:opacity .2s;vector-effect:non-scaling-stroke}
+.imap .rv.hl{stroke-width:2.8}.imap .rv.dim{opacity:.35;stroke-width:1.1}.imap .rv.sel{stroke-width:4}
+.imap .rvf{fill:none;stroke:#fff;stroke-opacity:.9;stroke-width:1;stroke-dasharray:2 7;stroke-linecap:round;animation:rvflow 1.3s linear infinite;pointer-events:none;vector-effect:non-scaling-stroke}
+.imap .rvf.hl{stroke-width:1.3}.imap .rvf.sel{stroke-width:1.7}
+@keyframes rvflow{to{stroke-dashoffset:-9}}
+@media (prefers-reduced-motion:reduce){.imap .rvf,.dg .rvf{animation:none}}
+.imap .rvhit{fill:none;stroke:transparent;stroke-width:14;cursor:pointer;pointer-events:stroke;vector-effect:non-scaling-stroke}
+.imap .rvl{font:700 10.5px var(--f-body);paint-order:stroke;stroke:var(--sheet);stroke-width:3px;pointer-events:none}
+.imap .off{opacity:.08!important}.imap .rvl.off{opacity:0!important}
+.rvchips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}.rvchips i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.rvchips [aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}`;
 /* ============================================================
    ZOOM — every map and diagram gets ＋ − ⛶ : zoom in place (drag to move), or open it full screen
    (pinch, mouse wheel, drag, double-tap). Works by changing the SVG's viewBox, so it stays sharp.
@@ -532,6 +602,7 @@ function visInit(){
 @media (max-width:760px){.map-wrap{grid-template-columns:1fr}}
 .imap{width:100%;height:auto;display:block;touch-action:manipulation}
 ${ZM_CSS}
+${RV_CSS}
 .imap .st{stroke:var(--ink2);stroke-width:.6;stroke-linejoin:round;cursor:pointer;transition:fill .15s}
 .imap .r1{fill:var(--accent-bg)} .imap .r2{fill:var(--blue-bg)} .imap .r3{fill:var(--warn-bg)} .imap .r4{fill:var(--good-bg)} .imap .r5{fill:var(--sunk)}
 .imap .st:hover{fill:color-mix(in srgb,var(--accent) 35%,var(--sheet))}
@@ -539,7 +610,7 @@ ${ZM_CSS}
 .imap .hit{fill:transparent;cursor:pointer}
 .imap .lb{font:700 11px var(--f-body);fill:var(--ink);text-anchor:middle;pointer-events:none;paint-order:stroke;stroke:var(--sheet);stroke-width:2.5px}
 .imap .lb.on{fill:#fff;stroke:rgba(0,0,0,.35)}
-.imap.faint .st{fill:var(--sunk);stroke:color-mix(in srgb,var(--ink2) 45%,transparent);cursor:default}
+.imap.faint .st{fill:var(--sunk);stroke:color-mix(in srgb,var(--ink2) 45%,transparent);cursor:default;pointer-events:none}
 .imap .pin{fill:var(--accent);stroke:var(--sheet);stroke-width:1.5}
 .imap .pn{font:700 13px var(--f-body);fill:var(--ink);paint-order:stroke;stroke:var(--sheet);stroke-width:3px}
 .imap .pnote{font:500 10px var(--f-body);fill:var(--ink2);paint-order:stroke;stroke:var(--sheet);stroke-width:3px}
@@ -581,5 +652,5 @@ ${ZM_CSS}
 @media (prefers-reduced-motion:reduce){.anim-in{animation:none}}`; document.head.appendChild(st); }
   PH_KEY = VIS.key; try { PHC = JSON.parse(localStorage.getItem(PH_KEY) || "{}"); } catch(e) {}
   PHOTO_ITEMS = phItems(); MQ_POOL = visRows().filter(f => mapOf(f[1]));
-  new MutationObserver(() => { phScan($("#app")); mapScan($("#app")); zmScan($("#app")); }).observe($("#app"), { childList: true, subtree: true });
+  new MutationObserver(() => { phScan($("#app")); mapScan($("#app")); rvScan($("#app")); zmScan($("#app")); }).observe($("#app"), { childList: true, subtree: true });
 }
