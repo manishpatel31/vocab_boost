@@ -1380,8 +1380,8 @@ function blockHTML(b){
   if (b.k==="facts") return `<div class="block"><h3>${b.title}</h3><dl class="facts">${b.rows.map(r=>`<div><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join("")}</dl></div>`;
   if (b.k==="tl") return `<div class="block"><h3>${b.title}</h3><ul class="tl">${b.rows.map(r=>`<li><span class="y">${r[0]}</span><span>${r[1]}</span></li>`).join("")}</ul></div>`;
   if (b.k==="table") return `<div class="block"><h3>${b.title}</h3><div class="tbl"><table><thead><tr>${b.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${b.rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
-  if (b.k==="fig") return `<div class="block"><h3>${b.title}</h3><figure class="fig">${b.svg}<figcaption>${b.cap}</figcaption></figure></div>`;
-  return "";
+  if (b.k==="fig") return `<div class="block${b.wide?" phblock":""}"><h3>${b.title}</h3><figure class="fig${b.wide?" wide":""}"${b.wide?` style="--minw:${b.wide}px"`:""}>${b.svg}<figcaption>${b.cap}</figcaption></figure></div>`;
+  return typeof visBlock === "function" ? visBlock(b) : "";      // photos, maps, charts, timelines… from study-visual.js
 }
 
 let LQ = null;
@@ -1681,6 +1681,7 @@ function reviseTabs(){
   t.push(["tricks","Tricks"],["traps","Traps"]);
   if (TILES.length) t.push(["nums","Numbers"]);
   if (!HUB) t.push(["flash","Flashcards"]);
+  if (typeof VIS !== "undefined") (VIS.tabs || []).forEach(x => t.push(x));      // e.g. ["vphotos","Photo quiz"], ["vmap","Map quiz"]
   return t;
 }
 function renderRevise(){
@@ -1710,6 +1711,8 @@ function renderRevise(){
   }
   if (RV === "nums") box.innerHTML = `<div class="tiles">${TILES.map(t=>`<div class="tile"><span class="num">${t[0]}</span><span>${t[1]}</span></div>`).join("")}</div>`;
   if (RV === "flash") drawFlash(box);
+  if (RV === "vphotos") photoQuiz(box);
+  if (RV === "vmap") mapQuiz(box);
 }
 /* Where the marks come from: lessons × exams, 0–3. The note says what the levels are based on. */
 function heatHTML(full){
@@ -1941,6 +1944,7 @@ function renderPlan(){
 /* ============================================================
    BOOT
    ============================================================ */
+if (typeof VIS !== "undefined" && typeof visInit === "function") visInit();
 renderTop();
 const hashTab = () => (location.hash||"").replace("#","");
 go(TABS.includes(hashTab()) ? hashTab() : TABS[0]);

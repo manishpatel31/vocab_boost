@@ -7,7 +7,7 @@
 // questions; the engine and look are shared with the other workbooks (tools/workbook/).
 // Afterwards run tools/index_app.js for each subject app (see tools/README.md).
 const path = require('path');
-const { hash, fail, loadData, check, writePage } = require('../workbook/lib.js');
+const { hash, fail, loadData, check, writePage, applyVisual } = require('../workbook/lib.js');
 const DATA = path.join(__dirname, 'data');
 const CFG = require('./apps.js');
 
@@ -57,9 +57,12 @@ CFG.apps.forEach(a => {
   const part = {}; (a.parts || []).forEach(p => p[2].forEach(id => { part[id] = [p[0], p[1]]; }));
   const lessons = a.lessons.map(id => Object.assign({}, byId.get(id), part[id] ? { part: part[id] } : {}));
   const qb = QB.filter(r => ids.has(r[0]));
-  const size = writePage({ file: a.file, title: a.title, brand: a.title, small: a.hi + ' · SSC CGL workbook', tabs: ['learn', 'practice', 'mock', 'revise', 'plan'], source: SOURCE }, {
+  // photos, maps and diagrams for one app: tools/history/visual/<id>.js (copies, so the hub's lessons stay as they are)
+  const own = lessons.map(l => JSON.parse(JSON.stringify(l)));
+  const V = applyVisual(path.join(__dirname, 'visual', a.id + '.js'), own, { QB: qb });
+  const size = writePage({ file: a.file, title: a.title, brand: a.title, small: a.hi + ' · SSC CGL workbook', tabs: ['learn', 'practice', 'mock', 'revise', 'plan'], source: SOURCE, visual: V.visual }, {
     APP: { id: a.id, key: a.key, mode: 'era', era: a.era, title: a.title, hi: a.hi, ico: a.ico, tagline: 'History for SSC', plans: a.plans, hub: hubRef, apps: CFG.apps.map(appRef) },
-    GROUPS, LESSONS: lessons, QB: qb,
+    GROUPS, LESSONS: own, QB: qb, VIS: V.VIS,
     TIMELINE: ctx.TIMELINE.filter(t => t.era === a.era),
     LASTMOMENT: ctx.LASTMOMENT.filter(c => (c.era || []).includes(a.era)),
     TILES: ctx.TILES.filter(t => t[2] === a.era),
