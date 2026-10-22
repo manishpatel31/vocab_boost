@@ -1794,7 +1794,7 @@ function phOpenverse(name){
     const r = (j.results || []).find(x => x.thumbnail && phMatch((x.title || "") + " " + (x.tags || []).map(t => t.name).join(" "), name));
     return r ? { t: r.thumbnail, o: r.url, w: r.width || 0, x: "", u: r.foreign_landing_url || "", src: "openverse",
       by: [r.creator, r.license ? (r.license === "cc0" || r.license === "pdm" ? r.license.toUpperCase() : "CC " + r.license.toUpperCase() + " " + (r.license_version || "")) : ""].filter(Boolean).join(" · ") } : null;
-  }).catch(() => null);
+  }).catch(() => undefined);                // could not ask: try again next time rather than remember "no photo"
 }
 function phFind(t){
   const { name, place } = phInfo(t);
@@ -1886,7 +1886,11 @@ function pqNext(){
   const pick = PHOTO_ITEMS[Math.floor(Math.random() * PHOTO_ITEMS.length)];
   wikiPhoto(pick.w).then(d => {
     if (!$("#pqi")) return;
-    if (!d) { PQ.fails++; if (d === undefined && PQ.fails > 4) { $("#pqi").innerHTML = `<span class="ph-wait">The photo quiz needs internet — connect and open it again.</span>`; PQ.fails = 0; return; } return pqNext(); }
+    if (!d) {                              // no photo for this one: try another, but give up after a few, so the page never spins
+      PQ.fails++;
+      if (PQ.fails > (d === undefined ? 4 : 30)) { $("#pqi").innerHTML = `<span class="ph-wait">${d === undefined ? "The photo quiz needs internet — connect and open it again." : "Not enough photos found yet — open a few lessons first, then try again."}</span>`; PQ.fails = 0; return; }
+      return setTimeout(pqNext, 0);
+    }
     PQ.fails = 0; PQ.cur = pick;
     const names = [...new Set(PHOTO_ITEMS.map(x => x.n))].filter(n => n !== pick.n);
     const opts = shuffle([pick.n].concat(shuffle(names).slice(0, 3)));
