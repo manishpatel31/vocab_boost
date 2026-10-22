@@ -8,7 +8,7 @@
 // questions (see below). 40_exam.js gives GROUPS, ERANOTE, INTROS and HEATMAP.
 // Afterwards, for each app: node tools/index_app.js <file> <id> gs   and   node tools/check_app.js <file>
 const fs = require('fs'), path = require('path');
-const { fail, hash, loadData, check, writePage } = require('../workbook/lib.js');
+const { fail, hash, loadData, check, writePage, applyVisual } = require('../workbook/lib.js');
 
 const APPS = [
   { dir: 'books', id: 'books', file: 'study-books-authors.html', key: 'books_authors_v1', era: 'bk', title: 'Books & Authors', hi: 'पुस्तकें और लेखक',
@@ -67,12 +67,14 @@ APPS.filter(a => !only || a.id === only || a.dir === only).forEach(app => {
   const tls = LESSONS.map(l => (l.blocks.find(b => b.k === 'tl') || {}).rows || []).flat();
   const lab = fs.readFileSync(path.join(dir, 'lab.js'), 'utf8') + '\n' + fs.readFileSync(path.join(__dirname, '..', 'workbook', 'games.js'), 'utf8');
   const tabs = ['learn', 'practice', 'mock', 'lab', 'revise', 'plan'];
+  // photos, maps, charts and timelines: tools/gk/<dir>/visual.js (see applyVisual in tools/workbook/lib.js)
+  const V = applyVisual(path.join(dir, 'visual.js'), LESSONS, { QB: qb, TILES: ctx.TILES });
   const size = writePage({ file: app.file, title: app.title, brand: app.title, small: app.hi + ' · SSC CGL · CHSL · MTS · RRB NTPC', tabs,
-    source: 'tools/gk/build.js from tools/gk/' + app.dir, extra: lab }, {
+    source: 'tools/gk/build.js from tools/gk/' + app.dir, extra: lab, visual: V.visual }, {
     APP: { id: app.id, key: app.key, mode: 'era', era: app.era, title: app.title, hi: app.hi, tagline: 'SSC CGL · CHSL · MTS · RRB NTPC',
       plans: [3, 5, 7, 10, 15], storyLabel: 'The story first · two minutes', keyLabel: 'Remember this:', apps: [], tabs },
     GROUPS: ctx.GROUPS, LESSONS, QB: qb, TIMELINE: tls.length ? [{ era: app.era, rows: tls }] : [],
-    LASTMOMENT: ctx.LASTMOMENT, TILES: ctx.TILES, ERANOTE: ctx.ERANOTE, INTROS: ctx.INTROS, HEATMAP: ctx.HEATMAP
+    LASTMOMENT: ctx.LASTMOMENT, TILES: ctx.TILES, ERANOTE: ctx.ERANOTE, INTROS: ctx.INTROS, HEATMAP: ctx.HEATMAP, VIS: V.VIS
   });
   const rep = qb.filter(r => r[7]).length, p = qb.filter(r => r[4] === 'p').length;
   console.log(`${app.file.padEnd(30)} ${LESSONS.length} lessons, ${qb.length} questions (${rep} reported in papers, ${p} repeatedly asked), ` +
