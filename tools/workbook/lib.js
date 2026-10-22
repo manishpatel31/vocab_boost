@@ -91,7 +91,7 @@ function applyVisual(file, LESSONS, extra){
   const strip = s => String(s == null ? '' : s).replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').trim();
   const rows = (id, title) => { const l = byId.get(id), b = l && l.blocks.find(b => b.rows && b.title && strip(b.title).startsWith(title));
     if (!b) fail(path.basename(file) + ': ' + id + ' has no table "' + title + '"'); return b.rows.map(r => r.map(strip)); };
-  const ctx = Object.assign({ place, rows, LESSONS, VISUAL: null, fail }, extra || {}); vm.createContext(ctx);
+  const ctx = Object.assign({ place, rows, LESSONS, VISUAL: null, fail, GEO: require('./geo.js') }, extra || {}); vm.createContext(ctx);
   vm.runInContext(fs.readFileSync(file, 'utf8').replace(/^const (\w+)/gm, 'var $1'), ctx, { filename: file });
   return ctx.VISUAL ? { visual: ctx.VISUAL.mode || true, VIS: ctx.VISUAL.VIS || null } : {};
 }

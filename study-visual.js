@@ -5,6 +5,7 @@
 
    A page loads this file before its own script, sets VIS, and calls visInit() just before it boots:
      const VIS = { key: "<photo cache key>", word: "festival", words: "festivals", ask: "Which state celebrates",
+                   search: "<word added to photo searches; default word>", quiz: "<noun in the photo quiz; default word>",
                    sig: { <state code>: "the one to remember", … } };
    and draws blocks {k:"photos"}, {k:"indiamap"}, {k:"mapfig"} with photosHTML / indiaMapHTML / mapFigHTML.
    It uses the page's LESSONS, $, esc, shuffle, LNUM and openLesson, and for the map features the rows
@@ -104,7 +105,7 @@ function phInfo(t){ const it = PHOTO_ITEMS.find(x => x.w === t) || { n: t.replac
 function phJSON(url){ return fetch(url).then(r => { if (!r.ok) { PH_WHY = "Wikipedia answered " + r.status; throw new Error(PH_WHY); } return r.json(); }); }
 /* Last stop: Openverse, a search of openly licensed photos from Flickr, museums and others (no key needed). */
 function phOpenverse(name){
-  const q = new RegExp("\\b" + VIS.word + "\\b|mela|puja|fair|yatra|jatra|utsav|feast", "i").test(name) ? name : name + " " + VIS.word;
+  const w = visSearchWord(), q = !w || new RegExp("\\b" + w + "\\b|mela|puja|fair|yatra|jatra|utsav|feast", "i").test(name) ? name : name + " " + w;
   return phJSON("https://api.openverse.org/v1/images/?page_size=15&mature=false&q=" + encodeURIComponent(q)).then(j => {
     const r = (j.results || []).find(x => x.thumbnail && phMatch((x.title || "") + " " + (x.tags || []).map(t => t.name).join(" "), name));
     return r ? { t: r.thumbnail, o: r.url, w: r.width || 0, x: "", u: r.foreign_landing_url || "", src: "openverse",
@@ -115,7 +116,7 @@ function phFind(t){
   const { name, place } = phInfo(t);
   const wq = "https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&origin=*&generator=search&gsrlimit=6" +
     "&prop=pageimages%7Cextracts%7Cinfo&inprop=url&piprop=thumbnail%7Coriginal&pithumbsize=500&exintro=1&explaintext=1&exsentences=3&exlimit=6&gsrsearch=" +
-    encodeURIComponent(`${name}${new RegExp("\\b" + VIS.word + "\\b", "i").test(name) ? "" : " " + VIS.word} ${/^[A-Z][A-Za-z&,' ]{2,40}$/.test(place) && !/^All India|^Marks|^\d/.test(place) ? place : ""}`.trim());
+    encodeURIComponent(`${name}${!visSearchWord() || new RegExp("\\b" + visSearchWord() + "\\b", "i").test(name) ? "" : " " + visSearchWord()} ${/^[A-Z][A-Za-z&,' ]{2,40}$/.test(place) && !/^All India|^Marks|^\d/.test(place) ? place : ""}`.trim());
   const cq = "https://commons.wikimedia.org/w/api.php?action=query&format=json&formatversion=2&origin=*&generator=search&gsrnamespace=6&gsrlimit=12" +
     "&prop=imageinfo&iiprop=url%7Csize%7Cmime&iiurlwidth=500&gsrsearch=" + encodeURIComponent(`${name} filetype:bitmap`);
   return phJSON(wq).then(j => {
@@ -159,7 +160,7 @@ function phFill(fig){
     if (d === undefined) return failed(PH_WHY || "can't reach Wikipedia");
     if (!d) {
       fig.classList.add("ph-none");
-      const q = encodeURIComponent(fig.querySelector("b").textContent + " " + VIS.word + " " + String(fig.querySelector("figcaption span").textContent).split(" · ")[0]);
+      const q = encodeURIComponent(fig.querySelector("b").textContent + " " + visSearchWord() + " " + String(fig.querySelector("figcaption span").textContent).split(" · ")[0]);
       box.outerHTML = `<div class="ph-img"><span class="ph-wait">No free photo found<br><a href="https://www.google.com/search?tbm=isch&q=${q}" target="_blank" rel="noopener">Search images ↗</a></span></div>`;
       return;
     }
@@ -192,7 +193,7 @@ function phOpen(t, name, note){
 /* Revise → Photo quiz: name the festival from its picture */
 let PQ = { score: 0, tried: 0, streak: 0, cur: null, fails: 0 };
 function photoQuiz(box){
-  box.innerHTML = `<p class="muted">Name the ${VIS.word} from its photo. Pictures come from Wikipedia, so this needs internet the first time; the ones you have seen are kept for offline use.</p>
+  box.innerHTML = `<p class="muted">Name the ${VIS.quiz || VIS.word} from its photo. Pictures come from Wikipedia, so this needs internet the first time; the ones you have seen are kept for offline use.</p>
     <div class="block pq"><div class="row between"><span class="eyebrow">Photo quiz</span><span class="num" id="pqs">${PQ.score}/${PQ.tried}${PQ.streak > 1 ? " · 🔥 " + PQ.streak : ""}</span></div>
     <div class="pq-img" id="pqi"><span class="ph-wait">Loading a photo…</span></div><div class="opts" id="pqo"></div><div id="pqe"></div></div>`;
   pqNext();
@@ -298,16 +299,20 @@ function stateChartHTML(b){
       `<text x="${(left + w + 6).toFixed(1)}" y="${y + 13}" font-size="12" class="b">${c}</text>`; }).join("") + `</svg>`;
   return `<div class="block phblock"><h3>${b.title}</h3><figure class="fig">${svg}<figcaption>${b.cap}</figcaption></figure></div>`;
 }
+const visSearchWord = () => VIS.search != null ? VIS.search : VIS.word;   // added to photo searches ("" when the names are people)
 const visRows = () => (typeof VIS !== "undefined" && VIS.rows) || (typeof FEST !== "undefined" ? FEST : []);
-/* A timeline: rows [year (number), label, note]; labels alternate above and below, in up to four rows, so they never overlap. */
+/* A timeline: rows [year (number), label, note]; labels alternate above and below the line in up to eight rows; when they would still overlap
+   (or b.vertical), it is drawn as a vertical list instead. */
 function tlFigHTML(b){
   const ev = b.rows.slice().sort((x, y) => x[0] - y[0]), y0 = ev[0][0], y1 = ev[ev.length - 1][0], span = Math.max(1, y1 - y0);
   const W = 680, x0 = 40, x1 = W - 40, X = yr => x0 + (x1 - x0) * (yr - y0) / span;
-  const NL = 8, lanes = Array.from({ length: NL }, () => []), place = [];   // lane k: above when even, below when odd; further out as k grows
+  const NL = 8, lanes = Array.from({ length: NL }, () => []), place = []; let crowded = false;   // lane k: above when even, below when odd; further out as k grows
   const anchor = x => x < x0 + 60 ? "start" : x > x1 - 60 ? "end" : "middle";
   ev.forEach(([yr, label, note]) => { const x = X(yr), w = Math.max((String(yr).length + 3 + label.length) * 7.4, (note || "").length * 6) + 12, an = anchor(x);
     const [l, r] = an === "start" ? [x - 6, x + w] : an === "end" ? [x - w, x + 6] : [x - w / 2, x + w / 2];
-    let k = 0; while (k < NL - 1 && lanes[k].some(([a, c]) => !(r < a || l > c))) k++; lanes[k].push([l, r]); place.push([yr, label, note, x, k]); });
+    let k = 0; while (k < NL && lanes[k].some(([a, c]) => !(r < a || l > c))) k++; if (k === NL) crowded = true; else lanes[k].push([l, r]); place.push([yr, label, note, x, k]); });
+  if (crowded || b.vertical) return `<div class="block phblock"><h3>${b.title}</h3><div class="vtl">${ev.map(([yr, label, note], i) =>
+    `<div class="vt anim-in" style="animation-delay:${Math.min(i, 15) * 35}ms"><b class="vy">${esc(String(yr))}</b><div><b>${esc(label)}</b>${note ? `<small>${esc(note)}</small>` : ""}</div></div>`).join("")}</div>${b.cap ? `<p class="map-cap">${b.cap}</p>` : ""}</div>`;
   const ly = k => k % 2 === 0 ? -34 - (k >> 1) * 50 : 44 + (k >> 1) * 50;     // label baseline, relative to the line
   const top = Math.min(-30, ...place.map(p => ly(p[4]) - 30)), bot = Math.max(30, ...place.map(p => ly(p[4]) + 22)), mid = -top + 10, H = mid + bot + 6;
   const ticks = []; const step = span > 120 ? 50 : span > 40 ? 10 : span > 15 ? 5 : 1;
@@ -320,14 +325,14 @@ function tlFigHTML(b){
         (note ? `<text x="${x.toFixed(0)}" y="${up ? y : y + 14}" text-anchor="${anc}" font-size="10.5" class="mut">${esc(note)}</text>` : ""); }).join("") + `</svg>`;
   return `<div class="block phblock"><h3>${b.title}</h3><figure class="fig wide" style="--minw:600px">${svg}<figcaption>${b.cap || ""}</figcaption></figure></div>`;
 }
-/* A bar chart: rows [label, value, note]; b.unit after the number; b.max to fix the scale. */
+/* A bar chart: rows [label, value, note]; b.unit after the number; b.max to fix the scale; b.hi bars (or the labels in b.mark) in colour. */
 function barsHTML(b){
   const rows = b.sort === false ? b.rows : b.rows.slice().sort((x, y) => y[1] - x[1]), max = b.max || Math.max(...rows.map(r => r[1]));
   const W = 680, bar = 20, gap = 8, left = b.left || 170, H = rows.length * (bar + gap) + 8;
   const svg = `<svg class="dg chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(b.title)}">` + rows.map(([label, v, note], i) => {
     const y = 4 + i * (bar + gap), w = Math.max(2, (W - left - 150) * v / max);
     return `<text x="${left - 8}" y="${y + 14}" text-anchor="end" font-size="12.5" class="b">${esc(label)}</text>` +
-      `<rect x="${left}" y="${y}" width="${w.toFixed(1)}" height="${bar}" rx="4" class="${i < (b.hi == null ? 1 : b.hi) ? "acc" : "bbg"}"/>` +
+      `<rect x="${left}" y="${y}" width="${w.toFixed(1)}" height="${bar}" rx="4" class="${(b.mark ? [].concat(b.mark).includes(label) : i < (b.hi == null ? 1 : b.hi)) ? "acc" : "bbg"}"/>` +
       `<text x="${(left + w + 6).toFixed(1)}" y="${y + 14}" font-size="12" class="b">${esc(String(v))}${b.unit ? " " + esc(b.unit) : ""}${note ? `<tspan class="mut" font-weight="500"> · ${esc(note)}</tspan>` : ""}</text>`; }).join("") + `</svg>`;
   return `<div class="block phblock"><h3>${b.title}</h3><figure class="fig wide" style="--minw:560px">${svg}<figcaption>${b.cap || ""}</figcaption></figure></div>`;
 }
@@ -349,8 +354,18 @@ function calendarHTML(b){
 /* The block kinds this file draws; a page's renderer calls visBlock(b) for anything it does not know. */
 function visBlock(b){
   const f = { photos: photosHTML, indiamap: indiaMapHTML, mapfig: mapFigHTML, statechart: stateChartHTML, info: infoHTML, tlfig: tlFigHTML,
-    bars: barsHTML, calendar: calendarHTML, worldfig: typeof worldFigHTML === "function" ? worldFigHTML : null }[b.k];
+    bars: barsHTML, calendar: calendarHTML, shelf: shelfHTML, cards: cardsHTML, worldfig: typeof worldFigHTML === "function" ? worldFigHTML : null }[b.k];
   return f ? f(b) : "";
+}
+/* A shelf of book covers: rows [title, author, badge]. */
+function shelfHTML(b){
+  return `<div class="block phblock"><h3>${b.title}</h3><div class="shelf">${b.rows.map(([t, a, badge], i) =>
+    `<div class="bk anim-in" style="--h:${(i * 47 + (b.hue || 20)) % 360};animation-delay:${Math.min(i, 12) * 40}ms"><b>${esc(t)}</b><i></i>${badge ? `<span class="bdg">${esc(badge)}</span>` : ""}<small>${esc(a)}</small></div>`).join("")}</div>${b.cap ? `<p class="map-cap">${b.cap}</p>` : ""}</div>`;
+}
+/* Cards: rows [heading, sub, note, icon] — a quick infographic without hand-written HTML. */
+function cardsHTML(b){
+  return `<div class="block phblock"><h3>${b.title}</h3><div class="fam">${b.rows.map(([h, sub, note, ic]) =>
+    `<div>${ic ? `<span class="ic" aria-hidden="true">${ic}</span>` : ""}<b>${esc(h)}</b>${sub ? `<span class="n">${esc(sub)}</span>` : ""}${note ? `<small>${esc(note)}</small>` : ""}</div>`).join("")}</div>${b.cap ? `<p class="map-cap">${b.cap}</p>` : ""}</div>`;
 }
 /* An infographic block: the page gives ready HTML (cards, icons). */
 function infoHTML(b){ return `<div class="block phblock"><h3>${b.title}</h3>${b.html}${b.cap ? `<p class="map-cap">${b.cap}</p>` : ""}</div>`; }
@@ -456,6 +471,14 @@ function visInit(){
 .cal-g .on{background:var(--accent);color:#fff;font-weight:700}
 .cal-m ul{margin:8px 0 2px;padding-left:0;list-style:none;font-size:13px;display:grid;gap:4px}
 .cal-m li b{display:inline-block;min-width:24px;color:var(--accent)}
+.shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:12px}
+.bk{position:relative;aspect-ratio:2/3;border-radius:4px 10px 10px 4px;padding:14px 10px 10px 16px;display:flex;flex-direction:column;gap:6px;color:#fff;overflow:hidden;
+  background:linear-gradient(160deg,hsl(var(--h) 45% 38%),hsl(calc(var(--h) + 25) 50% 24%));box-shadow:inset 6px 0 0 rgba(0,0,0,.22),0 2px 6px rgba(0,0,0,.18)}
+.bk b{font:700 14.5px/1.22 var(--f-display,Georgia,serif);overflow-wrap:break-word;hyphens:auto}.bk i{display:block;width:28px;height:2px;background:rgba(255,255,255,.6)}
+.bk small{margin-top:auto;font-size:11.5px;opacity:.9;line-height:1.3}.bk .bdg{margin-top:auto;align-self:flex-start;background:#f2c14e;color:#3a2a00;font:800 10px var(--f-body);padding:3px 7px;border-radius:99px}.bk .bdg + small{margin-top:2px}
+.vtl{position:relative;display:grid;gap:10px;padding:4px 0}.vtl::before{content:"";position:absolute;left:31px;top:8px;bottom:8px;width:3px;border-radius:2px;background:color-mix(in srgb,var(--accent) 45%,transparent)}
+.vt{display:grid;grid-template-columns:66px 1fr;gap:10px;align-items:start;position:relative}.vt .vy{justify-self:center;position:relative;background:var(--accent);color:#fff;font:700 12px var(--f-num);padding:3px 8px;border-radius:99px}
+.vt > div b{font-size:14.5px}.vt small{display:block;color:var(--ink2);font-size:12.5px;line-height:1.35}
 .anim-in{animation:visin .5s ease both}
 @keyframes visin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.anim-in{animation:none}}`; document.head.appendChild(st); }

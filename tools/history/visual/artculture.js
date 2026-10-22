@@ -107,5 +107,5 @@ place("L34", "story", { k: "photos", title: "In pictures", items: [
   P("Kalidasa", "Kalidasa", "Abhijnanashakuntalam"), P("Rabindranath_Tagore", "Rabindranath Tagore", "Gitanjali · Nobel 1913"), P("Bankim_Chandra_Chattopadhyay", "Bankim Chandra", "Anandamath"),
   P("Premchand", "Premchand", "Godaan"), P("Edicts_of_Ashoka", "Ashoka's edicts", "Brahmi script"), P("Brahmi_script", "Brahmi script", "Read by James Prinsep")] });
 
-VISUAL = { mode: true, VIS: { key: "artculture_photos_v1", word: "site", words: "World Heritage Sites", ask: "Which state is this World Heritage Site in:", rows: sitesByState,
+VISUAL = { mode: true, VIS: { key: "artculture_photos_v1", word: "site", search: "", words: "World Heritage Sites", ask: "Which state is this World Heritage Site in:", rows: sitesByState,
   tabs: [["vphotos", "Photo quiz"], ["vmap", "Map quiz"]] } };

@@ -6,6 +6,7 @@ const WORLD_PROJ = (lon, lat) => [((lon < WORLD_MAP.lon0 ? lon + 360 : lon) - WO
 /** The world with pins: [[label, lon, lat, note?, side?]]; side "l" puts the label on the left. o.vb crops (e.g. "580 120 300 200"). */
 function worldSVG(o = {}){
   const pins = (o.pins || []).map(([n, lo, la, note, side]) => { const [x, y] = WORLD_PROJ(lo, la), r = side === "l", dy = side === "u" ? -8 : side === "d" ? 12 : 0;
+    if (side === "n") return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6.5" class="pin"><title>${esc(note || n)}</title></circle><text x="${x.toFixed(1)}" y="${(y + 2.9).toFixed(1)}" class="wbn">${esc(n)}</text>`;  // a numbered badge
     return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" class="pin"/><text x="${(x + (r ? -7 : 7)).toFixed(1)}" y="${(y + 3 + dy).toFixed(1)}" class="wpn" text-anchor="${r ? "end" : "start"}">${esc(n)}</text>` +
       (note ? `<text x="${(x + (r ? -7 : 7)).toFixed(1)}" y="${(y + 13 + dy).toFixed(1)}" class="wpnote" text-anchor="${r ? "end" : "start"}">${esc(note)}</text>` : ""); }).join("");
   const hl = new Set(o.mark || []);
@@ -14,10 +15,11 @@ function worldSVG(o = {}){
     `<path d="${WORLD_MAP.india}" class="wc in"><title>India</title></path>${pins}</svg>`;
 }
 const WORLD_CREDIT = `<p class="map-credit">World map: Natural Earth (public domain); India in its official outline from OpenStreetMap data © OpenStreetMap contributors (ODbL). Simplified, not to scale.</p>`;
-/* Block: {k:"worldfig", title, pins, mark: [country names], vb, facts?, cap} */
+/* Block: {k:"worldfig", title, pins, mark: [country names], vb, facts?, legend?: [[key, text]] (a key under the map, for numbered pins), cap} */
 function worldFigHTML(b){
   const side = b.facts ? `<dl class="facts" style="margin:0">${b.facts.map(r => `<div><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join("")}</dl>` : "";
-  return `<div class="block phblock"><h3>${b.title}</h3><div class="${side ? "map-wrap" : ""}"><figure class="fig wide" style="--minw:${b.minw || 640}px">${worldSVG(b)}</figure>${side}</div><p class="map-cap">${b.cap || ""}</p>${WORLD_CREDIT}</div>`;
+  const leg = b.legend ? `<ol class="wleg">${b.legend.map(([k, t]) => `<li><b>${esc(k)}</b> ${esc(t)}</li>`).join("")}</ol>` : "";
+  return `<div class="block phblock"><h3>${b.title}</h3><div class="${side ? "map-wrap" : ""}"><figure class="fig wide" style="--minw:${b.minw || 640}px">${worldSVG(b)}</figure>${side}</div>${leg}<p class="map-cap">${b.cap || ""}</p>${WORLD_CREDIT}</div>`;
 }
 (function(){ if (document.getElementById("worldcss")) return; const st = document.createElement("style"); st.id = "worldcss";
   st.textContent = `.wmap{width:100%;height:auto;display:block;background:color-mix(in srgb,var(--blue-bg) 55%,var(--sheet));border-radius:12px}
@@ -25,5 +27,8 @@ function worldFigHTML(b){
 .wmap .wc.mk{fill:var(--accent-bg);stroke:var(--accent)} .wmap .wc.in{fill:color-mix(in srgb,var(--accent) 30%,var(--sheet));stroke:color-mix(in srgb,var(--accent) 55%,transparent);stroke-width:.35}
 .wmap .pin{fill:var(--accent);stroke:var(--sheet);stroke-width:1.2}
 .wmap .wpn{font:700 11px var(--f-body);fill:var(--ink);paint-order:stroke;stroke:var(--sheet);stroke-width:3px}
+.wmap .wbn{font:800 8px var(--f-body);fill:#fff;text-anchor:middle;pointer-events:none}
+.wleg{list-style:none;margin:10px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:4px 14px;font-size:13px}
+.wleg li{padding:4px 0;border-bottom:1px dashed var(--rule)}.wleg b{color:var(--accent);margin-right:4px}
 .wmap .wpnote{font:500 9px var(--f-body);fill:var(--ink2);paint-order:stroke;stroke:var(--sheet);stroke-width:3px}`;
   document.head.appendChild(st); })();
