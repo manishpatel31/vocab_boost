@@ -148,4 +148,23 @@ page's `LAB_CONF`; Chemistry uses it too.
 After a change: `node tools/gk/build.js [app]`, `node tools/index_app.js study-<file>.html <id> gs`,
 `node tools/check_app.js study-<file>.html`.
 
+### Pictures (`visual.js`)
+
+An app's pictures live beside its data, in `tools/gk/<app>/visual.js` (or `tools/history/visual/<id>.js`). The build runs it
+with `place(lesson, where, ...blocks)` — where is `"start"`, `"end"`, `"story"` or the start of a block's title, and the
+blocks go after it — `rows(lesson, table title)` (that table's rows as plain text, so the pictures follow the data),
+`GEO` (`tools/workbook/geo.js`: places for the maps) and `fail`. It ends by setting `VISUAL = { mode: true | "world", VIS }`;
+"world" also loads `study-world.js`. VIS sets the photo cache key, the words used by the quizzes, the Map quiz rows
+`[name, state, kind, note, lesson]` and the extra Revise tabs (`vphotos`, `vmap`).
+
+The blocks are drawn by `study-visual.js`: `photos` (items `[Wikipedia title, name, caption]`), `indiamap`, `mapfig`
+(pins `[label, lon, lat, note, "l" | "n"]` — "n" is a numbered badge — or `marks` on states), `worldfig` (`mark` country
+names, pins, `legend`, `vb` to zoom), `statechart`, `tlfig` (rows `[year, label, note]`; becomes a vertical list when
+the labels would crowd), `bars`, `calendar` (rows `[month, day, label]`), `cards`, `shelf` (book covers) and `info`
+(ready HTML or SVG).
+
+The hand-built Sports and International Organisations pages take theirs from `tools/hand/<name>.visual.js` (same API):
+`node tools/workbook/apply-hand.js sports|intlorgs` checks every place against the page's lessons and writes the blocks
+in, just before the boot. After any of these, run `node tools/stamp.js`.
+
 For any of these, bump `VERSION` in `sw.js` (or run `node tools/stamp.js` if `app.js` changed).

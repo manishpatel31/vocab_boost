@@ -352,6 +352,16 @@ function calendarHTML(b){
   return `<div class="block phblock"><h3>${b.title}</h3><div class="cal">${months}</div><p class="map-cap">${b.cap || "Tap a month to list its days."}</p></div>`;
 }
 /* The block kinds this file draws; a page's renderer calls visBlock(b) for anything it does not know. */
+/** Hand-built pages: splice the blocks written in by tools/workbook/apply-hand.js into LESSONS — [[lesson, where, blocks]],
+    where is "start", "end", "story" (after the story) or the start of a block's title (after that block). */
+function visPlace(list){
+  const strip = x => String(x == null ? "" : x).replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").trim();
+  list.forEach(([id, where, blocks]) => { const l = LESSONS.find(x => x.id === id); if (!l) return; let at;
+    if (where === "start") at = 0; else if (where === "end") at = l.blocks.length;
+    else if (where === "story") { const k = l.blocks.findIndex(x => x.k === "story"); at = k + 1; }
+    else { const k = l.blocks.findIndex(x => x.title && strip(x.title).startsWith(where)); at = k < 0 ? l.blocks.length : k + 1; }
+    l.blocks.splice(at, 0, ...blocks); });
+}
 function visBlock(b){
   const f = { photos: photosHTML, indiamap: indiaMapHTML, mapfig: mapFigHTML, statechart: stateChartHTML, info: infoHTML, tlfig: tlFigHTML,
     bars: barsHTML, calendar: calendarHTML, shelf: shelfHTML, cards: cardsHTML, worldfig: typeof worldFigHTML === "function" ? worldFigHTML : null }[b.k];

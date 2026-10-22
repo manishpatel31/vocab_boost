@@ -8,8 +8,9 @@ function worldSVG(o = {}){
   const sc = o.vb ? Math.max(0.15, +String(o.vb).split(/\s+/)[2] / WORLD_MAP.w * 1.6) : 1;   // a zoomed map keeps its badges the same size on screen
   const pins = (o.pins || []).map(([n, lo, la, note, side]) => { const [x, y] = WORLD_PROJ(lo, la), r = side === "l", dy = side === "u" ? -8 : side === "d" ? 12 : 0;
     if (side === "n") return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(6.5 * sc).toFixed(2)}" class="pin" style="stroke-width:${(1.2 * sc).toFixed(2)}"><title>${esc(note || n)}</title></circle><text x="${x.toFixed(1)}" y="${(y + 2.9 * sc).toFixed(2)}" class="wbn" style="font-size:${(8 * sc).toFixed(2)}px">${esc(n)}</text>`;  // a numbered badge
-    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" class="pin"/><text x="${(x + (r ? -7 : 7)).toFixed(1)}" y="${(y + 3 + dy).toFixed(1)}" class="wpn" text-anchor="${r ? "end" : "start"}">${esc(n)}</text>` +
-      (note ? `<text x="${(x + (r ? -7 : 7)).toFixed(1)}" y="${(y + 13 + dy).toFixed(1)}" class="wpnote" text-anchor="${r ? "end" : "start"}">${esc(note)}</text>` : ""); }).join("");
+    const fs = sc === 1 ? "" : ` style="font-size:${(11 * sc).toFixed(2)}px;stroke-width:${(3 * sc).toFixed(2)}px"`, fn = sc === 1 ? "" : ` style="font-size:${(9 * sc).toFixed(2)}px;stroke-width:${(3 * sc).toFixed(2)}px"`;
+    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(4 * sc).toFixed(2)}" class="pin"${sc === 1 ? "" : ` style="stroke-width:${(1.2 * sc).toFixed(2)}"`}/><text x="${(x + (r ? -7 : 7) * sc).toFixed(2)}" y="${(y + (3 + dy) * sc).toFixed(2)}" class="wpn" text-anchor="${r ? "end" : "start"}"${fs}>${esc(n)}</text>` +
+      (note ? `<text x="${(x + (r ? -7 : 7) * sc).toFixed(2)}" y="${(y + (13 + dy) * sc).toFixed(2)}" class="wpnote" text-anchor="${r ? "end" : "start"}"${fn}>${esc(note)}</text>` : ""); }).join("");
   const hl = new Set(o.mark || []);
   return `<svg class="wmap" viewBox="${o.vb || `0 0 ${WORLD_MAP.w} ${WORLD_MAP.h}`}" role="img" aria-label="World map">` +
     WORLD_MAP.c.map(c => `<path d="${c.d}" class="wc${hl.has(c.n) ? " mk" : ""}"><title>${esc(c.n)}</title></path>`).join("") +
@@ -20,7 +21,7 @@ const WORLD_CREDIT = `<p class="map-credit">World map: Natural Earth (public dom
 function worldFigHTML(b){
   const side = b.facts ? `<dl class="facts" style="margin:0">${b.facts.map(r => `<div><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join("")}</dl>` : "";
   const leg = b.legend ? `<ol class="wleg">${b.legend.map(([k, t]) => `<li><b>${esc(k)}</b> ${esc(t)}</li>`).join("")}</ol>` : "";
-  return `<div class="block phblock"><h3>${b.title}</h3><div class="${side ? "map-wrap" : ""}"><figure class="fig wide" style="--minw:${b.minw || 640}px">${worldSVG(b)}</figure>${side}</div>${leg}<p class="map-cap">${b.cap || ""}</p>${WORLD_CREDIT}</div>`;
+  return `<div class="block phblock"><h3>${b.title}</h3><div class="${side ? "map-wrap" : ""}"><figure class="fig wide" style="--minw:${b.minw || 640}px${b.vb ? ";max-width:" + (b.maxw || 560) + "px;margin:0 auto" : ""}">${worldSVG(b)}</figure>${side}</div>${leg}<p class="map-cap">${b.cap || ""}</p>${WORLD_CREDIT}</div>`;
 }
 (function(){ if (document.getElementById("worldcss")) return; const st = document.createElement("style"); st.id = "worldcss";
   st.textContent = `.wmap{width:100%;height:auto;display:block;background:color-mix(in srgb,var(--blue-bg) 55%,var(--sheet));border-radius:12px}

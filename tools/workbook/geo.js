@@ -37,7 +37,7 @@ const CITY = {
   'Gaborone': [25.91, -24.65], 'Abuja': [7.49, 9.06], 'Lima': [-77.04, -12.05], 'Caracas': [-66.9, 10.48], 'Port Louis': [57.5, -20.16],
   'Male': [73.51, 4.18], 'Victoria (Seychelles)': [55.45, -4.62], 'Kabul': [69.18, 34.53], 'Islamabad': [73.05, 33.68], 'Thimphu': [89.64, 27.47],
   'Naypyidaw': [96.13, 19.75], 'Tashkent': [69.24, 41.3], 'Bishkek': [74.59, 42.87], 'Astana': [71.45, 51.17], 'Muscat': [58.41, 23.59],
-  'Hanoi': [105.85, 21.03], 'Phnom Penh': [104.92, 11.56], 'Ulaanbaatar': [106.92, 47.89], 'Jerusalem': [35.22, 31.77], 'Tehran': [51.39, 35.69]
+  'Hanoi': [105.85, 21.03], 'Phnom Penh': [104.92, 11.56], 'Ulaanbaatar': [106.92, 47.89], 'Jerusalem': [35.22, 31.77], 'Tehran': [51.39, 35.69], 'Miami': [-80.19, 25.76], 'Ebene': [57.49, -20.24], 'Évian-les-Bains': [6.59, 46.4], 'Kananaskis': [-115.1, 50.9], 'Belgrade': [20.46, 44.79], 'Baghdad': [44.36, 33.31]
 };
 // [lon, lat, Natural Earth name] — the point sits inside the country, so the pin is on it even when the country is tiny on the map
 const COUNTRY = {
@@ -57,4 +57,7 @@ const COUNTRY = {
 };
 const city = n => { const c = CITY[n]; if (!c) throw new Error('geo.js: no city "' + n + '"'); return c; };
 const country = n => { const c = COUNTRY[n]; if (!c) throw new Error('geo.js: no country "' + n + '"'); return c; };
-module.exports = { CITY, COUNTRY, city, country };
+// the country names the world map (study-world.js) can colour in
+let NAMES = null;
+const worldNames = () => NAMES || (NAMES = new Set(JSON.parse(require('fs').readFileSync(require('path').join(__dirname, '..', '..', 'study-world.js'), 'utf8').match(/const WORLD_MAP = (\{.*?\});\n/s)[1]).c.map(c => c.n)));
+module.exports = { CITY, COUNTRY, city, country, worldNames };
