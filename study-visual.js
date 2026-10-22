@@ -410,6 +410,92 @@ function mapQuiz(box){
 }
 
 
+/* ============================================================
+   ZOOM — every map and diagram gets ＋ − ⛶ : zoom in place (drag to move), or open it full screen
+   (pinch, mouse wheel, drag, double-tap). Works by changing the SVG's viewBox, so it stays sharp.
+   ============================================================ */
+const ZM_MAX = 8;
+function zmBox(svg){ if (!svg._vb0) { const v = svg.viewBox.baseVal; svg._vb0 = [v.x, v.y, v.width, v.height]; svg._z = { k: 1, cx: v.x + v.width / 2, cy: v.y + v.height / 2 }; } return svg._vb0; }
+function zmApply(svg){
+  const [x0, y0, w0, h0] = zmBox(svg), z = svg._z; z.k = Math.min(ZM_MAX, Math.max(1, z.k));
+  const w = w0 / z.k, h = h0 / z.k;
+  z.cx = Math.min(x0 + w0 - w / 2, Math.max(x0 + w / 2, z.cx)); z.cy = Math.min(y0 + h0 - h / 2, Math.max(y0 + h / 2, z.cy));
+  svg.setAttribute("viewBox", `${(z.cx - w / 2).toFixed(2)} ${(z.cy - h / 2).toFixed(2)} ${w.toFixed(2)} ${h.toFixed(2)}`);
+  svg.classList.toggle("zoomed", z.k > 1.01);
+  const bar = svg._bar; if (bar) bar.querySelector("[data-z0]").hidden = z.k <= 1.01;
+}
+/** Zoom by f about a point given in screen pixels (or the middle). */
+function zmBy(svg, f, px, py){
+  zmBox(svg); const z = svg._z, r = svg.getBoundingClientRect(), vb = svg.viewBox.baseVal;
+  const fx = px == null ? .5 : (px - r.left) / r.width, fy = py == null ? .5 : (py - r.top) / r.height;
+  const ux = vb.x + fx * vb.width, uy = vb.y + fy * vb.height, k1 = Math.min(ZM_MAX, Math.max(1, z.k * f)), s = z.k / k1;
+  z.cx = ux + (z.cx - ux) * s; z.cy = uy + (z.cy - uy) * s; z.k = k1; zmApply(svg);
+}
+function zmReset(svg){ zmBox(svg); const [x0, y0, w0, h0] = svg._vb0; svg._z = { k: 1, cx: x0 + w0 / 2, cy: y0 + h0 / 2 }; zmApply(svg); }
+/** Drag to move (one finger or mouse), pinch to zoom (two fingers), wheel and double-tap to zoom. */
+function zmGestures(svg, opt){
+  const pts = new Map(); let last = null, pinch = null, moved = false, tap = 0;
+  svg.addEventListener("pointerdown", e => { if (!opt.always && svg._z.k <= 1.01 && e.pointerType !== "mouse") return;
+    pts.set(e.pointerId, [e.clientX, e.clientY]); moved = false; if (pts.size === 1) last = [e.clientX, e.clientY];
+    if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), k: svg._z.k }; } });
+  svg.addEventListener("pointermove", e => { if (!pts.has(e.pointerId)) return; pts.set(e.pointerId, [e.clientX, e.clientY]);
+    if (pts.size === 2 && pinch) { const [a, b] = [...pts.values()], d = Math.hypot(a[0] - b[0], a[1] - b[1]);
+      zmBy(svg, pinch.k * d / pinch.d / svg._z.k, (a[0] + b[0]) / 2, (a[1] + b[1]) / 2); moved = true; return; }
+    if (pts.size === 1 && last && svg._z.k > 1.01) { const r = svg.getBoundingClientRect(), vb = svg.viewBox.baseVal, dx = e.clientX - last[0], dy = e.clientY - last[1];
+      if (Math.abs(dx) + Math.abs(dy) > 3) moved = true;
+      svg._z.cx -= dx * vb.width / r.width; svg._z.cy -= dy * vb.height / r.height; last = [e.clientX, e.clientY]; zmApply(svg); e.preventDefault(); } });
+  const up = e => { pts.delete(e.pointerId); if (pts.size < 2) pinch = null; if (!pts.size) last = null; };
+  ["pointerup", "pointercancel", "pointerleave"].forEach(t => svg.addEventListener(t, up));
+  // a drag must not count as a tap on a state
+  svg.addEventListener("click", e => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
+  if (opt.wheel) svg.addEventListener("wheel", e => { e.preventDefault(); zmBy(svg, e.deltaY < 0 ? 1.25 : 0.8, e.clientX, e.clientY); }, { passive: false });
+  if (opt.dbl) svg.addEventListener("pointerup", e => { const t = Date.now(); if (t - tap < 300 && !moved) zmBy(svg, 2, e.clientX, e.clientY); tap = t; });
+}
+/** Full screen: the map itself moves into an overlay (so taps on states still work) and comes back on close. */
+function zmFull(svg, title){
+  const ph = document.createComment("zoom"), ov = document.createElement("div");
+  ov.className = "zm-ov"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", title || "Map");
+  ov.innerHTML = `<div class="zm-top"><b>${esc(title || "")}</b><span class="zm-hint">Pinch or scroll to zoom · drag to move</span><span class="zm-btns"><button type="button" data-zi aria-label="Zoom in">＋</button><button type="button" data-zo aria-label="Zoom out">−</button><button type="button" data-zr aria-label="Reset">⟲</button><button type="button" data-zx aria-label="Close">✕</button></span></div><div class="zm-body"></div><div class="zm-foot" hidden></div>`;
+  svg.parentNode.insertBefore(ph, svg); ov.querySelector(".zm-body").appendChild(svg); document.body.appendChild(ov); document.documentElement.classList.add("zm-lock");
+  const vb0 = svg._vb0.slice(), z0 = Object.assign({}, svg._z); svg.classList.add("zm-fs");
+  if (!svg._fsg) { zmGestures(svg, { always: true, wheel: true, dbl: true }); svg._fsg = 1; }
+  const close = () => { ph.parentNode.insertBefore(svg, ph); ph.remove(); ov.remove(); svg.classList.remove("zm-fs"); document.documentElement.classList.remove("zm-lock"); svg._vb0 = vb0; svg._z = z0; zmApply(svg); document.removeEventListener("keydown", key); };
+  const key = e => { if (e.key === "Escape") close(); if (e.key === "+" || e.key === "=") zmBy(svg, 1.5); if (e.key === "-") zmBy(svg, 1 / 1.5); };
+  document.addEventListener("keydown", key);
+  ov.querySelector("[data-zi]").onclick = () => zmBy(svg, 1.5); ov.querySelector("[data-zo]").onclick = () => zmBy(svg, 1 / 1.5);
+  ov.querySelector("[data-zr]").onclick = () => zmReset(svg); ov.querySelector("[data-zx]").onclick = close;
+  // a clickable map shows what the tapped state holds under the full-screen map too
+  const host = ph.parentNode.closest("[data-imap]"), foot = ov.querySelector(".zm-foot");
+  if (host) svg.addEventListener("click", function show(){ if (!svg.classList.contains("zm-fs")) return svg.removeEventListener("click", show);
+    setTimeout(() => { const side = host.querySelector("[data-mside]"); if (!side) return; foot.hidden = false; foot.innerHTML = side.innerHTML;
+      foot.querySelectorAll("[data-golesson]").forEach(b => b.onclick = () => { close(); openLesson(b.dataset.golesson, "learn"); }); }, 0); });
+}
+function zmScan(root){
+  (root || document).querySelectorAll("svg.imap:not([data-zm]), svg.wmap:not([data-zm]), .phblock figure.fig svg.dg:not([data-zm])").forEach(svg => {
+    svg.dataset.zm = 1; if (!svg.viewBox || !svg.viewBox.baseVal || !svg.viewBox.baseVal.width) return;
+    const wrap = document.createElement("div"); wrap.className = "zm-wrap"; svg.parentNode.insertBefore(wrap, svg); wrap.appendChild(svg);
+    const bar = document.createElement("div"); bar.className = "zm-bar";
+    bar.innerHTML = `<button type="button" data-zi aria-label="Zoom in">＋</button><button type="button" data-zo aria-label="Zoom out">−</button><button type="button" data-z0 aria-label="Reset zoom" hidden>⟲</button><button type="button" data-zf aria-label="Full screen">⛶</button>`;
+    wrap.appendChild(bar); svg._bar = bar; zmBox(svg);
+    const title = (svg.closest(".block") && svg.closest(".block").querySelector("h3") || {}).textContent;
+    bar.querySelector("[data-zi]").onclick = () => zmBy(svg, 1.5); bar.querySelector("[data-zo]").onclick = () => zmBy(svg, 1 / 1.5);
+    bar.querySelector("[data-z0]").onclick = () => zmReset(svg); bar.querySelector("[data-zf]").onclick = () => zmFull(svg, title);
+    zmGestures(svg, {});
+  });
+}
+const ZM_CSS = `.zm-wrap{position:relative}
+.zm-bar{position:absolute;top:6px;right:6px;display:flex;gap:4px;z-index:2}
+.zm-bar button,.zm-btns button{min-width:34px;height:34px;border-radius:10px;border:1px solid var(--rule);background:color-mix(in srgb,var(--sheet) 88%,transparent);color:var(--ink);font:700 17px var(--f-body);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.12);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.zm-bar button:hover,.zm-btns button:hover{background:var(--sheet)}
+svg.zoomed{touch-action:none;cursor:grab}
+.zm-ov{position:fixed;inset:0;z-index:1000;background:var(--paper,var(--sheet));display:flex;flex-direction:column}
+.zm-top{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--rule);background:var(--sheet)}
+.zm-top b{font-size:15px;flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.zm-hint{font-size:12px;color:var(--ink2)}
+@media (max-width:600px){.zm-hint{display:none}}.zm-btns{display:flex;gap:6px}
+.zm-body{flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;padding:8px;overflow:hidden}
+.zm-body svg.zm-fs{width:100%!important;height:100%!important;min-width:0!important;max-width:none;touch-action:none;cursor:grab}
+.zm-foot{max-height:34vh;overflow:auto;padding:10px 14px;border-top:1px solid var(--rule);background:var(--sheet)}
+html.zm-lock,html.zm-lock body{overflow:hidden}`;
 function visInit(){
   if (!document.getElementById("viscss")) { const st = document.createElement("style"); st.id = "viscss"; st.textContent = `/* diagrams (SVG) — colours follow the theme */
 .dg{font-family:var(--f-body)}
@@ -445,6 +531,7 @@ function visInit(){
 .map-wrap.one{grid-template-columns:1fr;max-width:560px;margin:0 auto}
 @media (max-width:760px){.map-wrap{grid-template-columns:1fr}}
 .imap{width:100%;height:auto;display:block;touch-action:manipulation}
+${ZM_CSS}
 .imap .st{stroke:var(--ink2);stroke-width:.6;stroke-linejoin:round;cursor:pointer;transition:fill .15s}
 .imap .r1{fill:var(--accent-bg)} .imap .r2{fill:var(--blue-bg)} .imap .r3{fill:var(--warn-bg)} .imap .r4{fill:var(--good-bg)} .imap .r5{fill:var(--sunk)}
 .imap .st:hover{fill:color-mix(in srgb,var(--accent) 35%,var(--sheet))}
@@ -494,5 +581,5 @@ function visInit(){
 @media (prefers-reduced-motion:reduce){.anim-in{animation:none}}`; document.head.appendChild(st); }
   PH_KEY = VIS.key; try { PHC = JSON.parse(localStorage.getItem(PH_KEY) || "{}"); } catch(e) {}
   PHOTO_ITEMS = phItems(); MQ_POOL = visRows().filter(f => mapOf(f[1]));
-  new MutationObserver(() => { phScan($("#app")); mapScan($("#app")); }).observe($("#app"), { childList: true, subtree: true });
+  new MutationObserver(() => { phScan($("#app")); mapScan($("#app")); zmScan($("#app")); }).observe($("#app"), { childList: true, subtree: true });
 }
