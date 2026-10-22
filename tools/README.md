@@ -88,13 +88,18 @@ After a change: `node tools/history/build.js`, then for each subject app
 
 ```
 tools/computer/
-  build.js                    data → study-computer.html
-  data/10_hardware.js         C1–C6, with their questions, last-moment cards and tiles
-  data/11_software_office.js  C7–C11
-  data/12_internet_network_security.js  C12–C17
+  build.js                    data + lab.js → study-computer.html; PARTS sets the lesson order
+  lab.js                      the Lab tab: decks built from the lesson tables (cmpRows) and a base-converter drill
+  data/10_hardware.js         Part 1: C1–C6 and C18 (output devices), with their questions, last-moment cards and tiles
+  data/11_software_office.js  Part 2: C7, C19 (operating systems), C20 (file extensions), C8–C11, C21 (Access & DBMS)
+  data/12_internet_network_security.js  Part 3: C12–C16, C22 (cyber law & Digital India), C17
   data/20_reported.js         questions candidates reported after a paper, each with that paper
   data/40_exam.js             heat map, exam pattern, tips, intro
 ```
+
+Lesson ids never change (saved progress hangs on them), so a new lesson takes the next free id and is placed
+in `PARTS` in build.js. A question's 6th and 7th fields keep the options in the order written (for
+"all of the above"): field 6 is the right answer's place, field 7 is 1. Questions with an 8th field came from a paper.
 
 After a change: `node tools/computer/build.js`, `node tools/index_app.js study-computer.html computer gs`,
 `node tools/check_app.js study-computer.html`.

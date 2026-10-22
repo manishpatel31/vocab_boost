@@ -6,7 +6,7 @@ const ERANOTE = { cmp: "Shortcuts, full forms, memory and the input/output devic
 const INTROS = { computer: {
   lead: "Everything the computer questions in SSC CGL and CHSL Tier 2 and RRB NTPC ask about, from what a CPU is to cyber security, explained for someone who has never studied computers.",
   tip: "Learn by doing: keep a computer or phone open and press each shortcut as you read it. Full forms and shortcuts are pure recall, so revise them every day for a week rather than once.",
-  order: "Go in order: hardware first (Part 1), then Windows and MS Office (Part 2), then the internet, networks and security (Part 3)."
+  order: "Go in order: hardware first (Part 1), then software, Windows and MS Office (Part 2), then the internet, networks and security (Part 3). Word, Excel and PowerPoint carry the most marks in the Tier 2 module, so give them extra time, and play the Lab's shortcut games for ten minutes a day."
 } };
 
 /* Lessons × exams. 3 = almost every paper, 2 = often, 1 = now and then, 0 = not in the syllabus.
@@ -22,7 +22,8 @@ const HEATMAP = {
     { id: "C5", v: [2, 2, 2] }, { id: "C6", v: [1, 1, 1] }, { id: "C7", v: [3, 3, 2] }, { id: "C8", v: [3, 3, 2] },
     { id: "C9", v: [3, 3, 2] }, { id: "C10", v: [3, 3, 2] }, { id: "C11", v: [2, 2, 1] }, { id: "C12", v: [3, 3, 2] },
     { id: "C13", v: [2, 2, 1] }, { id: "C14", v: [3, 3, 2] }, { id: "C15", v: [3, 3, 3] }, { id: "C16", v: [3, 3, 2] },
-    { id: "C17", v: [1, 1, 2] }
+    { id: "C17", v: [1, 1, 2] }, { id: "C18", v: [3, 3, 3] }, { id: "C19", v: [3, 3, 2] }, { id: "C20", v: [2, 2, 1] },
+    { id: "C21", v: [2, 2, 1] }, { id: "C22", v: [1, 1, 2] }
   ],
   pattern: {
     title: "Exam pattern at a glance",
@@ -39,7 +40,9 @@ const HEATMAP = {
     "<b>Shortcuts and full forms are the cheapest marks.</b> Learn the Shortcuts and the Protocols &amp; abbreviations lessons until the answers are automatic — they need no reasoning on the day.",
     "<b>Watch keys that change meaning between programs.</b> Ctrl+D, F7 and Ctrl+K do different things in Word, Excel and the browser, and the papers use that to set traps.",
     "<b>Memory questions are about order and volatility.</b> Know the hierarchy (registers → cache → RAM → disk) and which memories lose their data when the power goes.",
-    "<b>For RRB NTPC</b> the computer questions sit inside General Awareness, so put full forms, memory units, input/output devices, generations and the “father of” questions first."
+    "<b>For RRB NTPC</b> the computer questions sit inside General Awareness, so put full forms, memory units, input/output devices, generations and the “father of” questions first.",
+    "<b>Practise Excel by hand.</b> Count the cells in a range, copy a formula with relative and absolute references, and work out operator order (brackets, then ^, then × ÷, then + −) — these are sure calculation marks.",
+    "<b>Read every option.</b> “NOT”, “incorrect” and “all of the above” questions are frequent, and the commonest mix-ups are PC vs MAR, compiler vs interpreter, transition vs animation, hub vs switch, IPv4 bits vs bytes, and Word limits vs Excel limits."
   ],
-  note: "How the heat map is made: the levels are our estimate, from the official SSC syllabus for the computer module and from published shift-wise analyses of SSC CGL Tier 2 (March 2023) and RRB NTPC CBT-1 (June 2025). They are not a count of questions. Questions tagged 📜 were reported by candidates after those papers (memory-based); they are not copied from an official paper."
+  note: "How the heat map is made: the levels are our estimate, from the official SSC syllabus for the computer module and from published shift-wise analyses of SSC CGL Tier 2 (March 2023) and RRB NTPC CBT-1 (June 2025). They are not a count of questions. Questions tagged 📜 carry the paper they come from: a few were reported by candidates after the paper (memory-based), and the rest were matched to official SSC and RRB papers through published question pages (testbook.com). Check against the official answer key when it matters."
 };
