@@ -36,11 +36,12 @@ if (!vctx.VISUAL) fail('the visual file sets no VISUAL');
 const J = v => JSON.stringify(v).replace(/<\//g, '<\\/');
 
 // 1) the shared scripts, before the page's own
-const world = vctx.VISUAL.mode === 'world';
-s = s.replace(/\n<script src="study-(visual|world)\.js\?v=[0-9a-f]+"><\/script>/g, '');
+const has = m => [].concat(vctx.VISUAL.mode).includes(m), world = has('world'), rivers = has('rivers');
+s = s.replace(/\n<script src="study-(visual|world|rivers)\.js\?v=[0-9a-f]+"><\/script>/g, '');
 const first = s.lastIndexOf('\n<script>\n', s.indexOf('const LESSONS = '));   // the page's own script, the one that holds LESSONS
 if (first < 0) fail('no main script');
-s = s.slice(0, first) + '\n<script src="study-visual.js?v=00000000"></script>' + (world ? '\n<script src="study-world.js?v=00000000"></script>' : '') + s.slice(first);
+s = s.slice(0, first) + '\n<script src="study-visual.js?v=00000000"></script>' + (world ? '\n<script src="study-world.js?v=00000000"></script>' : '') +
+  (rivers ? '\n<script src="study-rivers.js?v=00000000"></script>' : '') + s.slice(first);
 // 2) the blocks and VIS, just before the boot
 s = s.replace(/\/\* visual: from tools\/hand\/[\s\S]*?\/\* visual end \*\/\n/, '');
 rep('/* boot */\n', `/* visual: from tools/hand/${name}.visual.js by tools/workbook/apply-hand.js — edit that file, not this */\nconst VIS = ${J(vctx.VISUAL.VIS)};\nvisPlace(${J(placed)});\nvisInit();\n/* visual end */\n/* boot */\n`);
@@ -50,7 +51,7 @@ if (!s.includes('const vb = visBlock(b)')) rep('function blockHTML(b){\n', 'func
 if (!s.includes('.concat(VIS.tabs')) {
   const t = s.indexOf('function renderRevise(){\n  const tabs = ['); if (t < 0) fail('no Revise tabs');
   const e = s.indexOf('];\n', t); s = s.slice(0, e) + '].concat(VIS.tabs || []);\n' + s.slice(e + 3);
-  rep('  const box = $("#rv");\n', '  const box = $("#rv");\n  if (RV === "vphotos") { photoQuiz(box); return; }\n  if (RV === "vmap") { mapQuiz(box); return; }\n');
+  rep('  const box = $("#rv");\n', '  const box = $("#rv");\n  if (RV === "vphotos") { photoQuiz(box); return; }\n  if (RV === "vmap") { mapQuiz(box); return; }\n  if (RV === "vriver") { riverQuiz(box); return; }\n');
 }
 fs.writeFileSync(P, s);
 console.log(file + ': ' + placed.reduce((n, p) => n + p[2].length, 0) + ' blocks in ' + new Set(placed.map(p => p[0])).size + ' lessons' + (world ? ' (with the world map)' : ''));
