@@ -5,8 +5,9 @@ const WORLD_MAP = {"w":1000,"h":394,"k":2.7777777777777777,"lon0":-168.5,"lat1":
 const WORLD_PROJ = (lon, lat) => [((lon < WORLD_MAP.lon0 ? lon + 360 : lon) - WORLD_MAP.lon0) * WORLD_MAP.k, (WORLD_MAP.lat1 - lat) * WORLD_MAP.k];
 /** The world with pins: [[label, lon, lat, note?, side?]]; side "l" puts the label on the left. o.vb crops (e.g. "580 120 300 200"). */
 function worldSVG(o = {}){
+  const sc = o.vb ? Math.max(0.15, +String(o.vb).split(/\s+/)[2] / WORLD_MAP.w * 1.6) : 1;   // a zoomed map keeps its badges the same size on screen
   const pins = (o.pins || []).map(([n, lo, la, note, side]) => { const [x, y] = WORLD_PROJ(lo, la), r = side === "l", dy = side === "u" ? -8 : side === "d" ? 12 : 0;
-    if (side === "n") return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6.5" class="pin"><title>${esc(note || n)}</title></circle><text x="${x.toFixed(1)}" y="${(y + 2.9).toFixed(1)}" class="wbn">${esc(n)}</text>`;  // a numbered badge
+    if (side === "n") return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(6.5 * sc).toFixed(2)}" class="pin" style="stroke-width:${(1.2 * sc).toFixed(2)}"><title>${esc(note || n)}</title></circle><text x="${x.toFixed(1)}" y="${(y + 2.9 * sc).toFixed(2)}" class="wbn" style="font-size:${(8 * sc).toFixed(2)}px">${esc(n)}</text>`;  // a numbered badge
     return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" class="pin"/><text x="${(x + (r ? -7 : 7)).toFixed(1)}" y="${(y + 3 + dy).toFixed(1)}" class="wpn" text-anchor="${r ? "end" : "start"}">${esc(n)}</text>` +
       (note ? `<text x="${(x + (r ? -7 : 7)).toFixed(1)}" y="${(y + 13 + dy).toFixed(1)}" class="wpnote" text-anchor="${r ? "end" : "start"}">${esc(note)}</text>` : ""); }).join("");
   const hl = new Set(o.mark || []);
@@ -23,7 +24,7 @@ function worldFigHTML(b){
 }
 (function(){ if (document.getElementById("worldcss")) return; const st = document.createElement("style"); st.id = "worldcss";
   st.textContent = `.wmap{width:100%;height:auto;display:block;background:color-mix(in srgb,var(--blue-bg) 55%,var(--sheet));border-radius:12px}
-.wmap .wc{fill:var(--sunk);stroke:color-mix(in srgb,var(--ink2) 40%,transparent);stroke-width:.4}
+.wmap .wc{fill:var(--sunk);stroke:color-mix(in srgb,var(--ink2) 40%,transparent);stroke-width:.4;vector-effect:non-scaling-stroke}
 .wmap .wc.mk{fill:var(--accent-bg);stroke:var(--accent)} .wmap .wc.in{fill:color-mix(in srgb,var(--accent) 30%,var(--sheet));stroke:color-mix(in srgb,var(--accent) 55%,transparent);stroke-width:.35}
 .wmap .pin{fill:var(--accent);stroke:var(--sheet);stroke-width:1.2}
 .wmap .wpn{font:700 11px var(--f-body);fill:var(--ink);paint-order:stroke;stroke:var(--sheet);stroke-width:3px}
