@@ -6,10 +6,11 @@
 // Updates  app.js?v=…, typing.js?v=…, typing-passages.js?v=…  in index.html and sw.js
 //          study-core.js?v=…    in every study-*.html and sw.js
 //          study-core.css?v=…   in every study-*.html and sw.js
+//          study-visual.js?v=…  in every study-*.html and sw.js
 // and bumps VERSION in sw.js when anything changed. Run it after editing any of those three files.
 const fs = require('fs'), path = require('path'), crypto = require('crypto');
 const R = path.join(__dirname, '..') + '/';
-const files = ['app.js', 'typing.js', 'typing-passages.js', 'study-core.js', 'study-core.css'];
+const files = ['app.js', 'typing.js', 'typing-passages.js', 'study-core.js', 'study-core.css', 'study-visual.js'];
 const hash = f => crypto.createHash('sha1').update(fs.readFileSync(R + f)).digest('hex').slice(0, 8);
 const pages = ['index.html', 'sw.js'].concat(fs.readdirSync(R).filter(f => /^study-.*\.html$/.test(f)));
 let changed = 0;
