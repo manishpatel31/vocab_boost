@@ -7,7 +7,7 @@
 //   throw everything away and download it all again.
 // - Mini apps, the question bank and the search index are saved the first time they are used,
 //   and fetched quietly once the app is idle (see 'warm'), so they open offline too.
-var VERSION = 'shabd-v62';                 // bump on every deploy so browsers pick up this file
+var VERSION = 'shabd-v63';                 // bump on every deploy so browsers pick up this file
 var CACHE = 'shabd-files';                 // kept across versions
 var SHELL = ['./', './index.html', './app.js?v=b69f1365', './manifest.json', './icon-192.png', './icon-512.png',
   'https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js',
@@ -78,6 +78,7 @@ function kind(url){
 }
 
 function save(req, res){
+  if(res && res.type === 'opaque' && new URL(req.url || req).hostname === 'upload.wikimedia.org') return res;   // opaque photos count as megabytes each; keep only CORS copies
   if(res && (res.ok || res.type === 'opaque')){
     var copy = res.clone();
     caches.open(CACHE).then(function(c){ c.put(req, copy); });
