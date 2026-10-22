@@ -6905,8 +6905,163 @@ listBlock,
     renderMissedWords();
     renderMasteryBreakdown();
     renderLockFeedStatus();
+    mabInit();
     document.getElementById('dupesArea').innerHTML = '';
   }
+
+  // ---------------- mini app builder prompt ----------------
+  // A prompt for any AI: with a PDF, PPT or transcript attached it writes everything a mini app needs, in the
+  // plain-text extract format the tools/ builds are made from (=== LESSON n ===, --- FACTS: … ---, Q:/A:/W:/E:/Tag:).
+  var MAB_KEY = 'mab_form_v1', mabReady = false;
+  var MAB_SRC = { pdf: 'a PDF', ppt: 'PowerPoint slides', video: 'the transcript of a video class', notes: 'study notes', web: 'web pages or articles', mixed: 'several files' };
+  function mabForm(){
+    var ticked = function(id){ return Array.prototype.slice.call(document.querySelectorAll('#' + id + ' input:checked')).map(function(i){ return i.value; }); };
+    return { subject: document.getElementById('mabSubject').value.trim(), source: document.getElementById('mabSource').value,
+      target: document.getElementById('mabTarget').value, qs: document.getElementById('mabQs').value,
+      exams: ticked('mabExams'), opts: ticked('mabOpts'), extra: document.getElementById('mabExtra').value.trim() };
+  }
+  function mabSave(){ try{ localStorage.setItem(MAB_KEY, JSON.stringify(mabForm())); }catch(e){} }
+  function mabInit(){
+    if(mabReady) return; mabReady = true;
+    var sel = document.getElementById('mabTarget');
+    Object.keys(STUDY).forEach(function(id){ var o = document.createElement('option'); o.value = id; o.textContent = 'Add to: ' + STUDY[id].title; sel.appendChild(o); });
+    var f = null; try{ f = JSON.parse(localStorage.getItem(MAB_KEY) || 'null'); }catch(e){}
+    if(f){
+      document.getElementById('mabSubject').value = f.subject || ''; document.getElementById('mabSource').value = f.source || 'pdf';
+      if(f.target && STUDY[f.target]) sel.value = f.target; document.getElementById('mabQs').value = f.qs || '50';
+      document.querySelectorAll('#mabExams input').forEach(function(i){ i.checked = (f.exams || []).indexOf(i.value) !== -1; });
+      document.querySelectorAll('#mabOpts input').forEach(function(i){ i.checked = (f.opts || []).indexOf(i.value) !== -1; });
+      document.getElementById('mabExtra').value = f.extra || '';
+    }
+    document.getElementById('mabPanel').addEventListener('input', mabSave);
+    document.getElementById('mabPanel').addEventListener('change', mabSave);
+  }
+  /** The lessons an existing app already has, so the AI can fit the new material around them. */
+  async function mabExisting(id){
+    if(!id) return null;
+    try{ var s = await loadSearchJson(); return (s.modules[id] || []).map(function(l){ return l.id + ' ' + l.t; }); }catch(e){ return []; }
+  }
+  async function mabPrompt(){
+    var f = mabForm(), on = function(k){ return f.opts.indexOf(k) !== -1; };
+    var subject = f.subject || (f.target ? STUDY[f.target].title : 'the subject of the attached material');
+    var exams = f.exams.length ? f.exams.join(', ') : 'SSC CGL, SSC CHSL and RRB NTPC';
+    var have = await mabExisting(f.target);
+    var qn = f.qs === 'all' ? 'every question in the source (keep them all), plus 20 to 30 new ones' : 'about ' + f.qs + (f.qs === '80' ? ' or more' : '');
+    var L = [];
+    L.push('You are preparing study material for a free exam-preparation app for Indian government exams (' + exams + '). I have attached ' + MAB_SRC[f.source] + ' on ' + subject + '. Read ALL of it, page by page (for slides and scanned or handwritten pages, read the images too), and turn it into the complete content of one mini app, in the exact plain-text format below. A program reads your reply, so follow the format to the letter.');
+    if(have) L.push('', 'This is for the existing mini app "' + STUDY[f.target].title + '". It already has these lessons:\n' + (have.length ? have.map(function(t){ return '  ' + t; }).join('\n') : '  (list not available)') + '\nOrganise the new material into lessons that fit this list, and use the same lesson titles where the topic is the same. New topics become new lessons.');
+    L.push('', 'WHO READS IT', 'Students who may be studying this subject for the first time, many of them more at home in Hindi than in English. Write in simple English: short sentences, everyday words, one idea per sentence. Explain every technical term the first time it appears.');
+    L.push('', 'WHAT TO DO',
+      '1. Keep EVERY fact, table, list, date, number, example, trick and question in the source. Leave nothing out; it is better to be long than to miss a fact.',
+      '2. Group the material into 8 to 20 lessons of a sensible size, in a sensible teaching order, under 2 to 4 parts.',
+      on('gaps') ? '3. Add what the exams ask but the source does not cover, and mark each addition with [ADDED].' : '3. Do not add topics the source does not cover.',
+      '4. Mark anything you are not sure of with [CHECK]. Never guess a number or a date without marking it.',
+      on('keys') ? '5. Check every answer in the source. If an answer key is wrong, use the correct answer in the question and list the correction under GAPS AND DOUBTS (not in the explanation).' : '5. Keep the answers the source gives.',
+      on('pyq') ? '6. Search the web for real past-paper questions on each topic from ' + exams + '. Tag a question as a PYQ ONLY when you found it on a page that names the exam and date, and copy that label exactly. Never invent a PYQ label; untagged questions are fine.' : '6. Do not label any question as a past-paper question unless the source itself says so.',
+      on('current') ? '7. For facts that change (counts, office holders, latest editions, records), give the latest figure you can verify and write "as of <month year>".' : '7. Keep facts as the source gives them, but mark ones that are clearly out of date with [CHECK].',
+      on('hindi') ? '8. Give every lesson title in English and Hindi, and put the Hindi word in brackets after key terms the first time, e.g. memory (मेमोरी).' : '8. Write in English only.');
+    if(f.extra) L.push('', 'MY OWN INSTRUCTIONS', f.extra);
+    L.push('', 'THE FORMAT', 'Plain text only: no markdown, no bold, no bullets other than "- ", no emoji. Separate the cells of a row with " | ". Section markers must be exactly as shown.', '',
+      '=== SOURCE ===',
+      'Title of the source: <title as written>',
+      'Type: <PDF / slides / transcript / notes, and how many files or pages>',
+      'Author / channel / publisher (if shown): <name>',
+      'Subject: <subject>',
+      'Suggested app name: <English name | Hindi name>',
+      'Exams it suits: <which exams and which paper or section>',
+      'What the source covers in one line: <one line>',
+      'What it does NOT cover that the exam asks (your view, [ADDED]): <list>',
+      'PYQ note: <where the PYQ labels came from, or "none">', '',
+      'Then, for every lesson:', '',
+      '=== LESSON 1 ===',
+      'Part: Part 1 · <part name>',
+      'Title: <English title>' + (on('hindi') ? ' | <Hindi title>' : ''),
+      'Exam weight: <0 to 3: 3 = asked in almost every paper, 2 = often, 1 = now and then, 0 = not in the syllabus>',
+      'Exam weight by exam: ' + (f.exams.length ? f.exams.map(function(e){ return e.replace(/^(SSC|RRB) /, '') + ' <0-3>'; }).join(' | ') : 'CGL <0-3> | CHSL <0-3> | NTPC <0-3>'), '',
+      '--- WHY IT MATTERS ---',
+      '<2 to 4 sentences: what the exams ask from this lesson, with example question types.>', '',
+      '--- STORY ---',
+      '<A two-minute story or everyday comparison (a kitchen, a post office, a city) that explains the whole lesson in plain words, in 3 to 6 short paragraphs.>',
+      'Remember this: <one line to carry into the tables>', '',
+      '--- FACTS: <title> ---',
+      '<term> | <fact in one or two sentences>',
+      '(as many FACTS sections as needed; exactly two cells per row)', '',
+      '--- TABLE: <title> ---',
+      '<column 1> | <column 2> | <column 3>',
+      '<row cell> | <row cell> | <row cell>',
+      '(first row = column headings; every row has the same number of cells; use tables for anything that compares, lists types, or pairs a name with a fact)', '',
+      '--- TIMELINE: <title> ---',
+      '<year or date> | <what happened>',
+      '(only when the lesson has dates)', '',
+      '--- EXPLANATION ---',
+      '<Paragraphs that explain how things work. Start a worked example with "Worked example, <name>:" and show every step.>', '',
+      '--- TRICKS ---',
+      '- <memory trick, mnemonic or short cut; Hinglish is fine>', '',
+      '--- TRAPS ---',
+      '- <a mix-up examiners use, and the right way round>', '',
+      '--- SUMMARY ---',
+      '- <5 to 8 one-line points that sum up the lesson>', '',
+      '--- QUESTIONS ---',
+      'Q: <question>',
+      'A: <right answer>',
+      'W: <wrong 1> | <wrong 2> | <wrong 3>',
+      'E: <1 or 2 sentences: why the answer is right and why the others are wrong>',
+      'Tag: <"from source", or [ADDED], or "PYQ <exam and paper label exactly as found> (Held On: <date>)">', '',
+      '(' + qn + ' per lesson, each block separated by a blank line)', '',
+      'After the last lesson:', '',
+      '=== LAST-MOMENT REVISION ===',
+      'Card: <title>',
+      '<item> | <answer>',
+      '(one card per lesson, 6 to 10 rows each: what to read five minutes before the exam)', '',
+      '=== QUICK TILES ===',
+      '<number, year or short value> | <what it is>',
+      '(40 to 60 tiles: the numbers and dates worth knowing by heart)', '');
+    if(on('lab')) L.push('=== LAB IDEAS ===',
+      'Deck: <game name> | <lesson number> | <table title> | <which column is asked> → <which column is the answer>',
+      '(8 to 15 quick 60-second quiz games built from tables whose answers are short: names, years, full forms, numbers. Say which deck suits a memory-match card game.)', '');
+    L.push('=== EXAM PATTERN ===',
+      'Exam | Section | Questions | Marks | Negative marking',
+      '<one row per exam in: ' + exams + '>', '',
+      '=== HOW TO STUDY THIS SUBJECT ===',
+      '- <5 to 8 lines: the order to study in, what to practise, common mistakes>', '',
+      '=== GAPS AND DOUBTS ===',
+      '- <wrong keys you corrected, facts you marked [CHECK], pages you could not read, questions you left out and why>', '',
+      '=== END OF EXTRACT ===');
+    L.push('', 'QUESTION RULES',
+      '- Four options in all: one right answer and three wrong ones that are believable, from the same family (names with names, years with years) and all different.',
+      '- Do not write two questions with the same wording, and do not ask the same fact twice in the same way.',
+      '- Avoid "All of the above" and "None of these" unless the source question uses them; never refer to options by letter ("Both A and B").',
+      '- Mix the kinds: direct facts, "which is NOT", match the pairs, statements I and II, odd one out, and small calculations where the subject has them.',
+      '- Every explanation must make sense without the source in front of the reader; do not write "as per the source".');
+    L.push('', 'IF THE REPLY GETS TOO LONG',
+      'Do not shorten or summarise to make it fit. Write as many lessons as fit in this reply, end with the line "=== CONTINUE FROM LESSON <n> ===", and stop. I will say "continue" and you will go on from exactly that lesson in the same format, until you write "=== END OF EXTRACT ===".');
+    return L.join('\n');
+  }
+  var MAB_CONT = 'Continue from exactly where you stopped, in the same format: start at the "=== LESSON n ===" line named in your "=== CONTINUE FROM LESSON n ===" line. Do not repeat or shorten anything already written, and keep every fact and question from the source. When everything is done, write the closing sections (LAST-MOMENT REVISION, QUICK TILES, LAB IDEAS if asked, EXAM PATTERN, HOW TO STUDY THIS SUBJECT, GAPS AND DOUBTS) and "=== END OF EXTRACT ===".';
+  var MAB_CHECK = 'Now check your whole reply against the attached source, page by page. List (1) every fact, table, trick or question in the source that is missing from your reply, (2) any question whose answer is wrong or whose options repeat, (3) any table row with the wrong number of cells, and (4) any PYQ label you could not confirm. Then write only the corrected or missing parts, each under the right "=== LESSON n ===" and "--- SECTION ---" headings, in the same format.';
+  async function mabCopy(text, msg, url){
+    var ok = await copyTextToClipboard(text);
+    showToast(ok ? msg : 'Could not copy — use Show prompt and copy it by hand.');
+    if(url) window.open(url, '_blank');
+  }
+  async function mabGo(url, name){
+    var f = mabForm();
+    if(!f.subject && !f.target){ showToast('Type the subject first, or pick the app it is for.'); document.getElementById('mabSubject').focus(); return; }
+    var p = await mabPrompt();
+    document.getElementById('mabPreview').textContent = p;
+    await mabCopy(p, name ? 'Prompt copied — attach your file in ' + name + ', paste the prompt (Ctrl+V) and send.' : 'Prompt copied — paste it into any AI with your file attached.', url);
+  }
+  document.getElementById('mabCopy').addEventListener('click', function(){ mabGo(null); });
+  document.getElementById('mabGpt').addEventListener('click', function(){ mabGo('https://chatgpt.com/', 'ChatGPT'); });
+  document.getElementById('mabGem').addEventListener('click', function(){ mabGo('https://gemini.google.com/app', 'Gemini'); });
+  document.getElementById('mabClaude').addEventListener('click', function(){ mabGo('https://claude.ai/new', 'Claude'); });
+  document.getElementById('mabShow').addEventListener('click', async function(){
+    var pre = document.getElementById('mabPreview');
+    if(pre.style.display === 'none'){ pre.textContent = await mabPrompt(); pre.style.display = 'block'; this.textContent = 'Hide prompt'; }
+    else { pre.style.display = 'none'; this.textContent = 'Show prompt'; }
+  });
+  document.getElementById('mabCont').addEventListener('click', function(){ mabCopy(MAB_CONT, '“Continue” prompt copied — paste it in the same chat.'); });
+  document.getElementById('mabCheck').addEventListener('click', function(){ mabCopy(MAB_CHECK, '“Check your work” prompt copied — paste it in the same chat after the extract is done.'); });
 
   // ---------------- lock-screen app feed ----------------
   var LOCK_PART = 300;   // words per document, keeps each well under Firestore's 1 MB limit
