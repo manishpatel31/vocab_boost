@@ -153,7 +153,7 @@ QB.push(
 ["S1","The JVP Committee (1948) on linguistic states was made up of:",["Jawaharlal Nehru, Vallabhbhai Patel, Pattabhi Sitaramayya","Jawaharlal Nehru, V. P. Menon, Pattabhi Sitaramayya","Jayaprakash Narayan, Vallabhbhai Patel, Rajendra Prasad","Jawaharlal Nehru, B. R. Ambedkar, Rajendra Prasad"],"J-V-P from their first names; it advised against language as the basis for now.",""],
 ["S1","Potti Sriramulu died fasting in 1952 for a separate state for:",["Telugu speakers (Andhra)","Kannada speakers","Marathi speakers","Punjabi speakers"],"Andhra State followed on 1 October 1953.","p"],
 ["S1","Which Constitutional Amendment went with the 1956 reorganisation and ended the Part A/B/C/D classes of states?",["7th Amendment, 1956","1st Amendment, 1951","42nd Amendment, 1976","36th Amendment, 1975"],"Both came into force on 1 November 1956.","p"],
-["S1","The States Reorganisation Act, 1956 created how many states and Union Territories?",["14 states and 6 UTs","16 states and 3 UTs","14 states and 9 UTs","28 states and 8 UTs"],"","p"],
+["S1","The States Reorganisation Act, 1956 created how many states and Union Territories?",["14 states and 6 UTs","16 states and 3 UTs","14 states and 9 UTs","28 states and 8 UTs"],"The States Reorganisation Act, 1956 reorganised states on linguistic lines into 14 states and 6 Union Territories.","p"],
 ["S1","How many states and Union Territories does India have (as of October 2026)?",["28 states and 8 UTs","29 states and 7 UTs","28 states and 9 UTs","29 states and 9 UTs"],"Since the DNH and DD merger on 26 January 2020.","p"],
 ["S1","Zonal councils were set up under the:",["States Reorganisation Act, 1956","North Eastern Council Act, 1971","Government of India Act, 1935","Constitution (7th Amendment) Act, 1956"],"They are statutory, not constitutional, bodies.","p"],
 ["S1","Who chairs each zonal council?",["The Union Home Minister","The Prime Minister","The President","The Vice-President"],"The chief ministers of the member states are members.",""],
@@ -169,7 +169,7 @@ QB.push(
 ["S3","Raipur is the capital of which Indian state?",["Chhattisgarh","Jharkhand","Odisha","Madhya Pradesh"],"Chhattisgarh was carved from MP in 2000.","p","","","SSC CHSL · 16 Jan 2017 (Evening)"],
 ["S3","Madhya Pradesh shares its border with how many states?",["5","4","6","3"],"Rajasthan, Uttar Pradesh, Chhattisgarh, Maharashtra and Gujarat.","p","","","SSC JE · 23 Jan 2018 (Shift 1)"],
 ["S3","Which state shares its border with the most Indian states?",["Uttar Pradesh","Madhya Pradesh","Assam","Chhattisgarh"],"Eight states (and Delhi); Assam and Chhattisgarh touch seven each.","p"],
-["S3","Uttar Pradesh borders which foreign country?",["Nepal","Bhutan","China","Bangladesh"],"","p"],
+["S3","Uttar Pradesh borders which foreign country?",["Nepal","Bhutan","China","Bangladesh"],"Uttar Pradesh borders Nepal to its north.","p"],
 ["S3","Uttarakhand was first known as:",["Uttaranchal","Kumaon Pradesh","Garhwal State","Himachal Uttar"],"Renamed Uttarakhand on 1 January 2007.","p"],
 ["S3","Which of these states is NOT in the Central Zonal Council?",["Bihar","Uttarakhand","Chhattisgarh","Madhya Pradesh"],"Bihar is in the Eastern council.",""]
 );

@@ -263,28 +263,28 @@ pairQs("N9", N9, { q: t => `Which national park is best known for the ${t}?`, rq
 pairQs("N10", N10, { q: t => `When did ${t} join the World Heritage list?`, extra: ["1992","2002"] });
 
 QB.push(
-["N1","National parks are declared under which law?",["Wildlife (Protection) Act, 1972","Forest Conservation Act, 1980","Environment (Protection) Act, 1986","Biological Diversity Act, 2002"],"","p"],
+["N1","National parks are declared under which law?",["Wildlife (Protection) Act, 1972","Forest Conservation Act, 1980","Environment (Protection) Act, 1986","Biological Diversity Act, 2002"],"National parks are declared under the Wildlife (Protection) Act, 1972 (Section 35).","p"],
 ["N1","Corbett National Park was first named:",["Hailey National Park","Ramganga National Park","Kumaon National Park","Nainital National Park"],"1936; renamed Ramganga in 1954 and Corbett in 1957.","p"],
 ["N1","About how many national parks does India have (as of 2026)?",["About 106","About 56","About 570","About 18"],"About 570 is the number of wildlife sanctuaries.","p"],
-["N1","In which kind of protected area is no human activity — not even grazing — allowed?",["National park","Wildlife sanctuary","Community reserve","Conservation reserve"],"",""],
+["N1","In which kind of protected area is no human activity — not even grazing — allowed?",["National park","Wildlife sanctuary","Community reserve","Conservation reserve"],"In a national park no human activity, grazing included, is allowed; sanctuaries can permit some.",""],
 ["N2","Which state or UT has no national park?",["Punjab","Haryana","Uttar Pradesh","Himachal Pradesh"],"Delhi and Lakshadweep have none either.","p"],
-["N2","Which national park is famous for the hangul?",["Dachigam","Hemis","Kishtwar","Great Himalayan"],"",""],
-["N3","India's first marine national park (1982) is in the:",["Gulf of Kutch","Gulf of Mannar","Andaman Islands","Gulf of Khambhat"],"","p"],
+["N2","Which national park is famous for the hangul?",["Dachigam","Hemis","Kishtwar","Great Himalayan"],"Dachigam near Srinagar protects the hangul (Kashmir stag).",""],
+["N3","India's first marine national park (1982) is in the:",["Gulf of Kutch","Gulf of Mannar","Andaman Islands","Gulf of Khambhat"],"India's first marine national park was declared in the Gulf of Kutch (Gujarat) in 1982.","p"],
 ["N4","How many national parks does Madhya Pradesh have?",["11","9","7","6"],"The most of any state.",""],
-["N4","Which national park in MP has dinosaur eggs?",["Dinosaur Fossil National Park, Dhar","Fossil National Park, Ghughua","Kanha","Satpura"],"",""],
+["N4","Which national park in MP has dinosaur eggs?",["Dinosaur Fossil National Park, Dhar","Fossil National Park, Ghughua","Kanha","Satpura"],"The Dinosaur Fossil National Park in Dhar district has fossilised dinosaur eggs; Ghughua (Dindori) has plant fossils.",""],
 ["N5","Which is the only national park in Bihar?",["Valmiki","Betla","Simlipal","Dudhwa"],"Also Bihar's only tiger reserve.","p"],
 ["N6","Which park has four big cats — tiger, leopard, clouded leopard and snow leopard?",["Namdapha","Kaziranga","Manas","Hemis"],"In Arunachal Pradesh.","p"],
-["N6","Which two Assam parks became national parks in 2021?",["Dihing Patkai and Raimona","Nameri and Orang","Manas and Kaziranga","Dibru-Saikhowa and Nameri"],"",""],
+["N6","Which two Assam parks became national parks in 2021?",["Dihing Patkai and Raimona","Nameri and Orang","Manas and Kaziranga","Dibru-Saikhowa and Nameri"],"Dihing Patkai and Raimona were declared national parks in 2021.",""],
 ["N7","The Nilgiri Biosphere Reserve includes which national parks?",["Bandipur, Nagarhole and Mudumalai","Periyar and Eravikulam","Kudremukh and Anshi","Gulf of Mannar and Guindy"],"Plus Silent Valley and Mukurthi.",""],
-["N8","How many national parks are in the Andaman and Nicobar Islands?",["9","3","6","11"],"",""],
+["N8","How many national parks are in the Andaman and Nicobar Islands?",["9","3","6","11"],"The Andaman and Nicobar Islands have nine national parks, the most of any UT.",""],
 ["N9","Kanha National Park saved which animal from extinction?",["Hard-ground barasingha","Sangai","Hangul","Wild buffalo"],"From about 66 animals in 1970.","p"],
 ["N10","Under Project Cheetah, the first cheetahs arrived at Kuno from:",["Namibia","South Africa","Kenya","Iran"],"17 September 2022.","p"],
-["N10","Which is India's only mixed World Heritage site?",["Khangchendzonga","Kaziranga","Sundarbans","Great Himalayan"],"","p"],
-["N10","Which three national parks became India's first natural World Heritage sites in 1985?",["Kaziranga, Manas and Keoladeo","Kaziranga, Sundarbans and Gir","Corbett, Kanha and Manas","Nanda Devi, Keoladeo and Sundarbans"],"","p"],
-["N10","The Valley of Flowers was added to the Nanda Devi World Heritage site in:",["2005","1988","2014","2016"],"",""],
-["N10","In 2025 cheetahs were also moved to which protected area in Madhya Pradesh?",["Gandhi Sagar Wildlife Sanctuary","Kanha National Park","Panna National Park","Madhav National Park"],"","p"],
-["N10","Mount Harriet National Park was renamed in 2021 as:",["Mount Manipur National Park","Mount Sri Vijaya National Park","Netaji Subhas National Park","Saddle Peak National Park"],"",""],
-["N10","Which Madhya Pradesh national park was declared a tiger reserve in 2025?",["Madhav","Kuno","Van Vihar","Sanjay"],"","p"]
+["N10","Which is India's only mixed World Heritage site?",["Khangchendzonga","Kaziranga","Sundarbans","Great Himalayan"],"Khangchendzonga National Park (Sikkim) was listed in 2016 as India's only mixed site, for both nature and culture.","p"],
+["N10","Which three national parks became India's first natural World Heritage sites in 1985?",["Kaziranga, Manas and Keoladeo","Kaziranga, Sundarbans and Gir","Corbett, Kanha and Manas","Nanda Devi, Keoladeo and Sundarbans"],"Kaziranga, Manas and Keoladeo were India's first natural World Heritage sites, listed in 1985.","p"],
+["N10","The Valley of Flowers was added to the Nanda Devi World Heritage site in:",["2005","1988","2014","2016"],"The Valley of Flowers was added to the Nanda Devi World Heritage site in 2005.",""],
+["N10","In 2025 cheetahs were also moved to which protected area in Madhya Pradesh?",["Gandhi Sagar Wildlife Sanctuary","Kanha National Park","Panna National Park","Madhav National Park"],"In April 2025 cheetahs were also released in Gandhi Sagar Wildlife Sanctuary, after Kuno.","p"],
+["N10","Mount Harriet National Park was renamed in 2021 as:",["Mount Manipur National Park","Mount Sri Vijaya National Park","Netaji Subhas National Park","Saddle Peak National Park"],"In 2021 Mount Harriet National Park was renamed Mount Manipur National Park, after the Manipuri freedom fighters jailed there.",""],
+["N10","Which Madhya Pradesh national park was declared a tiger reserve in 2025?",["Madhav","Kuno","Van Vihar","Sanjay"],"Madhav National Park (Shivpuri) was declared a tiger reserve in March 2025.","p"]
 );
 LASTMOMENT.push(
 {t:"Records", era:["np"], rows:[["First","Hailey 1936 → Corbett"],["Largest","Hemis (Ladakh)"],["Smallest","South Button Island"],["Most parks","Madhya Pradesh (11)"],["Floating","Keibul Lamjao"],["Cheetahs","Kuno (2022)"]]},

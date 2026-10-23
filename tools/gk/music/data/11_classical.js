@@ -129,17 +129,17 @@ QB.push(
 ["M4","Hindustani music has how many thaats in Bhatkhande's system?",["10","72","22","7"],"Carnatic music has 72 melakartas.","p"],
 ["M4","The Tyagaraja Aradhana festival is held every year at:",["Thiruvaiyaru","Tiruvarur","Madurai","Chennai"],"On the banks of the Kaveri, near Thanjavur.","p"],
 ["M4","V. D. Paluskar founded the Gandharva Mahavidyalaya in 1901 at:",["Lahore","Pune","Bombay","Gwalior"],"Later branches opened across India.",""],
-["M5","Who founded the Kirana gharana?",["Abdul Karim Khan","Alladiya Khan","Faiyaz Khan","Amir Khan"],"",""],
-["M5","Who founded the Jaipur-Atrauli gharana?",["Alladiya Khan","Abdul Karim Khan","Bade Ghulam Ali Khan","Rashid Khan"],"",""],
+["M5","Who founded the Kirana gharana?",["Abdul Karim Khan","Alladiya Khan","Faiyaz Khan","Amir Khan"],"The Kirana gharana is named after Kairana (UP) and was founded by Abdul Karim Khan.",""],
+["M5","Who founded the Jaipur-Atrauli gharana?",["Alladiya Khan","Abdul Karim Khan","Bade Ghulam Ali Khan","Rashid Khan"],"Alladiya Khan founded the Jaipur-Atrauli gharana; Kishori Amonkar belonged to it.",""],
 ["M5","A 'gharana' in music means:",["A family or school with its own style","A type of drum","A rhythm cycle","A wedding song"],"Ghar = house.",""],
-["M5","Which is the oldest khayal gharana?",["Gwalior","Kirana","Patiala","Mewati"],"","p"],
+["M5","Which is the oldest khayal gharana?",["Gwalior","Kirana","Patiala","Mewati"],"Gwalior is the oldest khayal gharana, the source of most later gharanas.","p"],
 ["M5","The Kirana gharana takes its name from Kairana, a town in:",["Uttar Pradesh","Karnataka","Rajasthan","Maharashtra"],"Near Shamli.",""],
-["M5","Kishori Amonkar's mother and guru was:",["Mogubai Kurdikar","Gangubai Hangal","Girija Devi","Kesarbai Kerkar"],"",""],
+["M5","Kishori Amonkar's mother and guru was:",["Mogubai Kurdikar","Gangubai Hangal","Girija Devi","Kesarbai Kerkar"],"Kishori Amonkar learnt from her mother, Mogubai Kurdikar of the Jaipur-Atrauli gharana.",""],
 ["M6","Which raga is linked with the monsoon and rain?",["Malhar","Bhairav","Yaman","Deepak"],"Miyan ki Malhar is credited to Tansen.","p"],
 ["M6","According to legend, which raga could light lamps?",["Deepak","Malhar","Bhairav","Darbari Kanada"],"Tansen is said to have sung it at Akbar's court.","p"],
 ["M6","How many beats does Teentaal have?",["16","12","10","7"],"Divided 4+4+4+4.","p"],
-["M6","How many melakarta ragas are there in Carnatic music?",["72","10","22","108"],"","p"],
-["M6","How many shrutis are there in an octave in Indian music?",["22","12","7","72"],"",""]
+["M6","How many melakarta ragas are there in Carnatic music?",["72","10","22","108"],"Carnatic music has 72 melakarta (parent) ragas, classified by Venkatamakhin.","p"],
+["M6","How many shrutis are there in an octave in Indian music?",["22","12","7","72"],"An octave holds 22 shrutis (microtones), from which the seven swaras are chosen.",""]
 );
 
 LASTMOMENT.push(

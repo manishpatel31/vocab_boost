@@ -161,14 +161,14 @@ QB.push(
 ["W9","Which sea has no coastline at all?",["Sargasso Sea","Dead Sea","Caspian Sea","Aral Sea"],"It lies inside the North Atlantic.","p"],
 ["W9","The Suez Canal was opened in:",["1869","1914","1895","1947"],"The Panama Canal opened in 1914.","p"],
 ["W9","The Equator and the Prime Meridian cross in the:",["Gulf of Guinea","Gulf of Aden","Gulf of Mexico","Persian Gulf"],"At 0°, 0°.",""],
-["W9","Which island is shared by Indonesia, Malaysia and Brunei?",["Borneo","Sumatra","Java","New Guinea"],"",""],
+["W9","Which island is shared by Indonesia, Malaysia and Brunei?",["Borneo","Sumatra","Java","New Guinea"],"Borneo, the third-largest island, is shared by Indonesia, Malaysia and Brunei.",""],
 ["W10","Which of the following lines separates Pakistan and Afghanistan?",["Durand Line","McMahon Line","Radcliffe Line","Jinnah Line"],"Drawn in 1893.","p","","","SSC CGL · 7 Dec 2022 (Shift 3)"],
 ["W10","The border line which separates India and Pakistan is the:",["Radcliffe Line","Durand Line","McMahon Line","Maginot Line"],"Drawn by Sir Cyril Radcliffe in 1947.","p","","","SSC CGL · 12 Dec 2022 (Shift 2)"],
-["W10","The McMahon Line was drawn at the Simla Convention of:",["1914","1893","1947","1962"],"",""],
+["W10","The McMahon Line was drawn at the Simla Convention of:",["1914","1893","1947","1962"],"The McMahon Line was drawn at the Simla Convention of 1914 between British India and Tibet.",""],
 ["W10","The Hindenburg Line was:",["A German defence line in France in World War I","The Germany–Poland border fixed in 1945","A line of French forts facing Germany","The USA–Canada border"],"The Germany–Poland border is the Oder–Neisse Line.",""],
-["W10","Igloos are the traditional snow houses of the:",["Inuit (Eskimo)","Masai","Bedouin","Bushmen"],"","p"],
+["W10","Igloos are the traditional snow houses of the:",["Inuit (Eskimo)","Masai","Bedouin","Bushmen"],"The Inuit of the Arctic built igloos from blocks of snow.","p"],
 ["W10","The ‘Herring Pond’ is a nickname of the:",["Atlantic Ocean","Pacific Ocean","North Sea","Baltic Sea"],"Herring fish are plentiful in the North Atlantic.",""],
-["W10","The Tuareg, called the 'blue men', live in the:",["Sahara","Kalahari","Gobi","Atacama"],"",""]
+["W10","The Tuareg, called the 'blue men', live in the:",["Sahara","Kalahari","Gobi","Atacama"],"The Tuareg nomads of the Sahara are called 'blue men' for their indigo-dyed robes.",""]
 );
 
 LASTMOMENT.push(

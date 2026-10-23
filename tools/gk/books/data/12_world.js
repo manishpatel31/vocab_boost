@@ -113,7 +113,7 @@ pairQs("B9", B9, { q: t => `Who is the author of '${t}'?`, rq: a => `Which recen
 QB.push(
 ["B8","Who is known as the father of economics?",["Adam Smith","Karl Marx","John Maynard Keynes","Alfred Marshall"],"Adam Smith, author of The Wealth of Nations (1776).","p"],
 ["B8","George Orwell, author of Animal Farm, was born in:",["Motihari, India","London, England","Paris, France","Rangoon, Burma"],"He was born in 1903 in Motihari, Bihar.","p"],
-["B8","The Communist Manifesto (1848) was written by Karl Marx and:",["Friedrich Engels","Vladimir Lenin","Leon Trotsky","Hegel"],"",""],
+["B8","The Communist Manifesto (1848) was written by Karl Marx and:",["Friedrich Engels","Vladimir Lenin","Leon Trotsky","Hegel"],"The Communist Manifesto (1848) was written by Karl Marx and Friedrich Engels.",""],
 ["B9","Who translated Banu Mushtaq's 'Heart Lamp' into English?",["Deepa Bhasthi","Daisy Rockwell","Lin King","Arunava Sinha"],"The prize is shared equally by author and translator.",""],
 ["B9","'Tomb of Sand', the first Hindi book to win the International Booker Prize, was originally titled:",["Ret Samadhi","Mai","Tirohit","Hamara Shahar Us Baras"],"Geetanjali Shree's Ret Samadhi, translated by Daisy Rockwell (2022).","p"],
 ["B9","In which language was 'Heart Lamp' originally written?",["Kannada","Malayalam","Tamil","Telugu"],"It became the first Kannada book to win the International Booker (2025).",""],
