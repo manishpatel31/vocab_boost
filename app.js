@@ -130,6 +130,7 @@
     indgeo:   { title: 'Indian Geography', file: 'study-indian-geography.html', key: 'indian_geography_v1' },
     parks:    { title: 'Protected Areas',              file: 'study-protected-areas.html', key: 'protected_areas_v1' },
     rivers:   { title: 'Rivers of India',              file: 'study-rivers-india.html',    key: 'rivers_india_v1' },
+    natparks: { title: 'National Parks of India',      file: 'study-national-parks.html',  key: 'national_parks_v1' },
     biology:  { title: 'Biology',                      file: 'study-biology.html',      key: 'biology_pyq_workbook_v1' },
     space:    { title: 'Space & ISRO Missions',              file: 'study-space.html',        key: 'space_missions_workbook_v1' },
     voice:    { title: 'Active & Passive Voice',       file: 'study-voice.html',        key: 'voice_workbook_v1' },
@@ -208,7 +209,8 @@
     ['worldgeo', 'geography', "\ud83c\udf0d", 'विश्व भूगोल', "Continents and oceans, capitals, currencies and parliaments, mountains, rivers and cities on them, lakes, waterfalls, deserts and grasslands, straits and canals, boundary lines and nicknames of places.", 10, 500, '#2E6DA4'],
     ['indgeo', 'geography', "\ud83c\uddee\ud83c\uddf3", 'भारत का भूगोल', "India's location and borders, Himalaya and passes, plains, plateaus, coasts and islands, Himalayan and Peninsular rivers, dams, lakes and falls, monsoon and climate, soils and forests, minerals, mines and power plants.", 12, 639, '#B0662E'],
     ['parks', 'geography', '\ud83d\udc05', 'संरक्षित क्षेत्र', 'National parks, sanctuaries, all 58 tiger reserves, the 18 biosphere reserves, Ramsar wetlands, UNESCO heritage sites and which animal lives where.', 8, 458, '#2E7D4F'],
-    ['rivers', 'geography', '\ud83c\udf0a', 'भारत की नदियाँ', 'Every river SSC asks about — sources, tributaries, the Panch Prayag, cities, dams, waterfalls, landforms made by rivers, disputes and waterways — with live river maps where the water flows downstream and a River quiz.', 10, 346, '#1C7FA6']
+    ['rivers', 'geography', '\ud83c\udf0a', 'भारत की नदियाँ', 'Every river SSC asks about — sources, tributaries, the Panch Prayag, cities, dams, waterfalls, landforms made by rivers, disputes and waterways — with live river maps where the water flows downstream and a River quiz.', 10, 346, '#1C7FA6'],
+    ['natparks', 'geography', '\ud83e\udd8f', 'भारत के राष्ट्रीय उद्यान', 'All of India\u2019s national parks, about 106, state by state \u2014 the records, the animal each protects, World Heritage parks and the news \u2014 with a map of every park by region and a Map quiz.', 10, 195, '#3D7A3A']
   ].forEach(function(x){ var m = STUDY[x[0]]; m.subj = 'gs'; m.gsub = x[1]; m.ico = x[2]; m.hi = x[3] + ' · CGL · CHSL · MTS · NTPC'; m.desc = x[4] + ' With tricks, traps, questions from past papers and a Lab of games.'; m.meta = x[5] + ' lessons · ' + x[6] + ' questions · Lab'; m.color = x[7]; m.lessons = x[5]; m.unit = 'lessons'; });
   STUDY.polity.gsub = 'polity'; STUDY.economics.gsub = 'economy'; STUDY.space.gsub = 'science';
   STUDY.history.gsub = 'history'; STUDY.history.core = 5; STUDY.histancient.core = 4; STUDY.histmedieval.core = 3; STUDY.histmodern.core = 2; STUDY.worldhist.core = 1;
@@ -1258,7 +1260,7 @@
 
   // ---- the practice / mock screen ----
   var drill = null, drillOpen = false, drillTimer = null;
-  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments', history: 'History', histancient: 'Ancient India', histmedieval: 'Medieval India', histmodern: 'Modern India', artculture: 'Art & Culture', worldhist: 'World History', computer: 'Computer Knowledge', polity: 'Polity', economics: 'Economy', space: 'Space', physics: 'Physics', chemistry: 'Chemistry', books: 'Books & Authors', days: 'Important Days', defence: 'Defence', awards: 'Awards & Honours', parks: 'Protected Areas', rivers: 'Rivers of India', environment: 'Environment & Ecology', biology: 'Biology', geometry: 'Geometry', mensuration2d: 'Mensuration 2D', mensuration3d: 'Mensuration 3D', trigonometry: 'Trigonometry', numbersystem: 'Number System', calendar: 'Calendar', clock: 'Clock', voice: 'Active & Passive Voice', narration: 'Narration', formulas: 'Formula Book' };
+  var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments', history: 'History', histancient: 'Ancient India', histmedieval: 'Medieval India', histmodern: 'Modern India', artculture: 'Art & Culture', worldhist: 'World History', computer: 'Computer Knowledge', polity: 'Polity', economics: 'Economy', space: 'Space', physics: 'Physics', chemistry: 'Chemistry', books: 'Books & Authors', days: 'Important Days', defence: 'Defence', awards: 'Awards & Honours', parks: 'Protected Areas', rivers: 'Rivers of India', natparks: 'National Parks', environment: 'Environment & Ecology', biology: 'Biology', geometry: 'Geometry', mensuration2d: 'Mensuration 2D', mensuration3d: 'Mensuration 3D', trigonometry: 'Trigonometry', numbersystem: 'Number System', calendar: 'Calendar', clock: 'Clock', voice: 'Active & Passive Voice', narration: 'Narration', formulas: 'Formula Book' };
   function openDrill(title){
     closeAllMenus();
     drillOpen = true;
@@ -3027,6 +3029,7 @@
     states: ['states and uts', 'states', 'union territories', 'state capitals', 'capitals', 'high courts', 'state animals'],
     worldgeo: ['world geography', 'world capitals', 'currencies', 'capitals and currencies', 'straits', 'boundary lines', 'deserts', 'grasslands'],
     indgeo: ['indian geography', 'geography of india', 'rivers', 'himalaya', 'mountain passes', 'dams', 'soils', 'minerals', 'monsoon'],
+    natparks: ['national parks', 'national park', 'parks of india', 'kaziranga', 'gir', 'corbett', 'hemis', 'kanha'],
     rivers: ['rivers', 'rivers of india', 'river', 'tributaries', 'dams', 'waterfalls', 'drainage', 'ganga', 'godavari', 'brahmaputra', 'indus'],
     parks: ['protected areas', 'national parks', 'wildlife sanctuaries', 'sanctuaries', 'tiger reserves', 'biosphere reserves', 'ramsar', 'ramsar sites', 'wetlands', 'world heritage', 'heritage sites'], biology: ['biology']
   };
