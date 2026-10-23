@@ -6,7 +6,7 @@
 // the Lab tab — periodic table and games — is this page's own script.
 // Afterwards: node tools/index_app.js study-chemistry.html chemistry gs
 const fs = require('fs'), path = require('path');
-const { fail, loadData, check, writePage } = require('../workbook/lib.js');
+const { fail, loadData, check, writePage, applyVisual } = require('../workbook/lib.js');
 const DATA = path.join(__dirname, 'data');
 
 // Data files only push: 1x lessons with their questions, last-moment cards and tiles; 40 the exam side.
@@ -25,15 +25,17 @@ const qb = ctx.QB.slice().sort((a, b) => num(a[0]) - num(b[0]));
 // the atom's timeline (K3) and the periodic table's (K4) also show on the Revise tab
 const tls = ['K3', 'K4', 'K18'].map(id => (byId.get(id).blocks.find(b => b.k === 'tl') || {}).rows || []).flat();
 const lab = fs.readFileSync(path.join(__dirname, 'lab.js'), 'utf8') + '\n' + fs.readFileSync(path.join(__dirname, '..', 'workbook', 'games.js'), 'utf8');
+// photos, diagrams and charts: visual.js beside this file (see applyVisual in tools/workbook/lib.js)
+const V = applyVisual(path.join(__dirname, 'visual.js'), LESSONS, { QB: qb });
 const size = writePage({ file: 'study-chemistry.html', title: 'Chemistry', brand: 'Chemistry',
   small: 'रसायन विज्ञान · SSC CGL · CHSL · RRB NTPC · Group D', tabs: ['learn', 'practice', 'mock', 'lab', 'revise', 'plan'],
-  source: 'tools/chemistry/build.js from tools/chemistry/data and lab.js', extra: lab }, {
+  source: 'tools/chemistry/build.js from tools/chemistry/data and lab.js', extra: lab, visual: V.visual }, {
   APP: { id: 'chemistry', key: 'chemistry_v1', mode: 'era', era: 'chem', title: 'Chemistry', hi: 'रसायन विज्ञान',
     tagline: 'SSC CGL · CHSL · RRB NTPC · Group D', plans: [3, 5, 7, 10, 15], storyLabel: 'The story first · two minutes', keyLabel: 'Remember this:', apps: [],
     tabs: ['learn', 'practice', 'mock', 'lab', 'revise', 'plan'] },
   GROUPS: ctx.GROUPS, LESSONS, QB: qb,
   TIMELINE: tls.length ? [{ era: 'chem', rows: tls }] : [],
-  LASTMOMENT: ctx.LASTMOMENT, TILES: ctx.TILES, ERANOTE: ctx.ERANOTE, INTROS: ctx.INTROS, HEATMAP: ctx.HEATMAP
+  LASTMOMENT: ctx.LASTMOMENT, TILES: ctx.TILES, ERANOTE: ctx.ERANOTE, INTROS: ctx.INTROS, HEATMAP: ctx.HEATMAP, VIS: V.VIS
 });
 const p = qb.filter(r => r[4] === 'p').length;
 console.log(`study-chemistry.html  ${LESSONS.length} lessons, ${qb.length} questions (${p} repeatedly asked), ` +
