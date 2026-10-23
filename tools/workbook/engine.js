@@ -36,7 +36,15 @@ const pCount = id => HUB ? ((APP.pcount||{})[id] || 0) : byLesson(id).filter(q=>
 const KEY = APP.key;
 let S = { ans:{}, bm:{}, les:{}, mocks:[], plan:null };
 try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch(e) {}
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
+// APP.shared: the hub and its apps keep one saved state (Computer Knowledge), so answers, bookmarks, lessons and Lab XP
+// follow the learner across them; each page keeps its own plan (S.plans[id]) and tags its mocks with its id.
+const SHARED = !!APP.shared;
+if (SHARED) {
+  S.plans = S.plans || {};
+  if (S.plan && !Object.keys(S.plans).length) S.plans[APP.hub ? APP.hub.id : APP.id] = S.plan;   // a plan made before the split covered everything: the hub's now
+  S.plan = S.plans[APP.id] || null;
+}
+const save = () => { try { if (SHARED) S.plans[APP.id] = S.plan; localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
 const record = (q, ok) => { S.ans[q.id] = ok ? 1 : 0; save(); renderTop(); };
 
 /* Another History app's saved progress. Every page is on the same site, so the hub (and a
@@ -60,7 +68,7 @@ function openApp(appId, lesson, tab){
   const a = APP.hub && appId === APP.hub.id ? APP.hub : A(appId);
   if (!a) return;
   const here = () => { location.href = a.file + (lesson ? "?lesson=" + encodeURIComponent(lesson) : "") + (tab ? "#" + tab : ""); };
-  if (!EMBED) return here();
+  if (!EMBED || (SHARED && a.key === KEY)) return here();      // parts of one shared app stay in the same frame and session
   let ok = false;
   const onAck = e => { if (e.origin === location.origin && e.data && e.data.type === "shabd-open-ok") ok = true; };
   window.addEventListener("message", onAck);
@@ -115,7 +123,7 @@ document.querySelectorAll(".nav button").forEach(b => b.addEventListener("click"
    START HERE (hub)
    ============================================================ */
 function renderStart(){
-  const done = LESSONS.filter(lesDone).length;
+  const done = LESSONS.filter(lesDone).length, ST = APP.start || {};      // APP.start: the hero's words for a hub that is not History
   const cards = APP.apps.map(a => {
     const ls = LESSONS.filter(l => l.app === a.id), d = ls.filter(lesDone).length, it = INTROS[a.id] || {};
     return `<button type="button" class="appc" data-go="${esc(JSON.stringify([a.id,null,null]))}">
@@ -127,20 +135,20 @@ function renderStart(){
   const tips = APP.apps.filter(a => INTROS[a.id]).map(a => `<div><dt>${esc(a.title)}</dt><dd>${esc(INTROS[a.id].tip)} ${esc(INTROS[a.id].order)}</dd></div>`).join("");
   $("#app").innerHTML = `<section class="view stack">
     <div class="hero">
-      <span class="eyebrow">New to history? Start here</span>
-      <h1>History, from zero to exam-ready</h1>
-      <p>SSC splits history into five subjects, so these are five apps &mdash; Ancient, Medieval, Modern, Art &amp; Culture, and World &mdash; with ${LESSONS.length} lessons between them. You do not need to know anything before you begin: every lesson opens with a two-minute story that explains what happened and why, and only then gives you the tables, tricks and traps the exam asks about.</p>
-      <div class="meter" aria-label="Lessons done in every History app"><i style="width:${done/LESSONS.length*100}%"></i></div>
+      <span class="eyebrow">${ST.eyebrow || "New to history? Start here"}</span>
+      <h1>${ST.h1 || "History, from zero to exam-ready"}</h1>
+      <p>${ST.p ? ST.p.replace("{n}", LESSONS.length) : `SSC splits history into five subjects, so these are five apps &mdash; Ancient, Medieval, Modern, Art &amp; Culture, and World &mdash; with ${LESSONS.length} lessons between them. You do not need to know anything before you begin: every lesson opens with a two-minute story that explains what happened and why, and only then gives you the tables, tricks and traps the exam asks about.`}</p>
+      <div class="meter" aria-label="Lessons done in every ${esc(ST.subject || "History")} app"><i style="width:${done/LESSONS.length*100}%"></i></div>
       <div class="row between"><span class="muted num" style="font-size:13px">${done}/${LESSONS.length} lessons done across the apps</span>
         <button class="btn pri sm" type="button" id="toplan">${S.plan ? "Open my plan" : "Make a study plan"}</button></div>
     </div>
     <div class="block"><h3>How to use these apps</h3><ol class="steps-list">
-      <li><b>Pick a plan</b> in the Plan tab &mdash; 5, 7, 10, 15 or 30 days. It tells you exactly what to read each day, and ticks itself as you finish lessons in the apps.</li>
-      <li><b>Read the story first</b> in every lesson, then the tables. The <b>Trick</b> boxes help you remember; the <b>Trap</b> boxes are the pairs SSC swaps to catch you.</li>
+      <li><b>Pick a plan</b> in the Plan tab &mdash; ${APP.plans.slice(0, -1).join(", ")} or ${APP.plans[APP.plans.length - 1]} days. It tells you exactly what to read each day, and ticks itself as you finish lessons in the apps.</li>
+      <li>${ST.read || "<b>Read the story first</b> in every lesson, then the tables."} The <b>Trick</b> boxes help you remember; the <b>Trap</b> boxes are the pairs SSC swaps to catch you.</li>
       <li><b>Take the quiz</b> at the end of each lesson. Anything you get wrong waits for you under Practice &rarr; Mistakes until you get it right.</li>
       <li><b>Revise in layers</b> in the Revise tab here: 30 days out read every summary, in the last week only the most-asked lessons, and in the final hour the Last moment sheet.</li>
     </ol></div>
-    <h2>The five apps</h2>
+    <h2>${ST.apps || "The five apps"}</h2>
     <div class="appcs">${cards}</div>
     ${tips ? `<div class="block"><h3>How to study each one</h3><dl class="facts prose">${tips}</dl></div>` : ""}
     <div class="block"><h3>Where the marks are</h3><dl class="facts prose">${GROUPS.filter(g=>ERANOTE[g.id]).map(g=>`<div><dt>${esc(g.name)}</dt><dd>${ERANOTE[g.id]}</dd></div>`).join("")}</dl>
@@ -374,7 +382,7 @@ function mockPool(scope){
 function renderMock(){
   if (M && M.running) return drawMockRun();
   if (M && M.done) return drawMockResult();
-  const hist = (S.mocks||[]).slice(-6).reverse();
+  const hist = (S.mocks||[]).filter(m => !SHARED || m.a === APP.id).slice(-6).reverse();
   $("#app").innerHTML = `<section class="view stack">
     <div class="stack" style="gap:6px"><span class="eyebrow">Timed, SSC pattern</span><h1>Mock test</h1>
     <p class="muted">+2 for a right answer, &minus;0.5 for a wrong one, 36 seconds a question (CGL Tier-1 pace). Answers show only after you submit.</p></div>
@@ -462,7 +470,7 @@ function submitMock(){
   const used = Math.min(M.secs, Math.round((Date.now()-M.start)/1000));
   M.res = {c,w,sk,score,max,used,per, acc: (c+w) ? Math.round(c*100/(c+w)) : 0};
   const d = new Date(); const ds = d.toLocaleDateString("en-IN",{day:"numeric",month:"short"})+" "+d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
-  S.mocks = (S.mocks||[]).concat([{d:ds, n:M.list.length, score, max, acc:M.res.acc}]).slice(-20); save(); renderTop();
+  S.mocks = (S.mocks||[]).concat([Object.assign({d:ds, n:M.list.length, score, max, acc:M.res.acc}, SHARED ? {a:APP.id} : {})]).slice(SHARED ? -60 : -20); save(); renderTop();
   M.filter = "wrong";
   if (TAB==="mock") drawMockResult();
 }
@@ -508,7 +516,7 @@ function renderRevise(){
   const tabs = reviseTabs();
   if (!tabs.some(t => t[0] === RV)) RV = tabs[0][0];
   $("#app").innerHTML = `<section class="view stack">
-    <div class="stack" style="gap:6px"><span class="eyebrow">Revision, layered by how long you have${HUB ? " · every era" : ""}</span><h1>Revise</h1>
+    <div class="stack" style="gap:6px"><span class="eyebrow">Revision, layered by how long you have${HUB ? ((APP.start || {}).every || " · every era") : ""}</span><h1>Revise</h1>
     <p class="muted">${HEATMAP ? "Start with the <b>Heat map</b> to see where the marks are, then read" : "Start at"} <b>30 days</b> for every summary, drop to <b>7 days</b> for the most-asked lessons only, and open <b>Last moment</b> in the hour before the paper.</p></div>
     <div class="seg" role="tablist">${tabs.map(t=>`<button type="button" role="tab" data-rv="${t[0]}" aria-selected="${RV===t[0]}">${t[1]}</button>`).join("")}</div>
     <div id="rv" class="stack"></div>
@@ -635,11 +643,13 @@ function drawFlash(box){
 const DAYMS = 86400000, MAXPD = 4;     // at most four new lessons a day, unless the must-do lessons need more
 const label = d => d + " day" + (d === 1 ? "" : "s");
 
+/* the apps a hub plan gives their own revision and mock days: History's three periods, or every app marked major */
+const majorApp = a => a.major != null ? !!a.major : ["anc","med","mod"].includes(a.era);
 /* the closing revision days, built first so a plan is always exactly `days` long */
 function planTailDays(days){
   const t = [];
   const rv = (rv, l, s) => ({ k:"rev", label:l, sub:s, go:[APP.id, null, "revise"], rv });
-  if (HUB && days >= 30) APP.apps.filter(a => ["anc","med","mod"].includes(a.era)).forEach(a => t.push({ title:"Revision", sub:a.title, tasks:[
+  if (HUB && days >= 30) APP.apps.filter(majorApp).forEach(a => t.push({ title:"Revision", sub:a.title, tasks:[
     { k:"rev", label:`${a.title}: Revise → 30 days`, sub:"Every summary in the app", go:[a.id, null, "revise"] },
     { k:"prac", label:`${a.title}: practise your mistakes`, sub:"Practice → Mistakes", go:[a.id, null, "practice"] },
     { k:"mock", label:`${a.title}: a 25-question mock`, sub:"Mock tab", go:[a.id, null, "mock"] }]}));
@@ -648,7 +658,7 @@ function planTailDays(days){
     rv("tricks", "Revise → Tricks, all of them", "The mnemonics"),
     rv("traps", "Revise → Traps, all of them", "The pairs SSC swaps")]});
   if (days >= 10) t.push({ title:"Revision", sub:"Full-length test", tasks: HUB
-    ? APP.apps.filter(a => ["anc","med","mod"].includes(a.era)).map(a => ({ k:"mock", label:`${a.title}: a 50-question mock, timed`, sub:"Then go through every mistake", go:[a.id, null, "mock"] }))
+    ? APP.apps.filter(majorApp).map(a => ({ k:"mock", label:`${a.title}: a 50-question mock, timed`, sub:"Then go through every mistake", go:[a.id, null, "mock"] }))
     : [{ k:"mock", label:"A 50-question mock, timed", sub:"Mock tab · 30 min", go:[APP.id, null, "mock"] },
        { k:"prac", label:"Go through every mistake it throws up", sub:"Practice → Mistakes", go:[APP.id, null, "practice"] }]});
   t.push({ title:"The day before", sub:"and the hour before", tasks:[
@@ -773,4 +783,6 @@ window.addEventListener("hashchange", () => {
   if (TABS.includes(t) && t !== TAB && !(M && M.running)) go(t);
 });
 /* progress made in another History app (another tab, or synced from your account) */
-window.addEventListener("storage", e => { if (e.key && e.key !== KEY && APP.apps.some(a => a.key === e.key) && (TAB === "plan" || TAB === "start")) go(TAB); });
+window.addEventListener("storage", e => {
+  if (SHARED && e.key === KEY) { try { const plan = S.plan; S = Object.assign(S, JSON.parse(e.newValue || "{}")); S.plans = S.plans || {}; S.plan = plan; } catch(x) {} if (TAB === "plan" || TAB === "start") go(TAB); return; }
+  if (e.key && e.key !== KEY && APP.apps.some(a => a.key === e.key) && (TAB === "plan" || TAB === "start")) go(TAB); });

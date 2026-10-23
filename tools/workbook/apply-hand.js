@@ -9,7 +9,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const ROOT = path.join(__dirname, '..', '..');
 const PAGES = { sports: 'study-sports.html', intlorgs: 'study-intl-orgs.html', polity: 'study-polity.html', economics: 'study-economics.html', biology: 'study-biology.html', space: 'study-space.html', physics: 'study-physics.html', reports: 'study-reports-indices.html',
   schemes: 'study-govt-schemes.html', appointments: 'study-appointments.html', ipr: 'study-ipr-plans.html', bns: 'study-bns-bnss-bsa.html',
-  'number-system': 'study-number-system.html', clock: 'study-clock.html', calendar: 'study-calendar.html', trigonometry: 'study-trigonometry.html', geometry: 'study-geometry.html',
+  'number-system': 'study-number-system.html', clock: 'study-clock.html', calendar: 'study-calendar.html', trigonometry: 'study-trigonometry.html', census: 'study-census.html', voice: 'study-voice.html', narration: 'study-narration.html', geometry: 'study-geometry.html',
   mensuration2d: 'study-mensuration2d.html', mensuration3d: 'study-mensuration3d.html' };
 const name = process.argv[2], file = PAGES[name];
 if (!file) { console.error('usage: apply-hand.js ' + Object.keys(PAGES).join('|')); process.exit(1); }
@@ -21,7 +21,11 @@ const rep = (a, b) => { if (s.split(a).length !== 2) fail('expected exactly one:
 // the page's lessons, as data
 const a = s.indexOf('const LESSONS = '), b = s.indexOf('\nconst QB = ');
 if (a < 0 || b < 0) fail('no LESSONS / QB');
-const ctx = {}; vm.createContext(ctx); vm.runInContext('var LESSONS = ' + s.slice(a + 'const LESSONS = '.length, b).trim().replace(/;$/, ''), ctx);
+const ctx = {}; vm.createContext(ctx);
+// constants the lessons use (a drawn SVG, say) sit just above them in the same script
+const pre = s.slice(s.lastIndexOf('<script>', a) + 8, a).replace(/^const (\w+)/gm, 'var $1');
+try { vm.runInContext(pre, ctx); } catch (e) { /* the page's own code: not needed for the lessons */ }
+vm.runInContext('var LESSONS = ' + s.slice(a + 'const LESSONS = '.length, b).trim().replace(/;$/, ''), ctx);
 const LESSONS = ctx.LESSONS;
 
 // run the visual file: place() records [lesson, where, blocks] after checking that the spot exists

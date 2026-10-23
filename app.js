@@ -154,7 +154,7 @@
    ['histmodern', '🇮🇳', 'आधुनिक भारत', 'Plassey to 1947 and after — the Company, Viceroys, 1857, reformers, the press, the Congress, Gandhi, revolutionaries, unsung heroes and the integration of India.', 12, 296, '#B5487A'],
    ['worldhist', '🌍', 'विश्व इतिहास · कौन क्या', 'Ancient civilisations to the Age of Discovery, revolutions and the World Wars, plus travellers, titles, books and slogans.', 3, 77, '#3E6FA8']
   ].forEach(function(x){ var m = STUDY[x[0]]; m.subj = 'gs'; m.gsub = 'history'; m.ico = x[1]; m.hi = x[2]; m.desc = x[3]; m.meta = x[4] + ' lessons · ' + x[5] + ' questions'; m.color = x[6]; m.lessons = x[4]; m.unit = 'lessons'; });
-  STUDY.computer.subj = 'gs'; STUDY.computer.gsub = 'computer'; STUDY.computer.core = 1; STUDY.computer.ico = '\ud83d\udcbb'; STUDY.computer.hi = 'कंप्यूटर ज्ञान · CGL · CHSL · NTPC'; STUDY.computer.desc = 'Hardware to cyber law for the SSC CGL and CHSL Tier 2 computer module and RRB NTPC — plain-words lessons on Windows, Word, Excel, PowerPoint, Access, the internet, networks and security, with shortcuts, full forms, past-paper questions and a Lab of shortcut and full-form games.'; STUDY.computer.meta = '22 lessons · 1,648 questions · Lab'; STUDY.computer.color = '#2E6DA4'; STUDY.computer.lessons = 22; STUDY.computer.unit = 'lessons';
+  STUDY.computer.subj = 'gs'; STUDY.computer.gsub = 'computer'; STUDY.computer.core = 1; STUDY.computer.ico = '\ud83d\udcbb'; STUDY.computer.hi = 'कंप्यूटर ज्ञान · CGL · CHSL · NTPC'; STUDY.computer.desc = 'Hardware to cyber law for the SSC CGL and CHSL Tier 2 computer module and RRB NTPC — plain-words lessons on Windows, Word, Excel, PowerPoint, Access, the internet, networks and security, with shortcuts, full forms, past-paper questions and a Lab of shortcut and full-form games. In three lighter parts (Hardware; Software & MS Office; Internet & Security) that share your progress.'; STUDY.computer.meta = '3 parts · 22 lessons · 1,648 questions · Lab'; STUDY.computer.color = '#2E6DA4'; STUDY.computer.lessons = 22; STUDY.computer.unit = 'lessons';
   STUDY.artculture.subj = 'gs'; STUDY.artculture.ico = '🎨'; STUDY.artculture.hi = 'कला एवं संस्कृति'; STUDY.artculture.desc = 'Classical dance and music, temples and caves, painting, crafts, theatre and puppets, literature and languages, and India\u2019s UNESCO heritage.'; STUDY.artculture.meta = '5 lessons · 120 questions'; STUDY.artculture.color = '#C2571A'; STUDY.artculture.lessons = 5; STUDY.artculture.unit = 'lessons';
   STUDY.polity.subj = 'gs'; STUDY.polity.ico = '📜'; STUDY.polity.hi = 'भारतीय राजव्यवस्था · PYQ'; STUDY.polity.desc = 'The whole Constitution the SSC way — Parts, Schedules, key Articles, President to Parliament, emergencies and amendments.'; STUDY.polity.meta = '20 lessons · 481 questions'; STUDY.polity.color = '#3A4F9A';
   STUDY.economics.subj = 'gs'; STUDY.economics.ico = '💹'; STUDY.economics.hi = 'भारतीय अर्थव्यवस्था · PYQ'; STUDY.economics.desc = 'Demand to GDP, inflation, RBI & banking, budget, GST, 1991 reforms and trade — built from past SSC questions.'; STUDY.economics.meta = '20 lessons · 530 questions'; STUDY.economics.color = '#1E7A8C';
@@ -2108,6 +2108,9 @@
     var r = reviewSync(), stale = Object.keys(r.items).filter(function(k){ return !studyBankIdx[k]; });
     if(stale.length){ stale.forEach(function(k){ delete r.items[k]; }); r.at = Date.now(); setStudyState('review', r); }   // questions since removed from the apps
     var keys = reviewDueKeys(r), apps = trackDueList(), words = currentUser ? dueRevisions().length : 0, tasks = todoLeftToday();
+    // a question due from two apps is asked once; its answer moves both copies along
+    var twins = {};
+    keys = keys.filter(function(k){ var q = studyBankIdx[k], t = q ? qSame(q) : k; if(twins[t]){ twins[t].push(k); return false; } twins[t] = [k]; return true; });
     var all = Object.keys(r.items), byMod = {};
     keys.forEach(function(k){ var m = k.split(':')[0]; byMod[m] = (byMod[m] || 0) + 1; });
     // the next seven days, so a light day can take a little extra
@@ -2140,7 +2143,7 @@
       var pick = keys.slice(0, take).map(function(k){ return studyBankIdx[k]; }).filter(Boolean);
       startPractice(shuffleArr(pick).map(prepQ), { title: 'Today’s revision', backLabel: 'Back to Today',
         back: function(){ drill = { kind: 'today', phase: 'list' }; document.getElementById('drillTitle').textContent = 'Today’s revision'; renderToday(); },
-        onAnswer: function(q, ok){ q.next = reviewAnswer(q.mod + ':' + q.id, ok); },
+        onAnswer: function(q, ok){ (twins[qSame(q.src)] || [q.mod + ':' + q.id]).forEach(function(k){ q.next = reviewAnswer(k, ok); }); },
         fb: function(q){ if(q.pick !== q.a) return 'Not quite — it comes back tomorrow.'; return q.next ? 'Right — next review in ' + REVIEW_GAPS[q.next[0] - 1] + ' day' + (REVIEW_GAPS[q.next[0] - 1] === 1 ? '' : 's') + '.' : 'Right — learnt for good. It leaves the queue.'; },
         doneText: function(d){ return d.cleared === d.qs.length ? 'All right — each one moves to a longer gap.' : 'Right ones move to a longer gap; the ones you missed come back tomorrow.'; } });
     });
@@ -2322,10 +2325,17 @@
     document.getElementById('mkStart').addEventListener('click', startMock);
   }
   function saveMockCfg(){ lsSet('shabdMockCfg', JSON.stringify(mockCfg)); }
+  /** The same question sits in more than one app (two dozen do): compare the text and the options, without tags, spaces,
+      punctuation or option order, so a mock or a review asks it once. Stems alone repeat ("Which pair is correctly matched?"). */
+  function qSame(q){
+    var norm = function(t){ return String(t == null ? '' : t).replace(/<[^>]+>/g, '').toLowerCase().replace(/[^a-z0-9\u0900-\u097f]+/g, ''); };
+    return norm(q.q) + '|' + (q.o || []).map(norm).sort().join('|');
+  }
+  function uniqQs(list){ var seen = {}; return list.filter(function(q){ var k = qSame(q.src || q); if(seen[k]) return false; seen[k] = 1; return true; }); }
   function pickFrom(mods, n){
     var pool = [];
     mods.forEach(function(m){ if(studyBank.modules[m]) pool = pool.concat(studyBank.modules[m].qs); });
-    return shuffleArr(pool).slice(0, n).map(prepQ);
+    return uniqQs(shuffleArr(pool)).slice(0, n).map(prepQ);
   }
   function startMock(){
     var c = mockCfg, en = [], gs = [], mt = [], rs = [];
@@ -2441,7 +2451,7 @@
       var pick = shuffleArr(t.qs.filter(function(q){ return ans[q.id] === 0; })).concat(shuffleArr(t.qs.filter(function(q){ return ans[q.id] !== 0 && ans[q.id] !== 1; })), shuffleArr(t.qs.filter(function(q){ return ans[q.id] === 1; })));
       pick.slice(0, per).forEach(function(q){ var x = prepQ(q); x.sec = SEC[t.g] || 'gs'; qs.push(x); });
     });
-    qs = shuffleArr(qs).slice(0, 25);
+    qs = uniqQs(shuffleArr(qs)).slice(0, 25);
     if(!qs.length){ showToast('No questions in your weak topics yet.'); return; }
     beginMock(qs, { topic: 'Weak topics', back: function(){ drill = { kind: 'weak', phase: 'list' }; document.getElementById('drillTitle').textContent = 'Weak spots'; renderWeak(); }, backLabel: 'Back to Weak spots' });
   }

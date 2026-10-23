@@ -102,15 +102,15 @@ pairQs("R7", R7F, { q: t => `${t} — which river?`, extra: ["Godavari","Kaveri"
 QB.push(
 ["R6","Which river is called the Dakshin Ganga?",["Godavari","Kaveri","Krishna","Mahanadi"],"Also Vriddha Ganga.","p"],
 ["R6","The Hirakud Dam is on the:",["Mahanadi","Godavari","Brahmani","Subarnarekha"],"Near Sambalpur, Odisha — one of the longest earthen dams.","p"],
-["R6","Asia's first hydroelectric power station (1902) was at:",["Shivanasamudra, on the Kaveri","Jog Falls","Bhakra","Hogenakkal"],"","p"],
+["R6","Asia's first hydroelectric power station (1902) was at:",["Shivanasamudra, on the Kaveri","Jog Falls","Bhakra","Hogenakkal"],"The Shivanasamudra plant on the Kaveri (1902) was one of Asia's first hydroelectric stations.","p"],
 ["R6","Where do the Tunga and the Bhadra meet to form the Tungabhadra?",["Koodli","Hampi","Kurnool","Hosapete"],"Near Shivamogga, Karnataka.",""],
 ["R6","The Brahmani is formed by which two rivers?",["South Koel and Sankh","Tunga and Bhadra","Wardha and Wainganga","Dibang and Lohit"],"They meet at Vedvyas near Rourkela.",""],
-["R6","Which river divides into a delta at Cuttack?",["Mahanadi","Brahmani","Godavari","Subarnarekha"],"",""],
+["R6","Which river divides into a delta at Cuttack?",["Mahanadi","Brahmani","Godavari","Subarnarekha"],"The Mahanadi begins its delta at Cuttack.",""],
 ["R6","The Wardha, Wainganga and Penganga together form the:",["Pranhita","Indravati","Manjira","Sabari"],"The Pranhita is the Godavari's largest tributary.",""],
 ["R7","The Narmada flows between which two ranges?",["Vindhya and Satpura","Satpura and Ajanta","Aravalli and Vindhya","Western Ghats and Satpura"],"In a rift valley.","p"],
-["R7","Why do the Narmada and Tapi form estuaries rather than deltas?",["They flow fast through rift valleys and carry little silt into tidal seas","They flow into the Bay of Bengal","They are seasonal rivers","They have no tributaries"],"",""],
-["R7","Which river crosses the Tropic of Cancer twice?",["Mahi","Narmada","Sabarmati","Tapi"],"","p"],
-["R7","Which is the longest river of Kerala?",["Periyar","Bharathapuzha","Pamba","Chaliyar"],"","p"],
+["R7","Why do the Narmada and Tapi form estuaries rather than deltas?",["They flow fast through rift valleys and carry little silt into tidal seas","They flow into the Bay of Bengal","They are seasonal rivers","They have no tributaries"],"The Narmada and Tapi run fast through rift valleys over hard rock and bring little silt, which the tides wash away, so they form estuaries.",""],
+["R7","Which river crosses the Tropic of Cancer twice?",["Mahi","Narmada","Sabarmati","Tapi"],"The Mahi makes an inverted U and crosses the Tropic of Cancer twice.","p"],
+["R7","Which is the longest river of Kerala?",["Periyar","Bharathapuzha","Pamba","Chaliyar"],"The Periyar (about 244 km) is Kerala's longest river.","p"],
 ["R7","The Dhuandhar Falls is near which city?",["Jabalpur","Mandla","Narmadapuram","Bharuch"],"At Bhedaghat, among the Marble Rocks.",""]
 );
 

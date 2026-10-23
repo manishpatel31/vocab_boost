@@ -220,30 +220,30 @@ pairQs("S10", S10B, { q: t => `The state bird of ${t} is:`, rq: a => `${a} — t
 QB.push(
 ["S8","Lakshadweep’s High Court is located in which state?",["Kerala","Karnataka","Tamil Nadu","Goa"],"Lakshadweep comes under the Kerala High Court at Kochi.","p","","","SSC CPO · 3 Jul 2017 (Afternoon)"],
 ["S8","How many Union Territories does India have now?",["8","9","7","6"],"Since 26 January 2020 (as of October 2026).","p"],
-["S8","Which UTs have an elected legislature?",["Delhi, Puducherry, Jammu and Kashmir","Delhi, Chandigarh, Puducherry","Delhi, Ladakh, Jammu and Kashmir","Puducherry, Chandigarh, Lakshadweep"],"","p"],
+["S8","Which UTs have an elected legislature?",["Delhi, Puducherry, Jammu and Kashmir","Delhi, Chandigarh, Puducherry","Delhi, Ladakh, Jammu and Kashmir","Puducherry, Chandigarh, Lakshadweep"],"Of the eight UTs, only Delhi, Puducherry and Jammu and Kashmir have elected legislatures.","p"],
 ["S8","Which Article contains the special provisions for Delhi?",["Article 239AA","Article 370","Article 371","Article 240"],"Added by the 69th Amendment, 1991.","p"],
 ["S8","The presidential order that made Article 370 inoperative was issued on:",["5 August 2019","31 October 2019","26 January 2020","15 August 2019"],"The two new UTs came into being on 31 October 2019.","p"],
 ["S8","Chandigarh became a Union Territory in:",["1966","1956","1953","1971"],"When Haryana was carved out of Punjab.",""],
 ["S8","Port Blair, the capital of the Andaman and Nicobar Islands, was renamed in 2024 as:",["Sri Vijaya Puram","Swaraj Dweep","Shaheed Dweep","Netaji Subhas Chandra Bose Dweep"],"Swaraj Dweep and Shaheed Dweep are the renamed Havelock and Neil islands.","p"],
 ["S8","Karaikal, a part of Puducherry, lies inside which state?",["Tamil Nadu","Kerala","Andhra Pradesh","Karnataka"],"Mahe is in Kerala and Yanam in Andhra Pradesh.",""],
 ["S9","Which is the oldest high court in India?",["Calcutta High Court","Bombay High Court","Madras High Court","Allahabad High Court"],"Set up in 1862.","p"],
-["S9","How many high courts does India have (as of 2026)?",["25","24","21","28"],"","p"],
+["S9","How many high courts does India have (as of 2026)?",["25","24","21","28"],"India has 25 High Courts; Andhra Pradesh got the newest, at Amaravati, in 2019.","p"],
 ["S9","Which high court serves four states?",["Gauhati High Court","Bombay High Court","Calcutta High Court","Punjab and Haryana High Court"],"Assam, Nagaland, Mizoram and Arunachal Pradesh.","p"],
 ["S9","Which Article allows a common high court for two or more states?",["Article 231","Article 214","Article 226","Article 124"],"Article 214 gives each state a high court.",""],
-["S9","Meghalaya, Manipur and Tripura got their own high courts in:",["2013","2019","2000","1972"],"",""],
+["S9","Meghalaya, Manipur and Tripura got their own high courts in:",["2013","2019","2000","1972"],"Meghalaya, Manipur and Tripura got their own High Courts in March 2013.",""],
 ["S9","In which of these states is the high court NOT in the capital city?",["Rajasthan","Bihar","Jharkhand","Telangana"],"Rajasthan’s high court is at Jodhpur.","p"],
 ["S9","Konkani, Manipuri and Nepali were added to the Eighth Schedule in:",["1992","2003","1967","1956"],"By the 71st Amendment.",""],
 ["S9","Which state was the first to make Sanskrit its second official language?",["Uttarakhand","Himachal Pradesh","Uttar Pradesh","Madhya Pradesh"],"In 2010; Himachal followed in 2019.",""],
 ["S10","Which is the most populous state according to the 2011 Census?",["Uttar Pradesh","Maharashtra","Bihar","West Bengal"],"About 19.98 crore people.","p","","","SSC CGL · 7 Jun 2019 (Shift 1)"],
 ["S10","Through which of the following states does the Tropic of Cancer pass?",["Mizoram","Odisha","Bihar","Maharashtra"],"It crosses Gujarat, Rajasthan, MP, Chhattisgarh, Jharkhand, West Bengal, Tripura and Mizoram.","p","","","SSC CHSL · 16 Oct 2020 (Shift 3)"],
-["S10","The Tropic of Cancer passes through how many Indian states?",["8","6","7","9"],"","p"],
+["S10","The Tropic of Cancer passes through how many Indian states?",["8","6","7","9"],"The Tropic of Cancer crosses eight states: Gujarat, Rajasthan, MP, Chhattisgarh, Jharkhand, West Bengal, Tripura and Mizoram.","p"],
 ["S10","How many Indian states share a border with Bangladesh?",["5","4","3","6"],"West Bengal, Assam, Meghalaya, Tripura and Mizoram.","p"],
 ["S10","How many Indian states share a border with Nepal?",["5","4","6","3"],"Uttarakhand, UP, Bihar, West Bengal and Sikkim.","p"],
-["S10","Which of these states does NOT border Bhutan?",["Nagaland","Sikkim","Assam","Arunachal Pradesh"],"",""],
-["S10","Which of these states does NOT border China?",["Punjab","Himachal Pradesh","Uttarakhand","Sikkim"],"",""],
+["S10","Which of these states does NOT border Bhutan?",["Nagaland","Sikkim","Assam","Arunachal Pradesh"],"Bhutan borders Sikkim, West Bengal, Assam and Arunachal Pradesh, but not Nagaland.",""],
+["S10","Which of these states does NOT border China?",["Punjab","Himachal Pradesh","Uttarakhand","Sikkim"],"Ladakh, Himachal, Uttarakhand, Sikkim and Arunachal border China; Punjab borders Pakistan.",""],
 ["S10","Which of these states shares a border with Pakistan?",["Gujarat","Haryana","Himachal Pradesh","Maharashtra"],"Gujarat, Rajasthan and Punjab (plus J&K and Ladakh).","p"],
-["S10","Which state has the longest border with Bangladesh?",["West Bengal","Assam","Tripura","Meghalaya"],"",""],
-["S10","How many Indian states have a sea coast?",["9","7","8","11"],"","p"]
+["S10","Which state has the longest border with Bangladesh?",["West Bengal","Assam","Tripura","Meghalaya"],"West Bengal has the longest border with Bangladesh, about 2,217 km.",""],
+["S10","How many Indian states have a sea coast?",["9","7","8","11"],"Nine states have a sea coast: Gujarat, Maharashtra, Goa, Karnataka, Kerala, Tamil Nadu, Andhra Pradesh, Odisha and West Bengal.","p"]
 );
 
 LASTMOMENT.push(

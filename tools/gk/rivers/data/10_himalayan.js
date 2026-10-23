@@ -226,23 +226,23 @@ QB.push(
 ["R1","Which river basin is the largest in India?",["Ganga","Godavari","Indus","Brahmaputra"],"About a quarter of India's area.",""],
 ["R1","Rivers older than the Himalaya, which kept cutting gorges as the mountains rose, are called:",["Antecedent rivers","Consequent rivers","Subsequent rivers","Superimposed rivers"],"The Indus, Sutlej and Brahmaputra.",""],
 ["R2","The Indus Waters Treaty was signed in:",["1960","1947","1972","1950"],"19 September 1960, at Karachi.","p"],
-["R2","Who brokered the Indus Waters Treaty?",["The World Bank","The United Nations","The IMF","The Commonwealth"],"",""],
+["R2","Who brokered the Indus Waters Treaty?",["The World Bank","The United Nations","The IMF","The Commonwealth"],"The Indus Waters Treaty (1960) was signed by Nehru and Ayub Khan, with the World Bank as broker and signatory.",""],
 ["R2","Under the Indus Waters Treaty, India got the waters of:",["Ravi, Beas and Sutlej","Indus, Jhelum and Chenab","Jhelum, Ravi and Beas","Chenab, Ravi and Sutlej"],"The eastern rivers.","p"],
 ["R2","The Chenab is formed by which two streams?",["Chandra and Bhaga","Alaknanda and Bhagirathi","Dibang and Lohit","Tunga and Bhadra"],"They meet at Tandi in Lahaul.","p"],
-["R2","Which river joins the Indus near Nimmu in Ladakh?",["Zanskar","Shyok","Gilgit","Jhelum"],"",""],
+["R2","Which river joins the Indus near Nimmu in Ladakh?",["Zanskar","Shyok","Gilgit","Jhelum"],"The Zanskar meets the Indus near Nimmu, below Leh.",""],
 ["R3","The Bhagirathi and the Alaknanda meet at:",["Devprayag","Rudraprayag","Haridwar","Karnaprayag"],"From here the river is called the Ganga.","p"],
 ["R3","Gaumukh is the snout of which glacier?",["Gangotri","Yamunotri","Siachen","Zemu"],"The Bhagirathi rises here.","p"],
 ["R3","Tehri Dam is built on the:",["Bhagirathi","Alaknanda","Yamuna","Mandakini"],"India's highest dam.","p"],
-["R3","The Ganga enters the plains at:",["Haridwar","Rishikesh","Devprayag","Kanpur"],"",""],
+["R3","The Ganga enters the plains at:",["Haridwar","Rishikesh","Devprayag","Kanpur"],"The Ganga leaves the hills and enters the plains at Haridwar.",""],
 ["R4","Which of these is a right-bank tributary of the Ganga?",["Son","Gomti","Kosi","Gandak"],"The Yamuna and the Son come from the south.","p"],
 ["R4","The Damodar Valley Corporation was set up in:",["1948","1956","1951","1962"],"Modelled on the Tennessee Valley Authority (USA).",""],
 ["R4","The Farakka Barrage is in:",["West Bengal","Bihar","Jharkhand","Uttar Pradesh"],"It was completed in 1975.","p"],
 ["R4","National Waterway 1 runs between:",["Prayagraj and Haldia","Sadiya and Dhubri","Kollam and Kottapuram","Patna and Kolkata"],"On the Ganga–Bhagirathi–Hooghly.","p"],
 ["R4","When was the Ganga declared India's National River?",["2008","2014","2009","2005"],"The Ganges dolphin became the National Aquatic Animal in 2009.",""],
-["R5","Near which peak does the Tsangpo take its U-turn into India?",["Namcha Barwa","Kangchenjunga","Nanda Devi","Gurla Mandhata"],"",""],
-["R5","Which two rivers join the Siang near Sadiya to form the Brahmaputra?",["Dibang and Lohit","Subansiri and Manas","Teesta and Sankosh","Kameng and Dhansiri"],"","p"],
+["R5","Near which peak does the Tsangpo take its U-turn into India?",["Namcha Barwa","Kangchenjunga","Nanda Devi","Gurla Mandhata"],"The Tsangpo makes a U-turn around Namcha Barwa and enters Arunachal Pradesh as the Siang (Dihang).",""],
+["R5","Which two rivers join the Siang near Sadiya to form the Brahmaputra?",["Dibang and Lohit","Subansiri and Manas","Teesta and Sankosh","Kameng and Dhansiri"],"Near Sadiya the Siang is joined by the Dibang and the Lohit, and the combined river is the Brahmaputra.","p"],
 ["R5","National Waterway 2 is on the:",["Brahmaputra","Ganga","Barak","Godavari"],"Dhubri to Sadiya.",""],
-["R5","Silchar stands on which river?",["Barak","Brahmaputra","Teesta","Lohit"],"",""]
+["R5","Silchar stands on which river?",["Barak","Brahmaputra","Teesta","Lohit"],"Silchar lies on the Barak in southern Assam.",""]
 );
 
 LASTMOMENT.push(

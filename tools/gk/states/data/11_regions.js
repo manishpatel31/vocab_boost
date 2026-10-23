@@ -155,11 +155,11 @@ QB.push(
 ["S6","Bombay State was split into Gujarat and Maharashtra by the:",["Bombay Reorganisation Act, 1960","States Reorganisation Act, 1956","Punjab Reorganisation Act, 1966","Goa, Daman and Diu Reorganisation Act, 1987"],"In force on 1 May 1960.",""],
 ["S6","Goa was freed from Portuguese rule by:",["Operation Vijay","Operation Polo","Operation Meghdoot","Operation Blue Star"],"19 December 1961 — Goa Liberation Day.","p"],
 ["S6","Maharashtra Day and Gujarat Day both fall on:",["1 May","1 November","26 January","2 October"],"Both states were formed on 1 May 1960.","p"],
-["S6","Before Gandhinagar (1970), Gujarat’s capital was:",["Ahmedabad","Surat","Vadodara","Rajkot"],"",""],
+["S6","Before Gandhinagar (1970), Gujarat’s capital was:",["Ahmedabad","Surat","Vadodara","Rajkot"],"Ahmedabad was Gujarat's capital from 1960 until Gandhinagar took over in 1970.",""],
 ["S6","Which UT is a member of the Western Zonal Council?",["Dadra and Nagar Haveli and Daman and Diu","Lakshadweep","Puducherry","Chandigarh"],"Its members: Goa, Gujarat, Maharashtra and DNH & DD.",""],
 ["S7","Hyderabad State joined India in 1948 through:",["Operation Polo","Operation Vijay","Operation Meghdoot","Operation Trident"],"September 1948.","p"],
 ["S7","Until when was Hyderabad the shared capital of Andhra Pradesh and Telangana?",["2 June 2024","2 June 2019","1 November 2016","26 January 2020"],"Ten years from 2 June 2014, under the AP Reorganisation Act.",""],
-["S7","Karnataka’s legislature holds its winter session in the Suvarna Vidhana Soudha at:",["Belagavi","Mysuru","Hubballi","Kalaburagi"],"",""],
+["S7","Karnataka’s legislature holds its winter session in the Suvarna Vidhana Soudha at:",["Belagavi","Mysuru","Hubballi","Kalaburagi"],"Karnataka's legislature holds its winter session in the Suvarna Vidhana Soudha at Belagavi.",""],
 ["S7","Kerala was formed in 1956 by joining Travancore-Cochin with:",["Malabar (from Madras State)","Coorg","Hyderabad State","Pondicherry"],"Kerala Piravi is on 1 November.",""],
 ["S7","Which southern state was formed most recently?",["Telangana","Andhra Pradesh","Karnataka","Kerala"],"2 June 2014.","p"]
 );

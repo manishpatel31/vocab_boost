@@ -153,21 +153,21 @@ QB.push(
 ["E1","The word 'ecology' comes from the Greek word 'oikos', which means:",["House","Life","Earth","Study"],"Oikos = house; logos = study.",""],
 ["E1","Which of these is the basic functional unit of ecology?",["Ecosystem","Population","Species","Biome"],"Living and non-living parts work together in it.","p"],
 ["E1","Pioneer species that first grow on bare rock are usually:",["Lichens","Ferns","Grasses","Shrubs"],"They start primary succession.","p"],
-["E1","The final stable community in ecological succession is called the:",["Climax community","Pioneer community","Seral community","Edge community"],"",""],
-["E1","The non-living (abiotic) part of an ecosystem includes:",["Sunlight, water and soil","Bacteria and fungi","Plants and animals","Producers and consumers"],"",""],
+["E1","The final stable community in ecological succession is called the:",["Climax community","Pioneer community","Seral community","Edge community"],"Succession runs from pioneer species through seral stages to a stable climax community that stays in balance with the climate.",""],
+["E1","The non-living (abiotic) part of an ecosystem includes:",["Sunlight, water and soil","Bacteria and fungi","Plants and animals","Producers and consumers"],"Abiotic means non-living: sunlight, water, soil, air and temperature. Plants, animals and microbes are biotic.",""],
 ["E2","The 'ten per cent law' of energy transfer was given by:",["Raymond Lindeman","Charles Elton","A. G. Tansley","Eugene Odum"],"In 1942.","p"],
-["E2","The ultimate source of energy for almost every ecosystem is:",["The Sun","Green plants","Decomposers","Soil minerals"],"","p"],
+["E2","The ultimate source of energy for almost every ecosystem is:",["The Sun","Green plants","Decomposers","Soil minerals"],"Producers trap solar energy by photosynthesis, so almost every food chain begins with the Sun.","p"],
 ["E2","Organisms that make their own food are called:",["Autotrophs","Heterotrophs","Saprophytes","Detritivores"],"Green plants are autotrophs.","p"],
-["E2","Many food chains joined together form a:",["Food web","Food pyramid","Trophic level","Biome"],"","p"],
+["E2","Many food chains joined together form a:",["Food web","Food pyramid","Trophic level","Biome"],"In nature food chains interlink, because most animals eat more than one thing, and together they form a food web.","p"],
 ["E2","The flow of energy in an ecosystem is:",["One-way (unidirectional)","Two-way","Cyclic","Random"],"Nutrients cycle; energy does not.","p"],
 ["E2","If plants hold 10,000 J of energy, how much reaches a secondary consumer by the 10% law?",["100 J","1,000 J","10 J","500 J"],"10,000 → 1,000 (herbivore) → 100 (carnivore).","p"],
-["E2","Which ecosystem on land has the highest primary productivity?",["Tropical rainforest","Desert","Tundra","Temperate grassland"],"",""],
-["E3","Which bacterium lives in the root nodules of leguminous plants and fixes nitrogen?",["Rhizobium","Nitrosomonas","Pseudomonas","Lactobacillus"],"",""],
+["E2","Which ecosystem on land has the highest primary productivity?",["Tropical rainforest","Desert","Tundra","Temperate grassland"],"Year-round warmth, light and rain make tropical rainforests the most productive land ecosystems.",""],
+["E3","Which bacterium lives in the root nodules of leguminous plants and fixes nitrogen?",["Rhizobium","Nitrosomonas","Pseudomonas","Lactobacillus"],"Rhizobium lives in the root nodules of legumes such as pea and gram and fixes atmospheric nitrogen; Nitrosomonas nitrifies.",""],
 ["E3","Which biogeochemical cycle has no gaseous phase?",["Phosphorus cycle","Nitrogen cycle","Carbon cycle","Water cycle"],"It is a sedimentary cycle.","p"],
 ["E3","Which is the most abundant gas in the Earth's atmosphere?",["Nitrogen","Oxygen","Argon","Carbon dioxide"],"About 78%.","p"],
-["E3","Which is the largest land biome on Earth?",["Taiga (boreal coniferous forest)","Tropical rainforest","Savanna","Tundra"],"",""],
-["E3","Permanently frozen ground found in the tundra is called:",["Permafrost","Taiga","Loess","Laterite"],"","p"],
-["E3","The water fern used as a biofertiliser in paddy fields, because it holds the cyanobacterium Anabaena, is:",["Azolla","Salvinia","Marsilea","Pistia"],"",""]
+["E3","Which is the largest land biome on Earth?",["Taiga (boreal coniferous forest)","Tropical rainforest","Savanna","Tundra"],"The taiga, or boreal conifer forest across Russia, Scandinavia and Canada, is the largest land biome.",""],
+["E3","Permanently frozen ground found in the tundra is called:",["Permafrost","Taiga","Loess","Laterite"],"Permafrost is ground that stays frozen for two or more years, typical of the tundra.","p"],
+["E3","The water fern used as a biofertiliser in paddy fields, because it holds the cyanobacterium Anabaena, is:",["Azolla","Salvinia","Marsilea","Pistia"],"Azolla, a water fern, carries the nitrogen-fixing cyanobacterium Anabaena, so it enriches paddy fields.",""]
 );
 
 LASTMOMENT.push(

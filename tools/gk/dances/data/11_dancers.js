@@ -130,9 +130,9 @@ pairQs("L6", L6F, { q: t => `${t} founded which institution?`, rq: a => `Who fou
 QB.push(
 ["L4","Vedantam Satyanarayana Sarma was famous in Kuchipudi for playing:",["Women's roles such as Satyabhama","Demon roles","Comic roles","Only the role of Krishna"],"Kuchipudi was once danced only by men.",""],
 ["L4","The 'Tanjore Quartet' of brothers is famous for:",["Shaping the Bharatanatyam recital (margam)","Founding Kerala Kalamandalam","Writing the Abhinaya Darpana","Creating Kathakali make-up"],"Chinnaiah, Ponniah, Sivanandam and Vadivelu, 19th century.","p"],
-["L4","Which Bharatanatyam dancer has been both director of Kalakshetra and chairperson of the Sangeet Natak Akademi?",["Leela Samson","Alarmel Valli","Geeta Chandran","Malavika Sarukkai"],"",""],
+["L4","Which Bharatanatyam dancer has been both director of Kalakshetra and chairperson of the Sangeet Natak Akademi?",["Leela Samson","Alarmel Valli","Geeta Chandran","Malavika Sarukkai"],"Leela Samson directed Kalakshetra (2005–12) and chaired the Sangeet Natak Akademi.",""],
 ["L5","Who is called the 'adi guru' of Odissi?",["Pankaj Charan Das","Kelucharan Mohapatra","Deba Prasad Das","Mayadhar Raut"],"He came from a family of Mahari temple dancers.",""],
-["L5","Who is called the father of modern Manipuri dance?",["Guru Bipin Singh","Rajkumar Singhajit Singh","Guru Amubi Singh","Jatin Goswami"],"","p"],
+["L5","Who is called the father of modern Manipuri dance?",["Guru Bipin Singh","Rajkumar Singhajit Singh","Guru Amubi Singh","Jatin Goswami"],"Guru Bipin Singh is called the father of modern Manipuri dance.","p"],
 ["L5","Protima Bedi founded the dance village Nrityagram in:",["1990","1975","2001","1964"],"At Hesaraghatta near Bengaluru.",""],
 ["L5","Which Kathak dancer also served as an officer of the Indian Audit and Accounts Service?",["Shovana Narayan","Sitara Devi","Uma Sharma","Kumudini Lakhia"],"Padma Shri 1992.",""],
 ["L4","Who was the first woman to be nominated to the Rajya Sabha, and founded Kalakshetra?",["Rukmini Devi Arundale","Mrinalini Sarabhai","T. Balasaraswati","Sonal Mansingh"],"Nominated in 1952; founded Kalakshetra in 1936.","p"],
@@ -152,7 +152,7 @@ QB.push(
 ["L6","Who is called the father of modern Indian dance?",["Uday Shankar","Ravi Shankar","Birju Maharaj","Vallathol Narayana Menon"],"He made the dance film Kalpana (1948).","p"],
 ["L6","Kerala Kalamandalam was founded in:",["1930","1936","1949","1952"],"By Vallathol Narayana Menon.","p"],
 ["L6","Kalakshetra was founded in:",["1936","1930","1949","1964"],"In Adyar, Chennai.","p"],
-["L6","Which dancer, nominated to the Rajya Sabha in 2018, is known for Odissi and Bharatanatyam?",["Sonal Mansingh","Hema Malini","Mallika Sarabhai","Leela Samson"],"",""]
+["L6","Which dancer, nominated to the Rajya Sabha in 2018, is known for Odissi and Bharatanatyam?",["Sonal Mansingh","Hema Malini","Mallika Sarabhai","Leela Samson"],"Sonal Mansingh, an Odissi and Bharatanatyam dancer, was nominated to the Rajya Sabha in 2018.",""]
 );
 
 LASTMOMENT.push(

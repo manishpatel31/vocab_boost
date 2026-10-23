@@ -7,6 +7,22 @@ const INTROS = { computer: {
   lead: "Everything the computer questions in SSC CGL and CHSL Tier 2 and RRB NTPC ask about, from what a CPU is to cyber security, explained for someone who has never studied computers.",
   tip: "Learn by doing: keep a computer or phone open and press each shortcut as you read it. Full forms and shortcuts are pure recall, so revise them every day for a week rather than once.",
   order: "Go in order: hardware first (Part 1), then software, Windows and MS Office (Part 2), then the internet, networks and security (Part 3). Word, Excel and PowerPoint carry the most marks in the Tier 2 module, so give them extra time, and play the Lab's shortcut games for ten minutes a day."
+},
+// one per part (the three apps tools/computer/build.js writes); the hub shows them on its Start page
+comphw: {
+  lead: "What a computer is made of and how it works: its history and generations, the CPU and motherboard, input and output devices, memory and storage, and number systems.",
+  tip: "Picture the machine as you read: input → CPU → output, with memory beside the CPU and storage behind it. Memory units and the device names are pure recall, so drill them in the Lab.",
+  order: "Do the lessons in order; each one adds a part to the same picture of the machine. Number systems come last and need a pen."
+},
+compsw: {
+  lead: "Software and how you use it: programming languages, operating systems, files, every shortcut that is asked, MS Word, Excel and PowerPoint, and databases.",
+  tip: "Press each shortcut on a real keyboard as you read it. Word, Excel and PowerPoint carry the most marks in the Tier 2 module, so give them the most time.",
+  order: "Software and operating systems first, then the shortcuts lesson, then Word, Excel and PowerPoint, and databases last."
+},
+compnet: {
+  lead: "The connected side: the internet and the web, e-mail and e-banking, networks and their devices, protocols and full forms, cyber security, the IT Act and new technologies.",
+  tip: "Full forms and port numbers are the cheapest marks here: learn them until they are automatic, and play the Lab's Ports & Protocols match.",
+  order: "Internet and e-mail first, then networks and protocols, then security and the IT Act, and new technologies last."
 } };
 
 /* Lessons × exams. 3 = almost every paper, 2 = often, 1 = now and then, 0 = not in the syllabus.

@@ -137,13 +137,13 @@ QB.push(
 ["R8","Which is the highest dam in India?",["Tehri","Bhakra","Hirakud","Sardar Sarovar"],"About 260 m, on the Bhagirathi.","p"],
 ["R8","Nehru called the big dams the:",["Temples of modern India","Pillars of the nation","Wheels of progress","Gates of plenty"],"Said of Bhakra–Nangal.","p"],
 ["R8","Which waterfall is called the Niagara of India?",["Chitrakote","Jog","Dudhsagar","Hundru"],"On the Indravati, Chhattisgarh.","p"],
-["R8","The Brindavan Gardens lie below which dam?",["Krishnaraja Sagar","Mettur","Tungabhadra","Almatti"],"",""],
-["R9","An oxbow lake is formed by:",["A river cutting off a meander","A glacier","Wind","Sea waves"],"","p"],
+["R8","The Brindavan Gardens lie below which dam?",["Krishnaraja Sagar","Mettur","Tungabhadra","Almatti"],"The Brindavan Gardens lie below the Krishnaraja Sagar dam on the Kaveri near Mysuru.",""],
+["R9","An oxbow lake is formed by:",["A river cutting off a meander","A glacier","Wind","Sea waves"],"When a river cuts across the neck of a meander, the old loop is left behind as an oxbow lake.","p"],
 ["R9","A U-shaped valley is made by:",["A glacier","A river","Wind","The sea"],"Rivers cut V-shaped valleys.","p"],
-["R9","Why do the west-coast rivers of India form estuaries?",["They are swift and the tides carry silt away","They flow over soft rock","They are fed by glaciers","They are very long"],"",""],
-["R9","Which word means the work of a river depositing silt?",["Deposition","Erosion","Weathering","Transportation"],"",""],
+["R9","Why do the west-coast rivers of India form estuaries?",["They are swift and the tides carry silt away","They flow over soft rock","They are fed by glaciers","They are very long"],"Short, swift west-coast rivers carry little silt, and the tides wash it away, so estuaries form instead of deltas.",""],
+["R9","Which word means the work of a river depositing silt?",["Deposition","Erosion","Weathering","Transportation"],"Deposition is the laying down of the silt a river carries when it slows.",""],
 ["R10","Which Article of the Constitution deals with inter-state river water disputes?",["Article 262","Article 263","Article 280","Article 32"],"Article 263 is about the Inter-State Council.","p"],
-["R10","The Mahadayi (Mhadei) water dispute involves:",["Goa, Karnataka and Maharashtra","Karnataka and Tamil Nadu","Andhra Pradesh and Odisha","Punjab and Haryana"],"","p"],
+["R10","The Mahadayi (Mhadei) water dispute involves:",["Goa, Karnataka and Maharashtra","Karnataka and Tamil Nadu","Andhra Pradesh and Odisha","Punjab and Haryana"],"The Mahadayi (Mhadei) dispute is between Goa, Karnataka and Maharashtra, over diverting its water.","p"],
 ["R10","Which was the first river-link project under the National Perspective Plan to begin?",["Ken–Betwa","Par–Tapi–Narmada","Damanganga–Pinjal","Godavari–Kaveri"],"Foundation stone, December 2024.","p"],
 ["R10","National Waterway 3 is in:",["Kerala","Assam","West Bengal","Goa"],"West Coast Canal, Kollam–Kottapuram.",""]
 );

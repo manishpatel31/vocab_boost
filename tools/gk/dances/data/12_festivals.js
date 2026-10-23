@@ -121,7 +121,7 @@ QB.push(
 ["L8","The Lalit Kala Akademi is India's national academy for:",["Fine arts","Music and dance","Literature","Drama"],"Set up in 1954.",""],
 ["L9","Which of the following is NOT a folk dance?",["Kathakali","Bihu","Garba","Lavani"],"Kathakali is one of the eight classical dances.","p"],
 ["L9","The Kalbelia dance of Rajasthan belongs to which community?",["Snake charmers","Fishermen","Camel herders","Potters"],"Its movements copy a serpent.",""],
-["L9","Which pair is correctly matched?",["Sattriya — classical dance of Assam","Yakshagana — classical dance of Kerala","Bihu — classical dance of Assam","Theyyam — classical dance of Karnataka"],"",""],
+["L9","Which pair is correctly matched?",["Sattriya — classical dance of Assam","Yakshagana — classical dance of Kerala","Bihu — classical dance of Assam","Theyyam — classical dance of Karnataka"],"Sattriya of Assam is one of the eight classical dances; Yakshagana, Bihu and Theyyam are folk or ritual forms.",""],
 ["L7","The Khajuraho Dance Festival began in:",["1975","1952","1986","1990"],"Organised by the Madhya Pradesh government every February.","p"],
 ["L7","The Konark Dance Festival is held against the backdrop of the:",["Sun Temple","Jagannath Temple","Lingaraj Temple","Udayagiri caves"],"From 1 to 5 December.","p"],
 ["L7","The Mamallapuram Dance Festival is held against the backdrop of:",["Arjuna's Penance","The Elephanta Caves","The Brihadeeswara Temple","The Meenakshi Temple"],"A huge rock relief of the Pallavas.",""],
@@ -130,14 +130,14 @@ QB.push(
 ["L7","The Konark Dance Festival is held every year in:",["December","February","August","April"],"1 to 5 December.",""],
 ["L8","The Sangeet Natak Akademi works under the:",["Ministry of Culture","Ministry of Education","Ministry of Information and Broadcasting","Ministry of Tourism"],"Set up in 1952.","p"],
 ["L8","The Sangeet Natak Akademi is India's national academy for:",["Music, dance and drama","Literature","Painting and sculpture","Films"],"Sahitya Akademi is for literature; Lalit Kala Akademi for fine arts.","p"],
-["L8","Who was the first chairman of the Sangeet Natak Akademi?",["P. V. Rajamannar","Rukmini Devi Arundale","Rabindranath Tagore","Zakir Husain"],"",""],
+["L8","Who was the first chairman of the Sangeet Natak Akademi?",["P. V. Rajamannar","Rukmini Devi Arundale","Rabindranath Tagore","Zakir Husain"],"P.V. Rajamannar was the first chairman of the Sangeet Natak Akademi (1953).",""],
 ["L8","The Ustad Bismillah Khan Yuva Puraskar is given to artists up to the age of:",["40","30","35","50"],"Given by the Sangeet Natak Akademi since 2006.",""],
 ["L8","The Sangeet Natak Akademi is headquartered at:",["Rabindra Bhavan, New Delhi","Kalakshetra, Chennai","Bharat Bhavan, Bhopal","Vigyan Bhavan, New Delhi"],"It shares Rabindra Bhavan with the Sahitya and Lalit Kala Akademis.",""],
 ["L9","Which of the following is NOT a classical dance of India?",["Yakshagana","Kuchipudi","Sattriya","Mohiniyattam"],"Yakshagana is Karnataka's folk dance-drama.","p"],
 ["L9","Which of these is a classical dance of Assam (not a folk dance)?",["Sattriya","Bihu","Bagurumba","Jhumur"],"Bihu and Bagurumba are folk dances of Assam.","p"],
 ["L9","Gotipua, a forerunner of Odissi, is performed by:",["Young boys dressed as girls","Temple priests","Married women","Masked warriors"],"In Odisha.","p"],
 ["L9","Which folk dance of Gujarat was added to UNESCO's intangible heritage list in December 2023?",["Garba","Dandiya Raas","Tippani","Padhar"],"India's 15th element on the list.",""],
-["L9","Kalaripayattu, which influenced Kathakali's training, is a:",["Martial art of Kerala","Folk dance of Tamil Nadu","Puppet theatre of Karnataka","Ritual song of Odisha"],"",""]
+["L9","Kalaripayattu, which influenced Kathakali's training, is a:",["Martial art of Kerala","Folk dance of Tamil Nadu","Puppet theatre of Karnataka","Ritual song of Odisha"],"Kalaripayattu is Kerala's martial art, and its body training shaped Kathakali.",""]
 );
 
 LASTMOMENT.push(
