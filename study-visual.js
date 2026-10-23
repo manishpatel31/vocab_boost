@@ -243,7 +243,7 @@ const mapOf = state => MAP_BY_NAME[mapNorm(state)];
 function mapSVG(o = {}){
   const tiny = s => MAP_TINY.includes(s.id);
   const marked = new Set((o.marks || []).map(m => m[0]));
-  const paths = INDIA_MAP.s.map(s => `<path d="${s.d}" class="st r${MAP_REGION[s.id] || 3}${marked.has(s.id) ? " mk" : ""}" data-st="${s.id}"><title>${esc(s.n)}</title></path>`).join("");
+  const paths = INDIA_MAP.s.map(s => `<path d="${s.d}" class="st r${MAP_REGION[s.id] || 3}${marked.has(s.id) ? " mk" : ""}" data-st="${s.id}"${o.fill && o.fill[s.id] ? ` style="fill:${o.fill[s.id]}"` : ""}><title>${esc(s.n)}</title></path>`).join("");
   const hits = o.faint ? "" : INDIA_MAP.s.filter(tiny).map(s => `<circle cx="${s.x}" cy="${s.y}" r="9" class="hit" data-st="${s.id}"><title>${esc(s.n)}</title></circle>`).join("");
   const labels = o.labels ? INDIA_MAP.s.filter(s => !["CH", "DL", "PY", "DH", "LD", "GA"].includes(s.id)).map(s =>
     `<text x="${s.x}" y="${s.y + 4}" class="lb" data-lb="${s.id}">${MAP_CODE[s.id] || s.id}</text>`).join("") : "";
@@ -287,8 +287,8 @@ function indiaMapHTML(b){
 /* Lesson block: pins on a faint map (the Kumbh cities) */
 function mapFigHTML(b){
   const side = b.facts ? `<dl class="facts" style="margin:0">${b.facts.map(r => `<div><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join("")}</dl>` : "";
-  return `<div class="block phblock"><h3>${b.title}</h3><div class="map-wrap${side ? "" : " one"}">${mapSVG({ faint: 1, pins: b.pins, marks: b.marks, vb: b.vb })}
-    ${side}</div><p class="map-cap">${b.cap}</p>${MAP_CREDIT}</div>`;
+  return `<div class="block phblock"><h3>${b.title}</h3><div class="map-wrap${side ? "" : " one"}">${mapSVG({ faint: 1, pins: b.pins, marks: b.marks, vb: b.vb, under: b.under, fill: b.fill })}
+    ${side}</div>${b.legend ? `<div class="mleg">${b.legend.map(([c, t]) => `<span><i style="background:${c}"></i>${esc(t)}</span>`).join("")}</div>` : ""}<p class="map-cap">${b.cap}</p>${MAP_CREDIT}</div>`;
 }
 /* A bar chart of how many items (festivals, dances…) the app has for each state, from FEST. */
 function stateChartHTML(b){
@@ -577,7 +577,7 @@ function visInit(){
 .dg .acs{stroke:var(--accent)} .dg .bls{stroke:var(--blue)}
 .dg .abg{fill:var(--accent-bg);stroke:var(--rule)} .dg .bbg{fill:var(--blue-bg);stroke:var(--rule)} .dg .gbg{fill:var(--good-bg);stroke:var(--rule)}
 .dg .s1{fill:var(--good-bg)} .dg .s2{fill:var(--warn-bg)} .dg .s3{fill:var(--blue-bg)} .dg .s4{fill:var(--accent-bg)} .dg .s5{fill:var(--sunk)} .dg .s6{fill:var(--blue-bg);opacity:.6}
-.fig.wide{overflow-x:auto;-webkit-overflow-scrolling:touch}.fig.wide svg{min-width:var(--minw,560px)}
+.fig.wide{overflow-x:auto;-webkit-overflow-scrolling:touch}.fig.wide svg{min-width:var(--minw,560px);max-width:none}
 /* photo galleries */
 .phblock{grid-column:1/-1}
 .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:12px}
@@ -622,6 +622,7 @@ ${RV_CSS}
 .map-side .plist li span{color:var(--ink2);font-size:13.5px;flex:1 1 60%}
 .map-panel h3{margin:0 0 4px}
 .map-cap{font-size:13px;color:var(--ink2);margin:10px 0 0}
+.mleg{display:flex;flex-wrap:wrap;gap:6px 16px;margin:10px 0 0;font-size:13px}.mleg span{display:inline-flex;align-items:center;gap:6px}.mleg i{width:14px;height:14px;border-radius:4px;border:1px solid rgba(0,0,0,.18);display:inline-block}
 .map-credit{font-size:11.5px;color:var(--ink2);margin:4px 0 0}.map-credit a{color:inherit}
 .imap.faint .st.mk{fill:var(--accent-bg);stroke:var(--accent)}
 .imap .ml{font:700 10.5px var(--f-body);fill:var(--accent);text-anchor:middle;paint-order:stroke;stroke:var(--sheet);stroke-width:3px}
@@ -655,5 +656,6 @@ ${RV_CSS}
 @media (prefers-reduced-motion:reduce){.anim-in{animation:none}}`; document.head.appendChild(st); }
   PH_KEY = VIS.key; try { PHC = JSON.parse(localStorage.getItem(PH_KEY) || "{}"); } catch(e) {}
   PHOTO_ITEMS = phItems(); MQ_POOL = visRows().filter(f => mapOf(f[1]));
-  new MutationObserver(() => { phScan($("#app")); mapScan($("#app")); rvScan($("#app")); zmScan($("#app")); }).observe($("#app"), { childList: true, subtree: true });
+  const app = document.getElementById("app");   // not $(): pages on study-core.js call this before that file defines $
+  new MutationObserver(() => { phScan(app); mapScan(app); rvScan(app); zmScan(app); }).observe(app, { childList: true, subtree: true });
 }

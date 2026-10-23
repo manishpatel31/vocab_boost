@@ -6,7 +6,7 @@
 // and the Lab games with the Static GK apps (tools/workbook/games.js).
 // Afterwards: node tools/index_app.js study-computer.html computer gs
 const fs = require('fs'), path = require('path');
-const { fail, loadData, check, writePage } = require('../workbook/lib.js');
+const { fail, loadData, check, writePage, applyVisual } = require('../workbook/lib.js');
 const DATA = path.join(__dirname, 'data');
 
 // Data files only push: 1x lessons and their questions (one file per part), 20 reported questions, 40 the exam side.
@@ -32,13 +32,15 @@ const qb = ctx.QB.slice().sort((a, b) => ORDER.indexOf(a[0]) - ORDER.indexOf(b[0
 const tl = (byId.get('C1') || { blocks: [] }).blocks.find(b => b.k === 'tl');
 const lab = fs.readFileSync(path.join(__dirname, 'lab.js'), 'utf8') + '\n' + fs.readFileSync(path.join(__dirname, '..', 'workbook', 'games.js'), 'utf8');
 const tabs = ['learn', 'practice', 'mock', 'lab', 'revise', 'plan'];
+// photos, diagrams and charts: visual.js beside this file (see applyVisual in tools/workbook/lib.js)
+const V = applyVisual(path.join(__dirname, 'visual.js'), LESSONS, { QB: qb });
 const size = writePage({ file: 'study-computer.html', title: 'Computer Knowledge', brand: 'Computer Knowledge',
-  small: 'कंप्यूटर ज्ञान · SSC CGL · CHSL · RRB NTPC', tabs, source: 'tools/computer/build.js from tools/computer/data', extra: lab }, {
+  small: 'कंप्यूटर ज्ञान · SSC CGL · CHSL · RRB NTPC', tabs, source: 'tools/computer/build.js from tools/computer/data', extra: lab, visual: V.visual }, {
   APP: { id: 'computer', key: 'computer_knowledge_v1', mode: 'era', era: 'cmp', title: 'Computer Knowledge', hi: 'कंप्यूटर ज्ञान',
     tagline: 'SSC CGL · CHSL · RRB NTPC', plans: [3, 5, 7, 10, 15, 30], storyLabel: 'In plain words · two minutes', keyLabel: 'Remember this:', apps: [], tabs },
   GROUPS: ctx.GROUPS, LESSONS, QB: qb,
   TIMELINE: tl ? [{ era: 'cmp', rows: tl.rows }] : [],
-  LASTMOMENT: ctx.LASTMOMENT, TILES: ctx.TILES, ERANOTE: ctx.ERANOTE, INTROS: ctx.INTROS, HEATMAP: ctx.HEATMAP
+  LASTMOMENT: ctx.LASTMOMENT, TILES: ctx.TILES, ERANOTE: ctx.ERANOTE, INTROS: ctx.INTROS, HEATMAP: ctx.HEATMAP, VIS: V.VIS
 });
 const rep = qb.filter(r => r[7]).length, p = qb.filter(r => r[4] === 'p').length;
 console.log(`study-computer.html  ${LESSONS.length} lessons, ${qb.length} questions (${rep} reported in papers, ${p} repeatedly asked), ` +

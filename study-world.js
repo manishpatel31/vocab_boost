@@ -14,7 +14,7 @@ function worldSVG(o = {}){
   const hl = new Set(o.mark || []);
   return `<svg class="wmap" viewBox="${o.vb || `0 0 ${WORLD_MAP.w} ${WORLD_MAP.h}`}" role="img" aria-label="World map">` +
     WORLD_MAP.c.map(c => `<path d="${c.d}" class="wc${hl.has(c.n) ? " mk" : ""}"><title>${esc(c.n)}</title></path>`).join("") +
-    `<path d="${WORLD_MAP.india}" class="wc in"><title>India</title></path>${pins}</svg>`;
+    `<path d="${WORLD_MAP.india}" class="wc in"><title>India</title></path>${o.under || ""}${pins}</svg>`;
 }
 const WORLD_CREDIT = `<p class="map-credit">World map: Natural Earth (public domain); India in its official outline from OpenStreetMap data © OpenStreetMap contributors (ODbL). Simplified, not to scale.</p>`;
 /* Block: {k:"worldfig", title, pins, mark: [country names], vb, facts?, legend?: [[key, text]] (a key under the map, for numbered pins), cap} */

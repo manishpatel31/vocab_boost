@@ -83,6 +83,7 @@ function renderLearn(){
 }
 
 function blockHTML(b){
+  if (typeof visBlock === "function") { const vb = visBlock(b); if (vb) return vb; }   // photos, maps and diagrams (study-visual.js)
 
   if (b.k==="formula") return `<div class="block"><h3>${b.title}</h3><div class="fgrid">${b.rows.map(r=>`<div class="fcard"><span class="fn">${r[0]}</span><span class="fx">${r[1]}</span>${r[2]?`<span class="fnote">${r[2]}</span>`:""}</div>`).join("")}</div></div>`;
   if (b.k==="ex") return `<div class="ex"><div class="exhead"><span class="lab">${b.src ? PYQ : "Solved example"}</span>${b.src?`<span class="src">${b.src}</span>`:""}</div><div class="exq">${b.q}</div>${b.fig?`<figure class="fig">${b.fig}</figure>`:""}<details><summary>Show solution</summary><ol>${b.steps.map(x=>`<li>${x}</li>`).join("")}</ol><div class="exans">Answer: ${b.ans}</div>${b.tip?`<div class="trick" style="margin-top:8px"><span class="lab">Shortcut</span>${b.tip}</div>`:""}</details></div>`;
@@ -384,7 +385,7 @@ let RV = "heat", FC = null, FCSCOPE = "all";
 const HID = {}, REV = {};
 Object.keys(COVERS).forEach(k => { HID[k] = 1; REV[k] = {}; });
 function renderRevise(){
-  const tabs = [["heat", APP.heatTab || "🔥 PYQ heat map"]].concat(Object.keys(COVERS).map(k=>[k, COVERS[k].tab]), [["dis",FIND.tab],["nums","Numbers & pairs"],["links","Connections"],["tricks","Tricks"],["traps","Traps"],["flash","Flashcards"]]);
+  const tabs = [["heat", APP.heatTab || "🔥 PYQ heat map"]].concat(Object.keys(COVERS).map(k=>[k, COVERS[k].tab]), [["dis",FIND.tab],["nums","Numbers & pairs"],["links","Connections"],["tricks","Tricks"],["traps","Traps"],["flash","Flashcards"]]).concat(typeof VIS !== "undefined" && VIS ? VIS.tabs || [] : []);
   if (!tabs.some(t=>t[0]===RV)) RV = "heat";
   $("#app").innerHTML = `<section class="view stack">
     <div class="stack" style="gap:6px"><span class="eyebrow">Last-day revision</span><h1>Revise</h1></div>
@@ -393,6 +394,9 @@ function renderRevise(){
   $("#app").querySelectorAll("[data-rv]").forEach(b => b.onclick = () => { RV = b.dataset.rv; renderRevise(); });
   const on = $(`.seg [aria-selected="true"]`); if (on) on.scrollIntoView({block:"nearest", inline:"center"});
   const box = $("#rv");
+  if (RV === "vphotos") { photoQuiz(box); return; }
+  if (RV === "vmap") { mapQuiz(box); return; }
+  if (RV === "vriver") { riverQuiz(box); return; }
   const pk = (key, i, val) => (HID[key] && !REV[key][i]) ? `<button type="button" class="peek" data-pk="${key}:${i}">tap</button>` : val;
   const coverChips = (key, label) => `<div class="chips"><button type="button" class="chip" data-hide="${key}" aria-pressed="${!!HID[key]}">${label}</button><button type="button" class="chip" data-cover="${key}">Cover all again</button></div>`;
   const bindCover = () => {

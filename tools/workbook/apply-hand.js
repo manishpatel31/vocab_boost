@@ -7,7 +7,8 @@
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const ROOT = path.join(__dirname, '..', '..');
-const PAGES = { sports: 'study-sports.html', intlorgs: 'study-intl-orgs.html' };
+const PAGES = { sports: 'study-sports.html', intlorgs: 'study-intl-orgs.html', polity: 'study-polity.html', economics: 'study-economics.html', biology: 'study-biology.html', space: 'study-space.html', physics: 'study-physics.html', reports: 'study-reports-indices.html',
+  schemes: 'study-govt-schemes.html', appointments: 'study-appointments.html', ipr: 'study-ipr-plans.html', bns: 'study-bns-bnss-bsa.html' };
 const name = process.argv[2], file = PAGES[name];
 if (!file) { console.error('usage: apply-hand.js ' + Object.keys(PAGES).join('|')); process.exit(1); }
 const P = path.join(ROOT, file);
@@ -30,7 +31,7 @@ const place = (id, where, ...blocks) => { const l = LESSONS.find(x => x.id === i
 const rows = (id, title) => { const l = LESSONS.find(x => x.id === id), bl = l && l.blocks.find(x => x.rows && x.title && strip(x.title).startsWith(title));
   if (!bl) fail(id + ' has no table "' + title + '"'); return bl.rows.map(r => r.map(strip)); };
 const vf = path.join(__dirname, '..', 'hand', name + '.visual.js');
-const vctx = { place, rows, LESSONS, VISUAL: null, fail, GEO: require('./geo.js') }; vm.createContext(vctx);
+const vctx = { place, rows, LESSONS, VISUAL: null, fail, GEO: require('./geo.js'), KIT: require('./visual-kit.js') }; vm.createContext(vctx);
 vm.runInContext(fs.readFileSync(vf, 'utf8').replace(/^const (\w+)/gm, 'var $1'), vctx, { filename: vf });
 if (!vctx.VISUAL) fail('the visual file sets no VISUAL');
 const J = v => JSON.stringify(v).replace(/<\//g, '<\\/');
@@ -42,15 +43,19 @@ const first = s.lastIndexOf('\n<script>\n', s.indexOf('const LESSONS = '));   //
 if (first < 0) fail('no main script');
 s = s.slice(0, first) + '\n<script src="study-visual.js?v=00000000"></script>' + (world ? '\n<script src="study-world.js?v=00000000"></script>' : '') +
   (rivers ? '\n<script src="study-rivers.js?v=00000000"></script>' : '') + s.slice(first);
-// 2) the blocks and VIS, just before the boot
+// 2) the blocks and VIS, just before the boot (pages on study-core.js: at the end of their own script, which runs before the engine)
 s = s.replace(/\/\* visual: from tools\/hand\/[\s\S]*?\/\* visual end \*\/\n/, '');
-rep('/* boot */\n', `/* visual: from tools/hand/${name}.visual.js by tools/workbook/apply-hand.js — edit that file, not this */\nconst VIS = ${J(vctx.VISUAL.VIS)};\nvisPlace(${J(placed)});\nvisInit();\n/* visual end */\n/* boot */\n`);
-// 3) lesson blocks of the new kinds, drawn by study-visual.js
-if (!s.includes('const vb = visBlock(b)')) rep('function blockHTML(b){\n', 'function blockHTML(b){\n  if (typeof visBlock === "function") { const vb = visBlock(b); if (vb) return vb; }\n');
-// 4) Revise: the photo quiz (and the map quiz) as tabs
-if (!s.includes('.concat(VIS.tabs')) {
+const core = s.includes('<script src="study-core.js'), block = `/* visual: from tools/hand/${name}.visual.js by tools/workbook/apply-hand.js — edit that file, not this */\nconst VIS = ${J(vctx.VISUAL.VIS)};\nvisPlace(${J(placed)});\nvisInit();\n/* visual end */\n`;
+if (core) { const c = s.indexOf('<script src="study-core.js'), e = s.lastIndexOf('</script>', c); s = s.slice(0, e) + block + s.slice(e); }
+else rep('/* boot */\n', block + '/* boot */\n');
+// 3) lesson blocks of the new kinds, drawn by study-visual.js (study-core.js does this itself)
+if (!core && !s.includes('const vb = visBlock(b)')) rep('function blockHTML(b){\n', 'function blockHTML(b){\n  if (typeof visBlock === "function") { const vb = visBlock(b); if (vb) return vb; }\n');
+// 4) Revise: the photo quiz (and the map quiz) as tabs (study-core.js does this itself)
+if (!core && !s.includes('.concat(VIS.tabs')) {
   const t = s.indexOf('function renderRevise(){\n  const tabs = ['); if (t < 0) fail('no Revise tabs');
-  const e = s.indexOf('];\n', t); s = s.slice(0, e) + '].concat(VIS.tabs || []);\n' + s.slice(e + 3);
+  const e = s.indexOf('\n', t + 'function renderRevise(){\n'.length);     // the end of the "const tabs = …;" line
+  if (s[e - 1] !== ';') fail('the Revise tabs line does not end in ";"');
+  s = s.slice(0, e - 1) + '.concat(VIS.tabs || []);' + s.slice(e);
   rep('  const box = $("#rv");\n', '  const box = $("#rv");\n  if (RV === "vphotos") { photoQuiz(box); return; }\n  if (RV === "vmap") { mapQuiz(box); return; }\n  if (RV === "vriver") { riverQuiz(box); return; }\n');
 }
 fs.writeFileSync(P, s);
