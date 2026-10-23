@@ -156,7 +156,8 @@ td.n{font-family:var(--f-num);font-variant-numeric:tabular-nums;white-space:nowr
 .tag.src{background:var(--good-bg);color:var(--good)}
 .bm{margin-left:auto;background:none;border:0;cursor:pointer;color:var(--ink2);font-size:20px;line-height:1;padding:4px}
 .bm[aria-pressed="true"]{color:var(--accent)}
-.qt{font-weight:600;font-size:16px}
+.qt{font-weight:600;font-size:16px;white-space:pre-line}      /* pre-line: Para Jumbles lists P Q R S on their own lines */
+.flash .front{white-space:pre-line}
 .opts{display:grid;gap:8px}
 .opt{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:start;text-align:left;width:100%;border:1.5px solid var(--rule);background:var(--paper);border-radius:9px;padding:10px 12px;cursor:pointer;min-height:44px}
 .opt .k{font-family:var(--f-num);font-weight:600;color:var(--ink2);font-size:14px;padding-top:1px}
@@ -206,6 +207,7 @@ legend{font-weight:700;margin-bottom:6px;padding:0}
 .radios label:has(input:checked){border-color:var(--blue);background:var(--blue-bg)}
 .radios label:has(input:focus-visible){outline:2px solid var(--blue);outline-offset:2px}
 select{font:inherit;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:8px;padding:8px 10px;max-width:100%}
+fieldset{min-width:0;grid-template-columns:minmax(0,1fr)}      /* a fieldset (and its grid column) is as wide as its widest select by default, which pushed the Mock page sideways on phones */
 .hist{display:grid;gap:0}
 .hist div{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px dashed var(--rule);font-size:14px}
 

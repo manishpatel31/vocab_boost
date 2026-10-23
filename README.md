@@ -19,7 +19,7 @@ Vocabulary, General Studies and Maths in one place, with one daily goal, one str
 
 Each mini app is one self-contained page (`study-<name>.html`) with lessons, a quick-revise tab and practice questions. About 18,000 questions in total.
 
-**English:** Grammar 100, `study-voice` (Active & Passive Voice), `study-narration` (Narration / direct–indirect speech) — both built around the SSC CGL pattern
+**English:** Grammar 100, `study-voice` (Active & Passive Voice), `study-narration` (Narration / direct–indirect speech) — both built around the SSC CGL pattern; `study-cloze-rc` (Cloze Test & Reading Comprehension: 13 lessons, 307 questions — six cloze skills and five RC question types with a method and original passages) and `study-para-jumbles` (Para Jumbles · Sentence Rearrangement: 12 lessons, 267 original sets — one lesson per clue, option elimination, single-sentence parts), both Static GK workbook builds in `tools/gk/clozerc/` and `tools/gk/parajumble/` with a Lab
 
 **General Studies**
 - History — split like Maths, one app per period: `study-history-ancient` (Ancient India), `study-history-medieval` (Medieval India), `study-history-modern` (Modern India) and `study-world-history` (World History & Who's Who), plus `study-history` — **History: Start here**, revision only like the Formula Book: how to study history from zero, a 5 / 7 / 10 / 15 / 30-day plan across all the History apps that ticks itself as you finish lessons, and revision in layers (30 days, 7 days, last moment, timeline, tricks, traps). Every lesson opens with a two-minute story before the tables, tricks and traps. Built from `tools/history/` (see `tools/README.md`)
