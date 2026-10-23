@@ -9,7 +9,7 @@ const sy = n => 20 + (n - 1) / 179 * 560;
 let lastL = -99, lastR = -99;
 const LAD = `<svg class="dg" viewBox="0 0 680 600" role="img" aria-label="India's rank in each index on one scale">
   <defs><linearGradient id="rk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f8f4e"/><stop offset=".5" stop-color="#f2c14e"/><stop offset="1" stop-color="#c0392b"/></linearGradient></defs>
-  <rect x="330" y="20" width="20" height="560" rx="10" fill="url(#rk)"/>${[1, 50, 100, 150, 180].map(n => `<text x="340" y="${sy(n) + 4}" text-anchor="middle" font-size="9.5" font-weight="800" style="fill:#fff">${n}</text>`).join("")}
+  <rect x="330" y="20" width="20" height="560" rx="10" fill="url(#rk)"/>${[1, 50, 100, 150, 180].map(n => `<text x="340" y="${sy(n) + 4}" text-anchor="middle" font-size="9.5" font-weight="800" style="fill:#fff;stroke:rgba(0,0,0,.55);stroke-width:2.2px;paint-order:stroke;stroke-linejoin:round">${n}</text>`).join("")}
   ${LD.map(([n, t], i) => { const left = i % 2 === 0, y0 = sy(n); let y = y0; if (left) { y = Math.max(y0, lastL + 15); lastL = y; } else { y = Math.max(y0, lastR + 15); lastR = y; }
     return `<path d="M${left ? 328 : 352} ${y0} L${left ? 300 : 380} ${y}" stroke="var(--ink2)" stroke-width="1"/><text x="${left ? 296 : 384}" y="${y + 4}" text-anchor="${left ? "end" : "start"}" font-size="11" font-weight="700">` +
       `<tspan style="fill:var(--accent)">${n}</tspan> ${t}</text>`; }).join("")}</svg>`;

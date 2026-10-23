@@ -29,7 +29,7 @@ function worldFigHTML(b){
 .wmap .wc.mk{fill:var(--accent-bg);stroke:var(--accent)} .wmap .wc.in{fill:color-mix(in srgb,var(--accent) 30%,var(--sheet));stroke:color-mix(in srgb,var(--accent) 55%,transparent);stroke-width:.35}
 .wmap .pin{fill:var(--accent);stroke:var(--sheet);stroke-width:1.2}
 .wmap .wpn{font:700 11px var(--f-body);fill:var(--ink);paint-order:stroke;stroke:var(--sheet);stroke-width:3px}
-.wmap .wbn{font:800 8px var(--f-body);fill:#fff;text-anchor:middle;pointer-events:none}
+.wmap .wbn{font:800 8px var(--f-body);fill:var(--on-acc);text-anchor:middle;pointer-events:none}
 .wleg{list-style:none;margin:10px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:4px 14px;font-size:13px}
 .wleg li{padding:4px 0;border-bottom:1px dashed var(--rule)}.wleg b{color:var(--accent);margin-right:4px}
 .wmap .wpnote{font:500 9px var(--f-body);fill:var(--ink2);paint-order:stroke;stroke:var(--sheet);stroke-width:3px}`;

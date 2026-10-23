@@ -30,8 +30,8 @@ const CE = rows("L2", "Last day of a century").map(r => [r[0].split(", ")[0], +r
 CE.forEach(([y, o, d]) => { const dec31 = new Date(Date.UTC(+y, 11, 31)).getUTCDay(); if (DAY[dec31] !== d || dec31 !== o) fail("calendar: 31 Dec " + y + " is not " + d); });
 const ring = DAY.map((d, k) => { const a = k / 7 * 2 * Math.PI, x = 200 + 115 * Math.sin(a), y = 150 - 115 * Math.cos(a), hit = CE.find(c => c[1] === k);
   return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="34" fill="${hit ? "var(--accent)" : "var(--sunk)"}" stroke="var(--rule)"/>` +
-    T(x.toFixed(1), (y + 1).toFixed(1), d.slice(0, 3), hit ? "#fff" : "var(--ink2)", "middle", 14) +
-    T(x.toFixed(1), (y + 17).toFixed(1), hit ? k + " odd" : "never", hit ? "#fff" : "var(--ink2)", "middle", 10, 600); }).join("");
+    T(x.toFixed(1), (y + 1).toFixed(1), d.slice(0, 3), hit ? "var(--on-acc)" : "var(--ink2)", "middle", 14) +
+    T(x.toFixed(1), (y + 17).toFixed(1), hit ? k + " odd" : "never", hit ? "var(--on-acc)" : "var(--ink2)", "middle", 10, 600); }).join("");
 const CR = `<svg class="dg" viewBox="0 0 660 300" role="img" aria-label="The last day of a century is always Sunday, Monday, Wednesday or Friday">
   <circle cx="200" cy="150" r="115" fill="none" stroke="var(--rule)" stroke-width="2" stroke-dasharray="4 5"/>${ring}
   ${T(200, 146, "odd days", "var(--ink2)", "middle", 12, 600)}${T(200, 164, "→ day", "var(--ink2)", "middle", 12, 600)}
@@ -57,7 +57,7 @@ place("L7", "Next year with the same calendar", KIT.fig("Which years share a cal
 const MY = 2027, MM = 0, first = new Date(Date.UTC(MY, MM, 1)).getUTCDay();
 if (first !== 5) fail("calendar: January 2027 should start on a Friday");
 const five = new Set([0, 1, 2].map(k => (first + k) % 7));
-let cal = DAY.map((d, k) => `<rect x="${20 + k * 60}" y="30" width="56" height="28" rx="6" fill="${five.has(k) ? "var(--accent)" : "var(--sunk)"}"/>` + T(48 + k * 60, 49, d.slice(0, 3), five.has(k) ? "#fff" : "var(--ink2)", "middle", 12)).join("");
+let cal = DAY.map((d, k) => `<rect x="${20 + k * 60}" y="30" width="56" height="28" rx="6" fill="${five.has(k) ? "var(--accent)" : "var(--sunk)"}"/>` + T(48 + k * 60, 49, d.slice(0, 3), five.has(k) ? "var(--on-acc)" : "var(--ink2)", "middle", 12)).join("");
 for (let dd = 1; dd <= 31; dd++) { const p = first + dd - 1, c = p % 7, r = Math.floor(p / 7), x = 20 + c * 60, y = 64 + r * 40;
   cal += `<rect x="${x}" y="${y}" width="56" height="36" rx="6" fill="${five.has(c) ? "hsla(20,85%,55%,.2)" : "var(--sheet)"}" stroke="var(--rule)"/>` + T(x + 28, y + 23, dd, dd > 28 ? "var(--accent)" : "var(--ink)", "middle", 14, dd > 28 ? 800 : 600); }
 const MC = `<svg class="dg" viewBox="0 0 660 320" role="img" aria-label="January 2027: Friday, Saturday and Sunday come five times">

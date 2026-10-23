@@ -11,7 +11,7 @@ Vocabulary, General Studies and Maths in one place, with one daily goal, one str
 |---|---|
 | **Home** | Today's goal, streak, revision due, and every subject as a card |
 | **Vocab** | Word of the day, all words, Spelling Bank, Roots, Add words, Present, AOD, Audio |
-| **Practice** | Mistakes book, Mixed mock (English + Maths + Reasoning + GS), Vocab quiz, Revision, Exam tomorrow |
+| **Practice** | Today's revision, Mistakes book, Mixed mock (English + Maths + Reasoning + GS), Weak spots, Vocab quiz, Revision, Exam tomorrow |
 | **Progress** | Study points, streak, per-subject progress |
 | **Search** | One box that searches lessons and notes across every mini app |
 
@@ -60,6 +60,10 @@ Each mini app is one self-contained page (`study-<name>.html`) with lessons, a q
 | `study-core.js`, `study-core.css` | Shared engine and look of the Maths, Reasoning, Physics, BNS, Voice and Narration apps (each of those pages holds only its own lessons and questions); it draws study-visual.js blocks and adds the Photo / Map quiz to Revise when a page sets `VIS` |
 | `tools/` | Scripts that build the chapter apps and the question bank — see `tools/README.md` |
 | `study-bank.json` | Every practice question, tagged by app and lesson. Used by Mixed mock, Mistakes book, wallpaper and the phone app |
+
+**Today's revision** (Home → Waiting for you, and Practice across subjects) puts everything due in one list. Every question you once got wrong — in a mini app, the Mistakes book or a mock — joins a spaced-review queue and comes back after 1, 3, 7, 15 and 30 days. A right answer moves it to the next gap, a wrong one starts it again the next day, and a right answer after the 30-day gap retires it. The same screen lists apps due for revision (study tracker), vocab words due back and today's tasks, with the questions due over the next seven days. The queue is saved as `shabdReview` and synced with the account like the mini apps.
+
+**Mixed mock** has one-tap presets (full Tier 1: 100 questions in 60 minutes; half paper; GS only) and, after every mock, the topics where marks were lost. **Weak spots** can build a timed 25-question mock from your weakest topics (wrong answers first, then questions not yet tried).
 | `study-search.json` | Lesson text index used by Search |
 | `wallpaper.html` | Live desktop wallpaper (works with Lively Wallpaper) showing words and GS/Maths fact cards |
 | `sw.js` | Service worker: offline use and caching |
