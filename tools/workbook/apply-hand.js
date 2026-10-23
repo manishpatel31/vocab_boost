@@ -7,7 +7,7 @@
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const ROOT = path.join(__dirname, '..', '..');
-const PAGES = { sports: 'study-sports.html', intlorgs: 'study-intl-orgs.html' };
+const PAGES = { sports: 'study-sports.html', intlorgs: 'study-intl-orgs.html', polity: 'study-polity.html', economics: 'study-economics.html', biology: 'study-biology.html', space: 'study-space.html' };
 const name = process.argv[2], file = PAGES[name];
 if (!file) { console.error('usage: apply-hand.js ' + Object.keys(PAGES).join('|')); process.exit(1); }
 const P = path.join(ROOT, file);

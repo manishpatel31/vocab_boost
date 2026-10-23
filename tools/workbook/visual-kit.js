@@ -55,4 +55,15 @@ function stateMap(title, rows, o){
   return { k: 'mapfig', title, marks: Object.entries(by).map(([c, l]) => [c, l.slice(0, max).join(' · ') + (l.length > max ? ' +' + (l.length - max) : '')].concat(o.at && o.at[c] ? o.at[c] : [])),
     cap: o.cap || 'Each state shows what it is known for here. Use ＋ or ⛶ to zoom in.' };
 }
-module.exports = { proj, path, latLine, lonLine, arrow, numbered, photos, wproj, warrow, code, stateMap };
+/** A drawn figure as an info block (svg is the markup; w the width below which it scrolls). */
+const fig = (title, svg, cap, w) => ({ k: 'info', title, html: `<figure class="fig wide" style="--minw:${w || 560}px;margin:0">${svg}</figure>`, cap });
+/** Time bars: rows [name, from, to, colour, note?] on an axis from a to b with a tick every step years. */
+function gantt(label, R, a, b, step){
+  const W = 680, L = 160, H = 24, sx = y => L + (y - a) / (b - a) * (W - L - 20), h = R.length * (H + 7) + 50, ticks = [];
+  for (let y = Math.ceil(a / step) * step; y <= b; y += step) ticks.push(y);
+  return `<svg class="dg" viewBox="0 0 ${W} ${h}" role="img" aria-label="${label}">` + ticks.map(y => `<line x1="${sx(y)}" y1="20" x2="${sx(y)}" y2="${h - 22}" class="grid"/><text x="${sx(y)}" y="${h - 6}" text-anchor="middle" font-size="10.5" class="mut">${y}</text>`).join('') +
+    R.map(([n, f, t, c, note], i) => { const y = 24 + i * (H + 7), wide = sx(t) - sx(f) > 74, lab = `${f}–${t}${note ? ' · ' + note : ''}`;
+      return `<text x="${L - 8}" y="${y + 16}" text-anchor="end" font-size="12" class="b">${n}</text><rect x="${sx(f)}" y="${y}" width="${Math.max(3, sx(t) - sx(f))}" height="${H}" rx="6" fill="${c}" class="anim-in" style="animation-delay:${Math.min(i, 15) * 70}ms"/>` +
+        (wide ? `<text x="${sx(f) + 6}" y="${y + 16}" font-size="10.5" style="fill:#fff;font-weight:700">${lab}</text>` : `<text x="${sx(t) + 5}" y="${y + 16}" font-size="10.5" class="mut">${lab}</text>`); }).join('') + '</svg>';
+}
+module.exports = { proj, path, latLine, lonLine, arrow, numbered, photos, wproj, warrow, code, stateMap, fig, gantt };
