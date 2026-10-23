@@ -103,7 +103,8 @@ LESSONS.push(
   {k:"table", title:"Nobel Prizes 2025 and 2026", head:["Prize","Winners","For"], rows: A8N.map(r => [r[0], r[1], r[2]])},
   {k:"table", title:"Other recent winners", head:["Award","Winner","Note"], rows: A8O.map(r => [r[0], r[1], r[2]])},
   {k:"trick", h:"Read the year in the question carefully — <b>Peace 2025 Machado, Peace 2026 Pillay</b>; <b>Literature 2025 Krasznahorkai, 2026 Carson</b>."},
-  {k:"trap", h:"This lesson goes out of date every year. Before your exam, check the latest Nobel, Booker, Oscar, Padma and sports award winners in the news."}
+  {k:"trap", h:"This lesson goes out of date every year. Before your exam, check the latest Nobel, Booker, Oscar, Padma and sports award winners in the news."},
+  {k:"p", h:"<b>Checked 23 October 2026</b> against NobelPrize.org and Britannica (Nobel 2026), the Ramon Magsaysay Award Foundation's 2026 information kit (announced 31 Aug; presented 15 Nov in Manila) and the Booker Prizes site. <b>Booker Prize 2026</b>: the winner is due on <b>9 November 2026</b>; the shortlist (22 Sept) is M. John Harrison, Marlon James, Luke Kennard, Rebecca Perry, Elizabeth Strout and Douglas Stuart — until then, Flesh (David Szalay, 2025) is the latest winner."}
 ], sum:["Nobel 2026: Physics Halzen; Chemistry Kagan and Soai; Medicine Deisseroth, Hegemann, Nagel; Literature Anne Carson; Peace Navi Pillay; Economics Hall and Woodford.","Nobel 2025: Peace María Corina Machado; Literature László Krasznahorkai; Chemistry Kitagawa, Robson, Yaghi (MOFs).","International Booker 2026: Taiwan Travelogue; 2025: Heart Lamp (Banu Mushtaq). Booker 2025: Flesh (David Szalay).","Oscars 2026: Best Picture One Battle After Another; Best Actor Michael B. Jordan; Best Actress Jessie Buckley.","Magsaysay 2026: Tommy Koh, Runa Khan, Bo Kyi; the latest Bharat Ratna awards are those of 2024."]}
 );
 
