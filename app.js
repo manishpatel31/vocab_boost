@@ -134,7 +134,9 @@
     biology:  { title: 'Biology',                      file: 'study-biology.html',      key: 'biology_pyq_workbook_v1' },
     space:    { title: 'Space & ISRO Missions',              file: 'study-space.html',        key: 'space_missions_workbook_v1' },
     voice:    { title: 'Active & Passive Voice',       file: 'study-voice.html',        key: 'voice_workbook_v1' },
-    narration:{ title: 'Narration',                    file: 'study-narration.html',    key: 'narration_workbook_v1' }
+    narration:{ title: 'Narration',                    file: 'study-narration.html',    key: 'narration_workbook_v1' },
+    clozerc:  { title: 'Cloze Test & Reading Comprehension', file: 'study-cloze-rc.html', key: 'cloze_rc_v1' },
+    parajumble:{ title: 'Para Jumbles',                file: 'study-para-jumbles.html', key: 'para_jumbles_v1' }
   };
   STUDY.grammar.subj = 'english'; STUDY.grammar.ico = '✍️'; STUDY.grammar.hi = 'व्याकरण · error spotting'; STUDY.grammar.desc = '100 rules with logic, tricks and examples; unit tests after every 10 rules; revise and mistakes lists.'; STUDY.grammar.meta = '100 rules · unit tests'; STUDY.grammar.color = '#C8402F';
   STUDY.bns.subj = 'gs'; STUDY.bns.ico = '⚖️'; STUDY.bns.hi = 'नए आपराधिक क़ानून · Polity'; STUDY.bns.desc = 'The three new criminal laws the SSC way — numbers and dates, new offences, FIR, arrest, bail and timelines, electronic evidence, PYQ-type questions and tricks.'; STUDY.bns.meta = '15 lessons · 267 questions'; STUDY.bns.color = '#3D5CF0';
@@ -163,6 +165,8 @@
   STUDY.biology.subj = 'gs'; STUDY.biology.ico = '🧬'; STUDY.biology.hi = 'जीव विज्ञान · PYQ'; STUDY.biology.desc = 'Cell to classification, vitamins, human body systems, hormones, plants, genetics and diseases.'; STUDY.biology.meta = '24 lessons · 461 questions'; STUDY.biology.color = '#3E8A4F';
   STUDY.voice.subj = 'english'; STUDY.voice.ico = '🔁'; STUDY.voice.hi = 'वाच्य · CGL pattern'; STUDY.voice.desc = 'Active ↔ passive the SSC CGL way — every tense and modal, Let / requested, By whom, It is said, PYQ-type questions and tricks.'; STUDY.voice.meta = '12 lessons · 196 questions'; STUDY.voice.color = '#B5487A'; STUDY.voice.lessons = 12; STUDY.voice.unit = 'lessons';
   STUDY.narration.subj = 'english'; STUDY.narration.ico = '💬'; STUDY.narration.hi = 'प्रत्यक्ष-अप्रत्यक्ष कथन · CGL pattern'; STUDY.narration.desc = 'Direct ↔ indirect speech the SSC CGL way — reporting verbs, tense backshift, time words, questions, commands, PYQ-type questions and tricks.'; STUDY.narration.meta = '12 lessons · 175 questions'; STUDY.narration.color = '#2F7A8C'; STUDY.narration.lessons = 12; STUDY.narration.unit = 'lessons';
+  STUDY.clozerc.subj = 'english'; STUDY.clozerc.ico = '📖'; STUDY.clozerc.hi = 'क्लोज़ टेस्ट और अपठित गद्यांश — कौशल दर कौशल'; STUDY.clozerc.desc = 'Six cloze skills and five RC question types for SSC Tier 1 English — collocations, prepositions, connectors, tense, near-synonyms, articles; main idea, detail, inference, vocabulary and tone — with a step-by-step method and original practice passages.'; STUDY.clozerc.meta = '13 lessons · 307 questions · Lab'; STUDY.clozerc.color = '#2E7D6B'; STUDY.clozerc.lessons = 13; STUDY.clozerc.unit = 'lessons';
+  STUDY.parajumble.subj = 'english'; STUDY.parajumble.ico = '🧩'; STUDY.parajumble.hi = 'वाक्य पुनर्व्यवस्था — सही क्रम पहचानें'; STUDY.parajumble.desc = 'Sentence rearrangement for SSC English: the formats, a five-step method, one lesson per clue (opener, pronouns, articles, connectors, time order, mandatory pairs), option elimination and 267 original practice sets.'; STUDY.parajumble.meta = '12 lessons · 267 questions · Lab'; STUDY.parajumble.color = '#3F6E8C'; STUDY.parajumble.lessons = 12; STUDY.parajumble.unit = 'lessons';
   // Revision only: every formula and concept, chapter-wise, with heat map and last-hour sheet (no questions)
   STUDY.formulas.subj = 'maths'; STUDY.formulas.ico = '📘'; STUDY.formulas.hi = 'सूत्र पुस्तिका · final revision'; STUDY.formulas.desc = 'All SSC maths formulas and key concepts in 24 chapters — tricks, traps, exam heat map and a last-hour sheet. Revision only, no questions.'; STUDY.formulas.meta = '24 chapters · 277 formulas'; STUDY.formulas.color = '#8C6A2F'; STUDY.formulas.lessons = 24; STUDY.formulas.unit = 'chapters'; STUDY.formulas.noq = true;
   // Maths section (Tier 1 + Tier 2): formulas, concepts, tricks, figures and PYQs
@@ -2249,7 +2253,7 @@
 
   // Mixed mock test
   var mockCfg = (function(){
-    var def = { en: 25, gs: 25, mt: 0, rs: 0, vocab: true, grammar: true, voice: true, narration: true, gsMods: gsQIds(), mtMods: mathQIds(), rsMods: reasoningIds(), neg: true, known: gsQIds() };
+    var def = { en: 25, gs: 25, mt: 0, rs: 0, vocab: true, grammar: true, voice: true, narration: true, clozerc: true, parajumble: true, gsMods: gsQIds(), mtMods: mathQIds(), rsMods: reasoningIds(), neg: true, known: gsQIds() };
     var c;
     try{ c = Object.assign({}, def, JSON.parse(lsGet('shabdMockCfg') || '{}')); }catch(e){ c = def; }
     var known = c.known || ['bns', 'schemes', 'census', 'intlorgs'];
@@ -2289,7 +2293,7 @@
     drillBody('<div class="dq-hero"><div class="eyebrow">English + Maths + Reasoning + General Studies · SSC pattern</div><h1>Mixed mock test</h1><p>Questions from your vocab register and every mini app, timed like Tier 1 (36 seconds a question), marked +2 / −0.5. Wrong answers go to your Mistakes book.</p></div>' +
       '<div class="dq-chips mk-presets"><button data-preset="full">Full Tier 1 · 100 Q · 60 min</button><button data-preset="half">Half paper · 40 Q · 24 min</button><button data-preset="gs">GS only · 25 Q · 15 min</button></div>' +
       '<div class="dq-setup">' +
-        '<div class="dq-box"><h3>English</h3>' + seg('en', [0, 10, 25]) + '<div class="dq-tags">' + tog('vocab', 'Vocabulary (' + words.length + ' words)') + tog('grammar', 'Grammar 100') + tog('voice', 'Active & Passive Voice') + tog('narration', 'Narration') + '</div></div>' +
+        '<div class="dq-box"><h3>English</h3>' + seg('en', [0, 10, 25]) + '<div class="dq-tags">' + tog('vocab', 'Vocabulary (' + words.length + ' words)') + tog('grammar', 'Grammar 100') + tog('voice', 'Active & Passive Voice') + tog('narration', 'Narration') + tog('clozerc', 'Cloze & RC') + tog('parajumble', 'Para Jumbles') + '</div></div>' +
         '<div class="dq-box"><h3>General Studies</h3>' + seg('gs', [0, 10, 25]) + '<div class="dq-tags">' + GS_SUBJECTS.map(function(g){ var l = gsQIds().filter(function(id){ return STUDY[id].gsub === g[0]; }); return l.length ? '<div class="dq-gsub"><span>' + g[1] + '</span>' + l.map(gsTog).join('') + '</div>' : ''; }).join('') + gsQIds().filter(function(id){ return !STUDY[id].gsub; }).map(gsTog).join('') + '</div></div>' +
         '<div class="dq-box"><h3>Maths</h3>' + seg('mt', [0, 10, 25]) + '<div class="dq-tags">' + mathQIds().map(mtTog).join('') + '</div></div>' +
         (reasoningIds().length ? '<div class="dq-box"><h3>Reasoning</h3>' + seg('rs', [0, 10, 25]) + '<div class="dq-tags">' + reasoningIds().map(rsTog).join('') + '</div></div>' : '') +
@@ -2340,7 +2344,7 @@
   function startMock(){
     var c = mockCfg, en = [], gs = [], mt = [], rs = [];
     if(c.en){
-      var enMods = ['grammar', 'voice', 'narration'].filter(function(m){ return c[m]; });
+      var enMods = ['grammar', 'voice', 'narration', 'clozerc', 'parajumble'].filter(function(m){ return c[m]; });
       var nv = c.vocab ? (enMods.length ? Math.round(c.en * 0.6) : c.en) : 0;
       var v = nv ? vocabQuestions(nv) : [];
       en = v.concat(enMods.length ? pickFrom(enMods, c.en - v.length) : []);
@@ -3153,7 +3157,7 @@
     polity: ['polity'], economics: ['economy', 'economics'], census: ['census'], sports: ['sports'],
     mensuration2d: ['mensuration 2d', '2d mensuration'], mensuration3d: ['mensuration 3d', '3d mensuration'],
     trigonometry: ['trigonometry', 'trigo'], space: ['isro', 'space missions'], voice: ['active passive', 'active and passive', 'passive voice'],
-    narration: ['narration', 'direct indirect', 'reported speech'], grammar: ['grammar'], geometry: ['geometry'], physics: ['physics'], chemistry: ['chemistry', 'chem', 'periodic table', 'acids', 'acid base', 'common names', 'ores', 'alloys', 'polymers'],
+    narration: ['narration', 'direct indirect', 'reported speech'], clozerc: ['cloze', 'cloze test', 'reading comprehension', 'comprehension', 'rc', 'passage', 'unseen passage'], parajumble: ['para jumble', 'para jumbles', 'sentence rearrangement', 'rearrangement', 'jumbled sentences', 'pqrs'], grammar: ['grammar'], geometry: ['geometry'], physics: ['physics'], chemistry: ['chemistry', 'chem', 'periodic table', 'acids', 'acid base', 'common names', 'ores', 'alloys', 'polymers'],
     books: ['books and authors', 'books & authors', 'authors', 'pen names'], days: ['important days', 'days and dates', 'important dates'],
     defence: ['defence', 'defense', 'military exercises', 'defence exercises', 'joint exercises', 'missiles'],
     awards: ['awards', 'awards and honours', 'honours', 'nobel', 'bharat ratna', 'padma'],

@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<link rel="stylesheet" href="study-workbook.css?v=00000000">
+<link rel="stylesheet" href="study-workbook.css?v=bb5cf493">
 <style>[hidden]{display:none!important}img{max-width:100%}:root{padding-top:env(safe-area-inset-top,0px)}</style>
 </head>
 <body>
@@ -361,13 +361,10 @@ const INTROS = {"parajumble":{"lead":"Sentence rearrangement the way SSC sets it
 const HEATMAP = {"cols":[{"label":"SSC CGL","sub":"Tier 1 · English"},{"label":"SSC CHSL","sub":"Tier 1 · English"},{"label":"SSC MTS / CPO","sub":"English"}],"rows":[{"id":"J1","v":[2,2,2]},{"id":"J2","v":[2,2,2]},{"id":"J3","v":[2,2,2]},{"id":"J4","v":[2,2,2]},{"id":"J5","v":[1,1,1]},{"id":"J6","v":[2,2,2]},{"id":"J7","v":[1,1,1]},{"id":"J8","v":[1,1,1]},{"id":"J9","v":[1,1,1]},{"id":"J10","v":[2,2,2]},{"id":"J11","v":[1,1,1]},{"id":"J12","v":[2,2,2]}],"pattern":{"title":"Where these questions sit","head":["Exam","Section","Rearrangement questions","Marking"],"rows":[["SSC CGL Tier 1","English Comprehension (25 Q)","About 0–2","2 each, &minus;0.5 per wrong"],["SSC CHSL Tier 1","English Language (25 Q)","About 0–2","2 each, &minus;0.5 per wrong"],["SSC MTS","English Language (25 Q, Session II)","About 0–2","3 each, &minus;1 per wrong"],["SSC CPO Paper I","English Comprehension (50 Q)","About 1–3","1 each, &minus;0.25 per wrong"]],"note":"Typical ranges from published shift-wise analyses — not fixed counts. Some shifts have none; check the latest notice for the marking scheme."},"tips":["<b>Find the opener first<\/b>: a sentence that begins with he, it, this, however, therefore or also cannot open.","<b>One sure pair<\/b> — a name and its pronoun, ‘a’ and ‘the’, a question and its answer — usually strikes out two or three options.","<b>Connectors<\/b> tell you what came before: contrast for however, a cause for therefore, a similar point for moreover.","<b>Read the final order once<\/b>; options often share their first two letters and differ only at the end."],"note":"How the heat map is made: our estimate from the syllabus and published analyses of how often sentence rearrangement and each kind of clue appear, not a count of questions."};
 </script>
 
-<script src="study-games.js?v=00000000"></script>
+<script src="study-games.js?v=2c884142"></script>
 <script>
 "use strict";
 /* Para Jumbles Lab — decks built from the lesson tables (labRows), played by tools/workbook/games.js. */
-// The question text lists the sentences on separate lines (P. … Q. … R. … S. …): keep those line breaks on this page.
-// fieldset{min-width:0} stops the Mock tab's lesson picker from pushing the page wider than a phone screen.
-(function(){ const st = document.createElement("style"); st.textContent = ".qt,.flash .front{white-space:pre-line}fieldset{min-width:0;grid-template-columns:minmax(0,1fr)}"; document.head.appendChild(st); })();
 const PJ_DECKS = [
   { id: "openers", ico: "🚪", title: "Opener or Not?", sub: "Can a paragraph begin like this?", lesson: "J3", q: "Can a paragraph begin like this:", opts: ["Can open", "Cannot open"], pairs: labRows("J3", 0) },
   { id: "connectors", ico: "🔗", title: "Connector Jobs", sub: "However, therefore, moreover …", lesson: "J6", q: "What job does this connector do:", pairs: labRows("J6", 0) },
@@ -386,7 +383,7 @@ const LAB_CONF = {
 };
 
 </script>
-<script src="study-workbook.js?v=00000000"></script>
+<script src="study-workbook.js?v=44501290"></script>
 <style id="shabd-skin">
 /* ===== शब्दRegister skin: app colours + fonts (only when opened from the app) ===== */
 :root[data-skin="paper"]{--app-pattern:repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(150,128,90,.10) 31px, rgba(150,128,90,.10) 32px);--app-psize:auto;--app-card:#FFFCF6;--app-rule:#DCCFB2;--app-pri:#2F6F63;--app-ink:#221E17;--app-soft:#5E5547;--app-faint:#857B6A;--app-bg:#F3EEE3;--app-deep:#E9E1CF;--app-display:"Fraunces", Georgia, serif;--app-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;--paper:#F3EEE3;--sheet:#FFFCF6;--sunk:#E9E1CF;--ink:#221E17;--ink2:#5E5547;--rule:#DCCFB2;--blue:#2F6F63;--on-blue:#FFFFFF;--blue-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--accent:#A87E1F;--accent-bg:color-mix(in srgb, #A87E1F 16%, #FFFCF6);--good:#2F6F63;--good-bg:color-mix(in srgb, #2F6F63 14%, #FFFCF6);--bad:#8C2F39;--bad-bg:color-mix(in srgb, #8C2F39 14%, #FFFCF6);--warn-bg:color-mix(in srgb, #C99A2E 18%, #FFFCF6);--f-display:"Fraunces", Georgia, serif;--f-body:"Instrument Sans", "Noto Sans Devanagari", system-ui, sans-serif;color-scheme:light;}

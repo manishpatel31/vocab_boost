@@ -1,7 +1,4 @@
 /* Para Jumbles Lab — decks built from the lesson tables (labRows), played by tools/workbook/games.js. */
-// The question text lists the sentences on separate lines (P. … Q. … R. … S. …): keep those line breaks on this page.
-// fieldset{min-width:0} stops the Mock tab's lesson picker from pushing the page wider than a phone screen.
-(function(){ const st = document.createElement("style"); st.textContent = ".qt,.flash .front{white-space:pre-line}fieldset{min-width:0;grid-template-columns:minmax(0,1fr)}"; document.head.appendChild(st); })();
 const PJ_DECKS = [
   { id: "openers", ico: "🚪", title: "Opener or Not?", sub: "Can a paragraph begin like this?", lesson: "J3", q: "Can a paragraph begin like this:", opts: ["Can open", "Cannot open"], pairs: labRows("J3", 0) },
   { id: "connectors", ico: "🔗", title: "Connector Jobs", sub: "However, therefore, moreover …", lesson: "J6", q: "What job does this connector do:", pairs: labRows("J6", 0) },
