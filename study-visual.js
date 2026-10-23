@@ -287,7 +287,7 @@ function indiaMapHTML(b){
 /* Lesson block: pins on a faint map (the Kumbh cities) */
 function mapFigHTML(b){
   const side = b.facts ? `<dl class="facts" style="margin:0">${b.facts.map(r => `<div><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join("")}</dl>` : "";
-  return `<div class="block phblock"><h3>${b.title}</h3><div class="map-wrap${side ? "" : " one"}">${mapSVG({ faint: 1, pins: b.pins, marks: b.marks, vb: b.vb })}
+  return `<div class="block phblock"><h3>${b.title}</h3><div class="map-wrap${side ? "" : " one"}">${mapSVG({ faint: 1, pins: b.pins, marks: b.marks, vb: b.vb, under: b.under })}
     ${side}</div><p class="map-cap">${b.cap}</p>${MAP_CREDIT}</div>`;
 }
 /* A bar chart of how many items (festivals, dances…) the app has for each state, from FEST. */

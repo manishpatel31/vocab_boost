@@ -30,7 +30,7 @@ const place = (id, where, ...blocks) => { const l = LESSONS.find(x => x.id === i
 const rows = (id, title) => { const l = LESSONS.find(x => x.id === id), bl = l && l.blocks.find(x => x.rows && x.title && strip(x.title).startsWith(title));
   if (!bl) fail(id + ' has no table "' + title + '"'); return bl.rows.map(r => r.map(strip)); };
 const vf = path.join(__dirname, '..', 'hand', name + '.visual.js');
-const vctx = { place, rows, LESSONS, VISUAL: null, fail, GEO: require('./geo.js') }; vm.createContext(vctx);
+const vctx = { place, rows, LESSONS, VISUAL: null, fail, GEO: require('./geo.js'), KIT: require('./visual-kit.js') }; vm.createContext(vctx);
 vm.runInContext(fs.readFileSync(vf, 'utf8').replace(/^const (\w+)/gm, 'var $1'), vctx, { filename: vf });
 if (!vctx.VISUAL) fail('the visual file sets no VISUAL');
 const J = v => JSON.stringify(v).replace(/<\//g, '<\\/');
