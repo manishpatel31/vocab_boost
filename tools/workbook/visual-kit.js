@@ -40,4 +40,19 @@ const warrow = (pts, color, label, at) => { const d = 'M' + pts.map(p => wproj(p
     `<path d="${d}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" opacity=".85" marker-end="url(#${id})" style="vector-effect:non-scaling-stroke"/>` +
     `<path d="${d}" fill="none" stroke="#fff" stroke-width="1" stroke-dasharray="2 7" style="animation:rvflow 1.2s linear infinite;vector-effect:non-scaling-stroke"/>` +
     (label ? `<text x="${lx}" y="${ly}" font-size="8.5" font-weight="700" style="fill:${color};paint-order:stroke;stroke:var(--sheet);stroke-width:2.5px">${label}</text>` : ''); };
-module.exports = { proj, path, latLine, lonLine, arrow, numbered, photos, wproj, warrow };
+/** State name → the India map's id (null when the text is not one state). */
+const STATES = { 'andaman and nicobar islands': 'AN', 'andhra pradesh': 'AP', 'arunachal pradesh': 'AR', 'assam': 'AS', 'bihar': 'BR', 'chandigarh': 'CH', 'chhattisgarh': 'CT',
+  'dadra and nagar haveli and daman and diu': 'DH', 'delhi': 'DL', 'goa': 'GA', 'gujarat': 'GJ', 'haryana': 'HR', 'himachal pradesh': 'HP', 'jammu and kashmir': 'JK', 'jharkhand': 'JH',
+  'karnataka': 'KA', 'kerala': 'KL', 'ladakh': 'LA', 'lakshadweep': 'LD', 'madhya pradesh': 'MP', 'maharashtra': 'MH', 'manipur': 'MN', 'meghalaya': 'ML', 'mizoram': 'MZ', 'nagaland': 'NL',
+  'odisha': 'OD', 'puducherry': 'PY', 'punjab': 'PB', 'rajasthan': 'RJ', 'sikkim': 'SK', 'tamil nadu': 'TN', 'telangana': 'TG', 'tripura': 'TR', 'uttar pradesh': 'UP', 'uttarakhand': 'UT', 'west bengal': 'WB' };
+const code = name => STATES[String(name || '').toLowerCase().replace(/&/g, 'and').replace(/\s*\(.*\)$/, '').trim()] || null;
+/** A map with each state's items written on it. rows: [item, state, …]; rows whose state is not one state are left out.
+    o.max: items per state (the rest become "+n"). */
+function stateMap(title, rows, o){
+  o = o || {}; const by = {};
+  rows.forEach(r => { const c = code(r[1]); if (c) (by[c] = by[c] || []).push(String(r[0]).replace(/ \(.*\)$/, '')); });
+  const max = o.max || 2;
+  return { k: 'mapfig', title, marks: Object.entries(by).map(([c, l]) => [c, l.slice(0, max).join(' · ') + (l.length > max ? ' +' + (l.length - max) : '')].concat(o.at && o.at[c] ? o.at[c] : [])),
+    cap: o.cap || 'Each state shows what it is known for here. Use ＋ or ⛶ to zoom in.' };
+}
+module.exports = { proj, path, latLine, lonLine, arrow, numbered, photos, wproj, warrow, code, stateMap };
