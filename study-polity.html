@@ -312,7 +312,7 @@ table.cover td{min-width:90px}
   </div>
 </nav>
 
-<script src="study-visual.js?v=3f7fec07"></script>
+<script src="study-visual.js?v=449f5496"></script>
 <script src="study-world.js?v=6b8f426d"></script>
 <script>
 "use strict";
@@ -1725,9 +1725,7 @@ function renderRevise(){
   $("#app").querySelectorAll("[data-rv]").forEach(b => b.onclick = () => { RV = b.dataset.rv; renderRevise(); });
   const on = $(`.seg [aria-selected="true"]`); if (on) on.scrollIntoView({block:"nearest", inline:"center"});
   const box = $("#rv");
-  if (RV === "vphotos") { photoQuiz(box); return; }
-  if (RV === "vmap") { mapQuiz(box); return; }
-  if (RV === "vriver") { riverQuiz(box); return; }
+  if (typeof visRevise === "function" && visRevise(RV, box)) return;      // photo, map, river, map-point and label quizzes (study-visual.js)
   const peekAll = (flag, rev, attr) => (i, val) => (flag && !rev[i]) ? `<button type="button" class="peek" data-${attr}="${i}">tap</button>` : val;
   if (RV === "heat") {
     const max = Math.max(...HEAT.map(h=>h[1]));

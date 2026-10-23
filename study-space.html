@@ -298,7 +298,7 @@ table.cover td{min-width:90px}
   </div>
 </nav>
 
-<script src="study-visual.js?v=3f7fec07"></script>
+<script src="study-visual.js?v=449f5496"></script>
 <script>
 "use strict";
 const LESSONS = [
@@ -1382,9 +1382,7 @@ function renderRevise(){
   $("#app").querySelectorAll("[data-rv]").forEach(b => b.onclick = () => { RV = b.dataset.rv; renderRevise(); });
   const on = $(`.seg [aria-selected="true"]`); if (on) on.scrollIntoView({block:"nearest", inline:"center"});
   const box = $("#rv");
-  if (RV === "vphotos") { photoQuiz(box); return; }
-  if (RV === "vmap") { mapQuiz(box); return; }
-  if (RV === "vriver") { riverQuiz(box); return; }
+  if (typeof visRevise === "function" && visRevise(RV, box)) return;      // photo, map, river, map-point and label quizzes (study-visual.js)
   if (RV === "missions") {
     box.innerHTML = `<input class="search" id="fs" type="search" placeholder="Search a mission, rocket or year (e.g. C57, LVM3, 2025, NASA)" aria-label="Search missions">
       <p class="muted" style="font-size:13px">${MISSIONS.length} missions, oldest first. Type a rocket number to see what it carried — the most-asked pairing.</p>

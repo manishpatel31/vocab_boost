@@ -8,7 +8,9 @@
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const ROOT = path.join(__dirname, '..', '..');
 const PAGES = { sports: 'study-sports.html', intlorgs: 'study-intl-orgs.html', polity: 'study-polity.html', economics: 'study-economics.html', biology: 'study-biology.html', space: 'study-space.html', physics: 'study-physics.html', reports: 'study-reports-indices.html',
-  schemes: 'study-govt-schemes.html', appointments: 'study-appointments.html', ipr: 'study-ipr-plans.html', bns: 'study-bns-bnss-bsa.html' };
+  schemes: 'study-govt-schemes.html', appointments: 'study-appointments.html', ipr: 'study-ipr-plans.html', bns: 'study-bns-bnss-bsa.html',
+  'number-system': 'study-number-system.html', clock: 'study-clock.html', calendar: 'study-calendar.html', trigonometry: 'study-trigonometry.html', geometry: 'study-geometry.html',
+  mensuration2d: 'study-mensuration2d.html', mensuration3d: 'study-mensuration3d.html' };
 const name = process.argv[2], file = PAGES[name];
 if (!file) { console.error('usage: apply-hand.js ' + Object.keys(PAGES).join('|')); process.exit(1); }
 const P = path.join(ROOT, file);
@@ -51,12 +53,13 @@ else rep('/* boot */\n', block + '/* boot */\n');
 // 3) lesson blocks of the new kinds, drawn by study-visual.js (study-core.js does this itself)
 if (!core && !s.includes('const vb = visBlock(b)')) rep('function blockHTML(b){\n', 'function blockHTML(b){\n  if (typeof visBlock === "function") { const vb = visBlock(b); if (vb) return vb; }\n');
 // 4) Revise: the photo quiz (and the map quiz) as tabs (study-core.js does this itself)
+s = s.replace('  if (RV === "vphotos") { photoQuiz(box); return; }\n  if (RV === "vmap") { mapQuiz(box); return; }\n  if (RV === "vriver") { riverQuiz(box); return; }\n', () => '  if (typeof visRevise === "function" && visRevise(RV, box)) return;      // photo, map, river, map-point and label quizzes (study-visual.js)\n');
 if (!core && !s.includes('.concat(VIS.tabs')) {
   const t = s.indexOf('function renderRevise(){\n  const tabs = ['); if (t < 0) fail('no Revise tabs');
   const e = s.indexOf('\n', t + 'function renderRevise(){\n'.length);     // the end of the "const tabs = …;" line
   if (s[e - 1] !== ';') fail('the Revise tabs line does not end in ";"');
   s = s.slice(0, e - 1) + '.concat(VIS.tabs || []);' + s.slice(e);
-  rep('  const box = $("#rv");\n', '  const box = $("#rv");\n  if (RV === "vphotos") { photoQuiz(box); return; }\n  if (RV === "vmap") { mapQuiz(box); return; }\n  if (RV === "vriver") { riverQuiz(box); return; }\n');
+  rep('  const box = $("#rv");\n', '  const box = $("#rv");\n  if (typeof visRevise === "function" && visRevise(RV, box)) return;      // photo, map, river, map-point and label quizzes (study-visual.js)\n');
 }
 fs.writeFileSync(P, s);
 console.log(file + ': ' + placed.reduce((n, p) => n + p[2].length, 0) + ' blocks in ' + new Set(placed.map(p => p[0])).size + ' lessons' + (world ? ' (with the world map)' : ''));

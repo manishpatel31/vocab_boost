@@ -105,7 +105,7 @@ const EY = `<svg class="dg" viewBox="0 0 660 260" role="img" aria-label="Parts o
   <path d="M335 60 Q380 130 335 200" fill="none" stroke="#c0392b" stroke-width="6"/><path d="M355 130 H420" stroke="#c69214" stroke-width="10" stroke-linecap="round"/>
   <path d="M60 110 L180 125 L345 150 M60 150 L180 135 L345 110" fill="none" stroke="#e0a040" stroke-width="1.5"/>
   ${[["Cornea", 150, 70, 470, 30], ["Iris", 162, 95, 470, 65], ["Pupil", 162, 130, 470, 100], ["Lens", 180, 115, 470, 135], ["Retina — real, inverted image", 345, 170, 470, 170], ["Optic nerve", 405, 130, 470, 205]]
-    .map(([t, x, y, tx, ty]) => `<line x1="${x}" y1="${y}" x2="${tx}" y2="${ty}" stroke="var(--ink2)"/>${T(tx + 4, ty + 4, t, "var(--ink)", "start", 11.5)}`).join("")}</svg>`;
+    .map(([t, x, y, tx, ty]) => `<line x1="${x}" y1="${y}" x2="${tx}" y2="${ty}" stroke="var(--ink2)"/>${T(tx + 4, ty + 4, t, "var(--ink)", "start", 11.5).replace("<text ", `<text data-lq="${String(t).split(" — ")[0].split(" (")[0].replace(/"/g, "")}" `)}`).join("")}</svg>`;
 place("L11", "Eye parts", KIT.fig("The human eye", EY, "Most of the bending happens at the cornea; the lens changes shape to focus (accommodation). The image on the retina is real and inverted — the brain turns it upright."));
 const DF = `<svg class="dg" viewBox="0 0 660 200" role="img" aria-label="Myopia and hypermetropia and their correction">
   ${[["Myopia", "image in front of retina", 0, "concave lens", -1], ["Hypermetropia", "image behind retina", 330, "convex lens", 1]].map(([n, s, x, fix, k]) =>

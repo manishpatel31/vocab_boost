@@ -64,7 +64,7 @@ const fam = (z, [c, r]) => r >= 9 ? "#b55a8a" : c === 1 && z !== 1 ? "#c0392b" :
 const PT = `<svg class="dg" viewBox="0 0 690 340" role="img" aria-label="The periodic table coloured by family">
   ${SYM.map((s, i) => { const z = i + 1, [c, r] = pos(z), x = 8 + (c - 1) * 37.5, y = 18 + (r - 1) * 34 + (r >= 9 ? -18 : 0), col = fam(z, [c, r]);
     return `<g><rect x="${x}" y="${y}" width="35" height="31" rx="4" fill="${col}" opacity="${[1, 2, 17, 18].includes(c) || r >= 9 ? .95 : .78}"><title>${z} ${s}</title></rect>` +
-      `<text x="${x + 3}" y="${y + 10}" font-size="7" style="fill:#fff">${z}</text><text x="${x + 17.5}" y="${y + 25}" text-anchor="middle" font-size="12" font-weight="800" style="fill:#fff">${s}</text></g>`; }).join("")}
+      `<text x="${x + 3}" y="${y + 10}" font-size="7" style="fill:#fff">${z}</text><text x="${x + 17.5}" y="${y + 25}" text-anchor="middle" font-size="12" font-weight="800" style="fill:#fff" data-lq="${s}">${s}</text></g>`; }).join("")}
   ${[["Alkali metals", "#c0392b"], ["Alkaline earth", "#e07b39"], ["Transition", "#c69214"], ["Halogens", "#2f8f4e"], ["Noble gases", "#2f6db5"], ["Other non-metals", "#5aa85a"], ["Metalloids", "#1f8a8a"], ["Lanthanides / actinides", "#b55a8a"]]
     .map(([t, c], i) => `<rect x="${90 + (i % 4) * 130}" y="${18 + Math.floor(i / 4) * 18}" width="12" height="12" rx="3" fill="${c}"/><text x="${106 + (i % 4) * 130}" y="${28 + Math.floor(i / 4) * 18}" font-size="10.5" class="b">${t}</text>`).join("")}</svg>`;
 place("K4", "Layout of the modern table", KIT.fig("The modern periodic table", PT, "18 groups (columns) and 7 periods (rows), arranged by atomic number (Moseley). The two bottom rows are the lanthanides and actinides. Hover a box for its atomic number.", 640));

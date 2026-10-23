@@ -30,12 +30,12 @@ const qb = ctx.QB.slice().sort((a, b) => ORDER.indexOf(a[0]) - ORDER.indexOf(b[0
 
 // The history of computing timeline lives in lesson C1; the Revise tab shows it as well.
 const tl = (byId.get('C1') || { blocks: [] }).blocks.find(b => b.k === 'tl');
-const lab = fs.readFileSync(path.join(__dirname, 'lab.js'), 'utf8') + '\n' + fs.readFileSync(path.join(__dirname, '..', 'workbook', 'games.js'), 'utf8');
+const lab = fs.readFileSync(path.join(__dirname, 'lab.js'), 'utf8');
 const tabs = ['learn', 'practice', 'mock', 'lab', 'revise', 'plan'];
 // photos, diagrams and charts: visual.js beside this file (see applyVisual in tools/workbook/lib.js)
 const V = applyVisual(path.join(__dirname, 'visual.js'), LESSONS, { QB: qb });
 const size = writePage({ file: 'study-computer.html', title: 'Computer Knowledge', brand: 'Computer Knowledge',
-  small: 'कंप्यूटर ज्ञान · SSC CGL · CHSL · RRB NTPC', tabs, source: 'tools/computer/build.js from tools/computer/data', extra: lab, visual: V.visual }, {
+  small: 'कंप्यूटर ज्ञान · SSC CGL · CHSL · RRB NTPC', tabs, source: 'tools/computer/build.js from tools/computer/data', extra: lab, games: true, visual: V.visual }, {
   APP: { id: 'computer', key: 'computer_knowledge_v1', mode: 'era', era: 'cmp', title: 'Computer Knowledge', hi: 'कंप्यूटर ज्ञान',
     tagline: 'SSC CGL · CHSL · RRB NTPC', plans: [3, 5, 7, 10, 15, 30], storyLabel: 'In plain words · two minutes', keyLabel: 'Remember this:', apps: [], tabs },
   GROUPS: ctx.GROUPS, LESSONS, QB: qb,

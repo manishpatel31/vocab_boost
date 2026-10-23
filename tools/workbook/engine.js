@@ -531,9 +531,7 @@ function renderRevise(){
   }
   if (RV === "nums") box.innerHTML = `<div class="tiles">${TILES.map(t=>`<div class="tile"><span class="num">${t[0]}</span><span>${t[1]}</span></div>`).join("")}</div>`;
   if (RV === "flash") drawFlash(box);
-  if (RV === "vphotos") photoQuiz(box);
-  if (RV === "vmap") mapQuiz(box);
-  if (RV === "vriver") riverQuiz(box);
+  if (typeof visRevise === "function") visRevise(RV, box);      // photo, map, river, map-point and label quizzes (study-visual.js)
 }
 /* Where the marks come from: lessons × exams, 0–3. The note says what the levels are based on. */
 function heatHTML(full){

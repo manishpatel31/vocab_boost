@@ -6,7 +6,10 @@ function appData(file){
   const src = fs.readFileSync(ROOT + file, 'utf8');
   const a = src.indexOf('"use strict";'), b = src.indexOf('</script>', a);
   const code = src.slice(a + 13, b).replace(/^const (\w+)/gm, 'var $1');
-  const ctx = {}; vm.createContext(ctx); vm.runInContext(code, ctx);
+  // hand-built pages keep their app code in the same script, after the data; it stops at the first use of the
+  // page (document, window …), by which time the data constants are already set
+  const ctx = {}; vm.createContext(ctx);
+  try { vm.runInContext(code, ctx); } catch (e) { if (!ctx.LESSONS || !ctx.QB) throw e; }
   return ctx;
 }
 const strip = h => String(h).replace(/<sup>(.*?)<\/sup>/g, '^$1').replace(/<sub>(.*?)<\/sub>/g, '$1').replace(/<svg[\s\S]*?<\/svg>/g, '').replace(/<[^>]+>/g, ' ').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&nbsp;/g,' ').replace(/\s+/g, ' ').trim();

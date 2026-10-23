@@ -1,7 +1,7 @@
 /* Art & Culture — temple and stupa diagrams, cave and painting maps, the World Heritage map and charts, scripts and photos
    (drawn by study-visual.js). place(lesson, where, ...blocks) and rows(lesson, table title) come from applyVisual in tools/workbook/lib.js. */
 const P = (w, n, c) => [w, n, c];
-const lab = (x, y, tx, ty, t, anc) => `<line x1="${x}" y1="${y}" x2="${tx}" y2="${ty}" class="grid"/><text x="${tx + (anc === "end" ? -3 : anc === "middle" ? 0 : 3)}" y="${ty + 4}" text-anchor="${anc || "start"}" font-size="11" class="mut">${t}</text>`;
+const lab = (x, y, tx, ty, t, anc) => `<line x1="${x}" y1="${y}" x2="${tx}" y2="${ty}" class="grid"/><text x="${tx + (anc === "end" ? -3 : anc === "middle" ? 0 : 3)}" y="${ty + 4}" text-anchor="${anc || "start"}" font-size="11" class="mut" data-lq="${String(t).split(" — ")[0].split(" (")[0].replace(/"/g, "")}">${t}</text>`;
 
 // L26 — dance and music
 place("L26", "story", { k: "photos", title: "In pictures", items: [

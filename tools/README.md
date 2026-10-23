@@ -54,8 +54,11 @@ tools/
 
 ## Workbook apps: History and Computer Knowledge
 
-The History pages, Computer Knowledge and Chemistry share one engine and look in `tools/workbook/`
-(`head.html`, `engine.js`, `tail.html`, and `lib.js`, which loads a data folder, checks it and writes a page).
+The History pages, Computer Knowledge, Chemistry and the Static GK and Geography apps share one engine and look in
+`tools/workbook/` (`head.html`, `engine.js`, `workbook.css`, `games.js`, `tail.html`, and `lib.js`, which loads a data
+folder, checks it and writes a page). Each build also writes the shared files `study-workbook.js` (engine.js),
+`study-workbook.css` (workbook.css) and `study-games.js` (the Lab games) at the site root; every page loads them, so
+they download once and stay cached. Run `node tools/stamp.js` after a build so pages ask for the new copies.
 Each family has its own data folder and build script. Edit the data, never the built pages.
 
 A lesson is the usual object, plus a `story` block (`h`, and a one-line `key`) that opens it in plain words.
@@ -168,8 +171,12 @@ the labels would crowd), `bars`, `calendar` (rows `[month, day, label]`), `cards
 (ready HTML or SVG).
 
 The hand-built pages take theirs from `tools/hand/<name>.visual.js` (same API): `node tools/workbook/apply-hand.js
-sports|intlorgs|polity|economics|biology|space|physics|reports|schemes|appointments|ipr|bns` checks every place against the page's lessons and writes
+sports|intlorgs|polity|economics|biology|space|physics|reports|schemes|appointments|ipr|bns|trigonometry|geometry|mensuration2d|mensuration3d|number-system|clock|calendar` checks every place against the page's lessons and writes
 the blocks in, just before the boot (pages on `study-core.js`, like Physics: at the end of their own script, as
 study-core.js itself draws the blocks and adds the quiz tabs). After any of these, run `node tools/stamp.js`.
+The chapter apps built by `build_app.py` (Number System, Clock, Calendar) get theirs the same way: when
+`tools/hand/<folder>.visual.js` exists, `build_app.py` runs apply-hand on the page it has just written, so a rebuild keeps the pictures.
+A figure may animate with CSS or SMIL (`<animate>`); study-visual.js starts SMIL animations when the figure scrolls into view,
+because Chrome leaves them still in figures drawn after the page has loaded.
 
 For any of these, bump `VERSION` in `sw.js` (or run `node tools/stamp.js` if `app.js` changed).

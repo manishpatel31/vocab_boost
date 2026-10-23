@@ -299,7 +299,7 @@ table.cover td{min-width:90px}
   </div>
 </nav>
 
-<script src="study-visual.js?v=3f7fec07"></script>
+<script src="study-visual.js?v=449f5496"></script>
 <script>
 "use strict";
 const LESSONS = [
@@ -1693,7 +1693,7 @@ let RV = "map", FC = null, FCSCOPE = "all", STF = "all", HIDE = {st:1, tr:0, key
 const rowsFor = () => FEST.map((f,i)=>i).filter(i => STF==="all" || FEST[i][1]===STF);
 function stateSelect(){ return `<select id="stf" aria-label="State"><option value="all">All states</option>${STATES.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join("")}</select>`; }
 function renderRevise(){
-  const tabs = [["map","State map"],["mapquiz","Map quiz"],["photos","Photo quiz"],["cover","Cover drill"],["finder","Dance finder"],["tribes","Community → dance"],["months","Themes"],["tricks2","State tricks"],["nums","Numbers & pairs"],["links","Links"],["tricks","Tricks"],["traps","Traps"],["flash","Flashcards"]];
+  const tabs = [["map","State map"],["mapquiz","Map quiz"],["photos","Photo quiz"],["cover","Cover drill"],["finder","Dance finder"],["tribes","Community → dance"],["months","Themes"],["tricks2","State tricks"],["nums","Numbers & pairs"],["links","Links"],["tricks","Tricks"],["traps","Traps"],["flash","Flashcards"]].concat((VIS.tabs || []).filter(t => /^v(pins|label)$/.test(t[0])));
   if (!tabs.some(t=>t[0]===RV)) RV = "map";
   $("#app").innerHTML = `<section class="view stack">
     <div class="stack" style="gap:6px"><span class="eyebrow">Last-day revision</span><h1>Revise</h1></div>
@@ -1767,6 +1767,7 @@ function renderRevise(){
   if (RV === "flash") drawFlash(box);
   if (RV === "photos") photoQuiz(box);
   if (RV === "mapquiz") mapQuiz(box);
+  if (typeof visRevise === "function") visRevise(RV, box);      // map-point and label quizzes (study-visual.js)
 }
 function drawFlash(box){
   if (!FC) { const pool = FCSCOPE==="all" ? QS : FCSCOPE==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===FCSCOPE); FC = {list: shuffle(pool), i:0, flip:false, known:0}; }
