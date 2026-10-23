@@ -168,7 +168,7 @@ the labels would crowd), `bars`, `calendar` (rows `[month, day, label]`), `cards
 (ready HTML or SVG).
 
 The hand-built pages take theirs from `tools/hand/<name>.visual.js` (same API): `node tools/workbook/apply-hand.js
-sports|intlorgs|polity|economics|biology|space|physics|reports` checks every place against the page's lessons and writes
+sports|intlorgs|polity|economics|biology|space|physics|reports|schemes|appointments|ipr|bns` checks every place against the page's lessons and writes
 the blocks in, just before the boot (pages on `study-core.js`, like Physics: at the end of their own script, as
 study-core.js itself draws the blocks and adds the quiz tabs). After any of these, run `node tools/stamp.js`.
 

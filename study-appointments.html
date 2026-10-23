@@ -298,6 +298,7 @@ table.cover td{min-width:90px}
   </div>
 </nav>
 
+<script src="study-visual.js?v=3f7fec07"></script>
 <script>
 "use strict";
 const LESSONS = [
@@ -961,6 +962,7 @@ function renderLearn(){
 }
 
 function blockHTML(b){
+  if (typeof visBlock === "function") { const vb = visBlock(b); if (vb) return vb; }
   if (b.k==="p") return `<div class="plain"><p>${b.h}</p></div>`;
   if (b.k==="trick") return `<div class="trick"><span class="lab">Trick</span>${b.h}</div>`;
   if (b.k==="link") return `<div class="link"><span class="lab">Link · connect the dots</span>${b.h}</div>`;
@@ -1254,7 +1256,7 @@ function drawMockResult(){
    ============================================================ */
 let RV = "who", FC = null, FCSCOPE = "all", CATF = "all", HIDE = {name:1, post:0, note:0}, CREV = {}, CORDER = null, BHIDE = 1, BREV = {};
 function renderRevise(){
-  const tabs = [["who","Who's who"],["bodies","Body types"],["finder","Search"],["firsts","Firsts"],["nums","Numbers & pairs"],["links","Links"],["tricks","Tricks"],["traps","Traps"],["flash","Flashcards"]];
+  const tabs = [["who","Who's who"],["bodies","Body types"],["finder","Search"],["firsts","Firsts"],["nums","Numbers & pairs"],["links","Links"],["tricks","Tricks"],["traps","Traps"],["flash","Flashcards"]].concat(VIS.tabs || []);
   if (!tabs.some(t=>t[0]===RV)) RV = "who";
   $("#app").innerHTML = `<section class="view stack">
     <div class="stack" style="gap:6px"><span class="eyebrow">Last-day revision</span><h1>Revise</h1></div>
@@ -1263,6 +1265,9 @@ function renderRevise(){
   $("#app").querySelectorAll("[data-rv]").forEach(b => b.onclick = () => { RV = b.dataset.rv; renderRevise(); });
   const on = $(`.seg [aria-selected="true"]`); if (on) on.scrollIntoView({block:"nearest", inline:"center"});
   const box = $("#rv");
+  if (RV === "vphotos") { photoQuiz(box); return; }
+  if (RV === "vmap") { mapQuiz(box); return; }
+  if (RV === "vriver") { riverQuiz(box); return; }
   const catSel = `<select id="catf" aria-label="Category"><option value="all">All categories</option>${CATS.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("")}</select>`;
   const bindCat = () => { const s=$("#catf"); if(!s) return; s.value = CATF; s.onchange = e => { CATF = e.target.value; CORDER = null; renderRevise(); }; };
   if (RV === "who") {
@@ -1338,6 +1343,11 @@ function drawFlash(box){
   $("#fck").onclick = () => { FC.known++; FC.i++; FC.flip=false; drawFlash(box); };
 }
 
+/* visual: from tools/hand/appointments.visual.js by tools/workbook/apply-hand.js — edit that file, not this */
+const VIS = {"key":"appointments_photos_v1","word":"person","words":"people","search":"","quiz":"person","ask":"","rows":[],"tabs":[["vphotos","Photo quiz"]]};
+visPlace([["L5","Who runs the government",[{"k":"photos","title":"Who runs the government","items":[["Droupadi_Murmu","Droupadi Murmu","President"],["C.P._Radhakrishnan","C.P. Radhakrishnan","Vice-President"],["Harivansh_Narayan_Singh","Harivansh Narayan Singh","Deputy Chairman, Rajya Sabha"],["T.V._Somanathan","T.V. Somanathan","Cabinet Secretary"],["Rajesh_Kumar_Singh","Rajesh Kumar Singh","Defence Secretary"],["Sanjay_Jaiswal","Sanjay Jaiswal","Chair, Lok Sabha Estimates Committee"],["Nidhi_Tewari","Nidhi Tewari","Private Secretary to PM"],["Anju_Rathi_Rana","Anju Rathi Rana","Union Law Secretary"],["Prof._S._Mahendra_Dev","Prof. S. Mahendra Dev","Chairman, PM's Economic Advisory Council"],["Ranjana_Prakash_Desai","Ranjana Prakash Desai","Chair, 8th Central Pay Commission"]]}]],["L6","Service chiefs",[{"k":"photos","title":"The service chiefs","items":[["N.S._Raja_Subramani","N.S. Raja Subramani","Chief of Defence Staff"],["Dhiraj_Seth","Dhiraj Seth","Chief of Army Staff"],["Krishna_Swaminathan","Krishna Swaminathan","Chief of Naval Staff"],["ACM_Amar_Preet_Singh","ACM Amar Preet Singh","Chief of Air Staff"],["Air_Marshal_Ashutosh_Dixit","Air Marshal Ashutosh Dixit","Vice Chief of Air Staff"]]}]],["L8","Regulators",[{"k":"photos","title":"Money regulators","items":[["Sanjay_Malhotra","Sanjay Malhotra","RBI"],["Tuhin_Kanta_Pandey","Tuhin Kanta Pandey","SEBI"],["Ajay_Seth","Ajay Seth","IRDAI"],["S._Ramann","S. Ramann","PFRDA"],["Ravi_Agrawal","Ravi Agrawal","CBDT"],["Srinivas_Injeti","Srinivas Injeti","NSE Governing Board"],["T.C.A._Kalyani","T.C.A. Kalyani","Controller General of Accounts"]]}]],["L12","International organisations",[{"k":"photos","title":"Heads of world bodies","items":[["Khalilur_Rahman","Khalilur Rahman","President, 81st UN General Assembly"],["Ajay_Banga","Ajay Banga","President, World Bank"],["Masato_Kanda","Masato Kanda","President, Asian Development Bank"],["Zou_Jiayi","Zou Jiayi","President, AIIB"],["Khaled_El-Enany","Khaled El-Enany","DG, UNESCO"],["Barham_Salih","Barham Salih","UN High Commissioner for Refugees"],["Shaikha_Nasser_Al_Nowais","Shaikha Nasser Al Nowais","First woman head of UN Tourism"],["Alois_Zwinggi","Alois Zwinggi","CEO, World Economic Forum"],["Urjit_Patel","Urjit Patel","Executive Director (India), IMF"],["Neelkanth_Mishra","Neelkanth Mishra","Executive Director (India), World Bank"],["Vivek_Aggarwal","Vivek Aggarwal","Vice-President, FATF"],["Gyanesh_Kumar","Gyanesh Kumar","Chair, International IDEA"]]}]],["L13","First women",[{"k":"photos","title":"Firsts in pictures","items":[["Kirsty_Coventry","Kirsty Coventry","First woman IOC President (also first African)"],["Sonali_Mishra","Sonali Mishra","First woman DG, RPF"],["Arti_Sarin","Arti Sarin","First woman DG, Armed Forces Medical Services"],["Anu_Garg","Anu Garg","First woman Chief Secretary, Odisha"],["Ashwini_Bhide","Ashwini Bhide","First woman Municipal Commissioner, Mumbai"],["Uma_Kanjilal","Uma Kanjilal","First woman VC, IGNOU"],["Sangeeta_Barooah_Pisharoty","Sangeeta Barooah Pisharoty","First woman President, Press Club of India"],["Nivedita_Dubey","Nivedita Dubey","First woman Director (HR), AAI"],["Saba_Shawl","Saba Shawl","First woman head, Srinagar Central Jail"],["Lisa_Gill","Lisa Gill","First woman CJ, Andhra Pradesh HC"],["Shaikha_Nasser_Al_Nowais","Shaikha Nasser Al Nowais","First woman head, UN Tourism"],["Vivek_Menon","Vivek Menon","First Asian chair, IUCN SSC"]]}]]]);
+visInit();
+/* visual end */
 /* boot */
 renderTop();
 const start = (location.hash||"").replace("#","");

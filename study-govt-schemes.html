@@ -270,6 +270,7 @@ select{font:inherit;border:1px solid var(--rule);background:var(--sheet);color:v
   </div>
 </nav>
 
+<script src="study-visual.js?v=3f7fec07"></script>
 <script>
 "use strict";
 const LESSONS = [
@@ -1071,6 +1072,7 @@ function renderLearn(){
 }
 
 function blockHTML(b){
+  if (typeof visBlock === "function") { const vb = visBlock(b); if (vb) return vb; }
   if (b.k==="p") return `<div class="plain"><p>${b.h}</p></div>`;
   if (b.k==="trick") return `<div class="trick"><span class="lab">Trick</span>${b.h}</div>`;
   if (b.k==="link") return `<div class="link"><span class="lab">Link · connect the schemes</span>${b.h}</div>`;
@@ -1364,7 +1366,7 @@ function drawMockResult(){
    ============================================================ */
 let RV = "where", FC = null, FCSCOPE = "all";
 function renderRevise(){
-  const tabs = [["where","Scheme finder"],["nums","Numbers"],["ff","Full forms"],["links","Links"],["tricks","Tricks"],["traps","Traps"],["flash","Flashcards"]];
+  const tabs = [["where","Scheme finder"],["nums","Numbers"],["ff","Full forms"],["links","Links"],["tricks","Tricks"],["traps","Traps"],["flash","Flashcards"]].concat(VIS.tabs || []);
   if (!tabs.some(t=>t[0]===RV)) RV = "where";
   $("#app").innerHTML = `<section class="view stack">
     <div class="stack" style="gap:6px"><span class="eyebrow">Last-day revision</span><h1>Revise</h1></div>
@@ -1372,6 +1374,9 @@ function renderRevise(){
     <div id="rv" class="stack"></div></section>`;
   $("#app").querySelectorAll("[data-rv]").forEach(b => b.onclick = () => { RV = b.dataset.rv; renderRevise(); });
   const box = $("#rv");
+  if (RV === "vphotos") { photoQuiz(box); return; }
+  if (RV === "vmap") { mapQuiz(box); return; }
+  if (RV === "vriver") { riverQuiz(box); return; }
   if (RV === "where") {
     const CATN = {CS:"Central Sector",CSS:"Centrally Sponsored",ST:"State",OT:"Other / fund / policy"};
     box.innerHTML = `<input class="search" id="rks" type="search" placeholder="Search a scheme, ministry, year or amount (e.g. MNRE, 2016, ₹3,000)" aria-label="Search schemes">
@@ -1431,6 +1436,11 @@ function drawFlash(box){
   $("#fck").onclick = () => { FC.known++; FC.i++; FC.flip=false; drawFlash(box); };
 }
 
+/* visual: from tools/hand/schemes.visual.js by tools/workbook/apply-hand.js — edit that file, not this */
+const VIS = {"key":"schemes_photos_v1","word":"place","words":"places","search":"","quiz":"place","ask":"","rows":[],"tabs":[]};
+visPlace([["L1","CSS sharing",[{"k":"info","title":"Who pays for a Centrally Sponsored Scheme","html":"<div style=\"margin:10px 0\"><div style=\"font-size:13px;margin-bottom:4px\"><b>General states<\/b><\/div><div style=\"display:flex;height:26px;border-radius:8px;overflow:hidden;font:700 12px var(--f-num);color:#fff\"><span style=\"flex:60;background:#2f6db5;display:flex;align-items:center;padding-left:8px\">Centre 60%<\/span><span style=\"flex:40;background:#c69214;display:flex;align-items:center;padding-left:8px\">State 40%<\/span><\/div><\/div><div style=\"margin:10px 0\"><div style=\"font-size:13px;margin-bottom:4px\"><b>8 North-East + Himalayan states (HP, Uttarakhand) + UT of J&K<\/b><\/div><div style=\"display:flex;height:26px;border-radius:8px;overflow:hidden;font:700 12px var(--f-num);color:#fff\"><span style=\"flex:90;background:#2f6db5;display:flex;align-items:center;padding-left:8px\">Centre 90%<\/span><span style=\"flex:10;background:#c69214;display:flex;align-items:center;padding-left:8px\">State 10%<\/span><\/div><\/div><div style=\"margin:10px 0\"><div style=\"font-size:13px;margin-bottom:4px\"><b>UTs without legislature (Ladakh, Chandigarh, A&N, Lakshadweep, DNH&DD)<\/b><\/div><div style=\"display:flex;height:26px;border-radius:8px;overflow:hidden;font:700 12px var(--f-num);color:#fff\"><span style=\"flex:100;background:#2f6db5;display:flex;align-items:center;padding-left:8px\">Centre 100%<\/span><\/div><\/div>","cap":"Central Sector schemes are paid wholly by the Centre. Delhi and Puducherry follow 60 : 40; J&K 90 : 10."}]],["L4","Textiles",[{"k":"mapfig","title":"The seven PM MITRA textile parks","pins":[["Virudhunagar",77.96,9.58,"",""],["Warangal",79.59,17.97,"",""],["Navsari",72.95,20.95,"","l"],["Kalaburagi",76.83,17.33,"","l"],["Dhar",75.3,22.6,"","l"],["Lucknow",80.95,26.85,"",""],["Amravati",77.75,20.93,"",""]],"cap":"Farm → Fibre → Factory → Fashion → Foreign (the 5F vision). One park in each of seven states."}]],["L15","Launch places",[{"k":"mapfig","title":"Where the schemes were launched","pins":[["1",83.37,26.76,"Gorakhpur","n"],["2",85.31,23.34,"Ranchi","n"],["3",76.97,29.39,"Panipat","n"],["4",84.15,25.76,"Ballia","n"],["5",79.87,25.29,"Mahoba","n"],["6",78,27.18,"Agra","n"],["7",88.36,22.57,"Kolkata","n"],["8",77.08,23.2,"Sehore","n"],["9",73.9,29.32,"Suratgarh","n"],["10",85.28,23.07,"Khunti","n"],["11",85.36,23.99,"Hazaribagh","n"],["12",75.4,28.13,"Jhunjhunu","n"],["13",81.12,18.8,"Bijapur (CG)","n"],["14",77.17,31.1,"Shimla–Delhi","n"]],"facts":[["1 · Gorakhpur","PM-KISAN (2019)"],["2 · Ranchi","PM-JAY (2018), PM-KMY (2019)"],["3 · Panipat","BBBP & SSY (2015), Bima Sakhi (2024)"],["4 · Ballia","Ujjwala (2016)"],["5 · Mahoba","Ujjwala 2.0 (2021)"],["6 · Agra","PMAY-G (2016)"],["7 · Kolkata","APY, PMJJBY, PMSBY (2015)"],["8 · Sehore","PMFBY (2016)"],["9 · Suratgarh","Soil Health Card (2015)"],["10 · Khunti","PM JANMAN (2023)"],["11 · Hazaribagh","Dharti Aaba (2024)"],["12 · Jhunjhunu","POSHAN Abhiyaan (2018)"],["13 · Bijapur (CG)","First Health & Wellness Centre (2018), Van Dhan (2018)"],["14 · Shimla–Delhi","First UDAN flight (2017)"]],"cap":"Jharkhand (Ranchi, Khunti, Hazaribagh) and UP (Gorakhpur, Ballia, Mahoba, Agra) host the most launches. Use ＋ or ⛶ to zoom in."}]],["L15","What changed",[{"k":"tlfig","title":"Recent changes, month by month","rows":[[2025,"Jul 2025 — PM-VBRY (ELI) approved ₹99,446 cr",""],[2025,"Oct 2025 — Dhan-Dhaanya & Pulses mission launched (11 Oct)",""],[2025,"Dec 2025 — VB-G RAM G Act passed",""],[2026,"Feb 2026 — Budget 2026-27: Biopharma SHAKTI, SHE-Mart, Bharat VISTAAR, CCUS ₹20,000 cr, ECMS raised to ₹40,000 cr",""],[2026,"Mar 2026 — Modified UDAN approved: ₹28,840 cr, 100 airports + 200 helipads",""],[2026,"1 Jul 2026 — VB-G RAM G in force",""],[2026,"15 Jul 2026 — MPMS ₹62,500 cr approved",""],[2026,"Jul 2026 — ISM 2",""],[2026,"24 Jul 2026 — BHAVYA Rasayan ₹3,030 cr approved",""],[2026,"2026 — Lakhpati Didi target doubled to 6 crore",""]]}]],["L5","MUDRA loan",[{"k":"bars","title":"MUDRA loans by size","unit":"₹ lakh (upper limit)","left":120,"hi":1,"sort":false,"rows":[["Shishu",0.5,"Up to ₹50,000"],["Kishore",5,"₹50,000 – ₹5 lakh"],["Tarun",10,"₹5 lakh – ₹10 lakh"],["Tarun Plus (Budget 2024-25)",20,"₹10 lakh – ₹20 lakh, only for those who repaid a Tarun loan"]]}]],["L6","The Jan Suraksha",[{"k":"cards","title":"The Jan Suraksha trio","rows":[["PM Jeevan Jyoti Bima (PMJJBY)","Age 18–50 · ₹436 / year","₹2 lakh life (death, any cause)","🛡️"],["PM Suraksha Bima (PMSBY)","Age 18–70 · ₹20 / year","₹2 lakh accidental death; ₹1 lakh partial disability","🩹"],["Atal Pension Yojana (APY)","Age 18–40 · Monthly by age & slab","₹1,000–5,000 pension at 60","👵"]]}]],["L12","Hydrogen colours",[{"k":"info","title":"Hydrogen comes in colours","html":"<div class=\"fam\"><div><span aria-hidden=\"true\" style=\"display:block;height:26px;border-radius:8px;background:#2f8f4e\"><\/span><b>Green<\/b><small>Electrolysis of water using renewable power – cleanest<\/small><\/div><div><span aria-hidden=\"true\" style=\"display:block;height:26px;border-radius:8px;background:#2f6db5\"><\/span><b>Blue<\/b><small>Natural gas; CO₂ captured and stored (CCS)<\/small><\/div><div><span aria-hidden=\"true\" style=\"display:block;height:26px;border-radius:8px;background:#8a8a8a\"><\/span><b>Grey<\/b><small>Natural gas; CO₂ released<\/small><\/div><div><span aria-hidden=\"true\" style=\"display:block;height:26px;border-radius:8px;background:#4a3020\"><\/span><b>Brown / Black<\/b><small>Lignite / bituminous coal – dirtiest<\/small><\/div><div><span aria-hidden=\"true\" style=\"display:block;height:26px;border-radius:8px;background:#e88aa6\"><\/span><b>Pink<\/b><small>Electrolysis using nuclear power<\/small><\/div><div><span aria-hidden=\"true\" style=\"display:block;height:26px;border-radius:8px;background:#1fa8a0\"><\/span><b>Turquoise<\/b><small>Methane pyrolysis (solid carbon)<\/small><\/div><\/div>","cap":"The National Green Hydrogen Mission (2023) aims at 5 million tonnes of green hydrogen a year by 2030."}]],["L14","Monthly cash",[{"k":"mapfig","title":"Cash for women, state by state","marks":[["MH","Majhi Ladki Bahin"],["MP","Ladli Behna"],["OD","Subhadra"],["KA","Gruha Lakshmi"],["JH","Maiyan Samman"],["HP","Pyari Behna Sukh Samman Nidhi"],["WB","Lakshmir Bhandar"],["CT","Mahtari Vandan"],["AS","Orunodoi 3.0"],["TN","Kalaignar Magalir Urimai Thogai"],["BR","Mahila Rozgar Yojana"]],"cap":"Maharashtra's Ladki Bahin and MP's Ladli Behna pay ₹1,500 a month; Jharkhand's Maiyan Samman ₹2,500."}]]]);
+visInit();
+/* visual end */
 /* boot */
 renderTop();
 const start = (location.hash||"").replace("#","");
