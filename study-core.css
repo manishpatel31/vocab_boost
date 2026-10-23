@@ -150,6 +150,7 @@ td.n{font-family:var(--f-num);font-variant-numeric:tabular-nums;white-space:nowr
 .qno{font-family:var(--f-num);font-weight:600;color:var(--ink2)}
 .tag{background:var(--sunk);color:var(--ink2);border-radius:99px;padding:1px 9px;font-weight:600}
 .tag.pyq{background:var(--accent-bg);color:var(--accent)}
+.tag.src{background:var(--good-bg);color:var(--good)}
 .bm{margin-left:auto;background:none;border:0;cursor:pointer;color:var(--ink2);font-size:20px;line-height:1;padding:4px}
 .bm[aria-pressed="true"]{color:var(--accent)}
 .qt{font-weight:600;font-size:16px}

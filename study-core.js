@@ -16,7 +16,7 @@ const LNUM = id => LESSONS.findIndex(l => l.id === id) + 1;
 
 const QS = QB.map(r => {
   const fixed = !!r[6];
-  return { t:r[0], q:r[1], o:r[2], e:r[3], p:(r[4]||"").includes("p"), a: fixed ? (r[5]||0) : 0, fixed, id:hash(r[1]) };
+  return { t:r[0], q:r[1], o:r[2], e:r[3], p:(r[4]||"").includes("p"), a: fixed ? (r[5]||0) : 0, fixed, id:hash(r[1]), src: r[7] || "" };
 });
 const byLesson = id => QS.filter(q => q.t === id);
 // order of options to show: array of original indexes
@@ -164,7 +164,7 @@ function expHTML(q, picked){
   return `<div class="exp">${ok ? `<b class="okl">Correct.</b>` : `<b class="nol">Answer: ${esc(q.o[q.a])}.</b>`} ${esc(q.e)}</div>`;
 }
 function metaHTML(q, no){
-  return `<div class="qmeta"><span class="qno">${no}</span><span class="tag">L${LNUM(q.t)} · ${esc(L(q.t).title)}</span>${q.p?`<span class="tag pyq">High-yield</span>`:""}
+  return `<div class="qmeta"><span class="qno">${no}</span><span class="tag">L${LNUM(q.t)} · ${esc(L(q.t).title)}</span>${q.src?`<span class="tag src" title="Reported by candidates after this paper (memory-based)">📜 Reported in: ${esc(q.src)}</span>`:""}${q.p?`<span class="tag pyq">High-yield</span>`:""}
   <button type="button" class="bm" data-bm="${q.id}" aria-pressed="${S.bm[q.id]?"true":"false"}" aria-label="Bookmark">${S.bm[q.id]?"★":"☆"}</button></div>`;
 }
 
@@ -211,6 +211,7 @@ let PF = "all", PSHOW = 20, PORDER = null, PPERM = {}, PPICK = {};
 function practiceList(){
   let list = QS;
   if (PF === "pyq") list = QS.filter(q => q.p);
+  else if (PF === "src") list = QS.filter(q => q.src);
   else if (PF === "hot") list = QS.filter(q => (L(q.t).heat||1) === 3);
   else if (PF === "wrong") list = QS.filter(q => S.ans[q.id] === 0);
   else if (PF === "new") list = QS.filter(q => S.ans[q.id] === undefined);
@@ -221,7 +222,7 @@ function practiceList(){
 }
 function renderPractice(){
   const wrongN = QS.filter(q => S.ans[q.id] === 0).length, bmN = QS.filter(q=>S.bm[q.id]).length, pyqN = QS.filter(q=>q.p).length;
-  const chips = [["all",`All ${QS.length}`],["new","Not tried"],["wrong",`Mistakes ${wrongN}`],["hot",`🔥 Hot topics ${QS.filter(q=>(L(q.t).heat||1)===3).length}`],["pyq",`${PYQ} ${pyqN}`],["bm",`Starred ${bmN}`]].concat(LESSONS.map((l,i)=>[l.id,`L${i+1} ${l.title}`]));
+  const chips = [["all",`All ${QS.length}`],["new","Not tried"],["wrong",`Mistakes ${wrongN}`],["hot",`🔥 Hot topics ${QS.filter(q=>(L(q.t).heat||1)===3).length}`],...(QS.some(q=>q.src) ? [["src",`Reported in papers ${QS.filter(q=>q.src).length}`]] : []),["pyq",`${PYQ} ${pyqN}`],["bm",`Starred ${bmN}`]].concat(LESSONS.map((l,i)=>[l.id,`L${i+1} ${l.title}`]));
   const list = practiceList();
   $("#app").innerHTML = `<section class="view stack">
     <div class="stack" style="gap:6px"><span class="eyebrow">Question bank</span><h1>Practice</h1>
@@ -274,7 +275,7 @@ function renderMock(){
     <p class="muted">+2 for a right answer, −0.5 for a wrong one, 36 seconds per question (CGL Tier-1 pace). Answers show only after you submit.</p></div>
     <div class="block stack">
       <fieldset><legend>Questions</legend><div class="radios">${[10,25,50,100].map(n=>`<label><input type="radio" name="mn" id="mn${n}" value="${n}" ${MCFG.n===n?"checked":""}><span>${n} · ${Math.round(n*36/60)} min</span></label>`).join("")}</div></fieldset>
-      <fieldset><legend>From</legend><select id="mscope" aria-label="Lessons to draw from"><option value="all">All lessons</option><option value="hot">🔥 Hot topics only</option><option value="pyq">${PYQ === "PYQ" ? "PYQs" : PYQ} only</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}" ${MCFG.scope===l.id?"selected":""}>L${i+1} · ${esc(l.title)}</option>`).join("")}</select></fieldset>
+      <fieldset><legend>From</legend><select id="mscope" aria-label="Lessons to draw from"><option value="all">All lessons</option><option value="hot">🔥 Hot topics only</option><option value="pyq">${PYQ === "PYQ" ? "PYQs" : PYQ} only</option>${QS.some(q=>q.src) ? `<option value="src">Reported in papers only</option>` : ""}<option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}" ${MCFG.scope===l.id?"selected":""}>L${i+1} · ${esc(l.title)}</option>`).join("")}</select></fieldset>
       <label class="row" style="gap:8px;font-weight:600"><input type="checkbox" id="mneg" ${MCFG.neg?"checked":""}> Negative marking (−0.5)</label>
       <div id="merr" class="muted" style="font-size:14px"></div>
       <div class="row end"><button class="btn pri" type="button" id="mstart">Start test</button></div>
@@ -285,7 +286,7 @@ function renderMock(){
   $("#mstart").onclick = () => {
     MCFG.n = +(document.querySelector('input[name="mn"]:checked')||{value:25}).value;
     MCFG.scope = $("#mscope").value; MCFG.neg = $("#mneg").checked ? 1 : 0;
-    let pool = MCFG.scope==="all" ? QS : MCFG.scope==="pyq" ? QS.filter(q=>q.p) : MCFG.scope==="hot" ? QS.filter(q=>(L(q.t).heat||1)===3) : MCFG.scope==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===MCFG.scope);
+    let pool = MCFG.scope==="all" ? QS : MCFG.scope==="pyq" ? QS.filter(q=>q.p) : MCFG.scope==="src" ? QS.filter(q=>q.src) : MCFG.scope==="hot" ? QS.filter(q=>(L(q.t).heat||1)===3) : MCFG.scope==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===MCFG.scope);
     if (!pool.length) { $("#merr").textContent = "No questions in that set yet. Pick another source."; return; }
     const qs = shuffle(pool).slice(0, MCFG.n);
     M = { running:true, list: qs.map(q=>({q, perm:makePerm(q)})), ans: qs.map(()=>null), mark: qs.map(()=>false), i:0, neg:MCFG.neg, secs: qs.length*36, start: Date.now(), showPal:false, confirm:false };
