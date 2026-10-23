@@ -247,10 +247,13 @@ function mapSVG(o = {}){
   const hits = o.faint ? "" : INDIA_MAP.s.filter(tiny).map(s => `<circle cx="${s.x}" cy="${s.y}" r="9" class="hit" data-st="${s.id}"><title>${esc(s.n)}</title></circle>`).join("");
   const labels = o.labels ? INDIA_MAP.s.filter(s => !["CH", "DL", "PY", "DH", "LD", "GA"].includes(s.id)).map(s =>
     `<text x="${s.x}" y="${s.y + 4}" class="lb" data-lb="${s.id}">${MAP_CODE[s.id] || s.id}</text>`).join("") : "";
+  // a zoomed view (o.vb) keeps pins and their labels about the same size on screen as on the whole map
+  const sc = o.vb ? Math.max(.3, Math.min(1, +String(o.vb).split(/\s+/)[2] / INDIA_MAP.w * 1.25)) : 1, f = v => (v * sc).toFixed(2);
+  const fs = (cls, px) => sc === 1 ? `class="${cls}"` : `class="${cls}" style="font-size:${f(px)}px;stroke-width:${f(3)}px"`;
   const pins = (o.pins || []).map(([n, lo, la, note, side]) => { const [x, y] = MAP_PROJ(lo, la), r = side === "l";
-    if (side === "n") return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="8.5" class="pin"><title>${esc(note || n)}</title></circle><text x="${x.toFixed(1)}" y="${(y + 3.8).toFixed(1)}" class="pbn">${esc(n)}</text>`;  // a numbered badge
-    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" class="pin"/><text x="${(x + (r ? -9 : 9)).toFixed(1)}" y="${(y - 2).toFixed(1)}" class="pn" text-anchor="${r ? "end" : "start"}">${esc(n)}</text>` +
-      (note ? `<text x="${(x + (r ? -9 : 9)).toFixed(1)}" y="${(y + 10).toFixed(1)}" class="pnote" text-anchor="${r ? "end" : "start"}">${esc(note)}</text>` : ""); }).join("");
+    if (side === "n") return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${f(8.5)}" class="pin"${sc === 1 ? "" : ` style="stroke-width:${f(1.5)}"`}><title>${esc(note || n)}</title></circle><text x="${x.toFixed(1)}" y="${(y + 3.8 * sc).toFixed(2)}" ${sc === 1 ? 'class="pbn"' : `class="pbn" style="font-size:${f(10.5)}px"`}>${esc(n)}</text>`;  // a numbered badge
+    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${f(5)}" class="pin"${sc === 1 ? "" : ` style="stroke-width:${f(1.5)}"`}/><text x="${(x + (r ? -9 : 9) * sc).toFixed(2)}" y="${(y - 2 * sc).toFixed(2)}" ${fs("pn", 13)} text-anchor="${r ? "end" : "start"}">${esc(n)}</text>` +
+      (note ? `<text x="${(x + (r ? -9 : 9) * sc).toFixed(2)}" y="${(y + 10 * sc).toFixed(2)}" ${fs("pnote", 10)} text-anchor="${r ? "end" : "start"}">${esc(note)}</text>` : ""); }).join("");
   const marks = (o.marks || []).map(([id, label, dx, dy]) => { const st = INDIA_MAP.s.find(x => x.id === id); if (!st) return "";
     return `<text x="${(st.x + (dx || 0)).toFixed(1)}" y="${(st.y + 4 + (dy || 0)).toFixed(1)}" class="ml">${esc(label)}</text>`; }).join("");
   // without a set view, widen it so no pin label runs off the edge
@@ -291,7 +294,7 @@ function mapFigHTML(b){
 function stateChartHTML(b){
   const n = {}; visRows().forEach(f => { n[f[1]] = (n[f[1]] || 0) + 1; });
   const rows = Object.entries(n).sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0])), max = rows[0][1];
-  const W = 640, bar = 18, gap = 6, left = 150, H = rows.length * (bar + gap) + 10;
+  const W = 640, bar = 18, gap = 6, left = b.left || 195, H = rows.length * (bar + gap) + 10;
   const svg = `<svg class="dg chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(b.title)}">` + rows.map(([st, c], i) => {
     const y = 5 + i * (bar + gap), w = (W - left - 40) * c / max;
     return `<text x="${left - 8}" y="${y + 13}" text-anchor="end" font-size="12" class="${i < 3 ? "b" : "mut"}">${esc(st)}</text>` +
