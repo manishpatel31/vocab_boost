@@ -50,7 +50,9 @@ if (!s.includes('const vb = visBlock(b)')) rep('function blockHTML(b){\n', 'func
 // 4) Revise: the photo quiz (and the map quiz) as tabs
 if (!s.includes('.concat(VIS.tabs')) {
   const t = s.indexOf('function renderRevise(){\n  const tabs = ['); if (t < 0) fail('no Revise tabs');
-  const e = s.indexOf('];\n', t); s = s.slice(0, e) + '].concat(VIS.tabs || []);\n' + s.slice(e + 3);
+  const e = s.indexOf('\n', t + 'function renderRevise(){\n'.length);     // the end of the "const tabs = …;" line
+  if (s[e - 1] !== ';') fail('the Revise tabs line does not end in ";"');
+  s = s.slice(0, e - 1) + '.concat(VIS.tabs || []);' + s.slice(e);
   rep('  const box = $("#rv");\n', '  const box = $("#rv");\n  if (RV === "vphotos") { photoQuiz(box); return; }\n  if (RV === "vmap") { mapQuiz(box); return; }\n  if (RV === "vriver") { riverQuiz(box); return; }\n');
 }
 fs.writeFileSync(P, s);
