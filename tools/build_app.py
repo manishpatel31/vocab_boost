@@ -7,7 +7,7 @@ LESSONS, QB, HEAT, TILES, PAIRS, COVERS, FIND and APP from its other files.
 The page itself is study-trigonometry.html with its data block swapped out; the shared
 engine and look come from study-core.js and study-core.css.
 """
-import json, os, sys
+import json, os, re, subprocess, sys
 
 TOOLS = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(TOOLS)
@@ -44,7 +44,10 @@ def build(name):
     html = html.replace('<div class="brand">Trigonometry<small>त्रिकोणमिति · SSC maths workbook</small></div>',
                         '<div class="brand">%s<small>%s · SSC %s workbook</small></div>' % (A.NAME, A.HINDI, A.KIND))
     assert "त्रिकोणमिति" not in html, "template title was not replaced"
+    html = re.sub(r'\n<script src="study-(visual|world|rivers)\.js\?v=[0-9a-f]+"></script>', "", html)   # the template's own pictures stay with it
     open(os.path.join(ROOT, A.FILE), "w", encoding="utf8").write(html)
+    if os.path.exists(os.path.join(TOOLS, "hand", name + ".visual.js")):   # this app's pictures (tools/hand/<name>.visual.js)
+        subprocess.run(["node", os.path.join(TOOLS, "workbook", "apply-hand.js"), name], check=True)
     print("%s: %d lessons, %d questions, %d KB" % (A.FILE, len(L), len(A.QB), len(html.encode()) // 1024))
 
 

@@ -616,10 +616,10 @@ function zmFull(svg, title){
   const ph = document.createComment("zoom"), ov = document.createElement("div");
   ov.className = "zm-ov"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", title || "Map");
   ov.innerHTML = `<div class="zm-top"><b>${esc(title || "")}</b><span class="zm-hint">Pinch or scroll to zoom · drag to move</span><span class="zm-btns"><button type="button" data-zi aria-label="Zoom in">＋</button><button type="button" data-zo aria-label="Zoom out">−</button><button type="button" data-zr aria-label="Reset">⟲</button><button type="button" data-zx aria-label="Close">✕</button></span></div><div class="zm-body"></div><div class="zm-foot" hidden></div>`;
-  svg.parentNode.insertBefore(ph, svg); ov.querySelector(".zm-body").appendChild(svg); document.body.appendChild(ov); document.documentElement.classList.add("zm-lock");
+  svg.parentNode.insertBefore(ph, svg); ov.querySelector(".zm-body").appendChild(svg); document.body.appendChild(ov); document.documentElement.classList.add("zm-lock"); smilKick(svg);
   const vb0 = svg._vb0.slice(), z0 = Object.assign({}, svg._z); svg.classList.add("zm-fs");
   if (!svg._fsg) { zmGestures(svg, { always: true, wheel: true, dbl: true }); svg._fsg = 1; }
-  const close = () => { ph.parentNode.insertBefore(svg, ph); ph.remove(); ov.remove(); svg.classList.remove("zm-fs"); document.documentElement.classList.remove("zm-lock"); svg._vb0 = vb0; svg._z = z0; zmApply(svg); document.removeEventListener("keydown", key); };
+  const close = () => { ph.parentNode.insertBefore(svg, ph); smilKick(svg); ph.remove(); ov.remove(); svg.classList.remove("zm-fs"); document.documentElement.classList.remove("zm-lock"); svg._vb0 = vb0; svg._z = z0; zmApply(svg); document.removeEventListener("keydown", key); };
   const key = e => { if (e.key === "Escape") close(); if (e.key === "+" || e.key === "=") zmBy(svg, 1.5); if (e.key === "-") zmBy(svg, 1 / 1.5); };
   document.addEventListener("keydown", key);
   ov.querySelector("[data-zi]").onclick = () => zmBy(svg, 1.5); ov.querySelector("[data-zo]").onclick = () => zmBy(svg, 1 / 1.5);
@@ -630,10 +630,15 @@ function zmFull(svg, title){
     setTimeout(() => { const side = host.querySelector("[data-mside]"); if (!side) return; foot.hidden = false; foot.innerHTML = side.innerHTML;
       foot.querySelectorAll("[data-golesson]").forEach(b => b.onclick = () => { close(); openLesson(b.dataset.golesson, "learn"); }); }, 0); });
 }
+/** SMIL animations in a figure drawn after the page loaded (or moved to a new parent) sit still in Chrome until
+    begun by hand, so begin them whenever the figure comes into view, and after every move. */
+function smilKick(svg){ svg.querySelectorAll("animate,animateMotion,animateTransform").forEach(a => { try { a.beginElement(); } catch (e) {} }); }
+const smilSeen = "IntersectionObserver" in window ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) smilKick(e.target); })) : null;
 function zmScan(root){
   (root || document).querySelectorAll("svg.imap:not([data-zm]), svg.wmap:not([data-zm]), .phblock figure.fig svg.dg:not([data-zm])").forEach(svg => {
     svg.dataset.zm = 1; if (!svg.viewBox || !svg.viewBox.baseVal || !svg.viewBox.baseVal.width) return;
     const wrap = document.createElement("div"); wrap.className = "zm-wrap"; svg.parentNode.insertBefore(wrap, svg); wrap.appendChild(svg);
+    if (svg.querySelector("animate,animateMotion,animateTransform")) { if (smilSeen) smilSeen.observe(svg); else smilKick(svg); }
     const bar = document.createElement("div"); bar.className = "zm-bar";
     bar.innerHTML = `<button type="button" data-zi aria-label="Zoom in">＋</button><button type="button" data-zo aria-label="Zoom out">−</button><button type="button" data-z0 aria-label="Reset zoom" hidden>⟲</button><button type="button" data-zf aria-label="Full screen">⛶</button>`;
     wrap.appendChild(bar); svg._bar = bar; zmBox(svg);
