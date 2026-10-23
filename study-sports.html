@@ -162,6 +162,7 @@ td.n{font-family:var(--f-num);font-variant-numeric:tabular-nums;white-space:nowr
 .qno{font-family:var(--f-num);font-weight:600;color:var(--ink2)}
 .tag{background:var(--sunk);color:var(--ink2);border-radius:99px;padding:1px 9px;font-weight:600}
 .tag.pyq{background:var(--accent-bg);color:var(--accent)}
+.tag.src{background:var(--good-bg);color:var(--good)}
 .bm{margin-left:auto;background:none;border:0;cursor:pointer;color:var(--ink2);font-size:20px;line-height:1;padding:4px}
 .bm[aria-pressed="true"]{color:var(--accent)}
 .qt{font-weight:600;font-size:16px}
@@ -503,9 +504,9 @@ const QB = [
 ["L1","Which of these sports has 7 players on court per side?",["Netball","Volleyball","Basketball","Baseball"],"Netball, handball, kabaddi and water polo have 7."],
 ["L1","How many players are there in a baseball team on the field?",["9","7","11","6"],"'Base milne par 9'."],
 ["L1","Which sport has 15 players a side?",["Rugby union","Hockey","Cricket","Handball"],"Rugby union 15; rugby league 13."],
-["L1","Which game was invented by James Naismith?",["Basketball","Volleyball","Handball","Baseball"],"1891, Springfield, USA.","p"],
+["L1","Which game was invented by James Naismith?",["Basketball","Volleyball","Handball","Baseball"],"1891, Springfield, USA.","p",0,0,"SSC CHSL · 25 Nov 2025 (Shift 2)"],
 ["L1","Volleyball was invented by…",["William G. Morgan","James Naismith","Jigoro Kano","Abner Doubleday"],"1895, USA."],
-["L1","National Sports Day in India is celebrated on…",["29 August","15 August","2 October","14 November"],"Birthday of Major Dhyan Chand.","p"],
+["L1","National Sports Day in India is celebrated on…",["29 August","15 August","2 October","14 November"],"Birthday of Major Dhyan Chand.","p",0,0,"SSC CGL · 7 Mar 2020 (Shift 3)"],
 ["L1","Which statement about India's national sport is correct?",["No sport has been officially declared the national sport","Hockey is officially the national sport","Kabaddi is officially the national sport","Cricket was declared national sport in 2011"],"Hockey is popularly called the national game but it has no official status."],
 ["L1","In which country did judo originate?",["Japan","China","Korea","India"],"Jigoro Kano, 1882."],
 ["L1","Ice hockey is played with how many players a side on the ice?",["6","5","11","7"],"Five skaters and a goalkeeper."],
@@ -514,7 +515,7 @@ const QB = [
 ["L1","FIDE is the world governing body of…",["Chess","Fencing","Football","Judo"],"Fédération Internationale des Échecs."],
 
 /* L2 */
-["L2","What is the length of a cricket pitch?",["22 yards","20 yards","24 yards","21 yards"],"22 yd = 66 ft = 20.12 m.","p"],
+["L2","What is the length of a cricket pitch?",["22 yards","20 yards","24 yards","21 yards"],"22 yd = 66 ft = 20.12 m.","p",0,0,"SSC CGL · 21 Jul 2023 (Shift 4)"],
 ["L2","The length of a cricket pitch in metres is about…",["20.12 m","22 m","18.5 m","24.2 m"],"22 yards."],
 ["L2","What is the width of a cricket pitch?",["10 ft (3.05 m)","8 ft","12 ft","9 ft"],"10 ft."],
 ["L2","The 22-yard length of the pitch is measured between…",["The two sets of stumps (bowling creases)","The two popping creases","The two return creases","Boundary to boundary"],"Stump to stump."],
@@ -573,8 +574,8 @@ const QB = [
 ["L4","Who was the first president of the BCCI?",["R.E. Grant Govan","Anthony de Mello","Maharaja of Patiala","C.K. Nayudu"],"Anthony de Mello was the first secretary."],
 ["L4","Who was the first secretary of the BCCI?",["Anthony de Mello","R.E. Grant Govan","Vizzy","Jagmohan Dalmiya"],"Grant Govan was president."],
 ["L4","India played its first Test match in 1932 at…",["Lord's","The Oval","Eden Gardens","Chepauk"],"v England; C.K. Nayudu captain."],
-["L4","Where is the BCCI headquartered?",["Wankhede Stadium, Mumbai","Eden Gardens, Kolkata","Feroz Shah Kotla, Delhi","Chinnaswamy, Bengaluru"],"Mumbai."],
-["L4","The Ranji Trophy is named after…",["K.S. Ranjitsinhji","Vijay Hazare","C.K. Nayudu","K.B. Deodhar"],"He played for England.","p"],
+["L4","Where is the BCCI headquartered?",["Wankhede Stadium, Mumbai","Eden Gardens, Kolkata","Feroz Shah Kotla, Delhi","Chinnaswamy, Bengaluru"],"Mumbai.","",0,0,"SSC CGL · 9 Sep 2024 (Shift 1)"],
+["L4","The Ranji Trophy is named after…",["K.S. Ranjitsinhji","Vijay Hazare","C.K. Nayudu","K.B. Deodhar"],"He played for England.","p",0,0,"SSC CHSL · 4 Jul 2024 (Shift 1)"],
 ["L4","The Ranji Trophy was first played in…",["1934-35","1928-29","1947-48","1950-51"],"Bombay were the first champions."],
 ["L4","The Vijay Hazare Trophy is India's domestic competition in…",["One-day (List A) cricket","First-class cricket","T20 cricket","Women's cricket"],"50 overs."],
 ["L4","The Duleep Trophy is contested between…",["Zonal teams","State teams","Universities","Railway zones only"],"First-class, zonal."],
@@ -1037,7 +1038,7 @@ const LNUM = id => LESSONS.findIndex(l => l.id === id) + 1;
 
 const QS = QB.map(r => {
   const fixed = !!r[6];
-  return { t:r[0], q:r[1], o:r[2], e:r[3], p:(r[4]||"").includes("p"), a: fixed ? (r[5]||0) : 0, fixed, id:hash(r[1]) };
+  return { t:r[0], q:r[1], o:r[2], e:r[3], p:(r[4]||"").includes("p"), a: fixed ? (r[5]||0) : 0, fixed, id:hash(r[1]), src: r[7] || "" };
 });
 const byLesson = id => QS.filter(q => q.t === id);
 // order of options to show: array of original indexes
@@ -1180,7 +1181,7 @@ function expHTML(q, picked){
   return `<div class="exp">${ok ? `<b class="okl">Correct.</b>` : `<b class="nol">Answer: ${esc(q.o[q.a])}.</b>`} ${esc(q.e)}</div>`;
 }
 function metaHTML(q, no){
-  return `<div class="qmeta"><span class="qno">${no}</span><span class="tag">L${LNUM(q.t)} · ${esc(L(q.t).title)}</span>${q.p?`<span class="tag pyq">Exam-asked</span>`:""}
+  return `<div class="qmeta"><span class="qno">${no}</span><span class="tag">L${LNUM(q.t)} · ${esc(L(q.t).title)}</span>${q.src?`<span class="tag src" title="Reported by candidates after this paper (memory-based)">📜 Reported in: ${esc(q.src)}</span>`:""}${q.p?`<span class="tag pyq">Exam-asked</span>`:""}
   <button type="button" class="bm" data-bm="${q.id}" aria-pressed="${S.bm[q.id]?"true":"false"}" aria-label="Bookmark">${S.bm[q.id]?"★":"☆"}</button></div>`;
 }
 
@@ -1227,6 +1228,7 @@ let PF = "all", PSHOW = 20, PORDER = null, PPERM = {}, PPICK = {};
 function practiceList(){
   let list = QS;
   if (PF === "pyq") list = QS.filter(q => q.p);
+  else if (PF === "src") list = QS.filter(q => q.src);
   else if (PF === "wrong") list = QS.filter(q => S.ans[q.id] === 0);
   else if (PF === "new") list = QS.filter(q => S.ans[q.id] === undefined);
   else if (PF === "bm") list = QS.filter(q => S.bm[q.id]);
@@ -1236,7 +1238,7 @@ function practiceList(){
 }
 function renderPractice(){
   const wrongN = QS.filter(q => S.ans[q.id] === 0).length, bmN = QS.filter(q=>S.bm[q.id]).length, pyqN = QS.filter(q=>q.p).length;
-  const chips = [["all",`All ${QS.length}`],["new","Not tried"],["wrong",`Mistakes ${wrongN}`],["pyq",`Exam-asked ${pyqN}`],["bm",`Starred ${bmN}`]].concat(LESSONS.map((l,i)=>[l.id,`L${i+1} ${l.title}`]));
+  const chips = [["all",`All ${QS.length}`],["new","Not tried"],["wrong",`Mistakes ${wrongN}`],...(QS.some(q=>q.src) ? [["src",`Reported in papers ${QS.filter(q=>q.src).length}`]] : []),["pyq",`Exam-asked ${pyqN}`],["bm",`Starred ${bmN}`]].concat(LESSONS.map((l,i)=>[l.id,`L${i+1} ${l.title}`]));
   const list = practiceList();
   $("#app").innerHTML = `<section class="view stack">
     <div class="stack" style="gap:6px"><span class="eyebrow">Question bank</span><h1>Practice</h1>
@@ -1289,7 +1291,7 @@ function renderMock(){
     <p class="muted">+2 for a right answer, −0.5 for a wrong one, 36 seconds per question (CGL Tier-1 pace). Answers show only after you submit.</p></div>
     <div class="block stack">
       <fieldset><legend>Questions</legend><div class="radios">${[10,25,50,100].map(n=>`<label><input type="radio" name="mn" id="mn${n}" value="${n}" ${MCFG.n===n?"checked":""}><span>${n} · ${Math.round(n*36/60)} min</span></label>`).join("")}</div></fieldset>
-      <fieldset><legend>From</legend><select id="mscope" aria-label="Lessons to draw from"><option value="all">All lessons</option><option value="pyq">Exam-asked only</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}" ${MCFG.scope===l.id?"selected":""}>L${i+1} · ${esc(l.title)}</option>`).join("")}</select></fieldset>
+      <fieldset><legend>From</legend><select id="mscope" aria-label="Lessons to draw from"><option value="all">All lessons</option><option value="pyq">Exam-asked only</option>${QS.some(q=>q.src) ? `<option value="src">Reported in papers only</option>` : ""}<option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}" ${MCFG.scope===l.id?"selected":""}>L${i+1} · ${esc(l.title)}</option>`).join("")}</select></fieldset>
       <label class="row" style="gap:8px;font-weight:600"><input type="checkbox" id="mneg" ${MCFG.neg?"checked":""}> Negative marking (−0.5)</label>
       <div id="merr" class="muted" style="font-size:14px"></div>
       <div class="row end"><button class="btn pri" type="button" id="mstart">Start test</button></div>
@@ -1300,7 +1302,7 @@ function renderMock(){
   $("#mstart").onclick = () => {
     MCFG.n = +(document.querySelector('input[name="mn"]:checked')||{value:25}).value;
     MCFG.scope = $("#mscope").value; MCFG.neg = $("#mneg").checked ? 1 : 0;
-    let pool = MCFG.scope==="all" ? QS : MCFG.scope==="pyq" ? QS.filter(q=>q.p) : MCFG.scope==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===MCFG.scope);
+    let pool = MCFG.scope==="all" ? QS : MCFG.scope==="pyq" ? QS.filter(q=>q.p) : MCFG.scope==="src" ? QS.filter(q=>q.src) : MCFG.scope==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===MCFG.scope);
     if (!pool.length) { $("#merr").textContent = "No questions in that set yet. Pick another source."; return; }
     const qs = shuffle(pool).slice(0, MCFG.n);
     M = { running:true, list: qs.map(q=>({q, perm:makePerm(q)})), ans: qs.map(()=>null), mark: qs.map(()=>false), i:0, neg:MCFG.neg, secs: qs.length*36, start: Date.now(), showPal:false, confirm:false };

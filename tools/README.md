@@ -186,6 +186,16 @@ The hand-built subject apps get their Plan and Lab tabs from `study-plan-lab.js`
 (the Lab: one game per lesson from its `table` and `facts` blocks, first column → second column and back when the answers are
 unique; tables about the exam itself are skipped). `node tools/hand/plan-lab.js` adds it, with `study-games.js`, to the pages that
 do not have it yet; then `node tools/stamp.js`.
+
+**Reported in papers.** The hand-built subject apps and the `study-core.js` apps follow the workbook convention: a question row's
+8th field (index 7) names the paper it was asked in, in the form `"SSC CGL · 13 Sep 2024 (Shift 1)"`. The engine shows it as a
+📜 "Reported in" tag on the question (practice, lesson quiz, mock review) and adds a "Reported in papers" Practice filter and mock
+source when the page has any. A shorter row is padded with fields 6 and 7 set to `0` (`""` for field 5 if it has none), which
+keeps the shuffled option order. Tag a question only when a named paper (exam, date and shift) is shown to have asked the same fact
+with the same answer, and record each tag in `tools/hand/reported.json` (`page`, `qtext`, `answer`, `src`, `url`, `note`) so it can
+be audited; the rest stay exam-style practice. `index_app.js` carries the field into study-bank.json as `rp` (app.js already uses
+`src` on a question for the question it was prepared from).
+
 Grammar 100 has its own engine, so its pictures (13 rules) live in `tools/hand/grammar-figs.js`, which writes `RULE_FIG` and its CSS
 into study-grammar-100.html and hooks `openRule()` to draw a rule's picture under its logic: `node tools/hand/grammar-figs.js`.
 A figure may animate with CSS or SMIL (`<animate>`); study-visual.js starts SMIL animations when the figure scrolls into view,

@@ -175,6 +175,7 @@ td.n{font-family:var(--f-num);font-variant-numeric:tabular-nums;white-space:nowr
 .qno{font-family:var(--f-num);font-weight:600;color:var(--ink2)}
 .tag{background:var(--sunk);color:var(--ink2);border-radius:99px;padding:1px 9px;font-weight:600}
 .tag.pyq{background:var(--accent-bg);color:var(--accent)}
+.tag.src{background:var(--good-bg);color:var(--good)}
 .bm{margin-left:auto;background:none;border:0;cursor:pointer;color:var(--ink2);font-size:20px;line-height:1;padding:4px}
 .bm[aria-pressed="true"]{color:var(--accent)}
 .qt{font-weight:600;font-size:16px}
@@ -640,7 +641,7 @@ const QB = [
 ["L1","Which of these is unicellular?",["Paramecium","Hydra","Earthworm","Spirogyra"],"Spirogyra is a filamentous multicellular alga."],
 ["L1","The electron microscope was developed by…",["Knoll and Ruska","Hooke","Leeuwenhoek","Zacharias Janssen"],"1931."],
 /* L2 */
-["L2","Which is present only in plant cells?",["Cell wall","Cell membrane","Mitochondria","Ribosome"],"Animal cells lack a wall.","p"],
+["L2","Which is present only in plant cells?",["Cell wall","Cell membrane","Mitochondria","Ribosome"],"Animal cells lack a wall.","p",0,0,"SSC CGL · 25 Jul 2023 (Shift 4)"],
 ["L2","Plant cell wall is mainly made of…",["Cellulose","Chitin","Peptidoglycan","Starch"],"A polysaccharide.","p"],
 ["L2","Cell wall of fungi is made of…",["Chitin","Cellulose","Lignin","Pectin"],"Same as insect exoskeleton.","p"],
 ["L2","Bacterial cell wall is made of…",["Peptidoglycan","Cellulose","Chitin","Suberin"],"Also called murein."],
@@ -671,7 +672,7 @@ const QB = [
 /* L4 */
 ["L4","Powerhouse of the cell is…",["Mitochondria","Ribosome","Nucleus","Lysosome"],"Makes ATP.","p"],
 ["L4","Energy in cells is stored as…",["ATP","DNA","Glucose only","Protein"],"Energy currency of the cell.","p"],
-["L4","Which organelle makes protein?",["Ribosome","Lysosome","Golgi body","Centrosome"],"Protein factory.","p"],
+["L4","Which organelle makes protein?",["Ribosome","Lysosome","Golgi body","Centrosome"],"Protein factory.","p",0,0,"SSC CGL · 18 Jul 2023 (Shift 2)"],
 ["L4","Ribosomes were discovered by…",["George Palade","Camillo Golgi","Robert Brown","Christian de Duve"],"1955."],
 ["L4","Suicidal bag of the cell is…",["Lysosome","Golgi body","Vacuole","Peroxisome"],"Hydrolytic enzymes.","p"],
 ["L4","Which organelle packages and delivers materials?",["Golgi apparatus","Endoplasmic reticulum","Ribosome","Nucleolus"],"Post office.","p"],
@@ -693,7 +694,7 @@ const QB = [
 ["L5","Chlorophyll is found in…",["Chloroplast","Chromoplast","Leucoplast","Mitochondria"],"Green plastid.","p"],
 ["L5","Red colour of tomato is due to…",["Carotenoids in chromoplasts","Chlorophyll","Anthocyanin in vacuole","Leucoplast"],"Lycopene is a carotenoid.","p"],
 ["L5","Colourless plastids are…",["Leucoplasts","Chromoplasts","Chloroplasts","Ribosomes"],"Storage plastids."],
-["L5","Which plastid stores oil?",["Elaioplast","Amyloplast","Aleuroplast","Chromoplast"],"Oilseeds."],
+["L5","Which plastid stores oil?",["Elaioplast","Amyloplast","Aleuroplast","Chromoplast"],"Oilseeds.","",0,0,"SSC CGL · 24 Jul 2023 (Shift 4)"],
 ["L5","Which plastid stores protein?",["Aleuroplast","Amyloplast","Elaioplast","Chloroplast"],"Also called proteinoplast."],
 ["L5","Potato stores starch in…",["Amyloplasts","Chromoplasts","Elaioplasts","Chloroplasts"],"Starch grains.","p"],
 ["L5","Metal present in chlorophyll is…",["Magnesium","Iron","Copper","Zinc"],"Haemoglobin has iron.","p"],
@@ -792,7 +793,7 @@ QB.push(
 ["L10","Seeds are naked in…",["Gymnosperms","Angiosperms","Pteridophytes","Bryophytes"],"No ovary wall.","p"],
 ["L10","Pine and Cycas are examples of…",["Gymnosperms","Angiosperms","Pteridophytes","Bryophytes"],"Conifers.","p"],
 ["L10","Moss (Funaria) and Marchantia belong to…",["Bryophyta","Pteridophyta","Thallophyta","Gymnosperms"],"Liverworts and mosses."],
-["L10","Ferns and horsetails belong to…",["Pteridophyta","Bryophyta","Angiosperms","Algae"],"Vascular, no seeds."],
+["L10","Ferns and horsetails belong to…",["Pteridophyta","Bryophyta","Angiosperms","Algae"],"Vascular, no seeds.","",0,0,"SSC CGL · 18 Jul 2023 (Shift 1)"],
 ["L10","Spirogyra is a…",["Green alga","Fungus","Moss","Fern"],"Thallophyta.","p"],
 ["L10","Chlorella belongs to…",["Green algae","Brown algae","Red algae","Fungi"],"Protein-rich supplement (CGL 2022).","p"],
 ["L10","Kelp, Laminaria and Sargassum are…",["Brown algae","Red algae","Green algae","Blue-green algae"],"Phaeophyceae."],
@@ -881,7 +882,7 @@ QB.push(
 ["L14","Fat-soluble vitamins are…",["A, D, E and K","B and C","A, B and C","B, D and K"],"KEDA.","p"],
 ["L14","Water-soluble vitamins are…",["B complex and C","A and D","E and K","A and K"],"Excreted in urine."],
 ["L14","Chemical name of vitamin A is…",["Retinol","Thiamine","Calciferol","Tocopherol"],"Needed for vision.","p"],
-["L14","Night blindness is caused by deficiency of…",["Vitamin A","Vitamin C","Vitamin K","Vitamin B12"],"Xerophthalmia too.","p"],
+["L14","Night blindness is caused by deficiency of…",["Vitamin A","Vitamin C","Vitamin K","Vitamin B12"],"Xerophthalmia too.","p",0,0,"SSC CHSL · 6 Aug 2021 (Shift 1)"],
 ["L14","Beriberi is caused by deficiency of…",["Vitamin B1 (thiamine)","Vitamin B3","Vitamin C","Vitamin D"],"Nerves and heart affected.","p"],
 ["L14","Pellagra is caused by deficiency of…",["Niacin (B3)","Thiamine (B1)","Riboflavin (B2)","Folic acid"],"Dermatitis, diarrhoea, dementia.","p"],
 ["L14","Riboflavin is vitamin…",["B2","B1","B6","B12"],"Cracked lips on deficiency."],
@@ -889,12 +890,12 @@ QB.push(
 ["L14","Chemical name of vitamin C is…",["Ascorbic acid","Citric acid","Folic acid","Retinol"],"Citrus fruits, amla.","p"],
 ["L14","Which vitamin is destroyed on heating/cooking?",["Vitamin C","Vitamin A","Vitamin D","Vitamin K"],"Heat-labile.","p"],
 ["L14","Rickets in children is due to deficiency of…",["Vitamin D","Vitamin C","Vitamin A","Vitamin B1"],"Soft bones.","p"],
-["L14","Vitamin produced in skin by sunlight is…",["Vitamin D","Vitamin A","Vitamin C","Vitamin K"],"Calciferol.","p"],
+["L14","Vitamin produced in skin by sunlight is…",["Vitamin D","Vitamin A","Vitamin C","Vitamin K"],"Calciferol.","p",0,0,"SSC CHSL · 8 Aug 2023 (Shift 2)"],
 ["L14","Osteomalacia in adults is due to lack of…",["Vitamin D","Vitamin E","Vitamin B2","Vitamin K"],"Adult rickets."],
 ["L14","Chemical name of vitamin E is…",["Tocopherol","Calciferol","Phylloquinone","Pyridoxine"],"Fertility, antioxidant."],
 ["L14","Vitamin essential for blood clotting is…",["Vitamin K","Vitamin C","Vitamin A","Vitamin B1"],"Phylloquinone.","p"],
 ["L14","Vitamin B12 is also called…",["Cyanocobalamin","Pyridoxine","Biotin","Niacin"],"Contains cobalt.","p"],
-["L14","Pernicious anaemia is caused by deficiency of…",["Vitamin B12","Vitamin C","Vitamin K","Vitamin A"],"Also needed for DNA synthesis."],
+["L14","Pernicious anaemia is caused by deficiency of…",["Vitamin B12","Vitamin C","Vitamin K","Vitamin A"],"Also needed for DNA synthesis.","",0,0,"SSC CGL · 5 Mar 2020 (Shift 2)"],
 ["L14","Folic acid is vitamin…",["B9","B7","B5","B3"],"Given in pregnancy."],
 ["L14","Folic acid deficiency in pregnancy can cause…",["Neural-tube defects in the baby","Night blindness","Scurvy","Goitre"],"Brain/spinal cord defects."],
 ["L14","Biotin is vitamin…",["B7","B6","B12","B2"],"Hair & skin."],
@@ -990,7 +991,7 @@ QB.push(
 ["L19","Which part relays sensory signals like touch and pain?",["Thalamus","Cerebellum","Pons","Medulla"],"Relay station."],
 ["L19","The three meninges are…",["Dura, arachnoid and pia mater","Pleura, pericardium and peritoneum","Cortex, medulla and pelvis","Axon, dendrite and cyton"],"Outer to inner."],
 /* L20 */
-["L20","Master gland of the body is…",["Pituitary","Thyroid","Adrenal","Pineal"],"Controls other glands.","p"],
+["L20","Master gland of the body is…",["Pituitary","Thyroid","Adrenal","Pineal"],"Controls other glands.","p",0,0,"SSC CGL · 4 Jun 2019 (Shift 2)"],
 ["L20","Pituitary is controlled by the…",["Hypothalamus","Thyroid","Pineal","Pancreas"],"The 'godfather'."],
 ["L20","Largest endocrine gland is…",["Thyroid","Pituitary","Adrenal","Pancreas"],"Butterfly-shaped, in the neck.","p"],
 ["L20","Endocrine glands are…",["Ductless glands","Glands with ducts","Only in the brain","Digestive glands"],"Secrete into blood.","p"],
@@ -1213,7 +1214,7 @@ const LNUM = id => LESSONS.findIndex(l => l.id === id) + 1;
 
 const QS = QB.map(r => {
   const fixed = !!r[6];
-  return { t:r[0], q:r[1], o:r[2], e:r[3], p:(r[4]||"").includes("p"), a: fixed ? (r[5]||0) : 0, fixed, id:hash(r[1]) };
+  return { t:r[0], q:r[1], o:r[2], e:r[3], p:(r[4]||"").includes("p"), a: fixed ? (r[5]||0) : 0, fixed, id:hash(r[1]), src: r[7] || "" };
 });
 const byLesson = id => QS.filter(q => q.t === id);
 // order of options to show: array of original indexes
@@ -1357,7 +1358,7 @@ function expHTML(q, picked){
   return `<div class="exp">${ok ? `<b class="okl">Correct.</b>` : `<b class="nol">Answer: ${esc(q.o[q.a])}.</b>`} ${esc(q.e)}</div>`;
 }
 function metaHTML(q, no){
-  return `<div class="qmeta"><span class="qno">${no}</span><span class="tag">L${LNUM(q.t)} · ${esc(L(q.t).title)}</span>${q.p?`<span class="tag pyq">High-yield</span>`:""}
+  return `<div class="qmeta"><span class="qno">${no}</span><span class="tag">L${LNUM(q.t)} · ${esc(L(q.t).title)}</span>${q.src?`<span class="tag src" title="Reported by candidates after this paper (memory-based)">📜 Reported in: ${esc(q.src)}</span>`:""}${q.p?`<span class="tag pyq">High-yield</span>`:""}
   <button type="button" class="bm" data-bm="${q.id}" aria-pressed="${S.bm[q.id]?"true":"false"}" aria-label="Bookmark">${S.bm[q.id]?"★":"☆"}</button></div>`;
 }
 
@@ -1404,6 +1405,7 @@ let PF = "all", PSHOW = 20, PORDER = null, PPERM = {}, PPICK = {};
 function practiceList(){
   let list = QS;
   if (PF === "pyq") list = QS.filter(q => q.p);
+  else if (PF === "src") list = QS.filter(q => q.src);
   else if (PF === "hot") list = QS.filter(q => (L(q.t).heat||1) === 3);
   else if (PF === "wrong") list = QS.filter(q => S.ans[q.id] === 0);
   else if (PF === "new") list = QS.filter(q => S.ans[q.id] === undefined);
@@ -1414,7 +1416,7 @@ function practiceList(){
 }
 function renderPractice(){
   const wrongN = QS.filter(q => S.ans[q.id] === 0).length, bmN = QS.filter(q=>S.bm[q.id]).length, pyqN = QS.filter(q=>q.p).length;
-  const chips = [["all",`All ${QS.length}`],["new","Not tried"],["wrong",`Mistakes ${wrongN}`],["hot",`🔥 Hot topics ${QS.filter(q=>(L(q.t).heat||1)===3).length}`],["pyq",`PYQ ${pyqN}`],["bm",`Starred ${bmN}`]].concat(LESSONS.map((l,i)=>[l.id,`L${i+1} ${l.title}`]));
+  const chips = [["all",`All ${QS.length}`],["new","Not tried"],["wrong",`Mistakes ${wrongN}`],["hot",`🔥 Hot topics ${QS.filter(q=>(L(q.t).heat||1)===3).length}`],...(QS.some(q=>q.src) ? [["src",`Reported in papers ${QS.filter(q=>q.src).length}`]] : []),["pyq",`PYQ ${pyqN}`],["bm",`Starred ${bmN}`]].concat(LESSONS.map((l,i)=>[l.id,`L${i+1} ${l.title}`]));
   const list = practiceList();
   $("#app").innerHTML = `<section class="view stack">
     <div class="stack" style="gap:6px"><span class="eyebrow">Question bank</span><h1>Practice</h1>
@@ -1467,7 +1469,7 @@ function renderMock(){
     <p class="muted">+2 for a right answer, −0.5 for a wrong one, 36 seconds per question (CGL Tier-1 pace). Answers show only after you submit.</p></div>
     <div class="block stack">
       <fieldset><legend>Questions</legend><div class="radios">${[10,25,50,100].map(n=>`<label><input type="radio" name="mn" id="mn${n}" value="${n}" ${MCFG.n===n?"checked":""}><span>${n} · ${Math.round(n*36/60)} min</span></label>`).join("")}</div></fieldset>
-      <fieldset><legend>From</legend><select id="mscope" aria-label="Lessons to draw from"><option value="all">All lessons</option><option value="hot">🔥 Hot topics only</option><option value="pyq">PYQs only</option><option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}" ${MCFG.scope===l.id?"selected":""}>L${i+1} · ${esc(l.title)}</option>`).join("")}</select></fieldset>
+      <fieldset><legend>From</legend><select id="mscope" aria-label="Lessons to draw from"><option value="all">All lessons</option><option value="hot">🔥 Hot topics only</option><option value="pyq">PYQs only</option>${QS.some(q=>q.src) ? `<option value="src">Reported in papers only</option>` : ""}<option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}" ${MCFG.scope===l.id?"selected":""}>L${i+1} · ${esc(l.title)}</option>`).join("")}</select></fieldset>
       <label class="row" style="gap:8px;font-weight:600"><input type="checkbox" id="mneg" ${MCFG.neg?"checked":""}> Negative marking (−0.5)</label>
       <div id="merr" class="muted" style="font-size:14px"></div>
       <div class="row end"><button class="btn pri" type="button" id="mstart">Start test</button></div>
@@ -1478,7 +1480,7 @@ function renderMock(){
   $("#mstart").onclick = () => {
     MCFG.n = +(document.querySelector('input[name="mn"]:checked')||{value:25}).value;
     MCFG.scope = $("#mscope").value; MCFG.neg = $("#mneg").checked ? 1 : 0;
-    let pool = MCFG.scope==="all" ? QS : MCFG.scope==="pyq" ? QS.filter(q=>q.p) : MCFG.scope==="hot" ? QS.filter(q=>(L(q.t).heat||1)===3) : MCFG.scope==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===MCFG.scope);
+    let pool = MCFG.scope==="all" ? QS : MCFG.scope==="pyq" ? QS.filter(q=>q.p) : MCFG.scope==="src" ? QS.filter(q=>q.src) : MCFG.scope==="hot" ? QS.filter(q=>(L(q.t).heat||1)===3) : MCFG.scope==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===MCFG.scope);
     if (!pool.length) { $("#merr").textContent = "No questions in that set yet. Pick another source."; return; }
     const qs = shuffle(pool).slice(0, MCFG.n);
     M = { running:true, list: qs.map(q=>({q, perm:makePerm(q)})), ans: qs.map(()=>null), mark: qs.map(()=>false), i:0, neg:MCFG.neg, secs: qs.length*36, start: Date.now(), showPal:false, confirm:false };
