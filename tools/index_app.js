@@ -2,6 +2,7 @@
 // so its lessons show in search and its questions reach Mistakes, mocks and the phone app.
 //
 //   node tools/index_app.js study-clock.html clock reasoning [--after calendar]
+//   node tools/index_app.js study-a.html,study-b.html mod gs      (several pages, one module)
 //
 // <module id> must match the app's id in index.html's STUDY list; <group> is maths, reasoning, english or gs.
 // A new module goes after --after (or at the end); an existing one keeps its place.
@@ -12,7 +13,8 @@ if (!file || !id || !group) { console.error('usage: node tools/index_app.js <stu
 
 const search = JSON.parse(fs.readFileSync(R + 'study-search.json', 'utf8'));
 const bank = JSON.parse(fs.readFileSync(R + 'study-bank.json', 'utf8'));
-const d = i.appData(file);
+// Several files joined by commas index as one module: Computer Knowledge's three parts are one module ("computer")
+const d = file.split(',').map(f => i.appData(f)).reduce((a, x) => ({ APP: a.APP, LESSONS: a.LESSONS.concat(x.LESSONS), QB: a.QB.concat(x.QB) }));
 const entry = i.bankEntry(d); entry.g = group;
 const ids = entry.qs.map(q => q.id);
 if (new Set(ids).size !== ids.length) { console.error('two questions have the same text — reword one'); process.exit(1); }

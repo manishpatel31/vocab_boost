@@ -91,8 +91,10 @@ After a change: `node tools/history/build.js`, then for each subject app
 
 ```
 tools/computer/
-  build.js                    data + lab.js → study-computer.html; PARTS sets the lesson order
-  lab.js                      the Lab tab: decks built from the lesson tables (cmpRows) and a base-converter drill
+  build.js                    data + lab.js → the hub study-computer.html and one app per part in PARTS
+                              (study-computer-hardware/-software/-internet.html); PARTS sets each part's lessons and order
+  lab.js                      the Lab tab: decks built from the lesson tables (cmpRows) and a base-converter drill;
+                              each part plays the decks whose lesson it holds
   data/10_hardware.js         Part 1: C1–C6 and C18 (output devices), with their questions, last-moment cards and tiles
   data/11_software_office.js  Part 2: C7, C19 (operating systems), C20 (file extensions), C8–C11, C21 (Access & DBMS)
   data/12_internet_network_security.js  Part 3: C12–C16, C22 (cyber law & Digital India), C17
@@ -101,11 +103,15 @@ tools/computer/
 ```
 
 Lesson ids never change (saved progress hangs on them), so a new lesson takes the next free id and is placed
-in `PARTS` in build.js. A question's 6th and 7th fields keep the options in the order written (for
+in `PARTS` in build.js. The hub and the three parts share one saved state (`APP.shared` in the engine: one
+localStorage key, `computer_knowledge_v1`), so answers, bookmarks, finished lessons and Lab XP made before the split
+carry over; each page keeps its own plan in `S.plans[id]` and tags its mocks with its id. The hub holds every lesson's
+title, summary, tricks and traps but no questions; `?lesson=C9` on the hub opens that lesson in its part. A question's 6th and 7th fields keep the options in the order written (for
 "all of the above"): field 6 is the right answer's place, field 7 is 1. Questions with an 8th field came from a paper.
 
-After a change: `node tools/computer/build.js`, `node tools/index_app.js study-computer.html computer gs`,
-`node tools/check_app.js study-computer.html`.
+After a change: `node tools/computer/build.js`, then index the three parts as one module:
+`node tools/index_app.js study-computer-hardware.html,study-computer-software.html,study-computer-internet.html computer gs`,
+and `node tools/check_app.js <file>` for the hub and each part.
 
 ### Chemistry (`tools/chemistry/`)
 
@@ -171,11 +177,13 @@ the labels would crowd), `bars`, `calendar` (rows `[month, day, label]`), `cards
 (ready HTML or SVG).
 
 The hand-built pages take theirs from `tools/hand/<name>.visual.js` (same API): `node tools/workbook/apply-hand.js
-sports|intlorgs|polity|economics|biology|space|physics|reports|schemes|appointments|ipr|bns|trigonometry|geometry|mensuration2d|mensuration3d|number-system|clock|calendar` checks every place against the page's lessons and writes
+sports|intlorgs|polity|economics|biology|space|physics|reports|schemes|appointments|ipr|bns|trigonometry|geometry|mensuration2d|mensuration3d|number-system|clock|calendar|census|voice|narration` checks every place against the page's lessons and writes
 the blocks in, just before the boot (pages on `study-core.js`, like Physics: at the end of their own script, as
 study-core.js itself draws the blocks and adds the quiz tabs). After any of these, run `node tools/stamp.js`.
 The chapter apps built by `build_app.py` (Number System, Clock, Calendar) get theirs the same way: when
 `tools/hand/<folder>.visual.js` exists, `build_app.py` runs apply-hand on the page it has just written, so a rebuild keeps the pictures.
+Grammar 100 has its own engine, so its pictures (13 rules) live in `tools/hand/grammar-figs.js`, which writes `RULE_FIG` and its CSS
+into study-grammar-100.html and hooks `openRule()` to draw a rule's picture under its logic: `node tools/hand/grammar-figs.js`.
 A figure may animate with CSS or SMIL (`<animate>`); study-visual.js starts SMIL animations when the figure scrolls into view,
 because Chrome leaves them still in figures drawn after the page has loaded.
 Colours: draw with the theme variables (`var(--ink)`, `var(--accent)`, `var(--sheet)` …); text on an accent-coloured shape takes

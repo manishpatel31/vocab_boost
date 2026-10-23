@@ -21,7 +21,7 @@ function cmpConv(){
   }
   return out;
 }
-const CMP_DECKS = [
+const CMP_ALL = [
   { id: "win", ico: "🪟", title: "Windows Shortcuts", sub: "Win + E, Alt + Tab, Shift + Delete…", lesson: "C8", q: "", rq: "Which keys:", pairs: short(cmpRows("C8", "Windows shortcuts"), 60) },
   { id: "word", ico: "📝", title: "Word Shortcuts", sub: "Ctrl + K, F7, Shift + F3…", lesson: "C9", q: "In Word:", rq: "Word shortcut to:", pairs: short(cmpRows("C9", "Word-specific shortcuts"), 60) },
   { id: "excel", ico: "📊", title: "Excel Shortcuts", sub: "F2, F4, Alt + =, Ctrl + ;…", lesson: "C10", q: "In Excel:", rq: "Excel shortcut to:", pairs: short(cmpRows("C10", "Excel shortcuts"), 60) },
@@ -48,6 +48,8 @@ const CMP_DECKS = [
   { id: "base", ico: "🔢", title: "Base Converter", sub: "Binary, octal, hex — beat the clock", lesson: "C6", q: "", make: cmpConv, options: it => shuffle([it.a].concat(it.opts4)),
     list: () => [["(1010)₂", "10"], ["(1111)₂", "15 = (F)₁₆ = (17)₈"], ["(11111111)₂", "255 = (FF)₁₆ = (377)₈"], ["(100)₁₀", "(1100100)₂ = (64)₁₆ = (144)₈"], ["(2D)₁₆", "45 = (101101)₂ = (55)₈"], ["Binary → octal / hex", "Group 3 / 4 bits from the right"]] }
 ];
+/* Each part of Computer Knowledge plays the decks whose lesson it holds (a deck needs at least four rows to make options). */
+const CMP_DECKS = CMP_ALL.filter(d => LESSONS.some(l => l.id === d.lesson) && (d.make || d.pairs.length >= 4));
 /* Up to n rows of a deck for the Grand Mix, spread over different answers so every question gets real wrong options. */
 function cmpSpread(rows, n){
   const by = {}; shuffle(rows).forEach(r => { (by[r[1]] = by[r[1]] || []).push(r); });
@@ -56,9 +58,11 @@ function cmpSpread(rows, n){
   return out;
 }
 const LAB_CONF = {
-  title: "Computer Lab", blurb: "Drill every shortcut, full form, extension and port until your fingers know it. Every right answer earns XP.",
+  title: "Computer Lab", blurb: "Drill the shortcuts, full forms, extensions, ports and units of this part until your fingers know them. Every right answer earns XP, shared across the three parts.",
   ranks: [[0, "Power Button", "🔌"], [60, "Keyboard Warrior", "⌨️"], [200, "Office Pro", "💼"], [450, "Network Admin", "🛰️"], [900, "Supercomputer", "🖥️"]],
   decks: CMP_DECKS.concat([{ id: "mix", ico: "🎲", title: "Grand Mix", sub: "Everything at once — the real exam feel", q: "",
     make: () => labMix(CMP_DECKS.filter(d => !d.make).map(d => Object.assign({}, d, { pairs: cmpSpread(d.pairs, 6) }))), list: () => CMP_DECKS.filter(d => !d.make).flatMap(d => d.pairs) }]),
-  match: { deck: "port", title: "Pair each protocol with its port", sub: "Flip cards — HTTP, HTTPS, SMTP, POP3, DNS… with their port numbers" }
+  match: [{ deck: "port", title: "Pair each protocol with its port", sub: "Flip cards — HTTP, HTTPS, SMTP, POP3, DNS… with their port numbers" },
+          { deck: "ext", title: "Pair each file type with its extension", sub: "Flip cards — .docx, .xlsx, .pptx, .pdf, .exe… with what they hold" },
+          { deck: "units", title: "Pair each memory unit with its size", sub: "Flip cards — nibble, byte, KB, MB, GB, TB… with their sizes" }].find(m => CMP_DECKS.some(d => d.id === m.deck)) || null
 };
