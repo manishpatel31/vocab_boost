@@ -14,14 +14,15 @@ const OR = `<svg class="dg" viewBox="0 0 660 300" role="img" aria-label="LEO, ME
   ${T(420, 200, "LEO — 160–2,000 km", "#2f8f4e", "start", 14)}<text x="420" y="218" font-size="11" class="mut">ISS, Hubble, imaging; ~90 min a lap</text>
   <text x="20" y="290" font-size="10.5" class="mut">Not to scale. The higher the orbit, the slower the satellite goes round.</text></svg>`;
 place("L2", "Orbits by height", KIT.fig("Three orbits by height", OR, "Low orbits give sharp pictures and fast laps; geostationary satellites hover over one spot of the equator, so dish antennas never need to move."));
-const LG = `<svg class="dg" viewBox="0 0 660 300" role="img" aria-label="The five Sun–Earth Lagrange points">
-  <circle cx="200" cy="150" r="34" fill="#f6c343"/>${T(200, 155, "Sun", "#5a3b00", "middle", 12)}
-  <circle cx="200" cy="150" r="230" fill="none" stroke="var(--rule)" stroke-dasharray="4 5"/>
-  ${earth(430, 150, 12)}${T(430, 180, "Earth", "#2f6db5", "middle", 11)}
-  ${[["L1", 395, 150, "Aditya-L1, SOHO"], ["L2", 470, 150, "JWST, Gaia"], ["L3", -30, 150, ""], ["L4", 315, -49, ""], ["L5", 315, 349, ""]].map(([n, x, y, t]) =>
-    `<circle cx="${x}" cy="${y}" r="7" fill="#7d4fb5"/>${T(x, y - 12, n, "#7d4fb5", "middle", 13)}${t ? `<text x="${x}" y="${y + 24}" text-anchor="middle" font-size="10.5" class="mut">${t}</text>` : ""}`).join("")}
-  <path d="M200 150 L315 -49 L430 150 L315 349 Z" fill="none" stroke="#7d4fb5" stroke-opacity=".35"/></svg>`;
-place("L2", "The Sun–Earth", Object.assign(KIT.fig("The five Lagrange points", LG.replace('viewBox="0 0 660 300"', 'viewBox="-60 -80 600 460"'), "L1 and L2 sit about 1.5 million km from Earth, towards and away from the Sun. L4 and L5 form equilateral triangles with the Sun and Earth — the only stable points.")));
+const LG = `<svg class="dg" viewBox="0 0 640 370" role="img" aria-label="The five Sun–Earth Lagrange points">
+  <circle cx="200" cy="185" r="30" fill="#f6c343"/>${T(200, 190, "Sun", "#5a3b00", "middle", 12)}
+  <circle cx="200" cy="185" r="170" fill="none" stroke="var(--rule)" stroke-dasharray="4 5"/><path d="M200 185 L285 38 L370 185 L285 332 Z" fill="none" stroke="#7d4fb5" stroke-opacity=".35"/>
+  ${earth(370, 185, 11)}${T(370, 214, "Earth", "#2f6db5", "middle", 11)}
+  ${[["L1", 335, 185], ["L2", 405, 185], ["L3", 30, 185], ["L4", 285, 38], ["L5", 285, 332]].map(([n, x, y]) => `<circle cx="${x}" cy="${y}" r="7" fill="#7d4fb5"/>${T(x, y - 12, n, "#7d4fb5", "middle", 13)}`).join("")}
+  ${T(450, 120, "L1 — Aditya-L1, SOHO", "#7d4fb5", "start", 12.5)}<text x="450" y="138" font-size="11" class="mut">a constant view of the Sun</text>
+  ${T(450, 250, "L2 — JWST, Gaia", "#7d4fb5", "start", 12.5)}<text x="450" y="268" font-size="11" class="mut">Sun, Earth, Moon all behind</text>
+  <path d="M335 175 L446 124 M405 195 L446 246" stroke="var(--rule)"/></svg>`;
+place("L2", "The Sun–Earth", Object.assign(KIT.fig("The five Lagrange points", LG, "L1 and L2 sit about 1.5 million km from Earth, towards and away from the Sun. L4 and L5 form equilateral triangles with the Sun and Earth — the only stable points.")));
 
 // L3 — a PSLV's four stages
 const ST = [["PS4", "Liquid (2 × engines)", "#7d4fb5", 40], ["PS3", "Solid", "#c69214", 34], ["PS2", "Liquid — Vikas", "#2f6db5", 60], ["PS1", "Solid + 6 strap-ons", "#c0503a", 90]];
