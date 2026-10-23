@@ -40,8 +40,8 @@ const SV = `<svg class="dg" viewBox="0 0 660 360" role="img" aria-label="Sieve o
   <rect x="392" y="174" width="26" height="26" rx="5" fill="var(--accent)"/>${T(428, 192, "left over: the 25 primes", "var(--ink)", "start", 12)}
   ${T(392, 240, "Stop at 7: the next prime, 11, has", "var(--ink2)", "start", 11.5, 500)}${T(392, 256, "11² = 121 > 100, so every composite", "var(--ink2)", "start", 11.5, 500)}
   ${T(392, 272, "up to 100 is already crossed out.", "var(--ink2)", "start", 11.5, 500)}${T(392, 304, "1 is neither prime nor composite.", "var(--ink2)", "start", 11.5, 500)}
-  <style>.svc,.svp{animation:svin .45s ease-out both}.svt{animation:svw .45s ease-out both}@keyframes svin{from{opacity:0}to{opacity:1}}@keyframes svw{from{fill:var(--ink)}to{fill:#fff}}
-  .svt{fill:#fff}${RM}.svc,.svp,.svt{animation:none}}</style></svg>`;
+  <style>.svc,.svp{animation:svin .45s ease-out both}.svt{animation:svw .45s ease-out both}@keyframes svin{from{opacity:0}to{opacity:1}}@keyframes svw{from{fill:var(--ink)}to{fill:var(--on-acc)}}
+  .svt{fill:var(--on-acc)}${RM}.svc,.svp,.svt{animation:none}}</style></svg>`;
 place("L1", "Prime facts SSC repeats", KIT.fig("Sieve of Eratosthenes, 1 to 100", SV,
   "Watch the multiples of 2, then 3, 5 and 7 drop out. The 25 primes up to 100 are what remains: 4 below 10, 21 from 10 to 100 — and 2 is the only even one."));
 
@@ -51,7 +51,7 @@ if (CY.length !== 4) fail("number-system: expected four digits with cycle 4");
 const wheel = ([d, seq], i) => { const cx = 82 + i * 165, cy = 100, R = 44, pos = [[0, -1], [1, 0], [0, 1], [-1, 0]];
   return `<circle cx="${cx}" cy="${cy}" r="${R}" fill="var(--sheet)" stroke="var(--rule)" stroke-width="2"/>` +
     `<g class="cyw" style="transform-origin:${cx}px ${cy}px;animation-delay:${i * .25}s"><path d="M${cx} ${cy} L${cx} ${cy - R + 4}" stroke="var(--accent)" stroke-width="4" stroke-linecap="round"/></g>` +
-    `<circle cx="${cx}" cy="${cy}" r="16" fill="var(--accent)"/>` + T(cx, cy + 6, d, "#fff", "middle", 17) +
+    `<circle cx="${cx}" cy="${cy}" r="16" fill="var(--accent)"/>` + T(cx, cy + 6, d, "var(--on-acc)", "middle", 17) +
     seq.map((u, k) => { const [ux, uy] = pos[k], x = cx + ux * (R + 16), y = cy + uy * (R + 16);
       return `<circle cx="${x}" cy="${y}" r="15" fill="var(--blue-bg)" stroke="var(--blue)"/>` + T(x, y + 5, u, "var(--ink)", "middle", 14); }).join("") +
     T(cx, 200, "power ÷ 4 leaves", "var(--ink2)", "middle", 10.5, 500) + T(cx, 218, "1 · 2 · 3 · 0", "var(--ink2)", "middle", 12, 600) +
@@ -67,8 +67,8 @@ let tree = "";
 FT.forEach(([n, p], i) => { const x = 60 + i * 30, y = 30 + i * 46, last = i === FT.length - 1;
   tree += `<line x1="${x}" y1="${y}" x2="${x - 26}" y2="${y + 46}" stroke="var(--ink2)"/><line x1="${x}" y1="${y}" x2="${x + 30}" y2="${y + 46}" stroke="var(--ink2)"/>` +
     `<circle cx="${x}" cy="${y}" r="17" fill="var(--sheet)" stroke="var(--rule)"/>` + T(x, y + 4.5, n, "var(--ink)", "middle", 12) +
-    `<circle cx="${x - 26}" cy="${y + 46}" r="14" fill="var(--accent)"/>` + T(x - 26, y + 50.5, p, "#fff", "middle", 13) +
-    (last ? `<circle cx="${x + 30}" cy="${y + 46}" r="14" fill="var(--accent)"/>` + T(x + 30, y + 50.5, n / p, "#fff", "middle", 13) : ""); });
+    `<circle cx="${x - 26}" cy="${y + 46}" r="14" fill="var(--accent)"/>` + T(x - 26, y + 50.5, p, "var(--on-acc)", "middle", 13) +
+    (last ? `<circle cx="${x + 30}" cy="${y + 46}" r="14" fill="var(--accent)"/>` + T(x + 30, y + 50.5, n / p, "var(--on-acc)", "middle", 13) : ""); });
 const grid = (f5, y0) => { let g = T(262, y0 - 8, f5 === 1 ? "× 5⁰" : "× 5¹", "var(--accent)", "start", 12);
   ["2⁰", "2¹", "2²", "2³"].forEach((h, c) => { g += T(310 + c * 46 + 20, y0 + 10, h, "var(--ink2)", "middle", 10.5, 600); });
   ["3⁰", "3¹", "3²"].forEach((h, r) => { g += T(290, y0 + 34 + r * 28, h, "var(--ink2)", "middle", 10.5, 600);
@@ -109,12 +109,12 @@ const BC = `<svg class="dg" viewBox="0 0 660 300" role="img" aria-label="Convert
   <defs><marker id="bcup" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="var(--accent)"/></marker></defs>
   ${steps.map(([n, nq, r], i) => { const y = 30 + i * 38; return T(40, y + 18, "2", "var(--ink2)", "middle", 14) + `<path d="M52 ${y} V${y + 26} H130" fill="none" stroke="var(--ink2)" stroke-width="1.5"/>` +
     T(64, y + 18, n, "var(--ink)", "start", 14, 600) + T(150, y + 18, "remainder", "var(--ink2)", "start", 11, 500) +
-    `<circle cx="232" cy="${y + 13}" r="13" fill="${r ? "var(--accent)" : "var(--sunk)"}"/>` + T(232, y + 18, r, r ? "#fff" : "var(--ink)", "middle", 14); }).join("")}
+    `<circle cx="232" cy="${y + 13}" r="13" fill="${r ? "var(--accent)" : "var(--sunk)"}"/>` + T(232, y + 18, r, r ? "var(--on-acc)" : "var(--ink)", "middle", 14); }).join("")}
   ${T(64, 30 + steps.length * 38 + 18, "0", "var(--ink2)", "start", 14, 500)}
   <path d="M262 ${30 + (steps.length - 1) * 38 + 18} V36" stroke="var(--accent)" stroke-width="3" marker-end="url(#bcup)"/>${T(272, 150, "read up", "var(--accent)", "start", 12)}
   ${T(360, 50, "45 = " + bits + "₂", "var(--ink)", "start", 18)}
   ${[...bits].map((b, i) => { const v = 2 ** (bits.length - 1 - i), x = 360 + i * 46; return `<rect x="${x}" y="90" width="40" height="40" rx="7" fill="${b === "1" ? "var(--accent)" : "var(--sunk)"}"/>` +
-    T(x + 20, 117, b, b === "1" ? "#fff" : "var(--ink)", "middle", 18) + T(x + 20, 150, v, "var(--ink2)", "middle", 12, 600); }).join("")}
+    T(x + 20, 117, b, b === "1" ? "var(--on-acc)" : "var(--ink)", "middle", 18) + T(x + 20, 150, v, "var(--ink2)", "middle", 12, 600); }).join("")}
   ${T(360, 190, "Check: " + [...bits].map((b, i) => b === "1" ? 2 ** (bits.length - 1 - i) : 0).filter(Boolean).join(" + ") + " = 45", "var(--ink)", "start", 13)}
   ${T(360, 230, "Octal: group 3 bits → 101 101 = 55₈", "var(--ink2)", "start", 12, 500)}${T(360, 252, "Hex: group 4 bits → 0010 1101 = 2D₁₆", "var(--ink2)", "start", 12, 500)}</svg>`;
 place("L12", "How to convert", KIT.fig("Decimal → binary, and back", BC,
@@ -123,8 +123,8 @@ place("L12", "How to convert", KIT.fig("Decimal → binary, and back", BC,
 // L13 — the pictures behind two standard sums
 const N = 5, U = 30;
 let odd = "", tri = "";
-for (let k = N; k >= 1; k--) odd += `<rect x="30" y="${40 + (N - k) * 0}" width="${k * U}" height="${k * U}" fill="${["hsla(20,85%,55%,.6)", "hsla(212,75%,55%,.45)", "hsla(135,55%,45%,.42)", "hsla(42,95%,52%,.5)", "hsla(330,70%,58%,.38)"][k - 1]}" stroke="var(--rule)"/>`;
-for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) { const k = Math.max(r, c) + 1; if (r === k - 1 && c === k - 1) odd += T(30 + c * U + U / 2, 40 + r * U + 19, 2 * k - 1, "var(--ink2)", "middle", 11, 600); }
+for (let k = N; k >= 1; k--) odd += `<rect x="30" y="${40 + (N - k) * 0}" width="${k * U}" height="${k * U}" fill="${["hsla(20,85%,55%,.4)", "hsla(212,75%,55%,.32)", "hsla(135,55%,45%,.3)", "hsla(42,95%,52%,.34)", "hsla(330,70%,58%,.26)"][k - 1]}" stroke="var(--rule)"/>`;
+for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) { const k = Math.max(r, c) + 1; if (r === k - 1 && c === k - 1) odd += T(30 + c * U + U / 2, 40 + r * U + 19, 2 * k - 1, "var(--ink)", "middle", 11.5, 700); }
 for (let r = 0; r < N; r++) for (let c = 0; c <= N; c++) { const mine = c <= r; tri += `<rect x="${380 + c * U}" y="${40 + r * U}" width="${U - 2}" height="${U - 2}" rx="4" fill="${mine ? "var(--accent)" : "var(--blue-bg)"}" stroke="var(--rule)"/>`; }
 const SM = `<svg class="dg" viewBox="0 0 660 270" role="img" aria-label="Odd numbers build squares; two staircases make a rectangle">${odd}
   ${T(30, 28, "1 + 3 + 5 + 7 + 9 = 5²", "var(--ink)", "start", 14)}${T(30, 220, "each odd number is one more L", "var(--ink2)", "start", 11.5, 500)}${T(30, 238, "1 + 3 + … + (2n − 1) = n²", "var(--accent)", "start", 13)}

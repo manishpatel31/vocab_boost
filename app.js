@@ -250,7 +250,7 @@
         '<p>Every question you got wrong in any mini app or mock — practise them until they’re gone.</p><div class="hub-meta"><span>' + (totalWrong ? totalWrong + ' waiting' : 'Nothing to fix yet') + '</span><b>Open ›</b></div></button>' +
       '<button class="hub-card hub-act" data-hub-act="mock" style="--hub-c:var(--teal);"><div class="hub-top"><div class="hub-ico">⏱️</div><div><h3>Mixed mock test</h3><div class="hi">English + Maths + Reasoning + GS · timed</div></div>' + (last ? '<div class="hub-big">' + last.score + '<small>/' + last.max + '</small></div>' : '') + '</div>' +
         '<p>Vocab, Grammar, ' + mathQIds().length + ' Maths, ' + reasoningIds().length + ' Reasoning and ' + gsQIds().length + ' GS apps in one SSC-style paper, +2 / −0.5, with a subject-wise report.</p><div class="hub-meta"><span>' + (hist.length ? hist.length + ' taken · last ' + agoText(last.at).replace('Opened ', '') : 'Not taken yet') + '</span><b>Start ›</b></div></button>' +
-      weakHubCard() + plannerHubCard() +
+      todayHubCard() + weakHubCard() + plannerHubCard() +
       '</div></section>';
   }
   function weakHubCard(){
@@ -347,7 +347,9 @@
     var due = currentUser ? dueRevisions().length : 0, mist = totalMistakes();
     var ve = viewEntries(), mem = ve.filter(function(e){ return e.confidence >= 5; }).length, left = ve.length - mem;
     var row = function(act, ico, n, label, sub, cls){ return '<button class="home-due-row ' + (cls || '') + '" data-home-act="' + act + '"><span class="ic">' + ico + '</span><span class="tx"><b>' + label + '</b><small>' + sub + '</small></span><span class="n">' + n + '</span></button>'; };
+    var tc = todayCounts();
     return '<div class="home-card home-due"><div class="home-card-h">Waiting for you</div><div class="home-due-rows">' +
+      row('today', '🧠', tc.n, 'Today’s revision', tc.n ? tc.q + ' questions back for review · ' + tc.apps + ' apps · ' + tc.words + ' words' : 'All caught up for today', tc.n ? 'hot' : '') +
       row('revision', '🔁', due, 'Revision rounds', due ? 'Memorized words due back today' : 'Nothing due today', due ? 'hot' : '') +
       row('mistakes', '📕', mist, 'Mistakes book', mist ? 'Wrong answers from every subject' : 'No mistakes waiting', mist ? 'hot' : '') +
       row('library', '📖', left, 'Words to master', mem + ' of ' + ve.length + ' memorized', '') +
@@ -457,6 +459,7 @@
     if(a === 'goal') openGoalModal(!(myProfile && myProfile.dailyGoal));
     else if(a === 'exam') examsModal();
     else if(a === 'mistakes') openMistakes();
+    else if(a === 'today') openToday();
     else if(a === 'mock') openMock();
     else if(a === 'revision' || a === 'library' || a === 'quiz' || a === 'add' || a === 'tasks' || a === 'plan' || a === 'typing') switchTab(a);
     else if(a === 'word') openWordPreviewModal(el.dataset.id);
@@ -471,7 +474,7 @@
     var jump = ev.target.closest('[data-hub-jump]');
     if(jump){ var t = document.getElementById('hubsub-' + jump.dataset.hubJump); if(t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
     var act = ev.target.closest('[data-hub-act]');
-    if(act){ if(act.dataset.hubAct === 'mistakes') openMistakes(); else if(act.dataset.hubAct === 'weak') openWeak(); else if(act.dataset.hubAct === 'planner') openPlanner(); else openMock(); return; }
+    if(act){ if(act.dataset.hubAct === 'mistakes') openMistakes(); else if(act.dataset.hubAct === 'today') openToday(); else if(act.dataset.hubAct === 'weak') openWeak(); else if(act.dataset.hubAct === 'planner') openPlanner(); else openMock(); return; }
     var h = ev.target.closest('[data-home-act]');
     if(h) homeAction(h.dataset.homeAct, h);
   }
@@ -869,7 +872,7 @@
   function mathIds(){ return Object.keys(STUDY).filter(function(id){ return STUDY[id].subj === 'maths'; }); }
   function mathQIds(){ return mathIds().filter(function(id){ return !STUDY[id].noq; }); }
   function reasoningIds(){ return Object.keys(STUDY).filter(function(id){ return STUDY[id].subj === 'reasoning'; }); }
-  var STUDY_EXTRA = { mocks: { key: 'shabdMockHistory', title: 'Mixed mock history' }, tracker: { key: 'shabdTracker', title: 'Study tracker' }, todo: { key: 'shabdTodo', title: 'Tasks' }, planner: { key: 'shabdPlanner', title: 'Study planner' }, exams: { key: 'shabdExams', title: 'Exams' }, typing: { key: 'shabdTyping', title: 'Typing tests' } };
+  var STUDY_EXTRA = { mocks: { key: 'shabdMockHistory', title: 'Mixed mock history' }, tracker: { key: 'shabdTracker', title: 'Study tracker' }, todo: { key: 'shabdTodo', title: 'Tasks' }, planner: { key: 'shabdPlanner', title: 'Study planner' }, exams: { key: 'shabdExams', title: 'Exams' }, typing: { key: 'shabdTyping', title: 'Typing tests' }, review: { key: 'shabdReview', title: 'Spaced review' } };
   function studyMod(id){ return STUDY[id] || STUDY_EXTRA[id]; }
   // ================= Study tracker: one record per visit to a mini app =================
   // Stored in localStorage 'shabdTracker' and synced like the mini apps (users/{uid}/study/tracker).
@@ -1261,6 +1264,7 @@
   // ---- the practice / mock screen ----
   var drill = null, drillOpen = false, drillTimer = null;
   var MOD_NAME = { vocab: 'Vocabulary', grammar: 'Grammar 100', bns: 'BNS · BNSS · BSA', schemes: 'Govt Schemes', census: 'Census', intlorgs: 'Intl Organisations', reports: 'Reports & Indices', sports: 'Sports', festivals: 'Festivals', iprplans: 'IPR & Plans', folkdances: 'Folk Dances', appointments: 'Appointments', history: 'History', histancient: 'Ancient India', histmedieval: 'Medieval India', histmodern: 'Modern India', artculture: 'Art & Culture', worldhist: 'World History', computer: 'Computer Knowledge', polity: 'Polity', economics: 'Economy', space: 'Space', physics: 'Physics', chemistry: 'Chemistry', books: 'Books & Authors', days: 'Important Days', defence: 'Defence', awards: 'Awards & Honours', parks: 'Protected Areas', rivers: 'Rivers of India', natparks: 'National Parks', environment: 'Environment & Ecology', biology: 'Biology', geometry: 'Geometry', mensuration2d: 'Mensuration 2D', mensuration3d: 'Mensuration 3D', trigonometry: 'Trigonometry', numbersystem: 'Number System', calendar: 'Calendar', clock: 'Clock', voice: 'Active & Passive Voice', narration: 'Narration', formulas: 'Formula Book' };
+  Object.keys(STUDY).forEach(function(id){ if(!MOD_NAME[id]) MOD_NAME[id] = STUDY[id].title; });   // apps added later name themselves
   function openDrill(title){
     closeAllMenus();
     drillOpen = true;
@@ -2025,7 +2029,7 @@
     var d = drill;
     if(d.i >= d.qs.length && d.from){
       drillBody('<div class="dq-hero"><div class="eyebrow">Practice done · ' + escapeHtml(d.from.title) + '</div><h1>' + d.cleared + ' of ' + d.qs.length + ' right</h1><p>' +
-        (d.cleared === d.qs.length ? 'All right — this topic is getting stronger.' : 'Wrong ones went to the Mistakes book, and the topic’s accuracy is updated.') + '</p></div>' +
+        (d.from.doneText ? d.from.doneText(d) : d.cleared === d.qs.length ? 'All right — this topic is getting stronger.' : 'Wrong ones went to the Mistakes book, and the topic’s accuracy is updated.') + '</p></div>' +
         '<div class="dq-actions"><button class="btn teal" id="pdBack">' + escapeHtml(d.from.backLabel || 'Back to Weak spots') + '</button></div>');
       document.getElementById('pdBack').addEventListener('click', function(){ if(d.from.back) d.from.back(); else openWeak(); });
       return;
@@ -2042,18 +2046,112 @@
       '<div class="dq-card" style="--dq-c:' + (STUDY[q.mod] ? STUDY[q.mod].color : 'var(--mustard)') + '"><div class="dq-meta"><span>Q ' + (d.i + 1) + ' / ' + d.qs.length + '</span><span>' + escapeHtml(MOD_NAME[q.mod]) + '</span>' + (q.tag ? '<span>' + escapeHtml(q.tag) + '</span>' : '') + '</div>' +
       '<div class="dq-q">' + escapeHtml(q.q) + '</div><div class="dq-opts">' +
       q.o.map(function(_, i){ return optHtml(q, i, !answered ? '' : (i === q.a ? ' ok' : (i === q.pick ? ' no' : ''))); }).join('') + '</div>' +
-      (answered ? '<div class="dq-fb ' + (q.pick === q.a ? 'good' : 'bad') + '"><b>' + (d.from ? (q.pick === q.a ? 'Right.' : 'Not quite — added to your Mistakes book.') : (q.pick === q.a ? 'Right — removed from your Mistakes book.' : 'Not yet — it stays in the book.')) + '</b>' + (q.e ? '<div>' + escapeHtml(q.e) + '</div>' : '') + aiQBtn(q) + '</div>' : '') +
+      (answered ? '<div class="dq-fb ' + (q.pick === q.a ? 'good' : 'bad') + '"><b>' + (d.from && d.from.fb ? d.from.fb(q) : d.from ? (q.pick === q.a ? 'Right.' : 'Not quite — added to your Mistakes book.') : (q.pick === q.a ? 'Right — removed from your Mistakes book.' : 'Not yet — it stays in the book.')) + '</b>' + (q.e ? '<div>' + escapeHtml(q.e) + '</div>' : '') + aiQBtn(q) + '</div>' : '') +
       '</div><div class="dq-actions">' + (answered ? '<button class="btn teal" id="pNext">' + (d.i === d.qs.length - 1 ? 'Finish' : 'Next ›') + '</button>' : '<span class="help">Tip: press 1–4 on a keyboard</span>') + '</div>');
     if(!answered) document.querySelectorAll('#drillBody [data-opt]').forEach(function(b){ b.addEventListener('click', function(){
       q.pick = +b.dataset.opt;
       var ok = q.pick === q.a;
       if(ok) d.cleared++;
       if(STUDY[q.mod]) studyMark(q.mod, q.id, ok);
+      if(d.from && d.from.onAnswer) d.from.onAnswer(q, ok);
       addGoalExtra(GOAL_PER_Q);
       renderPractice();
     }); });
     var nb = document.getElementById('pNext');
     if(nb) nb.addEventListener('click', function(){ d.i++; renderPractice(); });
+  }
+
+  // ================= Today's revision: one queue for everything due =================
+  // Spaced review: every question you once got wrong — in a mini app, the Mistakes book or a mock — comes back after
+  // 1, 3, 7, 15 and 30 days; a right answer moves it to the next gap, a wrong one starts it again tomorrow, and a right
+  // answer after the 30-day gap retires it. Stored in localStorage 'shabdReview' and synced like the mini apps.
+  // { items: { 'module:questionId': [step, dueAt] }, at }
+  var REVIEW_GAPS = [1, 3, 7, 15, 30];
+  function reviewData(){ var r = studyState('review'); if(!r.items || typeof r.items !== 'object') r.items = {}; return r; }
+  /** Take in mistakes made anywhere since the last look; returns the store. */
+  function reviewSync(){
+    var r = reviewData(), now = Date.now(), added = 0;
+    Object.keys(STUDY).forEach(function(mid){
+      if(STUDY[mid].noq) return;
+      studyWrongIds(mid).forEach(function(qid){ var k = mid + ':' + qid; if(!r.items[k]){ r.items[k] = [0, now]; added++; } });
+    });
+    if(added){ r.at = now; setStudyState('review', r); }
+    return r;
+  }
+  function reviewDueKeys(r){
+    r = r || reviewSync();
+    var eod = endOfTodayMs();
+    return Object.keys(r.items).filter(function(k){ return r.items[k][1] <= eod; }).sort(function(a, b){ return r.items[a][1] - r.items[b][1]; });
+  }
+  function reviewAnswer(key, ok){
+    var r = reviewData(), it = r.items[key] || [0, Date.now()], step = it[0];
+    if(!ok) r.items[key] = [0, Date.now() + DAY_MS];
+    else if(step >= REVIEW_GAPS.length) delete r.items[key];
+    else r.items[key] = [step + 1, Date.now() + REVIEW_GAPS[step] * DAY_MS];
+    r.at = Date.now();
+    setStudyState('review', r);
+    return r.items[key] ? r.items[key] : null;
+  }
+  /** Everything due today, without loading the question bank: { q, apps, words, tasks, n }. */
+  function todayCounts(){
+    var q = reviewDueKeys().length, apps = trackDueList().length, words = currentUser ? dueRevisions().length : 0, tasks = todoLeftToday();
+    return { q: q, apps: apps, words: words, tasks: tasks, n: q + apps + words };
+  }
+  async function openToday(){
+    openDrill('Today’s revision');
+    drillBody('<p class="help">Gathering everything due today…</p>');
+    try{ await loadStudyBank(); }catch(e){ drillBody('<div class="dq-empty">Couldn’t load the question bank. Upload <b>study-bank.json</b> to your site and try again.</div>'); return; }
+    drill = { kind: 'today', phase: 'list' };
+    renderToday();
+  }
+  function renderToday(){
+    var r = reviewSync(), stale = Object.keys(r.items).filter(function(k){ return !studyBankIdx[k]; });
+    if(stale.length){ stale.forEach(function(k){ delete r.items[k]; }); r.at = Date.now(); setStudyState('review', r); }   // questions since removed from the apps
+    var keys = reviewDueKeys(r), apps = trackDueList(), words = currentUser ? dueRevisions().length : 0, tasks = todoLeftToday();
+    var all = Object.keys(r.items), byMod = {};
+    keys.forEach(function(k){ var m = k.split(':')[0]; byMod[m] = (byMod[m] || 0) + 1; });
+    // the next seven days, so a light day can take a little extra
+    var days = [], eod = endOfTodayMs(), max = 1;
+    for(var i = 0; i < 7; i++){
+      var from = i ? eod + (i - 1) * DAY_MS : -Infinity, to = eod + i * DAY_MS;
+      var n = all.filter(function(k){ return r.items[k][1] > from && r.items[k][1] <= to; }).length;
+      max = Math.max(max, n); days.push({ n: n, l: i ? 'SMTWTFS'.charAt(new Date(Date.now() + i * DAY_MS).getDay()) : 'Today' });
+    }
+    var take = Math.min(keys.length, 20), stepOf = function(k){ return r.items[k][0]; };
+    var html = '<div class="dq-hero"><div class="eyebrow">' + escapeHtml(new Date().toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'long' })) + '</div><h1>Today’s revision</h1>' +
+      '<p>One list for everything due: questions you once got wrong come back after 1, 3, 7, 15 and 30 days, apps you haven’t revised in a while, words due back and today’s tasks.</p></div>' +
+      '<div class="wk-h">1 · Questions to review <span class="lvl">' + keys.length + ' due · ' + all.length + ' in the queue</span></div>' +
+      (keys.length ?
+        '<div class="dq-chips">' + Object.keys(byMod).sort(function(a, b){ return byMod[b] - byMod[a]; }).map(function(m){ return '<span class="dq-chip" style="--dq-c:' + (STUDY[m] ? STUDY[m].color : 'var(--mustard)') + '">' + escapeHtml(MOD_NAME[m] || m) + ' · ' + byMod[m] + '</span>'; }).join('') + '</div>' +
+        '<div class="dq-actions"><button class="btn teal" id="tdStart">Start ' + take + (keys.length > take ? ' of ' + keys.length : '') + ' ›</button></div>' :
+        '<div class="dq-empty" style="padding:18px;">' + (all.length ? 'Nothing due today. 🎉' : 'Nothing in the queue yet — every question you get wrong anywhere joins it.') + '</div>') +
+      (all.length ? '<div class="rq-week" aria-label="Questions due in the next 7 days">' + days.map(function(d){ return '<div class="tdd" title="' + d.n + ' due"><span class="tdb" style="height:' + Math.max(3, Math.round(d.n * 36 / max)) + 'px"></span><b>' + d.n + '</b><span>' + d.l + '</span></div>'; }).join('') + '</div>' : '') +
+      '<div class="wk-h">2 · Apps to revise <span class="lvl">every ' + trackEvery() + ' days</span></div>' +
+      (apps.length ? '<div class="rq-apps">' + apps.slice(0, 8).map(function(x){
+          return '<div class="rv-row" style="--hub-c:' + x.m.color + ';"><span class="ic">' + x.m.ico + '</span><span class="tx"><b>' + escapeHtml(x.m.title) + '</b><small>' + (x.lastStudy ? 'Last studied ' + trackAgo(x.lastStudy) : 'Last opened ' + trackAgo(x.base)) + ' · ≈ ' + fmtMin(x.revMin) + '</small></span>' +
+            '<button class="btn teal sm" data-open-study="' + x.id + '">Revise</button></div>'; }).join('') + (apps.length > 8 ? '<p class="help">+ ' + (apps.length - 8) + ' more in the study tracker.</p>' : '') + '</div>' :
+        '<div class="dq-empty" style="padding:18px;">No app is due for revision.</div>') +
+      '<div class="wk-h">3 · Words and tasks</div><div class="rq-more">' +
+        '<button class="home-due-row' + (words ? ' hot' : '') + '" data-td-go="revision"><span class="ic">🔁</span><span class="tx"><b>Words due back</b><small>' + (currentUser ? (words ? 'Revision rounds for memorized words' : 'Nothing due today') : 'Sign in to keep revision rounds') + '</small></span><span class="n">' + words + '</span></button>' +
+        '<button class="home-due-row' + (tasks ? ' hot' : '') + '" data-td-go="tasks"><span class="ic">✅</span><span class="tx"><b>Tasks</b><small>' + (tasks ? 'Left on today’s list' : 'Nothing left today') + '</small></span><span class="n">' + tasks + '</span></button></div>';
+    drillBody(html);
+    var st = document.getElementById('tdStart');
+    if(st) st.addEventListener('click', function(){
+      var pick = keys.slice(0, take).map(function(k){ return studyBankIdx[k]; }).filter(Boolean);
+      startPractice(shuffleArr(pick).map(prepQ), { title: 'Today’s revision', backLabel: 'Back to Today',
+        back: function(){ drill = { kind: 'today', phase: 'list' }; document.getElementById('drillTitle').textContent = 'Today’s revision'; renderToday(); },
+        onAnswer: function(q, ok){ q.next = reviewAnswer(q.mod + ':' + q.id, ok); },
+        fb: function(q){ if(q.pick !== q.a) return 'Not quite — it comes back tomorrow.'; return q.next ? 'Right — next review in ' + REVIEW_GAPS[q.next[0] - 1] + ' day' + (REVIEW_GAPS[q.next[0] - 1] === 1 ? '' : 's') + '.' : 'Right — learnt for good. It leaves the queue.'; },
+        doneText: function(d){ return d.cleared === d.qs.length ? 'All right — each one moves to a longer gap.' : 'Right ones move to a longer gap; the ones you missed come back tomorrow.'; } });
+    });
+    document.querySelectorAll('#drillBody [data-open-study]').forEach(function(b){ b.addEventListener('click', function(ev){ ev.stopPropagation(); closeDrill(false); openStudy(b.dataset.openStudy, false); }); });
+    document.querySelectorAll('#drillBody [data-td-go]').forEach(function(b){ b.addEventListener('click', function(){ closeDrill(false); switchTab(b.dataset.tdGo); }); });
+  }
+  function todayHubCard(){
+    var c = todayCounts();
+    return '<button class="hub-card hub-act" data-hub-act="today" style="--hub-c:var(--teal);"><div class="hub-top"><div class="hub-ico">🧠</div><div><h3>Today’s revision</h3><div class="hi">आज का रिवीज़न · one queue</div></div><div class="hub-big">' + c.n + '</div></div>' +
+      '<p>Old mistakes back on 1 · 3 · 7 · 15 · 30-day gaps, apps due for revision and words due back — in one list.</p>' +
+      '<div class="hub-meta"><span>' + (c.n ? c.q + ' questions · ' + c.apps + ' apps · ' + c.words + ' words' : 'All caught up') + '</span><b>Open ›</b></div></button>';
   }
 
   // Weak spots: accuracy by subject → app → topic, from the last answer to every question
@@ -2112,6 +2210,7 @@
       return '<div class="wk-subj" style="--dq-c:' + g[2] + '"><b>' + (t ? Math.round(r * 100 / t) + '%' : '—') + '</b><span>' + g[1] + ' · ' + t + ' of ' + n + ' tried</span></div>';
     }).join('') + '</div>';
     html += '<div class="wk-h">Weakest topics</div><p class="wk-note">Topics with at least 3 answers and under 80% right, weakest first.</p>' +
+      (weak.length ? '<div class="dq-actions" style="justify-content:flex-start;margin:6px 0 10px;"><button class="btn teal" id="wkMock">⏱️ Timed mock from these topics · 25 Q</button></div>' : '') +
       (weak.length ? '<div class="wk-list">' + weak.map(function(t){ return weakRow(t, true); }).join('') + '</div>' : '<div class="dq-empty" style="padding:20px;">No weak topics right now — everything you’ve tried is 80% or better. 💪</div>');
     if(untouched.length) html += '<div class="wk-h">Not started</div><p class="wk-note">Apps with no answers yet — even one quick practice shows where you stand.</p>' +
       '<div class="dq-chips">' + untouched.map(function(a){ return '<button data-open-study="' + a.mod + '" style="--dq-c:' + STUDY[a.mod].color + '">' + escapeHtml(a.name) + ' · ' + a.total + ' Qs</button>'; }).join('') + '</div>';
@@ -2127,6 +2226,8 @@
     });
     drillBody(html);
     var find = function(v){ var p = v.split('|'), mid = p[0], tag = p.slice(1).join('|'); return W.topics.filter(function(t){ return t.mod === mid && t.tag === tag; })[0]; };
+    var wm = document.getElementById('wkMock');
+    if(wm) wm.addEventListener('click', function(){ weakMock(weak); });
     document.querySelectorAll('#drillBody [data-wk-go]').forEach(function(b){ b.addEventListener('click', function(){
       var t = find(b.dataset.wkGo); if(!t) return;
       var ans = studyState(t.mod).ans || {};
@@ -2183,6 +2284,7 @@
     var rsTog = function(m){ return '<button class="dq-tog' + (c.rsMods.indexOf(m) !== -1 ? ' on' : '') + '" data-rsmod="' + m + '">' + escapeHtml(MOD_NAME[m]) + '</button>'; };
     var hist = mockHistory().slice(-5).reverse();
     drillBody('<div class="dq-hero"><div class="eyebrow">English + Maths + Reasoning + General Studies · SSC pattern</div><h1>Mixed mock test</h1><p>Questions from your vocab register and every mini app, timed like Tier 1 (36 seconds a question), marked +2 / −0.5. Wrong answers go to your Mistakes book.</p></div>' +
+      '<div class="dq-chips mk-presets"><button data-preset="full">Full Tier 1 · 100 Q · 60 min</button><button data-preset="half">Half paper · 40 Q · 24 min</button><button data-preset="gs">GS only · 25 Q · 15 min</button></div>' +
       '<div class="dq-setup">' +
         '<div class="dq-box"><h3>English</h3>' + seg('en', [0, 10, 25]) + '<div class="dq-tags">' + tog('vocab', 'Vocabulary (' + words.length + ' words)') + tog('grammar', 'Grammar 100') + tog('voice', 'Active & Passive Voice') + tog('narration', 'Narration') + '</div></div>' +
         '<div class="dq-box"><h3>General Studies</h3>' + seg('gs', [0, 10, 25]) + '<div class="dq-tags">' + GS_SUBJECTS.map(function(g){ var l = gsQIds().filter(function(id){ return STUDY[id].gsub === g[0]; }); return l.length ? '<div class="dq-gsub"><span>' + g[1] + '</span>' + l.map(gsTog).join('') + '</div>' : ''; }).join('') + gsQIds().filter(function(id){ return !STUDY[id].gsub; }).map(gsTog).join('') + '</div></div>' +
@@ -2195,6 +2297,12 @@
         return '<div><b>' + h.score + ' / ' + h.max + '</b><span>' + new Date(h.at).toLocaleDateString([], { day: 'numeric', month: 'short' }) + ' · English ' + h.en.r + '/' + h.en.t + (h.mt && h.mt.t ? ' · Maths ' + h.mt.r + '/' + h.mt.t : '') + (h.rs && h.rs.t ? ' · Reasoning ' + h.rs.r + '/' + h.rs.t : '') + ' · GS ' + h.gs.r + '/' + h.gs.t + '</span></div>';
       }).join('') + '</div>' : ''));
     document.querySelectorAll('#drillBody [data-cfg]').forEach(function(b){ b.addEventListener('click', function(){ mockCfg[b.dataset.cfg] = +b.dataset.val; saveMockCfg(); renderMockSetup(); }); });
+    document.querySelectorAll('#drillBody [data-preset]').forEach(function(b){ b.addEventListener('click', function(){
+      var p = { full: [25, 25, 25, 25], half: [10, 10, 10, 10], gs: [0, 25, 0, 0] }[b.dataset.preset];
+      mockCfg.en = p[0]; mockCfg.gs = p[1]; mockCfg.mt = p[2]; mockCfg.rs = reasoningIds().length ? p[3] : 0; mockCfg.neg = true;
+      mockCfg.gsMods = gsQIds(); mockCfg.mtMods = mathQIds(); mockCfg.rsMods = reasoningIds();   // the whole syllabus
+      saveMockCfg(); renderMockSetup();
+    }); });
     document.querySelectorAll('#drillBody [data-tog]').forEach(function(b){ b.addEventListener('click', function(){ mockCfg[b.dataset.tog] = !mockCfg[b.dataset.tog]; saveMockCfg(); renderMockSetup(); }); });
     document.querySelectorAll('#drillBody [data-gsmod]').forEach(function(b){ b.addEventListener('click', function(){
       var m = b.dataset.gsmod, i = mockCfg.gsMods.indexOf(m);
@@ -2304,7 +2412,8 @@
         (sec.gs.t ? '<div><b>' + pct(sec.gs.r, sec.gs.t) + '</b><span>General Studies · ' + sec.gs.r + '/' + sec.gs.t + '</span></div>' : '') +
         Object.keys(byMod).map(function(m){ return '<div style="--dq-c:' + (STUDY[m] ? STUDY[m].color : 'var(--mustard)') + '"><b>' + pct(byMod[m].r, byMod[m].t) + '</b><span>' + escapeHtml(MOD_NAME[m]) + ' · ' + byMod[m].r + '/' + byMod[m].t + '</span></div>'; }).join('') +
       '</div>' +
-      '<div class="dq-actions"><button class="btn teal" id="mkAgain">' + (d.back ? 'Back to Ask AI' : 'New mock test') + '</button><button class="btn ghost" id="mkMist">Open Mistakes book</button></div>' +
+      mockTopicsHtml(review) +
+      '<div class="dq-actions"><button class="btn teal" id="mkAgain">' + (d.back ? escapeHtml(d.backLabel || 'Back to Ask AI') : 'New mock test') + '</button><button class="btn ghost" id="mkMist">Open Mistakes book</button></div>' +
       (review.length ? '<h3 class="dq-h3">Review · ' + review.length + ' to learn</h3><div class="dq-list">' + review.map(function(q){
         return '<div class="dq-rev" style="--dq-c:' + (STUDY[q.mod] ? STUDY[q.mod].color : 'var(--mustard)') + '"><div class="dq-meta"><span>' + escapeHtml(MOD_NAME[q.mod]) + '</span>' + (q.tag ? '<span>' + escapeHtml(q.tag) + '</span>' : '') + '<span>' + (q.pick === null ? 'Skipped' : 'You chose ' + 'ABCD'.charAt(q.pick)) + '</span></div>' +
           '<div class="dq-q">' + escapeHtml(q.q) + '</div>' +
@@ -2313,6 +2422,28 @@
       }).join('') + '</div>' : '<div class="dq-empty">Perfect paper. 🏆</div>'));
     document.getElementById('mkAgain').addEventListener('click', function(){ if(d.back){ d.back(); return; } drill = { kind: 'mock', phase: 'setup' }; renderMockSetup(); });
     document.getElementById('mkMist').addEventListener('click', function(){ document.getElementById('drillTitle').textContent = 'Mistakes book'; drill = { kind: 'mistakes', phase: 'list', only: null }; renderMistakes(); });
+  }
+  /** After a mock: the topics where marks were lost, worst first, with one button to practise those questions. */
+  function mockTopicsHtml(review){
+    var t = {}, list;
+    review.forEach(function(q){ if(!STUDY[q.mod]) return; var k = q.mod + '|' + (q.tag || 'Other'); (t[k] = t[k] || { mod: q.mod, tag: q.tag || 'Other', n: 0, skip: 0 }).n++; if(q.pick === null) t[k].skip++; });
+    list = Object.keys(t).map(function(k){ return t[k]; }).sort(function(a, b){ return b.n - a.n; });
+    if(!list.length) return '';
+    return '<h3 class="dq-h3">Topics to revise</h3><div class="dq-chips">' + list.slice(0, 10).map(function(x){
+      return '<span class="dq-chip" style="--dq-c:' + STUDY[x.mod].color + '">' + escapeHtml(MOD_NAME[x.mod] || x.mod) + ' · ' + escapeHtml(x.tag) + ' · ' + x.n + (x.skip ? ' (' + x.skip + ' skipped)' : '') + '</span>'; }).join('') + '</div>' +
+      '<p class="help" style="margin-top:0;">Wrong answers are in your Mistakes book and come back in Today’s revision after 1, 3, 7, 15 and 30 days.</p>';
+  }
+  /** A timed mock from your weakest topics: wrong answers first, then questions not tried yet. */
+  function weakMock(weak){
+    var SEC = { gs: 'gs', maths: 'mt', reasoning: 'rs', english: 'en' }, per = Math.max(2, Math.ceil(25 / Math.max(1, weak.length))), qs = [];
+    weak.forEach(function(t){
+      var ans = studyState(t.mod).ans || {};
+      var pick = shuffleArr(t.qs.filter(function(q){ return ans[q.id] === 0; })).concat(shuffleArr(t.qs.filter(function(q){ return ans[q.id] !== 0 && ans[q.id] !== 1; })), shuffleArr(t.qs.filter(function(q){ return ans[q.id] === 1; })));
+      pick.slice(0, per).forEach(function(q){ var x = prepQ(q); x.sec = SEC[t.g] || 'gs'; qs.push(x); });
+    });
+    qs = shuffleArr(qs).slice(0, 25);
+    if(!qs.length){ showToast('No questions in your weak topics yet.'); return; }
+    beginMock(qs, { topic: 'Weak topics', back: function(){ drill = { kind: 'weak', phase: 'list' }; document.getElementById('drillTitle').textContent = 'Weak spots'; renderWeak(); }, backLabel: 'Back to Weak spots' });
   }
   document.addEventListener('keydown', function(ev){
     if(!drillOpen || !drill || ev.target.closest && ev.target.closest('input,textarea,select')) return;

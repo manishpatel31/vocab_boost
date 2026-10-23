@@ -178,5 +178,9 @@ The chapter apps built by `build_app.py` (Number System, Clock, Calendar) get th
 `tools/hand/<folder>.visual.js` exists, `build_app.py` runs apply-hand on the page it has just written, so a rebuild keeps the pictures.
 A figure may animate with CSS or SMIL (`<animate>`); study-visual.js starts SMIL animations when the figure scrolls into view,
 because Chrome leaves them still in figures drawn after the page has loaded.
+Colours: draw with the theme variables (`var(--ink)`, `var(--accent)`, `var(--sheet)` …); text on an accent-coloured shape takes
+`var(--on-acc)` (white in light mode, near-black in dark). As a safety net, study-visual.js measures every label of a figure
+against the shapes painted behind it when the figure comes into view, and nudges any label under 3:1 contrast lighter or darker
+(again whenever the theme changes).
 
 For any of these, bump `VERSION` in `sw.js` (or run `node tools/stamp.js` if `app.js` changed).

@@ -46,8 +46,9 @@ button{font:inherit;color:inherit}
 
 /* bottom nav */
 .nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--sheet);border-top:1px solid var(--rule);padding-bottom:env(safe-area-inset-bottom,0px)}
-.nav-in{max-width:640px;margin:0 auto;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;height:var(--nav-h)}
-.nav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;font-weight:600;color:var(--ink2);cursor:pointer}
+.nav-in{max-width:640px;margin:0 auto;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);height:var(--nav-h)}
+.nav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;font-weight:600;color:var(--ink2);cursor:pointer;min-width:0}
+.nav button span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .nav button[aria-current="page"]{color:var(--blue)}
 .nav button[aria-current="page"] span{border-bottom:2px solid var(--blue)}
@@ -121,8 +122,8 @@ p{margin:0}
 .facts{display:grid;gap:0}
 .facts div{display:grid;grid-template-columns:minmax(0,42%) minmax(0,1fr);gap:10px;padding:7px 0;border-top:1px dashed var(--rule)}
 .facts div:first-child{border-top:0}
-.facts dt{font-size:14px;color:var(--ink2);margin:0}
-.facts dd{margin:0;font-weight:600;min-width:0}
+.facts dt{font-size:14px;color:var(--ink2);margin:0;overflow-wrap:anywhere}
+.facts dd{margin:0;font-weight:600;min-width:0;overflow-wrap:anywhere}
 .facts.prose dd{font-weight:400;line-height:1.55}
 .tl{display:grid;gap:0;margin:0;padding:0;list-style:none}
 .tl li{display:grid;grid-template-columns:104px 1fr;gap:10px;padding:8px 0;border-top:1px dashed var(--rule)}
@@ -136,7 +137,7 @@ p{margin:0}
 .trick .lab{color:var(--accent)}
 .trap .lab{color:var(--bad)}
 .link .lab{color:var(--ink2)}
-.mn{font-family:var(--f-num);font-weight:600;background:var(--sheet);border-radius:6px;padding:1px 6px;white-space:nowrap}
+.mn{font-family:var(--f-num);font-weight:600;background:var(--sheet);border-radius:6px;padding:1px 6px;overflow-wrap:anywhere;-webkit-box-decoration-break:clone;box-decoration-break:clone}
 .tbl{overflow-x:auto;margin:0 -2px}
 table{border-collapse:collapse;width:100%;font-size:14px}
 th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:top}

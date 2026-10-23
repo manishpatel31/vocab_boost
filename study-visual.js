@@ -569,7 +569,7 @@ const RV_CSS = `.imap .rv{fill:none;stroke-width:1.7;stroke-linecap:round;stroke
 .imap .rvl{font:700 10.5px var(--f-body);paint-order:stroke;stroke:var(--sheet);stroke-width:3px;pointer-events:none}
 .imap .off{opacity:.08!important}.imap .rvl.off{opacity:0!important}
 .rvchips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}.rvchips i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
-.rvchips [aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}`;
+.rvchips [aria-pressed="true"]{background:var(--accent);color:var(--on-acc);border-color:var(--accent)}`;
 /* ============================================================
    ZOOM — every map and diagram gets ＋ − ⛶ : zoom in place (drag to move), or open it full screen
    (pinch, mouse wheel, drag, double-tap). Works by changing the SVG's viewBox, so it stays sharp.
@@ -634,11 +634,62 @@ function zmFull(svg, title){
     begun by hand, so begin them whenever the figure comes into view, and after every move. */
 function smilKick(svg){ svg.querySelectorAll("animate,animateMotion,animateTransform").forEach(a => { try { a.beginElement(); } catch (e) {} }); }
 const smilSeen = "IntersectionObserver" in window ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) smilKick(e.target); })) : null;
+/** Contrast guard: a label drawn for one theme can vanish in the other (a fixed dark colour on the dark page, white on a
+    pale fill). When a diagram comes into view, each label is measured against what is painted behind it, worked out from
+    the SVG's own shapes; a label under 3:1 is nudged lighter or darker until it reads (4.5:1). It runs again when the
+    theme changes, starting from the colours the diagram was drawn with. */
+const CG = { rgb: s => { const m = String(s).match(/rgba?\(([^)]+)\)/); if (!m) return null; const v = m[1].split(/[\s,\/]+/).filter(Boolean).map(Number); return [v[0], v[1], v[2], v.length > 3 ? v[3] : 1]; },
+  lum: c => { const f = x => { x /= 255; return x <= .03928 ? x / 12.92 : Math.pow((x + .055) / 1.055, 2.4); }; return .2126 * f(c[0]) + .7152 * f(c[1]) + .0722 * f(c[2]); },
+  over: (t, u) => [0, 1, 2].map(i => t[i] * t[3] + u[i] * (1 - t[3])).concat(1),
+  mix: (c, d, k) => [0, 1, 2].map(i => Math.round(c[i] + (d[i] - c[i]) * k)) };
+CG.ratio = (a, b) => { const x = CG.lum(a), y = CG.lum(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
+function cgPage(el){ for (let e = el; e && e.nodeType === 1; e = e.parentElement) { const c = CG.rgb(getComputedStyle(e).backgroundColor); if (c && c[3] > 0) return c[3] < 1 ? CG.over(c, cgPage(e.parentElement) || [255, 255, 255, 1]) : c; } return [255, 255, 255, 1]; }
+function contrastGuard(svg){
+  const texts = [...svg.querySelectorAll("text")]; if (!texts.length || !svg.getScreenCTM()) return;
+  texts.forEach(t => { if (t.dataset.cg0 !== undefined) { t.style.fill = t.dataset.cg0; delete t.dataset.cg0; } });
+  const all = [...svg.querySelectorAll("*")], page = cgPage(svg), SH = /^(rect|circle|ellipse|path|polygon)$/;
+  texts.forEach(t => {
+    const cs = getComputedStyle(t); if (cs.display === "none" || cs.visibility === "hidden" || +cs.opacity === 0 || !t.textContent.trim()) return;
+    if (cs.stroke !== "none" && parseFloat(cs.strokeWidth) >= 1.5) return;                       // already has a halo
+    const fg = CG.rgb(cs.fill); if (!fg) return;
+    let bb; try { bb = t.getBBox(); } catch (e) { return; } if (!bb.width) return;
+    const m = t.getScreenCTM(); if (!m) return;
+    const sp = new DOMPoint(bb.x + bb.width / 2, bb.y + bb.height / 2).matrixTransform(m);
+    const layers = [];
+    for (let k = all.indexOf(t) - 1; k >= 0; k--) {
+      const e = all[k]; if (!SH.test(e.tagName) || e.closest("defs,clipPath,mask,marker,pattern") || t.contains(e)) continue;
+      const ec = getComputedStyle(e); if (ec.fill === "none" || ec.display === "none" || ec.visibility === "hidden") continue;
+      const em = e.getScreenCTM(); if (!em) continue;
+      const lp = sp.matrixTransform(em.inverse()); let hit = false;
+      try { hit = e.isPointInFill(new DOMPoint(lp.x, lp.y)); } catch (x) { hit = false; } if (!hit) continue;
+      const f = CG.rgb(ec.fill); if (!f) return;                                                   // a gradient or pattern: leave it
+      let op = +ec.fillOpacity * +ec.opacity; for (let a = e.parentElement; a && a !== svg; a = a.parentElement) op *= +getComputedStyle(a).opacity;
+      layers.push([f[0], f[1], f[2], f[3] * op]); if (f[3] * op >= .99) break;
+    }
+    let bg = page; for (let k = layers.length - 1; k >= 0; k--) bg = CG.over(layers[k], bg);
+    if (CG.ratio(fg, bg) >= 3) return;
+    const W = [255, 255, 255], D = [20, 17, 13], to = CG.ratio(W, bg) >= CG.ratio(D, bg) ? W : D;   // whichever end reads better on this background
+    let c = fg; for (let k = .1; k <= 1.001 && CG.ratio(c, bg) < 4.5; k += .1) c = CG.mix(fg, to, k);
+    t.dataset.cg0 = t.style.fill || ""; t.style.fill = `rgb(${c.join(",")})`;
+  });
+}
+/** Measure once the figure's entry animations (bars growing, cards fading in) have finished, so shapes are where they end up. */
+function cgWhenStill(svg){
+  let anims = []; try { anims = svg.getAnimations({ subtree: true }).filter(a => { const t = a.effect && a.effect.getComputedTiming(); return t && t.iterations !== Infinity; }); } catch (e) {}
+  Promise.race([Promise.all(anims.map(a => a.finished.catch(() => {}))), new Promise(r => setTimeout(r, 4000))]).then(() => requestAnimationFrame(() => contrastGuard(svg)));
+}
+const cgSeen = "IntersectionObserver" in window ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { cgSeen.unobserve(e.target); cgWhenStill(e.target); } }), { rootMargin: "200px" }) : null;
+function cgWatch(svg){ if (cgSeen) cgSeen.observe(svg); else contrastGuard(svg); }
+// the theme can change while a page is open: check every diagram again as it comes into view
+(() => { const again = () => document.querySelectorAll("svg[data-zm]").forEach(cgWatch);
+  try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", again); } catch (e) {}
+  new MutationObserver(again).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "data-skin"] }); })();
 function zmScan(root){
   (root || document).querySelectorAll("svg.imap:not([data-zm]), svg.wmap:not([data-zm]), .phblock figure.fig svg.dg:not([data-zm])").forEach(svg => {
     svg.dataset.zm = 1; if (!svg.viewBox || !svg.viewBox.baseVal || !svg.viewBox.baseVal.width) return;
     const wrap = document.createElement("div"); wrap.className = "zm-wrap"; svg.parentNode.insertBefore(wrap, svg); wrap.appendChild(svg);
     if (svg.querySelector("animate,animateMotion,animateTransform")) { if (smilSeen) smilSeen.observe(svg); else smilKick(svg); }
+    cgWatch(svg);
     const bar = document.createElement("div"); bar.className = "zm-bar";
     bar.innerHTML = `<button type="button" data-zi aria-label="Zoom in">＋</button><button type="button" data-zo aria-label="Zoom out">−</button><button type="button" data-z0 aria-label="Reset zoom" hidden>⟲</button><button type="button" data-zf aria-label="Full screen">⛶</button>`;
     wrap.appendChild(bar); svg._bar = bar; zmBox(svg);
@@ -663,6 +714,12 @@ svg.zoomed{touch-action:none;cursor:grab}
 html.zm-lock,html.zm-lock body{overflow:hidden}`;
 function visInit(){
   if (!document.getElementById("viscss")) { const st = document.createElement("style"); st.id = "viscss"; st.textContent = `/* diagrams (SVG) — colours follow the theme */
+:root{--on-acc:#fff}
+/* the bottom tab bar: every tab gets an equal share, however many tabs a page has (hand-built pages fix it at 4) */
+/* long unbreakable words (paths, e-mail addresses) must not push the page sideways on a phone */
+.facts dt,.facts dd,dl.rk dt,dl.rk dd{overflow-wrap:anywhere}
+.nav-in{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr)}.nav button{min-width:0}.nav button span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--on-acc:#1a140c}}:root[data-theme="dark"]{--on-acc:#1a140c}
 .dg{font-family:var(--f-body)}
 .dg text{fill:var(--ink)} .dg .b{font-weight:700} .dg .mut{fill:var(--ink2);font-weight:500} .dg .acc-t{fill:var(--accent)}
 .dg .grid{stroke:var(--rule);stroke-width:1} .dg .card{fill:var(--sheet);stroke:var(--rule)} .dg .acc{fill:var(--accent)} .dg .blu{fill:var(--blue)}
@@ -710,7 +767,7 @@ ${RV_CSS}
 .imap .pin{fill:var(--accent);stroke:var(--sheet);stroke-width:1.5}
 .imap .pn{font:700 13px var(--f-body);fill:var(--ink);paint-order:stroke;stroke:var(--sheet);stroke-width:3px}
 .imap .pnote{font:500 10px var(--f-body);fill:var(--ink2);paint-order:stroke;stroke:var(--sheet);stroke-width:3px}
-.imap .pbn{font:800 10.5px var(--f-body);fill:#fff;text-anchor:middle;pointer-events:none}
+.imap .pbn{font:800 10.5px var(--f-body);fill:var(--on-acc);text-anchor:middle;pointer-events:none}
 .map-side .plist li{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:baseline}
 .map-side .plist li span{color:var(--ink2);font-size:13.5px;flex:1 1 60%}
 .map-panel h3{margin:0 0 4px}
@@ -733,7 +790,7 @@ ${RV_CSS}
 .cal-g{grid-column:1/-1;display:grid;grid-template-columns:repeat(7,1fr);gap:2px;font:500 10.5px var(--f-num);text-align:center}
 .cal-g i{font-style:normal;color:var(--ink2);font-weight:700}
 .cal-g span{padding:2px 0;border-radius:5px;color:var(--ink2)}
-.cal-g .on{background:var(--accent);color:#fff;font-weight:700}
+.cal-g .on{background:var(--accent);color:var(--on-acc);font-weight:700}
 .cal-m ul{margin:8px 0 2px;padding-left:0;list-style:none;font-size:13px;display:grid;gap:4px}
 .cal-m li b{display:inline-block;min-width:24px;color:var(--accent)}
 .shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:12px}
@@ -742,7 +799,7 @@ ${RV_CSS}
 .bk b{font:700 14.5px/1.22 var(--f-display,Georgia,serif);overflow-wrap:break-word;hyphens:auto}.bk i{display:block;width:28px;height:2px;background:rgba(255,255,255,.6)}
 .bk small{margin-top:auto;font-size:11.5px;opacity:.9;line-height:1.3}.bk .bdg{margin-top:auto;align-self:flex-start;background:#f2c14e;color:#3a2a00;font:800 10px var(--f-body);padding:3px 7px;border-radius:99px}.bk .bdg + small{margin-top:2px}
 .vtl{position:relative;display:grid;gap:10px;padding:4px 0}.vtl::before{content:"";position:absolute;left:31px;top:8px;bottom:8px;width:3px;border-radius:2px;background:color-mix(in srgb,var(--accent) 45%,transparent)}
-.vt{display:grid;grid-template-columns:66px 1fr;gap:10px;align-items:start;position:relative}.vt .vy{justify-self:center;position:relative;background:var(--accent);color:#fff;font:700 12px var(--f-num);padding:3px 8px;border-radius:99px}
+.vt{display:grid;grid-template-columns:66px 1fr;gap:10px;align-items:start;position:relative}.vt .vy{justify-self:center;position:relative;background:var(--accent);color:var(--on-acc);font:700 12px var(--f-num);padding:3px 8px;border-radius:99px}
 .vt > div b{font-size:14.5px}.vt small{display:block;color:var(--ink2);font-size:12.5px;line-height:1.35}
 .anim-in{animation:visin .5s ease both}
 @keyframes visin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
