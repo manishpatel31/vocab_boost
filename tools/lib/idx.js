@@ -32,7 +32,7 @@ function lessonEntry(l){ const parts = []; l.blocks.forEach(b => parts.push(...b
 const hash = s => { let h = 5381; for (let i=0;i<s.length;i++) h = ((h<<5)+h + s.charCodeAt(i))|0; return "q"+(h>>>0).toString(36); };
 function bankEntry(d){
   const qs = d.QB.map(r => { const fixed = !!r[6]; const L = d.LESSONS.find(l => l.id === r[0]);
-    const q = { id: hash(r[1]), q: r[1], o: r[2], a: fixed ? (r[5]||0) : 0, e: r[3], tag: L.title }; if (!fixed) q.sh = 1; q.l = r[0]; return q; });
+    const q = { id: hash(r[1]), q: r[1], o: r[2], a: fixed ? (r[5]||0) : 0, e: r[3], tag: L.title }; if (!fixed) q.sh = 1; q.l = r[0]; if (r[7]) q.rp = r[7]; return q; });
   return { lessons: d.LESSONS.length, qs, g: 'maths', t: d.APP.brand };
 }
 // formula book chapter → search entry
