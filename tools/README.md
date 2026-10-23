@@ -188,6 +188,8 @@ unique; tables about the exam itself are skipped). `node tools/hand/plan-lab.js`
 do not have it yet; then `node tools/stamp.js`.
 Grammar 100 has its own engine, so its pictures (13 rules) live in `tools/hand/grammar-figs.js`, which writes `RULE_FIG` and its CSS
 into study-grammar-100.html and hooks `openRule()` to draw a rule's picture under its logic: `node tools/hand/grammar-figs.js`.
+Its questions live in the page's `DATA` (each rule's `Q`, each unit's `test`), which `index_app.js` cannot read; after changing them,
+`node tools/index_grammar.js` refreshes the `grammar` module in study-bank.json (`--check` only reports whether it is up to date).
 A figure may animate with CSS or SMIL (`<animate>`); study-visual.js starts SMIL animations when the figure scrolls into view,
 because Chrome leaves them still in figures drawn after the page has loaded.
 Colours: draw with the theme variables (`var(--ink)`, `var(--accent)`, `var(--sheet)` …); text on an accent-coloured shape takes
