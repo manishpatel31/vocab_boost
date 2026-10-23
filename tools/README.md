@@ -182,6 +182,10 @@ the blocks in, just before the boot (pages on `study-core.js`, like Physics: at 
 study-core.js itself draws the blocks and adds the quiz tabs). After any of these, run `node tools/stamp.js`.
 The chapter apps built by `build_app.py` (Number System, Clock, Calendar) get theirs the same way: when
 `tools/hand/<folder>.visual.js` exists, `build_app.py` runs apply-hand on the page it has just written, so a rebuild keeps the pictures.
+The hand-built subject apps get their Plan and Lab tabs from `study-plan-lab.js`, which builds both from the page's own lessons
+(the Lab: one game per lesson from its `table` and `facts` blocks, first column → second column and back when the answers are
+unique; tables about the exam itself are skipped). `node tools/hand/plan-lab.js` adds it, with `study-games.js`, to the pages that
+do not have it yet; then `node tools/stamp.js`.
 Grammar 100 has its own engine, so its pictures (13 rules) live in `tools/hand/grammar-figs.js`, which writes `RULE_FIG` and its CSS
 into study-grammar-100.html and hooks `openRule()` to draw a rule's picture under its logic: `node tools/hand/grammar-figs.js`.
 A figure may animate with CSS or SMIL (`<animate>`); study-visual.js starts SMIL animations when the figure scrolls into view,
