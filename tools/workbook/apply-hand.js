@@ -7,7 +7,7 @@
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const ROOT = path.join(__dirname, '..', '..');
-const PAGES = { sports: 'study-sports.html', intlorgs: 'study-intl-orgs.html', polity: 'study-polity.html', economics: 'study-economics.html', biology: 'study-biology.html', space: 'study-space.html' };
+const PAGES = { sports: 'study-sports.html', intlorgs: 'study-intl-orgs.html', polity: 'study-polity.html', economics: 'study-economics.html', biology: 'study-biology.html', space: 'study-space.html', physics: 'study-physics.html' };
 const name = process.argv[2], file = PAGES[name];
 if (!file) { console.error('usage: apply-hand.js ' + Object.keys(PAGES).join('|')); process.exit(1); }
 const P = path.join(ROOT, file);
@@ -42,13 +42,15 @@ const first = s.lastIndexOf('\n<script>\n', s.indexOf('const LESSONS = '));   //
 if (first < 0) fail('no main script');
 s = s.slice(0, first) + '\n<script src="study-visual.js?v=00000000"></script>' + (world ? '\n<script src="study-world.js?v=00000000"></script>' : '') +
   (rivers ? '\n<script src="study-rivers.js?v=00000000"></script>' : '') + s.slice(first);
-// 2) the blocks and VIS, just before the boot
+// 2) the blocks and VIS, just before the boot (pages on study-core.js: at the end of their own script, which runs before the engine)
 s = s.replace(/\/\* visual: from tools\/hand\/[\s\S]*?\/\* visual end \*\/\n/, '');
-rep('/* boot */\n', `/* visual: from tools/hand/${name}.visual.js by tools/workbook/apply-hand.js — edit that file, not this */\nconst VIS = ${J(vctx.VISUAL.VIS)};\nvisPlace(${J(placed)});\nvisInit();\n/* visual end */\n/* boot */\n`);
-// 3) lesson blocks of the new kinds, drawn by study-visual.js
-if (!s.includes('const vb = visBlock(b)')) rep('function blockHTML(b){\n', 'function blockHTML(b){\n  if (typeof visBlock === "function") { const vb = visBlock(b); if (vb) return vb; }\n');
-// 4) Revise: the photo quiz (and the map quiz) as tabs
-if (!s.includes('.concat(VIS.tabs')) {
+const core = s.includes('<script src="study-core.js'), block = `/* visual: from tools/hand/${name}.visual.js by tools/workbook/apply-hand.js — edit that file, not this */\nconst VIS = ${J(vctx.VISUAL.VIS)};\nvisPlace(${J(placed)});\nvisInit();\n/* visual end */\n`;
+if (core) { const c = s.indexOf('<script src="study-core.js'), e = s.lastIndexOf('</script>', c); s = s.slice(0, e) + block + s.slice(e); }
+else rep('/* boot */\n', block + '/* boot */\n');
+// 3) lesson blocks of the new kinds, drawn by study-visual.js (study-core.js does this itself)
+if (!core && !s.includes('const vb = visBlock(b)')) rep('function blockHTML(b){\n', 'function blockHTML(b){\n  if (typeof visBlock === "function") { const vb = visBlock(b); if (vb) return vb; }\n');
+// 4) Revise: the photo quiz (and the map quiz) as tabs (study-core.js does this itself)
+if (!core && !s.includes('.concat(VIS.tabs')) {
   const t = s.indexOf('function renderRevise(){\n  const tabs = ['); if (t < 0) fail('no Revise tabs');
   const e = s.indexOf('\n', t + 'function renderRevise(){\n'.length);     // the end of the "const tabs = …;" line
   if (s[e - 1] !== ';') fail('the Revise tabs line does not end in ";"');

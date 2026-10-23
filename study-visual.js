@@ -577,7 +577,7 @@ function visInit(){
 .dg .acs{stroke:var(--accent)} .dg .bls{stroke:var(--blue)}
 .dg .abg{fill:var(--accent-bg);stroke:var(--rule)} .dg .bbg{fill:var(--blue-bg);stroke:var(--rule)} .dg .gbg{fill:var(--good-bg);stroke:var(--rule)}
 .dg .s1{fill:var(--good-bg)} .dg .s2{fill:var(--warn-bg)} .dg .s3{fill:var(--blue-bg)} .dg .s4{fill:var(--accent-bg)} .dg .s5{fill:var(--sunk)} .dg .s6{fill:var(--blue-bg);opacity:.6}
-.fig.wide{overflow-x:auto;-webkit-overflow-scrolling:touch}.fig.wide svg{min-width:var(--minw,560px)}
+.fig.wide{overflow-x:auto;-webkit-overflow-scrolling:touch}.fig.wide svg{min-width:var(--minw,560px);max-width:none}
 /* photo galleries */
 .phblock{grid-column:1/-1}
 .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:12px}
@@ -656,5 +656,6 @@ ${RV_CSS}
 @media (prefers-reduced-motion:reduce){.anim-in{animation:none}}`; document.head.appendChild(st); }
   PH_KEY = VIS.key; try { PHC = JSON.parse(localStorage.getItem(PH_KEY) || "{}"); } catch(e) {}
   PHOTO_ITEMS = phItems(); MQ_POOL = visRows().filter(f => mapOf(f[1]));
-  new MutationObserver(() => { phScan($("#app")); mapScan($("#app")); rvScan($("#app")); zmScan($("#app")); }).observe($("#app"), { childList: true, subtree: true });
+  const app = document.getElementById("app");   // not $(): pages on study-core.js call this before that file defines $
+  new MutationObserver(() => { phScan(app); mapScan(app); rvScan(app); zmScan(app); }).observe(app, { childList: true, subtree: true });
 }
