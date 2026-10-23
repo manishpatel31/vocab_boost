@@ -2,7 +2,7 @@
    kingdoms, the digestive tract, the heart's double circulation, the brain, the endocrine glands, photosynthesis, the flower
    and Mendel's cross; plus charts and photos (drawn by study-visual.js). place(), rows() and KIT come from apply-hand.js. */
 const lab = (x, y, tx, ty, t, a) => `<line x1="${x}" y1="${y}" x2="${tx}" y2="${ty}" stroke="var(--ink2)" stroke-width="1"/><circle cx="${x}" cy="${y}" r="2.2" fill="var(--ink2)"/>` +
-  `<text x="${tx + (a === "end" ? -4 : 4)}" y="${ty + 4}" text-anchor="${a || "start"}" font-size="11.5" font-weight="700">${t}</text>`;
+  `<text x="${tx + (a === "end" ? -4 : 4)}" y="${ty + 4}" text-anchor="${a || "start"}" font-size="11.5" font-weight="700" data-lq="${String(t).split(" — ")[0].split(" (")[0].replace(/"/g, "")}">${t}</text>`;
 const T = (x, y, t, c, a, s) => `<text x="${x}" y="${y}" font-size="${s || 12}" font-weight="700" text-anchor="${a || "start"}" style="fill:${c || "var(--ink)"}">${t}</text>`;
 const flowPath = (d, c, w, mk) => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w || 3}" stroke-linecap="round"${mk ? ` marker-end="url(#${mk})"` : ""}/><path d="${d}" fill="none" stroke="#fff" stroke-width="1.2" stroke-dasharray="2 7" style="animation:rvflow 1.1s linear infinite"/>`;
 

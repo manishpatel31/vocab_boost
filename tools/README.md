@@ -54,8 +54,11 @@ tools/
 
 ## Workbook apps: History and Computer Knowledge
 
-The History pages, Computer Knowledge and Chemistry share one engine and look in `tools/workbook/`
-(`head.html`, `engine.js`, `tail.html`, and `lib.js`, which loads a data folder, checks it and writes a page).
+The History pages, Computer Knowledge, Chemistry and the Static GK and Geography apps share one engine and look in
+`tools/workbook/` (`head.html`, `engine.js`, `workbook.css`, `games.js`, `tail.html`, and `lib.js`, which loads a data
+folder, checks it and writes a page). Each build also writes the shared files `study-workbook.js` (engine.js),
+`study-workbook.css` (workbook.css) and `study-games.js` (the Lab games) at the site root; every page loads them, so
+they download once and stay cached. Run `node tools/stamp.js` after a build so pages ask for the new copies.
 Each family has its own data folder and build script. Edit the data, never the built pages.
 
 A lesson is the usual object, plus a `story` block (`h`, and a one-line `key`) that opens it in plain words.

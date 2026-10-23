@@ -24,12 +24,12 @@ const qb = ctx.QB.slice().sort((a, b) => num(a[0]) - num(b[0]));
 
 // the atom's timeline (K3) and the periodic table's (K4) also show on the Revise tab
 const tls = ['K3', 'K4', 'K18'].map(id => (byId.get(id).blocks.find(b => b.k === 'tl') || {}).rows || []).flat();
-const lab = fs.readFileSync(path.join(__dirname, 'lab.js'), 'utf8') + '\n' + fs.readFileSync(path.join(__dirname, '..', 'workbook', 'games.js'), 'utf8');
+const lab = fs.readFileSync(path.join(__dirname, 'lab.js'), 'utf8');
 // photos, diagrams and charts: visual.js beside this file (see applyVisual in tools/workbook/lib.js)
 const V = applyVisual(path.join(__dirname, 'visual.js'), LESSONS, { QB: qb });
 const size = writePage({ file: 'study-chemistry.html', title: 'Chemistry', brand: 'Chemistry',
   small: 'रसायन विज्ञान · SSC CGL · CHSL · RRB NTPC · Group D', tabs: ['learn', 'practice', 'mock', 'lab', 'revise', 'plan'],
-  source: 'tools/chemistry/build.js from tools/chemistry/data and lab.js', extra: lab, visual: V.visual }, {
+  source: 'tools/chemistry/build.js from tools/chemistry/data and lab.js', extra: lab, games: true, visual: V.visual }, {
   APP: { id: 'chemistry', key: 'chemistry_v1', mode: 'era', era: 'chem', title: 'Chemistry', hi: 'रसायन विज्ञान',
     tagline: 'SSC CGL · CHSL · RRB NTPC · Group D', plans: [3, 5, 7, 10, 15], storyLabel: 'The story first · two minutes', keyLabel: 'Remember this:', apps: [],
     tabs: ['learn', 'practice', 'mock', 'lab', 'revise', 'plan'] },

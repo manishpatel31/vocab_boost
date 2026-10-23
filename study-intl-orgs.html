@@ -270,7 +270,7 @@ select{font:inherit;border:1px solid var(--rule);background:var(--sheet);color:v
   </div>
 </nav>
 
-<script src="study-visual.js?v=3f7fec07"></script>
+<script src="study-visual.js?v=10f83048"></script>
 <script src="study-world.js?v=6b8f426d"></script>
 <script>
 "use strict";
@@ -1030,8 +1030,7 @@ function renderRevise(){
     <div id="rv" class="stack"></div></section>`;
   $("#app").querySelectorAll("[data-rv]").forEach(b => b.onclick = () => { RV = b.dataset.rv; renderRevise(); });
   const box = $("#rv");
-  if (RV === "vphotos") { photoQuiz(box); return; }
-  if (RV === "vmap") { mapQuiz(box); return; }
+  if (typeof visRevise === "function" && visRevise(RV, box)) return;      // photo, map, river, map-point and label quizzes (study-visual.js)
   if (RV === "where") {
     box.innerHTML = `<input class="search" id="rks" type="search" placeholder="Search a body, city or year (e.g. Vienna, 1997)" aria-label="Search organisations">
       <div class="chips" role="group" aria-label="India status">${[["all","All"],["mem","India a member"],["no","India not a member"]].map(c=>`<button type="button" class="chip" data-is="${c[0]}" aria-pressed="${ISF===c[0]}">${c[1]}</button>`).join("")}</div>

@@ -4,7 +4,7 @@ const P = (w, n, c) => [w, n, c];
 const f = n => +n.toFixed(1);
 const GRASS = "#4f8f4a", GRASS2 = "#5b9c55", LINE = "#ffffff", CLAY = "#c0603c";
 // a label in the ink colour, with a thin leader line
-const lab = (x, y, tx, ty, t, anc) => `<line x1="${f(x)}" y1="${f(y)}" x2="${f(tx)}" y2="${f(ty)}" class="grid"/><text x="${f(tx + (anc === "end" ? -3 : anc === "middle" ? 0 : 3))}" y="${f(ty + 4)}" text-anchor="${anc || "start"}" font-size="11.5" class="mut" style="paint-order:stroke;stroke:var(--sheet);stroke-width:3px">${t}</text>`;
+const lab = (x, y, tx, ty, t, anc) => `<line x1="${f(x)}" y1="${f(y)}" x2="${f(tx)}" y2="${f(ty)}" class="grid"/><text x="${f(tx + (anc === "end" ? -3 : anc === "middle" ? 0 : 3))}" y="${f(ty + 4)}" text-anchor="${anc || "start"}" font-size="11.5" class="mut" style="paint-order:stroke;stroke:var(--sheet);stroke-width:3px" data-lq="${String(t).split(" — ")[0].split(" (")[0].replace(/"/g, "")}">${t}</text>`;
 // a measurement arrow with its text
 const dim = (x1, y1, x2, y2, t, dy) => `<path d="M${f(x1)} ${f(y1)} L${f(x2)} ${f(y2)}" class="acs" stroke-width="1.4" marker-start="url(#ar)" marker-end="url(#ar)"/>` +
   `<text x="${f((x1 + x2) / 2)}" y="${f((y1 + y2) / 2 + (dy || -6))}" text-anchor="middle" font-size="12" class="b acc-t">${t}</text>`;

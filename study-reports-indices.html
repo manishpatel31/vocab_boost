@@ -295,7 +295,7 @@ table.cover td{min-width:90px}
   </div>
 </nav>
 
-<script src="study-visual.js?v=3f7fec07"></script>
+<script src="study-visual.js?v=10f83048"></script>
 <script src="study-world.js?v=6b8f426d"></script>
 <script>
 "use strict";
@@ -1262,9 +1262,7 @@ function renderRevise(){
   $("#app").querySelectorAll("[data-rv]").forEach(b => b.onclick = () => { RV = b.dataset.rv; renderRevise(); });
   const on = $(`.seg [aria-selected="true"]`); if (on) on.scrollIntoView({block:"nearest", inline:"center"});
   const box = $("#rv");
-  if (RV === "vphotos") { photoQuiz(box); return; }
-  if (RV === "vmap") { mapQuiz(box); return; }
-  if (RV === "vriver") { riverQuiz(box); return; }
+  if (typeof visRevise === "function" && visRevise(RV, box)) return;      // photo, map, river, map-point and label quizzes (study-visual.js)
   if (RV === "ladder") {
     const rows = ladderRows();
     box.innerHTML = `<p class="muted">Every India rank on one line, smallest to largest. Read it top to bottom once a day — each hook pulls the next number. <span style="color:var(--good);font-weight:700">▲</span> improved · <span style="color:var(--bad);font-weight:700">▼</span> declined (for Terrorism and Air Quality a smaller number is worse).</p>

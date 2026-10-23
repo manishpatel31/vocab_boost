@@ -368,7 +368,9 @@ function visPlace(list){
 function visBlock(b){
   const f = { photos: photosHTML, indiamap: indiaMapHTML, mapfig: mapFigHTML, statechart: stateChartHTML, info: infoHTML, tlfig: tlFigHTML,
     bars: barsHTML, calendar: calendarHTML, shelf: shelfHTML, cards: cardsHTML, rivermap: riverMapHTML, worldfig: typeof worldFigHTML === "function" ? worldFigHTML : null }[b.k];
-  return f ? f(b) : "";
+  if (!f) return "";
+  const html = f(b), q = qzKind(b);
+  return q ? html.replace(/<\/div>\s*$/, `<div class="row end qz-go-row"><button type="button" class="chip" data-qz="${qzId(b)}">🎯 Quiz me on this ${q === "pins" ? "map" : "diagram"}</button></div></div>`) : html;
 }
 /* A shelf of book covers: rows [title, author, badge]. */
 function shelfHTML(b){
@@ -412,6 +414,91 @@ function mapQuiz(box){
   });
 }
 
+
+/* ============================================================
+   QUIZZES FROM THE PICTURES — any map block with 4+ named pins gives a "which place is marked?" quiz; any figure whose
+   SVG labels carry data-lq gives a "label it" quiz (one label turns into ?). Each eligible block gets a "Quiz me" button;
+   Revise gets "Map points" and "Label it" tabs that draw from every lesson. Visual files tag labels with data-lq.
+   ============================================================ */
+const qzPinName = p => String(p[4] === "n" ? (p[3] || p[0]) : p[0]).replace(/^\d+\s*[·.]?\s+/, "").replace(/\s*\(.*\)$/, "").trim();
+function qzPins(b){ const seen = new Set();
+  return (b.pins || []).map((p, i) => ({ i, n: qzPinName(p), lo: p[1], la: p[2] })).filter(x => x.n && x.n.length > 1 && !seen.has(x.n) && seen.add(x.n)); }
+function qzKind(b){
+  if (/^(mapfig|worldfig|rivermap)$/.test(b.k) && qzPins(b).length >= 4) return "pins";
+  if (b.k === "info" && (String(b.html).match(/data-lq/g) || []).length >= 4) return "labels";
+  return null;
+}
+const QZ_REG = {}; let QZ_N = 0;
+function qzId(b){ if (!b._qz) { b._qz = "qz" + (++QZ_N); QZ_REG[b._qz] = b; } return b._qz; }
+function qzPool(kind){ const out = [];
+  LESSONS.forEach(l => (l.blocks || []).forEach(b => { if (qzKind(b) === kind) { qzId(b); out.push({ b, l: l.id }); } })); return out; }
+// what to say after an answer: the block's key, legend or the pin's own note
+function qzNote(b, name){ const rows = (b.facts || []).concat(b.legend && Array.isArray(b.legend[0]) && typeof b.legend[0][1] === "string" ? b.legend : []);
+  const r = rows.find(r => String(r[0]).replace(/^\d+\s*[·.]?\s*/, "").replace(/<[^>]+>/g, "").trim() === name);
+  if (r) return String(r[1]).replace(/<[^>]+>/g, "");
+  const p = (b.pins || []).find(p => qzPinName(p) === name); return p && p[4] !== "n" && p[3] ? p[3] : ""; }
+let QZ = { score: 0, tried: 0, streak: 0 };
+const qzScore = () => `${QZ.score}/${QZ.tried}${QZ.streak > 1 ? " · 🔥 " + QZ.streak : ""}`;
+function qzAnswer(box, ok, right, note, lesson, next){
+  QZ.tried++; if (ok) { QZ.score++; QZ.streak++; } else QZ.streak = 0;
+  box.querySelector("[data-qzs]").textContent = qzScore();
+  box.querySelector("[data-qze]").innerHTML = `<div class="exp"><b class="${ok ? "okl" : "nol"}">${ok ? "Correct." : "It is " + esc(right) + "."}</b> ${esc(note || "")}${lesson ? ` <span class="muted">· Lesson ${LNUM(lesson)}</span>` : ""}</div>
+    <div class="row end" style="margin-top:10px">${lesson ? `<button type="button" class="btn" data-golesson="${lesson}">Read the lesson</button>` : ""}<button type="button" class="btn pri" data-qzn>Next</button></div>`;
+  if (lesson) bindLessonLinks(box.querySelector("[data-qze]"));
+  box.querySelector("[data-qzn]").onclick = next;
+}
+function qzOpts(box, right, names, onPick){
+  const opts = shuffle([right].concat(shuffle(names.filter(n => n !== right)).slice(0, 3)));
+  const o = box.querySelector("[data-qzo]");
+  o.innerHTML = opts.map((n, k) => `<button type="button" class="opt" data-o="${esc(n)}"><span class="k">${"ABCD"[k]}</span><span>${esc(n)}</span></button>`).join("");
+  o.querySelectorAll("[data-o]").forEach(btn => btn.onclick = () => { if (o.dataset.done) return; o.dataset.done = 1;
+    o.querySelectorAll("[data-o]").forEach(x => { x.disabled = true; if (x.dataset.o === right) x.classList.add("ok"); else if (x === btn) x.classList.add("no"); });
+    onPick(btn.dataset.o === right); });
+}
+/* Which place is marked? b: one block (from its button) or null for any map in the app */
+function pinQuiz(box, only){
+  const pool = only ? [{ b: only, l: null }] : qzPool("pins"); if (!pool.length) { box.innerHTML = `<p class="muted">No maps with places to quiz yet.</p>`; return; }
+  const { b, l } = pool[Math.floor(Math.random() * pool.length)], P = qzPins(b), t = P[Math.floor(Math.random() * P.length)];
+  const lesson = l || (LESSONS.find(x => (x.blocks || []).includes(b)) || {}).id;
+  const pins = P.map(p => ["", p.lo, p.la, "", ""]);
+  const svg = b.k === "worldfig" && typeof worldSVG === "function" ? worldSVG({ pins, vb: b.vb, mark: b.mark }) : mapSVG({ faint: 1, pins, vb: b.vb });
+  box.innerHTML = `<div class="block qz"><div class="row between"><span class="eyebrow">📍 Map points</span><span class="num" data-qzs>${qzScore()}</span></div>
+    <p class="qt" style="margin:8px 0 2px">Which place is marked in red?</p><p class="muted" style="margin:0 0 8px">${esc(String(b.title).replace(/<[^>]+>/g, ""))}</p>
+    <figure class="fig wide qz-map" style="--minw:300px;margin:0 auto;max-width:${b.k === "worldfig" ? 700 : 520}px">${svg}</figure><div class="opts" data-qzo></div><div data-qze></div></div>`;
+  const dots = box.querySelectorAll("svg circle.pin"); if (dots[P.indexOf(t)]) dots[P.indexOf(t)].classList.add("qz-on");
+  qzOpts(box, t.n, P.map(p => p.n), ok => qzAnswer(box, ok, t.n, qzNote(b, t.n), lesson, () => pinQuiz(box, only)));
+}
+/* Label it: one label of a diagram turns into "?" */
+function labelQuiz(box, only){
+  const pool = only ? [{ b: only, l: null }] : qzPool("labels"); if (!pool.length) { box.innerHTML = `<p class="muted">No labelled diagrams to quiz yet.</p>`; return; }
+  const { b, l } = pool[Math.floor(Math.random() * pool.length)], lesson = l || (LESSONS.find(x => (x.blocks || []).includes(b)) || {}).id;
+  box.innerHTML = `<div class="block qz"><div class="row between"><span class="eyebrow">🏷️ Label it</span><span class="num" data-qzs>${qzScore()}</span></div>
+    <p class="qt" style="margin:8px 0 2px">What goes where the red <b>?</b> is?</p><p class="muted" style="margin:0 0 8px">${esc(String(b.title).replace(/<[^>]+>/g, ""))}</p>
+    <div class="qz-fig">${b.html}</div><div class="opts" data-qzo></div><div data-qze></div></div>`;
+  const L = [...box.querySelectorAll(".qz-fig [data-lq]")], name = e => (e.getAttribute("data-lq") || e.textContent).trim();
+  const names = [...new Set(L.map(name))], t = L[Math.floor(Math.random() * L.length)], right = name(t), orig = t.innerHTML;
+  t.textContent = "?"; t.classList.add("qz-hole");
+  qzOpts(box, right, names, ok => { t.innerHTML = orig; t.classList.remove("qz-hole"); t.classList.add(ok ? "qz-ok" : "qz-no"); qzAnswer(box, ok, right, "", lesson, () => labelQuiz(box, only)); });
+}
+// a "Quiz me" button opens the quiz for that one block in an overlay
+function qzOpen(id){ const b = QZ_REG[id]; if (!b) return;
+  const over = document.createElement("div"); over.className = "ph-over"; over.innerHTML = `<div class="ph-card" role="dialog" aria-label="Quiz"><button type="button" class="ph-x" aria-label="Close">✕</button><div class="ph-body" data-qzbox></div></div>`;
+  document.body.appendChild(over); const close = () => over.remove();
+  over.addEventListener("click", e => { if (e.target === over) close(); }); over.querySelector(".ph-x").onclick = close;
+  document.addEventListener("keydown", function k(e){ if (e.key === "Escape") { close(); document.removeEventListener("keydown", k); } });
+  (qzKind(b) === "pins" ? pinQuiz : labelQuiz)(over.querySelector("[data-qzbox]"), b);
+}
+/* Revise tabs routed here by every engine: true when this file drew the tab */
+function visRevise(rv, box){
+  const f = { vphotos: photoQuiz, vmap: mapQuiz, vriver: riverQuiz, vpins: pinQuiz, vlabel: labelQuiz }[rv];
+  if (!f) return false; f(box); return true;
+}
+const QZ_CSS = `.qz-go-row{margin-top:8px}.qz-map svg circle.pin{fill:var(--ink2)}
+svg circle.pin.qz-on{fill:#d7301f!important;stroke:#fff;stroke-width:2px;transform-box:fill-box;transform-origin:center;animation:qzp .8s ease-in-out infinite alternate}
+@keyframes qzp{from{transform:scale(1.3)}to{transform:scale(2.1)}}
+.qz-fig text.qz-hole,.qz-fig .qz-hole{fill:#d7301f!important;color:#d7301f!important;font-weight:800}.qz-fig .qz-ok{fill:var(--good)!important}.qz-fig .qz-no{fill:var(--bad)!important}
+.qz .qz-fig .zm-ctl{display:none}
+@media (prefers-reduced-motion:reduce){svg circle.pin.qz-on{animation:none;transform:scale(1.8)}}`;
 
 /* ============================================================
    RIVERS — needs study-rivers.js (RIVERS). Block {k:"rivermap", title, show?: [rivers] (default all), hl?: [rivers drawn bold],
@@ -605,6 +692,7 @@ function visInit(){
 @media (max-width:760px){.map-wrap{grid-template-columns:1fr}}
 .imap{width:100%;height:auto;display:block;touch-action:manipulation}
 ${ZM_CSS}
+${QZ_CSS}
 ${RV_CSS}
 .imap .st{stroke:var(--ink2);stroke-width:.6;stroke-linejoin:round;cursor:pointer;transition:fill .15s}
 .imap .r1{fill:var(--accent-bg)} .imap .r2{fill:var(--blue-bg)} .imap .r3{fill:var(--warn-bg)} .imap .r4{fill:var(--good-bg)} .imap .r5{fill:var(--sunk)}
@@ -656,6 +744,10 @@ ${RV_CSS}
 @media (prefers-reduced-motion:reduce){.anim-in{animation:none}}`; document.head.appendChild(st); }
   PH_KEY = VIS.key; try { PHC = JSON.parse(localStorage.getItem(PH_KEY) || "{}"); } catch(e) {}
   PHOTO_ITEMS = phItems(); MQ_POOL = visRows().filter(f => mapOf(f[1]));
+  // the picture quizzes join Revise wherever the lessons have maps with places or labelled diagrams
+  VIS.tabs = VIS.tabs || [];
+  [["vpins", "📍 Map points", "pins"], ["vlabel", "🏷️ Label it", "labels"]].forEach(([id, t, k]) => { if (!VIS.tabs.some(x => x[0] === id) && qzPool(k).length) VIS.tabs.push([id, t]); });
+  document.addEventListener("click", e => { const q = e.target.closest && e.target.closest("[data-qz]"); if (q) qzOpen(q.dataset.qz); });
   const app = document.getElementById("app");   // not $(): pages on study-core.js call this before that file defines $
   new MutationObserver(() => { phScan(app); mapScan(app); rvScan(app); zmScan(app); }).observe(app, { childList: true, subtree: true });
 }

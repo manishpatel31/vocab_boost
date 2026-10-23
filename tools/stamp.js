@@ -10,7 +10,8 @@
 // and bumps VERSION in sw.js when anything changed. Run it after editing any of those three files.
 const fs = require('fs'), path = require('path'), crypto = require('crypto');
 const R = path.join(__dirname, '..') + '/';
-const files = ['app.js', 'typing.js', 'typing-passages.js', 'study-core.js', 'study-core.css', 'study-visual.js', 'study-world.js', 'study-rivers.js'];
+const files = ['app.js', 'typing.js', 'typing-passages.js', 'study-core.js', 'study-core.css', 'study-visual.js', 'study-world.js', 'study-rivers.js',
+  'study-workbook.js', 'study-workbook.css', 'study-games.js'];
 const hash = f => crypto.createHash('sha1').update(fs.readFileSync(R + f)).digest('hex').slice(0, 8);
 const pages = ['index.html', 'sw.js'].concat(fs.readdirSync(R).filter(f => /^study-.*\.html$/.test(f)));
 let changed = 0;

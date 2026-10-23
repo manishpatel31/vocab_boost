@@ -394,9 +394,7 @@ function renderRevise(){
   $("#app").querySelectorAll("[data-rv]").forEach(b => b.onclick = () => { RV = b.dataset.rv; renderRevise(); });
   const on = $(`.seg [aria-selected="true"]`); if (on) on.scrollIntoView({block:"nearest", inline:"center"});
   const box = $("#rv");
-  if (RV === "vphotos") { photoQuiz(box); return; }
-  if (RV === "vmap") { mapQuiz(box); return; }
-  if (RV === "vriver") { riverQuiz(box); return; }
+  if (typeof visRevise === "function" && visRevise(RV, box)) return;      // photo, map, river, map-point and label quizzes (study-visual.js)
   const pk = (key, i, val) => (HID[key] && !REV[key][i]) ? `<button type="button" class="peek" data-pk="${key}:${i}">tap</button>` : val;
   const coverChips = (key, label) => `<div class="chips"><button type="button" class="chip" data-hide="${key}" aria-pressed="${!!HID[key]}">${label}</button><button type="button" class="chip" data-cover="${key}">Cover all again</button></div>`;
   const bindCover = () => {

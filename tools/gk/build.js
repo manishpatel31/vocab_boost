@@ -65,12 +65,12 @@ APPS.filter(a => !only || a.id === only || a.dir === only).forEach(app => {
   LESSONS.forEach(l => { const n = QB.filter(q => q[0] === l.id).length; if (n < 12) fail(l.id + ' has only ' + n + ' questions'); });
   const qb = QB.slice().sort((a, b) => num(a[0]) - num(b[0]));
   const tls = LESSONS.map(l => (l.blocks.find(b => b.k === 'tl') || {}).rows || []).flat();
-  const lab = fs.readFileSync(path.join(dir, 'lab.js'), 'utf8') + '\n' + fs.readFileSync(path.join(__dirname, '..', 'workbook', 'games.js'), 'utf8');
+  const lab = fs.readFileSync(path.join(dir, 'lab.js'), 'utf8');
   const tabs = ['learn', 'practice', 'mock', 'lab', 'revise', 'plan'];
   // photos, maps, charts and timelines: tools/gk/<dir>/visual.js (see applyVisual in tools/workbook/lib.js)
   const V = applyVisual(path.join(dir, 'visual.js'), LESSONS, { QB: qb, TILES: ctx.TILES });
   const size = writePage({ file: app.file, title: app.title, brand: app.title, small: app.hi + ' · SSC CGL · CHSL · MTS · RRB NTPC', tabs,
-    source: 'tools/gk/build.js from tools/gk/' + app.dir, extra: lab, visual: V.visual }, {
+    source: 'tools/gk/build.js from tools/gk/' + app.dir, extra: lab, games: true, visual: V.visual }, {
     APP: { id: app.id, key: app.key, mode: 'era', era: app.era, title: app.title, hi: app.hi, tagline: 'SSC CGL · CHSL · MTS · RRB NTPC',
       plans: [3, 5, 7, 10, 15], storyLabel: 'The story first · two minutes', keyLabel: 'Remember this:', apps: [], tabs },
     GROUPS: ctx.GROUPS, LESSONS, QB: qb, TIMELINE: tls.length ? [{ era: app.era, rows: tls }] : [],
