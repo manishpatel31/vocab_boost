@@ -11,7 +11,8 @@ const A4P = [
   ["Asha Parekh","2020 award (52nd)","",""],
   ["Waheeda Rehman","2021 award (53rd)","",""],
   ["Mithun Chakraborty","2022 award (54th)","Presented in October 2024.",""],
-  ["Mohanlal","2023 award (55th)","Presented at the 71st National Film Awards, September 2025.","p"]
+  ["Mohanlal","2023 award (55th)","Presented at the 71st National Film Awards, September 2025.","p"],
+  ["Anant Nag","2024 award (56th)","Presented by President Murmu at the 72nd National Film Awards, Ekta Nagar (Gujarat), 22 Sep 2026; second Kannada actor after Dr. Rajkumar (1995).",""]
 ];
 const A4O = [
   ["Bhanu Athaiya","Oscar for Costume Design, 1983 (Gandhi)","The first Indian to win an Oscar.","p"],
@@ -66,14 +67,14 @@ const A5K = [
 
 LESSONS.push(
 {id:"A4", heat:3, title:"Film, music and arts awards", hi:"फ़िल्म, संगीत और कला पुरस्कार", blocks:[
-  {k:"hot", h:"Asked often: <b>Dadasaheb Phalke Award</b> (first: Devika Rani; latest: Mohanlal), <b>Indian Oscar winners</b> (Bhanu Athaiya, A. R. Rahman, Naatu Naatu, The Elephant Whisperers), and the <b>top prizes of film festivals</b>."},
+  {k:"hot", h:"Asked often: <b>Dadasaheb Phalke Award</b> (first: Devika Rani; latest: Anant Nag, 2024 award, given Sep 2026), <b>Indian Oscar winners</b> (Bhanu Athaiya, A. R. Rahman, Naatu Naatu, The Elephant Whisperers), and the <b>top prizes of film festivals</b>."},
   {k:"story", h:"<p>The <b>Dadasaheb Phalke Award</b>, named after the father of Indian cinema (who made Raja Harishchandra, 1913), is India's highest film honour. It began in 1969 and its first recipient was <b>Devika Rani</b>. Recent winners: Rajinikanth, Asha Parekh, Waheeda Rehman, Mithun Chakraborty and <b>Mohanlal</b> (presented in 2025).</p><p>India's first Oscar went to costume designer <b>Bhanu Athaiya</b> for Gandhi (1983). <b>A. R. Rahman</b> won two for Slumdog Millionaire (2009), and in 2023 India won twice — <b>'Naatu Naatu'</b> from RRR and the documentary short <b>The Elephant Whisperers</b>. In 2024 <b>Payal Kapadia</b> won the Grand Prix at Cannes.</p>", key:"Phalke first: Devika Rani (1969); latest: Mohanlal (55th). First Indian Oscar: Bhanu Athaiya (1983)."},
   {k:"table", title:"The awards", head:["Award","What it is","Note"], rows: A4A.map(r => [r[0], r[1], r[2]])},
   {k:"table", title:"Dadasaheb Phalke Award winners", head:["Winner","Year","Note"], rows: A4P.map(r => [r[0], r[1], r[2]])},
   {k:"table", title:"Indians at the Oscars, Grammys and Cannes", head:["Winner","Award","Note"], rows: A4O.map(r => [r[0], r[1], r[2]])},
   {k:"trick", h:"Festival animals — <b>Cannes palm, Berlin bear, Venice lion</b>: Palme d'Or, Golden Bear, Golden Lion."},
   {k:"trap", h:"<b>Satyajit Ray</b> got an <b>honorary</b> Oscar — the first Indian to <b>win</b> one was <b>Bhanu Athaiya</b>. <b>Naatu Naatu</b>'s Oscar went to <b>M. M. Keeravani</b> (music) and <b>Chandrabose</b> (lyrics), not to the director Rajamouli."}
-], sum:["The Dadasaheb Phalke Award (1969) is India's highest film award; first winner Devika Rani.","Recent Phalke winners: Rajinikanth, Asha Parekh, Waheeda Rehman, Mithun Chakraborty, Mohanlal (55th).","First Indian Oscar: Bhanu Athaiya (1983, Gandhi); A. R. Rahman won two in 2009.","2023 Oscars: 'Naatu Naatu' (RRR) and The Elephant Whisperers.","Cannes 2024: Payal Kapadia's All We Imagine as Light won the Grand Prix."]},
+], sum:["The Dadasaheb Phalke Award (1969) is India's highest film award; first winner Devika Rani.","Recent Phalke winners: Rajinikanth, Asha Parekh, Waheeda Rehman, Mithun Chakraborty, Mohanlal (55th), Anant Nag (56th, 2024 award).","First Indian Oscar: Bhanu Athaiya (1983, Gandhi); A. R. Rahman won two in 2009.","2023 Oscars: 'Naatu Naatu' (RRR) and The Elephant Whisperers.","Cannes 2024: Payal Kapadia's All We Imagine as Light won the Grand Prix."]},
 
 {id:"A5", heat:3, title:"Sports awards", hi:"खेल पुरस्कार", blocks:[
   {k:"hot", h:"Annual favourite: the <b>Khel Ratna</b> winners — and the 2025 surprise that <b>no one</b> got it. Also the <b>first Khel Ratna</b> (Anand), what the <b>Dronacharya</b> and <b>Arjuna</b> awards are for, and the <b>Ballon d'Or</b>."},
@@ -96,6 +97,7 @@ QB.push(
 ["A4","Who was the first Indian to win an Academy Award (Oscar)?",["Bhanu Athaiya","Satyajit Ray","A. R. Rahman","Resul Pookutty"],"For costume design in Gandhi (1983).","p"],
 ["A4","The song 'Naatu Naatu' that won the Oscar in 2023 is from the film:",["RRR","Baahubali","Pushpa","KGF"],"Music by M. M. Keeravani, lyrics by Chandrabose.","p"],
 ["A4","Who received the Dadasaheb Phalke Award presented at the 71st National Film Awards in 2025?",["Mohanlal","Mithun Chakraborty","Waheeda Rehman","Mammootty"],"Presented by the President in September 2025.","p"],
+["A4","Who received the Dadasaheb Phalke Award for 2024, presented at the 72nd National Film Awards in September 2026?",["Anant Nag","Mammootty","Kamal Haasan","Shabana Azmi"],"President Droupadi Murmu presented it at Ekta Nagar, Gujarat, on 22 Sep 2026. He is the second Kannada actor to receive it, after Dr. Rajkumar (1995).",""],
 ["A5","Who was the first recipient of the Khel Ratna award?",["Viswanathan Anand","Sachin Tendulkar","Leander Paes","Karnam Malleswari"],"For 1991–92.","p"],
 ["A5","The Dronacharya Award is given to:",["Coaches","Players","Sports journalists","Sports universities"],"Started in 1985.","p"],
 ["A5","The Khel Ratna was renamed after Major Dhyan Chand in:",["2021","2019","2016","2023"],"Earlier called the Rajiv Gandhi Khel Ratna.","p"],
@@ -103,7 +105,7 @@ QB.push(
 );
 
 LASTMOMENT.push(
-{t:"Film awards", era:["aw"], rows:[["First Phalke","Devika Rani (1969)"],["Latest Phalke","Mohanlal (55th, 2025)"],["First Indian Oscar","Bhanu Athaiya (1983)"],["Two Oscars","A. R. Rahman (2009)"],["Naatu Naatu","Keeravani, Chandrabose (2023)"],["Elephant Whisperers","Kartiki Gonsalves, Guneet Monga"],["Cannes palm","Palme d'Or"],["Cannes Grand Prix 2024","Payal Kapadia"]]},
+{t:"Film awards", era:["aw"], rows:[["First Phalke","Devika Rani (1969)"],["Latest Phalke","Anant Nag (56th, 2024 award, given Sep 2026)"],["First Indian Oscar","Bhanu Athaiya (1983)"],["Two Oscars","A. R. Rahman (2009)"],["Naatu Naatu","Keeravani, Chandrabose (2023)"],["Elephant Whisperers","Kartiki Gonsalves, Guneet Monga"],["Cannes palm","Palme d'Or"],["Cannes Grand Prix 2024","Payal Kapadia"]]},
 {t:"Sports awards", era:["aw"], rows:[["Highest","Khel Ratna (renamed 2021)"],["First Khel Ratna","Viswanathan Anand"],["Coaches","Dronacharya (1985)"],["Players","Arjuna (1961)"],["Khel Ratna 2024","Manu Bhaker, Gukesh, Harmanpreet, Praveen Kumar"],["Khel Ratna 2025","Not awarded"],["Ballon d'Or 2025","Ousmane Dembélé"],["Oscars of sport","Laureus"]]}
 );
 TILES.push(["1969","First Phalke Award","aw"],["1983","First Indian Oscar","aw"],["2023","Naatu Naatu Oscar","aw"],["1991","Khel Ratna begins","aw"],["1961","Arjuna Award begins","aw"],["1985","Dronacharya Award begins","aw"]);
