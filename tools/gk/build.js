@@ -22,7 +22,8 @@ const APPS = [
   { dir: 'parks', id: 'parks', file: 'study-protected-areas.html', key: 'protected_areas_v1', era: 'pa', title: 'Protected Areas', hi: 'संरक्षित क्षेत्र',
     parts: [['Part 1 · Parks and sanctuaries', 'राष्ट्रीय उद्यान और अभयारण्य', 1, 4], ['Part 2 · Reserves and wetlands', 'आरक्षित क्षेत्र और आर्द्रभूमि', 5, 7], ['Part 3 · Heritage and wildlife', 'धरोहर और वन्यजीव', 8, 99]] }
 ];
-// Newer apps keep their config next to their data: tools/gk/<dir>/app.json, same fields as above ("dir" is the folder).
+// Newer apps keep their config next to their data: tools/gk/<dir>/app.json, same fields as above ("dir" is the folder;
+// an optional "exams" replaces the default "SSC CGL · CHSL · MTS · RRB NTPC" line under the title).
 fs.readdirSync(__dirname).filter(d => fs.existsSync(path.join(__dirname, d, 'app.json')))
   .forEach(d => APPS.push(Object.assign({ dir: d }, JSON.parse(fs.readFileSync(path.join(__dirname, d, 'app.json'), 'utf8')))));
 
@@ -69,9 +70,9 @@ APPS.filter(a => !only || a.id === only || a.dir === only).forEach(app => {
   const tabs = ['learn', 'practice', 'mock', 'lab', 'revise', 'plan'];
   // photos, maps, charts and timelines: tools/gk/<dir>/visual.js (see applyVisual in tools/workbook/lib.js)
   const V = applyVisual(path.join(dir, 'visual.js'), LESSONS, { QB: qb, TILES: ctx.TILES });
-  const size = writePage({ file: app.file, title: app.title, brand: app.title, small: app.hi + ' · SSC CGL · CHSL · MTS · RRB NTPC', tabs,
+  const size = writePage({ file: app.file, title: app.title, brand: app.title, small: app.hi + ' · ' + (app.exams || 'SSC CGL · CHSL · MTS · RRB NTPC'), tabs,
     source: 'tools/gk/build.js from tools/gk/' + app.dir, extra: lab, games: true, visual: V.visual }, {
-    APP: { id: app.id, key: app.key, mode: 'era', era: app.era, title: app.title, hi: app.hi, tagline: 'SSC CGL · CHSL · MTS · RRB NTPC',
+    APP: { id: app.id, key: app.key, mode: 'era', era: app.era, title: app.title, hi: app.hi, tagline: app.exams || 'SSC CGL · CHSL · MTS · RRB NTPC',
       plans: [3, 5, 7, 10, 15], storyLabel: 'The story first · two minutes', keyLabel: 'Remember this:', apps: [], tabs },
     GROUPS: ctx.GROUPS, LESSONS, QB: qb, TIMELINE: tls.length ? [{ era: app.era, rows: tls }] : [],
     LASTMOMENT: ctx.LASTMOMENT, TILES: ctx.TILES, ERANOTE: ctx.ERANOTE, INTROS: ctx.INTROS, HEATMAP: ctx.HEATMAP, VIS: V.VIS

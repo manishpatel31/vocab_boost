@@ -196,7 +196,7 @@ td.n{font-family:var(--f-num);font-variant-numeric:tabular-nums;white-space:nowr
 .pal button.ok{background:var(--good-bg);border-color:var(--good);color:var(--good)}
 .pal button.no{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
 .confirm{background:var(--warn-bg);border-radius:var(--r);padding:12px 14px;display:grid;gap:10px}
-fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:8px;min-width:0;grid-template-columns:minmax(0,1fr)}
 legend{font-weight:700;margin-bottom:6px;padding:0}
 .radios{display:flex;gap:8px;flex-wrap:wrap}
 .radios label{border:1px solid var(--rule);background:var(--sheet);border-radius:99px;padding:6px 14px;font-weight:600;cursor:pointer;font-size:14px}

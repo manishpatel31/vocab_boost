@@ -43,6 +43,7 @@ tools/
 
 ## Data at a glance
 
+- **APP options** (rest.py): `pyq` renames the PYQ label, `heatTab` the heat-map tab; `mockSecs` / `mockPace` set the mock's seconds per question and its words (default 36, CGL Tier 1 pace; Statistics uses 72 for Paper II).
 - **Lesson**: `{"id": "L1", "heat": 0–3, "title", "hi" (Hindi), "blocks": [...], "sum": [...]}`.
   Block kinds (`k`): `hot` (why it's asked), `p` (text), `formula`, `table`, `facts`, `tl`, `fig` / `figs` (SVG),
   `ex` (worked example with `steps` and `ans`), `trick`, `trap`, `link`, `q` (inline check).
