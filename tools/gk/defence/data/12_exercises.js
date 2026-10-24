@@ -75,7 +75,7 @@ const F9R = [
   ["Yudh Abhyas 2026 (22nd)","USA","Auli, Uttarakhand — September 2026.",""],
   ["Mountain Guardian 2026","UAE","Mountain warfare, Uttarakhand — October 2026.",""],
   ["Khanjar 2026 (13th)","Kyrgyzstan","Misamari, Assam — February 2026.",""],
-  ["Dustlik 2026","Uzbekistan","Pune — April 2026.",""],
+  ["Dustlik 2026","Uzbekistan","7th edition, Gurumsaray Field Training Area, Namangan (Uzbekistan), 12–25 April 2026 (the 6th, in 2025, was in Pune).",""],
   ["Lamitiye 2026","Seychelles","Seychelles Defence Academy.",""],
   ["Yudh Abhyas 2025 (21st)","USA","Fort Wainwright, Alaska — September 2025.",""],
   ["Maitree 2025 (14th)","Thailand","Umroi, Meghalaya — September 2025.",""],
