@@ -76,7 +76,7 @@ LESSONS.push(
 ], sum:["Santhal Hul: 30 June 1855, Sidhu and Kanhu Murmu (Bhognadih) → Santhal Parganas.","Munda Ulgulan 1899–1900: Birsa Munda (born 15 Nov 1875, died 9 June 1900) → Chota Nagpur Tenancy Act 1908.","Kol 1831–32 (Buddhu Bhagat), Khasi 1829–33 (U Tirot Sing), Jaintia 1862 (U Kiang Nongbah), Rampa 1922–24 (Alluri Sitarama Raju), Heraka (Rani Gaidinliu).","Mangarh 1913 (Govind Guru, Bhils), Bhumkal 1910 (Gunda Dhur), Tana Bhagat 1914 (Jatra Bhagat), Komaram Bheem (1940).","Janjatiya Gaurav Divas: 15 November, since 2021. Hornbill: 1–10 December, Kisama, Nagaland.","Festivals: Sekrenyi–Angami, Moatsu–Ao, Wangala–Garo, Chapchar Kut–Mizo, Bwisagu–Bodo, Dree–Apatani, Nyokum–Nyishi, Solung–Adi, Bhagoria–Bhil, Medaram–Koya."]}
 );
 
-pairQs("T6", T6A, { q: t => `Who led the ${t}?`, rq: a => `${a} is remembered for leading which movement?` });
+pairQs("T6", T6A, { q: t => `Who led the ${t}?` });
 pairQs("T6", T6B, { q: t => `${t} is a festival of which tribe?` });
 
 QB.push(
