@@ -1,1 +1,156 @@
+# Questions for L7–L11
 from st import *
+
+# ---------- L7 regression, partial and multiple correlation ----------
+Q("L7", "The two regression coefficients are bᵧₓ = 1.6 and bₓᵧ = 0.4. The correlation coefficient is:", ["@", "0.64", "1", "−0.8"], "r = +√(1.6 × 0.4) = √0.64 = 0.8, positive like the coefficients.", fmt(math.sqrt(1.6 * 0.4)), hy=True)
+Q("L7", "The two regression coefficients are −0.5 and −0.8. The correlation coefficient is:", ["@", fmt(math.sqrt(0.4)), "−0.4", "−0.65"], "r = −√(0.5 × 0.8) = −√0.4 ≈ −0.63; r takes the common negative sign.", "−" + fmt(math.sqrt(0.4)))
+_sol = [(x, y) for x in range(-20, 21) for y in range(-20, 21) if 3 * x - 2 * y == 5 and x - 4 * y == -5]
+Q("L7", "The two regression lines are 3x − 2y = 5 and x − 4y = −5. The means x̄ and ȳ are:", ["x̄ = 3, ȳ = 2", "x̄ = 2, ȳ = 3", "x̄ = 5, ȳ = 5", "x̄ = 1, ȳ = −1"], "Both lines pass through (x̄, ȳ): solving them together gives x = 3, y = 2.", hy=True)
+assert _sol == [(3, 2)]
+# 3x − 2y = 5 as x on y: x = 5/3 + (2/3)y ; x − 4y = −5 as y on x: y = 5/4 + x/4
+assert F(3, 2) * 4 > 1 and F(2, 3) * F(1, 4) <= 1
+Q("L7", "The two regression lines are 3x − 2y = 5 and x − 4y = −5. The correlation coefficient is:", ["@", fmt(math.sqrt(6)), fmt(F(1, 6)), fmt(F(2, 3))], "Taking 3x − 2y = 5 as y on x gives bᵧₓ = 1.5 and bₓᵧ = 4 (product 6 > 1, impossible). So it is x on y: bₓᵧ = 2/3, and y on x is y = (x + 5)/4: bᵧₓ = 1/4. r = √(1/6) ≈ 0.41.", fmt(math.sqrt(1 / 6)))
+Q("L7", "r = 0.6, σₓ = 3 and σᵧ = 5. The regression coefficient of y on x is:", ["@", "0.36", "0.6", "1.67"], "bᵧₓ = r σᵧ/σₓ = 0.6 × 5/3 = 1. (0.36 is bₓᵧ = 0.6 × 3/5.)", fmt(F(6, 10) * 5 / 3))
+Q("L7", "x̄ = 10, ȳ = 40 and the regression coefficient of y on x is 2.5. The estimate of y when x = 14 is:", ["@", "35", "45", "41.6"], "y − 40 = 2.5(14 − 10) = 10 → y = 50.", fmt(40 + F(5, 2) * 4))
+Q("L7", "bᵧₓ = 1.6 and r = 0.8. The regression coefficient of x on y is:", ["@", "0.5", "1.28", "0.64"], "bₓᵧ = r²/bᵧₓ = 0.64/1.6 = 0.4.", fmt(F(64, 100) / F(16, 10)))
+Q("L7", "If r = 0, the two regression lines are:", ["perpendicular to each other", "coincident", "parallel", "inclined at 45°"], "With r = 0 the lines are y = ȳ and x = x̄, parallel to the axes and at right angles.")
+Q("L7", "If r = ±1, the two regression lines:", ["coincide", "are perpendicular", "are parallel but distinct", "do not meet"], "tan θ = 0 when r² = 1, so θ = 0 and the lines are the same.")
+Q("L7", "The two regression lines intersect at the point:", ["(x̄, ȳ)", "(0, 0)", "(σₓ, σᵧ)", "(bₓᵧ, bᵧₓ)"], "Both lines pass through the point of means.", hy=True)
+Q("L7", "u = x/2 and v = y/3, and the regression coefficient of v on u is 0.8. The regression coefficient of y on x is:", ["@", fmt(F(2, 3) * F(8, 10)), "0.8", "4.8"], "y = 3v, x = 2u → bᵧₓ = (3/2) × 0.8 = 1.2. Change of scale changes the coefficients.", fmt(F(3, 2) * F(8, 10)))
+Q("L7", "σᵧ = 10 and r = 0.6. The standard error of estimate of y on x is:", ["@", "6", "4", "6.4"], "Sᵧₓ = σᵧ√(1 − r²) = 10 × √0.64 = 8.", fmt(10 * math.sqrt(1 - 0.36)))
+Q("L7", "Which pair cannot be the two regression coefficients of a bivariate distribution?", ["1.5 and 0.8", "0.5 and 1.2", "−0.4 and −0.9", "2 and 0.3"], "Their product 1.2 would make r² > 1. The other products are 0.6, 0.36 and 0.6.", hy=True)
+assert 1.5 * 0.8 > 1 and all(a * b <= 1 for a, b in ((0.5, 1.2), (-0.4, -0.9), (2, 0.3)))
+Q("L7", "Which pair cannot be the two regression coefficients?", ["0.6 and −0.5", "0.6 and 0.5", "−0.6 and −0.5", "0.2 and 0.9"], "Both regression coefficients must have the same sign (the sign of r).")
+Q("L7", "r₁₂ = 0.7, r₁₃ = 0.5 and r₂₃ = 0.5. The partial correlation r₁₂.₃ is:", ["@", "0.7", "0.45", "0.52"], "(0.7 − 0.25)/√(0.75 × 0.75) = 0.45/0.75 = 0.6.", fmt((0.7 - 0.25) / math.sqrt(0.75 * 0.75)), hy=True)
+Q("L7", "r₁₂ = 0.6, r₁₃ = 0.6 and r₂₃ = 0. The multiple correlation R₁.₂₃ is:", ["@", "0.72", "1.2", "0.6"], "R² = (0.36 + 0.36 − 0)/(1 − 0) = 0.72 → R ≈ 0.85.", fmt(math.sqrt(0.72)))
+Q("L7", "If r₁₃ = r₂₃ = 0, the partial correlation r₁₂.₃ equals:", ["r₁₂", "0", "1", "r₁₂²"], "The formula reduces to (r₁₂ − 0)/√(1 × 1) = r₁₂: holding an unrelated variable fixed changes nothing.")
+Q("L7", "The multiple correlation coefficient R₁.₂₃ lies between:", ["0 and 1", "−1 and 1", "−1 and 0", "1 and ∞"], "R is the correlation between x₁ and its best linear estimate, which is never negative.")
+Q("L7", "The line of regression of y on x is fitted by minimising the sum of squares of:", ["the vertical deviations (in y) from the line", "the horizontal deviations (in x) from the line", "the perpendicular distances from the line", "the deviations of x from x̄"], "Least squares for y on x minimises Σ(y − a − bx)².")
+Q("L7", "If σₓ = σᵧ, then:", ["bᵧₓ = bₓᵧ = r", "bᵧₓ = 1/bₓᵧ", "r = 0", "the regression lines are perpendicular"], "bᵧₓ = rσᵧ/σₓ = r and bₓᵧ = rσₓ/σᵧ = r.")
+_x, _y = [1, 2, 3, 4, 5], [6, 7, 8, 9, 10]
+_a, _b = lsq(_x, _y)
+Q("L7", "For 5 pairs Σx = 15, Σy = 40, Σxy = 130 and Σx² = 55. The line of regression of y on x is:", ["y = 5 + x", "y = 8 + x", "y = 5 + 2x", "y = 3 + x"], "bᵧₓ = (5 × 130 − 15 × 40)/(5 × 55 − 225) = 50/50 = 1; a = ȳ − bx̄ = 8 − 3 = 5.")
+assert (_a, _b) == (5, 1) and (sum(_x), sum(_y), sum(a * b for a, b in zip(_x, _y)), sum(a * a for a in _x)) == (15, 40, 130, 55)
+Q("L7", "bᵧₓ = 0.8 and bₓᵧ = 0.45. The coefficient of determination is:", ["@", "0.6", "1.25", "0.625"], "r² = bᵧₓ × bₓᵧ = 0.36.", fmt(F(8, 10) * F(45, 100)))
+Q("L7", "σ₁ = 4, σ₂ = 2, r₁₂ = 0.7, r₁₃ = 0.5, r₂₃ = 0.5. The partial regression coefficient b₁₂.₃ is:", ["@", "0.6", "0.3", "1.4"], "b₁₂.₃ = (σ₁/σ₂)(r₁₂ − r₁₃r₂₃)/(1 − r₂₃²) = 2 × 0.45/0.75 = 1.2.", fmt(2 * F(45, 100) / F(75, 100)))
+
+# ---------- L8 probability ----------
+Q("L8", "Three fair coins are tossed. The probability of exactly two heads is:", ["@", "1/2", "1/4", "2/3"], "HHT, HTH, THH → 3 of the 8 equally likely outcomes = 3/8.", Fr(C(3, 2), 8))
+_s = [a + b for a in range(1, 7) for b in range(1, 7)]
+Q("L8", "Two dice are thrown. The probability that the sum is 7 is:", ["@", "7/36", "5/36", "1/12"], "(1, 6), (2, 5), (3, 4), (4, 3), (5, 2), (6, 1): 6 of 36 = 1/6.", Fr(_s.count(7), 36))
+_pr = {2, 3, 5, 7, 11}
+Q("L8", "Two dice are thrown. The probability that the sum is a prime number is:", ["@", "1/2", "7/18", "4/9"], "Sums 2, 3, 5, 7, 11 occur 1 + 2 + 4 + 6 + 2 = 15 ways → 15/36 = 5/12.", Fr(sum(1 for s in _s if s in _pr), 36))
+Q("L8", "A card is drawn from a pack of 52. The probability that it is a king or a heart is:", ["@", "17/52", "1/4", "1/52"], "13 hearts + 4 kings − 1 king of hearts = 16 → 16/52 = 4/13.", Fr(13 + 4 - 1, 52), hy=True)
+Q("L8", "A card is drawn from a pack of 52. The probability that it is a face card (J, Q or K) is:", ["@", "4/13", "1/4", "1/13"], "12 face cards → 12/52 = 3/13.", Fr(12, 52))
+Q("L8", "Two cards are drawn one after the other without replacement. The probability that both are aces is:", ["@", "1/169", "1/26", "2/221"], "(4/52)(3/51) = 12/2652 = 1/221. (1/169 assumes replacement.)", Fr(4 * 3, 52 * 51))
+Q("L8", "A bag has 5 red and 3 blue balls. Two balls are drawn at random. The probability that both are red is:", ["@", "25/64", "5/8", "3/28"], "C(5, 2)/C(8, 2) = 10/28 = 5/14.", Fr(C(5, 2), C(8, 2)))
+Q("L8", "P(A) = 0.6, P(B) = 0.5 and P(A ∩ B) = 0.3. P(A ∪ B) is:", ["@", "1.1", "0.3", "0.9"], "0.6 + 0.5 − 0.3 = 0.8.", fmt(F(6, 10) + F(5, 10) - F(3, 10)))
+Q("L8", "P(A) = 0.6, P(B) = 0.5 and P(A ∩ B) = 0.3. Which is true?", ["A and B are independent", "A and B are mutually exclusive", "P(A | B) = 0.5", "P(A ∪ B) = 1"], "P(A)P(B) = 0.3 = P(A ∩ B), so they are independent; P(A | B) = 0.3/0.5 = 0.6.")
+Q("L8", "A and B are independent with P(A) = 0.3 and P(B) = 0.4. P(A ∪ B) is:", ["@", "0.7", "0.12", "0.82"], "0.3 + 0.4 − 0.3 × 0.4 = 0.58.", fmt(F(3, 10) + F(4, 10) - F(12, 100)), hy=True)
+Q("L8", "A and B are mutually exclusive with P(A) = 0.3 and P(B) = 0.4. P(A ∪ B) is:", ["@", "0.58", "0.12", "0.4"], "For exclusive events P(A ∩ B) = 0, so P(A ∪ B) = 0.7.", fmt(F(3, 10) + F(4, 10)))
+Q("L8", "Two events with non-zero probabilities are mutually exclusive. They are:", ["dependent", "independent", "exhaustive", "equally likely"], "P(A ∩ B) = 0 but P(A)P(B) > 0, so they cannot be independent.", hy=True)
+Q("L8", "The odds in favour of an event are 3 : 5. Its probability is:", ["@", "3/5", "5/8", "2/5"], "P = 3/(3 + 5) = 3/8.", Fr(3, 3 + 5))
+Q("L8", "The odds against an event are 7 : 4. The probability that it happens is:", ["@", "7/11", "4/7", "3/11"], "Odds against 7 : 4 → P(happens) = 4/(7 + 4) = 4/11.", Fr(4, 11))
+Q("L8", "A coin is tossed 5 times. The probability of at least one head is:", ["@", "1/32", "5/32", "1/2"], "1 − (1/2)⁵ = 31/32.", Fr(1 - F(1, 2) ** 5))
+Q("L8", "A die is thrown 3 times. The probability of at least one six is:", ["@", "1/2", "125/216", "1/216"], "1 − (5/6)³ = 1 − 125/216 = 91/216.", Fr(1 - F(5, 6) ** 3))
+Q("L8", "The probability that a leap year chosen at random has 53 Sundays is:", ["@", "1/7", "53/366", "1/2"], "A leap year has 52 weeks + 2 days; 2 of the 7 day-pairs include a Sunday → 2/7.", Fr(2, 7))
+_p1 = F(1, 2) * F(3, 5) / (F(1, 2) * F(3, 5) + F(1, 2) * F(2, 5))
+Q("L8", "Urn I has 3 white and 2 black balls; urn II has 2 white and 3 black. An urn is chosen at random and a ball drawn from it is white. The probability that it came from urn I is:", ["@", "1/2", "3/10", "2/5"], "(½ × 3/5)/(½ × 3/5 + ½ × 2/5) = 3/5.", Fr(_p1), hy=True)
+_pdz = F(1, 100) * F(9, 10) / (F(1, 100) * F(9, 10) + F(99, 100) * F(5, 100))
+Q("L8", "1% of a population has a disease. A test detects it in 90% of those who have it but also gives a positive result for 5% of healthy people. A person tests positive. The probability that the person has the disease is about:", ["@", "0.9", "0.85", "0.01"], "P(D | +) = 0.009/(0.009 + 0.0495) = 0.009/0.0585 = 2/13 ≈ 0.15.", fmt(_pdz))
+Q("L8", "Factory X makes 60% of the bolts with 1% defective; factory Y makes 40% with 3% defective. The probability that a bolt picked at random is defective is:", ["@", "0.04", "0.02", "0.012"], "0.6 × 0.01 + 0.4 × 0.03 = 0.006 + 0.012 = 0.018.", fmt(F(6, 10) * F(1, 100) + F(4, 10) * F(3, 100), 3))
+_fam = [(a, b) for a in "BG" for b in "BG"]
+_atl = [f for f in _fam if "B" in f]
+Q("L8", "A family has two children and at least one of them is a boy. The probability that both are boys is:", ["@", "1/2", "1/4", "2/3"], "Equally likely BB, BG, GB, GG; ‘at least one boy’ leaves BB, BG, GB → 1/3.", Fr(sum(1 for f in _atl if f == ("B", "B")), len(_atl)))
+Q("L8", "A can solve a problem with probability 1/2 and B with probability 1/3, independently. The probability that the problem is solved is:", ["@", "1/6", "5/6", "1/2"], "1 − P(both fail) = 1 − (1/2)(2/3) = 2/3.", Fr(1 - F(1, 2) * F(2, 3)))
+Q("L8", "The axiomatic definition of probability was given by:", ["A. N. Kolmogorov", "R. A. Fisher", "Karl Pearson", "Pierre-Simon Laplace"], "Kolmogorov (1933) built probability on three axioms; Laplace is linked with the classical definition.")
+Q("L8", "A limitation of the classical definition of probability is that it:", ["needs the outcomes to be equally likely and finite in number", "cannot be used with coins or dice", "gives probabilities greater than 1", "needs a very large number of trials"], "Favourable/total works only when the cases are finite and equally likely.")
+Q("L8", "Three coins are tossed. The probability of at least two heads is:", ["@", "3/8", "1/4", "7/8"], "HHT, HTH, THH, HHH → 4/8 = 1/2.", Fr(C(3, 2) + C(3, 3), 8))
+
+# ---------- L9 random variables ----------
+_k = F(1, sum(range(1, 5)))
+Q("L9", "P(X = x) = kx for x = 1, 2, 3, 4. The value of k is:", ["@", "1/4", "1/24", "1/5"], "k(1 + 2 + 3 + 4) = 10k = 1 → k = 1/10.", Fr(_k), hy=True)
+Q("L9", "P(X = x) = k(x² + 1) for x = 0, 1, 2. The value of k is:", ["@", "1/5", "1/6", "1/3"], "k(1 + 2 + 5) = 8k = 1 → k = 1/8.", Fr(1, 1 + 2 + 5))
+_x, _p = [1, 2, 3], [F(2, 10), F(5, 10), F(3, 10)]
+_E = sum(a * b for a, b in zip(_x, _p)); _V = sum(a * a * b for a, b in zip(_x, _p)) - _E ** 2
+Q("L9", "X takes the values 1, 2, 3 with probabilities 0.2, 0.5, 0.3. E(X) is:", ["@", "2", "1.9", "2.3"], "0.2 + 1.0 + 0.9 = 2.1.", fmt(_E))
+Q("L9", "X takes the values 1, 2, 3 with probabilities 0.2, 0.5, 0.3. Var(X) is:", ["@", "4.9", "0.7", "0.41"], "E(X²) = 0.2 + 2 + 2.7 = 4.9; Var = 4.9 − 2.1² = 4.9 − 4.41 = 0.49.", fmt(_V), hy=True)
+Q("L9", "E(X) = 4. Then E(3X + 2) is:", ["@", "12", "36", "18"], "3 × 4 + 2 = 14.", 3 * 4 + 2)
+Q("L9", "Var(X) = 5. Then Var(2X − 3) is:", ["@", "10", "7", "17"], "2² × 5 = 20; the −3 has no effect.", 4 * 5)
+_die = list(range(1, 7))
+Q("L9", "For the score X on one throw of a fair die, Var(X) is:", ["@", "3.5", "17.5", "15.17"], "E(X) = 3.5, E(X²) = 91/6; Var = 91/6 − 12.25 = 35/12 ≈ 2.92.", fmt(pvar(_die)))
+Q("L9", "X has density f(x) = 3x² for 0 < x < 1. E(X) is:", ["@", "1/2", "3/5", "1"], "∫₀¹ x · 3x² dx = 3/4.", Fr(3, 4))
+Q("L9", "f(x) = k for 2 < x < 6 (0 elsewhere) is a density. The value of k is:", ["@", "1/6", "4", "1/2"], "Area = k × (6 − 2) = 1 → k = 1/4.", Fr(1, 6 - 2))
+Q("L9", "f(x) = kx² for 0 < x < 3 (0 elsewhere) is a density. The value of k is:", ["@", "1/3", "1/27", "3"], "∫₀³ kx² dx = 9k = 1 → k = 1/9.", Fr(1, 27 // 3))
+Q("L9", "Which is NOT a property of a distribution function F(x)?", ["F(x) can decrease as x increases", "F(−∞) = 0", "F(∞) = 1", "0 ≤ F(x) ≤ 1"], "F(x) = P(X ≤ x) never decreases.")
+Q("L9", "X and Y are independent with Var(X) = 4 and Var(Y) = 9. Var(X − Y) is:", ["@", "−5", "5", "√13"], "For independent variables Var(X − Y) = Var X + Var Y = 13.", 4 + 9, hy=True)
+Q("L9", "Var(X) = 4, Var(Y) = 9 and Cov(X, Y) = 2. Var(X − Y) is:", ["@", "13", "17", "5"], "4 + 9 − 2 × 2 = 9.", 4 + 9 - 2 * 2)
+Q("L9", "X and Y are independent with E(X) = 2 and E(Y) = 5. E(XY) is:", ["@", "7", "2.5", "3"], "For independent variables E(XY) = E(X)E(Y) = 10.", 2 * 5)
+Q("L9", "E(XY) = 12, E(X) = 3 and E(Y) = 3. Cov(X, Y) is:", ["@", "9", "12", "4"], "Cov = E(XY) − E(X)E(Y) = 12 − 9 = 3.", 12 - 9)
+Q("L9", "By Chebyshev’s inequality, P(|X − μ| ≥ 3σ) is at most:", ["@", "1/3", "0.0027", "8/9"], "P(|X − μ| ≥ kσ) ≤ 1/k² = 1/9. (0.0027 is the exact value only for a normal variable.)", Fr(1, 9))
+Q("L9", "By Chebyshev’s inequality, P(|X − μ| < 2σ) is at least:", ["@", "1/4", "0.9545", "1/2"], "1 − 1/k² = 1 − 1/4 = 3/4, for any distribution.", Fr(1 - F(1, 4)))
+_j = {(0, 0): F(1, 10), (0, 1): F(2, 10), (1, 0): F(3, 10), (1, 1): F(4, 10)}
+_ex = sum(p for (x, y), p in _j.items() if x == 1); _ey = sum(p for (x, y), p in _j.items() if y == 1); _exy = _j[(1, 1)]
+Q("L9", "Joint pmf: p(0, 0) = 0.1, p(0, 1) = 0.2, p(1, 0) = 0.3, p(1, 1) = 0.4. P(X = 1) is:", ["@", "0.4", "0.6", "0.3"], "Marginal: p(1, 0) + p(1, 1) = 0.3 + 0.4 = 0.7.", fmt(_ex))
+Q("L9", "Joint pmf: p(0, 0) = 0.1, p(0, 1) = 0.2, p(1, 0) = 0.3, p(1, 1) = 0.4. Cov(X, Y) is:", ["@", "0.4", "0.02", "0"], "E(X) = 0.7, E(Y) = 0.6, E(XY) = 0.4 → Cov = 0.4 − 0.42 = −0.02.", fmt(_exy - _ex * _ey))
+Q("L9", "A game pays ₹10 with probability 0.3 and costs ₹5 with probability 0.7. The expected gain per game is:", ["@", "₹1.5", "₹5", "₹0.5"], "10 × 0.3 − 5 × 0.7 = 3 − 3.5 = −0.5 → an expected loss of ₹0.5.", "−₹" + fmt(-(10 * F(3, 10) - 5 * F(7, 10))))
+Q("L9", "The moment generating function of X is (0.4 + 0.6eᵗ)¹⁰. The mean of X is:", ["@", "4", "2.4", "0.6"], "It is the binomial MGF with n = 10, p = 0.6 → mean np = 6. (2.4 is the variance.)", fmt(10 * F(6, 10)))
+Q("L9", "The moment generating function of X is e^(3(eᵗ − 1)). The variance of X is:", ["@", "9", "√3", "1/3"], "It is the Poisson MGF with m = 3; the variance equals m = 3.", 3)
+Q("L9", "For a continuous random variable X, P(X = 5) is:", ["0", "f(5)", "F(5)", "1 − F(5)"], "A single point has zero area under the density.")
+Q("L9", "Var(X) = 9 and E(X) = 4. E(X²) is:", ["@", "13", "7", "16"], "E(X²) = Var(X) + [E(X)]² = 9 + 16 = 25.", 9 + 16)
+
+# ---------- L10 discrete distributions ----------
+Q("L10", "A fair coin is tossed 8 times. The probability of exactly 3 heads is:", ["@", "3/8", "1/8", "5/16"], "C(8, 3)/2⁸ = 56/256 = 7/32.", Fr(binom(8, F(1, 2), 3)))
+_q = F(42, 10) / 6
+Q("L10", "A binomial distribution has mean 6 and variance 4.2. Its parameters are:", ["n = 20, p = 0.3", "n = 30, p = 0.2", "n = 20, p = 0.7", "n = 60, p = 0.1"], "q = 4.2/6 = 0.7 → p = 0.3 → n = 6/0.3 = 20.", hy=True)
+assert _q == F(7, 10) and 6 / (1 - _q) == 20
+Q("L10", "A distribution is said to have mean 4 and variance 5. Which is true?", ["It cannot be binomial, since a binomial variance is less than its mean", "It is binomial with p = 0.8", "It is binomial with n = 20", "It is Poisson with m = 4"], "Binomial variance npq < np because q < 1; and a Poisson would need mean = variance.")
+Q("L10", "The variance of a binomial distribution with n = 10 and p = 0.4 is:", ["@", "4", "6", "1.55"], "npq = 10 × 0.4 × 0.6 = 2.4. (4 is the mean.)", fmt(10 * F(4, 10) * F(6, 10)))
+Q("L10", "The standard deviation of a binomial distribution with n = 100 and p = 0.1 is:", ["@", "9", "10", "0.9"], "√(npq) = √9 = 3. (9 is the variance.)", fmt(math.sqrt(100 * 0.1 * 0.9)))
+Q("L10", "A shooter hits a target with probability 0.2 per shot. In 4 independent shots, the probability of at least one hit is:", ["@", "0.8", "0.4096", "0.0016"], "1 − 0.8⁴ = 1 − 0.4096 = 0.5904.", fmt(1 - F(8, 10) ** 4, 4))
+Q("L10", "The mode of a binomial distribution with n = 10 and p = 0.3 is:", ["@", "3.3", "4", "2"], "(n + 1)p = 3.3 → mode = 3 (its integer part).", max(range(11), key=lambda r: binom(10, F(3, 10), r)))
+Q("L10", "A binomial distribution is symmetric when:", ["p = 1/2", "n is even", "np is an integer", "p = q = 1"], "β₁ = (q − p)²/(npq) = 0 only when p = q = 1/2.")
+Q("L10", "For a Poisson distribution with mean 3, the variance is:", ["3", "9", "√3", "1/3"], "Mean = variance = m for a Poisson distribution.", hy=True)
+Q("L10", "X is Poisson with mean 3. Given e⁻³ = 0.0498, P(X = 2) is about:", ["@", "0.0747", "0.149", "0.448"], "e⁻³ × 3²/2! = 0.0498 × 4.5 ≈ 0.224.", fmt(0.0498 * 9 / 2, 3))
+_m = [m for m in range(1, 20) if math.isclose(poisson(m, 2), poisson(m, 3))]
+Q("L10", "For a Poisson variable P(X = 2) = P(X = 3). The mean is:", ["@", "2", "2.5", "6"], "e⁻ᵐm²/2 = e⁻ᵐm³/6 → m = 3.", _m[0], hy=True)
+_m = [m for m in range(1, 20) if math.isclose(poisson(m, 1), 2 * poisson(m, 2))]
+Q("L10", "For a Poisson variable P(X = 1) = 2P(X = 2). The mean is:", ["@", "2", "0.5", "4"], "e⁻ᵐm = 2 × e⁻ᵐm²/2 = e⁻ᵐm² → m = 1.", _m[0])
+Q("L10", "Items are defective with probability 0.01. Using the Poisson approximation, the probability that a lot of 200 has no defective item is about (e⁻² = 0.1353):", ["@", "0.2707", "0.8647", "0.0135"], "m = np = 200 × 0.01 = 2 → P(0) = e⁻² ≈ 0.1353.", fmt(math.exp(-2), 4))
+Q("L10", "β₁ for a Poisson distribution with mean 4 is:", ["@", "4", "2", "3.25"], "β₁ = 1/m = 0.25. (3.25 is β₂ = 3 + 1/m.)", fmt(F(1, 4)))
+Q("L10", "β₂ for a Poisson distribution with mean 2 is:", ["@", "3", "0.5", "5"], "β₂ = 3 + 1/m = 3.5: always leptokurtic, approaching the normal 3 as m grows.", fmt(3 + F(1, 2)))
+Q("L10", "X and Y are independent Poisson variables with means 2 and 3. Then X + Y is:", ["Poisson with mean 5", "Poisson with mean 6", "binomial with n = 5", "normal with mean 5"], "The Poisson distribution is additive: the means add.")
+Q("L10", "Each trial succeeds with probability 0.2. The expected number of trials up to and including the first success is:", ["@", "4", "0.2", "8"], "Geometric (trials): mean 1/p = 5. (4 = q/p counts the failures before it.)", fmt(1 / F(2, 10)))
+Q("L10", "For a geometric distribution counting the failures before the first success, with p = 0.5, the variance is:", ["@", "1", "4", "0.5"], "Variance q/p² = 0.5/0.25 = 2.", fmt(F(1, 2) / F(1, 4)))
+Q("L10", "5 items are drawn without replacement from a lot of 20 that has 8 defectives. The expected number of defectives drawn is:", ["@", "2.5", "4", "1.6"], "Hypergeometric mean = nM/N = 5 × 8/20 = 2.", fmt(F(5 * 8, 20)))
+Q("L10", "A lot of 10 items has 3 defectives. Two items are drawn without replacement. The probability that both are defective is:", ["@", "9/100", "3/10", "2/15"], "C(3, 2)/C(10, 2) = 3/45 = 1/15. (9/100 assumes replacement.)", Fr(C(3, 2), C(10, 2)))
+Q("L10", "X is uniform on the integers 1, 2, …, 10. Var(X) is:", ["@", "9.17", "5.5", "33"], "(n² − 1)/12 = 99/12 = 8.25.", fmt(pvar(list(range(1, 11)))))
+Q("L10", "For a binomial distribution with n = 10 and p = 0.5, the ratio P(X = 5)/P(X = 4) is:", ["@", "5/6", "1", "1/2"], "[(n − r)/(r + 1)](p/q) with r = 4: (6/5)(1) = 6/5.", Fr(binom(10, F(1, 2), 5) / binom(10, F(1, 2), 4)))
+_p = [F(k, 10) for k in range(1, 10) if 5 * F(k, 10) * (1 + 1 - F(k, 10)) == F(18, 10)]
+Q("L10", "For a binomial distribution with n = 5, the sum of the mean and the variance is 1.8. The value of p is:", ["@", "0.3", "0.8", "0.36"], "np + npq = 5p(2 − p) = 1.8 → p² − 2p + 0.36 = 0 → p = 0.2 (p = 1.8 is impossible).", fmt(_p[0]))
+
+# ---------- L11 continuous distributions ----------
+Q("L11", "X ~ N(50, 25). The standard normal value for X = 60 is:", ["@", "0.4", "10", "0.5"], "N(50, 25) has σ = √25 = 5 → z = (60 − 50)/5 = 2. Dividing by 25 is the classic slip.", fmt(F(60 - 50, 5)), hy=True)
+Q("L11", "For the standard normal variable Z, P(Z > 1.96) is about:", ["@", "0.05", "0.975", "0.0228"], "Φ(1.96) ≈ 0.975, so the right tail is 0.025.", fmt(1 - Phi(1.96), 3))
+Q("L11", "For the standard normal variable Z, P(−1.96 < Z < 1.96) is about:", ["@", "0.975", "0.6827", "0.99"], "2Φ(1.96) − 1 ≈ 0.95: the 95% band.", fmt(2 * Phi(1.96) - 1, 2))
+Q("L11", "IQ is N(100, 15²). Given Φ(1) = 0.8413, the proportion with IQ below 85 is:", ["@", "0.8413", "0.3413", "0.0228"], "z = (85 − 100)/15 = −1 → Φ(−1) = 1 − 0.8413 = 0.1587.", fmt(1 - F(8413, 10000), 4))
+Q("L11", "Marks of 1,000 students are N(60, 8²). Given Φ(2) = 0.9772, about how many score above 76?", ["@", "977", "46", "159"], "z = (76 − 60)/8 = 2 → tail 1 − 0.9772 = 0.0228 → about 23 students.", round(1000 * (1 - 0.9772)), hy=True)
+Q("L11", "For a normal distribution, mean, median and mode are:", ["all equal", "in the order mean > median > mode", "in the order mode > median > mean", "unrelated"], "The curve is symmetric with a single peak, so all three coincide at μ.")
+Q("L11", "The coefficient of kurtosis β₂ of a normal distribution is:", ["3", "0", "1", "2"], "Normal is the mesokurtic standard: β₂ = 3, γ₂ = 0.")
+Q("L11", "The percentage of a normal population within μ ± 3σ is about:", ["99.73%", "95.45%", "68.27%", "99%"], "±1σ: 68.27%, ±2σ: 95.45%, ±3σ: 99.73%.")
+Q("L11", "The quartile deviation of a normal distribution with σ = 20 is about:", ["@", "15.96", "20", "10"], "QD ≈ 0.6745σ = 13.49. (15.96 is the MD, 0.7979σ.)", fmt(0.6745 * 20))
+Q("L11", "The mean deviation about the mean of a normal distribution with σ = 10 is about:", ["@", "6.745", "10", "8.5"], "MD = σ√(2/π) ≈ 0.7979 × 10 ≈ 7.98.", fmt(10 * math.sqrt(2 / math.pi)))
+Q("L11", "The points of inflexion of N(30, 16) are at:", ["26 and 34", "14 and 46", "22 and 38", "29 and 31"], "σ = √16 = 4 → μ ± σ = 26 and 34.")
+_n = NormalDist(50, 10)
+Q("L11", "For N(50, 10²), the first and third quartiles are about:", ["@", "40 and 60", "45 and 55", "36.5 and 63.5"], "Q₁, Q₃ = μ ∓ 0.6745σ = 50 ∓ 6.745.", "%s and %s" % (fmt(_n.inv_cdf(0.25)), fmt(_n.inv_cdf(0.75))))
+Q("L11", "X ~ N(10, 4) and Y ~ N(20, 9) are independent. The distribution of X + Y is:", ["N(30, 13)", "N(30, 5)", "N(30, 25)", "N(10, 13)"], "Means add (30) and, for independent variables, variances add (13).")
+Q("L11", "X ~ N(10, 4) and Y ~ N(20, 9) are independent. The variance of 2X − Y is:", ["@", "17", "−1", "7"], "Var = 2² × 4 + 9 = 25. The minus sign does not subtract a variance.", 4 * 4 + 9)
+Q("L11", "X has an exponential distribution with λ = 0.5. Its mean and variance are:", ["2 and 4", "0.5 and 0.25", "2 and 2", "0.5 and 4"], "Mean 1/λ = 2, variance 1/λ² = 4.", hy=True)
+Q("L11", "X is exponential with mean 3. Given e⁻¹ = 0.3679, P(X > 3) is:", ["@", "0.6321", "0.5", "0.1353"], "λ = 1/3 → P(X > 3) = e^(−3/3) = e⁻¹ ≈ 0.3679.", fmt(math.exp(-1), 4))
+Q("L11", "The memoryless (lack of memory) property belongs to which continuous distribution?", ["Exponential", "Normal", "Uniform", "Beta"], "P(X > s + t | X > s) = P(X > t) holds only for the exponential among continuous laws (and the geometric among discrete ones).")
+Q("L11", "X is uniform on (0, 12). Its variance is:", ["@", "6", "144", "3"], "(b − a)²/12 = 144/12 = 12.", fmt(F(12 ** 2, 12)))
+Q("L11", "X is uniform on (2, 8). P(3 < X < 5) is:", ["@", "1/2", "1/6", "5/8"], "Length 2 out of 6 → 1/3.", Fr(5 - 3, 8 - 2))
+Q("L11", "A binomial variable has n = 100 and p = 0.5. Its normal approximation has mean and SD:", ["50 and 5", "50 and 25", "50 and 10", "25 and 5"], "Mean np = 50, SD √(npq) = √25 = 5.")
+Q("L11", "X is normal with σ = 10, and P(X > 80) = 0.0228 (Φ(2) = 0.9772). The mean μ is:", ["@", "70", "78", "100"], "A right tail of 0.0228 means z = 2 → 80 = μ + 2 × 10 → μ = 60.", 80 - 2 * 10)
+Q("L11", "The maximum ordinate (height) of the standard normal curve is about:", ["@", "1", "0.5", "0.2420"], "At z = 0, f = 1/√(2π) ≈ 0.3989. (0.2420 is the height at z = ±1.)", fmt(1 / math.sqrt(2 * math.pi), 4))
+Q("L11", "For any normal distribution, the proportion of values lying below the mean is:", ["0.5", "0.68", "0.3413", "depends on σ"], "The curve is symmetric about μ.")
