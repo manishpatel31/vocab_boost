@@ -10,7 +10,8 @@ const CA5_NAT = [
   ["Puducherry","AINRC-led NDA won 18 of the 30 elected seats","N. Rangasamy sworn in on 13 May 2026 for a record fifth term as CM; oath given by Lt Governor K. Kailashnathan."],
   ["Falta re-poll (West Bengal)","Held on 21 May 2026; BJP's Debangshu Panda won by about 1.09 lakh votes","The 29 April poll there was cancelled over EVM tampering complaints; counting on 24 May."],
   ["Supreme Court judges ordinance","Promulgated 16 May 2026: judges raised from 33 to 37, besides the CJI (38 in all)","Amends the Supreme Court (Number of Judges) Act, 1956 under Article 123. The last rise was in 2019 (30 to 33)."],
-  ["Assam UCC Bill","Passed by the Assam Assembly on 27 May 2026","Third state after Uttarakhand and Gujarat, and the first in the North-East. Scheduled Tribes are kept out of it."]
+  ["Assam UCC Bill","Passed by the Assam Assembly on 27 May 2026","Third state after Uttarakhand and Gujarat, and the first in the North-East. Scheduled Tribes are kept out of it."],
+  ["Kharif MSP 2026-27","Cabinet, 13 May 2026: MSP raised for 14 kharif crops; common paddy ₹2,441 a quintal (up ₹72)","Biggest rise for sunflower seed (₹622). MSP at least 50% above the cost of production for every crop."]
 ];
 const CA5_INT = [
   ["PM's five-nation tour","15–20 May 2026: UAE, Netherlands, Sweden, Norway and Italy","Ties with Sweden were raised to a Strategic Partnership."],
@@ -53,7 +54,8 @@ const CA5_PLC = [
   ["C. Joseph Vijay","Actor and TVK founder — Tamil Nadu CM from 10 May 2026","His party's first election."]
 ];
 const CA5_OBI = [
-  ["Bashir Badr","Urdu poet; died in Bhopal on 28 May 2026, aged 91","Padma Shri and Sahitya Akademi Award (for the ghazal collection 'Aas'), both in 1999."]
+  ["Bashir Badr","Urdu poet; died in Bhopal on 28 May 2026, aged 91","Padma Shri and Sahitya Akademi Award (for the ghazal collection 'Aas'), both in 1999."],
+  ["Suman Kalyanpur","Playback singer; died in Mumbai on 31 May 2026, aged 89","Padma Bhushan; sang many duets with Mohammed Rafi. Last rites with state honours on 1 June."]
 ];
 const CA5_SRC = [
   ['<a href="https://www.thestatesman.com/india/assembly-election-results-2026-counting-begins-in-westbengal-assam-tamil-nadu-kerala-puducherry-1503589335.html">thestatesman.com</a>',"Counting in five assemblies on 4 May 2026"],
@@ -126,6 +128,11 @@ const CA5_SRC = [
   ['<a href="https://www.indiandefensenews.in/2026/05/defence-secretary-rajesh-kumar-singh.html">indiandefensenews.in</a>',"Rajesh Kumar Singh as DRDO Chairman after Samir V. Kamat"],
   ['<a href="https://investmentguruindia.com/newsdetail/ashok-kumar-lahiri-takes-charge-as-niti-aayog-vice-chairman386196">investmentguruindia.com (IANS, 8 May 2026)</a>',"Ashok Kumar Lahiri takes charge as NITI Aayog Vice Chairman"],
   ['<a href="https://www.niti.gov.in/sites/default/files/2026-04/Revised-Composition-of-the-National-Institution-for-Transforming-India-NITI-Aayog-24-04-26.pdf">niti.gov.in (notification of 24 Apr 2026)</a>',"Appointment from the date he assumes charge"],
+  ['<a href="https://ianslive.in/cabinet-okays-increase-in-msp-for-14-kharif-crops--20260513155103">ianslive.in</a>',"Cabinet raises MSP for 14 kharif crops (13 May 2026)"],
+  ['<a href="https://swarajyamag.com/amp/story/economy/pm-modi-led-cabinet-approves-higher-msp-for-14-kharif-crops-for-2026-27-marketing-season">swarajyamag.com</a>',"Paddy ₹2,441 (+₹72); sunflower seed +₹622; at least 50% over cost"],
+  ['<a href="https://www.thestatesman.com/india/union-cabinet-approves-increase-in-msp-for-14-kharif-crops-1503593495.html">thestatesman.com</a>',"MSP increase for 14 kharif crops"],
+  ['<a href="https://www.thestatesman.com/entertainment/the-voice-that-lingered-like-a-melody-india-bids-a-tearful-farewell-to-suman-kalyanpur-1503600770.html">thestatesman.com</a>',"Suman Kalyanpur died 31 May 2026, aged 89; Padma Bhushan"],
+  ['<a href="https://wionews.com/entertainment/bollywood/veteran-singer-suman-kalyanpur-dies-at-89-tributes-pour-in-1780281408313">wionews.com</a>',"Died at her Mumbai home; last rites with state honours"],
   ['<a href="https://newsonair.gov.in/famous-urdu-poet-bashir-badr-passes-away-in-bhopal/">newsonair.gov.in</a>',"Bashir Badr died in Bhopal (28 May 2026)"],
   ['<a href="https://wionews.com/entertainment/legendary-urdu-poet-bashir-badr-passes-away-at-91-at-bhopal-residence-1779970296312">wionews.com</a>',"Aged 91; Padma Shri and Sahitya Akademi (1999)"]
 ];
@@ -163,7 +170,8 @@ LESSONS.push(
   "IPL 2026: RCB beat GT by 5 wickets (31 May, Ahmedabad). Thomas Cup — China; Uber Cup — South Korea; India bronze.",
   "Padma investiture I (25 May): 66 awards; Padma Vibhushan to Dharmendra (posthumous) and N. Rajam.",
   "International Booker 2026: Taiwan Travelogue (Yáng Shuāng-zǐ, tr. Lin King). PM Modi: Sweden's Royal Order of the Polar Star.",
-  "Died: Bashir Badr, Urdu poet (28 May, Bhopal)."
+  "Kharif MSP 2026-27 (13 May): common paddy ₹2,441 a quintal.",
+  "Died: Bashir Badr, Urdu poet (28 May, Bhopal); Suman Kalyanpur, playback singer (31 May, Mumbai)."
 ]}
 );
 
@@ -201,10 +209,12 @@ QB.push(
 ["CA5","At the Padma investiture of 25 May 2026, who received the Padma Vibhushan on behalf of the late actor Dharmendra?",["Hema Malini","Sunny Deol","Esha Deol","Bobby Deol"],"Hema Malini, his wife, received the posthumous award from President Droupadi Murmu.",""],
 ["CA5","Violinist N. Rajam received which Padma award on 25 May 2026?",["Padma Vibhushan","Padma Bhushan","Padma Shri","Bharat Ratna"],"She and Dharmendra were the two Padma Vibhushan awardees at the first ceremony.",""],
 ["CA5","Which book won the International Booker Prize 2026?",["Taiwan Travelogue","Heart Lamp","Tomb of Sand","Kairos"],"Taiwan Travelogue by Yáng Shuāng-zǐ, translated by Lin King, won on 19 May 2026; Heart Lamp won in 2025.",""],
+["CA5","Under the kharif MSP approved on 13 May 2026, the MSP of common paddy for 2026-27 is:",["₹2,441 a quintal","₹2,369 a quintal","₹2,183 a quintal","₹2,610 a quintal"],"The Cabinet raised it by ₹72 to ₹2,441; ₹2,610 is the wheat MSP for 2027-28.",""],
+["CA5","Suman Kalyanpur, who died in Mumbai on 31 May 2026, was a famous:",["Playback singer","Kathak dancer","Film director","Tabla player"],"The Padma Bhushan singer was 89 and was known for her duets with Mohammed Rafi.",""],
 ["CA5","Bashir Badr, who died in Bhopal on 28 May 2026, was a noted:",["Urdu poet","Hindustani classical singer","Film director","Hockey player"],"The Urdu poet was 91 and had received the Padma Shri and the Sahitya Akademi Award in 1999.",""]
 );
 
 LASTMOMENT.push(
-{t:"May 2026", era:["ca"], rows:[["WB CM (9 May)","Suvendu Adhikari — first BJP CM"],["TN CM (10 May)","C. Joseph Vijay (TVK)"],["Kerala CM (18 May)","V. D. Satheesan (UDF)"],["Assam · Puducherry","Himanta (2nd term) · Rangasamy (5th term)"],["SC judges","37 + CJI (ordinance 16 May)"],["UCC","Assam 3rd state (27 May)"],["India–Nordic","Oslo, 19 May"],["RBI surplus","₹2.87 lakh crore"],["CDS · CNS (31 May)","Raja Subramani · Krishna Swaminathan"],["IPL 2026","RCB (beat GT)"],["Died","Bashir Badr (28 May)"]]}
+{t:"May 2026", era:["ca"], rows:[["WB CM (9 May)","Suvendu Adhikari — first BJP CM"],["TN CM (10 May)","C. Joseph Vijay (TVK)"],["Kerala CM (18 May)","V. D. Satheesan (UDF)"],["Assam · Puducherry","Himanta (2nd term) · Rangasamy (5th term)"],["SC judges","37 + CJI (ordinance 16 May)"],["UCC","Assam 3rd state (27 May)"],["India–Nordic","Oslo, 19 May"],["RBI surplus","₹2.87 lakh crore"],["CDS · CNS (31 May)","Raja Subramani · Krishna Swaminathan"],["IPL 2026","RCB (beat GT)"],["Died","Bashir Badr · Suman Kalyanpur"]]}
 );
 TILES.push(["37","Supreme Court judges besides the CJI — ordinance of 16 May 2026","ca"],["207","BJP seats in West Bengal, 4 May 2026","ca"],["₹2.87 lakh cr","RBI surplus to the Centre for 2025-26","ca"],["3rd","CDS — Gen N. S. Raja Subramani (31 May 2026)","ca"],["27th","Navy chief — Adm Krishna Swaminathan (31 May 2026)","ca"]);
