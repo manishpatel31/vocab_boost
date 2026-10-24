@@ -100,7 +100,7 @@ const P9L = [
   ["Anand Bhavan, Prayagraj","Motilal Nehru","The Nehru family home; Indira Gandhi was born there.",""],
   ["Belur Math","Swami Vivekananda","He founded it (1898) as the headquarters of the Ramakrishna Mission.",""],
   ["Dakshineswar Kali Temple","Ramakrishna Paramahansa","He was its priest.",""],
-  ["The ashram at Puducherry","Sri Aurobindo","He lived there from 1910 to 1950.",""],
+  ["Puducherry (the ashram)","Sri Aurobindo","He lived there from 1910 to 1950.",""],
   ["Tiruvannamalai","Ramana Maharshi","He lived at the foot of the Arunachala hill.",""],
   ["Kalady (Kerala)","Adi Shankaracharya","His birthplace, on the Periyar.",""],
   ["Netaji Bhawan, Kolkata","Subhas Chandra Bose","His family home on Elgin Road, from where he escaped in 1941.",""]
@@ -207,9 +207,9 @@ LESSONS.push(
 ]}
 );
 
-pairQs("P7", P7I, { q: t => `'${t}' — whose words are these?`, e: r => `${r[1]}. ${r[2]}` });
-pairQs("P7", P7S, { q: t => `Who wrote the lines '${t}'?`, e: r => `${r[1]}. ${r[2]}` });
-pairQs("P7", P7W, { q: t => `Who said: '${t}'?`, e: r => `${r[1]}. ${r[2]}` });
+pairQs("P7", P7I, { q: t => `'${t}' — whose words are these?`, e: r => `${r[1].replace(/\.$/, "")}. ${r[2]}` });
+pairQs("P7", P7S, { q: t => `Who wrote the lines '${t}'?`, e: r => `${r[1].replace(/\.$/, "")}. ${r[2]}` });
+pairQs("P7", P7W, { q: t => `Who said: '${t}'?`, e: r => `${r[1].replace(/\.$/, "")}. ${r[2]}` });
 pairQs("P8", P8S, { q: t => `${t} is the memorial of which leader?`, e: r => `${r[0]} — ${r[1]}. ${r[2]}` });
 pairQs("P8", P8T, { q: t => `Whom does the ${t.replace(/^Statue under/, 'statue under')} honour?`, e: r => `${r[0]} — ${r[1]}. ${r[2]}` });
 pairQs("P9", P9B, { q: t => `Where was ${t} born?`, e: r => `${r[0]} — born at ${r[1]}. ${r[2]}` });
@@ -224,13 +224,13 @@ QB.push(
 ["P7","When Indira Gandhi asked how India looked from space, Rakesh Sharma (1984) replied with a line written by:",["Muhammad Iqbal","Rabindranath Tagore","Kavi Pradeep","Bankim Chandra Chatterjee"],"He answered 'Saare Jahan Se Achha', from Iqbal's Tarana-e-Hind.",""],
 ["P7","Gandhi gave the call 'Do or Die' at:",["Gowalia Tank, Bombay","Sabarmati Ashram","Lahore","Wardha"],"On 8 August 1942, at the AICC session that passed the Quit India resolution.",""],
 ["P8","Which pair of samadhi and leader is correct?",["Vijay Ghat — Lal Bahadur Shastri","Shanti Van — Indira Gandhi","Veer Bhumi — Jawaharlal Nehru","Shakti Sthal — Rajiv Gandhi"],"Shanti Van is Nehru's, Veer Bhumi Rajiv's and Shakti Sthal Indira's.",""],
-["P8","Kisan Ghat in Delhi is the samadhi of:",["Charan Singh","Devi Lal","Jagjivan Ram","Morarji Desai"],"Devi Lal's is Sangharsh Sthal and Jagjivan Ram's Samata Sthal.",""],
+["P8","Which is the samadhi of Jagjivan Ram?",["Samata Sthal","Sangharsh Sthal","Kisan Ghat","Ekta Sthal"],"'Place of equality'. Sangharsh Sthal is Devi Lal's, Kisan Ghat Charan Singh's and Ekta Sthal Zail Singh's.",""],
 ["P8","Sadaiv Atal, Vajpayee's memorial, stands in which complex?",["Rashtriya Smriti Sthal","Shanti Van","Teen Murti","Rashtra Prerna Sthal"],"It opened there on 25 December 2018. The Rashtra Prerna Sthal (2025) is in Lucknow.",""],
 ["P8","In March 2025 the family of which former Prime Minister accepted a memorial plot at the Rashtriya Smriti Sthal?",["Manmohan Singh","I. K. Gujral","P. V. Narasimha Rao","H. D. Deve Gowda"],"Manmohan Singh died on 26 December 2024 and was cremated at Nigambodh Ghat.",""],
 ["P8","The Rashtra Prerna Sthal opened in Lucknow on 25 December 2025 has statues of Atal Bihari Vajpayee, Deendayal Upadhyaya and:",["Syama Prasad Mookerjee","Vallabhbhai Patel","Ram Manohar Lohia","Charan Singh"],"The three 65-ft statues were unveiled on Vajpayee's birth anniversary.",""],
 ["P8","Ambedkar embraced Buddhism in 1956 at:",["Deekshabhoomi, Nagpur","Chaitya Bhoomi, Mumbai","Mhow","Sarnath"],"Chaitya Bhoomi in Mumbai is his samadhi; Mhow his birthplace.",""],
 ["P8","The samadhis of Kasturba Gandhi and Mahadev Desai are at:",["Aga Khan Palace, Pune","Sabarmati Ashram","Sevagram","Raj Ghat"],"Both died there while detained during the Quit India movement.",""],
-["P9","Which leader was born in Odisha?",["Subhas Chandra Bose","Rabindranath Tagore","Bipin Chandra Pal","Chittaranjan Das"],"Bose was born at Cuttack in 1897; the others were born in Bengal.",""],
+["P9","Which leader was born in Odisha?",["Subhas Chandra Bose","Rabindranath Tagore","Aurobindo Ghosh","Chittaranjan Das"],"Bose was born at Cuttack in 1897; the other three were born in Calcutta.",""],
 ["P9","Which two leaders share 2 October as their birthday?",["Mahatma Gandhi and Lal Bahadur Shastri","Mahatma Gandhi and Vallabhbhai Patel","Lal Bahadur Shastri and Jawaharlal Nehru","Vallabhbhai Patel and Jawaharlal Nehru"],"Gandhi in 1869 and Shastri in 1904. Patel's birthday is 31 October and Nehru's 14 November.",""],
 ["P9","George Orwell, whose real name was Eric Arthur Blair, was born in:",["Motihari, Bihar","Shimla","Darjeeling","Rangoon"],"He was born there in 1903, where his father worked for the opium department.",""]
 );

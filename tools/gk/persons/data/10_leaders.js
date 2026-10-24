@@ -93,7 +93,7 @@ const P3T = [
   ["Veeramangai","Velu Nachiyar","'Brave woman'; queen of Sivaganga who beat the Company (1780).",""],
   ["Durga Bhabhi","Durgawati Devi","Revolutionary who helped Bhagat Singh slip out of Lahore (1928).",""],
   ["Captain Lakshmi","Lakshmi Sahgal","Led the Rani of Jhansi Regiment of the INA.",""],
-  ["Pandita","Ramabai Dongre","Scholars in Calcutta gave her the titles Pandita and Sarasvati (1878).",""]
+  ["Pandita","Ramabai Dongre","Pandita Ramabai: scholars in Calcutta gave her the titles Pandita and Sarasvati (1878).",""]
 ];
 
 LESSONS.push(
@@ -163,7 +163,14 @@ LESSONS.push(
 );
 
 pairQs("P1", P1T, { q: t => `Who is popularly known as '${t}'?`, e: r => `${r[1]} — '${r[0]}'. ${r[2]}` });
-pairQs("P1", P1G, { q: t => `Who gave the title ${t}?`, e: r => `${r[0]} came from ${r[1]}. ${r[2]}` });
+// Who gave the title: wrong options are other givers, never the person who received the title.
+(() => { const givers = [...new Set(P1G.map(r => r[1]))];
+  P1G.forEach((r, i) => {
+    const pool = givers.filter(g => g !== r[1] && !r[0].includes(g.split(" ").pop())), wrong = [];
+    for (let k = i * 5; wrong.length < 3; k += 3) { const g = pool[k % pool.length]; if (!wrong.includes(g)) wrong.push(g); }
+    QB.push(["P1", r[0].startsWith("the name") ? `Who gave ${r[0]}?` : `Who gave the title ${r[0]}?`, [r[1]].concat(wrong),
+      `${r[1]} gave ${r[0]}. ${r[2]}`, ""]);
+  }); })();
 pairQs("P2", P2K, { q: t => `Which leader was known as '${t}'?`, e: r => `${r[1]} — '${r[0]}'. ${r[2]}` });
 pairQs("P2", P2M, { q: t => `Who is popularly called '${t}'?`, e: r => `${r[1]} — '${r[0]}'. ${r[2]}` });
 pairQs("P3", P3T, { q: t => `Who is remembered by the title '${t}'?`, rq: a => `Which title belongs to ${a}?`, e: r => `${r[1]} — '${r[0]}'. ${r[2]}` });
@@ -190,7 +197,7 @@ QB.push(
 ["P3","Jyotiba Phule was given the title 'Mahatma' in:",["1888","1857","1915","1920"],"In Bombay, more than a quarter of a century before Gandhi came to be called Mahatma.",""],
 ["P3","Ishwar Chandra got the title 'Vidyasagar' from:",["The Sanskrit College, Calcutta","The University of Calcutta","Raja Ram Mohan Roy","The British Government"],"He earned it in 1839 for his learning; 'Vidyasagar' means ocean of learning.",""],
 ["P3","E. V. Ramasamy was called 'Vaikom Veerar' for his part in:",["The Vaikom Satyagraha","The Guruvayur Satyagraha","The Self-Respect conference at Chengalpattu","The Salt March at Vedaranyam"],"The Vaikom Satyagraha (1924–25) in Travancore was for the right to use temple roads.",""],
-["P3","Which pair is correctly matched?",["Sarojini Naidu — Nightingale of India","Florence Nightingale — Mother of the Indian Revolution","Aruna Asaf Ali — Saint of the Gutters","Bhikaji Cama — Grand Old Lady of the Independence Movement"],"Cama is the Mother of the Indian Revolution; Aruna Asaf Ali the Grand Old Lady; Mother Teresa the Saint of the Gutters.",""],
+["P3","Which pair of title and woman is correctly matched?",["Sarojini Naidu — Nightingale of India","Florence Nightingale — Mother of the Indian Revolution","Aruna Asaf Ali — Saint of the Gutters","Bhikaji Cama — Grand Old Lady of the Independence Movement"],"Cama is the Mother of the Indian Revolution; Aruna Asaf Ali the Grand Old Lady; Mother Teresa the Saint of the Gutters.",""],
 ["P3","Durgawati Devi, known as 'Durga Bhabhi', is remembered for:",["Helping Bhagat Singh escape from Lahore in disguise","Leading the Rani of Jhansi Regiment","Running the secret Congress Radio","Raising a flag at Stuttgart"],"After the Saunders killing in 1928 she travelled with Bhagat Singh posing as his wife.",""],
 ["P3","The British general who called Rani Lakshmibai the most dangerous of the rebel leaders was:",["Hugh Rose","Colin Campbell","Henry Havelock","John Nicholson"],"Hugh Rose fought her at Jhansi and Gwalior in 1858.",""]
 );

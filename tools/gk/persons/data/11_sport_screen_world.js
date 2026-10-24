@@ -187,7 +187,7 @@ pairQs("P4", P4W, { q: t => `Which sportsperson is nicknamed '${t}'?`, e: r => `
 pairQs("P5", P5F, { q: t => `Which film personality is known as '${t}'?`, e: r => `${r[1]} — '${r[0]}'. ${r[2]}` });
 pairQs("P5", P5A, { q: t => `Who is known by the title '${t}'?`, e: r => `${r[1]} — '${r[0]}'. ${r[2]}` });
 pairQs("P6", P6W, { q: t => `Who is known as '${t}'?`, e: r => `${r[1]} — '${r[0]}'. ${r[2]}` });
-pairQs("P6", P6N, { q: t => `Who is honoured as the founding father of ${t}?`, e: r => `${r[1]} — ${r[0]}. ${r[2]}` });
+pairQs("P6", P6N, { q: t => `Who is called the Father of the Nation of ${t}?`, e: r => `${r[1]} — ${r[0]}. ${r[2]}` });
 
 QB.push(
 ["P4","Who gave Milkha Singh the name 'Flying Sikh'?",["General Ayub Khan","Jawaharlal Nehru","Abdul Khaliq","Dhyan Chand"],"Pakistan's leader said it after Milkha beat Abdul Khaliq in Lahore in 1960.",""],
@@ -203,7 +203,7 @@ QB.push(
 ["P5","Lata Mangeshkar and Sarojini Naidu share which title?",["Nightingale of India","Swar Kokila","Bharat Ratna","Modern Meera"],"Both are called the Nightingale of India — Lata for singing, Sarojini for poetry. Only Lata got the Bharat Ratna (2001).",""],
 ["P5","Dadasaheb Phalke is called the Father of Indian Cinema because he made:",["Raja Harishchandra (1913)","Alam Ara (1931)","Kisan Kanya (1937)","Achhut Kanya (1936)"],"Alam Ara (1931) was the first Indian talkie, by Ardeshir Irani.",""],
 ["P5","Gandhi called which poet 'Rashtrakavi'?",["Maithili Sharan Gupt","Ramdhari Singh Dinkar","Jaishankar Prasad","Harivansh Rai Bachchan"],"Gupt wrote Bharat Bharati (1912); Dinkar is also called a national poet, but Gandhi's 'Rashtrakavi' was Gupt.",""],
-["P5","Which pair is wrongly matched?",["Tragedy Queen — Madhubala","Tragedy King — Dilip Kumar","Dream Girl — Hema Malini","Venus of Indian Cinema — Madhubala"],"The Tragedy Queen is Meena Kumari.",""],
+["P5","Which pair of film title and star is wrongly matched?",["Tragedy Queen — Madhubala","Tragedy King — Dilip Kumar","Dream Girl — Hema Malini","Venus of Indian Cinema — Madhubala"],"The Tragedy Queen is Meena Kumari.",""],
 ["P6","The name 'Iron Lady' was first given to Margaret Thatcher by:",["A Soviet army newspaper","The British Parliament","An American President","The Queen"],"The Red Star newspaper used it in 1976 to mock her; she liked it.",""],
 ["P6","Florence Nightingale was called the 'Lady with the Lamp' for her work in the:",["Crimean War","First World War","Boer War","American Civil War"],"She nursed British soldiers at Scutari in the 1850s.",""],
 ["P6","In Italian unification, Mazzini, Garibaldi and Cavour are called its:",["Soul, sword and brain","Brain, soul and sword","Sword, brain and soul","Soul, brain and sword"],"Mazzini the soul, Garibaldi the sword, Cavour the brain.",""],
