@@ -90,7 +90,7 @@ LESSONS.push(
 ], sum:["CSIR labs by city: NAL Bengaluru, IICT Hyderabad, IGIB Delhi, CBRI Roorkee, IIP Dehradun, IHBT Palampur, IIIM Jammu.","CIMAP and IITR Lucknow, NML Jamshedpur, CMERI Durgapur, CIMFR Dhanbad, CSMCRI Bhavnagar, CECRI Karaikudi, SERC Chennai.","Policies: Scientific Policy Resolution 1958, Technology Policy Statement 1983, S&T Policy 2003, STI Policy 2013, draft STIP 2020.","ANRF Act 2023 replaced SERB; the PM chairs its board; ₹50,000 crore over five years; DST is its department.","A ₹1 lakh crore RDI fund (2025) lends to private research through ANRF.","National Science Day is 28 February (Raman effect, 1928); 2026 theme: Women in Science."]}
 );
 
-pairQs("ST1", ST1, { q: t => `Under which ministry, department or office does the ${t} work?` });
+pairQs("ST1", ST1.filter(r => !/Scientific and Industrial Research/.test(r[0])), { q: t => `Under which ministry, department or office does the ${t} work?` });
 pairQs("ST2", ST2, { q: t => `CSIR's ${t} is in which city?`, extra: ["Pune", "Mysuru"] });
 
 QB.push(

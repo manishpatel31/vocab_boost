@@ -121,7 +121,6 @@ QB.push(
 ["ST5","The BioE3 policy approved in August 2024 stands for Biotechnology for:",["Economy, Environment and Employment","Energy, Education and Equality","Exports, Enterprise and Efficiency","Ecology, Evolution and Ethics"],"It backs biomanufacturing hubs and biofoundries.",""],
 
 ["ST6","The National Quantum Mission was approved in 2023 with an outlay of about:",["₹6,003 crore","₹76,000 crore","₹19,744 crore","₹10,372 crore"],"₹6,003.65 crore for 2023-24 to 2030-31, run by DST.",""],
-["ST6","Which department runs the National Quantum Mission?",["Department of Science and Technology","Ministry of Electronics and IT","Department of Telecommunications","Department of Space"],"DST is the nodal department.",""],
 ["ST6","Under the National Quantum Mission, the hub for quantum computing is at:",["IISc Bengaluru","IIT Madras","IIT Bombay","IIT Delhi"],"IIT Madras (with C-DOT) has communication, IIT Bombay sensing and metrology, IIT Delhi materials and devices.",""],
 ["ST6","The National Quantum Mission's hub for quantum communication is at IIT Madras, together with:",["C-DOT","ISRO","BSNL","DRDO"],"The Centre for Development of Telematics is its partner.",""],
 ["ST6","QpiAI-Indus, launched in April 2025 as India's first full-stack quantum computer, has how many qubits?",["25","7","50","128"],"QpiAI, a Bengaluru start-up, built it; it plans 128 qubits next.",""],

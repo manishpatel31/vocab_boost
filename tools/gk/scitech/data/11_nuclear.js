@@ -4,8 +4,8 @@ const ST3 = [
   ["Atomic Energy Commission (AEC)","Sets India's atomic energy policy","1948; Homi J. Bhabha was the first chairman.",""],
   ["Bhabha Atomic Research Centre (BARC)","Leads India's nuclear research from Trombay","Trombay, Mumbai; began in 1954 as AEET, renamed after Bhabha in 1967.",""],
   ["Indira Gandhi Centre for Atomic Research (IGCAR)","Researches fast breeder reactors at Kalpakkam","Kalpakkam, Tamil Nadu; set up in 1971.",""],
-  ["Nuclear Power Corporation of India Ltd (NPCIL)","Builds and runs the PHWR and VVER power plants","Mumbai; 1987. Runs every working power reactor except the fast breeder.",""],
-  ["BHAVINI (Bharatiya Nabhikiya Vidyut Nigam)","Builds and runs fast breeder reactors","Kalpakkam; 2003. Built the 500 MWe PFBR.",""],
+  ["Nuclear Power Corporation of India Ltd (NPCIL)","Builds and runs India's nuclear power stations (except the PFBR)","Mumbai; 1987. Runs every working power reactor except the fast breeder.",""],
+  ["BHAVINI (Bharatiya Nabhikiya Vidyut Nigam)","Builds and runs the PFBR at Kalpakkam","Kalpakkam; 2003. Built the 500 MWe PFBR.",""],
   ["Atomic Energy Regulatory Board (AERB)","Checks nuclear and radiation safety","Mumbai; 1983. Became a statutory body under the SHANTI Act, 2025.",""],
   ["Uranium Corporation of India Ltd (UCIL)","Mines and processes uranium","1967; its first mine is at Jaduguda, Jharkhand.",""],
   ["Nuclear Fuel Complex (NFC)","Makes fuel bundles for reactors","Hyderabad; 1971.",""],
@@ -32,7 +32,7 @@ const ST4B = [
 const ST4C = [
   ["Tarapur units 1 and 2 (1969)","USA","Boiling water reactors supplied by General Electric."],
   ["Rawatbhata unit 1 (1973)","Canada","A CANDU-type heavy water reactor."],
-  ["CIRUS research reactor (1960)","Canada","Its plutonium was used for the 1974 test."],
+  ["the CIRUS research reactor (1960)","Canada","Its plutonium was used for the 1974 test."],
   ["Kudankulam","Russia","VVER-1000 pressurised water reactors (Rosatom)."],
   ["Jaitapur (planned)","France","EDF's EPR design."],
   ["Kovvada (planned)","USA","Westinghouse AP1000 design."]

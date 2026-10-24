@@ -25,7 +25,7 @@ const ST8A = [
   ["Maitri","Schirmacher Oasis, Antarctica","Built in 1989; Maitri II, a greener replacement, is planned for about 2029.",""],
   ["Bharati","Larsemann Hills, Antarctica","Opened in 2012; built from 134 shipping containers.",""],
   ["Himadri","Ny-Ålesund, Svalbard (Norway), in the Arctic","India's first Arctic research station (2008).",""],
-  ["IndARC","Kongsfjorden, Svalbard","India's first underwater observatory in the Arctic (2014).",""],
+  ["IndARC (underwater observatory)","Kongsfjorden, Svalbard","India's first underwater observatory in the Arctic (2014).",""],
   ["Himansh","Chandra basin, Spiti (Himachal Pradesh)","A high-altitude station for studying Himalayan glaciers (2016).",""]
 ];
 const ST8B = [
@@ -113,7 +113,7 @@ QB.push(
 ["ST7","What is ONDC?",["An open network that lets any buyer app reach any seller","A government shopping app","A payment system run by NPCI","A digital currency"],"It works like UPI for e-commerce: platforms plug into a shared network.",""],
 ["ST7","Bhashini is part of which mission?",["National Language Translation Mission","National e-Governance Plan","Digital Literacy Mission","IndiaAI Mission"],"MeitY's National Language Translation Mission runs it.",""],
 ["ST7","Which platform keeps records of routine vaccinations of children and pregnant women?",["U-WIN","CoWIN","ABHA","UMANG"],"U-WIN (2024) carries forward the CoWIN model to routine immunisation.",""],
-["ST7","CERT-In was set up in:",["2004","2000","2008","2014"],"It was set up in 2004 and given legal backing under Section 70B in the 2008 amendment.",""],
+["ST7","CERT-In was set up in:",["2004","2000","2011","2014"],"It was set up in 2004 and given legal backing under Section 70B in the 2008 amendment.",""],
 ["ST7","Under CERT-In's 2022 directions, a cyber incident must be reported within:",["6 hours","24 hours","72 hours","1 hour"],"Companies must report notable cyber incidents to CERT-In within six hours.",""],
 ["ST7","NCIIPC, which protects critical information infrastructure, is part of:",["National Technical Research Organisation","CERT-In","Intelligence Bureau","DRDO"],"NCIIPC works under Section 70A of the IT Act and is part of NTRO.",""],
 ["ST7","In which year was the Digital Personal Data Protection Act passed?",["2023","2019","2021","2025"],"It received the President's assent on 11 August 2023.",""],
