@@ -162,7 +162,7 @@ LESSONS.push(
 ]}
 );
 
-pairQs("P1", P1T, { q: t => `Who is popularly known as '${t}'?`, rq: a => `Which title is associated with ${a}?`, e: r => `${r[1]} — '${r[0]}'. ${r[2]}` });
+pairQs("P1", P1T, { q: t => `Who is popularly known as '${t}'?`, e: r => `${r[1]} — '${r[0]}'. ${r[2]}` });
 pairQs("P1", P1G, { q: t => `Who gave the title ${t}?`, e: r => `${r[0]} came from ${r[1]}. ${r[2]}` });
 pairQs("P2", P2K, { q: t => `Which leader was known as '${t}'?`, e: r => `${r[1]} — '${r[0]}'. ${r[2]}` });
 pairQs("P2", P2M, { q: t => `Who is popularly called '${t}'?`, e: r => `${r[1]} — '${r[0]}'. ${r[2]}` });

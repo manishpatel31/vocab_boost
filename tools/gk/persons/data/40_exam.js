@@ -9,7 +9,8 @@ const INTROS = { persons: {
 const HEATMAP = {
   cols: [{ label: "SSC CGL", sub: "Tier 1 · GA" }, { label: "SSC CHSL / MTS", sub: "GA" }, { label: "RRB NTPC", sub: "GA" }],
   rows: [
-    { id: "P1", v: [2, 3, 2] }, { id: "P2", v: [1, 1, 1] }, { id: "P3", v: [2, 2, 2] }
+    { id: "P1", v: [2, 3, 2] }, { id: "P2", v: [1, 1, 1] }, { id: "P3", v: [2, 2, 2] }, { id: "P4", v: [1, 2, 2] }, { id: "P5", v: [1, 1, 1] }, { id: "P6", v: [1, 1, 1] },
+    { id: "P7", v: [3, 2, 2] }, { id: "P8", v: [2, 2, 2] }, { id: "P9", v: [1, 2, 2] }
   ],
   pattern: {
     title: "Where these questions sit",
