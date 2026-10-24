@@ -10,8 +10,9 @@ const HEATMAP = {
   cols: [{ label: "CGL Paper III", sub: "Tier 2 · AAO" }, { label: "Other accounts papers", sub: "JAO, auditor, commerce" }],
   rows: [
     { id: "F1", v: [3, 3] }, { id: "F2", v: [3, 3] }, { id: "F3", v: [2, 2] }, { id: "F4", v: [3, 3] }, { id: "F5", v: [3, 3] },
-    { id: "F6", v: [3, 3] }, { id: "F7", v: [2, 2] }, { id: "F8", v: [3, 3] }, { id: "F9", v: [3, 3] }
-  ].filter(r => LESSONS.some(l => l.id === r.id)),
+    { id: "F6", v: [3, 3] }, { id: "F7", v: [2, 2] }, { id: "F8", v: [3, 3] }, { id: "F9", v: [3, 3] }, { id: "F10", v: [2, 2] },
+    { id: "F11", v: [1, 1] }, { id: "F12", v: [3, 2] }, { id: "F13", v: [2, 1] }, { id: "F14", v: [3, 1] }
+  ],
   pattern: {
     title: "Where these questions sit",
     head: ["Paper", "Part", "Marks", "Marking"],
