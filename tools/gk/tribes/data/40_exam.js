@@ -9,7 +9,7 @@ const INTROS = { tribes: {
 const HEATMAP = {
   cols: [{ label: "SSC CGL", sub: "Tier 1 · GA" }, { label: "SSC CHSL / MTS", sub: "GA" }, { label: "RRB NTPC", sub: "GA" }],
   rows: [
-    { id: "T1", v: [2, 1, 2] }, { id: "T2", v: [1, 1, 1] }, { id: "T3", v: [1, 1, 1] }, { id: "T4", v: [2, 1, 2] }, { id: "T5", v: [1, 1, 1] }, { id: "T6", v: [2, 1, 2] }, { id: "T7", v: [3, 2, 3] }, { id: "T8", v: [2, 1, 2] }
+    { id: "T1", v: [2, 1, 2] }, { id: "T2", v: [1, 1, 1] }, { id: "T3", v: [1, 1, 1] }, { id: "T4", v: [2, 1, 2] }, { id: "T5", v: [1, 1, 1] }, { id: "T6", v: [2, 1, 2] }, { id: "T7", v: [3, 2, 3] }, { id: "T8", v: [2, 1, 2] }, { id: "T9", v: [2, 1, 2] }
   ],
   pattern: {
     title: "Where these questions sit",
