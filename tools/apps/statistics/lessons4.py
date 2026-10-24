@@ -52,7 +52,7 @@ L.append({"id": "L12", "heat": 3, "title": "Sampling theory", "hi": "प्र�
 
 # ---------------------------------------------------------------- L13
 _lo = 52 - 1.96 * 8 / math.sqrt(64); _hi = 52 + 1.96 * 8 / math.sqrt(64)
-L.append({"id": "L13", "heat": 3, "title": "Estimation: point, interval & methods", "hi": "आकलन: बिंदु, अंतराल और विधियाँ", "blocks": [
+L.append({"id": "L13", "heat": 3, "title": "Point & interval estimation", "hi": "आकलन: बिंदु, अंतराल और विधियाँ", "blocks": [
  {"k": "hot", "h": "<b>Part of the most heavily weighted unit (statistical inference).</b> Properties of a good estimator (unbiased, consistent, efficient, sufficient), which estimator is unbiased for what, the maximum likelihood estimators of standard distributions, the method of moments, and confidence intervals for a mean or a proportion."},
  {"k": "p", "h": "An <b>estimator</b> is a rule (a statistic) for guessing a parameter; its value in a given sample is an <b>estimate</b>. A <b>point estimate</b> is one number (x̄ = 52); an <b>interval estimate</b> gives a range with a stated <b>confidence coefficient</b> (52 ± 1.96, 95%). “95% confidence” means that intervals built this way cover the true parameter in 95% of repeated samples — not that the parameter is random."},
  {"k": "table", "title": "Properties of a good estimator T of θ", "head": ["Property", "Meaning", "Example"], "rows": [
@@ -91,7 +91,7 @@ L.append({"id": "L13", "heat": 3, "title": "Estimation: point, interval & method
 _z14 = (F(103, 1) - 100) / (F(15, 1) / 6)
 _zp = (F(56, 100) - F(1, 2)) / math.sqrt(0.25 / 400)
 _dd = [2, 4, -1, 3, 2]; _dbar = mean(_dd); _sd = math.sqrt(svar(_dd)); _tp = float(_dbar) / (_sd / math.sqrt(5))
-L.append({"id": "L14", "heat": 3, "title": "Testing of hypotheses: Z and t tests", "hi": "परिकल्पना परीक्षण: Z और t परीक्षण", "blocks": [
+L.append({"id": "L14", "heat": 3, "title": "Hypothesis tests: Z and t", "hi": "परिकल्पना परीक्षण: Z और t परीक्षण", "blocks": [
  {"k": "hot", "h": "<b>The core of the paper’s inference questions.</b> Type I and Type II errors, level of significance and power, one- and two-tailed critical values, p-values, the Z test for a mean or a proportion, the t test (one sample, two samples, paired, and for a correlation coefficient) with the right degrees of freedom, and properties of the t distribution."},
  {"k": "p", "h": "A test starts with a <b>null hypothesis</b> H₀ (no difference, μ = μ₀) and an <b>alternative</b> H₁ (μ ≠ μ₀, μ &gt; μ₀ or μ &lt; μ₀). A <b>test statistic</b> measures how far the sample is from H₀ in standard-error units. If it falls in the <b>critical region</b> we reject H₀. Rejecting a true H₀ is a <b>Type I error</b> (probability α, the level of significance); accepting a false H₀ is a <b>Type II error</b> (probability β). <b>Power</b> = 1 − β is the chance of catching a false H₀."},
  {"k": "table", "title": "Critical values of Z", "head": ["Level", "Two-tailed", "Right-tailed", "Left-tailed"], "rows": [
@@ -252,9 +252,9 @@ L.append({"id": "L18", "heat": 3, "title": "Index numbers", "hi": "सूचक�
   ["Quantity index", "swap p and q: Laspeyres Σq₁p₀/Σq₀p₀", "value index Σp₁q₁/Σp₀q₀"]]},
  {"k": "table", "title": "Tests of adequacy", "head": ["Test", "Condition", "Satisfied by"], "rows": [
   ["Unit test", "free of the units of measurement", "every formula except the simple aggregative"],
-  ["Time reversal", "P₀₁ × P₁₀ = 1", "Fisher, Marshall–Edgeworth, Kelly, simple GM of relatives — not Laspeyres or Paasche"],
+  ["Time reversal", "P₀₁ × P₁₀ = 1", "Fisher, Marshall–Edgeworth, Kelly, simple aggregative, simple GM of relatives — not Laspeyres or Paasche"],
   ["Factor reversal", "P₀₁ × Q₀₁ = Σp₁q₁/Σp₀q₀ (the value ratio)", "Fisher only"],
-  ["Circular test", "P₀₁ × P₁₂ × P₂₀ = 1", "simple GM of relatives and Kelly’s fixed-weight index; not Fisher"]]},
+  ["Circular test", "P₀₁ × P₁₂ × P₂₀ = 1", "simple GM of relatives, simple aggregative and Kelly’s fixed-weight index; not Fisher, Laspeyres or Paasche"]]},
  {"k": "formula", "title": "Using index numbers", "rows": [
   ["Chain index", "link relative = p₁/p₀ × 100; chain index = (link relative × previous chain index)/100", "base changes every year"],
   ["Base shifting", "new index = old index / (old index of the new base year) × 100", "old index 156, old index of the new base year 120 → 156/120 × 100 = 130"],

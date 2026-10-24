@@ -5,15 +5,15 @@ L = []
 
 # ---------------------------------------------------------------- L1
 _ev = F(1, 4) * 2 - F(3, 4) * F(1, 2)
-L.append({"id": "L1", "heat": 2, "title": "The paper, the plan & statistical basics", "hi": "परीक्षा का स्वरूप, तैयारी और मूल अवधारणाएँ", "blocks": [
+L.append({"id": "L1", "heat": 2, "title": "Paper II, the plan & basics", "hi": "परीक्षा का स्वरूप, तैयारी और मूल अवधारणाएँ", "blocks": [
  {"k": "hot", "h": "<b>Why this lesson comes first.</b> Paper II (Statistics) is a whole extra paper that only JSO-type candidates sit, and its marks go into the merit for those posts. It is a graduation-level, mostly numerical paper: about two-thirds of the questions need a formula and a short calculation, the rest test definitions (scales, estimator properties, sampling methods, index-number tests). Knowing the pattern and the vocabulary first saves time in every later lesson."},
  {"k": "table", "title": "Paper II at a glance (as reported for recent cycles; confirm in the current notice)", "head": ["Item", "Detail"], "rows": [
-  ["Who takes it", "candidates who apply for Junior Statistical Officer (MoSPI); recent notices also link Statistical Investigator Grade II to it"],
+  ["Who takes it", "candidates for Junior Statistical Officer (MoSPI) and, where the notice says so, Statistical Investigator Grade II"],
   ["When", "in Tier 2, alongside the common Paper I"],
   ["Questions · marks", "100 objective questions · 200 marks (2 marks each)"],
   ["Time", "2 hours (extra time for candidates eligible for a scribe)"],
   ["Negative marking", "0.50 mark per wrong answer, as reported for recent cycles"],
-  ["Level", "graduation statistics; calculator not allowed"],
+  ["Level", "graduation statistics; no calculator is provided"],
   ["Mode", "computer-based test, English and Hindi"]]},
  {"k": "table", "title": "The official syllabus, unit by unit, and where it is in this app", "head": ["Syllabus unit", "Key sub-topics", "Lesson"], "rows": [
   ["Collection, classification and presentation of data", "primary and secondary data, tabulation, frequency distributions, diagrams and graphs", "L2"],
@@ -69,7 +69,7 @@ L.append({"id": "L1", "heat": 2, "title": "The paper, the plan & statistical bas
 # ---------------------------------------------------------------- L2
 _pie = F(1200, 4800) * 360
 _stur = 1 + 3.322 * math.log10(100)
-L.append({"id": "L2", "heat": 2, "title": "Collection, classification & presentation of data", "hi": "आँकड़ों का संग्रह, वर्गीकरण और प्रस्तुतीकरण", "blocks": [
+L.append({"id": "L2", "heat": 2, "title": "Collecting & presenting data", "hi": "आँकड़ों का संग्रह, वर्गीकरण और प्रस्तुतीकरण", "blocks": [
  {"k": "hot", "h": "<b>Steady, easy marks.</b> Expect definitions (primary vs secondary data, parts of a table, which graph locates the median) and quick numbers: class mark, class width, pie-chart angle, the number of classes by Sturges’ rule, cumulative frequency, and heights of a histogram with unequal classes."},
  {"k": "p", "h": "<b>Primary data</b> are collected first-hand by the investigator for the purpose in hand; <b>secondary data</b> were collected by someone else and are reused (published reports, census tables, RBI bulletins). Primary data are more reliable for the purpose but cost more time and money; secondary data must be checked for suitability, adequacy and reliability before use. A <b>census</b> (complete enumeration) covers every unit; a <b>sample survey</b> covers a part."},
  {"k": "table", "title": "Methods of collecting primary data", "head": ["Method", "Best when", "Weakness"], "rows": [

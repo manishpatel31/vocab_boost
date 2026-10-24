@@ -8,7 +8,7 @@ _r12, _r13, _r23 = F(8, 10), F(6, 10), F(5, 10)
 _p123 = float(_r12 - _r13 * _r23) / math.sqrt((1 - _r13 ** 2) * (1 - _r23 ** 2))
 _R123 = math.sqrt((_r12 ** 2 + _r13 ** 2 - 2 * _r12 * _r13 * _r23) / (1 - _r23 ** 2))
 _b7 = F(8, 10) * 6 / 4
-L.append({"id": "L7", "heat": 3, "title": "Regression, multiple & partial correlation", "hi": "समाश्रयण, बहु और आंशिक सहसंबंध", "blocks": [
+L.append({"id": "L7", "heat": 3, "title": "Regression & partial correlation", "hi": "समाश्रयण, बहु और आंशिक सहसंबंध", "blocks": [
  {"k": "hot", "h": "<b>Very frequent.</b> Given two regression lines, find the means, identify which line is which and find r; build a line from means, SDs and r and use it to estimate; use r = ±√(bᵧₓ·bₓᵧ); the effect of change of origin and scale on the coefficients; and, from the syllabus, multiple and partial correlation for three variables."},
  {"k": "p", "h": "Correlation says how strongly two variables move together; <b>regression</b> gives the line used to <i>predict</i> one from the other. There are two lines: <b>y on x</b> (predict y from a known x; it minimises the vertical squared errors) and <b>x on y</b> (predict x from y). Both pass through the point of means (x̄, ȳ). They coincide when r = ±1 and are perpendicular (parallel to the axes) when r = 0."},
  {"k": "formula", "title": "Two-variable regression", "rows": [
@@ -16,7 +16,7 @@ L.append({"id": "L7", "heat": 3, "title": "Regression, multiple & partial correl
   ["Line of x on y", "x − x̄ = bₓᵧ (y − ȳ)", "bₓᵧ = r σₓ/σᵧ = Cov/σᵧ²"],
   ["From sums", "bᵧₓ = [nΣxy − ΣxΣy]/[nΣx² − (Σx)²]", "least squares: Σy = na + bΣx, Σxy = aΣx + bΣx²"],
   ["Link with r", "r² = bᵧₓ · bₓᵧ;  r takes the common sign of the b’s", "both b’s have the same sign as r"],
-  ["Limits", "bᵧₓ · bₓᵧ ≤ 1;  (|bᵧₓ| + |bₓᵧ|)/2 ≥ |r|", "if one |b| > 1, the other must be < 1"],
+  ["Limits", "bᵧₓ · bₓᵧ ≤ 1;  (|bᵧₓ| + |bₓᵧ|)/2 ≥ |r|", "if one |b| &gt; 1, the other must be &lt; 1"],
   ["Origin and scale", "u = (x − a)/h, v = (y − c)/k → bᵧₓ = (k/h) bᵥᵤ", "origin has no effect; scale does"],
   ["Angle between lines", "tan θ = [(1 − r²)/|r|] · σₓσᵧ/(σₓ² + σᵧ²)", "r = ±1: θ = 0; r = 0: θ = 90°"],
   ["Standard error of estimate", "Sᵧₓ = σᵧ √(1 − r²)", "spread of y about the line of y on x"]]},
@@ -112,7 +112,7 @@ L.append({"id": "L9", "heat": 2, "title": "Random variables & expectation", "hi"
 
 # ---------------------------------------------------------------- L10
 _b2 = binom(6, F(1, 2), 2)
-L.append({"id": "L10", "heat": 3, "title": "Binomial, Poisson & other discrete distributions", "hi": "द्विपद, प्वासों और अन्य असतत बंटन", "blocks": [
+L.append({"id": "L10", "heat": 3, "title": "Binomial, Poisson & others", "hi": "द्विपद, प्वासों और अन्य असतत बंटन", "blocks": [
  {"k": "hot", "h": "<b>Among the most asked topics.</b> Find n and p from the mean and variance, compute P(X = r) or P(X ≥ 1), use mean = variance for the Poisson, solve P(X = 1) = P(X = 2), approximate a binomial by a Poisson, and recall β₁ and β₂. Geometric, hypergeometric and discrete uniform distributions appear as one-line questions."},
  {"k": "p", "h": "A <b>Bernoulli trial</b> has two outcomes, success (probability p) and failure (q = 1 − p). Counting the successes in <b>n independent trials</b> with the same p gives the <b>binomial</b> distribution B(n, p). When n is large and p small with np = m moderate (rare events: misprints per page, accidents per day), the binomial approaches the <b>Poisson</b> distribution with mean m."},
  {"k": "formula", "title": "Binomial B(n, p)", "rows": [
@@ -147,7 +147,7 @@ L.append({"id": "L10", "heat": 3, "title": "Binomial, Poisson & other discrete d
  "Discrete uniform 1…n: mean (n + 1)/2, variance (n² − 1)/12"]})
 
 # ---------------------------------------------------------------- L11
-L.append({"id": "L11", "heat": 3, "title": "Normal, exponential & other continuous distributions", "hi": "प्रसामान्य, चरघातांकी और अन्य संतत बंटन", "blocks": [
+L.append({"id": "L11", "heat": 3, "title": "Normal, exponential & uniform", "hi": "प्रसामान्य, चरघातांकी और अन्य संतत बंटन", "blocks": [
  {"k": "hot", "h": "<b>Asked in every paper.</b> Standardise with Z = (X − μ)/σ and read areas; the 68–95–99.7 rule; the number of students between two marks; properties of the normal curve (mean = median = mode, points of inflexion, QD and MD); and the exponential distribution’s mean, variance and memoryless property. The continuous uniform is a quick formula question."},
  {"k": "p", "h": "The <b>normal distribution</b> N(μ, σ²) is the bell-shaped, symmetric curve that describes many measurements and — through the central limit theorem — the means of large samples. Every normal variable becomes the <b>standard normal</b> Z ~ N(0, 1) after Z = (X − μ)/σ, so one table of areas serves all. The <b>exponential distribution</b> models waiting times between Poisson events; it “forgets” the time already waited."},
  {"k": "formula", "title": "The normal distribution N(μ, σ²)", "rows": [

@@ -138,7 +138,7 @@ assert abs(_r6 - 6 / math.sqrt(60)) < 1e-12
 _rx, _ry = [1, 2, 3, 4, 5], [2, 4, 1, 3, 5]
 _d2 = spearman_d2(_rx, _ry); _rho = spearman(_rx, _ry)
 _yq = F(30 * 10 - 20 * 40, 30 * 10 + 20 * 40)
-L.append({"id": "L6", "heat": 3, "title": "Correlation & association of attributes", "hi": "सहसंबंध और गुणों का साहचर्य", "blocks": [
+L.append({"id": "L6", "heat": 3, "title": "Correlation & attributes", "hi": "सहसंबंध और गुणों का साहचर्य", "blocks": [
  {"k": "hot", "h": "<b>A high-yield unit.</b> Karl Pearson’s r from sums, the effect of change of origin and scale, Spearman’s rank correlation (with and without ties), r² as explained variation, and Yule’s coefficient of association for attributes are all common. Correlation and regression together usually give several questions."},
  {"k": "p", "h": "<b>Correlation</b> measures how closely two variables move together in a straight-line pattern. A <b>scatter diagram</b> gives the first picture: points rising to the right show positive correlation, falling show negative, a shapeless cloud shows little or none. Karl Pearson’s <b>r</b> puts a number on it, from −1 (perfect negative) to +1 (perfect positive). Correlation is not causation: two variables may both depend on a third."},
  {"k": "formula", "title": "Karl Pearson’s coefficient", "rows": [
