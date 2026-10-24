@@ -41,7 +41,6 @@ QB.push(
 ["H3","Which Eastern Ganga king built the Konark Sun Temple?",["Narasimhadeva I","Anantavarman Chodaganga","Kharavela","Jajati Keshari"],"Narasimhadeva I built it about 1250. Anantavarman Chodaganga began the Jagannath temple at Puri.",""],
 ["H3","The great open-air relief called Arjuna's Penance, or the Descent of the Ganga, is at:",["Mahabalipuram","Ellora","Hampi","Khajuraho"],"It is carved on two huge boulders at Mahabalipuram, from the Pallava period.",""],
 ["H3","Who built the Shore Temple at Mahabalipuram?",["Narasimhavarman II (Rajasimha)","Narasimhavarman I (Mamalla)","Mahendravarman I","Rajaraja I"],"The Shore Temple dates from Rajasimha's reign, about 700 CE; the rathas are older.",""],
-["H3","The Pancha Rathas of Mahabalipuram are named after:",["The Pandavas and Draupadi","Five Pallava kings","The five elements","Five Chola queens"],"The five monolithic shrines carry the names Dharmaraja, Bhima, Arjuna, Nakula–Sahadeva and Draupadi.",""],
 ["H3","Which is the largest temple at Khajuraho?",["Kandariya Mahadeva","Lakshmana","Chaunsath Yogini","Parsvanatha"],"The Kandariya Mahadeva temple, dedicated to Shiva, is the largest and tallest.",""],
 ["H3","The Khajuraho temples belong to which faiths?",["Hindu and Jain","Hindu only","Buddhist and Hindu","Jain only"],"There are Hindu temples (to Shiva, Vishnu and others) and Jain temples (such as Parsvanatha).",""],
 ["H3","The stone chariot shown on the ₹50 note stands in which temple of Hampi?",["Vitthala","Virupaksha","Hazara Rama","Achyutaraya"],"The stone chariot, a shrine of Garuda, is in the courtyard of the Vitthala temple.",""],
@@ -56,10 +55,8 @@ QB.push(
 ["H3","Rani ki Vav lies on the bank of which river?",["Saraswati","Sabarmati","Mahi","Narmada"],"It was built beside the Saraswati at Patan; the river's floods later filled it with silt.",""],
 ["H3","The Ramappa temple is unusual because it is named after:",["Its chief sculptor","A Kakatiya king","The god Rama","A nearby lake"],"It is known by the name of Ramappa, the sculptor, though its god is Ramalingeswara (Shiva).",""],
 ["H3","The tower of the Ramappa temple is built of:",["Light, porous 'floating' bricks","Makrana marble","Iron beams","Teak wood"],"Its bricks are so light that they float on water, which eases the load on the walls.",""],
-["H3","In which district is the Ramappa temple?",["Mulugu","Nalgonda","Khammam","Adilabad"],"It stands at Palampet in Mulugu district, Telangana.",""],
 ["H3","The Hoysala World Heritage site (2023) has temples at Belur, Halebidu and:",["Somanathapura","Shravanabelagola","Aihole","Badami"],"The Keshava temple at Somanathapura (1268) is the third.",""],
 ["H3","Hoysala temples are carved mainly from:",["Soapstone (chloritic schist)","Red sandstone","Granite","Laterite"],"Soft soapstone let Hoysala sculptors carve very fine detail.",""],
-["H3","Hoysala temples usually stand on a raised star-shaped platform called a:",["Jagati","Vimana","Gopuram","Shikhara"],"The jagati doubles as a path for walking round the temple.",""],
 ["H3","Which of these temple sites in Karnataka is NOT on the World Heritage list?",["Aihole","Pattadakal","Hampi","Belur"],"Aihole and Badami are on the Tentative List only; Pattadakal, Hampi and Belur are inscribed.",""],
 ["H3","Which sun temple is a World Heritage site?",["Konark","Modhera","Martand","Katarmal"],"Only Konark is inscribed; Modhera (Gujarat) is on the Tentative List.",""]
 );

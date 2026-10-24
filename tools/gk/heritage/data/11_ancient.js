@@ -63,8 +63,5 @@ QB.push(
 ["H2","Sarnath is the place where the Buddha:",["Gave his first sermon","Attained enlightenment","Was born","Died"],"At the Deer Park of Sarnath he 'set the wheel of the law in motion' — the first sermon.",""],
 ["H2","Which of these is part of the Sarnath World Heritage site?",["Dhamek Stupa","Great Stupa of Sanchi","Vajrasana","Ramabhar Stupa"],"The Dhamek Stupa is at Sarnath. The Vajrasana is at Bodh Gaya and the Ramabhar Stupa at Kushinagar.",""],
 ["H2","India's National Emblem is taken from the Lion Capital found at:",["Sarnath","Sanchi","Lauriya Nandangarh","Rampurva"],"The Lion Capital of Ashoka's pillar at Sarnath was adopted as the National Emblem on 26 January 1950.",""],
-["H2","Which of the four great places of the Buddha's life is a World Heritage site outside India?",["Lumbini","Kushinagar","Sarnath","Bodh Gaya"],"Lumbini, his birthplace, is in Nepal. Kushinagar, where he died, is not a World Heritage site.",""],
-["H2","Ajanta's caves were rediscovered in 1819 by:",["John Smith, a British officer","James Prinsep","John Marshall","William Jones"],"John Smith came upon Cave 10 while hunting a tiger in 1819.",""],
-["H2","Ellora's Buddhist chaitya hall, Cave 10, is popularly named after:",["Vishvakarma","Indra","Kubera","Maitreya"],"It is called the Vishvakarma or Carpenter's cave, because its stone ribs look like wooden beams.",""]
 );
 LASTMOMENT.push({t:"Ancient and Buddhist sites", era:["hm"], rows:[["Bhimbetka","MP, 2003 — rock paintings"],["Sanchi","MP, 1989 — Ashoka's stupa"],["Dholavira","Gujarat, 2021 — Harappan"],["Bodh Gaya","Bihar, 2002 — enlightenment"],["Nalanda","Bihar, 2016"],["Sarnath","UP, 2026 — first sermon"],["Ajanta · Ellora · Elephanta","Maharashtra — 1983, 1983, 1987"]]});

@@ -38,8 +38,7 @@ LESSONS.push(
 pairQs("H5", H5S.map(r => [r[0], r[1], r[3], ""]), { q: t => `The World Heritage site “${t}” is in which state or UT?`, e: r => `${r[0]} is in ${r[1]}. ${r[2]}`,
   rq: a => `Which of these colonial, modern or city sites on the World Heritage list is in ${a}?`, re: r => `${r[0]} is in ${r[1]}. ${r[2]}`, extra: ["Karnataka","Delhi"] });
 pairQs("H5", H5R.map(r => [r[0], r[1], r[3], ""]), { q: t => `The ${t} runs in which state?`, e: r => `The ${r[0]} is in ${r[1]}. ${r[2]}`, extra: ["Maharashtra","Uttarakhand"] });
-pairQs("H5", H5R.map(r => [r[0], r[2], r[3], ""]), { q: t => `In which year was the ${t} added to the World Heritage list?`, e: r => `The ${r[0]} joined in ${r[1]}. Darjeeling 1999, Nilgiri 2005, Kalka–Shimla 2008.`,
-  rq: a => `Which mountain railway joined the World Heritage list in ${a}?`, re: r => `The ${r[0]} joined in ${r[1]}.`, extra: ["2010"], pool: ["Matheran Hill Railway","Kangra Valley Railway"] });
+pairQs("H5", H5R.map(r => [r[0], r[2], r[3], ""]), { q: t => `In which year was the ${t} added to the World Heritage list?`, e: r => `The ${r[0]} joined in ${r[1]}. Darjeeling 1999, Nilgiri 2005, Kalka–Shimla 2008.`, extra: ["2010"] });
 
 QB.push(
 ["H5","The Basilica of Bom Jesus in Old Goa holds the remains of:",["St Francis Xavier","St Thomas","Vasco da Gama","St Ignatius Loyola"],"St Francis Xavier's body lies in a silver casket in the basilica.",""],

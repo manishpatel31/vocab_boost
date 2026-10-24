@@ -26,8 +26,7 @@ LESSONS.push(
 ], sum:["Seven natural sites: Kaziranga, Manas, Keoladeo (1985); Sundarbans (1987); Nanda Devi and Valley of Flowers (1988, 2005); Western Ghats (2012); Great Himalayan NP (2014).","One mixed site: Khangchendzonga, Sikkim (2016).","The Western Ghats site has 39 parts in Kerala, Karnataka, Tamil Nadu and Maharashtra.","Manas was on the danger list from 1992 to 2011.","India has 13 UNESCO biosphere reserves; the latest is the Cold Desert (2025)."]}
 );
 
-pairQs("H6", H6S.map(r => [r[0], r[1], r[3], ""]), { q: t => `In which state is the natural or mixed World Heritage site “${t}”?`, e: r => `${r[0]} is in ${r[1]}. ${r[2]}`,
-  rq: a => `Which of these natural or mixed World Heritage sites is in ${a}?`, re: r => `${r[0]} is in ${r[1]}. ${r[2]}`, extra: ["Gujarat","Kerala"] });
+pairQs("H6", H6S.map(r => [r[0], r[1], r[3], ""]), { q: t => `In which state is the natural or mixed World Heritage site “${t}”?`, e: r => `${r[0]} is in ${r[1]}. ${r[2]}`, extra: ["Gujarat","Kerala"] });
 
 QB.push(
 ["H6","Which Indian natural site was on the List of World Heritage in Danger from 1992 to 2011?",["Manas","Kaziranga","Keoladeo","Sundarbans"],"Manas was put on the danger list after damage during unrest, and taken off in 2011 after recovery.",""],

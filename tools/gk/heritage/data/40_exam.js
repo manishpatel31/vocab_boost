@@ -10,7 +10,8 @@ const HEATMAP = {
   cols: [{ label: "SSC CGL", sub: "Tier 1 · GA" }, { label: "SSC CHSL / MTS", sub: "GA" }, { label: "RRB NTPC", sub: "GA" }],
   rows: [
     { id: "H1", v: [2, 2, 2] }, { id: "H2", v: [2, 2, 2] }, { id: "H3", v: [2, 2, 2] }, { id: "H4", v: [3, 2, 3] }, { id: "H5", v: [2, 1, 2] },
-    { id: "H6", v: [1, 1, 1] }
+    { id: "H6", v: [1, 1, 1] }, { id: "H7", v: [3, 3, 3] }, { id: "H8", v: [2, 2, 2] }, { id: "H9", v: [2, 2, 2] },
+    { id: "H10", v: [2, 2, 2] }
   ],
   pattern: {
     title: "Where these questions sit",

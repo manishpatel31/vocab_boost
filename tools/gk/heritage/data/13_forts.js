@@ -51,7 +51,6 @@ LESSONS.push(
 
 pairQs("H4", H4S.map(r => [r[0], r[1], r[3], ""]), { q: t => `Where is the World Heritage site “${t}”?`, e: r => `${r[0]} is in ${r[1]}. ${r[2]}`,
   rq: a => `Which of these Sultanate, Mughal or fort sites on the World Heritage list is in ${a}?`, re: r => `${r[0]} is in ${r[1]}. ${r[2]}`, extra: ["Madhya Pradesh","Maharashtra"] });
-pairQs("H4", H4S.map(r => [r[0], r[2], r[3], ""]), { q: t => `When was “${t}” inscribed on the World Heritage list?`, e: r => `${r[0]} was inscribed in ${r[1]}.`, extra: ["2016"] });
 
 QB.push(
 ["H4","The Taj Mahal was built by Shah Jahan in memory of:",["Mumtaz Mahal","Nur Jahan","Mariam-uz-Zamani","Jahanara Begum"],"Mumtaz Mahal (Arjumand Banu Begum) died in 1631; work on her tomb began the next year.",""],
