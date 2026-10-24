@@ -9,7 +9,8 @@ const CA2_NAT = [
   ["Capital expenditure","₹12.2 lakh crore for 2026-27","Up from ₹11.2 lakh crore in 2025-26."],
   ["Income-tax Act, 2025","Replaces the Income-tax Act, 1961 from 1 Apr 2026","'Previous year' and 'assessment year' give way to a single 'tax year'."],
   ["16th Finance Commission","Report for 2026–31 tabled on 1 Feb 2026; states' share of central taxes kept at 41%","Chaired by Arvind Panagariya; the same 41% as the 15th Commission."],
-  ["India AI Impact Summit","Bharat Mandapam, New Delhi, from 16 Feb 2026","The New Delhi Declaration on AI Impact was adopted on 19 Feb; over 38,000 GPUs already provided under the IndiaAI Mission."]
+  ["India AI Impact Summit","Bharat Mandapam, New Delhi, from 16 Feb 2026","The New Delhi Declaration on AI Impact was adopted on 19 Feb; over 38,000 GPUs already provided under the IndiaAI Mission."],
+  ["Ramsar sites on World Wetlands Day (2 Feb 2026)","India's count stood at 98 after Patna Bird Sanctuary (Etah, UP) and Chhari-Dhand (Kutch, Gujarat) were added","Announced on 30 Jan 2026 by Environment Minister Bhupender Yadav; up from 26 sites in 2014. Theme: 'Wetlands and Traditional Knowledge: Celebrating Cultural Heritage'."]
 ];
 const CA2_INT = [
   ["India–US interim trade framework","Announced on 6 Feb 2026: US tariff on Indian goods cut to 18%","The extra 25% duty was removed from 7 Feb 2026; dairy and cereals stayed protected on India's side."],
@@ -27,12 +28,14 @@ const CA2_ECO = [
   ["India Semiconductor Mission 2.0","Announced in the Budget 2026-27","Moves beyond chips to equipment, materials and Indian chip design (IP)."],
   ["Electronics Components Manufacturing Scheme","Outlay raised to ₹40,000 crore in the Budget","The scheme had started in April 2025 with about ₹23,000 crore."],
   ["SME Growth Fund","₹10,000 crore fund announced in the Budget 2026-27","The Cabinet approved it in October 2026 (see October)."],
-  ["Henley Passport Index, February 2026","India 75th, with 56 visa-free destinations","Up from 80th in January."]
+  ["Henley Passport Index, February 2026","India 75th, with 56 visa-free destinations","Up from 80th in January."],
+  ["Corruption Perceptions Index 2025 (Transparency International)","Released on 10 Feb 2026: India 91st of 182, score 39","Up from 96th (score up by one point). Denmark first (89) for the eighth time; the global average fell to 42."]
 ];
 const CA2_SCI = [
   ["International Fleet Review 2026","Reviewed by President Droupadi Murmu off Visakhapatnam on 18 Feb 2026","Theme: 'United Through Oceans, Strengthening Bridges of Friendship'."],
   ["Exercise MILAN 2026","Multinational naval exercise at Visakhapatnam, alongside the Fleet Review","The IONS Conclave of Chiefs was held at the same time."],
-  ["New Delhi Frontier AI Commitments","Voluntary framework announced on 19 Feb 2026 at the AI Impact Summit","Adopted by leading global and Indian AI companies."]
+  ["New Delhi Frontier AI Commitments","Voluntary framework announced on 19 Feb 2026 at the AI Impact Summit","Adopted by leading global and Indian AI companies."],
+  ["INS Anjadip","Commissioned at Chennai on 27 Feb 2026","An anti-submarine warfare shallow water craft built by GRSE, Kolkata; Navy chief Admiral Dinesh K. Tripathi presided."]
 ];
 const CA2_SPO = [
   ["Australian Open 2026 — men's singles","Carlos Alcaraz beat Novak Djokovic 2-6, 6-2, 6-3, 7-5 on 1 Feb 2026","His first Australian Open and seventh major; the youngest man to complete the career Grand Slam."],
@@ -47,6 +50,7 @@ const CA2_AWD = [
   ["Grammys 2026 — other main awards","Record of the Year 'Luther' (Kendrick Lamar & SZA); Song of the Year 'Wildflower' (Billie Eilish)","Best New Artist: Olivia Dean."]
 ];
 const CA2_APP = [
+  ["CEO, NITI Aayog (additional charge)","Nidhi Chhibber — from 24 Feb 2026","After B. V. R. Subrahmanyam's tenure ended. A 1994-batch IAS officer (Chhattisgarh cadre), DG of NITI Aayog's DMEO and a former CBSE chairperson. Anurag Jain became the regular CEO in July 2026."],
   ["Prime Minister of Bangladesh","Tarique Rahman — sworn in on 17 Feb 2026","Oath given by President Mohammed Shahabuddin; 25 ministers sworn in with him."],
   ["President-elect of Portugal","António José Seguro — elected on 8 Feb 2026","For a five-year term."],
   ["Prime Minister of Japan","Sanae Takaichi — won a two-thirds majority on 8 Feb 2026","PM since 21 Oct 2025; her party's best result since 1955."]
@@ -57,9 +61,15 @@ const CA2_PLC = [
   ["Harare, Zimbabwe","U-19 World Cup final, 6 Feb 2026","India beat England at Harare Sports Club."],
   ["Vadodara, Gujarat","WPL 2026 final, 5 Feb 2026","At the Baroda Cricket Association Stadium."],
   ["Milan and Cortina d'Ampezzo, Italy","Joint hosts of the 2026 Winter Olympics","Norway topped the medal table."],
-  ["Wijk aan Zee, Netherlands","Tata Steel Chess, which ended on 1 Feb 2026","Abdusattorov won the Masters."]
+  ["Wijk aan Zee, Netherlands","Tata Steel Chess, which ended on 1 Feb 2026","Abdusattorov won the Masters."],
+  ["Chhari-Dhand, Kutch (Gujarat)","Became a Ramsar site (announced 30 Jan 2026)","Gujarat's only Conservation Reserve; a stopover for migratory birds that spreads to about 80 sq km in the monsoon."],
+  ["Patna Bird Sanctuary, Etah (Uttar Pradesh)","Became a Ramsar site (announced 30 Jan 2026)","Not in Bihar — it is in Etah district of Uttar Pradesh."]
 ];
 const CA2_OBI = [
+  ["André Béteille","Sociologist; died in New Delhi on 3 Feb 2026, aged 91","Professor at the Delhi School of Economics and the first Chancellor of Ashoka University; wrote 'Caste, Class and Power'; Padma Bhushan (2005)."],
+  ["Ricky A. J. Syngkon","Lok Sabha MP for Shillong (Meghalaya); died on 19 Feb 2026, aged 54","Collapsed while playing football; a member of the Voice of the People Party (VPP)."],
+  ["Mukul Roy","Former Railway Minister; died in Kolkata on 23 Feb 2026, aged 71","A founder of the Trinamool Congress; Railway Minister in 2012 after Dinesh Trivedi."],
+  ["R. Nallakannu","CPI veteran and freedom fighter; died in Chennai on 25 Feb 2026, aged 101","State Secretary of the CPI in Tamil Nadu (1992–2005); given a state funeral."],
   ["Ayatollah Ali Khamenei","Supreme Leader of Iran; killed in the US–Israeli strikes of 28 Feb 2026","Iran declared national mourning; senior officials were killed with him."]
 ];
 const CA2_SRC = [
@@ -110,13 +120,33 @@ const CA2_SRC = [
   ['<a href="https://en.wikipedia.org/wiki/2026_Winter_Olympics_medal_table">wikipedia.org</a>',"Final medal table: Norway 18 gold; USA 12; Italy best ever"],
   ['<a href="https://www.francsjeux.com/en/short/Milan-Cortina-2026-Norway-USA-Netherlands%3A-The-final-medal-table-of-the-Winter-Olympic-Games/">francsjeux.com</a>',"Games ended 22 Feb 2026; Norway, USA, Netherlands top three"],
   ['<a href="https://www.thestatesman.com/entertainment/grammy-awards-2026-full-list-of-winners-album-record-song-of-the-year-and-more-1503550473.html">thestatesman.com</a>',"68th Grammys, 1 Feb 2026: main winners"],
-  ['<a href="https://www.outlookindia.com/art-entertainment/hollywood/grammy-awards-2026-full-list-of-winners">outlookindia.com</a>',"Bad Bunny Album of the Year — first Spanish-language album; 'Luther' Record of the Year"]
+  ['<a href="https://www.outlookindia.com/art-entertainment/hollywood/grammy-awards-2026-full-list-of-winners">outlookindia.com</a>',"Bad Bunny Album of the Year — first Spanish-language album; 'Luther' Record of the Year"],
+  ['<a href="https://www.newsonair.gov.in/world-wetlands-day-indias-ramsar-sites-grow-from-26-to-98-says-minister-kirti-vardhan-singh">newsonair.gov.in (2 Feb 2026)</a>',"World Wetlands Day 2026: Ramsar sites up from 26 to 98"],
+  ['<a href="https://www.drishtiias.com/daily-updates/daily-news-analysis/india-expands-ramsar-network-to-98-sites/print_manually">drishtiias.com (2 Feb 2026)</a>',"98 sites; Patna Bird Sanctuary (Etah) and Chhari-Dhand (Kutch); announced 30 Jan; theme"],
+  ['<a href="https://swarajyamag.com/amp/story/states/indias-ramsar-network-grows-to-98-with-inclusion-of-ups-patna-bird-sanctuary-and-gujarats-chhari-dhand-wetlands">swarajyamag.com</a>',"Ramsar network grows to 98; Chhari-Dhand a Conservation Reserve"],
+  ['<a href="https://www.drishtiias.com/daily-updates/daily-news-analysis/corruption-perception-index-2025/print_manually">drishtiias.com (16 Feb 2026)</a>',"CPI 2025: India 91 of 182, score 39; Denmark 89, eighth time first; global average 42"],
+  ['<a href="https://catholicconnect.in/news/india-ranks-91st-in-2025-corruption-perceptions-index">catholicconnect.in (PTI)</a>',"Released Tuesday 10 Feb 2026; India up five places from 96th"],
+  ["study-economics.html (this repo, checked 2 Oct 2026)","CPI 2025 rank 91"],
+  ['<a href="https://stratpost.com/ins-anjadip-commissioned-at-chennai/">stratpost.com</a>',"INS Anjadip commissioned at Chennai; Admiral Tripathi presided"],
+  ['<a href="https://www.etvbharat.com/en/bharat/ins-anjadip-to-be-inducted-into-indian-navy-on-feb-27-enn26022304684">etvbharat.com</a>',"Induction on 27 Feb 2026; built by GRSE"],
+  ['<a href="https://www.newsonair.gov.in/indian-navy-inducts-anjadip-fourth-anti-submarine-warfare-shallow-water-craft">newsonair.gov.in</a>',"Navy inducts Anjadip, an ASW shallow water craft"],
+  ['<a href="https://storyboard18.com/brand-makers/nidhi-chhibber-takes-interim-charge-as-ceo-of-niti-aayog-after-subrahmanyams-tenure-ends-90604.htm">storyboard18.com (24 Feb 2026)</a>',"Nidhi Chhibber interim CEO of NITI Aayog from 24 Feb 2026; ACC/DoPT order"],
+  ['<a href="https://www.drishtiias.com/state-pcs-current-affairs/nidhi-chhibber-takes-additional-charge-as-niti-aayog-ceo/print_manually">drishtiias.com</a>',"Additional charge; 1994-batch IAS, Chhattisgarh cadre; DMEO; former CBSE chair"],
+  ['<a href="https://thewire.in/education/renowned-sociologist-andre-beteille-passes-away-at-91">thewire.in</a>',"André Béteille died in New Delhi on 3 Feb 2026, aged 91; Delhi School of Economics"],
+  ['<a href="https://www.ashoka.edu.in/remembering-andre-beteille-first-chancellor-of-ashoka-university/">ashoka.edu.in</a>',"First Chancellor of Ashoka University; Padma Bhushan"],
+  ['<a href="https://nenow.in/national/renowned-indian-sociologist-andre-beteille-passes-away.html">nenow.in</a>',"Béteille's books, including Caste, Class and Power (1965)"],
+  ['<a href="https://www.newsonair.gov.in/mp-from-the-shillong-parliamentary-constituency-dr-ricky-a-j-syngkon-passes-away-at-54-following-cardiac-arrest">newsonair.gov.in (20 Feb 2026)</a>',"Shillong MP Ricky A. J. Syngkon died aged 54 after a cardiac arrest"],
+  ['<a href="https://en.wikipedia.org/wiki/Ricky_A._J._Syngkon">wikipedia.org</a>',"Died 19 Feb 2026 at Shillong; VPP; collapsed while playing football"],
+  ['<a href="https://www.newsonair.gov.in/former-railway-minister-and-rajya-sabha-mp-mukul-roy-passes-away">newsonair.gov.in (23 Feb 2026)</a>',"Mukul Roy, former Railway Minister, passed away"],
+  ['<a href="https://www.onmanorama.com/news/india/2026/02/23/former-railway-minster-mukul-roy-death-kolkata.amp.html">onmanorama.com</a>',"Died in Kolkata on 23 Feb 2026, aged 71; Railway Minister 2012 after Dinesh Trivedi"],
+  ['<a href="https://www.newsonair.gov.in/veteran-cpi-leader-r-nallakannu-passes-away-at-age-101-in-chennai">newsonair.gov.in (25 Feb 2026)</a>',"R. Nallakannu died in Chennai aged 101"],
+  ['<a href="https://thesouthfirst.com/tamilnadu/cpi-veteran-leader-r-nallakannu-passes-away-aged-101-in-chennai/">thesouthfirst.com</a>',"CPI State Secretary 1992–2005; state honours"]
 ];
 
 LESSONS.push(
 {id:"CA2", title:"February 2026", hi:"फ़रवरी 2026", blocks:[
   {k:"hot", h:"Most likely to be asked: the <b>Union Budget 2026-27</b> (1 Feb — fiscal deficit <b>4.3%</b>, capex <b>₹12.2 lakh crore</b>, new Income-tax Act from 1 April, 16th Finance Commission's <b>41%</b>), the <b>AI Impact Summit</b> at Bharat Mandapam, the <b>RBI holding the repo at 5.25%</b>, the new <b>CPI (2024)</b> and <b>GDP (2022-23)</b> base years, <b>India's sixth U-19 World Cup</b>, <b>Alcaraz</b>'s Australian Open, <b>Tarique Rahman</b> as Bangladesh's PM and the <b>18% US tariff</b> deal."},
-  {k:"story", h:"<p>February 2026 began with the <b>Union Budget</b> on <b>Sunday, 1 February</b>. The Finance Minister held income-tax slabs where they were but brought in the new <b>Income-tax Act, 2025</b> from 1 April, raised the tax on <b>futures and options</b>, set the fiscal deficit at <b>4.3%</b> and capital spending at <b>₹12.2 lakh crore</b>, and tabled the <b>16th Finance Commission</b>'s report, which kept the states' share at <b>41%</b>. The same day, <b>Alcaraz</b> won the Australian Open to complete the career Grand Slam.</p><p>On <b>6 February</b> the RBI left the repo rate at <b>5.25%</b>, India and the US announced a trade framework cutting the US tariff to <b>18%</b>, and India's boys won a record <b>sixth U-19 World Cup</b> in Harare. Elections abroad followed — <b>Japan</b> and <b>Portugal</b> on 8 February, <b>Bangladesh</b> on 12 February, where <b>Tarique Rahman</b> became PM. New Delhi hosted the <b>AI Impact Summit</b> and Visakhapatnam the <b>International Fleet Review</b>. The statistics changed too — a <b>CPI with base 2024</b> (12 Feb) and a <b>GDP series with base 2022-23</b> (27 Feb). The month ended with US–Israeli strikes on Iran that killed <b>Ayatollah Khamenei</b> (28 Feb).</p>", key:"Budget 1 Feb (FD 4.3%, capex ₹12.2 lakh crore, FC share 41%); repo 5.25% (6 Feb); U-19 WC sixth title; AI Summit New Delhi; Khamenei killed (28 Feb)."},
+  {k:"story", h:"<p>February 2026 began with the <b>Union Budget</b> on <b>Sunday, 1 February</b>. The Finance Minister held income-tax slabs where they were but brought in the new <b>Income-tax Act, 2025</b> from 1 April, raised the tax on <b>futures and options</b>, set the fiscal deficit at <b>4.3%</b> and capital spending at <b>₹12.2 lakh crore</b>, and tabled the <b>16th Finance Commission</b>'s report, which kept the states' share at <b>41%</b>. The same day, <b>Alcaraz</b> won the Australian Open to complete the career Grand Slam.</p><p>On <b>6 February</b> the RBI left the repo rate at <b>5.25%</b>, India and the US announced a trade framework cutting the US tariff to <b>18%</b>, and India's boys won a record <b>sixth U-19 World Cup</b> in Harare. Elections abroad followed — <b>Japan</b> and <b>Portugal</b> on 8 February, <b>Bangladesh</b> on 12 February, where <b>Tarique Rahman</b> became PM. New Delhi hosted the <b>AI Impact Summit</b> and Visakhapatnam the <b>International Fleet Review</b>. The statistics changed too — a <b>CPI with base 2024</b> (12 Feb) and a <b>GDP series with base 2022-23</b> (27 Feb). India's Ramsar count stood at <b>98</b> on World Wetlands Day, and the <b>Corruption Perceptions Index</b> put India at <b>91st</b>. The month ended with US–Israeli strikes on Iran that killed <b>Ayatollah Khamenei</b> (28 Feb).</p>", key:"Budget 1 Feb (FD 4.3%, capex ₹12.2 lakh crore, FC share 41%); repo 5.25% (6 Feb); U-19 WC sixth title; AI Summit New Delhi; Khamenei killed (28 Feb)."},
   {k:"table", title:"National — government decisions, schemes, laws", head:["Item","Fact","Note"], rows: CA2_NAT},
   {k:"table", title:"International — summits, agreements, elections abroad", head:["Item","Fact","Note"], rows: CA2_INT},
   {k:"table", title:"Economy and banking", head:["Item","Fact","Note"], rows: CA2_ECO},
@@ -131,6 +161,7 @@ LESSONS.push(
   {k:"trap", h:"<b>Which growth figure?</b> The Economic Survey (29 Jan) and the RBI (6 Feb) said <b>7.4%</b> for 2025-26 on the old base; the <b>new series</b> of 27 Feb put it at <b>7.6%</b>. Read which series the question means."},
   {k:"trap", h:"The RBI <b>held</b> the repo at <b>5.25%</b> in February 2026 — the cut had come in December 2025, and the hike to 5.50% came only in October 2026. And the <b>16th</b> Finance Commission did <b>not</b> change the states' share: it stayed at <b>41%</b>, as under the 15th."},
   {k:"trap", h:"<b>Two finals on 1 February</b>: <b>Alcaraz</b> beat Djokovic in Melbourne, and <b>Abdusattorov</b> won the Tata Steel Masters at Wijk aan Zee. The women's Australian Open final (Rybakina) was a day earlier, on <b>31 January</b>."},
+  {k:"trap", h:"<b>Ramsar count by month</b>: <b>98</b> on World Wetlands Day (2 Feb 2026), after Patna Bird Sanctuary and Chhari-Dhand; <b>103</b> by October 2026. And <b>Patna Bird Sanctuary</b> is in <b>Etah, Uttar Pradesh</b> — not in Bihar."},
   {k:"table", title:"Sources (checked 24 Oct 2026)", head:["Source","What it confirmed"], rows: CA2_SRC}
 ], sum:[
   "Union Budget 2026-27 on Sunday, 1 Feb 2026: fiscal deficit 4.3% (from 4.4%); debt 55.6% of GDP; capex ₹12.2 lakh crore; slabs unchanged.",
@@ -143,7 +174,10 @@ LESSONS.push(
   "Bangladesh: BNP won (12 Feb); Tarique Rahman PM (17 Feb). Japan: LDP 316 of 465 (8 Feb). Portugal: Seguro President (8 Feb).",
   "28 Feb: US–Israeli strikes on Iran; Ayatollah Ali Khamenei killed.",
   "Sport: Alcaraz AO (1 Feb); India U-19 champions, sixth title (6 Feb, Harare); RCB WPL (5 Feb); Winter Olympics — Norway top.",
-  "Grammys (1 Feb): Album of the Year Bad Bunny — first in Spanish. International Fleet Review, Visakhapatnam (18 Feb)."
+  "Grammys (1 Feb): Album of the Year Bad Bunny — first in Spanish. International Fleet Review, Visakhapatnam (18 Feb).",
+  "Ramsar sites: 98 on World Wetlands Day (Patna Bird Sanctuary, UP; Chhari-Dhand, Gujarat). CPI 2025 (10 Feb): India 91 of 182, Denmark first.",
+  "INS Anjadip commissioned at Chennai (27 Feb). Nidhi Chhibber NITI Aayog CEO (additional charge) from 24 Feb.",
+  "Deaths: André Béteille (3 Feb), Ricky Syngkon (19 Feb), Mukul Roy (23 Feb), R. Nallakannu (25 Feb), Ali Khamenei (28 Feb)."
 ]}
 );
 
@@ -176,10 +210,21 @@ QB.push(
 ["CA2","Which team won the Women's Premier League 2026, beating Delhi Capitals in the final at Vadodara?",["Royal Challengers Bengaluru","Mumbai Indians","UP Warriorz","Gujarat Giants"],"RCB won by 6 wickets on 5 Feb 2026 for their second title.",""],
 ["CA2","Who won the Tata Steel Chess Masters 2026, which ended on 1 February 2026?",["Nodirbek Abdusattorov","Javokhir Sindarov","Arjun Erigaisi","D. Gukesh"],"The Uzbek grandmaster won at Wijk aan Zee; his compatriot Javokhir Sindarov was second.",""],
 ["CA2","Which country topped the medal table at the 2026 Winter Olympics in Milan–Cortina?",["Norway","United States","Italy","Germany"],"Norway won 18 golds; the USA was second with 12.",""],
-["CA2","Which album won Album of the Year at the 68th Grammy Awards on 1 February 2026?",["Debí Tirar Más Fotos (Bad Bunny)","Luther (Kendrick Lamar & SZA)","Wildflower (Billie Eilish)","Cowboy Carter (Beyoncé)"],"Bad Bunny's album was the first Spanish-language album to win; 'Luther' won Record of the Year.",""]
+["CA2","Which album won Album of the Year at the 68th Grammy Awards on 1 February 2026?",["Debí Tirar Más Fotos (Bad Bunny)","Luther (Kendrick Lamar & SZA)","Wildflower (Billie Eilish)","Cowboy Carter (Beyoncé)"],"Bad Bunny's album was the first Spanish-language album to win; 'Luther' won Record of the Year.",""],
+["CA2","In Transparency International's Corruption Perceptions Index 2025, released on 10 February 2026, India ranked:",["91st","96th","85th","116th"],"India rose five places from 96th to 91st of 182, with a score of 39.",""],
+["CA2","Which country topped the Corruption Perceptions Index 2025 (released February 2026)?",["Denmark","Finland","Singapore","New Zealand"],"Denmark scored 89 and was first for the eighth time in a row.",""],
+["CA2","On World Wetlands Day 2026 (2 February), how many Ramsar sites did India have?",["98","96","103","89"],"Two additions — Patna Bird Sanctuary and Chhari-Dhand — took the count from 96 to 98; it reached 103 in October 2026.",""],
+["CA2","Chhari-Dhand, named a Ramsar site just before World Wetlands Day 2026, is in which state?",["Gujarat","Rajasthan","Uttar Pradesh","Maharashtra"],"It is in Kutch district, Gujarat, and is the state's only Conservation Reserve.",""],
+["CA2","Patna Bird Sanctuary, a Ramsar site from early 2026, is located in:",["Etah district, Uttar Pradesh","Patna district, Bihar","Kutch district, Gujarat","Bharatpur district, Rajasthan"],"Despite its name, the sanctuary is in Etah district of Uttar Pradesh.",""],
+["CA2","Who was given additional charge as CEO of NITI Aayog from 24 February 2026?",["Nidhi Chhibber","B. V. R. Subrahmanyam","Anurag Jain","Amitabh Kant"],"Nidhi Chhibber took over when B. V. R. Subrahmanyam's tenure ended; Anurag Jain was named the regular CEO in July 2026.",""],
+["CA2","INS Anjadip, commissioned at Chennai on 27 February 2026, is a:",["Anti-submarine warfare shallow water craft","Nuclear-powered submarine","Aircraft carrier","Fleet support tanker"],"It is one of the Navy's anti-submarine shallow water craft, built by GRSE, Kolkata.",""],
+["CA2","André Béteille, who died on 3 February 2026, was a renowned:",["Sociologist","Physicist","Carnatic musician","Cartoonist"],"He taught at the Delhi School of Economics, studied caste and class, and was Ashoka University's first Chancellor.",""],
+["CA2","R. Nallakannu, who died in Chennai on 25 February 2026 aged 101, was a veteran of which party?",["Communist Party of India","DMK","Indian National Congress","AIADMK"],"He was the CPI's State Secretary in Tamil Nadu from 1992 to 2005.",""],
+["CA2","Mukul Roy, who died on 23 February 2026, had served as Union Minister of:",["Railways","Home Affairs","External Affairs","Finance"],"He became Railway Minister in 2012, after Dinesh Trivedi; he was a founder of the Trinamool Congress.",""],
+["CA2","Ricky A. J. Syngkon, who died on 19 February 2026, was the Lok Sabha MP from:",["Shillong","Tura","Aizawl","Kohima"],"He represented Shillong (Meghalaya) for the Voice of the People Party.",""]
 );
 
 LASTMOMENT.push(
 {t:"February 2026", era:["ca"], rows:[["Budget 2026-27","1 Feb (Sunday)"],["Fiscal deficit","4.3% (from 4.4%)"],["Capex","₹12.2 lakh crore"],["16th FC","Panagariya · 41%"],["Repo (6 Feb)","Held at 5.25%"],["New bases","CPI 2024 · GDP 2022-23"],["AI Impact Summit","Bharat Mandapam"],["US tariff deal","18%"],["U-19 World Cup","India, 6th title (Harare)"],["Bangladesh PM","Tarique Rahman"]]}
 );
-TILES.push(["4.3%","Fiscal deficit target for 2026-27","ca"],["41%","States' share of central taxes — 16th Finance Commission","ca"],["5.25%","Repo rate held on 6 Feb 2026","ca"],["6th","U-19 World Cup title for India (Feb 2026)","ca"],["316","Seats won by Japan's LDP on 8 Feb 2026","ca"]);
+TILES.push(["4.3%","Fiscal deficit target for 2026-27","ca"],["41%","States' share of central taxes — 16th Finance Commission","ca"],["5.25%","Repo rate held on 6 Feb 2026","ca"],["6th","U-19 World Cup title for India (Feb 2026)","ca"],["316","Seats won by Japan's LDP on 8 Feb 2026","ca"],["98","India's Ramsar sites on World Wetlands Day 2026","ca"],["91","India in the Corruption Perceptions Index 2025","ca"]);
