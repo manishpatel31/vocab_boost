@@ -96,6 +96,8 @@
     firsts:   { title: 'Firsts, Superlatives & National Symbols', file: 'study-firsts-symbols.html', key: 'firsts_symbols_v1' },
     heritage: { title: 'UNESCO Heritage & Monuments', file: 'study-heritage-monuments.html', key: 'heritage_monuments_v1' },
     tribes:   { title: 'Tribes, Languages & Scripts',  file: 'study-tribes-languages.html', key: 'tribes_languages_v1' },
+    statistics:{ title: 'Statistics · CGL JSO',        file: 'study-statistics.html', key: 'statistics_jso_workbook_v1' },
+    finacc:   { title: 'Finance & Accounts · CGL AAO', file: 'study-finance-accounts.html', key: 'finance_accounts_v1' },
     persons:  { title: 'Famous Personalities',         file: 'study-personalities.html', key: 'personalities_v1' },
     scitech:  { title: 'Science & Technology in India', file: 'study-science-tech.html', key: 'science_tech_v1' },
     history:  { title: 'History: Start here',          file: 'study-history.html',      key: 'history_hub_v1' },
@@ -203,6 +205,9 @@
    ['scitech', 'science', '🔬', 'भारत में विज्ञान एवं प्रौद्योगिकी — संस्थान, मिशन और नई तकनीक', "India's science system, nuclear power, biotech firsts, the new national missions, Digital India, the polar stations, science awards and technology terms — figures checked as of October 2026.", 11, 391, '#0E7490'],
    ['tribes', 'culture', '🪶', 'जनजातियाँ, भाषाएँ और लिपियाँ — एक जगह', 'Scheduled Tribes and the Fifth and Sixth Schedules, the tribes of every region, tribal revolts and festivals, the Eighth Schedule and classical languages, and India’s scripts.', 10, 411, '#8B5E34']
   ].forEach(function(x){ var m = STUDY[x[0]]; m.subj = 'gs'; m.gsub = x[1]; m.ico = x[2]; m.hi = x[3]; m.desc = x[4] + ' With tricks, traps and a Lab of games.'; m.meta = x[5] + ' lessons · ' + x[6] + ' questions · Lab'; m.color = x[7]; m.lessons = x[5]; m.unit = 'lessons'; });
+  // CGL Tier 2 papers for two posts (tools/apps/statistics, tools/gk/finacc)
+  STUDY.statistics.subj = 'maths'; STUDY.statistics.tier2 = true; STUDY.statistics.ico = '📊'; STUDY.statistics.hi = 'सांख्यिकी · CGL JSO · Tier 2 Paper II'; STUDY.statistics.desc = 'Tier 2 Paper II (Statistics) for the Junior Statistical Officer post: 18 lessons from data and averages to inference, ANOVA, time series and index numbers, with formula cards, solved examples and 403 questions whose numeric answers are checked by program.'; STUDY.statistics.meta = '18 lessons · 403 questions'; STUDY.statistics.color = '#0f766e'; STUDY.statistics.lessons = 18; STUDY.statistics.unit = 'lessons';
+  STUDY.finacc.subj = 'gs'; STUDY.finacc.gsub = 'economy'; STUDY.finacc.tier2 = true; STUDY.finacc.ico = '🧾'; STUDY.finacc.hi = 'वित्त एवं लेखा · CGL AAO · Tier 2 Paper III'; STUDY.finacc.desc = 'Paper III Part A in full — journal to final accounts, BRS, rectification, depreciation, bills, partnership, NPOs and self-balancing ledgers, with worked numericals — plus a Part B map with the CAG, DPC Act and 16th Finance Commission.'; STUDY.finacc.meta = '14 lessons · 366 questions · Lab'; STUDY.finacc.color = '#4A5D23'; STUDY.finacc.lessons = 14; STUDY.finacc.unit = 'lessons';
   STUDY.polity.core = STUDY.economics.core = 1; STUDY.physics.core = 2; STUDY.biology.core = 1;
   STUDY.physics.gsub = 'science'; STUDY.biology.gsub = 'science';
   STUDY.chemistry.subj = 'gs'; STUDY.chemistry.gsub = 'science'; STUDY.chemistry.core = 2; STUDY.chemistry.ico = '\u2697\ufe0f'; STUDY.chemistry.hi = 'रसायन विज्ञान · CGL · CHSL · NTPC · Group D';
@@ -2266,17 +2271,19 @@
   }
 
   // Mixed mock test
+  // Tier 2 papers (JSO Statistics, AAO Finance & Accounts) start switched off in the mixed mock; they can be ticked by hand
+  function notTier2(id){ return !STUDY[id].tier2; }
   var mockCfg = (function(){
-    var def = { en: 25, gs: 25, mt: 0, rs: 0, vocab: true, grammar: true, voice: true, narration: true, clozerc: true, parajumble: true, gsMods: gsQIds(), mtMods: mathQIds(), rsMods: reasoningIds(), neg: true, known: gsQIds() };
+    var def = { en: 25, gs: 25, mt: 0, rs: 0, vocab: true, grammar: true, voice: true, narration: true, clozerc: true, parajumble: true, gsMods: gsQIds().filter(notTier2), mtMods: mathQIds().filter(notTier2), rsMods: reasoningIds(), neg: true, known: gsQIds() };
     var c;
     try{ c = Object.assign({}, def, JSON.parse(lsGet('shabdMockCfg') || '{}')); }catch(e){ c = def; }
     var known = c.known || ['bns', 'schemes', 'census', 'intlorgs'];
-    gsQIds().forEach(function(id){ if(known.indexOf(id) === -1 && c.gsMods.indexOf(id) === -1) c.gsMods.push(id); });
+    gsQIds().filter(notTier2).forEach(function(id){ if(known.indexOf(id) === -1 && c.gsMods.indexOf(id) === -1) c.gsMods.push(id); });
     c.known = gsQIds();
     c.gsMods = c.gsMods.filter(function(id){ return STUDY[id] && !STUDY[id].noq; });
     if(!Array.isArray(c.mtMods)) c.mtMods = mathQIds();
     var mk = c.knownMt || [];
-    mathQIds().forEach(function(id){ if(mk.indexOf(id) === -1 && c.mtMods.indexOf(id) === -1) c.mtMods.push(id); });
+    mathQIds().filter(notTier2).forEach(function(id){ if(mk.indexOf(id) === -1 && c.mtMods.indexOf(id) === -1) c.mtMods.push(id); });
     c.knownMt = mathQIds();
     c.mtMods = c.mtMods.filter(function(id){ return STUDY[id] && !STUDY[id].noq; });
     if(typeof c.mt !== 'number') c.mt = 0;
@@ -3162,7 +3169,7 @@
     bns: ['bnss', 'bsa'], schemes: ['schemes', 'govt schemes', 'government scheme', 'yojana', 'yojanas'],
     intlorgs: ['international organisations', 'international organizations', 'intl orgs'],
     reports: ['reports and indices', 'reports indices', 'indices reports'], iprplans: ['ipr', 'five year plans', 'industrial policy'],
-    folkdances: ['folk dances', 'folk dance'], festivals: ['festivals'], appointments: ['appointments'], persons: ['personalities', 'nicknames', 'titles', 'who is called', 'slogans', 'quotes', 'samadhi', 'memorials', 'pen names', 'upadhi'], scitech: ['science and technology', 'sci tech', 'nuclear', 'nuclear power plants', 'biotechnology', 'csir', 'national missions', 'quantum mission', 'semiconductor', 'digital india', 'antarctica stations', 'polar', 'vigyan puraskar'], firsts: ['firsts', 'first in india', 'first woman', 'national symbols', 'national animal', 'national bird', 'superlatives', 'largest', 'longest', 'nicknames'], heritage: ['unesco', 'world heritage', 'heritage sites', 'monuments', 'who built', 'temple architecture', 'intangible heritage', 'creative cities'], tribes: ['tribes', 'tribal', 'scheduled tribes', 'pvtg', 'languages', 'eighth schedule', 'classical languages', 'scripts', 'lipi'], currentaffairs: ['current affairs', 'current affair', 'news', 'monthly current affairs', 'samsamayiki', 'ca 2026', 'summit', 'obituary', 'in news'],
+    folkdances: ['folk dances', 'folk dance'], festivals: ['festivals'], appointments: ['appointments'], statistics: ['statistics', 'jso', 'junior statistical officer', 'paper 2', 'paper ii', 'mean median mode', 'standard deviation', 'correlation', 'regression', 'probability', 'index numbers', 'anova', 'hypothesis'], finacc: ['accounts', 'accountancy', 'finance and accounts', 'aao', 'paper 3', 'paper iii', 'journal', 'ledger', 'bank reconciliation', 'depreciation', 'final accounts', 'partnership', 'cag'], persons: ['personalities', 'nicknames', 'titles', 'who is called', 'slogans', 'quotes', 'samadhi', 'memorials', 'pen names', 'upadhi'], scitech: ['science and technology', 'sci tech', 'nuclear', 'nuclear power plants', 'biotechnology', 'csir', 'national missions', 'quantum mission', 'semiconductor', 'digital india', 'antarctica stations', 'polar', 'vigyan puraskar'], firsts: ['firsts', 'first in india', 'first woman', 'national symbols', 'national animal', 'national bird', 'superlatives', 'largest', 'longest', 'nicknames'], heritage: ['unesco', 'world heritage', 'heritage sites', 'monuments', 'who built', 'temple architecture', 'intangible heritage', 'creative cities'], tribes: ['tribes', 'tribal', 'scheduled tribes', 'pvtg', 'languages', 'eighth schedule', 'classical languages', 'scripts', 'lipi'], currentaffairs: ['current affairs', 'current affair', 'news', 'monthly current affairs', 'samsamayiki', 'ca 2026', 'summit', 'obituary', 'in news'],
     history: ['history', 'itihas', 'history plan', 'history hub', 'history revision'],
     histancient: ['ancient history', 'ancient india', 'ancient'], histmedieval: ['medieval history', 'medieval india', 'medieval'],
     histmodern: ['modern history', 'modern india', 'freedom struggle', 'national movement'], artculture: ['art and culture', 'art culture', 'culture'],

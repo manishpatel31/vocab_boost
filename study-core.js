@@ -266,15 +266,17 @@ function bindCard(card){
    MOCK TEST
    ============================================================ */
 let M = null, MCFG = {n:25, scope:"all", neg:1}, LEAVE_TO = null;
+// seconds per mock question: 36 is the CGL Tier 1 pace; a page may set APP.mockSecs (and APP.mockPace, the words) for its paper
+const QSEC = APP.mockSecs || 36;
 function renderMock(){
   if (M && M.running) return drawMockRun();
   if (M && M.done) return drawMockResult();
   const hist = (S.mocks||[]).slice(-6).reverse();
   $("#app").innerHTML = `<section class="view stack">
     <div class="stack" style="gap:6px"><span class="eyebrow">Timed, SSC pattern</span><h1>Mock test</h1>
-    <p class="muted">+2 for a right answer, −0.5 for a wrong one, 36 seconds per question (CGL Tier-1 pace). Answers show only after you submit.</p></div>
+    <p class="muted">+2 for a right answer, −0.5 for a wrong one, ${QSEC} seconds per question (${esc(APP.mockPace || "CGL Tier-1 pace")}). Answers show only after you submit.</p></div>
     <div class="block stack">
-      <fieldset><legend>Questions</legend><div class="radios">${[10,25,50,100].map(n=>`<label><input type="radio" name="mn" id="mn${n}" value="${n}" ${MCFG.n===n?"checked":""}><span>${n} · ${Math.round(n*36/60)} min</span></label>`).join("")}</div></fieldset>
+      <fieldset><legend>Questions</legend><div class="radios">${[10,25,50,100].map(n=>`<label><input type="radio" name="mn" id="mn${n}" value="${n}" ${MCFG.n===n?"checked":""}><span>${n} · ${Math.round(n*QSEC/60)} min</span></label>`).join("")}</div></fieldset>
       <fieldset><legend>From</legend><select id="mscope" aria-label="Lessons to draw from"><option value="all">All lessons</option><option value="hot">🔥 Hot topics only</option><option value="pyq">${PYQ === "PYQ" ? "PYQs" : PYQ} only</option>${QS.some(q=>q.src) ? `<option value="src">Reported in papers only</option>` : ""}<option value="wrong">My mistakes</option>${LESSONS.map((l,i)=>`<option value="${l.id}" ${MCFG.scope===l.id?"selected":""}>L${i+1} · ${esc(l.title)}</option>`).join("")}</select></fieldset>
       <label class="row" style="gap:8px;font-weight:600"><input type="checkbox" id="mneg" ${MCFG.neg?"checked":""}> Negative marking (−0.5)</label>
       <div id="merr" class="muted" style="font-size:14px"></div>
@@ -289,7 +291,7 @@ function renderMock(){
     let pool = MCFG.scope==="all" ? QS : MCFG.scope==="pyq" ? QS.filter(q=>q.p) : MCFG.scope==="src" ? QS.filter(q=>q.src) : MCFG.scope==="hot" ? QS.filter(q=>(L(q.t).heat||1)===3) : MCFG.scope==="wrong" ? QS.filter(q=>S.ans[q.id]===0) : QS.filter(q=>q.t===MCFG.scope);
     if (!pool.length) { $("#merr").textContent = "No questions in that set yet. Pick another source."; return; }
     const qs = shuffle(pool).slice(0, MCFG.n);
-    M = { running:true, list: qs.map(q=>({q, perm:makePerm(q)})), ans: qs.map(()=>null), mark: qs.map(()=>false), i:0, neg:MCFG.neg, secs: qs.length*36, start: Date.now(), showPal:false, confirm:false };
+    M = { running:true, list: qs.map(q=>({q, perm:makePerm(q)})), ans: qs.map(()=>null), mark: qs.map(()=>false), i:0, neg:MCFG.neg, secs: qs.length*QSEC, start: Date.now(), showPal:false, confirm:false };
     M.end = M.start + M.secs*1000;
     startTimer(); drawMockRun();
   };
@@ -374,7 +376,7 @@ function drawMockResult(){
   $("#mnew").onclick = () => { M = null; renderMock(); };
   $("#mretry").onclick = () => {
     const list = M.list.map(it=>({q:it.q, perm:makePerm(it.q)}));
-    M = { running:true, list, ans:list.map(()=>null), mark:list.map(()=>false), i:0, neg:MCFG.neg, secs:list.length*36, start:Date.now(), showPal:false, confirm:false };
+    M = { running:true, list, ans:list.map(()=>null), mark:list.map(()=>false), i:0, neg:MCFG.neg, secs:list.length*QSEC, start:Date.now(), showPal:false, confirm:false };
     M.end = M.start + M.secs*1000; startTimer(); drawMockRun();
   };
 }
