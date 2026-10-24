@@ -93,6 +93,9 @@
     folkdances:{ title: 'Folk Dances of India',        file: 'study-folk-dances.html',  key: 'folk_dances_workbook_v1' },
     appointments:{ title: 'Appointments 2026',          file: 'study-appointments.html', key: 'appointments_workbook_v1' },
     currentaffairs:{ title: 'Current Affairs 2026',     file: 'study-current-affairs.html', key: 'current_affairs_2026_v1' },
+    firsts:   { title: 'Firsts, Superlatives & National Symbols', file: 'study-firsts-symbols.html', key: 'firsts_symbols_v1' },
+    heritage: { title: 'UNESCO Heritage & Monuments', file: 'study-heritage-monuments.html', key: 'heritage_monuments_v1' },
+    tribes:   { title: 'Tribes, Languages & Scripts',  file: 'study-tribes-languages.html', key: 'tribes_languages_v1' },
     history:  { title: 'History: Start here',          file: 'study-history.html',      key: 'history_hub_v1' },
     histancient:  { title: 'Ancient India',            file: 'study-history-ancient.html',  key: 'history_ancient_v1' },
     histmedieval: { title: 'Medieval India',           file: 'study-history-medieval.html', key: 'history_medieval_v1' },
@@ -191,6 +194,11 @@
   STUDY.festivals.gsub = 'culture'; STUDY.folkdances.gsub = 'culture'; STUDY.sports.gsub = 'staticgk'; STUDY.intlorgs.gsub = 'staticgk';
   STUDY.reports.gsub = 'current'; STUDY.appointments.gsub = 'current';
   STUDY.currentaffairs.subj = 'gs'; STUDY.currentaffairs.gsub = 'current'; STUDY.currentaffairs.ico = '🗞️'; STUDY.currentaffairs.hi = 'समसामयिकी 2026 · माह-दर-माह'; STUDY.currentaffairs.desc = 'The news of 2026 one month at a time — government decisions, summits, economy and banking, science, space and defence, sports, awards, appointments, places in news and obituaries — every fact dated and sourced.'; STUDY.currentaffairs.meta = '10 months · Jan–Oct 2026 · 354 questions · Lab'; STUDY.currentaffairs.color = '#B45309'; STUDY.currentaffairs.lessons = 10; STUDY.currentaffairs.unit = 'months';
+  // Static GK apps built in October 2026 (tools/gk/firsts, heritage, tribes): practice questions, no past-paper tags yet
+  [['firsts', 'staticgk', '🏆', 'प्रथम, सर्वोच्च एवं राष्ट्रीय प्रतीक', "India's national symbols, the first holders of posts, first women, India's and the world's firsts and records, and nicknames of places — with the latest bridges and tunnels checked as of October 2026.", 10, 403, '#B45309'],
+   ['heritage', 'culture', '🏛️', 'यूनेस्को धरोहर एवं भारत के स्मारक', "India's 45 World Heritage sites (Sarnath the newest, 2026), who built India's famous monuments, temple styles, the intangible heritage list, Memory of the World and the Creative Cities — with maps and a Heritage Lab.", 10, 392, '#8A5A2B'],
+   ['tribes', 'culture', '🪶', 'जनजातियाँ, भाषाएँ और लिपियाँ — एक जगह', 'Scheduled Tribes and the Fifth and Sixth Schedules, the tribes of every region, tribal revolts and festivals, the Eighth Schedule and classical languages, and India’s scripts.', 10, 411, '#8B5E34']
+  ].forEach(function(x){ var m = STUDY[x[0]]; m.subj = 'gs'; m.gsub = x[1]; m.ico = x[2]; m.hi = x[3]; m.desc = x[4] + ' With tricks, traps and a Lab of games.'; m.meta = x[5] + ' lessons · ' + x[6] + ' questions · Lab'; m.color = x[7]; m.lessons = x[5]; m.unit = 'lessons'; });
   STUDY.polity.core = STUDY.economics.core = 1; STUDY.physics.core = 2; STUDY.biology.core = 1;
   STUDY.physics.gsub = 'science'; STUDY.biology.gsub = 'science';
   STUDY.chemistry.subj = 'gs'; STUDY.chemistry.gsub = 'science'; STUDY.chemistry.core = 2; STUDY.chemistry.ico = '\u2697\ufe0f'; STUDY.chemistry.hi = 'रसायन विज्ञान · CGL · CHSL · NTPC · Group D';
@@ -3150,7 +3158,7 @@
     bns: ['bnss', 'bsa'], schemes: ['schemes', 'govt schemes', 'government scheme', 'yojana', 'yojanas'],
     intlorgs: ['international organisations', 'international organizations', 'intl orgs'],
     reports: ['reports and indices', 'reports indices', 'indices reports'], iprplans: ['ipr', 'five year plans', 'industrial policy'],
-    folkdances: ['folk dances', 'folk dance'], festivals: ['festivals'], appointments: ['appointments'], currentaffairs: ['current affairs', 'current affair', 'news', 'monthly current affairs', 'samsamayiki', 'ca 2026', 'summit', 'obituary', 'in news'],
+    folkdances: ['folk dances', 'folk dance'], festivals: ['festivals'], appointments: ['appointments'], firsts: ['firsts', 'first in india', 'first woman', 'national symbols', 'national animal', 'national bird', 'superlatives', 'largest', 'longest', 'nicknames'], heritage: ['unesco', 'world heritage', 'heritage sites', 'monuments', 'who built', 'temple architecture', 'intangible heritage', 'creative cities'], tribes: ['tribes', 'tribal', 'scheduled tribes', 'pvtg', 'languages', 'eighth schedule', 'classical languages', 'scripts', 'lipi'], currentaffairs: ['current affairs', 'current affair', 'news', 'monthly current affairs', 'samsamayiki', 'ca 2026', 'summit', 'obituary', 'in news'],
     history: ['history', 'itihas', 'history plan', 'history hub', 'history revision'],
     histancient: ['ancient history', 'ancient india', 'ancient'], histmedieval: ['medieval history', 'medieval india', 'medieval'],
     histmodern: ['modern history', 'modern india', 'freedom struggle', 'national movement'], artculture: ['art and culture', 'art culture', 'culture'],

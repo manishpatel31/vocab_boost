@@ -72,9 +72,9 @@ place("L27", "story", { k: "photos", title: "In pictures", items: [
   P("Qutb_Minar", "Qutub Minar", "Delhi Sultanate"), P("Humayun's_Tomb", "Humayun's Tomb", "First garden tomb"), P("Gol_Gumbaz", "Gol Gumbaz", "Bijapur"), P("Victoria_Memorial,_Kolkata", "Victoria Memorial", "Colonial")] });
 
 // L35 — World Heritage: the clickable map and quiz (one row per state), charts and photos
-const WHS = rows("L35", "India's 44");
+const WHS = rows("L35", "India's 45");
 const sitesByState = WHS.flatMap(r => r[1].split(/, /).map(st => [r[0].replace(/ \(.*\)$/, ""), st, r[3], r[2], "L35"]));
-place("L35", "India's 44", { k: "indiamap", title: "World Heritage Sites on the map", cap: "Tap a state to see its World Heritage Sites. A site that spans states (the Western Ghats, the mountain railways, the Maratha forts) is listed in each." },
+place("L35", "India's 45", { k: "indiamap", title: "World Heritage Sites on the map", cap: "Tap a state to see its World Heritage Sites. A site that spans states (the Western Ghats, the mountain railways, the Maratha forts) is listed in each." },
   { k: "statechart", title: "Sites per state", cap: "Maharashtra leads, then Rajasthan, Gujarat, Karnataka, Madhya Pradesh and Uttar Pradesh. Sites that span states count once for each." });
 const DEC = {}; WHS.forEach(r => { const d = Math.floor(parseInt(r[2], 10) / 10) * 10; DEC[d] = (DEC[d] || 0) + 1; });
 const TYPES = ["Cultural", "Natural", "Mixed"].map(t => [t, WHS.filter(r => r[3] === t).length]);

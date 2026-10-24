@@ -168,7 +168,7 @@ LESSONS.push(
     ["Tiger reserves","58 — the latest Madhav (MP, March 2025)"],
     ["Biosphere reserves","18 — 13 of them in UNESCO's world network"],
     ["Ramsar sites","98 as of January 2026; about 100 reported by mid-2026"],
-    ["UNESCO World Heritage sites","44 as of 2025 (Sarnath reported as the 45th in July 2026)"],
+    ["UNESCO World Heritage sites","45 as of 2026 (Sarnath the 45th, July 2026)"],
     ["Most national parks","Madhya Pradesh and Andaman & Nicobar Islands"],
     ["Protected area share","About 5–6% of India's land"]
   ]},

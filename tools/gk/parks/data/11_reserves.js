@@ -111,7 +111,7 @@ const P7 = [
   ["Sacred Ensembles of the Hoysalas","Karnataka","2023 — Belur, Halebidu, Somanathapura.","p"],
   ["Moidams of Charaideo","Assam","2024 — Ahom royal burial mounds; first cultural site of the North-East.","p"],
   ["Maratha Military Landscapes","Maharashtra and Tamil Nadu","2025 — 12 forts incl. Raigad and Gingee; the 44th site.","p"],
-  ["Sarnath","Uttar Pradesh","Reported inscribed July 2026 as the 45th site.",""],
+  ["Sarnath","Uttar Pradesh","Inscribed 25 July 2026 at the 48th session (Busan) — the 45th site.",""],
   ["Kaziranga National Park","Assam","1985 — natural.","p"],
   ["Manas Wildlife Sanctuary","Assam","1985 — natural.",""],
   ["Keoladeo National Park","Rajasthan","1985 — natural.",""],
@@ -152,11 +152,11 @@ LESSONS.push(
 
 {id:"P7", heat:3, title:"UNESCO World Heritage sites in India", hi:"भारत में यूनेस्को विश्व धरोहर स्थल", blocks:[
   {k:"hot", h:"Asked every year: <b>which state</b> a heritage site is in, the <b>newest</b> sites (Moidams 2024, Maratha Military Landscapes 2025), the <b>first four</b> (1983) and the <b>natural</b> and <b>mixed</b> sites."},
-  {k:"story", h:"<p>India's heritage list began in <b>1983</b> with <b>Ajanta, Ellora, Agra Fort and the Taj Mahal</b>. Over four decades it grew to <b>44</b> sites by 2025 — <b>36 cultural, 7 natural and 1 mixed</b> (Khangchendzonga).</p><p>Recent years added <b>Dholavira</b> and <b>Ramappa Temple</b> (2021), <b>Santiniketan</b> and the <b>Hoysala temples</b> (2023), the <b>Moidams of Charaideo</b> in Assam (2024) and the <b>Maratha Military Landscapes</b> — 12 forts in Maharashtra and Tamil Nadu (2025). In July 2026 <b>Sarnath</b> was reported added as the 45th. Maharashtra has the most sites.</p>", key:"First four (1983): Ajanta, Ellora, Agra Fort, Taj; 44 sites by 2025 (36 cultural, 7 natural, 1 mixed); latest Maratha Military Landscapes (2025)."},
+  {k:"story", h:"<p>India's heritage list began in <b>1983</b> with <b>Ajanta, Ellora, Agra Fort and the Taj Mahal</b>. Over four decades it grew to <b>45</b> sites by 2026 — <b>37 cultural, 7 natural and 1 mixed</b> (Khangchendzonga); <b>Sarnath</b> became the 45th on 25 July 2026.</p><p>Recent years added <b>Dholavira</b> and <b>Ramappa Temple</b> (2021), <b>Santiniketan</b> and the <b>Hoysala temples</b> (2023), the <b>Moidams of Charaideo</b> in Assam (2024) and the <b>Maratha Military Landscapes</b> — 12 forts in Maharashtra and Tamil Nadu (2025). In July 2026 <b>Sarnath</b> was reported added as the 45th. Maharashtra has the most sites.</p>", key:"First four (1983): Ajanta, Ellora, Agra Fort, Taj; 44 sites by 2025 (36 cultural, 7 natural, 1 mixed); latest Maratha Military Landscapes (2025)."},
   {k:"table", title:"World Heritage sites", head:["Site","State / UT","Year and note"], rows: P7.map(r => [r[0], r[1], r[2]])},
   {k:"trick", h:"The natural seven — <b>“Kaziranga Manas Keoladeo, Sundar Nanda, Himalaya Ghats”</b>: Kaziranga, Manas, Keoladeo, Sundarbans, Nanda Devi & Valley of Flowers, Great Himalayan NP, Western Ghats. Khangchendzonga is the one <b>mixed</b>."},
   {k:"trap", h:"<b>Rani-ki-Vav</b> is in Patan, <b>Gujarat</b> — not Rajasthan. <b>Ramappa</b> is in <b>Telangana</b>. The <b>Hill Forts</b> are in Rajasthan, but the <b>Maratha forts</b> include <b>Gingee</b> in Tamil Nadu."}
-], sum:["First four World Heritage sites (1983): Ajanta, Ellora, Agra Fort, Taj Mahal.","India had 44 sites by 2025 — 36 cultural, 7 natural, 1 mixed (Khangchendzonga).","Recent: Dholavira and Ramappa (2021), Santiniketan and Hoysala temples (2023), Moidams (2024), Maratha Military Landscapes (2025).","Ahmedabad (2017) was India's first World Heritage City; Jaipur followed in 2019.","Sarnath was reported as the 45th site in July 2026."]}
+], sum:["First four World Heritage sites (1983): Ajanta, Ellora, Agra Fort, Taj Mahal.","India has 45 sites (2026) — 37 cultural, 7 natural, 1 mixed (Khangchendzonga).","Recent: Dholavira and Ramappa (2021), Santiniketan and Hoysala temples (2023), Moidams (2024), Maratha Military Landscapes (2025).","Ahmedabad (2017) was India's first World Heritage City; Jaipur followed in 2019.","Sarnath (Uttar Pradesh) became the 45th site on 25 July 2026."]}
 );
 
 pairQs("P5", P5, { q: t => `${t} Biosphere Reserve is in:`, rq: a => `Which biosphere reserve is in ${a}?` });
@@ -181,12 +181,13 @@ QB.push(
 ["P7","India's only 'mixed' World Heritage site is:",["Khangchendzonga National Park","Kaziranga National Park","Western Ghats","Sundarbans"],"Natural and cultural — Sikkim, 2016.","p"],
 ["P7","India's first World Heritage City is:",["Ahmedabad","Jaipur","Varanasi","Delhi"],"Inscribed in 2017.","p"],
 ["P7","The Western Ghats (2012) are a World Heritage site of which type?",["Natural","Cultural","Mixed","Intangible"],"Spread over Kerala, Karnataka, Tamil Nadu and Maharashtra.","p"],
-["P7","Which became India's 44th World Heritage site in 2025?",["Maratha Military Landscapes","Moidams of Charaideo","Santiniketan","Sacred Ensembles of the Hoysalas"],"12 forts in Maharashtra and Tamil Nadu.","p"]
+["P7","Which became India's 44th World Heritage site in 2025?",["Maratha Military Landscapes","Moidams of Charaideo","Santiniketan","Sacred Ensembles of the Hoysalas"],"12 forts in Maharashtra and Tamil Nadu.","p"],
+["P7","Which became India's 45th World Heritage site in July 2026?",["Sarnath","Bodh Gaya","Kushinagar","Vaishali"],"Sarnath, where the Buddha gave his first sermon, was inscribed on 25 July 2026 at the 48th World Heritage Committee session in Busan.",""]
 );
 
 LASTMOMENT.push(
 {t:"Biosphere reserves", era:["pa"], rows:[["Total","18 (13 in UNESCO)"],["First","Nilgiri, 1986"],["Last","Panna, 2011"],["Largest","Great Rann of Kutch"],["Smallest","Dibru-Saikhowa"],["First marine","Gulf of Mannar"],["Newest in UNESCO","Cold Desert, 2025"],["Seshachalam","Andhra Pradesh"]]},
 {t:"Ramsar", era:["pa"], rows:[["Signed","1971, Ramsar (Iran)"],["India joined","1982"],["First sites","Chilika, Keoladeo"],["Largest","Sundarban Wetland"],["Smallest","Renuka"],["Most sites","Tamil Nadu"],["Montreux Record","Keoladeo, Loktak"],["Count","98 (Jan 2026)"]]},
-{t:"World Heritage", era:["pa"], rows:[["First four (1983)","Ajanta, Ellora, Agra Fort, Taj"],["Total (2025)","44"],["Mixed","Khangchendzonga"],["First city","Ahmedabad"],["2024","Moidams (Assam)"],["2025","Maratha Military Landscapes"],["Rani-ki-Vav","Gujarat"],["Ramappa","Telangana"]]}
+{t:"World Heritage", era:["pa"], rows:[["First four (1983)","Ajanta, Ellora, Agra Fort, Taj"],["Total (2026)","45 — Sarnath the latest"],["Mixed","Khangchendzonga"],["First city","Ahmedabad"],["2024","Moidams (Assam)"],["2025","Maratha Military Landscapes"],["Rani-ki-Vav","Gujarat"],["Ramappa","Telangana"]]}
 );
-TILES.push(["1971","Ramsar Convention","pa"],["1982","India joins Ramsar","pa"],["1986","First biosphere reserve","pa"],["18","Biosphere reserves","pa"],["1983","First World Heritage sites","pa"],["44","Heritage sites, 2025","pa"]);
+TILES.push(["1971","Ramsar Convention","pa"],["1982","India joins Ramsar","pa"],["1986","First biosphere reserve","pa"],["18","Biosphere reserves","pa"],["1983","First World Heritage sites","pa"],["45","Heritage sites, 2026","pa"]);

@@ -70,21 +70,21 @@ LESSONS.push(
 
 {id:"L35", g:"art", heat:3, title:"UNESCO world heritage of India", hi:"भारत की यूनेस्को विश्व धरोहर", blocks:[
   {k:"hot", h:"Asked every year, usually as <b>site ↔ state</b>, <b>which year</b>, <b>the first four</b> or <b>the only mixed site</b>, plus whichever site was added most recently. The intangible list (Garba, Durga Puja, Kumbh, Yoga) is asked just as often."},
-  {k:"story", h:"<p>UNESCO keeps a <b>World Heritage List</b> of places so valuable that they belong to all humanity. Each place is put in one of three boxes: <b>cultural</b> (made by people — temples, forts, cities), <b>natural</b> (forests, mountains, wildlife) or <b>mixed</b> (both at once).</p><p>As of the <b>2025</b> session, India has <b>44 sites</b>: <b>36 cultural, 7 natural and 1 mixed</b>. The story starts in <b>1983</b> with four: two cave sites in Maharashtra (<b>Ajanta, Ellora</b>) and two Mughal monuments in Agra (<b>Agra Fort, Taj Mahal</b>). The seven natural sites are easy to picture as a journey — rhinos and wild buffalo in <b>Assam</b> (Kaziranga, Manas), birds in <b>Rajasthan</b> (Keoladeo), tigers in the mangroves of <b>Bengal</b> (Sundarbans), the high <b>Himalaya</b> (Nanda Devi, Great Himalayan NP) and the long <b>Western Ghats</b>. The one mixed site is <b>Khangchendzonga</b> in Sikkim.</p><p>There is a second list for things you cannot touch — songs, dances, festivals and crafts. This is the <b>intangible cultural heritage</b> list. India has <b>15 elements</b> on it up to <b>Garba of Gujarat (2023)</b>. Anything added after the 2025 site session, or after 2023 on the intangible list, is not counted in this lesson.</p>"},
+  {k:"story", h:"<p>UNESCO keeps a <b>World Heritage List</b> of places so valuable that they belong to all humanity. Each place is put in one of three boxes: <b>cultural</b> (made by people — temples, forts, cities), <b>natural</b> (forests, mountains, wildlife) or <b>mixed</b> (both at once).</p><p>As of the <b>2026</b> session, India has <b>45 sites</b>: <b>37 cultural, 7 natural and 1 mixed</b> — <b>Sarnath</b> became the 45th on 25 July 2026. The story starts in <b>1983</b> with four: two cave sites in Maharashtra (<b>Ajanta, Ellora</b>) and two Mughal monuments in Agra (<b>Agra Fort, Taj Mahal</b>). The seven natural sites are easy to picture as a journey — rhinos and wild buffalo in <b>Assam</b> (Kaziranga, Manas), birds in <b>Rajasthan</b> (Keoladeo), tigers in the mangroves of <b>Bengal</b> (Sundarbans), the high <b>Himalaya</b> (Nanda Devi, Great Himalayan NP) and the long <b>Western Ghats</b>. The one mixed site is <b>Khangchendzonga</b> in Sikkim.</p><p>There is a second list for things you cannot touch — songs, dances, festivals and crafts. This is the <b>intangible cultural heritage</b> list. India has <b>15 elements</b> on it up to <b>Garba of Gujarat (2023)</b>. Anything added after the 2025 site session, or after 2023 on the intangible list, is not counted in this lesson.</p>"},
   {k:"facts", title:"Key numbers and firsts", rows:[
-    ["Total sites (as of 2025)","<b>44</b> — 36 cultural, 7 natural, 1 mixed"],
+    ["Total sites (as of 2026)","<b>45</b> — 37 cultural, 7 natural, 1 mixed"],
     ["First sites (1983)","<b>Ajanta, Ellora, Agra Fort, Taj Mahal</b>"],
     ["Only mixed site","<b>Khangchendzonga National Park</b>, Sikkim (2016)"],
     ["First Indian city","<b>Ahmedabad</b> (2017); Jaipur followed in 2019"],
     ["First Harappan site in India","<b>Dholavira</b>, Gujarat (2021)"],
     ["Temple named after its sculptor","<b>Ramappa</b> (Kakatiya Rudreshwara) temple, Telangana (2021)"],
     ["First cultural site of the North-East","<b>Moidams</b> — Ahom mound burials at Charaideo, Assam (2024)"],
-    ["Latest (2025)","<b>Maratha Military Landscapes</b> — 12 forts: 11 in Maharashtra and <b>Gingee</b> in Tamil Nadu"],
+    ["Latest (2026)","<b>Sarnath</b> (Uttar Pradesh), inscribed 25 July 2026 at Busan; before it, the <b>Maratha Military Landscapes</b> (2025) — 12 forts: 11 in Maharashtra and <b>Gingee</b> in Tamil Nadu"],
     ["India hosted the committee","46th World Heritage Committee session, <b>New Delhi, July 2024</b>"],
     ["On currency notes","₹10 Konark wheel, ₹20 Ellora, ₹50 Hampi stone chariot, ₹100 <b>Rani ki Vav</b>, ₹200 Sanchi, ₹500 Red Fort"],
     ["World Heritage Day","<b>18 April</b>"]
   ]},
-  {k:"table", title:"India's 44 World Heritage Sites (as of 2025)", head:["Site","State","Year","Type"], rows:[
+  {k:"table", title:"India's 45 World Heritage Sites (as of 2026)", head:["Site","State","Year","Type"], rows:[
     ["<b>Ajanta Caves</b>","Maharashtra","1983","Cultural"],
     ["<b>Ellora Caves</b>","Maharashtra","1983","Cultural"],
     ["<b>Agra Fort</b>","Uttar Pradesh","1983","Cultural"],
@@ -128,7 +128,8 @@ LESSONS.push(
     ["<b>Santiniketan</b>","West Bengal","2023","Cultural"],
     ["Sacred Ensembles of the <b>Hoysalas</b> (Belur, Halebidu, Somanathapura)","Karnataka","2023","Cultural"],
     ["<b>Moidams</b> of the Ahom dynasty, Charaideo","Assam","2024","Cultural"],
-    ["<b>Maratha Military Landscapes</b> of India","Maharashtra, Tamil Nadu","2025","Cultural"]
+    ["<b>Maratha Military Landscapes</b> of India","Maharashtra, Tamil Nadu","2025","Cultural"],
+    ["<b>Sarnath</b> (where the Buddha gave his first sermon)","Uttar Pradesh","2026","Cultural"]
   ]},
   {k:"tl", title:"Intangible cultural heritage of India (15 elements, up to 2023)", rows:[
     ["2008","<b>Koodiyattam</b> (Sanskrit theatre, Kerala), <b>Ramlila</b>, <b>Vedic chanting</b> — first proclaimed 2001–05, inscribed 2008"],
@@ -146,10 +147,10 @@ LESSONS.push(
   {k:"trick", h:"<b>Intangible years</b>: <span class=\"mn\">K-R-V = 2008</span> (Koodiyattam, Ramlila, Vedic chanting); <span class=\"mn\">M-K-C = 2010</span> (Mudiyettu, Kalbelia, Chhau). The rest come one or two at a time: Ramman 09, Ladakh 12, Sankirtana 13, Thatheras 14, Navroz and Yoga 16, Kumbh 17, Durga Puja 21, Garba 23."},
   {k:"trap", h:"The only <b>mixed</b> site is <b>Khangchendzonga</b>, not Nanda Devi. <b>Keoladeo is in Rajasthan</b>, not Gujarat; <b>Ramappa is in Telangana</b>, not Andhra; <b>Rani ki Vav is in Gujarat</b>, not Rajasthan. <b>Matheran's railway is not part of the Mountain Railways site</b>. <b>Kumbh Mela and Yoga</b> are <i>intangible</i> heritage, not World Heritage Sites. <b>Ahmedabad</b> was the first Indian city, not Jaipur."}
 ], sum:[
-  "As of the 2025 session India has 44 World Heritage Sites: 36 cultural, 7 natural and 1 mixed.",
+  "As of the 2026 session India has 45 World Heritage Sites: 37 cultural, 7 natural and 1 mixed.",
   "The first four, in 1983, were Ajanta, Ellora, Agra Fort and the Taj Mahal; the only mixed site is Khangchendzonga in Sikkim (2016).",
   "Natural sites: Kaziranga and Manas (Assam), Keoladeo (Rajasthan), Sundarbans (West Bengal), Nanda Devi and Valley of Flowers (Uttarakhand), Western Ghats and Great Himalayan NP (Himachal).",
-  "Recent sites: Ramappa and Dholavira 2021, Santiniketan and Hoysala temples 2023, Moidams of Assam 2024, Maratha Military Landscapes 2025.",
+  "Recent sites: Ramappa and Dholavira 2021, Santiniketan and Hoysala temples 2023, Moidams of Assam 2024, Maratha Military Landscapes 2025, Sarnath 2026.",
   "Intangible heritage: Koodiyattam, Ramlila and Vedic chanting 2008; Ramman 2009; Mudiyettu, Kalbelia and Chhau 2010; Yoga 2016; Kumbh Mela 2017; Durga Puja 2021; Garba 2023."
 ]}
 );
