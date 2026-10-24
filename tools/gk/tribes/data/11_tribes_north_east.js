@@ -13,7 +13,7 @@ const T2A = [
   ["Mina","Rajasthan","The largest tribe of Rajasthan, in the east of the state (Jaipur, Dausa, Sawai Madhopur)."],
   ["Rathwa","Gujarat","Of Chhota Udepur; they paint the ritual Pithora wall paintings."],
   ["Kotwalia","Gujarat","A PVTG of bamboo-workers in south Gujarat."],
-  ["Madia Gond","Maharashtra","A PVTG of Gadchiroli district; Hemalkasa's Lok Biradari hospital serves them."],
+  ["Madia Gond (Gadchiroli)","Maharashtra","A PVTG of Gadchiroli district; Hemalkasa's Lok Biradari hospital serves them."],
   ["Bharia","Madhya Pradesh","A PVTG of the deep Patalkot valley in Chhindwara district."],
   ["Muria","Chhattisgarh","A Gond people of Bastar, famous for the ghotul — the village youth dormitory."],
   ["Abujh Maria","Chhattisgarh","A PVTG of the remote Abujhmarh hills (Narayanpur)."],

@@ -90,7 +90,7 @@ LESSONS.push(
 );
 
 pairQs("T4", T4A.filter(r => !["Jamatia","Chakhesang","Dimasa","Galo"].includes(r[0])), { q: t => `The ${t} tribe belongs mainly to which state?` });
-pairQs("T5", T5A, { q: t => `Where do the ${t} live?`, rq: a => `Which tribe lives in ${a}?` });
+pairQs("T5", T5A, { q: t => `Where do the ${t} live?`, rq: a => `Which tribe lives here: ${a}?` });
 pairQs("T5", T5B, { q: t => `The ${t} tribe is best known for:` });
 
 QB.push(

@@ -13,7 +13,7 @@ const T6A = [
   ["Tana Bhagat movement (1914)","Jatra Bhagat","An Oraon movement against taxes, liquor and spirit worship; the Tana Bhagats later joined Gandhi's struggle."],
   ["Gond struggle in Hyderabad State (1930s–1940)","Komaram Bheem","Raised the call ‘Jal, Jangal, Zameen’ against the Nizam's forest officials; killed at Jodeghat in 1940."],
   ["Bhil gathering at Mangarh (1913)","Govind Guru","On 17 November 1913 British troops fired on his followers on Mangarh hill (Banswara, Rajasthan) — the ‘Adivasi Jallianwala’."],
-  ["Bhil outlaw in Nimar (1878–89)","Tantia Bhil","The ‘Indian Robin Hood’, who robbed the rich to help the poor; hanged in 1889."],
+  ["Bhil resistance in Nimar (1878–89)","Tantia Bhil","The ‘Indian Robin Hood’, who robbed the rich to help the poor; hanged in 1889."],
   ["Sonakhan rising (1857)","Veer Narayan Singh","A zamindar of Sonakhan, hanged at Raipur — Chhattisgarh's first martyr of 1857."],
   ["Koraput protest (1942)","Laxman Naik","Led tribal people in Quit India in Koraput (Odisha); hanged in 1943."]
 ];
