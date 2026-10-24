@@ -3,74 +3,77 @@
 
 /* F3 — the first holders of India's top posts (pairQs asks both ways). */
 const F3P = [
-  ["the first President of India","Rajendra Prasad","Rajendra Prasad was President from 1950 to 1962 — the only one elected twice.",""],
-  ["the first Vice-President of India","Sarvepalli Radhakrishnan","Radhakrishnan was Vice-President from 1952 to 1962 and then the second President.",""],
-  ["the first Prime Minister of India","Jawaharlal Nehru","Nehru was Prime Minister from 1947 until his death in 1964.",""],
-  ["the first Deputy Prime Minister of India","Vallabhbhai Patel","Patel was also the first Home Minister and joined the princely states to India.",""],
-  ["the first Governor-General of independent India","Lord Mountbatten","Mountbatten stayed on as Governor-General from August 1947 to June 1948.",""],
-  ["the first (and last) Indian Governor-General","C. Rajagopalachari","Rajaji held the post from 1948 until it ended on 26 January 1950.",""],
-  ["the first Speaker of the Lok Sabha","G. V. Mavalankar","Ganesh Vasudev Mavalankar was Speaker from 1952 to 1956.",""],
-  ["the first Chief Justice of India","H. J. Kania","Harilal Jekisundas Kania headed the Supreme Court from 1950 to 1951.",""],
-  ["the first Chief Election Commissioner","Sukumar Sen","Sukumar Sen ran the first general elections of 1951–52.",""],
-  ["the first Attorney General of India","M. C. Setalvad","Motilal Chimanlal Setalvad was Attorney General from 1950 to 1963.",""],
-  ["the first Comptroller and Auditor General","V. Narahari Rao","V. Narahari Rao was CAG from 1948 to 1954.",""],
-  ["the first Finance Minister of independent India","R. K. Shanmukham Chetty","Shanmukham Chetty presented independent India's first budget on 26 November 1947.",""],
-  ["the first Education Minister of India","Maulana Abul Kalam Azad","Azad's birthday, 11 November, is kept as National Education Day.",""],
-  ["the first Law Minister of India","B. R. Ambedkar","Ambedkar also chaired the Drafting Committee of the Constitution.",""],
-  ["the first Indian Governor of the Reserve Bank","C. D. Deshmukh","C. D. Deshmukh led the RBI from 1943 to 1949 and later became Finance Minister.",""],
-  ["the first non-Congress Prime Minister","Morarji Desai","Morarji Desai led the Janata Party government of 1977–79.",""],
-  ["the first Muslim President of India","Zakir Husain","Zakir Husain (1967–69) was also the first President to die in office.",""],
-  ["the first Sikh President of India","Giani Zail Singh","Zail Singh was President from 1982 to 1987.",""],
-  ["the first Dalit President of India","K. R. Narayanan","K. R. Narayanan was President from 1997 to 2002.",""],
-  ["the first President from a Scheduled Tribe","Droupadi Murmu","Droupadi Murmu took office in July 2022 — also the second woman President.",""],
-  ["the first acting President of India","V. V. Giri","V. V. Giri acted as President in 1969 after Zakir Husain died, and was then elected.",""],
-  ["the first Chief Justice to act as President","M. Hidayatullah","M. Hidayatullah acted as President in July–August 1969, when V. V. Giri resigned to stand for election.",""]
+  ["the first President of India","Rajendra Prasad","Rajendra Prasad was President from 1950 to 1962 — the only one elected twice.","pres"],
+  ["the first Vice-President of India","Sarvepalli Radhakrishnan","Radhakrishnan was Vice-President from 1952 to 1962 and then the second President.","pres"],
+  ["the first Prime Minister of India","Jawaharlal Nehru","Nehru was Prime Minister from 1947 until his death in 1964.","gov"],
+  ["the first Deputy Prime Minister of India","Vallabhbhai Patel","Patel was also the first Home Minister and joined the princely states to India.","gov"],
+  ["the first Governor-General of independent India","Lord Mountbatten","Mountbatten stayed on as Governor-General from August 1947 to June 1948.","gov"],
+  ["the first (and last) Indian Governor-General","C. Rajagopalachari","Rajaji held the post from 1948 until it ended on 26 January 1950.","gov"],
+  ["the first Speaker of the Lok Sabha","G. V. Mavalankar","Ganesh Vasudev Mavalankar was Speaker from 1952 to 1956.","off"],
+  ["the first Chief Justice of India","H. J. Kania","Harilal Jekisundas Kania headed the Supreme Court from 1950 to 1951.","off"],
+  ["the first Chief Election Commissioner","Sukumar Sen","Sukumar Sen ran the first general elections of 1951–52.","off"],
+  ["the first Attorney General of India","M. C. Setalvad","Motilal Chimanlal Setalvad was Attorney General from 1950 to 1963.","off"],
+  ["the first Comptroller and Auditor General","V. Narahari Rao","V. Narahari Rao was CAG from 1948 to 1954.","off"],
+  ["the first Finance Minister of independent India","R. K. Shanmukham Chetty","Shanmukham Chetty presented independent India's first budget on 26 November 1947.","gov"],
+  ["the first Education Minister of India","Maulana Abul Kalam Azad","Azad's birthday, 11 November, is kept as National Education Day.","gov"],
+  ["the first Law Minister of India","B. R. Ambedkar","Ambedkar also chaired the Drafting Committee of the Constitution.","gov"],
+  ["the first Indian Governor of the Reserve Bank","C. D. Deshmukh","C. D. Deshmukh led the RBI from 1943 to 1949 and later became Finance Minister.","off"],
+  ["the first non-Congress Prime Minister","Morarji Desai","Morarji Desai led the Janata Party government of 1977–79.","gov"],
+  ["the first Muslim President of India","Zakir Husain","Zakir Husain (1967–69) was also the first President to die in office.","pres"],
+  ["the first Sikh President of India","Giani Zail Singh","Zail Singh was President from 1982 to 1987.","pres"],
+  ["the first Dalit President of India","K. R. Narayanan","K. R. Narayanan was President from 1997 to 2002.","pres"],
+  ["the first President from a Scheduled Tribe","Droupadi Murmu","Droupadi Murmu took office in July 2022 — also the second woman President.","pres"],
+  ["the first acting President of India","V. V. Giri","V. V. Giri acted as President in 1969 after Zakir Husain died, and was then elected.","pres"],
+  ["the first Chief Justice to act as President","M. Hidayatullah","M. Hidayatullah acted as President in July–August 1969, when V. V. Giri resigned to stand for election.","pres"]
 ];
 /* F3 — Indians who were first on the world stage (forward questions only). */
 const F3W = [
-  ["the first Indian to go into space","Rakesh Sharma","Rakesh Sharma flew on Soyuz T-11 on 3 April 1984 with two Soviet cosmonauts.",""],
-  ["the first Indian to visit the International Space Station","Shubhanshu Shukla","Group Captain Shubhanshu Shukla piloted Axiom-4, which docked with the ISS on 26 June 2025.",""],
-  ["the first Indian to win a Nobel Prize","Rabindranath Tagore","Tagore won the Literature prize in 1913 for Gitanjali — the first Asian laureate too.",""],
-  ["the first Indian elected to the British House of Commons","Dadabhai Naoroji","Naoroji won Finsbury Central in 1892.",""],
-  ["the first President of the Indian National Congress","W. C. Bonnerjee","Womesh Chunder Bonnerjee presided over the first session at Bombay in 1885.",""],
-  ["the first Indian to join the Indian Civil Service","Satyendranath Tagore","Rabindranath's elder brother was selected in 1863.",""],
-  ["the first Indian to win an individual Olympic gold","Abhinav Bindra","Bindra won the 10 m air rifle at Beijing in 2008.",""],
-  ["the first Indian to win an individual Olympic medal","K. D. Jadhav","Khashaba Dadasaheb Jadhav won wrestling bronze at Helsinki in 1952.",""],
-  ["the first Indian to win an Olympic gold in athletics","Neeraj Chopra","Neeraj Chopra won the javelin at the Tokyo Games (held in 2021).",""],
-  ["the first Indian to win an Oscar","Bhanu Athaiya","Bhanu Athaiya won for costume design for Gandhi in 1983.",""],
-  ["the first captain of India in Test cricket","C. K. Nayudu","C. K. Nayudu led India in its first Test, at Lord's in 1932.",""]
+  ["the first Indian to go into space","Rakesh Sharma","Rakesh Sharma flew on Soyuz T-11 on 3 April 1984 with two Soviet cosmonauts.","world"],
+  ["the first Indian to visit the International Space Station","Shubhanshu Shukla","Group Captain Shubhanshu Shukla piloted Axiom-4, which docked with the ISS on 26 June 2025.","world"],
+  ["the first Indian to win a Nobel Prize","Rabindranath Tagore","Tagore won the Literature prize in 1913 for Gitanjali — the first Asian laureate too.","world"],
+  ["the first Indian elected to the British House of Commons","Dadabhai Naoroji","Naoroji won Finsbury Central in 1892.","world"],
+  ["the first President of the Indian National Congress","W. C. Bonnerjee","Womesh Chunder Bonnerjee presided over the first session at Bombay in 1885.","world"],
+  ["the first Indian to join the Indian Civil Service","Satyendranath Tagore","Rabindranath's elder brother was selected in 1863.","world"],
+  ["the first Indian to win an individual Olympic gold","Abhinav Bindra","Bindra won the 10 m air rifle at Beijing in 2008.","sport"],
+  ["the first Indian to win an individual Olympic medal","K. D. Jadhav","Khashaba Dadasaheb Jadhav won wrestling bronze at Helsinki in 1952.","sport"],
+  ["the first Indian to win an Olympic gold in athletics","Neeraj Chopra","Neeraj Chopra won the javelin at the Tokyo Games (held in 2021).","sport"],
+  ["the first Indian to win an Oscar","Bhanu Athaiya","Bhanu Athaiya won for costume design for Gandhi in 1983.","world"],
+  ["the first captain of India in Test cricket","C. K. Nayudu","C. K. Nayudu led India in its first Test, at Lord's in 1932.","sport"]
 ];
-pairQs("F3", F3P, { q: t => `Who became ${t}?`, rq: a => `${a} is known as:` });
-pairQs("F3", F3W, { q: t => `Who was ${t}?` });
+fsPairs("F3", F3P, { q: t => `Who became ${t}?`, rq: a => `${a} is known as:` });
+fsPairs("F3", F3W, { q: t => `Who was ${t}?` });
 
 /* F4 — the first women (pairQs asks both ways). */
 const F4P = [
-  ["the first woman Prime Minister of India","Indira Gandhi","Indira Gandhi became Prime Minister in January 1966.",""],
-  ["the first woman President of India","Pratibha Patil","Pratibha Patil was President from 2007 to 2012.",""],
-  ["the first woman Governor of an Indian state","Sarojini Naidu","Sarojini Naidu became Governor of the United Provinces (now Uttar Pradesh) in 1947.",""],
-  ["the first woman Chief Minister in India","Sucheta Kripalani","Sucheta Kripalani became Chief Minister of Uttar Pradesh in 1963.",""],
-  ["the first woman Union Cabinet minister","Rajkumari Amrit Kaur","Rajkumari Amrit Kaur was Health Minister from 1947 to 1957 and founded AIIMS.",""],
-  ["the first woman President of the UN General Assembly","Vijaya Lakshmi Pandit","Vijaya Lakshmi Pandit presided over the General Assembly in 1953 — the first woman anywhere to do so.",""],
-  ["the first woman Speaker of the Lok Sabha","Meira Kumar","Meira Kumar was Speaker from 2009 to 2014.",""],
-  ["the first woman judge of the Supreme Court","M. Fathima Beevi","Fathima Beevi joined the Supreme Court in 1989 and was later Governor of Tamil Nadu.",""],
-  ["the first woman judge of a High Court","Anna Chandy","Anna Chandy became a judge of the Kerala High Court in 1959.",""],
-  ["the first woman Chief Justice of a High Court","Leila Seth","Leila Seth became Chief Justice of the Himachal Pradesh High Court in 1991.",""],
-  ["the first woman IAS officer","Anna Rajam Malhotra","Anna Rajam Malhotra joined the Indian Administrative Service in 1951.",""],
-  ["the first woman IPS officer","Kiran Bedi","Kiran Bedi joined the Indian Police Service in 1972.",""],
-  ["the first woman officer of the Indian Foreign Service","C. B. Muthamma","C. B. Muthamma joined in 1949 and later won a Supreme Court case against rules that held women back in the service.",""],
-  ["the first Indian woman to climb Mount Everest","Bachendri Pal","Bachendri Pal reached the summit on 23 May 1984.",""],
-  ["the first woman to climb Everest twice","Santosh Yadav","Santosh Yadav climbed it in 1992 and again in 1993.",""],
-  ["the first woman amputee to climb Everest","Arunima Sinha","Arunima Sinha, who lost a leg in a train attack, reached the top in May 2013.",""],
-  ["the first Indian-born woman in space","Kalpana Chawla","Kalpana Chawla flew on the space shuttle Columbia (STS-87) in 1997.",""],
-  ["the first Indian woman to win an Olympic medal","Karnam Malleswari","Karnam Malleswari won weightlifting bronze at Sydney in 2000.",""],
-  ["the first Indian woman to win an Olympic silver medal","P. V. Sindhu","P. V. Sindhu won badminton silver at Rio in 2016.",""],
-  ["the first Indian woman to fly an aircraft","Sarla Thakral","Sarla Thakral earned her flying licence in 1936, at the age of 21.",""],
-  ["the first woman Chief Election Commissioner","V. S. Ramadevi","V. S. Ramadevi held the post briefly in 1990.",""],
-  ["the first Indian woman to win Miss World","Reita Faria","Reita Faria won the title in 1966.",""],
-  ["the first woman to win the Jnanpith Award","Ashapurna Devi","The Bengali writer Ashapurna Devi received it in 1976.",""],
-  ["the first woman ruler of the Delhi Sultanate","Razia Sultan","Razia ruled from 1236 to 1240.",""]
+  ["the first woman Prime Minister of India","Indira Gandhi","Indira Gandhi became Prime Minister in January 1966.","pol"],
+  ["the first woman President of India","Pratibha Patil","Pratibha Patil was President from 2007 to 2012.","pol"],
+  ["the first woman Governor of an Indian state","Sarojini Naidu","Sarojini Naidu became Governor of the United Provinces (now Uttar Pradesh) in 1947.","pol"],
+  ["the first woman Chief Minister in India","Sucheta Kripalani","Sucheta Kripalani became Chief Minister of Uttar Pradesh in 1963.","pol"],
+  ["the first woman Union Cabinet minister","Rajkumari Amrit Kaur","Rajkumari Amrit Kaur was Health Minister from 1947 to 1957 and founded AIIMS.","pol"],
+  ["the first woman President of the UN General Assembly","Vijaya Lakshmi Pandit","Vijaya Lakshmi Pandit presided over the General Assembly in 1953 — the first woman anywhere to do so.","pol"],
+  ["the first woman Speaker of the Lok Sabha","Meira Kumar","Meira Kumar was Speaker from 2009 to 2014.","pol"],
+  ["the first woman judge of the Supreme Court","M. Fathima Beevi","Fathima Beevi joined the Supreme Court in 1989 and was later Governor of Tamil Nadu.","law"],
+  ["the first woman judge of a High Court","Anna Chandy","Anna Chandy became a judge of the Kerala High Court in 1959.","law"],
+  ["the first woman Chief Justice of a High Court","Leila Seth","Leila Seth became Chief Justice of the Himachal Pradesh High Court in 1991.","law"],
+  ["the first woman IAS officer","Anna Rajam Malhotra","Anna Rajam Malhotra joined the Indian Administrative Service in 1951.","law"],
+  ["the first woman IPS officer","Kiran Bedi","Kiran Bedi joined the Indian Police Service in 1972.","law"],
+  ["the first woman officer of the Indian Foreign Service","C. B. Muthamma","C. B. Muthamma joined in 1949 and later won a Supreme Court case against rules that held women back in the service.","law"],
+  ["the first Indian woman to climb Mount Everest","Bachendri Pal","Bachendri Pal reached the summit on 23 May 1984.","adv"],
+  ["the first woman to climb Everest twice","Santosh Yadav","Santosh Yadav climbed it in 1992 and again in 1993.","adv"],
+  ["the first woman amputee to climb Everest","Arunima Sinha","Arunima Sinha, who lost a leg in a train attack, reached the top in May 2013.","adv"],
+  ["the first Indian-born woman in space","Kalpana Chawla","Kalpana Chawla flew on the space shuttle Columbia (STS-87) in 1997.","adv"],
+  ["the first Indian woman to win an Olympic medal","Karnam Malleswari","Karnam Malleswari won weightlifting bronze at Sydney in 2000.","adv"],
+  ["the first Indian woman to win an Olympic silver medal","P. V. Sindhu","P. V. Sindhu won badminton silver at Rio in 2016.","adv"],
+  ["the first Indian woman to fly an aircraft","Sarla Thakral","Sarla Thakral earned her flying licence in 1936, at the age of 21.","adv"],
+  ["the first woman Chief Election Commissioner","V. S. Ramadevi","V. S. Ramadevi held the post briefly in 1990.","pol"],
+  ["the first Indian woman to win Miss World","Reita Faria","Reita Faria won the title in 1966.","arts"],
+  ["the first woman to win the Jnanpith Award","Ashapurna Devi","The Bengali writer Ashapurna Devi received it in 1976.","arts"],
+  ["the first woman to win the Sahitya Akademi Award","Amrita Pritam","The Punjabi poet Amrita Pritam won it in 1956 for Sunehe.","arts"],
+  ["the first winner of the Dadasaheb Phalke Award","Devika Rani","The actress Devika Rani received the first award in 1969.","arts"],
+  ["the first Indian woman to win the Booker Prize","Arundhati Roy","Arundhati Roy won in 1997 for The God of Small Things.","arts"],
+  ["the first woman ruler of the Delhi Sultanate","Razia Sultan","Razia ruled from 1236 to 1240.","pol"]
 ];
-pairQs("F4", F4P, { q: t => `Who was ${t}?`, rq: a => `${a} is known as:` });
+fsPairs("F4", F4P, { q: t => `Who was ${t}?`, rq: a => `${a} is known as:`, fill: { arts: ["adv"] } });
 
 LESSONS.push(
 {id:"F3", heat:2, title:"Firsts in India: the people", hi:"भारत में प्रथम: व्यक्ति", blocks:[
@@ -79,7 +82,7 @@ LESSONS.push(
     key:"Prasad, Radhakrishnan, Nehru, Patel, Mountbatten → Rajaji, Mavalankar, Kania, Sukumar Sen."},
   {k:"table", title:"First holders of India's posts", head:["First","Who","Note"], rows: F3P.map(r => [r[0].charAt(0).toUpperCase() + r[0].slice(1), r[1], r[2]])},
   {k:"table", title:"Indians first on the world stage", head:["First","Who","Note"], rows: F3W.map(r => [r[0].charAt(0).toUpperCase() + r[0].slice(1), r[1], r[2]])},
-  {k:"link", h:"More firsts elsewhere: the first <b>Bharat Ratna</b> awardees and the first woman, posthumous and foreign recipients — see <a href=\"study-awards.html?lesson=A1\">Awards &amp; Honours</a>; the first <b>Field Marshal</b>, Param Vir Chakra and CDS — see <a href=\"study-defence.html?lesson=F3\">Defence</a>; and the newest 'first' appointments — see the Appointments app."},
+  {k:"link", h:"More firsts elsewhere: the first <b>Bharat Ratna</b> awardees and the first woman, posthumous and foreign recipients — see <a href=\"study-awards.html?lesson=A1\">Awards &amp; Honours</a>; the first <b>Field Marshal</b>, Param Vir Chakra and CDS — see <a href=\"study-defence.html?lesson=F3\">Defence</a>; and the newest 'first' appointments — see <a href=\"study-appointments.html\">Appointments</a>."},
   {k:"trick", h:"The first family of the Republic — <b>“Prasad Presides, Radha Assists, Nehru Navigates, Patel Protects”</b>: President, Vice-President, Prime Minister, Deputy PM and Home Minister."},
   {k:"trap", h:"<b>Mountbatten</b> was the first Governor-General of <b>independent</b> India; <b>Rajagopalachari</b> was the first (and last) <b>Indian</b> Governor-General. <b>V. V. Giri</b> was the first <b>acting</b> President, but <b>M. Hidayatullah</b> was the first <b>Chief Justice</b> to act as President. <b>Rakesh Sharma</b> was the first Indian in space; <b>Shubhanshu Shukla</b> the first on the <b>ISS</b>."}
 ], sum:["President Rajendra Prasad; Vice-President S. Radhakrishnan; PM Jawaharlal Nehru; Deputy PM Vallabhbhai Patel.","Governor-General: Mountbatten (first of free India), then C. Rajagopalachari (first and last Indian).","Speaker G. V. Mavalankar; CJI H. J. Kania; CEC Sukumar Sen; AG M. C. Setalvad; CAG V. Narahari Rao.","First non-Congress PM: Morarji Desai (1977). Presidents: Zakir Husain (first Muslim), Zail Singh (Sikh), K. R. Narayanan (Dalit), Droupadi Murmu (Scheduled Tribe).","Rakesh Sharma — space (1984); Shubhanshu Shukla — ISS (2025); Tagore — Nobel (1913)."]},
@@ -101,7 +104,7 @@ LESSONS.push(
     ["First woman to head the State Bank of India","Arundhati Bhattacharya (2013)"],
     ["First woman to present a full Union Budget as Finance Minister","Nirmala Sitharaman (2019)"],
     ["First Indian winner of the International Booker Prize","Geetanjali Shree, Tomb of Sand (2022); Banu Mushtaq's Heart Lamp (2025) was the first Kannada winner"]]},
-  {k:"link", h:"The first women <b>fighter pilots</b>, the first woman <b>Lieutenant General</b> and the first woman <b>Rafale pilot</b> are in <a href=\"study-defence.html?lesson=F3\">Defence</a>. Women leaders of the freedom struggle are in Modern History (L32)."},
+  {k:"link", h:"The first women <b>fighter pilots</b>, the first woman <b>Lieutenant General</b> and the first woman <b>Rafale pilot</b> are in <a href=\"study-defence.html?lesson=F3\">Defence</a>. Women leaders of the freedom struggle are in <a href=\"study-history-modern.html\">Modern History</a> (L32)."},
   {k:"trick", h:"The 1947 pair — <b>“Sarojini Governs, Amrit Ministers”</b>. The 'ladder' of the courts — <b>“Anna climbs, Fathima reaches the top, Leila leads”</b>: Anna Chandy (HC judge 1959) → Fathima Beevi (SC judge 1989) → Leila Seth (HC Chief Justice 1991)."},
   {k:"trap", h:"<b>Anna Rajam Malhotra</b> = IAS; <b>Kiran Bedi</b> = IPS — don't swap. <b>Bachendri Pal</b> climbed Everest first (1984); <b>Santosh Yadav</b> was first to do it <b>twice</b>. The first woman <b>Governor</b> is Sarojini Naidu, but the first woman <b>Chief Minister</b> is Sucheta Kripalani — both in Uttar Pradesh. India has <b>not yet had a woman Chief Justice of India</b> (as of October 2026); Justice B. V. Nagarathna is in line for 2027."}
 ], sum:["PM Indira Gandhi (1966); President Pratibha Patil (2007); Speaker Meira Kumar (2009).","Governor Sarojini Naidu (1947); CM Sucheta Kripalani (1963); Union minister Rajkumari Amrit Kaur (1947).","Judges: Anna Chandy (HC, 1959), Fathima Beevi (SC, 1989), Leila Seth (HC Chief Justice, 1991).","IAS Anna Rajam Malhotra (1951); IPS Kiran Bedi (1972); IFS C. B. Muthamma (1949).","Everest: Bachendri Pal (1984), Santosh Yadav twice, Arunima Sinha (amputee, 2013).","Space Kalpana Chawla (1997); Olympic medal Karnam Malleswari (2000); silver P. V. Sindhu (2016)."]},
@@ -144,7 +147,7 @@ LESSONS.push(
     ["First World Heritage sites","Ajanta, Ellora, Agra Fort and the Taj Mahal (1983)"],
     ["First Ramsar sites","Chilika and Keoladeo (1981)"],
     ["First biosphere reserve","Nilgiri (1986)"]]},
-  {k:"link", h:"The first <b>railway</b> (1853), <b>metro</b> (1984), <b>Vande Bharat</b> and India's first <b>airline</b> flight are in <a href=\"study-industries-transport.html?lesson=T6\">Industries &amp; Transport</a>, with the first <b>cotton and jute mills</b> and the first <b>steel plant</b>. The first <b>banks</b> are in Banking; the first <b>satellites and Moon missions</b> in the Space app."},
+  {k:"link", h:"The first <b>railway</b> (1853), <b>metro</b> (1984), <b>Vande Bharat</b> and India's first <b>airline</b> flight are in <a href=\"study-industries-transport.html?lesson=T6\">Industries &amp; Transport</a>, with the first <b>cotton and jute mills</b> and the first <b>steel plant</b>. The first <b>banks</b> are in <a href=\"study-banking.html?lesson=N3\">Banking</a>; the first <b>satellites and Moon missions</b> in <a href=\"study-space.html\">Space</a>."},
   {k:"trick", h:"Film in three steps — <b>“Phalke Silent, Irani Talks, Kisan in Colour”</b>: 1913, 1931, 1937. Nuclear in three — <b>“Apsara 56, Tarapur 69, Pokhran 74”</b>."},
   {k:"trap", h:"<b>Apsara</b> is a research <b>reactor</b> (Trombay); <b>Tarapur</b> is the first <b>power station</b> — different things. <b>Dakshin Gangotri</b> is in <b>Antarctica</b>, <b>Himadri</b> in the <b>Arctic</b>. The first universities (1857) were <b>Calcutta, Bombay and Madras</b> — not Delhi or Banaras."}
 ], sum:["Hicky's Bengal Gazette (1780); Udant Martand (1826, first Hindi paper).","Raja Harishchandra (1913), Alam Ara (1931), Kisan Kanya (1937); Doordarshan 1959.","Universities 1857 (Calcutta, Bombay, Madras); IIT Kharagpur 1951; AIIMS 1956; IIM Calcutta 1961.","Apsara reactor (1956), Tarapur power station (1969), Pokhran test (1974), Aryabhata (1975).","Dakshin Gangotri (Antarctica, 1983–84); Himadri (Arctic, 2008); first test-tube baby Durga (1978).","General elections 1951–52; first Lok Adalat Junagadh (1982); Asian Games New Delhi (1951)."]},
@@ -171,7 +174,7 @@ LESSONS.push(
     ["First human in space","Yuri Gagarin, Vostok 1, 12 April 1961"],
     ["First woman in space","Valentina Tereshkova, 1963"],
     ["First people on the Moon","Neil Armstrong and Buzz Aldrin, Apollo 11, 20 July 1969"],
-    ["The full list","See the Space app, lesson 14 (World space firsts)"]]},
+    ["The full list","See <a href=\"study-space.html\">Space</a>, lesson 14 (World space firsts)"]]},
   {k:"trick", h:"Women at the top, in order — <b>“Sri Lanka 60, India 66, Iceland 80, Britain 79”</b>: Bandaranaike (1960, PM), Indira Gandhi (1966), Thatcher (1979), Vigdís (1980, first elected President)."},
   {k:"trap", h:"The world's first woman Prime Minister was <b>Sirimavo Bandaranaike</b>, not Indira Gandhi or Golda Meir. <b>Amundsen</b> reached the <b>South</b> Pole (1911); <b>Peary</b> claimed the <b>North</b> Pole (1909), a claim still doubted. <b>Magellan</b> died on the way — <b>Elcano</b> brought the ship home in 1522."}
 ], sum:["First woman PM: Sirimavo Bandaranaike (Sri Lanka, 1960); first woman elected President: Vigdís Finnbogadóttir (Iceland, 1980).","Marie Curie — first woman Nobel laureate (1903); Bertha von Suttner — first woman Peace laureate (1905).","First Nobels, 1901: Röntgen (Physics), van 't Hoff (Chemistry), von Behring (Medicine), Sully Prudhomme (Literature), Dunant and Passy (Peace).","Everest: Tenzing and Hillary (1953); Junko Tabei (first woman, 1975). South Pole: Amundsen (1911).","Olympics Athens 1896; FIFA World Cup Uruguay 1930; Cricket World Cup 1975 (West Indies)."]}
@@ -179,36 +182,36 @@ LESSONS.push(
 
 /* F6 tables: filled here so pairQs and the lesson read the same rows. */
 const F6P = [
-  ["the first woman Prime Minister in the world","Sirimavo Bandaranaike","Sirimavo Bandaranaike became Prime Minister of Ceylon (Sri Lanka) in 1960.",""],
-  ["the first woman elected President of a country","Vigdís Finnbogadóttir","Vigdís Finnbogadóttir was elected President of Iceland in 1980.",""],
-  ["the first woman Prime Minister of Britain","Margaret Thatcher","Margaret Thatcher led Britain from 1979 to 1990.",""],
-  ["the first woman Prime Minister of Pakistan","Benazir Bhutto","Benazir Bhutto took office in 1988 — the first woman elected to lead a Muslim-majority country.",""],
-  ["the first woman Chancellor of Germany","Angela Merkel","Angela Merkel was Chancellor from 2005 to 2021.",""],
-  ["the first President of the United States","George Washington","George Washington took office in 1789.",""],
-  ["the first Black President of the United States","Barack Obama","Barack Obama was President from 2009 to 2017.",""],
-  ["the first woman to win a Nobel Prize","Marie Curie","Marie Curie shared the 1903 Physics prize and won Chemistry alone in 1911.",""],
-  ["the first woman to win the Nobel Peace Prize","Bertha von Suttner","The Austrian writer Bertha von Suttner won it in 1905.",""],
-  ["the first woman to climb Mount Everest","Junko Tabei","Junko Tabei of Japan reached the top on 16 May 1975.",""],
-  ["the first person to reach the South Pole","Roald Amundsen","The Norwegian Roald Amundsen's team got there on 14 December 1911.",""],
-  ["the first person to fly solo non-stop across the Atlantic","Charles Lindbergh","Charles Lindbergh flew the Spirit of St. Louis from New York to Paris in 1927.",""],
-  ["the first woman to fly solo across the Atlantic","Amelia Earhart","Amelia Earhart crossed from Newfoundland to Northern Ireland in 1932.",""],
-  ["the first European to reach India by sea","Vasco da Gama","Vasco da Gama landed near Calicut in May 1498.",""],
-  ["the leader of the first voyage round the world","Ferdinand Magellan","Magellan's fleet sailed in 1519; he was killed on the way and Juan Sebastián Elcano finished the voyage in 1522.",""],
-  ["the first person to run a mile in under four minutes","Roger Bannister","Roger Bannister ran 3 minutes 59.4 seconds at Oxford in 1954.",""]
+  ["the first woman Prime Minister in the world","Sirimavo Bandaranaike","Sirimavo Bandaranaike became Prime Minister of Ceylon (Sri Lanka) in 1960.","lead"],
+  ["the first woman elected President of a country","Vigdís Finnbogadóttir","Vigdís Finnbogadóttir was elected President of Iceland in 1980.","lead"],
+  ["the first woman Prime Minister of Britain","Margaret Thatcher","Margaret Thatcher led Britain from 1979 to 1990.","lead"],
+  ["the first woman Prime Minister of Pakistan","Benazir Bhutto","Benazir Bhutto took office in 1988 — the first woman elected to lead a Muslim-majority country.","lead"],
+  ["the first woman Chancellor of Germany","Angela Merkel","Angela Merkel was Chancellor from 2005 to 2021.","lead"],
+  ["the first woman Vice-President of the United States","Kamala Harris","Kamala Harris, whose mother came from Chennai, took office in January 2021.","lead"],
+  ["the first woman to win a Nobel Prize","Marie Curie","Marie Curie shared the 1903 Physics prize and won Chemistry alone in 1911.","wfeat"],
+  ["the first woman to win the Nobel Peace Prize","Bertha von Suttner","The Austrian writer Bertha von Suttner won it in 1905.","wfeat"],
+  ["the first woman to climb Mount Everest","Junko Tabei","Junko Tabei of Japan reached the top on 16 May 1975.","wfeat"],
+  ["the first person to reach the South Pole","Roald Amundsen","The Norwegian Roald Amundsen's team got there on 14 December 1911.","sea"],
+  ["the first person to fly solo non-stop across the Atlantic","Charles Lindbergh","Charles Lindbergh flew the Spirit of St. Louis from New York to Paris in 1927.","mfeat"],
+  ["the first woman to fly solo across the Atlantic","Amelia Earhart","Amelia Earhart crossed from Newfoundland to Northern Ireland in 1932.","wfeat"],
+  ["the first European to reach India by sea","Vasco da Gama","Vasco da Gama landed near Calicut in May 1498.","sea"],
+  ["the leader of the first voyage round the world","Ferdinand Magellan","Magellan's fleet sailed in 1519; he was killed on the way and Juan Sebastián Elcano finished the voyage in 1522.","sea"],
+  ["the first person to run a mile in under four minutes","Roger Bannister","Roger Bannister ran 3 minutes 59.4 seconds at Oxford in 1954.","mfeat"],
+  ["the first person to sail alone round the world","Joshua Slocum","Joshua Slocum sailed the sloop Spray round the world alone in 1895–98.","sea"]
 ];
 const F6N = [
-  ["Physics","Wilhelm Röntgen","Wilhelm Röntgen won the first Physics prize (1901) for discovering X-rays.",""],
-  ["Chemistry","Jacobus van 't Hoff","Jacobus van 't Hoff won the first Chemistry prize (1901) for laws of chemical dynamics and osmotic pressure.",""],
-  ["Physiology or Medicine","Emil von Behring","Emil von Behring won the first Medicine prize (1901) for serum therapy against diphtheria.",""],
-  ["Literature","Sully Prudhomme","The French poet Sully Prudhomme won the first Literature prize (1901).",""],
-  ["Peace","Henry Dunant and Frédéric Passy","The first Peace prize (1901) was shared by Henry Dunant, founder of the Red Cross, and Frédéric Passy.",""],
-  ["Economic Sciences","Ragnar Frisch and Jan Tinbergen","The Economics prize was first given in 1969, to Ragnar Frisch and Jan Tinbergen.",""]
+  ["Physics","Wilhelm Röntgen","Wilhelm Röntgen won the first Physics prize (1901) for discovering X-rays.","nobel"],
+  ["Chemistry","Jacobus van 't Hoff","Jacobus van 't Hoff won the first Chemistry prize (1901) for laws of chemical dynamics and osmotic pressure.","nobel"],
+  ["Physiology or Medicine","Emil von Behring","Emil von Behring won the first Medicine prize (1901) for serum therapy against diphtheria.","nobel"],
+  ["Literature","Sully Prudhomme","The French poet Sully Prudhomme won the first Literature prize (1901).","nobel"],
+  ["Peace","Henry Dunant and Frédéric Passy","The first Peace prize (1901) was shared by Henry Dunant, founder of the Red Cross, and Frédéric Passy.","nobel"],
+  ["Economic Sciences","Ragnar Frisch and Jan Tinbergen","The Economics prize was first given in 1969, to Ragnar Frisch and Jan Tinbergen.","nobel"]
 ];
 (() => { const l = LESSONS.find(x => x.id === "F6"), t = l.blocks.filter(b => b.k === "table");
   t[0].rows = F6P.map(r => [r[0].charAt(0).toUpperCase() + r[0].slice(1), r[1], r[2]]);
   t[1].rows = F6N.map(r => [r[0], r[1], r[2]]); })();
-pairQs("F6", F6P, { q: t => `Who was ${t}?`, rq: a => `${a} is remembered as:` });
-pairQs("F6", F6N, { q: t => `Who won the first Nobel Prize in ${t}?` });
+fsPairs("F6", F6P, { q: t => `Who was ${t}?`, rq: a => `${a} is remembered as:`, fill: { mfeat: ["sea"], sea: ["mfeat"] } });
+fsPairs("F6", F6N, { q: t => `Who won the first Nobel Prize in ${t}?` });
 
 QB.push(
 ["F3","Which President of India was elected for two full terms?",["Rajendra Prasad","Sarvepalli Radhakrishnan","Zakir Husain","A. P. J. Abdul Kalam"],"Rajendra Prasad served from 1950 to 1962, the only President elected twice.",""],

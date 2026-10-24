@@ -2,6 +2,26 @@
    (animal, bird, flower, tree, fruit, river, aquatic and heritage animal, microbe) and the ones that were never declared.
    Facts that changed recently (Vande Mataram's six-stanza order of January 2026, the 2026 amendment bill) are as of October 2026. */
 
+/** fsPairs(lesson, rows, o): like pairQs, but each row carries a group (r[3]) and the wrong options come from rows of the
+    same group — so a 'first woman Prime Minister' question offers other political leaders, not explorers. A group with fewer
+    than four rows borrows from the groups listed in o.fill[group] (then from the whole table).
+    rows: [prompt, answer, note, group]. o: { q: prompt → question, rq?: answer → reverse question, fill?: {group: [groups]} }.
+    Options are picked the same way on every build. */
+function fsHash(s){ let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function fsPairs(lesson, rows, o){
+  const pool = (r, key) => { const order = [r[3]].concat((o.fill || {})[r[3]] || []);
+    const seen = new Set([r[key]]), out = [];
+    order.forEach(g => rows.filter(x => x[3] === g).forEach(x => { if (!seen.has(x[key])) { seen.add(x[key]); out.push(x[key]); } }));
+    rows.forEach(x => { if (!seen.has(x[key])) { seen.add(x[key]); out.push(x[key]); } });
+    return out; };
+  const pick = (seed, r, key) => { const all = pool(r, key), own = all.filter(v => rows.some(x => x[3] === r[3] && x[key] === v));
+    const first = own.sort((a, b) => fsHash(seed + a) - fsHash(seed + b)).slice(0, 3);
+    return first.concat(all.filter(v => !first.includes(v)).slice(0, 3 - first.length)); };
+  const n = {}; rows.forEach(r => { n[r[1]] = (n[r[1]] || 0) + 1; });
+  rows.forEach(r => { const q = o.q(r[0]); QB.push([lesson, q, [r[1]].concat(pick(q, r, 1)), r[2], ""]); });
+  if (o.rq) rows.filter(r => n[r[1]] === 1).forEach(r => { const q = o.rq(r[1]); QB.push([lesson, q, [r[0]].concat(pick(q, r, 0)), r[2], ""]); });
+}
+
 /* The national flag, drawn to the Flag Code's 2:3 proportions with the 24-spoke Ashoka Chakra. */
 const FLAG_SVG = (() => {
   const cx = 150, cy = 100, r = 28, sp = [];
