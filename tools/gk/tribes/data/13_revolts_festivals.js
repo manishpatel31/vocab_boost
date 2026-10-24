@@ -77,7 +77,7 @@ LESSONS.push(
 );
 
 pairQs("T6", T6A, { q: t => `Who led the ${t}?` });
-pairQs("T6", T6B, { q: t => `${t} is a festival of which tribe?` });
+pairQs("T6", T6B.filter(r => !["Tokhu Emong","Reh","Mopin","Gaan-Ngai","Tuluni","Aoleang","Ali-Aye-Ligang"].includes(r[0])), { q: t => `${t} is a festival of which tribe?` });
 
 QB.push(
 ["T6","On which date did the Santhal Hul begin?",["30 June 1855","15 November 1875","9 June 1900","10 May 1857"],"30 June is kept as Hul Diwas. 15 November 1875 is Birsa Munda's birth; 9 June 1900 his death.",""],

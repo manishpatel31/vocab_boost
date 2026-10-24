@@ -62,7 +62,7 @@ LESSONS.push(
 ], sum:["Brahmi: the mother of Indian scripts; Ashoka's edicts; read by James Prinsep (1837). Kharosthi: right to left, from Aramaic, north-west.","Devanagari: Hindi, Marathi, Nepali, Sanskrit, Konkani, Bodo, Dogri, Maithili. Gurmukhi: Punjabi (Guru Angad Dev).","Grantha: Sanskrit in the Tamil country, parent of the Malayalam script. Sharada: Kashmir. Tirhuta: Maithili. Modi: Marathi. Takri: Dogri.","Meitei Mayek: Manipuri (back in official use from 2021). Urdu and Kashmiri: Perso-Arabic. Sindhi: Perso-Arabic and Devanagari.","Ol Chiki (Santhali): Raghunath Murmu, 1925. Warang Citi (Ho): Lako Bodra. Sorang Sompeng (Sora): Mangei Gomango. Tolong Siki (Kurukh): Narayan Oraon.","Khasi, Mizo and Garo are written in the Roman script."]}
 );
 
-pairQs("T8", T8A, { q: t => `The ${t} script is (or was) chiefly used for which language?` });
+pairQs("T8", T8A.filter(r => !/^(Lepcha|Limbu)/.test(r[0])), { q: t => `The ${t} script is (or was) chiefly used for which language?` });
 pairQs("T8", T8B.filter(r => ["Bodo","Konkani","Punjabi (in India)","Kashmiri","Santhali","Manipuri","Khasi","Mizo"].includes(r[0])), { q: t => `What is the standard script for ${t} today?` });
 
 QB.push(

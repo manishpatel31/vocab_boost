@@ -89,7 +89,7 @@ LESSONS.push(
 ], sum:["Nilgiris: Toda (buffaloes, barrel huts, embroidery), Kota (artisans), Kurumba, Irula (snake catchers) — all PVTGs.","Chenchu: Nallamala (AP–Telangana); Soliga: BR Hills (Karnataka); Jenu Kuruba: honey; Kani: Jeevani; Koya: Medaram.","Andaman (Negrito): Great Andamanese (Strait Island), Jarawa (ATR forests), Onge (Little Andaman), Sentinelese (North Sentinel).","Nicobar (Mongoloid): Shompen (Great Nicobar, PVTG), Nicobarese (Car Nicobar, not a PVTG).","Lakshadweep is about 95% ST; Badagas are not ST."]}
 );
 
-pairQs("T4", T4A, { q: t => `The ${t} tribe belongs mainly to which state?` });
+pairQs("T4", T4A.filter(r => !["Jamatia","Chakhesang","Dimasa","Galo"].includes(r[0])), { q: t => `The ${t} tribe belongs mainly to which state?` });
 pairQs("T5", T5A, { q: t => `Where do the ${t} live?`, rq: a => `Which tribe lives in ${a}?` });
 pairQs("T5", T5B, { q: t => `The ${t} tribe is best known for:` });
 

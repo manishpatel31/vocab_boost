@@ -85,7 +85,7 @@ LESSONS.push(
 ], sum:["Eighth Schedule: 22 languages — 14 in 1950; Sindhi (21st, 1967); Konkani, Manipuri, Nepali (71st, 1992); Bodo, Dogri, Maithili, Santhali (92nd, 2003).","96th Amendment (2011): Oriya became Odia. English is not in the Eighth Schedule.","Classical languages (11): Tamil 2004, Sanskrit 2005, Telugu and Kannada 2008, Malayalam 2013, Odia 2014; Marathi, Pali, Prakrit, Assamese, Bengali on 3 October 2024.","Part XVII, Articles 343–351: 343 Union language (Hindi in Devanagari), 345 state languages, 348 courts (English), 350A mother tongue, 350B linguistic minorities officer, 351 developing Hindi.","Official Languages Act 1963; Kher Commission 1955; Hindi Divas 14 September.","Census 2011: Hindi 43.6%, then Bengali, Marathi, Telugu, Tamil."]}
 );
 
-pairQs("T7", T7A.filter(r => r[1] !== ORIG || ["Kashmiri","Sanskrit","Urdu","Odia","Assamese"].includes(r[0])),
+pairQs("T7", T7A.filter(r => r[1] !== ORIG || ["Kashmiri","Sanskrit"].includes(r[0])),
   { q: t => `How did ${t} enter the Eighth Schedule?`, rq: a => `Which language entered the Eighth Schedule by the ${a}?` });
 pairQs("T7", T7B, { q: t => `In which year was ${t} declared a classical language?`, rq: a => `Which language was declared a classical language in ${a}?`, extra: ["2010","2019"] });
 pairQs("T7", T7C, { q: t => `Which Article of the Constitution deals with ${t}?` });

@@ -69,8 +69,7 @@ LESSONS.push(
 );
 
 pairQs("T9", T9A, { q: t => `What did the ${t} lead to?` });
-pairQs("T9", T9B, { q: t => `${t} is observed on:`, rq: a => `Which day is observed on ${a}?` });
-pairQs("T9", T9C.filter(r => ["Tulu","Mundari","Nicobarese","Manipuri","Mizo","Kokborok","Toda","Bhili"].includes(r[0])), { q: t => `${t} belongs to which language family?` });
+pairQs("T9", T9B, { q: t => `${t} is observed on:` });
 
 QB.push(
 ["T9","Potti Sriramulu died in 1952 after fasting for a separate state for which language?",["Telugu","Tamil","Kannada","Marathi"],"He fasted for a Telugu-speaking state carved out of Madras State.",""],
