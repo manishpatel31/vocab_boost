@@ -1,5 +1,5 @@
 /* Firsts, Superlatives & National Symbols Lab — decks built from the lesson tables (labRows), played by tools/workbook/games.js. */
-const fsLow = rows => rows.map(p => [p[0].charAt(0).toLowerCase() + p[0].slice(1), p[1], p[2]]);
+const fsLow = rows => rows.map(p => [p[0].replace(/^(The|National) /, m => m.toLowerCase()), p[1], p[2]]);
 const FS_DECKS = [
   { id: "symbols", ico: "🇮🇳", title: "Symbol → Item", sub: "Animal, bird, flower, tree, river…", lesson: "F2", q: "Which is India's", rq: "Which national title does this hold:", pairs: fsLow(labRows("F2", 0)) },
   { id: "makers", ico: "✍️", title: "Who Made It?", sub: "Anthem, song, flag, ₹, pledge", lesson: "F1", q: "Who wrote or designed:", pairs: labRows("F1", 0) },
@@ -7,7 +7,7 @@ const FS_DECKS = [
   { id: "stage", ico: "🚀", title: "Indians on the World Stage", sub: "Space, Nobel, Olympics, Oscar", lesson: "F3", q: "Who was", rq: "Which first belongs to", pairs: fsLow(labRows("F3", 1)) },
   { id: "women", ico: "👩", title: "First Women", sub: "IAS, IPS, Governor, Everest…", lesson: "F4", q: "Who was", rq: "Which first belongs to", pairs: fsLow(labRows("F4", 0)) },
   { id: "world", ico: "🌍", title: "World Firsts", sub: "Bandaranaike, Curie, Amundsen…", lesson: "F6", q: "Who was", rq: "Which first belongs to", pairs: fsLow(labRows("F6", 0)) },
-  { id: "nobel", ico: "🏅", title: "The First Nobels", sub: "1901 — and Economics in 1969", lesson: "F6", q: "The first Nobel Prize in", rq: "Which first Nobel went to", pairs: labRows("F6", 1) },
+  { id: "nobel", ico: "🏅", title: "The First Nobels", sub: "1901 — and Economics in 1969", lesson: "F6", q: "The first Nobel Prize for", rq: "Which first Nobel went to", pairs: labRows("F6", 1) },
   { id: "india", ico: "🌉", title: "Superlative → Place: India", sub: "Bridges, tunnels, roads", lesson: "F7", q: "Which is", rq: "Which record does this hold:", pairs: fsLow(labRows("F7", 0)) },
   { id: "places", ico: "🗿", title: "India's Record Buildings", sub: "Statue, stadium, dome, minaret", lesson: "F7", q: "Which is", rq: "Which record does this hold:", pairs: fsLow(labRows("F7", 1)) },
   { id: "builtw", ico: "🏙️", title: "Superlative → Place: World", sub: "Buildings, bridges, tunnels", lesson: "F8", q: "Which is", rq: "Which record does this hold:", pairs: labRows("F8", 0) },

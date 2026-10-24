@@ -70,8 +70,7 @@ const F4P = [
   ["the first woman to win the Jnanpith Award","Ashapurna Devi","The Bengali writer Ashapurna Devi received it in 1976.","arts"],
   ["the first woman to win the Sahitya Akademi Award","Amrita Pritam","The Punjabi poet Amrita Pritam won it in 1956 for Sunehe.","arts"],
   ["the first winner of the Dadasaheb Phalke Award","Devika Rani","The actress Devika Rani received the first award in 1969.","arts"],
-  ["the first Indian woman to win the Booker Prize","Arundhati Roy","Arundhati Roy won in 1997 for The God of Small Things.","arts"],
-  ["the first woman ruler of the Delhi Sultanate","Razia Sultan","Razia ruled from 1236 to 1240.","pol"]
+  ["the first Indian woman to win the Booker Prize","Arundhati Roy","Arundhati Roy won in 1997 for The God of Small Things.","arts"]
 ];
 fsPairs("F4", F4P, { q: t => `Who was ${t}?`, rq: a => `${a} is known as:`, fill: { arts: ["adv"] } });
 
@@ -101,6 +100,7 @@ LESSONS.push(
     ["First Indian woman Nobel laureate","Mother Teresa — Peace, 1979"],
     ["First Asian woman to swim the English Channel","Arati Saha (1959)"],
     ["First woman Chief Minister of Delhi","Sushma Swaraj (1998)"],
+    ["First (and only) woman ruler of the Delhi Sultanate","Razia Sultan (1236–40)"],
     ["First woman to head the State Bank of India","Arundhati Bhattacharya (2013)"],
     ["First woman to present a full Union Budget as Finance Minister","Nirmala Sitharaman (2019)"],
     ["First Indian winner of the International Booker Prize","Geetanjali Shree, Tomb of Sand (2022); Banu Mushtaq's Heart Lamp (2025) was the first Kannada winner"]]},
@@ -211,7 +211,7 @@ const F6N = [
   t[0].rows = F6P.map(r => [r[0].charAt(0).toUpperCase() + r[0].slice(1), r[1], r[2]]);
   t[1].rows = F6N.map(r => [r[0], r[1], r[2]]); })();
 fsPairs("F6", F6P, { q: t => `Who was ${t}?`, rq: a => `${a} is remembered as:`, fill: { mfeat: ["sea"], sea: ["mfeat"] } });
-fsPairs("F6", F6N, { q: t => `Who won the first Nobel Prize in ${t}?` });
+fsPairs("F6", F6N, { q: t => t === "Peace" ? "Who won the first Nobel Peace Prize?" : `Who won the first Nobel Prize in ${t}?` });
 
 QB.push(
 ["F3","Which President of India was elected for two full terms?",["Rajendra Prasad","Sarvepalli Radhakrishnan","Zakir Husain","A. P. J. Abdul Kalam"],"Rajendra Prasad served from 1950 to 1962, the only President elected twice.",""],
@@ -232,6 +232,7 @@ QB.push(
 ["F4","Who was the first Indian writer to win the International Booker Prize, for Tomb of Sand (2022)?",["Geetanjali Shree","Banu Mushtaq","Arundhati Roy","Kiran Desai"],"Geetanjali Shree won with Daisy Rockwell's translation from Hindi; Banu Mushtaq won in 2025 for a Kannada book.",""],
 ["F4","Who was the first woman Chief Minister of Delhi?",["Sushma Swaraj","Sheila Dikshit","Atishi","Rekha Gupta"],"Sushma Swaraj was Chief Minister for a few weeks in 1998, before Sheila Dikshit's long term.",""],
 ["F4","Who became the first Indian woman Nobel laureate?",["Mother Teresa","Kalpana Chawla","Indira Gandhi","Sarojini Naidu"],"Mother Teresa won the Peace Prize in 1979.",""],
+["F4","Who was the first and only woman to rule the Delhi Sultanate?",["Razia Sultan","Nur Jahan","Chand Bibi","Rani Durgavati"],"Razia, daughter of Iltutmish, ruled from 1236 to 1240; Nur Jahan was a Mughal empress, not a sultan.",""],
 ["F5","India's first newspaper, Hicky's Bengal Gazette, began in:",["1780","1818","1857","1826"],"James Augustus Hicky started it in Calcutta in 1780.",""],
 ["F5","Udant Martand (1826), the first Hindi newspaper, was published from:",["Calcutta","Kanpur","Varanasi","Allahabad"],"Jugal Kishore Shukla brought it out in Calcutta; 30 May is Hindi Journalism Day.",""],
 ["F5","India's first full-length feature film, Raja Harishchandra (1913), was made by:",["Dadasaheb Phalke","Ardeshir Irani","V. Shantaram","Himanshu Rai"],"Phalke is called the father of Indian cinema.",""],
