@@ -1,0 +1,216 @@
+/* F3 subsidiary books and the cash book; F4 bank reconciliation; F5 rectification of errors and the suspense account. */
+const FA_BOOK = [
+  ["Goods bought on credit from Sohan","Purchases book","Credit purchases of goods only."],
+  ["Goods sold on credit to Meena","Sales book","Credit sales of goods only."],
+  ["Goods returned to Sohan","Purchases returns book","Also called the returns outward book; a debit note is sent."],
+  ["Goods returned by Meena","Sales returns book","Also called the returns inward book; a credit note is sent."],
+  ["Furniture bought on credit","Journal proper","Not goods for resale, so not the purchases book."],
+  ["Old machine sold on credit","Journal proper","An asset, not goods."],
+  ["A bill accepted by a debtor received","Bills receivable book",""],
+  ["A bill accepted in favour of a creditor","Bills payable book",""],
+  ["Cash sales of goods","Cash book","All cash and bank transactions go to the cash book."],
+  ["Rent paid by cheque","Cash book",""],
+  ["Opening entry at the start of the year","Journal proper",""],
+  ["Rectification of an error","Journal proper",""],
+  ["Depreciation charged on machinery","Journal proper","An adjustment entry."],
+  ["Bad debts written off","Journal proper",""],
+  ["Postage, cartage and small office expenses","Petty cash book","Kept on the imprest system."]
+];
+const FA_BRS = [
+  ["Cheques issued but not yet presented for payment","Add","The bank has not paid them yet, so its balance is higher."],
+  ["Cheques deposited but not yet collected (credited) by the bank","Less","Entered in the cash book, not yet in the pass book."],
+  ["Bank charges debited only in the pass book","Less",""],
+  ["Interest allowed by the bank, credited only in the pass book","Add",""],
+  ["Amount paid directly into the bank by a customer","Add","Not known to the firm yet."],
+  ["Insurance premium paid by the bank on standing instructions","Less",""],
+  ["Dividend collected by the bank on the firm's behalf","Add",""],
+  ["A deposited cheque dishonoured, shown only in the pass book","Less",""],
+  ["Interest on overdraft charged by the bank","Less",""],
+  ["Debit side of the cash book (bank column) overcast","Less","The cash book balance is too high."],
+  ["Credit side of the cash book (bank column) overcast","Add","The cash book balance is too low."],
+  ["A cheque issued for ₹1,250 entered in the cash book as ₹1,520","Add","Add ₹270 — the cash book shows ₹270 too little."],
+  ["A cheque received for ₹900 entered in the cash book as ₹600","Add","Add ₹300 — the bank credited the full ₹900."],
+  ["The bank wrongly debited the firm's account with another customer's cheque","Less","The pass book balance is too low."]
+];
+const FA_ERRTYPE = [
+  ["A credit sale to Ravi is not entered in any book","Error of omission","Complete omission — the trial balance still agrees."],
+  ["A credit sale is entered in the sales book but not posted to Ravi's account","Error of omission","Partial omission — the trial balance does not agree."],
+  ["₹540 received from Asha is posted to her account as ₹450","Error of commission","Wrong amount posted."],
+  ["Cash received from Ram is credited to Shyam's account","Error of commission","Wrong account of the same class."],
+  ["The sales book is undercast by ₹1,000","Error of commission","A casting (totalling) error."],
+  ["A debit is posted to the credit side of an account","Error of commission","Posting to the wrong side."],
+  ["Purchase of machinery is debited to Purchases account","Error of principle","Capital expenditure treated as revenue."],
+  ["Repairs to a building are debited to Building account","Error of principle","Revenue expenditure treated as capital."],
+  ["Wages paid for installing a new machine are debited to Wages account","Error of principle","They are part of the machine's cost."],
+  ["Sale of old furniture is credited to Sales account","Error of principle","A capital receipt treated as revenue."],
+  ["Wages account is overcast by ₹500 and Commission received account is also overcast by ₹500","Compensating errors","One cancels the other."],
+  ["Purchases account is undercast by ₹200 and Sales account is undercast by ₹200","Compensating errors","Debit short and credit short by the same amount."]
+];
+const FA_ERRTB = [
+  ["Wrong totalling of the purchases book","Affects the trial balance",""],
+  ["Posting only one side of a journal entry","Affects the trial balance",""],
+  ["Posting an amount to the wrong side of an account","Affects the trial balance",""],
+  ["Wrong balancing of a ledger account","Affects the trial balance",""],
+  ["Posting a wrong amount in one ledger account only","Affects the trial balance",""],
+  ["Omitting a transaction completely","Does not affect the trial balance",""],
+  ["An error of principle","Does not affect the trial balance",""],
+  ["Two compensating errors","Does not affect the trial balance",""],
+  ["Posting to the wrong person's account on the correct side","Does not affect the trial balance",""],
+  ["Entering a wrong amount in the book of original entry","Does not affect the trial balance","Both sides carry the same wrong figure."]
+];
+
+LESSONS.push(
+{id:"F3", heat:3, title:"Subsidiary books and the cash book", hi:"सहायक पुस्तकें और रोकड़ बही", blocks:[
+  {k:"hot", h:"Most asked: which <b>subsidiary book</b> records a transaction (credit purchase of an asset is a favourite trap), <b>debit note vs credit note</b>, <b>contra entries</b>, the <b>discount columns</b> of a triple-column cash book, and the <b>imprest</b> system of petty cash."},
+  {k:"story", h:"<p>A busy firm cannot pass a journal entry for every sale. So the journal is split into <b>special journals</b> — subsidiary books — each for one kind of transaction: credit purchases of goods, credit sales of goods, returns each way, bills, and cash. Only what fits none of them goes to the <b>journal proper</b>.</p><p>The <b>cash book</b> is special: it is a book of original entry <i>and</i> a ledger at the same time, because the cash and bank accounts are kept in it. The periodic totals of the purchases and sales books are posted to the Purchases and Sales accounts; the individual suppliers and customers are posted line by line.</p>", key:"Goods on credit → purchases or sales book; assets on credit → journal proper; any cash or bank → cash book."},
+  {k:"table", title:"Transaction → book", head:["Transaction","Book","Note"], rows: FA_BOOK},
+  {k:"table", title:"Source documents", head:["Document","Prepared by","Recorded in"], rows:[
+    ["Invoice (bill)","Seller, on a credit sale","Seller's sales book; buyer's purchases book"],
+    ["Debit note","Buyer, when returning goods to the supplier","Buyer's purchases returns book"],
+    ["Credit note","Seller, when goods come back from a customer","Seller's sales returns book"],
+    ["Cash memo","Seller, on a cash sale","Cash book"],
+    ["Voucher","Anyone paying or receiving","The evidence behind every entry"]]},
+  {k:"table", title:"Kinds of cash book", head:["Cash book","Columns","Note"], rows:[
+    ["Single column","Cash","Works as the cash account"],
+    ["Double column","Cash and bank (or cash and discount)",""],
+    ["Triple column","Cash, bank and discount","Discount columns are memorandum only; their totals are posted"],
+    ["Petty cash book","Small expenses","Imprest system: a fixed float is restored at the end of each period"],
+    ["Analytical petty cash book","A column for each kind of small expense","Postage, stationery, cartage, conveyance…"]]},
+  {k:"facts", title:"Rules of the cash book", rows:[
+    ["Contra entry","An entry on both sides of the cash book — cash deposited into the bank, or cash withdrawn from the bank for office use; marked 'C'"],
+    ["Cash column","Can never have a credit balance — you cannot pay out more cash than you hold"],
+    ["Bank column credit balance","Means a bank overdraft"],
+    ["Discount on the receipts (debit) side","Discount allowed — its total is debited to Discount allowed A/c"],
+    ["Discount on the payments (credit) side","Discount received — its total is credited to Discount received A/c"],
+    ["Cash withdrawn for the owner's own use","Not a contra entry: Drawings A/c Dr, To Bank"]]},
+  {k:"ex", h:"<p><b>Worked example — triple-column cash book.</b> 1 April: cash ₹10,000, bank ₹25,000. 3 Apr received ₹4,900 cash from Arun, discount allowed ₹100. 5 Apr deposited ₹6,000 into the bank (C). 8 Apr paid Bina ₹7,800 by cheque, discount received ₹200. 12 Apr cash sales ₹3,000. 15 Apr withdrew ₹2,000 from the bank for office use (C). 20 Apr paid wages ₹1,500 in cash. 25 Apr received a cheque of ₹5,000 from Chetan and banked it the same day.</p><p><b>Cash:</b> 10,000 + 4,900 − 6,000 + 3,000 + 2,000 − 1,500 = <b>₹12,400</b>. <b>Bank:</b> 25,000 + 6,000 − 7,800 − 2,000 + 5,000 = <b>₹26,200</b>.</p><p><b>Discount:</b> ₹100 is debited to Discount allowed A/c; ₹200 is credited to Discount received A/c. Arun is credited with ₹5,000 and Bina debited with ₹8,000.</p>"},
+  {k:"ex", h:"<p><b>Worked example — imprest petty cash.</b> The petty cashier holds an imprest of ₹5,000. During the month she spends ₹3,640. At the month's end the main cashier pays her <b>₹3,640</b> — exactly what was spent — so she starts the next month with ₹5,000 again (1,360 left + 3,640).</p>"},
+  {k:"trick", h:"<b>Debit note goes with the goods going out</b> (purchase return); <b>credit note goes with the goods coming back</b> (sales return) — the note is named after what it does to the <i>other</i> party's account in your books."},
+  {k:"trap", h:"Furniture or machinery bought <b>on credit</b> goes to the <b>journal proper</b>, not the purchases book. A cheque received and banked the same day is a <b>bank</b> entry, not a contra. Cash withdrawn for <b>personal</b> use is <b>drawings</b>, not a contra entry."}
+], sum:["Subsidiary books: purchases, sales, purchases returns, sales returns, bills receivable, bills payable, cash book, journal proper.","Purchases and sales books record credit transactions in goods only; credit purchase of an asset goes to the journal proper.","Debit note — goods returned to a supplier; credit note — goods returned by a customer.","The cash book is both a book of original entry and a ledger.","Contra entry: both cash and bank columns, e.g. cash deposited into the bank.","Cash column never shows a credit balance; a credit bank balance is an overdraft.","Petty cash on the imprest system: the amount spent is reimbursed."]},
+
+{id:"F4", heat:3, title:"Bank reconciliation statement", hi:"बैंक समाधान विवरण", blocks:[
+  {k:"hot", h:"Most asked: a <b>BRS numerical</b> with four to six items — add or less? — starting from the cash book or from the pass book, the <b>overdraft</b> version, and <b>why</b> the two balances differ."},
+  {k:"story", h:"<p>A firm keeps its bank account in the bank column of its cash book; the bank keeps the same account from its own side and sends a copy, the <b>pass book</b> (bank statement). On any date the two balances rarely match. Some items are in one record but not yet in the other: cheques written but not yet presented, cheques banked but not yet cleared, bank charges, interest, direct deposits, payments under standing instructions. Errors on either side add more.</p><p>A <b>bank reconciliation statement (BRS)</b> starts from one balance, adds or subtracts each such item, and arrives at the other. It is a <b>statement</b> prepared by the firm, not an account.</p>", key:"Ask one question for each item: does it make the balance I am moving towards bigger or smaller?"},
+  {k:"table", title:"Starting from the cash book (debit) balance: add or less?", head:["Item","Add / Less","Why"], rows: FA_BRS},
+  {k:"facts", title:"Balances and their names", rows:[
+    ["Favourable balance","Debit in the cash book = credit in the pass book (the bank owes you)"],
+    ["Overdraft","Credit in the cash book = debit in the pass book (you owe the bank)"],
+    ["Starting from the pass book","Reverse every sign in the table"],
+    ["Starting from an overdraft","Treat the overdraft as a minus figure, or reverse the signs; a minus answer means an overdraft"],
+    ["Amended cash book","First enter in the cash book what only the bank knew (charges, interest, direct deposits, dishonours); then the BRS needs only the timing items"],
+    ["Who prepares it","The account holder, usually monthly when the statement arrives"]]},
+  {k:"ex", h:"<p><b>Worked example — favourable balance.</b> On 31 March the cash book shows a debit balance of ₹42,000. (i) Cheques issued ₹12,500 not yet presented. (ii) Cheques deposited ₹8,000 not yet cleared. (iii) Bank charges ₹300. (iv) Interest credited ₹600. (v) A customer paid ₹4,200 directly into the bank. (vi) The bank paid an insurance premium of ₹1,500.</p><p><b>Add:</b> 12,500 + 600 + 4,200 = 17,300. <b>Less:</b> 8,000 + 300 + 1,500 = 9,800.</p><p>Balance as per pass book = 42,000 + 17,300 − 9,800 = <b>₹49,500</b>.</p>"},
+  {k:"ex", h:"<p><b>Worked example — overdraft.</b> The cash book shows an overdraft of ₹20,000. Cheques issued ₹5,000 not presented; cheques deposited ₹3,000 not credited; interest on overdraft ₹400 charged by the bank.</p><p>Write the overdraft as −20,000. Cheques not presented make the bank balance better: −20,000 + 5,000 = −15,000. Deposits not credited make it worse: −15,000 − 3,000 = −18,000. Interest charged: −18,000 − 400 = −18,400.</p><p>Overdraft as per pass book = <b>₹18,400</b>.</p>"},
+  {k:"trick", h:"<b>“Issued — Increase, Deposited — Deduct”</b> when you start from the cash book. Anything the bank <b>gave</b> you (interest, direct deposit, dividend) is added; anything it <b>took</b> (charges, premium, dishonour) is deducted."},
+  {k:"trap", h:"If the question starts from the <b>pass book</b> or from an <b>overdraft</b>, every sign flips. A debit balance in the <b>pass book</b> is an <b>overdraft</b>, not a favourable balance. A BRS is <b>not</b> part of the double entry books."}
+], sum:["A BRS explains the difference between the cash book's bank balance and the pass book balance on a date.","From a cash book debit balance: add cheques issued not presented, interest and direct deposits; deduct cheques deposited not cleared, bank charges and payments by the bank.","Starting from the pass book, or from an overdraft, reverse the signs.","Cash book debit = pass book credit = favourable; cash book credit = pass book debit = overdraft.","An amended cash book first records items known only to the bank.","The BRS is a statement prepared by the account holder, not an account."]},
+
+{id:"F5", heat:3, title:"Rectification of errors and the suspense account", hi:"अशुद्धियों का सुधार और उचंत खाता", blocks:[
+  {k:"hot", h:"Most asked: naming the <b>type of error</b> (omission, commission, principle, compensating), whether it <b>affects the trial balance</b>, the <b>rectifying entry</b>, the <b>effect on profit</b>, and the opening balance of a <b>suspense account</b>."},
+  {k:"story", h:"<p>Errors creep in at two stages: when a transaction is written in a book of original entry, and when it is posted to the ledger. Some errors are <b>one-sided</b> — only one account is wrong — and they throw the trial balance out. Others are <b>two-sided</b> — both accounts are wrong by the same amount — and the trial balance still agrees.</p><p>When the trial balance does not agree and the accounts must be prepared, the difference is parked in a <b>suspense account</b>. As each one-sided error is found, the correcting entry uses the suspense account as the other side, until it closes.</p>", key:"One-sided error → suspense account in the rectifying entry; two-sided error → correct the two accounts directly."},
+  {k:"table", title:"Error → type", head:["Error","Type","Note"], rows: FA_ERRTYPE},
+  {k:"table", title:"Does it affect the trial balance?", head:["Error","Effect","Note"], rows: FA_ERRTB},
+  {k:"table", title:"Rectifying entries", head:["Error","Rectifying entry","Effect before rectification"], rows:[
+    ["Sales book undercast by ₹1,000","Suspense A/c Dr 1,000 → To Sales A/c 1,000","Profit understated ₹1,000"],
+    ["₹500 received from Ram credited to Shyam","Shyam Dr 500 → To Ram 500","No effect on profit"],
+    ["Repairs to building ₹2,000 debited to Building A/c","Repairs A/c Dr 2,000 → To Building A/c 2,000","Profit overstated ₹2,000"],
+    ["Furniture ₹8,000 passed through the purchases book","Furniture A/c Dr 8,000 → To Purchases A/c 8,000","Profit understated ₹8,000"],
+    ["Discount allowed ₹300 not posted to Discount account","Discount allowed A/c Dr 300 → To Suspense A/c 300","Profit overstated ₹300"],
+    ["Credit sale of ₹1,200 posted to Mohan's account as ₹2,100","Suspense A/c Dr 900 → To Mohan 900","No effect on profit"],
+    ["Goods sold to Arun ₹5,000 entered in the purchases book","Arun Dr 10,000 → To Purchases 5,000, To Sales 5,000","Profit understated ₹10,000"],
+    ["Old machinery sold for ₹6,000 credited to Sales A/c","Sales A/c Dr 6,000 → To Machinery A/c 6,000","Profit overstated (sales too high)"]]},
+  {k:"ex", h:"<p><b>Worked example — the suspense account.</b> A trial balance did not agree and the difference was put to suspense. Later three errors were found: (a) the sales book was undercast by ₹1,000; (b) discount allowed of ₹300 was not posted to Discount allowed account; (c) a credit sale of ₹1,200 was posted to Mohan's account as ₹2,100.</p><p><b>Step 1 — effect on the trial balance:</b> (a) credit side short ₹1,000; (b) debit side short ₹300; (c) debit side ₹900 too much. Net: the debit side was ₹600 too high and the credit side ₹1,000 too low, so debits exceeded credits by <b>₹1,600</b>.</p><p><b>Step 2:</b> the suspense account opened with a <b>credit</b> of ₹1,600. <b>Step 3 — rectifications:</b> (a) Suspense Dr 1,000; (b) Suspense Cr 300; (c) Suspense Dr 900. Debits 1,900 = credits 1,600 + 300. The account closes.</p>"},
+  {k:"facts", title:"When the error is found", rows:[
+    ["Before the trial balance","Correct the account itself with a note, or pass a journal entry"],
+    ["After the trial balance, before final accounts","Journal entry, using the suspense account for one-sided errors"],
+    ["After final accounts (next year)","Nominal account errors are corrected through the Profit and Loss Adjustment account, because last year's nominal accounts are closed"],
+    ["Clerical errors","Omission, commission and compensating errors; an error of principle is not clerical"]]},
+  {k:"trick", h:"For profit, think of the <b>nominal</b> account that was wrong: an expense <b>overstated</b> or an income <b>understated</b> means profit was <b>understated</b> — and the other way round. Errors between two <b>personal</b> or two <b>real</b> accounts do not touch profit."},
+  {k:"trap", h:"Wages paid to install a machine debited to Wages is an <b>error of principle</b>, not commission. A <b>complete</b> omission does not affect the trial balance; a <b>partial</b> omission does. An error in the <b>book of original entry</b> (wrong amount in the sales book for one sale) is two-sided."}
+], sum:["Errors: omission (complete or partial), commission, principle, compensating.","Errors of principle mix up capital and revenue items; they never affect the trial balance.","One-sided errors affect the trial balance and are rectified through the suspense account.","Complete omission, errors of principle, compensating errors and wrong account on the correct side do not affect the trial balance.","Suspense opens on the side that is short; after all corrections it closes.","After final accounts, nominal-account errors are corrected through a P&L Adjustment account.","An expense overstated (or income understated) understates profit."]}
+);
+
+QB.push(
+["F3","The purchases book records:",["Credit purchases of goods only","All purchases of goods, cash and credit","Credit purchases of goods and assets","Cash purchases of goods only"],"Only credit purchases of goods meant for resale go to the purchases book.",""],
+["F3","Machinery bought on credit from Mohan is recorded in the:",["Journal proper","Purchases book","Cash book","Bills payable book"],"It is an asset, not goods for resale, so it goes to the journal proper.",""],
+["F3","A debit note is sent when:",["Goods are returned to the supplier","Goods are returned by a customer","Goods are sold on credit","A customer pays in cash"],"The buyer returning goods sends a debit note, debiting the supplier's account.",""],
+["F3","Goods returned by a customer are recorded in the sales returns book on the basis of a:",["Credit note issued to the customer","Debit note issued to the customer","Invoice","Cash memo"],"The seller issues a credit note, crediting the customer's account.",""],
+["F3","A contra entry is one that:",["Appears on both sides of the cash book","Appears only in the journal proper","Corrects an error","Opens the books at the start of the year"],"Cash deposited into or withdrawn from the bank for office use touches both the cash and bank columns.",""],
+["F3","Which of these is NOT a contra entry?",["Cash withdrawn from the bank for the owner's personal use","Cash deposited into the bank","Cash withdrawn from the bank for office use","Cash taken from the office safe and deposited in the bank"],"Withdrawal for personal use is drawings: Drawings A/c Dr, To Bank.",""],
+["F3","The cash column of a cash book can never show a:",["Credit balance","Debit balance","Nil balance","Balance carried down"],"More cash cannot be paid out than is held, so cash never has a credit balance.",""],
+["F3","The total of the discount column on the receipts side of a cash book is posted to the:",["Debit of Discount allowed account","Credit of Discount allowed account","Credit of Discount received account","Debit of Discount received account"],"Discount on receipts is given to customers — a loss, debited to Discount allowed.",""],
+["F3","The cash book is:",["Both a book of original entry and a ledger","Only a book of original entry","Only a ledger","A memorandum book outside the accounts"],"It records transactions first and also serves as the cash and bank accounts.",""],
+["F3","A petty cash book is usually kept on the:",["Imprest system","Single entry system","Accrual system","Reducing balance system"],"Under the imprest system the petty cashier is reimbursed exactly what was spent.",""],
+["F3","The petty cashier's imprest is ₹5,000 and she spends ₹3,640 during the month. How much will the main cashier give her at the month's end?",["₹3,640","₹5,000","₹1,360","₹8,640"],"Under the imprest system the amount spent, ₹3,640, is reimbursed.",""],
+["F3","Opening cash ₹8,000; cash sales ₹5,000; salaries paid ₹3,500; cash deposited into the bank ₹6,000; cash withdrawn from the bank for office use ₹1,500. What is the closing cash balance?",["₹5,000","₹17,000","₹11,000","₹2,000"],"8,000 + 5,000 − 3,500 − 6,000 + 1,500 = ₹5,000.",""],
+["F3","A credit balance in the bank column of a cash book means:",["A bank overdraft","Cash in hand","A favourable bank balance","An error in the cash book"],"The firm owes the bank — an overdraft.",""],
+["F3","Opening, closing, adjustment and rectification entries are made in the:",["Journal proper","Cash book","Sales book","Purchases returns book"],"Entries that fit no special book go to the journal proper.",""],
+["F3","The periodic total of the sales book is posted to the:",["Credit of Sales account","Debit of Sales account","Debit of Cash account","Credit of the customers' accounts"],"Customers are debited one by one; the total is credited to Sales account.",""],
+["F3","In the purchases book, the individual suppliers' accounts are:",["Credited","Debited","Not posted","Posted to the cash book"],"Each supplier is a giver and is credited; the total is debited to Purchases.",""],
+["F3","Goods with a list price of ₹10,000 are bought on credit at a 10% trade discount. The purchases book shows:",["₹9,000","₹10,000","₹1,000","₹11,000"],"Purchases are recorded at the net price after trade discount.",""],
+["F3","Discount shown on the payments side of a triple-column cash book is:",["Discount received","Discount allowed","Trade discount","Bank discount"],"Discount on payments is earned from suppliers — discount received.",""],
+["F3","A cheque received from a customer and deposited into the bank on the same day is entered in the:",["Bank column on the receipts side","Cash column on the receipts side","Both columns as a contra entry","Journal proper"],"It never passes through the office cash, so it goes straight to the bank column.",""],
+["F3","The returns outward book is another name for the:",["Purchases returns book","Sales returns book","Bills payable book","Petty cash book"],"Goods going out to suppliers are purchases returns.",""],
+["F3","An analytical petty cash book has:",["A separate column for each kind of small expense","A column for cash and one for bank","A column for discount","Only one amount column"],"Columns for postage, stationery, cartage and so on make posting easy.",""],
+["F3","Old furniture sold for cash is recorded in the:",["Cash book","Sales book","Journal proper","Purchases returns book"],"Every cash transaction goes to the cash book.",""],
+["F3","Ravi paid ₹1,960 and was allowed a discount of ₹40. His account is credited with:",["₹2,000","₹1,960","₹40","₹1,920"],"Cash 1,960 plus discount 40 — Ravi is cleared of ₹2,000.",""],
+["F3","The bills receivable book records:",["Bills received from debtors","Bills accepted in favour of creditors","Cheques received","Invoices received"],"Bills drawn on and accepted by debtors are bills receivable.",""],
+
+["F4","A bank reconciliation statement is prepared by:",["The account holder","The bank","The auditor only","The Reserve Bank of India"],"The firm prepares it from its own cash book and the bank statement.",""],
+["F4","A favourable balance in the cash book is a:",["Debit balance","Credit balance","Nil balance","Contra balance"],"Money in the bank is an asset — a debit balance in the cash book.",""],
+["F4","An overdraft as per the pass book appears as a:",["Debit balance","Credit balance","Favourable balance","Contra balance"],"In the bank's books the customer owes the bank — a debit balance.",""],
+["F4","Starting from the cash book debit balance, cheques issued but not yet presented are:",["Added","Deducted","Ignored","Shown separately as a note"],"The bank has not paid them yet, so its balance is higher.",""],
+["F4","Starting from the cash book debit balance, cheques deposited but not yet collected are:",["Deducted","Added","Ignored","Doubled"],"The bank has not credited them yet, so its balance is lower.",""],
+["F4","Starting from the pass book balance, interest allowed by the bank (not yet in the cash book) is:",["Deducted","Added","Ignored","Added twice"],"The pass book includes it and the cash book does not, so moving to the cash book it is deducted.",""],
+["F4","The cash book shows a debit balance of ₹25,000. Cheques issued ₹4,000 have not been presented and cheques deposited ₹6,500 have not been collected. What is the pass book balance?",["₹22,500","₹27,500","₹35,500","₹14,500"],"25,000 + 4,000 − 6,500 = ₹22,500.",""],
+["F4","The pass book shows a credit balance of ₹18,000. Bank charges ₹200 are not in the cash book; a cheque of ₹3,000 deposited is not yet credited; a cheque of ₹5,000 issued is not yet presented. What is the cash book balance?",["₹16,200","₹15,800","₹19,800","₹26,200"],"From the pass book: + 200 + 3,000 − 5,000 → 18,000 − 1,800 = ₹16,200.",""],
+["F4","The cash book shows an overdraft of ₹15,000. Cheques issued ₹2,500 are not presented and interest on overdraft ₹300 appears only in the pass book. What is the overdraft as per the pass book?",["₹12,800","₹17,800","₹12,200","₹17,200"],"−15,000 + 2,500 − 300 = −12,800, an overdraft of ₹12,800.",""],
+["F4","The cash book shows a debit balance of ₹30,000. Cheques issued ₹7,000 not presented; cheques deposited ₹5,000 not cleared; interest credited ₹400; bank charges ₹150. What is the pass book balance?",["₹32,250","₹32,550","₹27,750","₹42,550"],"30,000 + 7,000 + 400 − 5,000 − 150 = ₹32,250.",""],
+["F4","The cash book shows a debit balance of ₹42,000. Cheques issued ₹12,500 not presented; deposits ₹8,000 not cleared; bank charges ₹300; interest credited ₹600; direct deposit by a customer ₹4,200; insurance premium paid by the bank ₹1,500. What is the pass book balance?",["₹49,500","₹34,500","₹52,500","₹46,500"],"Add 17,300, less 9,800: 42,000 + 7,500 = ₹49,500.",""],
+["F4","Starting from the cash book balance, an amount paid directly into the bank by a customer is:",["Added","Deducted","Ignored","Treated as a contra"],"The bank balance includes it but the cash book does not yet.",""],
+["F4","Starting from the cash book balance, a deposited cheque that was dishonoured (entered only in the pass book) is:",["Deducted","Added","Ignored","Added to the overdraft limit"],"The bank has reversed the credit, so its balance is lower.",""],
+["F4","Which of these is a timing difference between the cash book and the pass book?",["A cheque issued but not yet presented","Bank charges not known to the firm","A cheque wrongly recorded by the firm","A direct deposit by a customer"],"Cheques in transit clear by themselves later; the others need an entry or a correction.",""],
+["F4","The pass book is a copy of:",["The customer's account in the bank's ledger","The firm's cash book","The firm's ledger","The bank's balance sheet"],"The bank sends the customer a copy of his account in its own books.",""],
+["F4","The debit side of the bank column of the cash book was overcast by ₹500. Starting from the cash book balance, you will:",["Deduct ₹500","Add ₹500","Add ₹1,000","Ignore it"],"The cash book balance is ₹500 too high.",""],
+["F4","A cheque issued for ₹1,250 was entered in the cash book as ₹1,520. Starting from the cash book balance, the adjustment is:",["Add ₹270","Less ₹270","Add ₹1,520","Less ₹1,250"],"The cash book was reduced by ₹270 too much, so ₹270 is added back.",""],
+["F4","An 'amended cash book' is prepared to record:",["Items known only to the bank, such as charges, interest and direct deposits","Cheques issued but not yet presented","Cheques deposited but not yet collected","Only errors made by the bank"],"Once these are entered, the BRS needs only the timing items.",""],
+["F4","Starting from the pass book balance, a dividend collected directly by the bank is:",["Deducted","Added","Ignored","Added to the cheques not presented"],"The pass book includes it; moving to the cash book, deduct it.",""],
+["F4","Starting from the cash book balance, an insurance premium paid by the bank under a standing instruction is:",["Deducted","Added","Ignored","Shown as a contra"],"The bank has paid it out, so its balance is lower.",""],
+["F4","A bank reconciliation statement is:",["A statement prepared to explain the difference between two balances","An account in the general ledger","A book of original entry","A part of the final accounts"],"It is a working statement, not part of the double entry.",""],
+["F4","A credit balance in the pass book means:",["The bank owes the customer — a favourable balance","The customer owes the bank","The account is overdrawn","There is an error in the pass book"],"In the bank's books the customer is a creditor.",""],
+["F4","The cash book shows a debit balance of ₹10,000 and the only difference is a cheque of ₹2,000 deposited but not yet credited. The pass book balance is:",["₹8,000","₹12,000","₹10,000","₹2,000"],"The bank has not yet added the ₹2,000.",""],
+
+["F5","Purchase of machinery debited to Purchases account is an error of:",["Principle","Omission","Commission","Compensation"],"A capital item treated as revenue is an error of principle.",""],
+["F5","A credit sale to Ravi not entered in any book is an error of:",["Complete omission","Partial omission","Commission","Principle"],"Nothing was recorded at all, so the trial balance still agrees.",""],
+["F5","₹540 received from Asha was posted to her account as ₹450. This is an error of:",["Commission","Omission","Principle","Compensation"],"A wrong amount posted is a clerical error of commission.",""],
+["F5","Wages account is overcast by ₹500 and Commission received account is also overcast by ₹500. These are:",["Compensating errors","Errors of principle","Errors of omission","Errors of original entry"],"An excess debit and an excess credit of the same amount cancel out.",""],
+["F5","Which of these errors does NOT affect the agreement of the trial balance?",["An error of principle","Wrong totalling of the purchases book","Posting to the wrong side of an account","Wrong balancing of an account"],"An error of principle puts the right amount on the right side of the wrong kind of account.",""],
+["F5","Which of these errors DOES affect the agreement of the trial balance?",["Wrong totalling of the sales book","Complete omission of a transaction","Posting to the wrong customer on the correct side","An error of principle"],"A casting error changes one side only.",""],
+["F5","A suspense account is opened when:",["The trial balance does not agree","The firm makes a loss","A debtor becomes insolvent","Goods are sent on consignment"],"The difference is parked in suspense until the errors are found.",""],
+["F5","The debit side of a trial balance exceeds the credit side by ₹2,000. The suspense account will show:",["A credit of ₹2,000","A debit of ₹2,000","A credit of ₹4,000","A debit of ₹1,000"],"Suspense goes on the short side — here the credit side.",""],
+["F5","The sales book was undercast by ₹1,000. The rectifying entry is:",["Suspense A/c Dr, To Sales A/c","Sales A/c Dr, To Suspense A/c","Debtors A/c Dr, To Sales A/c","Sales A/c Dr, To Debtors A/c"],"Sales must be credited with ₹1,000 more; the other side is suspense because customers were posted correctly.",""],
+["F5","Repairs to a building of ₹2,000 were debited to Building account. The rectifying entry is:",["Repairs A/c Dr, To Building A/c","Building A/c Dr, To Repairs A/c","Repairs A/c Dr, To Suspense A/c","Suspense A/c Dr, To Building A/c"],"Move the amount from the asset to the expense account.",""],
+["F5","Furniture of ₹8,000 was bought on credit and passed through the purchases book. Before correction, the profit is:",["Understated by ₹8,000","Overstated by ₹8,000","Understated by ₹16,000","Not affected"],"Purchases (an expense) were overstated, so profit was understated.",""],
+["F5","Wages of ₹3,000 paid for installing a new machine were debited to Wages account. The rectifying entry is:",["Machinery A/c Dr, To Wages A/c","Wages A/c Dr, To Machinery A/c","Machinery A/c Dr, To Suspense A/c","Suspense A/c Dr, To Wages A/c"],"Installation wages are part of the machine's cost.",""],
+["F5","₹500 received from Ram was credited to Shyam's account. The rectifying entry is:",["Shyam Dr, To Ram","Ram Dr, To Shyam","Suspense A/c Dr, To Ram","Cash A/c Dr, To Ram"],"Cancel the wrong credit to Shyam and give it to Ram.",""],
+["F5","Discount allowed of ₹300 was posted to the customer's account but not to Discount allowed account. The rectifying entry is:",["Discount allowed A/c Dr ₹300, To Suspense A/c","Suspense A/c Dr ₹300, To Discount allowed A/c","Customer's A/c Dr ₹300, To Discount allowed A/c","Discount allowed A/c Dr ₹300, To Customer's A/c"],"Only the discount account is missing its debit, so suspense takes the credit.",""],
+["F5","A credit sale of ₹1,200 was posted to Mohan's account as ₹2,100. The rectifying entry is:",["Suspense A/c Dr ₹900, To Mohan ₹900","Mohan Dr ₹900, To Suspense A/c ₹900","Sales A/c Dr ₹900, To Mohan ₹900","Mohan Dr ₹900, To Sales A/c ₹900"],"Mohan was debited ₹900 too much; sales were right, so suspense takes the other side.",""],
+["F5","After a trial balance failed to agree, three errors were found: the sales book was undercast by ₹1,000; discount allowed of ₹300 was not posted to the discount account; and a credit sale of ₹1,200 was posted to the customer as ₹2,100. What was the original suspense balance?",["₹1,600 credit","₹1,600 debit","₹400 credit","₹2,200 debit"],"Debits were ₹600 too high (900 − 300) and credits ₹1,000 too low, so debits exceeded credits by ₹1,600 — suspense credit.",""],
+["F5","An error in a nominal account found after the final accounts are prepared is corrected through the:",["Profit and Loss Adjustment account","Suspense account","Trading account","Capital reserve"],"Last year's nominal accounts are closed, so the correction goes through P&L Adjustment.",""],
+["F5","Goods of ₹5,000 sold to Arun were entered in the purchases book. In the rectifying entry, Arun is debited with:",["₹10,000","₹5,000","₹2,500","Nothing"],"Arun was wrongly credited ₹5,000 and should have been debited ₹5,000 — a swing of ₹10,000.",""],
+["F5","Clerical errors include errors of:",["Omission, commission and compensation","Principle only","Principle and omission only","Principle and compensation only"],"An error of principle is not clerical — it comes from not knowing the rules.",""],
+["F5","Old machinery sold for ₹6,000 was credited to Sales account. The rectifying entry is:",["Sales A/c Dr, To Machinery A/c","Machinery A/c Dr, To Sales A/c","Suspense A/c Dr, To Machinery A/c","Cash A/c Dr, To Machinery A/c"],"The sale of an asset reduces the asset, not sales.",""],
+["F5","The purchases returns book was overcast by ₹200. The rectifying entry is:",["Purchases returns A/c Dr ₹200, To Suspense A/c","Suspense A/c Dr ₹200, To Purchases returns A/c","Creditors A/c Dr ₹200, To Purchases returns A/c","Purchases A/c Dr ₹200, To Suspense A/c"],"The returns account was credited ₹200 too much; suppliers were posted correctly.",""],
+["F5","Posting a credit sale to the debtor's account but not entering it in the sales book total is an error of:",["Partial omission","Complete omission","Principle","Compensation"],"One side was recorded and the other missed, so the trial balance is affected.",""],
+["F5","Entering a credit sale of ₹2,500 in the sales book as ₹2,050 is an error that:",["Does not affect the trial balance","Affects only the debit side of the trial balance","Affects only the credit side of the trial balance","Is corrected through the suspense account"],"The wrong figure is carried to both the customer and the sales account.",""],
+["F5","After all the errors have been rectified, the suspense account:",["Shows no balance","Shows a debit balance","Shows a credit balance","Goes to the balance sheet as an asset"],"Each one-sided error removes part of it until it closes.",""],
+["F5","The sale of old furniture credited to Sales account is an error of:",["Principle","Commission","Omission","Compensation"],"A capital receipt treated as revenue is an error of principle.",""]
+);
+
+LASTMOMENT.push(
+{t:"Which book?", era:["fa"], rows:[["Credit purchase of goods","Purchases book"],["Credit sale of goods","Sales book"],["Asset bought on credit","Journal proper"],["Debit note","Purchases returns"],["Credit note","Sales returns"],["Any cash or bank","Cash book"]]},
+{t:"BRS from a cash book debit balance", era:["fa"], rows:[["Cheques issued, not presented","Add"],["Cheques deposited, not cleared","Less"],["Interest, direct deposit, dividend","Add"],["Charges, premium, dishonour","Less"],["Starting from pass book / overdraft","Reverse"]]},
+{t:"Errors", era:["fa"], rows:[["Machinery to Purchases","Principle"],["Wrong amount posted","Commission"],["Nothing recorded","Omission (TB agrees)"],["Two errors cancel","Compensating"],["One-sided errors","Through suspense"]]}
+);
+TILES.push(["3","Columns in a triple-column cash book","fa"]);
