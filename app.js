@@ -92,6 +92,7 @@
     iprplans: { title: 'IPR & Five Year Plans',        file: 'study-ipr-plans.html',    key: 'economy_ipr_plans_v1' },
     folkdances:{ title: 'Folk Dances of India',        file: 'study-folk-dances.html',  key: 'folk_dances_workbook_v1' },
     appointments:{ title: 'Appointments 2026',          file: 'study-appointments.html', key: 'appointments_workbook_v1' },
+    currentaffairs:{ title: 'Current Affairs 2026',     file: 'study-current-affairs.html', key: 'current_affairs_2026_v1' },
     history:  { title: 'History: Start here',          file: 'study-history.html',      key: 'history_hub_v1' },
     histancient:  { title: 'Ancient India',            file: 'study-history-ancient.html',  key: 'history_ancient_v1' },
     histmedieval: { title: 'Medieval India',           file: 'study-history-medieval.html', key: 'history_medieval_v1' },
@@ -189,6 +190,7 @@
   STUDY.bns.gsub = 'polity'; STUDY.schemes.gsub = 'economy'; STUDY.iprplans.gsub = 'economy'; STUDY.census.gsub = 'geography';
   STUDY.festivals.gsub = 'culture'; STUDY.folkdances.gsub = 'culture'; STUDY.sports.gsub = 'staticgk'; STUDY.intlorgs.gsub = 'staticgk';
   STUDY.reports.gsub = 'current'; STUDY.appointments.gsub = 'current';
+  STUDY.currentaffairs.subj = 'gs'; STUDY.currentaffairs.gsub = 'current'; STUDY.currentaffairs.ico = '🗞️'; STUDY.currentaffairs.hi = 'समसामयिकी 2026 · माह-दर-माह'; STUDY.currentaffairs.desc = 'The news of 2026 one month at a time — government decisions, summits, economy and banking, science, space and defence, sports, awards, appointments, places in news and obituaries — every fact dated and sourced.'; STUDY.currentaffairs.meta = '10 months · Jan–Oct 2026 · Lab'; STUDY.currentaffairs.color = '#B45309'; STUDY.currentaffairs.lessons = 10; STUDY.currentaffairs.unit = 'months';
   STUDY.polity.core = STUDY.economics.core = 1; STUDY.physics.core = 2; STUDY.biology.core = 1;
   STUDY.physics.gsub = 'science'; STUDY.biology.gsub = 'science';
   STUDY.chemistry.subj = 'gs'; STUDY.chemistry.gsub = 'science'; STUDY.chemistry.core = 2; STUDY.chemistry.ico = '\u2697\ufe0f'; STUDY.chemistry.hi = 'रसायन विज्ञान · CGL · CHSL · NTPC · Group D';
@@ -3148,7 +3150,7 @@
     bns: ['bnss', 'bsa'], schemes: ['schemes', 'govt schemes', 'government scheme', 'yojana', 'yojanas'],
     intlorgs: ['international organisations', 'international organizations', 'intl orgs'],
     reports: ['reports and indices', 'reports indices', 'indices reports'], iprplans: ['ipr', 'five year plans', 'industrial policy'],
-    folkdances: ['folk dances', 'folk dance'], festivals: ['festivals'], appointments: ['appointments'],
+    folkdances: ['folk dances', 'folk dance'], festivals: ['festivals'], appointments: ['appointments'], currentaffairs: ['current affairs', 'current affair', 'news', 'monthly current affairs', 'samsamayiki', 'ca 2026', 'summit', 'obituary', 'in news'],
     history: ['history', 'itihas', 'history plan', 'history hub', 'history revision'],
     histancient: ['ancient history', 'ancient india', 'ancient'], histmedieval: ['medieval history', 'medieval india', 'medieval'],
     histmodern: ['modern history', 'modern india', 'freedom struggle', 'national movement'], artculture: ['art and culture', 'art culture', 'culture'],
