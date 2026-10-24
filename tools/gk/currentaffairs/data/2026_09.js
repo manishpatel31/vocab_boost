@@ -4,7 +4,7 @@
 const CA9_NAT = [
   ["EPFO wage ceiling","Raised from ₹15,000 to ₹25,000 a month, with effect from 17 Sep 2026","Cabinet decision; the first revision since September 2014. Over 51 lakh more workers come under compulsory EPFO cover."],
   ["Supreme Court on the CEC law","Split verdict on 23 Sep 2026; the matter sent to the CJI for a Constitution Bench","Justices Dipankar Datta and Satish Chandra Sharma differed on the challenge to the 2023 law on appointing the CEC and Election Commissioners."],
-  ["India's first LNG-powered train","Flagged off from Sabarmati (Ahmedabad) by Amit Shah on 27 Sep 2026","Dual-fuel (diesel + LNG) power cars; LNG can replace up to about 40% of the diesel."],
+  ["India's first LNG-powered train","Flagged off from Sabarmati (Ahmedabad) by Amit Shah on 27 Sep 2026","An eight-coach DEMU for the Sabarmati–Mahesana route; dual-fuel (diesel + LNG) power cars — LNG can replace up to about 40% of the diesel."],
   ["India Net Zero Portal and NAPCC Dashboard","Launched in Mumbai on 16 Sep 2026, World Ozone Day","Launched by MoS Kirti Vardhan Singh (Environment Ministry); companies register net-zero targets on the portal."],
   ["Green Energy Corridor Phase-III","Approved by the Cabinet on 30 Sep 2026: ₹1,86,405 crore","Intra-state transmission lines plus 50 GWh of battery storage, by 2032-33."],
   ["Rabi MSP for 2027-28","Approved on 30 Sep 2026: wheat ₹2,610 a quintal (+₹25)","Safflower got the biggest rise (+₹675, to ₹7,215); mustard ₹6,613, masur ₹7,390."],
@@ -31,7 +31,8 @@ const CA9_SCI = [
   ["GSLV-F17 / EOS-05 (GISAT-1A)","Launched from Sriharikota on 4 Sep 2026","An earth-observation satellite for a geosynchronous orbit; ISRO's first launch since the PSLV-C62 failure of 12 Jan 2026."],
   ["Next Generation Missile Vessel (NGMV)","Keel of the first ship laid at Cochin Shipyard on 18 Sep 2026","Six NGMVs are being built for the Navy, armed with BrahMos; first delivery due March 2027."],
   ["Drug haul in the Arabian Sea","About 526 kg seized from an Iranian boat on 25 Sep 2026","Coast Guard and Gujarat ATS, west of Lakshadweep; worth over ₹3,000 crore; five Pakistani nationals held."],
-  ["World Ozone Day 2026 (32nd)","Marked in Mumbai on 16 Sep 2026","Theme: 'Global Action for a Cooler Planet'; the Net Zero Portal was launched there."]
+  ["World Ozone Day 2026 (32nd)","Marked in Mumbai on 16 Sep 2026","Theme: 'Global Action for a Cooler Planet'; the Net Zero Portal was launched there."],
+  ["Tarang Shakti 2026","Multinational air exercise of the IAF, Jodhpur, 26 Sep – 12 Oct 2026","The second edition; foreign air forces flew in and over 30 nations sent observers."]
 ];
 const CA9_SPO = [
   ["US Open 2026 — men's singles","Alexander Zverev (Germany) beat Ben Shelton on 13 Sep 2026","His first US Open and second Grand Slam title, after the 2026 French Open."],
@@ -40,7 +41,9 @@ const CA9_SPO = [
   ["India's first gold at the 2026 Asian Games","Women's cricket, 22 Sep 2026: beat Sri Lanka by 147 runs","India kept the title it won in 2023; Smriti Mandhana top-scored with 79."],
   ["Neeru Dhanda","Women's trap gold at the Asian Games, 29 Sep 2026","The first Indian woman to win the trap gold at the Asian Games."],
   ["46th Chess Olympiad (Samarkand, Uzbekistan)","Ended 27 Sep 2026: India silver (open) and bronze (women)","Open gold Uzbekistan, women's gold China; India kept the Nona Gaprindashvili Trophy for the best combined result."],
-  ["World Athletics Ultimate Championship","First edition, Budapest, 11–13 Sep 2026","Men's javelin won by Rumesh Tharanga Pathirage (Sri Lanka) with 91.09 m; Neeraj Chopra missed it through injury."]
+  ["World Athletics Ultimate Championship","First edition, Budapest, 11–13 Sep 2026","Men's javelin won by Rumesh Tharanga Pathirage (Sri Lanka) with 91.09 m; Neeraj Chopra missed it through injury."],
+  ["Asian Games kabaddi","Both golds for India on 26 Sep 2026 — men and women beat Iran in the finals","The men's ninth Asian Games kabaddi title."],
+  ["Shubman Gill","Unbeaten 223 v West Indies at Guwahati, 30 Sep 2026 — the fastest ODI double century","Reached 200 in 117 balls; India chased 406, the second-highest chase in ODIs, and took the series."]
 ];
 const CA9_AWD = [
   ["Dadasaheb Phalke Award (for 2024)","Anant Nag — announced 16 Sep, presented 22 Sep 2026","The second Kannada actor to get it, after Dr Rajkumar (1995)."],
@@ -121,6 +124,15 @@ const CA9_SRC = [
   ['<a href="https://www.uniindia.com/sports/asian-games-shooting-trap-neeru-gold/196491">uniindia.com</a>',"Neeru Dhanda's trap gold"],
   ['<a href="https://newsonair.gov.in/india-retains-nona-gaprindashvili-trophy-at-chess-olympiad-with-open-silver-womens-bronze/">newsonair.gov.in</a>',"Chess Olympiad: India open silver, women bronze; Gaprindashvili Trophy kept (27 Sep 2026)"],
   ['<a href="https://www.nationalheraldindia.com/sports/chess-olympiad-india-men-finish-with-silver-women-bronze-in-samarkand">nationalheraldindia.com</a>',"Held in Samarkand; Uzbekistan and China won gold"],
+  ['<a href="https://www.businesstoday.in/india/story/asian-games-2026-india-beat-iran-40-34-in-thrilling-mens-kabaddi-final-to-retain-gold-medal-558029-2026-09-26">businesstoday.in</a>',"Men's kabaddi gold v Iran, 26 Sep 2026"],
+  ['<a href="https://www.theweek.in/news/sports/2026/09/26/asian-games-kabaddi-after-women-indian-mens-team-also-defeats-iran-to-clinch-gold.html">theweek.in</a>',"Women's and men's kabaddi golds, both v Iran"],
+  ['<a href="https://morungexpress.com/asian-games-india-clinch-record-extending-ninth-gold-in-mens-kabaddi-after-iran-win">morungexpress.com</a>',"Men's ninth Asian Games kabaddi gold"],
+  ['<a href="https://www.khaleejtimes.com/cricket/gill-smashes-fastest-odi-double-ton-as-india-beat-west-indies-in-run-fest">khaleejtimes.com</a>',"Gill's fastest ODI double century; India beat West Indies"],
+  ['<a href="https://www.gulftoday.ae/sport/2026/09/30/west-indies-pile-up-record-405-7-in-second-odi-against-india">gulftoday.ae</a>',"West Indies 405/7; Gill's double ton powered the chase (30 Sep 2026)"],
+  ['<a href="https://www.outlookindia.com/sports/cricket/india-vs-west-indies-2nd-odi-2026-shubman-gill-guwahati-in-pics">outlookindia.com</a>',"Gill unbeaten 223 at Guwahati; series sealed"],
+  ['<a href="https://newsonair.gov.in/tarang-shakti-2026-multinational-air-exercise-to-begin-on-26th-september-in-jodhpur/">newsonair.gov.in</a>',"Tarang Shakti 2026 from 26 Sep in Jodhpur"],
+  ['<a href="https://www.drishtiias.com/daily-updates/daily-news-analysis/exercise-tarang-shakti-2026">drishtiias.com</a>',"Second edition; to 12 Oct; observer nations"],
+  ['<a href="https://indianinfrastructure.com/2026/10/01/centre-launches-indias-first-lng-powered-train-in-gujarat/">indianinfrastructure.com</a>',"LNG DEMU of eight coaches, Sabarmati–Mahesana"],
   ['<a href="https://khelnow.com/athletics/rumesh-pathirage-gold-world-athletics-ultimate-championship-202609">khelnow.com</a>',"Ultimate Championship javelin: Pathirage 91.09 m"],
   ['<a href="https://www.nbcsports.com/olympics/news/world-athletics-ultimate-championship-results-2026">nbcsports.com</a>',"Inaugural Ultimate Championship, Budapest, 11–13 Sep 2026"],
   ['<a href="https://www.drishtiias.com/state-pcs-current-affairs/anant-nag-to-receive-dadasaheb-phalke-award-for-2024">drishtiias.com</a>',"Anant Nag: Phalke Award for 2024"],
@@ -172,6 +184,7 @@ LESSONS.push(
   "GSLV-F17 launched EOS-05 (GISAT-1A) on 4 Sep 2026; first NGMV keel laid at Cochin Shipyard on 18 Sep.",
   "Asian Games opened in Aichi-Nagoya on 19 Sep; India's first gold: women's cricket (22 Sep); Neeru Dhanda trap gold (29 Sep).",
   "US Open 2026: Alexander Zverev and Elena Rybakina. Chess Olympiad (Samarkand): India open silver, women bronze.",
+  "Asian Games kabaddi: both golds v Iran (26 Sep). Shubman Gill 223* — fastest ODI double century (30 Sep).",
   "72nd National Film Awards at Ekta Nagar, Gujarat (22 Sep); Phalke Award for 2024 to Anant Nag.",
   "Gender Gap 2026: India 131 (16 Sep). GII 2026: India 38 (29 Sep).",
   "UNGA 81st session opened on 8 Sep under Khalilur Rahman (Bangladesh)."
@@ -203,6 +216,9 @@ QB.push(
 ["CA9","India's first gold medal at the 2026 Asian Games came in:",["Women's cricket","Men's hockey","Shooting","Kabaddi"],"India's women beat Sri Lanka by 147 runs in the final on 22 Sep 2026.",""],
 ["CA9","Neeru Dhanda made history at the 2026 Asian Games by winning gold in:",["Women's trap shooting","Women's skeet shooting","Women's 10 m air pistol","Women's 50 m rifle 3 positions"],"On 29 Sep 2026 she became the first Indian woman to win the Asian Games trap gold.",""],
 ["CA9","At the Chess Olympiad held in Samarkand in September 2026, India's open team won:",["Silver","Gold","Bronze","No medal"],"Uzbekistan won the open gold and India silver; India's women won bronze.",""],
+["CA9","At the 2026 Asian Games (26 September), India won both kabaddi golds by beating which country in the finals?",["Iran","Bangladesh","South Korea","Pakistan"],"Both the men's and women's teams beat Iran; it was the men's ninth Asian Games kabaddi title.",""],
+["CA9","Shubman Gill's unbeaten 223 against the West Indies at Guwahati on 30 September 2026 was the:",["Fastest double century in ODIs","First double century in T20Is","Highest Test score by an Indian","Slowest ODI double century"],"He reached 200 in 117 balls as India chased 406.",""],
+["CA9","The multinational air exercise Tarang Shakti 2026 (26 September – 12 October) was hosted by the IAF at:",["Jodhpur","Jamnagar","Hindon","Kalaikunda"],"The second edition was held at Air Force Station Jodhpur and nearby bases.",""],
 ["CA9","Who won the men's javelin at the first World Athletics Ultimate Championship (Budapest, September 2026)?",["Rumesh Tharanga Pathirage","Neeraj Chopra","Anderson Peters","Arshad Nadeem"],"The Sri Lankan threw 91.09 m; Neeraj Chopra did not compete because of injury.",""],
 ["CA9","Who received the Dadasaheb Phalke Award for 2024, presented on 22 September 2026?",["Anant Nag","Mohanlal","Mithun Chakraborty","Mammootty"],"Anant Nag received it at the 72nd National Film Awards; Mohanlal was the previous recipient.",""],
 ["CA9","Where were the 72nd National Film Awards presented on 22 September 2026?",["Ekta Nagar (Kevadia), Gujarat","Vigyan Bhawan, New Delhi","Panaji, Goa","Mumbai"],"It was the first time the ceremony was held outside New Delhi.",""],
