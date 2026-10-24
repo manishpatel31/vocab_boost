@@ -32,9 +32,9 @@ LESSONS.push(
 ], sum:["Mahabalipuram (Pallavas) and Konark (Eastern Gangas) were inscribed in 1984.","Khajuraho (Chandelas, MP) and Hampi (Vijayanagara, Karnataka) in 1986; Pattadakal (Chalukyas) and the Chola temples in 1987.","Brihadisvara, Thanjavur — Rajaraja I; Gangaikondacholapuram — Rajendra I; Darasuram — Rajaraja II (added 2004).","Rani ki Vav (Patan, 2014) is a stepwell built by Queen Udayamati; it is on the ₹100 note.","Ramappa (Telangana, 2021) is named after its sculptor; Hoysala temples of Belur, Halebidu and Somanathapura (2023).","Konark is the Black Pagoda; Hampi's stone chariot is on the ₹50 note, Konark's wheel on the ₹10 note."]}
 );
 
-pairQs("H3", H3S.map(r => [r[0], r[1], r[4], ""]), { q: t => `The temple site “${t}” is in which state?`, e: r => `${r[0]} is in ${r[1]}. ${r[2]}`,
-  rq: a => `Which of these World Heritage temple sites is in ${a}?`, re: r => `${r[0]} is in ${r[1]}. ${r[2]}`, extra: ["Andhra Pradesh","Kerala"] });
-pairQs("H3", H3S.map(r => [r[0], r[3], r[4], ""]), { q: t => `Which dynasty built the World Heritage site “${t}”?`, e: r => `${r[0]} was built by the ${r[1]}. ${r[2]}` });
+pairQs("H3", H3S.map(r => [r[0], r[1], r[4], ""]), { q: t => `In which state is the World Heritage site “${t}”?`, e: r => `“${r[0]}” is in ${r[1]}. ${r[2]}`,
+  rq: a => `Which of these World Heritage temple sites is in ${a}?`, re: r => `“${r[0]}” is in ${r[1]}. ${r[2]}`, extra: ["Andhra Pradesh","Kerala"] });
+pairQs("H3", H3S.map(r => [r[0], r[3], r[4], ""]), { q: t => `Which dynasty built the World Heritage site “${t}”?`, e: r => `“${r[0]}” was built by the ${r[1]}. ${r[2]}` });
 QB.push(
 ["H3","The Sun Temple at Konark is designed as:",["Surya's chariot with 24 wheels and seven horses","A lotus with eight petals","Mount Kailasa","A ship setting sail"],"The whole temple is a stone chariot of the sun god, pulled by seven horses.",""],
 ["H3","Sailors once called the Konark temple the:",["Black Pagoda","White Pagoda","Golden Pagoda","Lion Pagoda"],"Its dark tower was a landmark for sailors; the White Pagoda was the Jagannath temple at Puri.",""],

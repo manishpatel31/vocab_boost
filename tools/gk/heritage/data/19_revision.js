@@ -40,8 +40,8 @@ LESSONS.push(
 );
 
 pairQs("H10", H10N, { q: t => `Which heritage site is shown on the back of the new ${t} note?`, e: r => `The ${r[0]} note shows ${r[1]}. ${r[2]}`,
-  rq: a => `${a} appears on the back of which new banknote?`, re: r => `${r[1]} is on the ${r[0]} note.` });
-pairQs("H10", H10K, { q: t => `Which monument or place is nicknamed the ‘${t}’?`, e: r => `${r[1]} is called the ${r[0]}. ${r[2]}` });
+  rq: a => `${a} appears on the back of which new banknote?`, re: r => `The ${r[0]} note shows ${r[1]}.` });
+pairQs("H10", H10K, { q: t => `Which monument or place is nicknamed the ‘${t}’?`, e: r => `${r[1]} — the ‘${r[0]}’. ${r[2]}` });
 
 QB.push(
 ["H10","Which of these sites was inscribed on the World Heritage list earliest?",["Elephanta Caves","Santiniketan","Jaipur City","Ramappa Temple"],"Elephanta was listed in 1987; Jaipur in 2019, Ramappa in 2021, Santiniketan in 2023.",""],

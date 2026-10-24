@@ -3,8 +3,8 @@ const H4S = [
   ["Agra Fort","Uttar Pradesh","1983","Akbar rebuilt it in red sandstone from 1565; Jahangir and Shah Jahan added palaces."],
   ["Taj Mahal","Uttar Pradesh","1983","Shah Jahan's tomb for Mumtaz Mahal on the Yamuna, built 1632–1653."],
   ["Fatehpur Sikri","Uttar Pradesh","1986","Akbar's 'City of Victory' (1571–1585), with the Buland Darwaza."],
-  ["Humayun's Tomb, Delhi","Delhi","1993","The first garden-tomb of the subcontinent, built 1565–1572."],
-  ["Qutb Minar and its Monuments, Delhi","Delhi","1993","Begun by Qutb-ud-din Aibak and finished by Iltutmish; the Iron Pillar stands in the complex."],
+  ["Humayun's Tomb","Delhi","1993","The first garden-tomb of the subcontinent, built 1565–1572."],
+  ["Qutb Minar and its Monuments","Delhi","1993","Begun by Qutb-ud-din Aibak and finished by Iltutmish; the Iron Pillar stands in the complex."],
   ["Red Fort Complex","Delhi","2007","Shah Jahan's palace-fort of Shahjahanabad, built 1639–1648, with Salimgarh Fort."],
   ["Champaner-Pavagadh Archaeological Park","Gujarat","2004","Mahmud Begada's capital below Pavagadh hill, with the Kalika Mata temple on top."],
   ["Hill Forts of Rajasthan","Rajasthan","2013","Six Rajput forts: Chittorgarh, Kumbhalgarh, Ranthambore, Gagron, Amber, Jaisalmer."],
@@ -49,8 +49,8 @@ LESSONS.push(
 ], sum:["Agra Fort and Taj Mahal (1983), Fatehpur Sikri (1986) — all in Uttar Pradesh.","Humayun's Tomb and Qutb Minar (1993), Red Fort (2007) — all in Delhi.","Taj Mahal: Shah Jahan for Mumtaz Mahal; architect Ustad Ahmad Lahauri; Makrana marble.","Humayun's Tomb was the first garden-tomb; Qutb Minar was begun by Aibak and finished by Iltutmish.","Hill Forts of Rajasthan (2013): Chittorgarh, Kumbhalgarh, Ranthambore, Gagron, Amber, Jaisalmer.","Champaner-Pavagadh (Gujarat, 2004) was Mahmud Begada's capital.","Moidams of Charaideo (Assam, 2024); Maratha Military Landscapes — twelve forts, Gingee in Tamil Nadu (2025)."]}
 );
 
-pairQs("H4", H4S.map(r => [r[0], r[1], r[3], ""]), { q: t => `Where is the World Heritage site “${t}”?`, e: r => `${r[0]} is in ${r[1]}. ${r[2]}`,
-  rq: a => `Which of these Sultanate, Mughal or fort sites on the World Heritage list is in ${a}?`, re: r => `${r[0]} is in ${r[1]}. ${r[2]}`, extra: ["Madhya Pradesh","Maharashtra"] });
+pairQs("H4", H4S.filter(r => !r[0].includes(r[1])).map(r => [r[0], r[1], r[3], ""]), { q: t => `Where is the World Heritage site “${t}”?`, e: r => `“${r[0]}” is in ${r[1]}. ${r[2]}`,
+  rq: a => `Which of these Sultanate, Mughal or fort sites on the World Heritage list is in ${a}?`, re: r => `“${r[0]}” is in ${r[1]}. ${r[2]}`, extra: ["Madhya Pradesh","Maharashtra"] });
 
 QB.push(
 ["H4","The Taj Mahal was built by Shah Jahan in memory of:",["Mumtaz Mahal","Nur Jahan","Mariam-uz-Zamani","Jahanara Begum"],"Mumtaz Mahal (Arjumand Banu Begum) died in 1631; work on her tomb began the next year.",""],

@@ -64,8 +64,8 @@ LESSONS.push(
 ], sum:["The intangible heritage convention dates from 2003; India's nodal body is the Sangeet Natak Akademi.","India has 16 elements; the latest is Deepavali (10 December 2025, Red Fort, New Delhi).","2008: Koodiyattam, Vedic chanting, Ramlila. 2010: Mudiyettu, Kalbelia, Chhau. 2016: Yoga, Navroz. 2017: Kumbh Mela. 2021: Durga Puja. 2023: Garba.","Memory of the World (1992): Rigveda manuscripts (2007); Bhagavad Gita and Natyashastra (2025) took India to 14 entries.","Creative Cities (2004): Jaipur and Srinagar (crafts), Varanasi, Chennai and Gwalior (music), Mumbai (film), Hyderabad and Lucknow (gastronomy), Kozhikode (literature)."]}
 );
 
-pairQs("H9", H9I.map(r => [r[0], r[2], r[3], ""]), { q: t => `In which year was “${t}” inscribed on UNESCO's intangible cultural heritage list?`, e: r => `${r[0]} was inscribed in ${r[1]}. ${r[2]}`, extra: ["2019"] });
-pairQs("H9", H9I.filter(r => ["Koodiyattam","Mudiyettu","Ramman","Kalbelia","Sankirtana","Thatheras of Jandiala Guru","Garba of Gujarat","Durga Puja in Kolkata"].includes(r[0])).map(r => [r[0], r[1], r[3], ""]),
+pairQs("H9", H9I.map(r => [r[0], r[2], r[3], ""]), { q: t => `In which year was “${t}” inscribed on UNESCO's intangible cultural heritage list?`, e: r => `“${r[0]}” was inscribed in ${r[1]}. ${r[2]}`, extra: ["2019"] });
+pairQs("H9", H9I.filter(r => ["Koodiyattam","Mudiyettu","Ramman","Kalbelia","Sankirtana","Thatheras of Jandiala Guru"].includes(r[0])).map(r => [r[0], r[1], r[3], ""]),
   { q: t => `${t}, on UNESCO's intangible heritage list, belongs to which state?`, e: r => `${r[0]} belongs to ${r[1]}. ${r[2]}`, extra: ["Odisha","Assam"] });
 pairQs("H9", H9C, { q: t => `${t} is a UNESCO Creative City in which field?`, e: r => `${r[0]} joined the Creative Cities Network for ${r[1].toLowerCase()} in ${r[2]}.`, extra: ["Design","Media Arts"] });
 

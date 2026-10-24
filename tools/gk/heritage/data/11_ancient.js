@@ -39,9 +39,9 @@ LESSONS.push(
 ], sum:["Bhimbetka (2003) and Sanchi (1989) are both in Raisen district, Madhya Pradesh.","Dholavira (2021), on Khadir Bet in Kutch, is India's only Harappan World Heritage site.","Bodh Gaya (2002) and Nalanda (2016) are in Bihar; Sarnath (2026) is in Uttar Pradesh.","Ajanta: Buddhist, paintings. Ellora: Buddhist, Hindu and Jain; Kailasa temple of Krishna I. Elephanta: Shiva, on Gharapuri island.","Sanchi's Great Stupa was begun by Ashoka; its gateways are toranas.","Sarnath's Lion Capital is the National Emblem; the Dhamek Stupa marks the first sermon."]}
 );
 
-pairQs("H2", H2S.map(r => [r[0], r[1], r[3], ""]), { q: t => `Which state is home to the World Heritage site “${t}”?`, e: r => `${r[0]} is in ${r[1]}. ${r[2]}`,
-  rq: a => `Which of these ancient or Buddhist World Heritage sites is in ${a}?`, re: r => `${r[0]} is in ${r[1]}. ${r[2]}`, extra: ["Odisha","Karnataka"] });
-pairQs("H2", H2S.map(r => [r[0], r[2], r[3], ""]), { q: t => `In which year was “${t}” inscribed on the World Heritage list?`, e: r => `${r[0]} was inscribed in ${r[1]}. ${r[2]}`, extra: ["1993","2014"] });
+pairQs("H2", H2S.map(r => [r[0], r[1], r[3], ""]), { q: t => `Which state is home to the World Heritage site “${t}”?`, e: r => `“${r[0]}” is in ${r[1]}. ${r[2]}`,
+  rq: a => `Which of these ancient or Buddhist World Heritage sites is in ${a}?`, re: r => `“${r[0]}” is in ${r[1]}. ${r[2]}`, extra: ["Odisha","Karnataka"] });
+pairQs("H2", H2S.map(r => [r[0], r[2], r[3], ""]), { q: t => `In which year was “${t}” inscribed on the World Heritage list?`, e: r => `“${r[0]}” was inscribed in ${r[1]}. ${r[2]}`, extra: ["1993","2014"] });
 
 QB.push(
 ["H2","Which cave site is entirely Buddhist and famous for its wall paintings?",["Ajanta","Ellora","Elephanta","Udayagiri and Khandagiri"],"Ajanta's caves are all Buddhist; its paintings show Jataka stories and figures such as the Padmapani.",""],

@@ -2,7 +2,7 @@
 const H8T = [
   ["Somnath Temple","Gujarat","First of the 12 jyotirlingas, at Prabhas Patan; the present temple opened in 1951."],
   ["Sun Temple, Modhera","Gujarat","Built under the Solanki king Bhima I (1026–27); a great stepped tank, the Surya Kund."],
-  ["Dilwara Temples","Rajasthan","Jain temples of white marble at Mount Abu, from the 11th to the 13th century."],
+  ["Dilwara temple complex","Rajasthan","Jain temples of white marble at Mount Abu, from the 11th to the 13th century."],
   ["Ranakpur Jain Temple","Rajasthan","1,444 carved pillars; built in Rana Kumbha's time by the merchant Dharna Shah."],
   ["Jagannath Temple","Odisha","Puri; the Rath Yatra; sailors called it the White Pagoda."],
   ["Lingaraja Temple","Odisha","Bhubaneswar, 11th century; the finest of the Odisha (Kalinga) style."],
@@ -73,7 +73,7 @@ LESSONS.push(
 ], sum:["Nagara (north): curved shikhara, amalaka, kalasha — Khajuraho, Konark, Lingaraja, Modhera.","Dravida (south): pyramidal vimana and gopurams — Brihadisvara, Shore Temple, Meenakshi, Kailasa (Ellora).","Vesara (Deccan): a mix — Aihole, Badami, Pattadakal, the Hoysala temples.","Kamakhya — Assam; Jagannath and Lingaraja — Odisha; Meenakshi and Ramanathaswamy — Tamil Nadu; Modhera and Somnath — Gujarat; Dilwara and Ranakpur — Rajasthan.","Kashi Vishwanath was rebuilt by Ahilyabai Holkar (1780); Somnath reopened in 1951; Ram Mandir consecrated 22 January 2024.","Maharashtra has the most World Heritage sites; UP, Rajasthan, Gujarat and Karnataka follow."]}
 );
 
-pairQs("H8", H8T, { q: t => `The famous ${t} is in which state or UT?`, e: r => `The ${r[0]} is in ${r[1]}. ${r[2]}` });
+pairQs("H8", H8T, { q: t => `In which state or UT is the famous ${t}?`, e: r => `The ${r[0]} is in ${r[1]}. ${r[2]}` });
 pairQs("H8", H8S, { q: t => `To which temple style does ${t} belong?`, e: r => `${r[0]} is a ${r[1]} temple. ${r[2]}`, extra: ["Indo-Saracenic","Indo-Islamic"] });
 
 QB.push(
