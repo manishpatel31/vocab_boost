@@ -334,6 +334,9 @@
 
   .loading-overlay{ position:fixed; inset:0; background:var(--paper); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px; z-index:500; font-family:var(--font-display); font-size:19px; color:var(--ink-soft); }
   .loading-overlay.hidden{ display:none; }
+  .loading-overlay .load-note{ max-width:340px; padding:0 20px; text-align:center; font-family:var(--font-body, inherit); font-size:15px; line-height:1.5; }
+  .loading-overlay .load-note p{ margin:4px 0 14px; }
+  .avatar.initials{ display:inline-grid; place-items:center; flex:none; background:var(--teal); color:#fff; font-size:12.5px; font-weight:700; letter-spacing:.02em; }
 
   /* ---------- app bar with grouped navigation ---------- */
   .appbar{ position:sticky; top:0; z-index:100; display:flex; align-items:center; gap:18px; height:64px; padding:0 20px; background:var(--bar-bg); color:var(--bar-fg); border-bottom:1px solid var(--bar-line); }
@@ -708,7 +711,7 @@
   .account-btn{ display:flex; align-items:center; gap:8px; height:42px; padding:0 10px 0 5px; border:1px solid var(--bar-line); border-radius:999px; background:transparent; color:var(--bar-fg); font-size:13px; font-weight:600; max-width:260px; }
   .account-btn:hover, .navgroup.open > .account-btn{ background:var(--bar-hover); }
   .who{ display:flex; align-items:center; gap:8px; min-width:0; }
-  .who > span:not(.admin-badge):not(.mod-badge){ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:130px; }
+  .who > span:not(.admin-badge):not(.mod-badge):not(.avatar){ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:130px; }
   .offline-badge{ background:var(--maroon); color:#fff; font-size:11px; padding:4px 10px; border-radius:var(--pill); font-weight:600; }
   .notif-count{ position:absolute; top:4px; right:3px; background:var(--maroon); color:#fff; font-size:10px; font-weight:700; border-radius:var(--pill); padding:1px 5px; line-height:1.3; }
   .admin-badge{ background:var(--mustard); color:#1B1203; font-size:10px; font-weight:700; padding:2px 8px; border-radius:var(--pill); text-transform:lowercase; }
@@ -995,7 +998,7 @@
     .brand-paper{ font-size:18px; }
     .brand-indigo{ font-size:17px; }
     .brand-mark{ width:30px; height:30px; }
-    .who > span:not(.admin-badge):not(.mod-badge){ display:none; }
+    .who > span:not(.admin-badge):not(.mod-badge):not(.avatar){ display:none; }
     .navgroups{ position:fixed; left:0; right:0; bottom:0; z-index:110; justify-content:space-around; gap:0; padding:6px 4px calc(8px + env(safe-area-inset-bottom)); background:var(--bar-bg); border-top:1px solid var(--bar-line); }
     body.theme-indigo .navgroups{ left:10px; right:10px; bottom:10px; padding:6px 4px; border-radius:22px; background:var(--bar-bg); box-shadow:var(--shadow-lg); }
     .navgroup{ position:static; }
@@ -1536,6 +1539,17 @@
 <script>(function(){try{var t=localStorage.getItem("vocabRegisterTheme");var m=localStorage.getItem("vocabRegisterDarkMode");var d=m==="1"||(m===null&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.body.className=(t==="indigo"?"theme-indigo":"theme-paper")+(d?" dark":"");}catch(e){document.body.className="theme-paper";}})();</script>
 
 <div class="loading-overlay" id="loadingOverlay"><div>Opening पाठShala…</div></div>
+<script>
+  // Still on "Opening…" after 12 seconds (a slow or blocked connection): say so and offer a retry
+  setTimeout(function(){
+    var o = document.getElementById('loadingOverlay');
+    if(!o || o.classList.contains('hidden') || o.querySelector('.load-note')) return;
+    var d = document.createElement('div'); d.className = 'load-note';
+    d.innerHTML = '<p>This is taking longer than usual. Check your internet connection and try again.</p><button type="button" class="btn teal">Try again</button>';
+    d.querySelector('button').onclick = function(){ location.reload(); };
+    o.appendChild(d);
+  }, 12000);
+</script>
 
 <div class="hub-page search-page" id="searchPage" role="dialog" aria-label="Search">
   <div class="study-bar search-bar">
@@ -2168,7 +2182,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="app.js?v=62762de4"></script>
+<script src="app.js?v=5db13e05"></script>
 <script src="typing-passages.js?v=df4bd310"></script>
 <script src="typing.js?v=02ff18bc"></script>
 </body>

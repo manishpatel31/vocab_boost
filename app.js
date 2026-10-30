@@ -820,6 +820,12 @@
       (setting .src adds one, so the phone's Back button needed several presses). */
   function setStudyFrame(url){
     var f = document.getElementById('studyFrame');
+    if(!f.dataset.focusOnLoad){   // on a computer, put the keyboard in the mini app so its shortcuts work at once
+      f.dataset.focusOnLoad = '1';
+      f.addEventListener('load', function(){
+        try{ if(studyOpen && matchMedia('(hover: hover) and (pointer: fine)').matches && !/^about:/.test(f.contentWindow.location.href)) f.contentWindow.focus(); }catch(e){}
+      });
+    }
     try{ if(f.contentWindow){ f.contentWindow.location.replace(url); return; } }catch(e){}
     f.src = url;
   }
@@ -2637,6 +2643,19 @@
     return;
   }
 
+  // Sign-in and sync come from Google's CDN. If that did not load (offline on the very first visit, or a network
+  // that blocks www.gstatic.com), say so instead of leaving "Opening पाठShala…" on screen for ever.
+  if(typeof firebase === 'undefined' || !firebase.auth || !firebase.firestore){
+    var lo = document.getElementById('loadingOverlay');
+    lo.innerHTML = '<div>Couldn’t reach the sign-in service</div><div class="load-note"><p>' +
+      (navigator.onLine ? 'Your network may be blocking Google’s servers (www.gstatic.com). Try another network or turn off a VPN / ad blocker, then try again.'
+                        : 'You’re offline. Connect to the internet once so पाठShala can save itself for offline use, then try again.') +
+      '</p><button type="button" class="btn teal">Try again</button></div>';
+    lo.querySelector('button').onclick = function(){ location.reload(); };
+    window.addEventListener('online', function(){ location.reload(); });
+    return;
+  }
+
   firebase.initializeApp(firebaseConfig);
   var auth = firebase.auth();
   var db = firebase.firestore();
@@ -2788,10 +2807,16 @@
     }
   }
 
+  /** "Manish Patel" → "MP", "someone@mail.com" → "S": shown on phones when the account has no photo */
+  function initialsOf(name){
+    var parts = String(name).split('@')[0].split(/[\s._-]+/).filter(Boolean);
+    return ((parts[0] || '?').charAt(0) + (parts.length > 1 ? parts[parts.length - 1].charAt(0) : '')).toUpperCase();
+  }
   function renderWhoBox(){
     var box = document.getElementById('whoBox');
     box.innerHTML =
-      (currentUser.photoURL ? '<img class="avatar" src="'+escapeAttr(currentUser.photoURL)+'" alt="">' : '') +
+      (currentUser.photoURL ? '<img class="avatar" src="'+escapeAttr(currentUser.photoURL)+'" alt="">'
+        : '<span class="avatar initials" aria-hidden="true">'+escapeHtml(initialsOf(currentUser.displayName || currentUser.email || '?'))+'</span>') +
       '<span>'+escapeHtml(currentUser.displayName || currentUser.email)+'</span>' +
       (isAdminUser ? '<span class="admin-badge">admin</span>' : (isModeratorUser ? '<span class="mod-badge">moderator</span>' : ''));
   }

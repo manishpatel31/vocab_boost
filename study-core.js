@@ -475,3 +475,6 @@ function drawFlash(box){
 renderTop();
 const start = (location.hash||"").replace("#","");
 go(["learn","practice","mock","revise"].includes(start) ? start : "learn");
+
+/* keyboard shortcuts and answer feedback, shared by every mini app (study-keys.js; tools/stamp.js sets its ?v=) */
+(function(){ if (window.__studyKeys || document.querySelector("script[data-study-keys]")) return; const s = document.createElement("script"); s.src = "study-keys.js?v=c97dabb7"; s.dataset.studyKeys = ""; document.head.appendChild(s); })();
