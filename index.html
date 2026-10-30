@@ -1177,7 +1177,7 @@
   .sr-try button{ border:1px solid var(--rule); background:var(--card); color:var(--ink); border-radius:999px; padding:6px 13px; font:inherit; font-size:13.5px; cursor:pointer; }
   @media (max-width: 860px){ .search-bar .sb-lab{ display:none; } .sr-go{ display:none; } }
   /* ---------- पाठShala home (default page) ---------- */
-  body.on-home header.top, .main:has(#view-home.active) header.top{ display:none; }
+  body.on-home header.top, .main:has(#view-home.active) header.top, body[data-tab="study"] header.top, .main:has(#view-study.active) header.top{ display:none; }
   .main:has(#view-tasks.active) header.top, .main:has(#view-plan.active) header.top, .main:has(#view-typing.active) header.top{ display:none; }
   /* sections below the first screen are laid out only when scrolled near */
   #homeBody > .hub-sec{ content-visibility:auto; contain-intrinsic-size:auto 900px; }
@@ -1296,6 +1296,103 @@
     .home-tools b{ font-size:13px; }
     .home-week{ width:100%; justify-content:space-between; }
     .home-exam b{ font-size:38px; }
+  }
+  /* Home: continue where you left off — a list on a computer, a strip you swipe on a phone */
+  .home-card-h .lvl, .hub-sec-more{ border:0; background:none; padding:0; font:inherit; cursor:pointer; }
+  .home-card-h button.lvl{ letter-spacing:.04em; text-transform:none; font-size:13px; }
+  .hub-sec-more{ margin-left:auto; font-size:13.5px; font-weight:700; color:var(--teal); }
+  .cont-list{ display:flex; flex-direction:column; gap:2px; }
+  .cont-item{ display:flex; align-items:center; gap:12px; width:100%; min-width:0; padding:9px 8px; border:0; background:none; border-radius:12px; color:var(--ink); font:inherit; text-align:left; cursor:pointer; }
+  .cont-item:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent); }
+  .cont-item .ic{ width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; background:color-mix(in srgb, var(--hub-c) 15%, var(--card)); }
+  .cont-item .tx{ flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; }
+  .cont-item .tx b{ font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .cont-item small{ font-size:12.5px; color:var(--ink-faint); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .cont-item .bar{ display:block; height:4px; border-radius:4px; background:var(--rule); overflow:hidden; margin-top:4px; }
+  .cont-item .bar i{ display:block; height:100%; border-radius:4px; background:var(--hub-c); }
+  .cont-item .go{ font-size:13px; font-weight:700; color:var(--hub-c); white-space:nowrap; }
+  .home-prac small.hot{ color:var(--maroon); font-weight:700; }
+  @media (max-width: 860px){
+    .home-cont2{ padding:0; background:none; border:0; box-shadow:none; overflow:visible; gap:8px; }
+    .home-cont2 .home-card-h{ padding:0 2px; }
+    .home-cont2 .cont-list{ flex-direction:row; gap:10px; overflow-x:auto; scroll-snap-type:x mandatory; scroll-padding-inline:14px; margin:0 -14px; padding:2px 14px 8px; scrollbar-width:none; }
+    .home-cont2 .cont-list::-webkit-scrollbar{ display:none; }
+    .cont-item{ flex:0 0 80%; max-width:300px; padding:12px; background:var(--card); border:1px solid var(--rule); border-radius:var(--radius-lg); box-shadow:var(--shadow); scroll-snap-align:start; }
+    .cont-item:only-child{ flex-basis:100%; max-width:none; }
+    .cont-item:hover{ background:var(--card); }
+    .home-prac small{ display:block; font-size:11.5px; }
+  }
+  /* Study tab: every mini app — chips, search, folding subjects, slim rows */
+  .st-head{ position:sticky; top:64px; z-index:20; margin:-8px 0 6px; padding:8px 0 10px; background:var(--paper); border-bottom:1px solid var(--rule); }
+  .st-title{ display:flex; align-items:baseline; justify-content:space-between; gap:10px; }
+  .st-title h1{ margin:0; font-family:var(--font-display); font-weight:var(--h-weight); font-size:32px; color:var(--ink); }
+  .st-title span{ font-size:13px; color:var(--ink-faint); }
+  .st-search{ display:flex; align-items:center; gap:8px; height:44px; max-width:520px; padding:0 12px; margin:10px 0; border-radius:12px; background:var(--card); border:1px solid var(--rule); color:var(--ink-faint); }
+  .st-search:focus-within{ border-color:var(--ink-faint); }
+  .st-search input{ flex:1; min-width:0; border:0; outline:0; background:none; font:inherit; font-size:15px; color:var(--ink); }
+  .st-chips{ display:flex; flex-wrap:wrap; gap:8px; }
+  .st-chip{ flex:none; border:1px solid var(--rule); background:var(--card); color:var(--ink); border-radius:999px; padding:7px 13px; font:inherit; font-size:13.5px; font-weight:600; cursor:pointer; white-space:nowrap; }
+  .st-chip:hover{ border-color:var(--ink-faint); }
+  .st-chip .c{ color:var(--ink-faint); margin-left:2px; }
+  .st-chip.hot .c{ color:var(--maroon); font-weight:700; }
+  .st-chip[aria-pressed="true"]{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .st-chip[aria-pressed="true"] .c{ color:inherit; opacity:.75; }
+  .st-grp{ border-bottom:1px solid var(--rule); padding-bottom:6px; }
+  .st-gh{ display:flex; align-items:center; gap:10px; width:100%; padding:14px 2px 10px; background:none; border:0; font:inherit; color:var(--ink); text-align:left; }
+  button.st-gh{ cursor:pointer; }
+  .st-gh .gi{ font-size:21px; width:28px; text-align:center; flex-shrink:0; }
+  .st-gh .gt{ flex:1; min-width:0; display:flex; flex-direction:column; }
+  .st-gh .gt b{ font-family:var(--font-display); font-weight:var(--h-weight); font-size:19px; }
+  .st-gh .gt b span{ font-family:var(--font-hindi); font-weight:400; font-size:13px; color:var(--ink-faint); margin-left:8px; }
+  .st-gh small{ font-size:12.5px; color:var(--ink-faint); }
+  .st-gh .due{ flex-shrink:0; font-size:12px; font-weight:700; color:#fff; background:var(--maroon); border-radius:999px; padding:2px 9px; }
+  .st-gh .chev{ flex-shrink:0; color:var(--ink-soft); transition:transform .2s ease; }
+  .st-gh[aria-expanded="false"] .chev{ transform:rotate(-90deg); }
+  .st-list{ display:grid; grid-template-columns:repeat(auto-fill, minmax(330px, 1fr)); gap:8px; padding-bottom:10px; }
+  .st-row{ display:flex; align-items:center; gap:12px; min-width:0; padding:9px 4px 9px 12px; background:var(--card); border:1px solid var(--rule); border-radius:14px; cursor:pointer; transition:border-color .15s ease; }
+  .st-row:hover{ border-color:var(--ink-faint); }
+  .st-ic{ width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; background:color-mix(in srgb, var(--hub-c) 15%, var(--card)); }
+  .st-tx{ flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; }
+  .st-t{ display:flex; align-items:center; gap:6px; min-width:0; }
+  .st-t b{ font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .st-due{ flex:none; font-style:normal; font-size:11px; font-weight:700; color:var(--maroon); background:color-mix(in srgb, var(--maroon) 13%, var(--card)); border-radius:6px; padding:1px 6px; }
+  .st-tx small{ font-size:12.5px; color:var(--ink-faint); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .st-bar{ display:block; height:4px; border-radius:4px; background:var(--rule); overflow:hidden; margin-top:5px; }
+  .st-bar i{ display:block; height:100%; border-radius:4px; background:var(--hub-c); }
+  .st-pct{ font-size:13px; font-weight:700; color:var(--ink-soft); min-width:34px; text-align:right; font-variant-numeric:tabular-nums; }
+  .st-more{ width:40px; height:40px; flex-shrink:0; border:0; border-radius:10px; background:none; color:var(--ink-soft); font-size:20px; font-weight:700; line-height:1; cursor:pointer; }
+  button.st-more:hover{ background:color-mix(in srgb, var(--ink) 7%, transparent); color:var(--ink); }
+  .st-fold{ grid-column:1 / -1; padding:10px; border:1px dashed var(--rule); border-radius:12px; background:none; font:inherit; font-size:13.5px; font-weight:600; color:var(--ink-soft); cursor:pointer; }
+  .st-fold:hover{ border-color:var(--ink-faint); color:var(--ink); }
+  .st-empty{ padding:40px 10px; text-align:center; color:var(--ink-faint); }
+  .st-sheet{ display:flex; flex-direction:column; gap:12px; }
+  .st-sh-top{ display:flex; align-items:center; gap:12px; }
+  .st-sh-top .st-ic{ width:50px; height:50px; font-size:25px; border-radius:14px; }
+  .st-sh-name{ flex:1; min-width:0; }
+  .st-sh-name h3{ margin:0; font-family:var(--font-display); font-weight:var(--h-weight); font-size:22px; line-height:1.15; }
+  .st-sh-name .hi{ font-size:13px; color:var(--ink-faint); }
+  .st-sheet .help{ margin:0; }
+  .st-sh-note{ padding:9px 12px; border-radius:12px; background:var(--paper); font-size:13.5px; font-weight:600; color:var(--ink-soft); }
+  .st-sh-note.due{ background:color-mix(in srgb, var(--maroon) 13%, var(--card)); color:var(--maroon); }
+  .st-sh-go{ height:48px; font-size:15.5px; }
+  .st-sh-acts{ display:grid; grid-template-columns:repeat(auto-fit, minmax(90px, 1fr)); gap:8px; }
+  .st-sh-acts button{ display:flex; flex-direction:column; align-items:center; gap:4px; padding:10px 6px; border:1px solid var(--rule); border-radius:14px; background:var(--card); color:var(--ink); font:inherit; font-size:13px; font-weight:600; cursor:pointer; }
+  .st-sh-acts button:hover{ border-color:var(--ink-faint); }
+  .st-sh-acts span{ font-size:19px; }
+  .st-sheet .modal-actions{ margin-top:0; }
+  /* Plan and Tasks share one place in the phone's bottom bar */
+  .pt-switch{ display:flex; gap:4px; padding:4px; margin:0 0 14px; border-radius:12px; background:var(--paper-deep); }
+  .pt-switch .tab{ flex:1; height:38px; border:0; border-radius:9px; background:none; color:var(--ink-soft); font:inherit; font-size:14px; font-weight:700; cursor:pointer; }
+  .pt-switch .tab.active{ background:var(--card); color:var(--ink); box-shadow:var(--shadow); }
+  @media (max-width: 860px){
+    .st-head{ top:58px; margin:-18px -14px 6px; padding:14px 14px 10px; }
+    .st-title h1{ font-size:28px; }
+    .st-search{ max-width:none; }
+    .st-chips{ flex-wrap:nowrap; overflow-x:auto; margin:0 -14px; padding:0 14px 2px; scrollbar-width:none; }
+    .st-chips::-webkit-scrollbar{ display:none; }
+    .st-list{ grid-template-columns:1fr; }
+    body[data-tab="tasks"] .navgroups > .tab[data-tab="plan"]{ color:var(--bar-fg); background:var(--bar-hover); }
+    body.theme-indigo[data-tab="tasks"] .navgroups > .tab[data-tab="plan"]{ background:var(--accent); color:#fff; }
   }
   /* Progress tab: every subject */
   .ss-list{ display:grid; gap:8px; }
@@ -1650,6 +1747,7 @@
 
     <nav class="navgroups" aria-label="Main">
       <button class="tab active" data-tab="home"><svg class="nav-ico" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"></path><path d="M5 10v10h5v-6h4v6h5V10"></path></svg><span>Home</span></button>
+      <button class="tab" data-tab="study"><svg class="nav-ico" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 5.5C5 4 8.5 4 12 6c3.5-2 7-2 9.5-.5V19c-2.5-1.5-6-1.5-9.5.5-3.5-2-7-2-9.5-.5z"></path><path d="M12 6v13.5"></path></svg><span>Study</span></button>
       <div class="navgroup" data-group="vocab">
         <button class="nav-btn" aria-haspopup="true" aria-expanded="false"><svg class="nav-ico" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5z"></path><path d="M4 19a2 2 0 0 1 2-2h13"></path></svg><span>Vocab</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
         <div class="navmenu">
@@ -1680,7 +1778,7 @@
       </div>
       <button class="tab" data-tab="plan"><svg class="nav-ico" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path><path d="M8 14.5h2M14 14.5h2"></path></svg><span>Plan</span></button>
       <button class="tab" data-tab="stats"><svg class="nav-ico" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7"></path></svg><span>Progress</span></button>
-      <button class="tab" data-tab="tasks"><svg class="nav-ico" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10"></path><path d="M3.5 6l1.5 1.5L7.5 5M3.5 12l1.5 1.5 2.5-2.5M3.5 18l1.5 1.5 2.5-2.5"></path></svg><span>Tasks</span></button>
+      <button class="tab desk-only" data-tab="tasks"><svg class="nav-ico" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10"></path><path d="M3.5 6l1.5 1.5L7.5 5M3.5 12l1.5 1.5 2.5-2.5M3.5 18l1.5 1.5 2.5-2.5"></path></svg><span>Tasks</span></button>
       <div class="navgroup mod-only desk-only" data-group="manage" style="display:none;">
         <button class="nav-btn" aria-haspopup="true" aria-expanded="false"><svg class="nav-ico" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path></svg><span>Manage</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
         <div class="navmenu">
@@ -1747,6 +1845,7 @@
     </header>
 
     <section class="view active" id="view-home"><div class="home" id="homeBody"></div></section>
+    <section class="view" id="view-study"><div class="st-root" id="studyRoot"></div></section>
 
     <section class="view" id="view-library">
       <div class="vocab-dash" id="vocabDash"></div>
@@ -2037,8 +2136,8 @@
       </div>
     </section>
 
-    <section class="view" id="view-plan"><div id="planRoot" class="pc-root"></div></section>
-    <section class="view" id="view-tasks"><div id="todoRoot"></div></section>
+    <section class="view" id="view-plan"><div class="pt-switch phone-only" role="group" aria-label="Plan or Tasks"><button class="tab" data-tab="plan">Plan</button><button class="tab" data-tab="tasks">Tasks</button></div><div id="planRoot" class="pc-root"></div></section>
+    <section class="view" id="view-tasks"><div class="pt-switch phone-only" role="group" aria-label="Plan or Tasks"><button class="tab" data-tab="plan">Plan</button><button class="tab" data-tab="tasks">Tasks</button></div><div id="todoRoot"></div></section>
     <section class="view" id="view-typing"><div id="typingRoot"></div></section>
 
     <section class="view" id="view-admin">
@@ -2182,7 +2281,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="app.js?v=5db13e05"></script>
+<script src="app.js?v=e816c87a"></script>
 <script src="typing-passages.js?v=df4bd310"></script>
 <script src="typing.js?v=02ff18bc"></script>
 </body>
