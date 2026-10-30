@@ -7,14 +7,22 @@
 //          study-core.js?v=…    in every study-*.html and sw.js
 //          study-core.css?v=…   in every study-*.html and sw.js
 //          study-visual.js?v=…  in every study-*.html and sw.js
+//          study-keys.js?v=…    inside study-core.js, study-workbook.js and study-plan-lab.js, which load it
 // and bumps VERSION in sw.js when anything changed. Run it after editing any of those three files.
 const fs = require('fs'), path = require('path'), crypto = require('crypto');
 const R = path.join(__dirname, '..') + '/';
 const files = ['app.js', 'typing.js', 'typing-passages.js', 'study-core.js', 'study-core.css', 'study-visual.js', 'study-world.js', 'study-rivers.js',
-  'study-workbook.js', 'study-workbook.css', 'study-games.js', 'study-plan-lab.js'];
+  'study-workbook.js', 'study-workbook.css', 'study-games.js', 'study-plan-lab.js', 'study-keys.js'];
 const hash = f => crypto.createHash('sha1').update(fs.readFileSync(R + f)).digest('hex').slice(0, 8);
 const pages = ['index.html', 'sw.js'].concat(fs.readdirSync(R).filter(f => /^study-.*\.html$/.test(f)));
 let changed = 0;
+// study-keys.js is loaded by the shared engines rather than by the pages: stamp it inside them first,
+// so their own hashes below already include the new stamp
+const keysAt = 'study-keys.js?v=' + hash('study-keys.js');
+['study-core.js', 'study-workbook.js', 'study-plan-lab.js', 'tools/workbook/engine.js'].forEach(f => {
+  const src = fs.readFileSync(R + f, 'utf8'), out = src.replace(/study-keys\.js\?v=[A-Za-z0-9]+/g, keysAt);
+  if (out !== src) { fs.writeFileSync(R + f, out); changed++; console.log('updated', f); }
+});
 const stamps = {};
 files.forEach(f => { stamps[f] = hash(f); });
 pages.forEach(p => {

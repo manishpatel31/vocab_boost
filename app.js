@@ -244,45 +244,153 @@
     var d = Math.floor((Date.now() - ms) / DAY_MS);
     return 'Opened ' + (d <= 0 ? 'today' : d === 1 ? 'yesterday' : d + ' days ago');
   }
-  function hubCard(id){
-    var m = STUDY[id], pr = studyProgress(id), x = trackInfo(id);
-    var pct = pr.total ? Math.round(pr.done * 100 / pr.total) : 0;
-    var qn = trackTotalQ(id), nq = m.noq ? (m.noqStat || [(/([\d,]+)\s+formulas/.exec(m.meta || '') || [])[1], 'formulas']) : null;
-    var revTitle = !x.started ? 'Plan revision' : x.off ? 'Revision reminders are off' : x.due ? 'Revision due now' : 'Next revision ' + trackDate(x.nextAt);
-    return '<div class="hub-card" role="button" tabindex="0" data-open-study="' + id + '" style="--hub-c:' + m.color + ';">' +
-      '<div class="hub-top"><div class="hub-ico">' + m.ico + '</div><div style="flex:1; min-width:0;"><h3>' + escapeHtml(m.title) + '</h3><div class="hi">' + escapeHtml(m.hi) + '</div></div>' +
-        '<div class="hub-side"><div class="hub-tbs">' +
-          '<button class="hub-tb" data-track-history="' + id + '" title="Your sessions, scores and mocks">🕘<span>History</span></button>' +
-          '<button class="hub-tb' + (x.due ? ' due' : '') + '" data-track-revise="' + id + '" title="' + escapeAttr(revTitle) + '">🔁<span>' + (x.due ? 'Revise!' : 'Revise') + '</span></button>' +
-          (document.body.classList.contains('ai-on') ? '<button class="hub-tb ai" data-ai-app="' + id + '" title="AI: analyse my progress in this app, important topics, plan, mock">✨<span>AI</span></button>' : '') +
-        '</div><div class="hub-ring" title="' + pct + '% done">' + ringSvg(pct, m.color, 50) + '<span>' + pct + '%</span></div></div></div>' +
-      '<div class="hub-facts">' +
-        '<div><b>' + (m.lessons || '—') + '</b><span>' + (m.unit || 'lessons') + '</span></div>' +
+  // ================= Study tab: every mini app, by subject =================
+  // Home shows today (goal, continue, what's waiting); this tab is the whole catalogue: filter chips, a search box,
+  // subjects that fold away, one slim row per app, and a sheet (⋯) with the app's numbers, History, Revise and AI.
+  var stF = 'all', stQ = '', stNew = {};
+  function stFold(){ try{ return JSON.parse(lsGet('studyFold') || '{}') || {}; }catch(e){ return {}; } }
+  var ST_ORDER = { due: 0, progress: 1, done: 2, new: 3 };
+  function studyGroups(){
+    var g = [{ key: 'english', name: 'English', hi: 'अंग्रेज़ी', ids: englishIds(), vocab: true },
+      { key: 'maths', name: 'Maths', hi: 'गणित', ids: mathIds() },
+      { key: 'reasoning', name: 'Reasoning', hi: 'तर्कशक्ति', ids: reasoningIds() }];
+    GS_SUBJECTS.concat([['other', 'More', 'अन्य']]).forEach(function(s){ var ids = subjIds(s[0]); if(ids.length) g.push({ key: s[0], name: s[1], hi: s[2], ids: ids }); });
+    return g;
+  }
+  /** One app as the Study tab and Home's Continue list show it. */
+  function studyItem(id){
+    var m = STUDY[id], x = trackInfo(id), pr = x.pr, pct = pr.total ? Math.round(pr.done * 100 / pr.total) : 0, sub;
+    if(x.status === 'due') sub = 'Revision due · last studied ' + trackAgo(x.lastStudy || x.base);
+    else if(x.status === 'done') sub = 'Completed' + (x.nextAt ? ' · revise on ' + trackDate(x.nextAt) : '');
+    else if(x.status === 'progress') sub = pr.done + ' / ' + pr.total + ' ' + (m.unit || 'lessons') + (x.visited ? ' · ' + trackAgo(x.visited) : '');
+    else sub = m.meta || ((m.lessons || '') + ' ' + (m.unit || 'lessons'));
+    return { id: id, m: m, x: x, st: x.status, pct: pct, sub: sub, find: (m.title + ' ' + (m.hi || '') + ' ' + (m.meta || '')).toLowerCase() };
+  }
+  function vocabItem(){
+    var ve = viewEntries(), mem = ve.filter(function(e){ return e.confidence >= 5; }).length, due = currentUser ? dueRevisions().length : 0;
+    return { id: '', vocab: true, m: { title: 'शब्दRegister', ico: '📖', color: 'var(--mustard)' }, st: due ? 'due' : ve.length ? 'progress' : 'new',
+      pct: ve.length ? Math.round(mem * 100 / ve.length) : 0, sub: due ? due + ' words due back today' : mem + ' of ' + ve.length + ' words memorized', find: 'shabdregister vocabulary words शब्दावली' };
+  }
+  function stRow(it){
+    var act = it.vocab ? 'data-home-act="library"' : 'data-open-study="' + it.id + '"';
+    return '<div class="st-row" role="button" tabindex="0" ' + act + ' style="--hub-c:' + it.m.color + ';">' +
+      '<span class="st-ic">' + it.m.ico + '</span>' +
+      '<span class="st-tx"><span class="st-t"><b>' + escapeHtml(it.m.title) + '</b>' + (it.st === 'due' ? '<em class="st-due">Revise</em>' : '') + '</span>' +
+        '<small>' + escapeHtml(it.sub) + '</small><span class="st-bar"><i style="width:' + it.pct + '%"></i></span></span>' +
+      '<span class="st-pct">' + it.pct + '%</span>' +
+      (it.vocab ? '<span class="st-more" aria-hidden="true"></span>' : '<button class="st-more" data-study-more="' + it.id + '" aria-label="' + escapeAttr('More about ' + it.m.title) + '" title="Details, history, revise">⋯</button>') + '</div>';
+  }
+  function renderStudyTab(){
+    var root = document.getElementById('studyRoot');
+    if(!root) return;
+    var groups = studyGroups(), items = [];
+    groups.forEach(function(g){ g.items = (g.vocab ? [vocabItem()] : []).concat(g.ids.map(studyItem)); items = items.concat(g.items); });
+    var nProg = items.filter(function(it){ return it.st === 'progress' || it.st === 'due'; }).length, nDue = items.filter(function(it){ return it.st === 'due'; }).length;
+    if(stF !== 'all' && stF !== 'prog' && stF !== 'due' && !groups.some(function(g){ return g.key === stF; })) stF = 'all';
+    var chips = [['all', 'All'], ['prog', 'In progress', nProg || undefined], ['due', 'Due', nDue || undefined]].concat(groups.map(function(g){ return [g.key, g.name]; }));
+    var hadFocus = document.activeElement && document.activeElement.id === 'stSearch';
+    root.innerHTML = '<div class="st-head"><div class="st-title"><h1>Study</h1><span>' + (items.length - 1) + ' mini apps · ' + groups.length + ' subjects</span></div>' +
+      '<label class="st-search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>' +
+        '<input type="search" id="stSearch" placeholder="Find an app — polity, rivers, trigonometry…" autocomplete="off" enterkeyhint="search" aria-label="Find an app" value="' + escapeAttr(stQ) + '"></label>' +
+      '<div class="st-chips" role="group" aria-label="Show">' + chips.map(function(c){
+        return '<button class="st-chip' + (c[0] === 'due' && c[2] ? ' hot' : '') + '" data-st-f="' + c[0] + '" aria-pressed="' + (stF === c[0] && !stQ) + '">' + c[1] + (c[2] !== undefined ? ' <span class="c">' + c[2] + '</span>' : '') + '</button>';
+      }).join('') + '</div></div><div id="stList"></div>';
+    drawStudyList(groups);
+    if(hadFocus){ var s = document.getElementById('stSearch'); s.focus(); s.setSelectionRange(s.value.length, s.value.length); }
+  }
+  function drawStudyList(groups){
+    var box = document.getElementById('stList');
+    if(!box) return;
+    if(!groups){ groups = studyGroups(); groups.forEach(function(g){ g.items = (g.vocab ? [vocabItem()] : []).concat(g.ids.map(studyItem)); }); }
+    var toks = stQ.toLowerCase().split(/\s+/).filter(Boolean), fold = stFold(), html = '';
+    var sorted = function(list){ return list.slice().sort(function(a, b){ return ST_ORDER[a.st] - ST_ORDER[b.st] || (b.x ? b.x.visited || 0 : 0) - (a.x ? a.x.visited || 0 : 0); }); };
+    groups.forEach(function(g){
+      var all = g.items, list;
+      if(toks.length) list = all.filter(function(it){ return toks.every(function(t){ return it.find.indexOf(t) !== -1; }); });
+      else if(stF === 'prog') list = all.filter(function(it){ return it.st === 'progress' || it.st === 'due'; });
+      else if(stF === 'due') list = all.filter(function(it){ return it.st === 'due'; });
+      else if(stF === 'all' || stF === g.key) list = all;
+      else list = [];
+      if(!list.length) return;
+      var real = all.filter(function(it){ return !it.vocab; }), dueN = all.filter(function(it){ return it.st === 'due'; }).length;
+      var pct = real.length ? Math.round(real.reduce(function(s, it){ return s + it.pct; }, 0) / real.length) : 0;
+      var active = sorted(list.filter(function(it){ return it.st !== 'new'; })), fresh = list.filter(function(it){ return it.st === 'new'; });
+      var folding = stF === 'all' && !toks.length, open = !folding || (fold[g.key] === undefined ? active.length > 0 : fold[g.key]);
+      var showNew = !folding || !active.length || stNew[g.key];
+      var head = '<span class="gi">' + (SUBJ_ICO[g.key] || '📘') + '</span><span class="gt"><b>' + g.name + '<span>' + g.hi + '</span></b><small>' +
+        real.length + ' app' + (real.length === 1 ? '' : 's') + ' · ' + pct + '% done' + (folding && !open && active.length ? ' · ' + active.length + ' in progress' : '') + '</small></span>' +
+        (dueN ? '<span class="due">' + dueN + ' due</span>' : '');
+      html += '<section class="st-grp">' + (folding
+          ? '<button class="st-gh" data-st-fold="' + g.key + '" aria-expanded="' + open + '">' + head + '<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>'
+          : '<div class="st-gh">' + head + '</div>') +
+        (open ? '<div class="st-list">' + active.concat(showNew ? fresh : []).map(stRow).join('') +
+          (folding && fresh.length && active.length ? '<button class="st-fold" data-st-new="' + g.key + '" aria-expanded="' + !!showNew + '">' + (showNew ? 'Hide the ones not started' : 'Not started · ' + fresh.length + ' app' + (fresh.length === 1 ? '' : 's')) + '</button>' : '') +
+        '</div>' : '') + '</section>';
+    });
+    box.innerHTML = html || '<p class="st-empty">' + (toks.length ? 'No app matches “' + escapeHtml(stQ) + '”.' : stF === 'due' ? 'Nothing is due for revision. Well done!' : 'Nothing in progress yet — open any app to start.') + '</p>';
+  }
+  function openStudyTab(filter){ stF = filter || 'all'; stQ = ''; switchTab('study'); }
+  /** ⋯ on a row: the numbers the old Home cards showed, and their History / Revise / AI buttons. */
+  function openStudySheet(id){
+    var it = studyItem(id), m = it.m, x = it.x, qn = trackTotalQ(id), nq = m.noq ? (m.noqStat || [(/([\d,]+)\s+formulas/.exec(m.meta || '') || [])[1], 'formulas']) : null;
+    var when = x.status === 'due' ? '<div class="st-sh-note due">Revision due · last studied ' + trackAgo(x.lastStudy || x.base) + '</div>'
+      : x.started ? '<div class="st-sh-note">' + (x.off ? 'Revision reminders are off' : 'Next revision ' + trackDate(x.nextAt)) + (x.visited ? ' · last opened ' + trackAgo(x.visited) : '') + '</div>' : '';
+    modalBodyRef().innerHTML = '<div class="st-sheet" style="--hub-c:' + m.color + ';">' +
+      '<div class="st-sh-top"><span class="st-ic">' + m.ico + '</span><div class="st-sh-name"><h3>' + escapeHtml(m.title) + '</h3><div class="hi">' + escapeHtml(m.hi || '') + '</div></div>' +
+        '<div class="hub-ring">' + ringSvg(it.pct, m.color, 50) + '<span>' + it.pct + '%</span></div></div>' + when +
+      (m.desc ? '<p class="help">' + escapeHtml(m.desc) + '</p>' : '') +
+      '<div class="hub-facts"><div><b>' + (m.lessons || '—') + '</b><span>' + (m.unit || 'lessons') + '</span></div>' +
         '<div><b>' + (nq ? (nq[0] || '—') : (qn || '—')) + '</b><span>' + (nq ? nq[1] : 'questions') + '</span></div>' +
-        '<div title="' + escapeAttr('About ' + fmtMin(x.fullMin) + ' to do every lesson and question') + '"><b>' + fmtShort(x.fullMin) + '</b><span>to finish</span></div>' +
-        '<div title="' + escapeAttr('About ' + fmtMin(x.revMin) + ': skim the lessons + one 25-question mock') + '"><b>' + fmtShort(x.revMin) + '</b><span>to revise</span></div>' +
-      '</div>' +
-      '<div class="hub-meta"><span>' + (x.visited ? 'Last opened ' + trackAgo(x.visited) : 'Not opened yet') + '</span><b>' + (x.started ? 'Continue ›' : 'Start ›') + '</b></div></div>';
+        '<div><b>' + fmtShort(x.fullMin) + '</b><span>to finish</span></div><div><b>' + fmtShort(x.revMin) + '</b><span>to revise</span></div></div>' +
+      '<button class="btn teal st-sh-go" data-open-study="' + id + '">' + (x.status === 'due' ? 'Revise now' : x.started ? 'Continue' : 'Start') + ' ›</button>' +
+      '<div class="st-sh-acts"><button data-track-history="' + id + '"><span aria-hidden="true">🕘</span>History</button><button data-track-revise="' + id + '"><span aria-hidden="true">🔁</span>Revision plan</button>' +
+        (document.body.classList.contains('ai-on') ? '<button data-ai-app="' + id + '"><span aria-hidden="true">✨</span>Ask AI</button>' : '') + '</div>' +
+      '<div class="modal-actions"><button class="btn ghost" id="stShClose">Close</button></div></div>';
+    modalBgRef().classList.add('open');
+    document.getElementById('stShClose').addEventListener('click', function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML = ''; });
   }
-  function hubPracticeSection(){
-    var totalWrong = 0;
-    Object.keys(STUDY).forEach(function(id){ totalWrong += studyWrongIds(id).length; });
-    var hist = mockHistory(), last = hist[hist.length - 1];
-    return '<section class="hub-sec"><div class="hub-sec-h"><h2>Practice across subjects</h2><span>सभी विषय</span></div><div class="hub-grid hub-actions">' +
-      '<button class="hub-card hub-act" data-hub-act="mistakes" style="--hub-c:var(--maroon);"><div class="hub-top"><div class="hub-ico">📕</div><div><h3>Mistakes book</h3><div class="hi">गलतियाँ · all subjects</div></div><div class="hub-big">' + totalWrong + '</div></div>' +
-        '<p>Every question you got wrong in any mini app or mock — practise them until they’re gone.</p><div class="hub-meta"><span>' + (totalWrong ? totalWrong + ' waiting' : 'Nothing to fix yet') + '</span><b>Open ›</b></div></button>' +
-      '<button class="hub-card hub-act" data-hub-act="mock" style="--hub-c:var(--teal);"><div class="hub-top"><div class="hub-ico">⏱️</div><div><h3>Mixed mock test</h3><div class="hi">English + Maths + Reasoning + GS · timed</div></div>' + (last ? '<div class="hub-big">' + last.score + '<small>/' + last.max + '</small></div>' : '') + '</div>' +
-        '<p>Vocab, Grammar, ' + mathQIds().length + ' Maths, ' + reasoningIds().length + ' Reasoning and ' + gsQIds().length + ' GS apps in one SSC-style paper, +2 / −0.5, with a subject-wise report.</p><div class="hub-meta"><span>' + (hist.length ? hist.length + ' taken · last ' + agoText(last.at).replace('Opened ', '') : 'Not taken yet') + '</span><b>Start ›</b></div></button>' +
-      todayHubCard() + weakHubCard() + plannerHubCard() +
-      '</div></section>';
-  }
-  function weakHubCard(){
-    var tried = 0, right = 0;
+  // Ask AI from the sheet opens the AI page: shut the sheet first (window capture runs before the AI button's own handler)
+  window.addEventListener('click', function(ev){
+    if(ev.target.closest && ev.target.closest('#modalBody .st-sheet [data-ai-app]')){ modalBgRef().classList.remove('open'); }
+  }, true);
+  (function(){
+    var root = document.getElementById('studyRoot');
+    if(!root) return;
+    root.addEventListener('click', function(ev){
+      var more = ev.target.closest('[data-study-more]');
+      if(more){ ev.stopPropagation(); openStudySheet(more.dataset.studyMore); return; }
+      var f = ev.target.closest('[data-st-f]');
+      if(f){ stF = f.dataset.stF; stQ = ''; renderStudyTab(); var on = root.querySelector('.st-chip[aria-pressed="true"]'); if(on) on.scrollIntoView({ block: 'nearest', inline: 'center' }); window.scrollTo(0, 0); return; }
+      var fd = ev.target.closest('[data-st-fold]');
+      if(fd){ var k = fd.dataset.stFold, s = stFold(); s[k] = fd.getAttribute('aria-expanded') !== 'true'; lsSet('studyFold', JSON.stringify(s)); drawStudyList(); return; }
+      var nw = ev.target.closest('[data-st-new]');
+      if(nw){ stNew[nw.dataset.stNew] = !stNew[nw.dataset.stNew]; drawStudyList(); return; }
+      studyClick(ev);
+    });
+    root.addEventListener('keydown', function(ev){
+      if((ev.key === 'Enter' || ev.key === ' ') && ev.target.matches && ev.target.matches('.st-row')){ ev.preventDefault(); ev.target.click(); }
+    });
+    root.addEventListener('input', function(ev){
+      if(ev.target.id !== 'stSearch') return;
+      stQ = ev.target.value.trim();
+      root.querySelectorAll('.st-chip').forEach(function(c){ c.setAttribute('aria-pressed', String(!stQ && c.dataset.stF === stF)); });
+      drawStudyList();
+    });
+  })();
+
+  /** Home: the cross-subject practice tools as small tiles (the Practice menu has them too). */
+  function homePractice(){
+    var c = todayCounts(), wrong = totalMistakes(), hist = mockHistory(), last = hist[hist.length - 1], tried = 0, right = 0;
     Object.keys(STUDY).forEach(function(id){ if(STUDY[id].noq) return; var a = studyState(id).ans || {}; Object.keys(a).forEach(function(k){ tried++; if(a[k] === 1) right++; }); });
-    return '<button class="hub-card hub-act" data-hub-act="weak" style="--hub-c:var(--mustard);"><div class="hub-top"><div class="hub-ico">🎯</div><div><h3>Weak spots</h3><div class="hi">कमज़ोर विषय · accuracy by topic</div></div>' +
-      (tried ? '<div class="hub-big">' + Math.round(right * 100 / tried) + '<small>%</small></div>' : '') + '</div>' +
-      '<p>Your accuracy in every subject, chapter and topic, weakest first — practise a topic or add it to Tasks in one tap.</p>' +
-      '<div class="hub-meta"><span>' + (tried ? tried + ' questions answered' : 'Answer some questions first') + '</span><b>Open ›</b></div></button>';
+    var plans = plData().plans.length;
+    var t = [['data-hub-act="mistakes"', '📕', 'Mistakes book', wrong ? wrong + ' to fix' : 'Nothing to fix', wrong],
+      ['data-hub-act="mock"', '⏱️', 'Mixed mock', last ? 'Last ' + last.score + ' / ' + last.max : 'Full Tier 1 paper'],
+      ['data-hub-act="today"', '🧠', 'Today’s revision', c.n ? c.n + ' due' : 'All caught up', c.n],
+      ['data-hub-act="weak"', '🎯', 'Weak spots', tried ? Math.round(right * 100 / tried) + '% accuracy' : 'Accuracy by topic'],
+      ['data-hub-act="planner"', '🗓️', 'Study planner', plans ? plans + ' plan' + (plans > 1 ? 's' : '') : 'AI makes a plan'],
+      ['data-home-act="typing"', '⌨️', 'Typing test', 'SSC 35 w.p.m.']];
+    return '<section class="hub-sec"><div class="hub-sec-h"><h2>Practice</h2><span>सभी विषय · all subjects</span></div><div class="home-tools home-prac">' +
+      t.map(function(x){ return '<button ' + x[0] + '><span class="ic">' + x[1] + '</span><b>' + x[2] + '</b><small' + (x[4] ? ' class="hot"' : '') + '>' + x[3] + '</small></button>'; }).join('') + '</div></section>';
   }
   // ================= पाठShala home: the app's front page =================
   var EXAM_DEFAULT = '2026-10-13';
@@ -356,15 +464,19 @@
       '<h1>' + greetText() + (firstName() ? ', <span>' + escapeHtml(firstName()) + '</span>' : '') + '</h1>' +
       '<p>Everything for SSC CGL in one place — vocabulary, grammar and General Studies. One goal, one streak.</p></div>' + cd + '</div>';
   }
-  function homeContinueCard(){
-    var id = lastStudyId();
-    var m = STUDY[id || 'grammar'], pr = studyProgress(id || 'grammar'), pct = pr.total ? Math.round(pr.done * 100 / pr.total) : 0;
-    return '<button class="home-card home-cont" data-open-study="' + (id || 'grammar') + '" style="--hub-c:' + m.color + ';">' +
-      '<div class="home-card-h">' + (id ? 'Continue where you left off' : 'Start here') + '</div>' +
-      '<div class="hub-top"><div class="hub-ico">' + m.ico + '</div><div style="flex:1; min-width:0;"><h3>' + escapeHtml(m.title) + '</h3><div class="hi">' + pr.done + ' / ' + pr.total + ' ' + m.unit + ' · ' + escapeHtml(id ? agoText((studyMeta()[id] || {}).openedAt).replace('Opened ', '') : (pr.done || pr.tried ? 'in progress' : 'not started')) + '</div></div>' +
-      '<div class="hub-ring">' + ringSvg(pct, m.color, 50) + '<span>' + pct + '%</span></div></div>' +
-      '<div class="home-bar"><i style="width:' + pct + '%; background:' + m.color + ';"></i></div>' +
-      '<div class="hub-meta"><span>' + escapeHtml(m.hi) + '</span><b>' + (id ? 'Resume' : 'Open') + ' ›</b></div></button>';
+  /** Continue: the last few apps you opened, newest first (a list on a computer, a strip you swipe on a phone). */
+  function homeContinue(){
+    var meta = studyMeta(), ids = Object.keys(STUDY).filter(function(id){ return (meta[id] || {}).openedAt; })
+      .sort(function(a, b){ return meta[b].openedAt - meta[a].openedAt; }).slice(0, 4);
+    var first = !ids.length;
+    if(first) ids = ['grammar'];
+    return '<div class="home-card home-cont2"><div class="home-card-h">' + (first ? 'Start here' : 'Continue where you left off') + '<button class="lvl" data-study-subj="all">All apps ›</button></div><div class="cont-list">' +
+      ids.map(function(id){
+        var it = studyItem(id), m = it.m;
+        return '<button class="cont-item" data-open-study="' + id + '" style="--hub-c:' + m.color + ';"><span class="ic">' + m.ico + '</span>' +
+          '<span class="tx"><b>' + escapeHtml(m.title) + '</b><small>' + escapeHtml(first ? m.meta || '' : it.sub) + '</small><span class="bar"><i style="width:' + it.pct + '%"></i></span></span>' +
+          '<span class="go">' + (first ? 'Open' : it.st === 'due' ? 'Revise' : 'Resume') + ' ›</span></button>';
+      }).join('') + '</div></div>';
   }
   function homeDueCard(){
     var due = currentUser ? dueRevisions().length : 0, mist = totalMistakes();
@@ -392,16 +504,6 @@
     return '<div class="home-tools" aria-label="Vocab tools">' +
       t.map(function(x){ return '<button data-home-act="' + x[0] + '"><span class="ic">' + x[1] + '</span><b>' + x[2] + '</b><small>' + x[3] + '</small></button>'; }).join('') + '</div>';
   }
-  function homeVocabCard(){
-    var ve = viewEntries(), mem = ve.filter(function(e){ return e.confidence >= 5; }).length, pct = ve.length ? Math.round(mem * 100 / ve.length) : 0;
-    var due = currentUser ? dueRevisions().length : 0;
-    return '<button class="hub-card" data-home-act="library" style="--hub-c:var(--mustard);">' +
-      '<div class="hub-top"><div class="hub-ico">📖</div><div style="flex:1; min-width:0;"><h3>शब्दRegister</h3><div class="hi">शब्दावली · Vocabulary</div></div>' +
-        '<div class="hub-ring" title="' + pct + '% memorized">' + ringSvg(pct, 'var(--mustard)', 50) + '<span>' + pct + '%</span></div></div>' +
-      '<p>Meanings, idioms, one-word substitutions, spellings and roots — with quizzes and spaced revision.</p>' +
-      '<div class="hub-stats"><span><b>' + ve.length + '</b> words</span><span><b>' + mem + '</b> memorized</span>' + (due ? '<span class="hub-wrong"><b>' + due + '</b> due</span>' : '') + '</div>' +
-      '<div class="hub-meta"><span>Library · Spelling Bank · Roots</span><b>Open ›</b></div></button>';
-  }
   var SUBJ_ICO = { maths: '➗', reasoning: '🧩', english: '🔤', history: '🏺', culture: '🎭', polity: '⚖️', geography: '🗺️', economy: '💰', science: '🔬', staticgk: '📚', computer: '💻', current: '📰', other: '📘' };
   function subjIds(key){
     return gsIds().filter(function(id){ return (STUDY[id].gsub || 'other') === key; }).sort(function(a, b){ return (STUDY[b].core || 0) - (STUDY[a].core || 0); });
@@ -411,7 +513,7 @@
     list.forEach(function(id){ var p = studyProgress(id); done += p.done; total += p.total; tried += p.tried; right += p.right; });
     return { pct: total ? Math.round(done * 100 / total) : 0, done: done, total: total, tried: tried, acc: tried ? Math.round(right * 100 / tried) : null };
   }
-  /** One tile per subject: how far along it is; tap to jump to its row. */
+  /** One tile per subject: how far along it is; tap to see its apps in the Study tab. */
   function homeSubjects(){
     var en = englishIds(), ve = viewEntries(), mem = ve.filter(function(e){ return e.confidence >= 5; }).length;
     var gp = subjProgress(en), vocPct = ve.length ? Math.round(mem * 100 / ve.length) : 0;
@@ -425,10 +527,11 @@
       var sp = subjProgress(list);
       tiles.push({ key: g[0], name: g[1], hi: g[2], n: list.length, pct: sp.pct, acc: sp.acc, jump: list.length ? g[0] : '' });
     });
-    return '<section class="hub-sec"><div class="hub-sec-h"><h2>Your subjects</h2><span>विषय · tap one to jump to its apps</span></div><div class="subj-tiles">' +
+    var total = Object.keys(STUDY).length;
+    return '<section class="hub-sec"><div class="hub-sec-h"><h2>Study</h2><span>' + total + ' mini apps · tap a subject</span><button class="hub-sec-more" data-study-subj="all">All apps ›</button></div><div class="subj-tiles">' +
       tiles.map(function(t){
         if(!t.n) return '<div class="subj-tile empty"><span class="ic">' + SUBJ_ICO[t.key] + '</span><b>' + t.name + '</b><small>' + t.hi + '</small><em>No app yet</em></div>';
-        return '<button class="subj-tile" data-hub-jump="' + t.jump + '"><span class="ic">' + SUBJ_ICO[t.key] + '</span><b>' + t.name + '</b><small>' + t.hi + '</small>' +
+        return '<button class="subj-tile" data-study-subj="' + t.jump + '"><span class="ic">' + SUBJ_ICO[t.key] + '</span><b>' + t.name + '</b><small>' + t.hi + '</small>' +
           '<span class="bar"><i style="width:' + t.pct + '%"></i></span><em>' + t.pct + '% · ' + t.n + ' app' + (t.n === 1 ? '' : 's') + '</em></button>';
       }).join('') + '</div></section>';
   }
@@ -438,26 +541,13 @@
   function renderHub(){
     var box = document.getElementById('homeBody');
     if(!box) return;
-    var ids = Object.keys(STUDY), html;
+    var html;
     veMemo = viewEntries();
     try{ html = homeHero() +
-      '<div class="home-row1">' + homeTodayCard() + homeContinueCard() + '</div>' +
+      '<div class="home-row1">' + homeTodayCard() + homeContinue() + '</div>' +
       '<div class="home-row2">' + homeDueCard() + homeReviseCard() + '</div>' +
-      homeSubjects() +
-      hubPracticeSection() +
-      '<section class="hub-sec hub-sub" id="hubsub-english"><div class="hub-sec-h"><h2>English</h2><span>अंग्रेज़ी</span></div><div class="hub-grid">' + homeVocabCard() + ids.filter(function(id){ return STUDY[id].subj === 'english'; }).map(hubCard).join('') + '</div></section>' +
-      '<section class="hub-sec hub-sub" id="hubsub-maths"><div class="hub-sec-h"><h2>Maths</h2><span>गणित · formulas, figures, tricks & PYQs</span></div><div class="hub-grid">' + mathIds().map(hubCard).join('') + '</div></section>' +
-      '<section class="hub-sec hub-sub" id="hubsub-reasoning"><div class="hub-sec-h"><h2>Reasoning</h2><span>तर्कशक्ति · rules, shortcuts & practice</span></div><div class="hub-grid">' + reasoningIds().map(hubCard).join('') + '</div></section>' +
-      '<section class="hub-sec" id="homeGs"><div class="hub-sec-h"><h2>General Studies</h2><span>सामान्य अध्ययन · ' + gsIds().length + ' mini apps in ' + GS_SUBJECTS.filter(function(g){ return subjIds(g[0]).length; }).length + ' subjects</span></div>' +
-        GS_SUBJECTS.concat([['other', 'More', 'अन्य']]).map(function(g){
-          var list = subjIds(g[0]);
-          if(!list.length) return '';
-          var sp = subjProgress(list);
-          return '<div class="hub-sub" id="hubsub-' + g[0] + '"><div class="hub-sub-h"><span class="sub-ico">' + (SUBJ_ICO[g[0]] || '📘') + '</span><h3>' + g[1] + '</h3><span>' + g[2] + '</span>' +
-            '<span class="sub-prog"><i><b style="width:' + sp.pct + '%"></b></i>' + list.length + ' app' + (list.length === 1 ? '' : 's') + ' · ' + sp.pct + '% done</span></div>' +
-            '<div class="hub-grid">' + list.map(hubCard).join('') + '</div></div>';
-        }).join('') +
-      '</section>';
+      homePractice() +
+      homeSubjects();
     } finally { veMemo = null; }
     if(html === hubHtml && box.firstChild) return;
     hubHtml = html;
@@ -473,6 +563,7 @@
     clearTimeout(homeTimer);
     homeTimer = setTimeout(function(){
       if(isActive('home') && !drillOpen) renderHub();
+      if(isActive('study') && !drillOpen) drawStudyList();
       if(isActive('library')) renderVocabDash();
       if(isActive('stats')){ renderTracker(); renderStudyStats(); }
       if(isActive('plan') && plMode !== 'setup' && !(document.activeElement && document.activeElement.closest && document.activeElement.closest('#planRoot input, #planRoot textarea'))) renderPlanTab();
@@ -494,8 +585,8 @@
   function studyClick(ev){
     var c = ev.target.closest('[data-open-study]');
     if(c){ openStudy(c.dataset.openStudy, false); return; }
-    var jump = ev.target.closest('[data-hub-jump]');
-    if(jump){ var t = document.getElementById('hubsub-' + jump.dataset.hubJump); if(t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+    var subj = ev.target.closest('[data-study-subj]');
+    if(subj){ openStudyTab(subj.dataset.studySubj); return; }
     var act = ev.target.closest('[data-hub-act]');
     if(act){ if(act.dataset.hubAct === 'mistakes') openMistakes(); else if(act.dataset.hubAct === 'today') openToday(); else if(act.dataset.hubAct === 'weak') openWeak(); else if(act.dataset.hubAct === 'planner') openPlanner(); else openMock(); return; }
     var h = ev.target.closest('[data-home-act]');
@@ -820,6 +911,12 @@
       (setting .src adds one, so the phone's Back button needed several presses). */
   function setStudyFrame(url){
     var f = document.getElementById('studyFrame');
+    if(!f.dataset.focusOnLoad){   // on a computer, put the keyboard in the mini app so its shortcuts work at once
+      f.dataset.focusOnLoad = '1';
+      f.addEventListener('load', function(){
+        try{ if(studyOpen && matchMedia('(hover: hover) and (pointer: fine)').matches && !/^about:/.test(f.contentWindow.location.href)) f.contentWindow.focus(); }catch(e){}
+      });
+    }
     try{ if(f.contentWindow){ f.contentWindow.location.replace(url); return; } }catch(e){}
     f.src = url;
   }
@@ -1991,17 +2088,7 @@
       showToast(n + ' task' + (n === 1 ? '' : 's') + ' added to Tasks for ' + plDateText(sms) + '.');
     });
   }
-  function plannerHubCard(){
-    var plans = plData().plans, now = Date.now(), sub = 'Plan any subjects for any number of days';
-    if(plans.length){
-      var all = 0, done = 0;
-      plans.forEach(function(p){ var d = plIdx(p, now); if(d >= 0 && d < p.list.length) p.list[d].tasks.forEach(function(t, j){ all++; if(plTaskDone(p, d, j, t)) done++; }); });
-      sub = plans.length + ' plan' + (plans.length > 1 ? 's' : '') + ' · ' + (all ? done + '/' + all + ' of today’s tasks done' : 'nothing planned today');
-    }
-    return '<button class="hub-card hub-act" data-hub-act="planner" style="--hub-c:var(--indigo, #3D5CF0);"><div class="hub-top"><div class="hub-ico">🗓️</div><div><h3>Study planner</h3><div class="hi">अध्ययन योजना · any apps, any days</div></div></div>' +
-      '<p>Say what you want to cover, in how many days, and how your days look — AI shapes a plan around your job and holidays, shown on a calendar with your exams.</p>' +
-      '<div class="hub-meta"><span>' + escapeHtml(sub) + '</span><b>' + (plans.length ? 'Open ›' : 'Make a plan ›') + '</b></div></button>';
-  }
+
 
   // Mistakes book
   async function openMistakes(){
@@ -2173,12 +2260,7 @@
     document.querySelectorAll('#drillBody [data-open-study]').forEach(function(b){ b.addEventListener('click', function(ev){ ev.stopPropagation(); closeDrill(false); openStudy(b.dataset.openStudy, false); }); });
     document.querySelectorAll('#drillBody [data-td-go]').forEach(function(b){ b.addEventListener('click', function(){ closeDrill(false); switchTab(b.dataset.tdGo); }); });
   }
-  function todayHubCard(){
-    var c = todayCounts();
-    return '<button class="hub-card hub-act" data-hub-act="today" style="--hub-c:var(--teal);"><div class="hub-top"><div class="hub-ico">🧠</div><div><h3>Today’s revision</h3><div class="hi">आज का रिवीज़न · one queue</div></div><div class="hub-big">' + c.n + '</div></div>' +
-      '<p>Old mistakes back on 1 · 3 · 7 · 15 · 30-day gaps, apps due for revision and words due back — in one list.</p>' +
-      '<div class="hub-meta"><span>' + (c.n ? c.q + ' questions · ' + c.apps + ' apps · ' + c.words + ' words' : 'All caught up') + '</span><b>Open ›</b></div></button>';
-  }
+
 
   // Weak spots: accuracy by subject → app → topic, from the last answer to every question
   var WEAK_SUBJ = [['english', 'English', 'var(--teal)'], ['maths', 'Maths', 'var(--blue, #2f6db5)'], ['reasoning', 'Reasoning', 'var(--purple, #7a4fb0)'], ['gs', 'General Studies', 'var(--mustard)']];
@@ -2637,6 +2719,19 @@
     return;
   }
 
+  // Sign-in and sync come from Google's CDN. If that did not load (offline on the very first visit, or a network
+  // that blocks www.gstatic.com), say so instead of leaving "Opening पाठShala…" on screen for ever.
+  if(typeof firebase === 'undefined' || !firebase.auth || !firebase.firestore){
+    var lo = document.getElementById('loadingOverlay');
+    lo.innerHTML = '<div>Couldn’t reach the sign-in service</div><div class="load-note"><p>' +
+      (navigator.onLine ? 'Your network may be blocking Google’s servers (www.gstatic.com). Try another network or turn off a VPN / ad blocker, then try again.'
+                        : 'You’re offline. Connect to the internet once so पाठShala can save itself for offline use, then try again.') +
+      '</p><button type="button" class="btn teal">Try again</button></div>';
+    lo.querySelector('button').onclick = function(){ location.reload(); };
+    window.addEventListener('online', function(){ location.reload(); });
+    return;
+  }
+
   firebase.initializeApp(firebaseConfig);
   var auth = firebase.auth();
   var db = firebase.firestore();
@@ -2788,10 +2883,16 @@
     }
   }
 
+  /** "Manish Patel" → "MP", "someone@mail.com" → "S": shown on phones when the account has no photo */
+  function initialsOf(name){
+    var parts = String(name).split('@')[0].split(/[\s._-]+/).filter(Boolean);
+    return ((parts[0] || '?').charAt(0) + (parts.length > 1 ? parts[parts.length - 1].charAt(0) : '')).toUpperCase();
+  }
   function renderWhoBox(){
     var box = document.getElementById('whoBox');
     box.innerHTML =
-      (currentUser.photoURL ? '<img class="avatar" src="'+escapeAttr(currentUser.photoURL)+'" alt="">' : '') +
+      (currentUser.photoURL ? '<img class="avatar" src="'+escapeAttr(currentUser.photoURL)+'" alt="">'
+        : '<span class="avatar initials" aria-hidden="true">'+escapeHtml(initialsOf(currentUser.displayName || currentUser.email || '?'))+'</span>') +
       '<span>'+escapeHtml(currentUser.displayName || currentUser.email)+'</span>' +
       (isAdminUser ? '<span class="admin-badge">admin</span>' : (isModeratorUser ? '<span class="mod-badge">moderator</span>' : ''));
   }
@@ -3657,10 +3758,12 @@
     refreshNavActive();
     closeAllMenus();
     document.body.classList.toggle('on-home', name === 'home');
+    document.body.dataset.tab = name;
     if(name === 'library') libraryAnimate = true;
     window.scrollTo(0, 0);
     if(name === 'library'){ renderVocabDash(); renderLibrary(); }
     if(name === 'home'){ renderHub(); refreshHubProgressSoon(); }
+    if(name === 'study'){ renderStudyTab(); refreshHubProgressSoon(); }
     if(name === 'stats'){ renderStreakPanel(); renderTracker(); renderStudyStats(); renderStats(); renderLeaderboard(); renderAllUsers(); refreshHubProgressSoon(); }
     if(name === 'review'){ renderReview(); renderSpellReview(); }
     if(name === 'quiz') renderQuizHome();

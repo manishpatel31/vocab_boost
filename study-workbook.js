@@ -788,3 +788,6 @@ window.addEventListener("hashchange", () => {
 window.addEventListener("storage", e => {
   if (SHARED && e.key === KEY) { try { const plan = S.plan; S = Object.assign(S, JSON.parse(e.newValue || "{}")); S.plans = S.plans || {}; S.plan = plan; } catch(x) {} if (TAB === "plan" || TAB === "start") go(TAB); return; }
   if (e.key && e.key !== KEY && APP.apps.some(a => a.key === e.key) && (TAB === "plan" || TAB === "start")) go(TAB); });
+
+/* keyboard shortcuts and answer feedback, shared by every mini app (study-keys.js; tools/stamp.js sets its ?v=) */
+(function(){ if (window.__studyKeys || document.querySelector("script[data-study-keys]")) return; const s = document.createElement("script"); s.src = "study-keys.js?v=c97dabb7"; s.dataset.studyKeys = ""; document.head.appendChild(s); })();
