@@ -252,7 +252,7 @@
   var ST_ORDER = { due: 0, progress: 1, done: 2, new: 3 };
   function studyGroups(){
     var g = [{ key: 'english', name: 'English', hi: 'अंग्रेज़ी', ids: englishIds(), vocab: true },
-      { key: 'maths', name: 'Maths', hi: 'गणित', ids: mathIds() },
+      { key: 'maths', name: 'Maths', hi: 'गणित', ids: shownIds(mathIds()) },
       { key: 'reasoning', name: 'Reasoning', hi: 'तर्कशक्ति', ids: reasoningIds() }];
     GS_SUBJECTS.concat([['other', 'More', 'अन्य']]).forEach(function(s){ var ids = subjIds(s[0]); if(ids.length) g.push({ key: s[0], name: s[1], hi: s[2], ids: ids }); });
     return g;
@@ -289,7 +289,7 @@
     if(stF !== 'all' && stF !== 'prog' && stF !== 'due' && !groups.some(function(g){ return g.key === stF; })) stF = 'all';
     var chips = [['all', 'All'], ['prog', 'In progress', nProg || undefined], ['due', 'Due', nDue || undefined]].concat(groups.map(function(g){ return [g.key, g.name]; }));
     var hadFocus = document.activeElement && document.activeElement.id === 'stSearch';
-    root.innerHTML = '<div class="st-head"><div class="st-title"><h1>Study</h1><span>' + (items.length - 1) + ' mini apps · ' + groups.length + ' subjects</span></div>' +
+    root.innerHTML = '<div class="st-head"><div class="st-title"><h1>Study</h1><span>' + (items.length - 1) + ' mini apps · ' + groups.length + ' subjects · <button class="st-papers" data-st-papers>My papers</button></span></div>' +
       '<label class="st-search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>' +
         '<input type="search" id="stSearch" placeholder="Find an app — polity, rivers, trigonometry…" autocomplete="off" enterkeyhint="search" aria-label="Find an app" value="' + escapeAttr(stQ) + '"></label>' +
       '<div class="st-chips" role="group" aria-label="Show">' + chips.map(function(c){
@@ -327,6 +327,9 @@
           (folding && fresh.length && active.length ? '<button class="st-fold" data-st-new="' + g.key + '" aria-expanded="' + !!showNew + '">' + (showNew ? 'Hide the ones not started' : 'Not started · ' + fresh.length + ' app' + (fresh.length === 1 ? '' : 's')) + '</button>' : '') +
         '</div>' : '') + '</section>';
     });
+    var hid = hiddenApps();
+    if(hid.length && !toks.length && (stF === 'all' || groups.some(function(g){ return g.key === stF; })))
+      html += '<p class="st-hidden">Not shown: ' + hid.map(function(id){ return escapeHtml(STUDY[id].title); }).join(' · ') + ' — Tier 2 papers you aren’t taking. <button class="st-papers" data-st-papers>Change</button></p>';
     box.innerHTML = html || '<p class="st-empty">' + (toks.length ? 'No app matches “' + escapeHtml(stQ) + '”.' : stF === 'due' ? 'Nothing is due for revision. Well done!' : 'Nothing in progress yet — open any app to start.') + '</p>';
   }
   function openStudyTab(filter){ stF = filter || 'all'; stQ = ''; switchTab('study'); }
@@ -357,6 +360,7 @@
     var root = document.getElementById('studyRoot');
     if(!root) return;
     root.addEventListener('click', function(ev){
+      if(ev.target.closest('[data-st-papers]')){ papersModal(); return; }
       var more = ev.target.closest('[data-study-more]');
       if(more){ ev.stopPropagation(); openStudySheet(more.dataset.studyMore); return; }
       var f = ev.target.closest('[data-st-f]');
@@ -377,6 +381,148 @@
       drawStudyList();
     });
   })();
+
+  // ================= My exams: the Tier 2 papers you are taking =================
+  // Statistics (JSO) and Finance & Accounts (AAO) are each for one post. Until you choose, each shows once you have opened
+  // it; after you choose, Home, Study, the planner and the mixed mock follow your choice. Saved with your exams (synced).
+  var PAPERS = [['jso', 'statistics', 'Statistics', 'CGL Tier 2 Paper II · Junior Statistical Officer'], ['aao', 'finacc', 'Finance & Accounts', 'CGL Tier 2 Paper III · Assistant Audit / Accounts Officer']];
+  PAPERS.forEach(function(p){ STUDY[p[1]].paper = p[0]; });
+  function papersChosen(){ var p = studyState('exams').papers; return p && typeof p === 'object' ? p : null; }
+  function appShown(id, chosen){
+    var m = STUDY[id];
+    if(!m || !m.paper) return true;
+    if(chosen === undefined) chosen = papersChosen();
+    if(chosen && chosen[m.paper] !== undefined) return !!chosen[m.paper];
+    return !!(studyMeta()[id] || {}).openedAt;
+  }
+  function shownIds(list){ var c = papersChosen(); return list.filter(function(id){ return appShown(id, c); }); }
+  function hiddenApps(){ var c = papersChosen(); return Object.keys(STUDY).filter(function(id){ return !appShown(id, c); }); }
+  function papersModal(){
+    modalBodyRef().innerHTML = '<h3>Which papers are you taking?</h3><p class="help" style="margin-top:0;">Everything for CGL Tier 1 and Tier 2, CHSL, CPO and MTS is always there. These two apps are for one post each — tick the ones you are taking. Home, Study, the planner and the mixed mock follow this.</p>' +
+      '<div class="pp-list">' + PAPERS.map(function(p){
+        var m = STUDY[p[1]];
+        return '<label class="pp-row"><input type="checkbox" data-pp="' + p[0] + '"' + (appShown(p[1]) ? ' checked' : '') + '><span class="ic" aria-hidden="true">' + m.ico + '</span><span class="tx"><b>' + p[2] + '</b><small>' + p[3] + '</small></span></label>';
+      }).join('') + '</div>' +
+      '<div class="modal-actions"><button class="btn ghost" id="ppCancel">Cancel</button><button class="btn teal" id="ppSave">Save</button></div>';
+    modalBgRef().classList.add('open');
+    var close = function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML = ''; };
+    document.getElementById('ppCancel').addEventListener('click', close);
+    document.getElementById('ppSave').addEventListener('click', function(){
+      var s = studyState('exams'), papers = {};   // not examsSave(): choosing papers must not count as editing the exam list
+      modalBodyRef().querySelectorAll('[data-pp]').forEach(function(b){ papers[b.dataset.pp] = b.checked; });
+      s.papers = papers;
+      setStudyState('exams', s);
+      // the mixed mock: a paper you take is in it, one you don't is out
+      PAPERS.forEach(function(p){
+        var list = mockCfg[STUDY[p[1]].subj === 'maths' ? 'mtMods' : 'gsMods'];
+        if(!Array.isArray(list)) return;
+        var i = list.indexOf(p[1]);
+        if(papers[p[0]] && i === -1) list.push(p[1]);
+        if(!papers[p[0]] && i !== -1) list.splice(i, 1);
+      });
+      saveMockCfg();
+      close();
+      renderHomeSoon();
+      if(isActive('study')) renderStudyTab();
+      showToast('Saved — showing the papers you take.');
+    });
+  }
+
+  // ================= Today's session: the day in one list =================
+  // Made from what the app already knows — the revision queue, today's plan tasks, apps due for revision, the app you were
+  // last in, the mistakes book — each with a time, and one button that opens the next step. A step ticks itself when its
+  // work is done; a plan task the app can't see (a revision, a mock) is ticked with its circle, as in Plan. The day's list
+  // is kept (shabdSession) so finished steps stay on it, struck through.
+  function sessionSteps(){
+    var out = [], r = reviewDueKeys().length, w = currentUser ? dueRevisions().length : 0;
+    if(r || w) out.push({ k: 'rev', ico: '🧠', label: 'Today’s revision', sub: [r ? r + ' question' + (r > 1 ? 's' : '') + ' back for review' : '', w ? w + ' word' + (w > 1 ? 's' : '') + ' due back' : ''].filter(Boolean).join(' · '), min: Math.max(3, Math.round(r * 0.6 + w * 0.3)) });
+    var planned = false, inPlan = {};
+    plData().plans.forEach(function(p){
+      var d = plIdx(p, Date.now());
+      if(d < 0 || d >= p.list.length) return;
+      p.list[d].tasks.forEach(function(t, j){
+        if(t.m && !STUDY[t.m]) return;
+        var tx = plTaskText(t);
+        planned = true;
+        if(t.m) inPlan[t.m] = 1;
+        out.push({ k: 'plan:' + p.id + ':' + d + ':' + j, ico: t.k === 'les' ? STUDY[t.m].ico : t.k === 'mock' ? '⏱️' : t.k === 'mist' ? '📕' : t.k === 'weak' ? '🎯' : '🔁',
+          label: tx.label, sub: (t.k === 'les' ? '' : p.name + ' · ') + tx.sub, min: t.min || 15, tick: t.k !== 'les' });
+      });
+    });
+    trackDueList().filter(function(x){ return appShown(x.id) && !inPlan[x.id]; }).slice(0, 2).forEach(function(x){
+      out.push({ k: 'due:' + x.id, ico: x.m.ico, label: 'Revise ' + x.m.title, sub: 'Due · last studied ' + trackAgo(x.lastStudy || x.base), min: Math.round(Math.min(x.revMin, 40)) });
+    });
+    var last = lastStudyId();
+    if(!planned && last && appShown(last)){
+      var x = trackInfo(last);
+      if(x.status === 'progress') out.push({ k: 'cont:' + last, ico: x.m.ico, label: 'Continue ' + x.m.title, sub: x.pr.done + ' / ' + x.pr.total + ' ' + (x.m.unit || 'lessons') + ' done · the next one and its quiz', min: plPerLesson(last) });
+    }
+    var mist = totalMistakes();
+    if(mist >= 5 && !out.some(function(s){ return /^plan:/.test(s.k) && s.ico === '📕'; })) out.push({ k: 'mist', ico: '📕', label: 'Mistakes book', sub: 'Clear 10 of your ' + mist + ' wrong answers', min: 10, n: mist });
+    return out;
+  }
+  function sessionPlanTask(k){ var p = k.split(':'), pl = plGet(p[1]), day = pl && pl.list[+p[2]]; return day && day.tasks[+p[3]] ? { p: pl, d: +p[2], j: +p[3], t: day.tasks[+p[3]] } : null; }
+  function sessionDone(s){
+    var k = s.k, id = k.split(':')[1];
+    if(k === 'rev') return !reviewDueKeys().length && !(currentUser && dueRevisions().length);
+    if(/^plan:/.test(k)){ var r = sessionPlanTask(k); return !!r && plTaskDone(r.p, r.d, r.j, r.t); }
+    if(/^(due|cont):/.test(k)) return !!STUDY[id] && (trackInfo(id).lastStudy || 0) >= plMid(Date.now());
+    if(k === 'mist') return totalMistakes() <= Math.max(0, (s.n || 0) - 10);
+    return false;
+  }
+  function sessionToday(){
+    var day = todoDay(0), st;
+    try{ st = JSON.parse(lsGet('shabdSession') || '{}') || {}; }catch(e){ st = {}; }
+    if(st.day !== day || !Array.isArray(st.steps)) st = { day: day, steps: [] };
+    var live = {};
+    sessionSteps().forEach(function(s){ live[s.k] = s; if(!st.steps.some(function(o){ return o.k === s.k; })) st.steps.push(s); });
+    // a step stays while it is still wanted or once it is done; one that is neither (snoozed, plan changed) leaves
+    st.steps = st.steps.filter(function(s){
+      s.done = sessionDone(s);
+      if(!s.done && live[s.k]){ s.sub = live[s.k].sub; s.min = live[s.k].min; }
+      return s.done || !!live[s.k];
+    });
+    lsSet('shabdSession', JSON.stringify(st));
+    return st.steps;
+  }
+  function homeSession(){
+    var steps = sessionToday();
+    if(!steps.length) return '';
+    var left = steps.filter(function(s){ return !s.done; }), next = left[0], mins = left.reduce(function(a, s){ return a + (s.min || 0); }, 0);
+    return '<div class="home-card home-sess"><div class="home-card-h">Today’s session<span class="lvl">' + (left.length ? 'about ' + fmtMin(mins) + ' left' : 'all done ✓') + '</span></div><div class="sess-list">' +
+      steps.map(function(s, i){
+        var n = s.done ? '✓' : i + 1;
+        return '<div class="sess-step' + (s.done ? ' done' : '') + (s === next ? ' next' : '') + '">' +
+          (s.tick ? '<button class="sess-n" data-sess-tick="' + escapeAttr(s.k) + '" aria-pressed="' + !!s.done + '" aria-label="' + escapeAttr((s.done ? 'Not done: ' : 'Mark done: ') + s.label) + '">' + n + '</button>' : '<span class="sess-n" aria-hidden="true">' + n + '</span>') +
+          '<button class="sess-main" data-sess="' + escapeAttr(s.k) + '"><span class="ic" aria-hidden="true">' + s.ico + '</span><span class="tx"><b>' + escapeHtml(s.label) + '</b><small>' + escapeHtml(s.sub) + '</small></span>' +
+          '<span class="sess-min">' + (s.done ? 'done' : fmtShort(s.min || 5)) + '</span></button></div>';
+      }).join('') + '</div>' +
+      (next ? '<button class="btn teal sess-go" data-sess="' + escapeAttr(next.k) + '">' + (left.length === steps.length ? 'Start' : 'Continue') + ' · step ' + (steps.indexOf(next) + 1) + ' of ' + steps.length + ' ›</button>'
+            : '<p class="sess-fin">Everything for today is done — well done!</p>') + '</div>';
+  }
+  function sessionGo(k){
+    var id = k.split(':')[1];
+    if(k === 'rev') return openToday();
+    if(k === 'mist') return openMistakes();
+    if(/^due:/.test(k)) return openStudy(id, false, null, STUDY[id].noq ? null : 'revise');
+    if(/^cont:/.test(k)) return openStudy(id, false);
+    var r = sessionPlanTask(k), t = r && r.t;
+    if(!t) return;
+    if(t.k === 'mock') return openMock();
+    if(t.k === 'mist') return openMistakes();
+    if(t.k === 'weak') return openWeak();
+    openStudy(t.m, false, t.k === 'les' ? t.id : null, (t.k === 'rev' || t.k === 'wrev') && !STUDY[t.m].noq ? 'revise' : null);
+  }
+  function sessionTick(k){
+    var r = sessionPlanTask(k);
+    if(!r) return;
+    var key = r.d + ':' + r.j;
+    r.p.done = r.p.done || {};
+    if(r.p.done[key]) delete r.p.done[key]; else r.p.done[key] = 1;
+    plPut(r.p);
+    renderHub();
+    if(isActive('plan')) renderPlanTab();
+  }
 
   /** Home: the cross-subject practice tools as small tiles (the Practice menu has them too). */
   function homePractice(){
@@ -466,7 +612,7 @@
   }
   /** Continue: the last few apps you opened, newest first (a list on a computer, a strip you swipe on a phone). */
   function homeContinue(){
-    var meta = studyMeta(), ids = Object.keys(STUDY).filter(function(id){ return (meta[id] || {}).openedAt; })
+    var meta = studyMeta(), ids = shownIds(Object.keys(STUDY)).filter(function(id){ return (meta[id] || {}).openedAt; })
       .sort(function(a, b){ return meta[b].openedAt - meta[a].openedAt; }).slice(0, 4);
     var first = !ids.length;
     if(first) ids = ['grammar'];
@@ -506,7 +652,7 @@
   }
   var SUBJ_ICO = { maths: '➗', reasoning: '🧩', english: '🔤', history: '🏺', culture: '🎭', polity: '⚖️', geography: '🗺️', economy: '💰', science: '🔬', staticgk: '📚', computer: '💻', current: '📰', other: '📘' };
   function subjIds(key){
-    return gsIds().filter(function(id){ return (STUDY[id].gsub || 'other') === key; }).sort(function(a, b){ return (STUDY[b].core || 0) - (STUDY[a].core || 0); });
+    return shownIds(gsIds()).filter(function(id){ return (STUDY[id].gsub || 'other') === key; }).sort(function(a, b){ return (STUDY[b].core || 0) - (STUDY[a].core || 0); });
   }
   function subjProgress(list){
     var done = 0, total = 0, tried = 0, right = 0;
@@ -517,9 +663,9 @@
   function homeSubjects(){
     var en = englishIds(), ve = viewEntries(), mem = ve.filter(function(e){ return e.confidence >= 5; }).length;
     var gp = subjProgress(en), vocPct = ve.length ? Math.round(mem * 100 / ve.length) : 0;
-    var mp = subjProgress(mathIds());
+    var mp = subjProgress(shownIds(mathIds()));
     var tiles = [{ key: 'english', name: 'English', hi: 'अंग्रेज़ी', n: en.length + 1, pct: Math.round((gp.pct + vocPct) / 2), acc: gp.acc, jump: 'english' },
-      { key: 'maths', name: 'Maths', hi: 'गणित', n: mathIds().length, pct: mp.pct, acc: mp.acc, jump: 'maths' }];
+      { key: 'maths', name: 'Maths', hi: 'गणित', n: shownIds(mathIds()).length, pct: mp.pct, acc: mp.acc, jump: 'maths' }];
     var rp = subjProgress(reasoningIds());
     tiles.push({ key: 'reasoning', name: 'Reasoning', hi: 'तर्कशक्ति', n: reasoningIds().length, pct: rp.pct, acc: rp.acc, jump: 'reasoning' });
     GS_SUBJECTS.forEach(function(g){
@@ -527,7 +673,7 @@
       var sp = subjProgress(list);
       tiles.push({ key: g[0], name: g[1], hi: g[2], n: list.length, pct: sp.pct, acc: sp.acc, jump: list.length ? g[0] : '' });
     });
-    var total = Object.keys(STUDY).length;
+    var total = Object.keys(STUDY).length - hiddenApps().length;
     return '<section class="hub-sec"><div class="hub-sec-h"><h2>Study</h2><span>' + total + ' mini apps · tap a subject</span><button class="hub-sec-more" data-study-subj="all">All apps ›</button></div><div class="subj-tiles">' +
       tiles.map(function(t){
         if(!t.n) return '<div class="subj-tile empty"><span class="ic">' + SUBJ_ICO[t.key] + '</span><b>' + t.name + '</b><small>' + t.hi + '</small><em>No app yet</em></div>';
@@ -543,7 +689,7 @@
     if(!box) return;
     var html;
     veMemo = viewEntries();
-    try{ html = homeHero() +
+    try{ html = homeHero() + homeSession() +
       '<div class="home-row1">' + homeTodayCard() + homeContinue() + '</div>' +
       '<div class="home-row2">' + homeDueCard() + homeReviseCard() + '</div>' +
       homePractice() +
@@ -583,6 +729,10 @@
     else if(a === 'panic') document.getElementById('panicBtn').click();
   }
   function studyClick(ev){
+    var tk = ev.target.closest('[data-sess-tick]');
+    if(tk){ sessionTick(tk.dataset.sessTick); return; }
+    var ss = ev.target.closest('[data-sess]');
+    if(ss){ sessionGo(ss.dataset.sess); return; }
     var c = ev.target.closest('[data-open-study]');
     if(c){ openStudy(c.dataset.openStudy, false); return; }
     var subj = ev.target.closest('[data-study-subj]');
@@ -1500,10 +1650,12 @@
         }).join('') + '</div>' : '<p class="help">No exams yet — add one below.</p>') +
         '<div class="field-2col"><div class="field"><label class="field-label" for="exName">Exam</label><input type="text" id="exName" maxlength="60" placeholder="e.g. SSC CGL Tier 1" autocomplete="off"></div>' +
         '<div class="field"><label class="field-label" for="exDate">Date</label><input type="date" id="exDate" min="' + t + '"></div></div>' +
+        '<p class="help">Taking a Tier 2 post paper (Statistics for JSO, Finance &amp; Accounts for AAO)? <button class="st-papers" id="exPapers">Choose your papers</button></p>' +
         '<div class="modal-actions"><button class="btn ghost" id="exClose">Done</button><button class="btn teal" id="exAdd">Add exam</button></div>';
       document.querySelectorAll('#modalBody [data-ex-del]').forEach(function(b){ b.addEventListener('click', function(){
         var s2 = examsData(); s2.list.splice(+b.dataset.exDel, 1); examsSave(s2); draw();
       }); });
+      document.getElementById('exPapers').addEventListener('click', papersModal);
       document.getElementById('exClose').addEventListener('click', function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML = ''; renderHub(); if(isActive('plan')) renderPlanTab(); });
       document.getElementById('exAdd').addEventListener('click', function(){
         var n = document.getElementById('exName').value.trim() || 'Exam', d = document.getElementById('exDate').value;
@@ -1523,8 +1675,8 @@
   }
   function plPerLesson(id){ var m = STUDY[id], x = trackInfo(id); return m.lessons ? Math.max(5, Math.round(x.fullMin / m.lessons)) : 10; }
   function plGroups(){
-    var g = [['English', englishIds()], ['Maths', mathIds()], ['Reasoning', reasoningIds()]];
-    GS_SUBJECTS.forEach(function(s){ var l = gsIds().filter(function(id){ return STUDY[id].gsub === s[0]; }); if(l.length) g.push([s[1], l]); });
+    var g = [['English', englishIds()], ['Maths', shownIds(mathIds())], ['Reasoning', reasoningIds()]];
+    GS_SUBJECTS.forEach(function(s){ var l = shownIds(gsIds()).filter(function(id){ return STUDY[id].gsub === s[0]; }); if(l.length) g.push([s[1], l]); });
     var other = gsIds().filter(function(id){ return !STUDY[id].gsub; }); if(other.length) g.push(['General Studies', other]);
     return g.filter(function(x){ return x[1].length; });
   }

@@ -9,8 +9,8 @@ Vocabulary, General Studies and Maths in one place, with one daily goal, one str
 
 | Section | What it does |
 |---|---|
-| **Home** | Today only: exam countdown, today's goal and streak, Continue (the last apps you opened), what's waiting (revision, mistakes, words, tasks), apps due for revision, Practice tiles and the subjects |
-| **Study** | Every mini app by subject: filter chips (All · In progress · Due · each subject), a search box, subjects that fold away (open by themselves once you start one; apps not started wait behind a button), one slim row per app, and ⋯ for its numbers, History, Revision plan and AI |
+| **Home** | Today only: exam countdown, **Today's session** (one list for the day — the revision queue, today's plan tasks, apps due for revision, the app you were last in, the mistakes book — each with a time, one button for the next step, steps that tick themselves; saved as `shabdSession`), today's goal and streak, Continue, what's waiting, apps due for revision, Practice tiles and the subjects |
+| **Study** | Every mini app by subject: filter chips (All · In progress · Due · each subject), a search box, subjects that fold away (open by themselves once you start one; apps not started wait behind a button), one slim row per app, and ⋯ for its numbers, History, Revision plan and AI. **My papers**: Statistics (JSO) and Finance & Accounts (AAO) are each for one post — until you choose, each shows once you have opened it; after you choose (Study → My papers, or Your exams), Home, Study, the planner and the mixed mock follow your choice (saved with your exams as `papers`) |
 | **Vocab** | Word of the day, all words, Spelling Bank, Roots, Add words, Present, AOD, Audio |
 | **Practice** | Today's revision, Mistakes book, Mixed mock (English + Maths + Reasoning + GS), Weak spots, Vocab quiz, Revision, Exam tomorrow |
 | **Progress** | Study points, streak, per-subject progress |
