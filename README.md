@@ -156,6 +156,31 @@ One app, **पाठShala** (package `com.manish.vocablock`). The code is in the
    - run `node tools/stamp.js`, then push to `main`.
 3. Installing a newer APK updates the app and keeps its settings. It must always be signed with the same key from `vocab-lock`.
 
+## Firestore rules
+
+`firestore.rules` is a **copy** of the live security rules (Firebase console → Firestore Database → Rules), kept here so changes can be seen and undone. Editing the file changes nothing by itself: paste it into the console (or run `firebase deploy --only firestore:rules`) to publish it. **When you change the rules in the console, paste them back into this file.**
+
+| Data | Who can read | Who can write | Used by |
+|---|---|---|---|
+| `words`, `spellwords`, `rootGroups` | anyone signed in | moderators (root groups: admin). Anyone signed in may change only `confLevels` on a word | the shared word register, Spelling Bank, Roots |
+| `submissions`, `spellSubmissions` | the author and moderators | the author creates; moderators approve or edit | Add words, approvals |
+| `users/{uid}` (profile) | **anyone signed in** | only that user | leaderboard (top 50 by words memorized), the admin's moderator search by email |
+| `users/{uid}/progress`, `/study`, `/notifications` | only that user (moderators may create notifications) | only that user | word progress; every mini app's progress, Tasks, Plan, exams, review queue and **My notes** (`study/notes_<app>`) |
+| `roles` | anyone signed in | admin | moderators |
+| `activity` | anyone signed in | the person it is about; admin deletes | activity feed |
+| `quizAttempts` | moderators | the person answering | "most missed words" |
+| `lockFeed` | **anyone** (no sign-in) | moderators | the phone's word list before the app sends its own (older installs) |
+| `lockSync/{code}` | anyone who has the 20-letter code (`get`); the owner can list theirs | the owner | the phone's lock screen, widgets and reminders; the desktop wallpaper. The code is the secret |
+| `lockSync/{code}/events` | the owner | anyone with the code, but only small, checked rating / task events | ratings from the lock screen and wallpaper |
+| `lockInbox/{uid}` | anyone who knows the uid (`get` only) | the user and moderators | "your word was approved" notifications on the phone |
+
+**The admin** is the Google account `47manish31@gmail.com` (`isAdmin`, same as `ADMIN_EMAILS` in `app.js`). **Moderators** are the uids in `roles`.
+
+**Things to know:**
+- **Profiles are readable by everyone signed in.** Each user's `users/{uid}` (name, email, goal, counts) is visible to any signed-in person, because the leaderboard lists users. To keep emails private, move the email to a field only the owner can read, or give the leaderboard its own small public doc, then limit `users/{uid}` reads to the owner and the admin.
+- **Phone codes and inboxes.** `lockSync` and `lockInbox` are read without signing in, because the phone's background check and the wallpaper have no Google sign-in. Keep the link code private: anyone with it can read that progress summary and send ratings.
+- **Notes and new mini apps need no new rule.** My notes and any new mini app's progress live under `users/{uid}/study/{doc}`, which the `study` rule already covers.
+
 ## Hosting & notes
 
 - Hosted on GitHub Pages straight from the `main` branch root.

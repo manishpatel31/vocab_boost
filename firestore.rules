@@ -1,0 +1,140 @@
+// Firestore security rules for the पाठShala project (cgl-vocab-register).
+// A COPY of the live rules, kept here so changes can be seen and undone. The live rules are in the Firebase console:
+// Firestore Database → Rules. Editing this file changes nothing by itself — paste it there (or `firebase deploy
+// --only firestore:rules`) to publish, and paste the console's rules here after changing them there.
+// Copied from the console on 7 Nov 2026. What each part protects: README → "Firestore rules".
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- helpers ----------
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.email == '47manish31@gmail.com';
+    }
+    function isModerator() {
+      return isAdmin() ||
+        (isSignedIn() && exists(/databases/$(database)/documents/roles/$(request.auth.uid)));
+    }
+    function isOwnNew() {
+      return isSignedIn() && request.resource.data.authorUid == request.auth.uid;
+    }
+    function isOwnExisting() {
+      return isSignedIn() && resource.data.authorUid == request.auth.uid;
+    }
+
+    // ---------- shared word library ----------
+    match /words/{id} {
+      allow read: if isSignedIn();
+      allow create, delete: if isModerator();
+      // Moderators edit anything; everyone else may only change the confidence counters.
+      allow update: if isModerator() ||
+        (isSignedIn() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['confLevels']));
+    }
+
+    match /submissions/{id} {
+      allow create: if isOwnNew();
+      allow read, delete: if isModerator() || isOwnExisting();
+      allow update: if isModerator();
+    }
+
+    // ---------- spelling bank ----------
+    match /spellwords/{id} {
+      allow read: if isSignedIn();
+      allow write: if isModerator();
+    }
+
+    match /spellSubmissions/{id} {
+      allow create: if isOwnNew();
+      allow read, delete: if isModerator() || isOwnExisting();
+      allow update: if isModerator();
+    }
+
+    // ---------- root-word groups ----------
+    match /rootGroups/{key} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // ---------- lock-screen app word feed ----------
+    match /lockFeed/{doc} {
+      allow read: if true;
+      allow write: if isModerator();
+    }
+
+    // ---------- users, progress, notifications ----------
+    match /users/{uid} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && request.auth.uid == uid;
+
+      match /progress/{wordId} {
+        allow read, write: if isSignedIn() && request.auth.uid == uid;
+      }
+
+      // progress of the English / GS study modules (Grammar 100, BNS, Schemes, Census, Intl Orgs)
+      match /study/{module} {
+        allow read, write: if isSignedIn() && request.auth.uid == uid;
+      }
+
+      match /notifications/{n} {
+        allow read, update, delete: if isSignedIn() && request.auth.uid == uid;
+        allow create: if isSignedIn() && (request.auth.uid == uid || isModerator());
+      }
+    }
+
+    // ---------- moderators ----------
+    match /roles/{uid} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // ---------- activity feed ----------
+    match /activity/{id} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.byUid == request.auth.uid;
+      allow delete: if isAdmin();
+    }
+
+    // ---------- quiz answers (for the "most missed words" admin view) ----------
+    match /quizAttempts/{id} {
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+      allow read: if isModerator();
+      allow delete: if isAdmin();
+    }
+
+    // ---------- Vocab Lock phone app: account link + progress sync (the link code is the secret) ----------
+    match /lockSync/{code} {
+      allow get: if true;
+      allow list: if isSignedIn() && resource.data.uid == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+      allow update: if isSignedIn() && resource.data.uid == request.auth.uid
+                    && request.resource.data.uid == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.uid == request.auth.uid;
+
+      // changes sent by the phone app and the PC wallpaper:
+      // rate / rev = word levels, gs = quiz answers, task / todo = Tasks list, wall = wallpaper settings
+      match /events/{e} {
+        allow create: if exists(/databases/$(database)/documents/lockSync/$(code))
+                      && request.resource.data.keys().hasOnly(['w', 'k', 'c', 't', 'd'])
+                      && request.resource.data.k in ['rate', 'rev', 'gs', 'task', 'todo', 'wall']
+                      && request.resource.data.c is int
+                      && request.resource.data.c >= 0 && request.resource.data.c <= 5
+                      && request.resource.data.w is string
+                      && (request.resource.data.w.size() < 64
+                          || (request.resource.data.k in ['todo', 'wall'] && request.resource.data.w.size() < 10000));
+        allow read, delete: if isSignedIn()
+                      && get(/databases/$(database)/documents/lockSync/$(code)).data.uid == request.auth.uid;
+      }
+    }
+
+    // ---------- Vocab Lock phone app: "your word was approved" news ----------
+    match /lockInbox/{uid} {
+      allow get: if true;
+      allow list: if false;
+      allow create, update: if isSignedIn() && (request.auth.uid == uid || isModerator());
+      allow delete: if isSignedIn() && request.auth.uid == uid;
+    }
+  }
+}
