@@ -476,5 +476,5 @@ renderTop();
 const start = (location.hash||"").replace("#","");
 go(["learn","practice","mock","revise"].includes(start) ? start : "learn");
 
-/* keyboard shortcuts and answer feedback, shared by every mini app (study-keys.js; tools/stamp.js sets its ?v=) */
-(function(){ if (window.__studyKeys || document.querySelector("script[data-study-keys]")) return; const s = document.createElement("script"); s.src = "study-keys.js?v=c97dabb7"; s.dataset.studyKeys = ""; document.head.appendChild(s); })();
+/* the shared layer of every mini app: keys, answer feedback, look and feel (study-ui.js; tools/stamp.js sets its ?v=) */
+(function(){ if (window.__studyUI || document.querySelector("script[data-study-ui]")) return; const s = document.createElement("script"); s.src = "study-ui.js?v=876bef82"; s.dataset.studyUi = ""; document.head.appendChild(s); })();
