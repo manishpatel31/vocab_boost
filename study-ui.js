@@ -51,7 +51,10 @@
 .opt.no.fx-pick{animation:fxShake .38s ease-in-out}
 .opt.sel.fx-pick{animation:fxTap .2s ease-out}
 .opts.fx-missed .opt.ok{animation:fxGlow .9s ease-out}
-#app > .fx-in{animation:fxIn .2s ease-out}
+#app > .fx-in{animation:fxSlR .3s cubic-bezier(.2,.8,.2,1)}
+#app > .fx-in-l{animation:fxSlL .3s cubic-bezier(.2,.8,.2,1)}
+@keyframes fxSlR{from{opacity:0;transform:translateX(22px)}to{opacity:1;transform:none}}
+@keyframes fxSlL{from{opacity:0;transform:translateX(-22px)}to{opacity:1;transform:none}}
 @keyframes fxPop{0%{transform:scale(1)}40%{transform:scale(1.025)}100%{transform:scale(1)}}
 @keyframes fxTap{0%{transform:scale(.98)}100%{transform:scale(1)}}
 @keyframes fxShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
@@ -157,9 +160,12 @@
       if (!nb && ioi == null) nb = document.querySelector(`.opt[data-oi="${CSS.escape(oi || "")}"].sel`);
       if (!nb) return;
       nb.classList.remove("fx-pick"); void nb.offsetWidth; nb.classList.add("fx-pick");
-      // a short buzz inside the Android app: a tick for right, a double for wrong
-      const P = window.PathshalaApp;
-      if (P && typeof P.haptic === "function") P.haptic(nb.classList.contains("no") ? "wrong" : "right");
+      // feel it: a buzz for right / wrong (study-ui "FEEL" below), a tick drawn on the right answer, +1 floating up
+      const F = window.PathshalaFeel;
+      if (F) {
+        if (nb.classList.contains("no")) F.feel("wrong");
+        else if (nb.classList.contains("ok")) { F.feel("right"); F.tick(nb); F.plus(nb, 1); }
+      }
       const set = nb.closest(".opts");
       if (set && nb.classList.contains("no")) set.classList.add("fx-missed");
       // on a small screen the explanation and the Next button can land below the fold
@@ -177,7 +183,11 @@
     go = function(){
       const r = inner.apply(this, arguments);
       const v = document.querySelector("#app > :first-child");
-      if (v && !still()) v.classList.add("fx-in");
+      // slide in from the side of the tab that was tapped (order of the tab bar)
+      const order = [...document.querySelectorAll(".nav [data-tab], nav.tabs [data-tab], .nav button, nav.tabs button")].map(b => b.dataset.tab || b.textContent.trim().toLowerCase());
+      const to = order.indexOf(String(arguments[0] || "")), from = order.indexOf(go.__last || "");
+      go.__last = String(arguments[0] || "");
+      if (v && !still()) v.classList.add(to >= 0 && from >= 0 && to < from ? "fx-in-l" : "fx-in");
       return r;
     };
   }
@@ -895,4 +905,152 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
   if (document.head) start(); else addEventListener("DOMContentLoaded", start);
   // after the page's own handler (it only knows paper / indigo), so a new design wins
   addEventListener("message", e => { if (e.origin === location.origin && e.data && e.data.type === "shabd-theme" && e.data.skin) setTimeout(() => apply(e.data.skin), 0); });
+})();
+
+/* ============================================================
+   FEEL — vibrations and small animations in every mini app (Style Lab picks, Nov 2026).
+   Vibration patterns match the app's (app.js HAPTIC); right / wrong use Android's own haptics inside the app; all
+   switched off by Display settings → Vibration ('pathshalaHaptics' = '0', shared with the app).
+   - tap: a light tick on every button, tab and chip · select: picking an option · hold: starting to select text
+   - right answer: a tick drawn on the option and "+1" floating up · wrong: the shake already here, plus a buzz
+   - the last minute of a mock (#mtime, Grammar's #timer): a warning buzz and the clock pulses
+   - a lesson's Summary reached from its quiz, or a mock finished: confetti; the last lesson of an app: a badge
+   - flashcards (#fcard) turn over; tabs slide in from the side tapped (go wrapper above)
+   - building blocks: lettered answer badges, question dots over a lesson quiz, soft-shadow cards, the Continue card
+     as a bold block
+   ============================================================ */
+(function(){
+  if (window.__studyFeel) return;
+  window.__studyFeel = true;
+  const P = { tick: [8], select: [15], right: [12, 60, 18], wrong: [45, 50, 45], streak: [15, 40, 15, 40, 30], goal: [20, 50, 20, 50, 20, 50, 70], level: [30, 30, 30, 30, 30, 30, 120], warn: [80, 120, 80], hold: [25] };
+  const on = () => { try { return localStorage.getItem("pathshalaHaptics") !== "0"; } catch (e) { return true; } };
+  const still = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function feel(k){
+    if (!on()) return;
+    const A = window.PathshalaApp;
+    if (A && typeof A.haptic === "function" && (k === "right" || k === "wrong")) { A.haptic(k); return; }
+    try { if (navigator.vibrate) navigator.vibrate(P[k] || P.tick); } catch (e) {}
+  }
+  function tick(opt){
+    if (!opt || opt.querySelector(".fx-tick")) return;
+    opt.insertAdjacentHTML("beforeend", '<svg class="fx-tick" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10.5l4 4 8-9"/></svg>');
+  }
+  function plus(el, n){
+    if (!el || still()) return;
+    const r = el.getBoundingClientRect(); if (!r.width) return;
+    const f = document.createElement("div"); f.className = "fx-plus"; f.textContent = "+" + n;
+    f.style.left = (r.right - 34) + "px"; f.style.top = (r.top + 2) + "px";
+    document.body.appendChild(f); setTimeout(() => f.remove(), 1150);
+  }
+  function confetti(){
+    if (still()) return;
+    const cv = document.createElement("canvas"); cv.className = "fx-conf"; document.body.appendChild(cv);
+    const w = cv.width = innerWidth * 2, h = cv.height = innerHeight * 2, g = cv.getContext("2d"), cs = getComputedStyle(document.documentElement);
+    const cols = ["--blue", "--accent", "--good", "--bad"].map(v => cs.getPropertyValue(v).trim() || "#f90");
+    const bits = Array.from({ length: 110 }, () => ({ x: w / 2 + (Math.random() - .5) * w * .3, y: h * .35, vx: (Math.random() - .5) * 26, vy: -Math.random() * 30 - 10, a: Math.random() * 6, c: cols[Math.floor(Math.random() * cols.length)], s: 10 + Math.random() * 10 }));
+    let t = 0;
+    (function frame(){
+      g.clearRect(0, 0, w, h);
+      bits.forEach(b => { b.x += b.vx; b.y += b.vy; b.vy += 1; b.vx *= .985; b.a += .2; g.save(); g.translate(b.x, b.y); g.rotate(b.a); g.fillStyle = b.c; g.fillRect(-b.s / 2, -b.s / 4, b.s, b.s / 2); g.restore(); });
+      if (++t < 100) requestAnimationFrame(frame); else cv.remove();
+    })();
+  }
+  function badge(title, sub){
+    const b = document.createElement("div"); b.className = "fx-level"; b.setAttribute("role", "status");
+    b.innerHTML = `<b>${title}</b><small>${sub}</small>`;
+    document.body.appendChild(b); setTimeout(() => b.classList.add("out"), 2600); setTimeout(() => b.remove(), 3100);
+  }
+  window.PathshalaFeel = { feel, tick, plus, confetti };
+
+  // taps and picks
+  document.addEventListener("click", e => {
+    const t = e.target.closest && e.target.closest("button, [role=tab], .chip, a.btn");
+    if (!t || t.disabled || t.closest(".un-ui")) return;
+    feel(t.classList.contains("opt") ? "select" : "tick");
+  }, true);
+  // starting to select text (a long press on a phone)
+  let selWas = true;
+  document.addEventListener("selectionchange", () => { const s = getSelection(), empty = !s || s.isCollapsed; if (!empty && selWas) feel("hold"); selWas = empty; });
+
+  // the last minute of a mock
+  let warned = false;
+  setInterval(() => {
+    const el = document.querySelector("#mtime, #timer"); if (!el) { warned = false; return; }
+    const m = /(\d+):(\d{2})/.exec(el.textContent || ""); if (!m) return;
+    const secs = +m[1] * 60 + +m[2];
+    if (secs > 60) { warned = false; el.classList.remove("fx-low"); return; }
+    if (secs > 0 && !warned) { warned = true; feel("warn"); el.classList.add("fx-low"); }
+  }, 1000);
+
+  // lesson finished (Summary right after its quiz), app finished (its last lesson), mock finished
+  let lastStep = "", lastTitle = "", mockWas = false, flipped = false, cardWas = null;
+  function watch(){
+    const cur = document.querySelector(".steps [aria-current=\"step\"]"), step = cur ? cur.dataset.step || "" : "";
+    const h1 = document.querySelector("#app h1"), title = h1 ? h1.textContent : "";
+    if (step === "sum" && lastStep === "quiz" && title === lastTitle) {
+      confetti(); feel("goal");
+      if (!document.getElementById("nextles") && document.getElementById("tomock")) setTimeout(() => { badge("App complete", "Every lesson done — try a mock test"); feel("level"); }, 700);
+    }
+    lastStep = step; lastTitle = title;
+    let mk = null; try { mk = typeof M !== "undefined" ? M : null; } catch (e) {}
+    const done = !!(mk && mk.done);
+    if (done && !mockWas) { confetti(); feel("goal"); }
+    mockWas = done;
+    // a flashcard turned over
+    const card = document.getElementById("fcard");
+    if (card && card !== cardWas && flipped && !still()) card.classList.add("fx-flip");
+    if (card !== cardWas) flipped = false;
+    cardWas = card;
+    // question dots over a lesson quiz
+    const lq = document.getElementById("lq");
+    let st = null; try { st = typeof LQ !== "undefined" ? LQ : null; } catch (e) {}
+    if (lq && st && st.list && st.list.length > 1) {
+      let bar = document.querySelector(".fx-qdots");
+      if (!bar || bar.nextElementSibling !== lq) { if (bar) bar.remove(); bar = document.createElement("div"); bar.className = "fx-qdots"; bar.setAttribute("aria-hidden", "true"); lq.parentNode.insertBefore(bar, lq); }
+      const n = st.list.length, html = Array.from({ length: Math.min(n, 40) }, (_, i) => `<i class="${i < st.i ? "d" : i === st.i ? "c" : ""}"></i>`).join("");
+      if (bar.innerHTML !== html) bar.innerHTML = html;
+    }
+  }
+  document.addEventListener("click", e => { if (e.target.closest && e.target.closest("#fcard")) flipped = true; }, true);
+  let q = false;
+  const soon = () => { if (q) return; q = true; requestAnimationFrame(() => { q = false; watch(); }); };
+
+  const css = document.createElement("style");
+  css.textContent = `
+.opt.ok{position:relative}
+.fx-tick{position:absolute;right:10px;top:50%;width:18px;height:18px;margin-top:-9px;pointer-events:none}
+.fx-tick path{fill:none;stroke:var(--good);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:24;stroke-dashoffset:24;animation:fxDraw .35s .1s ease-out forwards}
+@keyframes fxDraw{to{stroke-dashoffset:0}}
+.fx-plus{position:fixed;z-index:600;pointer-events:none;font:800 19px var(--f-display,inherit);color:var(--good);animation:fxFly 1.1s ease-out forwards}
+@keyframes fxFly{0%{opacity:0;transform:translateY(8px) scale(.8)}20%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-44px)}}
+.fx-conf{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:650}
+.fx-level{position:fixed;left:50%;top:calc(18px + env(safe-area-inset-top,0px));z-index:660;transform:translateX(-50%);overflow:hidden;border-radius:16px;padding:12px 20px;background:var(--blue);color:var(--on-blue);text-align:center;box-shadow:0 14px 34px -14px rgba(0,0,0,.5);animation:fxLvl .7s cubic-bezier(.3,1.6,.5,1);transition:opacity .4s, transform .4s}
+.fx-level b{display:block;font:800 18px var(--f-display,inherit)}.fx-level small{font-size:12.5px;opacity:.9}
+.fx-level::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.55) 50%,transparent 70%);transform:translateX(-120%);animation:fxShine .9s .3s ease-out forwards}
+.fx-level.out{opacity:0;transform:translate(-50%,-12px)}
+@keyframes fxLvl{0%{transform:translateX(-50%) scale(.6);opacity:0}100%{transform:translateX(-50%) scale(1);opacity:1}}
+@keyframes fxShine{to{transform:translateX(120%)}}
+#mtime.fx-low,#timer.fx-low{color:var(--bad);animation:fxPulse 1s ease-in-out infinite}
+@keyframes fxPulse{50%{opacity:.55}}
+#fcard.fx-flip{animation:fxFlip .45s cubic-bezier(.4,.2,.2,1)}
+@keyframes fxFlip{0%{transform:perspective(700px) rotateY(90deg)}100%{transform:perspective(700px) rotateY(0)}}
+.fx-qdots{display:flex;flex-wrap:wrap;gap:5px;margin:2px 0 10px}
+.fx-qdots i{width:9px;height:9px;border-radius:50%;background:var(--rule);transition:background .2s,transform .2s}
+.fx-qdots i.d{background:var(--blue)}
+.fx-qdots i.c{background:var(--accent);transform:scale(1.25)}
+/* building blocks: lettered answers, soft-shadow cards, the Continue card as a bold block */
+.opt .k{display:inline-grid;place-items:center;width:26px;height:26px;padding:0;border-radius:8px;background:var(--sunk);color:var(--ink2);font-size:13px;font-weight:700;align-self:start}
+.opt.sel .k{background:var(--blue);color:var(--on-blue)}
+.opt.ok .k{background:var(--good);color:#fff}
+.opt.no .k{background:var(--bad);color:#fff}
+.block,.qcard,.icheck{box-shadow:0 10px 24px -18px rgba(0,0,0,.4)}
+.fx-front{border:2px solid var(--ink)!important;border-radius:10px!important;box-shadow:4px 4px 0 var(--ink)!important}
+@media (prefers-reduced-motion:reduce){.fx-tick path{animation:none;stroke-dashoffset:0}.fx-level,.fx-level::after,#fcard.fx-flip,#mtime.fx-low,#timer.fx-low{animation:none}}`;
+  function start(){
+    document.head.appendChild(css);
+    const root = document.getElementById("app") || document.body;
+    new MutationObserver(soon).observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: ["aria-current"] });
+    watch();
+  }
+  if (document.body) start(); else addEventListener("DOMContentLoaded", start);
 })();

@@ -2388,6 +2388,8 @@
     if(!answered) document.querySelectorAll('#drillBody [data-opt]').forEach(function(b){ b.addEventListener('click', function(){
       q.pick = +b.dataset.opt;
       var ok = q.pick === q.a;
+      feel(ok ? 'right' : 'wrong');
+      if(ok) floatPlus(b, GOAL_PER_Q);
       if(ok) d.cleared++;
       if(STUDY[q.mod]) studyMark(q.mod, q.id, ok);
       if(d.from && d.from.onAnswer) d.from.onAnswer(q, ok);
@@ -2702,6 +2704,7 @@
     var el = document.getElementById('drillClock');
     el.textContent = Math.floor(left / 60) + ':' + ('0' + left % 60).slice(-2);
     el.classList.toggle('low', left < 60);
+    if(left === 60) feel('warn');
     if(left <= 0) submitMock(true);
   }
   function renderMockRun(){
@@ -2848,6 +2851,10 @@
         '<input type="checkbox" id="dyslexiaFontChk" style="margin-top:3px; width:18px; height:18px;" '+(dys?'checked':'')+'>' +
         '<span>Use a more dyslexia-friendly font (rounder letterforms, wider spacing)</span>' +
       '</label></div>' +
+      '<div class="field"><label style="display:flex; gap:10px; align-items:flex-start; cursor:pointer;">' +
+        '<input type="checkbox" id="hapticsChk" style="margin-top:3px; width:18px; height:18px;" '+(hapticsOn()?'checked':'')+'>' +
+        '<span>Vibration — a light tap on buttons, a buzz for right and wrong answers, streaks, goals and the last minute of a mock (phones that can vibrate)</span>' +
+      '</label></div>' +
       '<div class="modal-actions"><button class="btn ghost" id="displaySettingsClose">Close</button></div>';
     modalBgRef().classList.add('open');
     document.getElementById('textSizeSelect').addEventListener('change', function(){
@@ -2858,6 +2865,7 @@
       localStorage.setItem(DYSLEXIA_FONT_KEY, this.checked ? '1' : '0');
       applyDisplaySettings();
     });
+    document.getElementById('hapticsChk').addEventListener('change', function(){ lsSet('pathshalaHaptics', this.checked ? null : '0'); if(this.checked) feel('right'); });
     document.getElementById('displaySettingsClose').addEventListener('click', function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML=''; });
   });
 
@@ -3147,12 +3155,51 @@
   var toastTimer = null;
   var CHECK_SVG = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg>';
   var FLAME_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2c.6 3.4-1.2 5.3-2.8 7.1C7.6 10.9 6 12.7 6 15.5 6 19.1 8.7 22 12 22s6-2.9 6-6.5c0-2.3-1-4-2.2-5.4-.3 1.4-1.1 2.5-2.3 3 .5-2.9-.2-5.1-1.5-7.1z"></path></svg>';
+  // ================= Feel: vibrations and small animations (Style Lab picks) =================
+  // Vibration patterns ([buzz, pause, …] ms); right / wrong use Android's own crisp haptics inside the app.
+  // On unless switched off in Display settings ('pathshalaHaptics' = '0', read by the mini apps too).
+  var HAPTIC = { tick: [8], select: [15], right: [12, 60, 18], wrong: [45, 50, 45], streak: [15, 40, 15, 40, 30], goal: [20, 50, 20, 50, 20, 50, 70], level: [30, 30, 30, 30, 30, 30, 120], warn: [80, 120, 80], hold: [25] };
+  function hapticsOn(){ return lsGet('pathshalaHaptics') !== '0'; }
+  function feel(k){
+    if(!hapticsOn()) return;
+    var A = window.PathshalaApp;
+    if(A && typeof A.haptic === 'function' && (k === 'right' || k === 'wrong')){ A.haptic(k); return; }
+    try{ if(navigator.vibrate) navigator.vibrate(HAPTIC[k] || HAPTIC.tick); }catch(e){}
+  }
+  window.PathshalaFeel = { feel: feel };
+  // a light tick on every button, tab and chip
+  document.addEventListener('click', function(e){
+    var b = e.target.closest && e.target.closest('button, .tab, .chip, [role="tab"], a.btn');
+    if(b && !b.disabled && !b.closest('#drillBody [data-opt]')) feel('tick');
+  }, true);
+  var stillMotion = function(){ return !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); };
+  /** "+n" floating up from an element (points earned). */
+  function floatPlus(el, n){
+    if(!el || stillMotion()) return;
+    var r = el.getBoundingClientRect(); if(!r.width) return;
+    var f = document.createElement('div'); f.className = 'fx-plus'; f.textContent = '+' + n;
+    f.style.left = (r.left + r.width / 2) + 'px'; f.style.top = (r.top + 4) + 'px';
+    document.body.appendChild(f); setTimeout(function(){ f.remove(); }, 1150);
+  }
+  /** Small dots bursting out of an element (a goal reached). */
+  function burstAt(el){
+    if(!el || stillMotion()) return;
+    var r = el.getBoundingClientRect(); if(!r.width) return;
+    for(var i = 0; i < 10; i++){ var d = document.createElement('i'), a = i / 10 * Math.PI * 2; d.className = 'fx-burst';
+      d.style.left = (r.left + r.width / 2 - 4) + 'px'; d.style.top = (r.top + r.height / 2 - 4) + 'px';
+      d.style.setProperty('--dx', (Math.cos(a) * 42).toFixed(0) + 'px'); d.style.setProperty('--dy', (Math.sin(a) * 42).toFixed(0) + 'px');
+      document.body.appendChild(d); (function(x){ setTimeout(function(){ x.remove(); }, 800); })(d); }
+  }
+  var SKEL = '<div class="skel" role="status" aria-label="Loading"><i></i><i></i><i></i></div>';
+
   function showCelebration(kicker, text, iconHtml, variant){
     var old = document.getElementById('celebrateToast');
     if(old && old.parentNode) old.parentNode.removeChild(old);
     var el = document.createElement('div');
     el.id = 'celebrateToast';
-    el.className = 'celebrate' + (variant ? ' celebrate-' + variant : '');
+    var badge = /New badge/.test(kicker || '');
+    el.className = 'celebrate' + (variant ? ' celebrate-' + variant : '') + (badge ? ' celebrate-level' : '');
+    feel(badge ? 'level' : variant === 'streak' ? 'goal' : 'right');
     el.setAttribute('role', 'status');
     var falls = ['fallA', 'fallB', 'fallC'];
     var conf = '';
@@ -4026,7 +4073,7 @@
     if(!t) return;
     if(fin){
       todoPop = id;
-      if(window.PathshalaApp && typeof window.PathshalaApp.haptic === 'function') window.PathshalaApp.haptic('tick'); else if(navigator.vibrate) try{ navigator.vibrate(30); }catch(e){}
+      feel('tick');
       var left = todoLeftToday();
       showToast(left ? 'Done ' + '✓'.repeat(t.n) + ' — ' + left + ' left for today' : 'Done ' + '✓'.repeat(t.n) + ' — that’s everything for today 🎉');
       var f = todoFocusGet(); if(f && f.id === id) todoFocusSet(null);
@@ -4070,7 +4117,7 @@
       g.gain.setValueAtTime(0.18, ac.currentTime); g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 1.4);
       o.start(); o.stop(ac.currentTime + 1.4);
     }catch(e){}
-    if(window.PathshalaApp && typeof window.PathshalaApp.haptic === 'function') window.PathshalaApp.haptic('done'); else if(navigator.vibrate) try{ navigator.vibrate([200, 100, 200]); }catch(e){}
+    feel('goal');
     showToast('Focus session done — ' + f.min + ' min' + (t ? ' on “' + t.t + '”. ' + (fin ? 'Task finished ✓' : 'Tick added ✓') : '.'));
     if(t) todoPop = t.id;
     if(isActive('tasks')) renderTodo();
@@ -4176,7 +4223,11 @@
   var tabs = document.querySelectorAll('.tab');
   var views = document.querySelectorAll('.view');
   tabs.forEach(function(tab){ tab.addEventListener('click', function(){ switchTab(tab.dataset.tab); }); });
+  var tabOrder = ['home', 'study', 'vocab', 'practice', 'plan', 'tasks', 'stats'], tabAt = 'home';
   function switchTab(name){
+    var from = tabOrder.indexOf(tabAt), to = tabOrder.indexOf(name), same = name === tabAt;
+    tabAt = name;
+    if(!same && !stillMotion()){ var nv = document.getElementById('view-' + name); if(nv){ nv.classList.remove('tab-in-l', 'tab-in-r'); void nv.offsetWidth; nv.classList.add(to >= 0 && from >= 0 && to < from ? 'tab-in-l' : 'tab-in-r'); setTimeout(function(){ nv.classList.remove('tab-in-l', 'tab-in-r'); }, 400); } }
     if(name !== 'typing' && window.shabdTyping) window.shabdTyping.leave();
     tabs.forEach(function(t){ t.classList.toggle('active', t.dataset.tab === name); });
     views.forEach(function(v){ v.classList.toggle('active', v.id === 'view-' + name); });
@@ -5742,9 +5793,11 @@ list.map(function(w, i){ return (i + 1) + '. ' + w.term; }).join('\n'),
   }
   function streakBadgeHtml(u){ var n = streakOf(u); return n ? ' · <span class="lb-streak" title="' + n + '-day streak">' + FLAME_SVG + n + '</span>' : ''; }
 
+  var gwPrev = null;   // { count, frac, met, streak } as last drawn
   function renderGoalWidget(){
     var el = document.getElementById('goalWidget');
     if(!el) return;
+    var was = gwPrev;
     if(!currentUser || !myProfile){ el.style.display = 'none'; return; }
     el.style.display = 'flex';
     var goal = myProfile.dailyGoal || 0;
@@ -5765,6 +5818,17 @@ list.map(function(w, i){ return (i + 1) + '. ' + w.term; }).join('\n'),
     el.innerHTML = '<span class="gw-ring"><svg width="48" height="48" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="19" fill="none" stroke="var(--paper-deep)" stroke-width="5"></circle><circle class="gw-arc" cx="24" cy="24" r="19" fill="none" stroke-width="5" stroke-linecap="round" stroke-dasharray="' + (frac * circ).toFixed(1) + ' ' + circ.toFixed(1) + '"></circle></svg><span class="gw-num">' + count + '</span></span>' +
       '<span class="gw-text"><span class="gw-label">' + (met ? 'Goal done' : 'Today') + '</span><span class="gw-val">' + count + ' / ' + goal + '</span></span>' +
       '<span class="gw-streak ' + streakCls + '" title="' + escapeAttr(tip) + '">' + FLAME_SVG + streak + '</span>';
+    // the ring grows from where it was; points float up; a burst at 100%; the flame flares when the streak grows
+    var arc = el.querySelector('.gw-arc');
+    if(arc && was && was.frac !== frac && !stillMotion()){
+      arc.style.transition = 'none'; arc.setAttribute('stroke-dasharray', (was.frac * circ).toFixed(1) + ' ' + circ.toFixed(1));
+      arc.getBoundingClientRect(); arc.style.transition = '';
+      requestAnimationFrame(function(){ arc.setAttribute('stroke-dasharray', (frac * circ).toFixed(1) + ' ' + circ.toFixed(1)); });
+    }
+    if(was && count > was.count) floatPlus(el.querySelector('.gw-ring'), count - was.count);
+    if(was && met && !was.met) setTimeout(function(){ burstAt(el.querySelector('.gw-ring')); }, 650);
+    if(was && streak > was.streak){ var fl = el.querySelector('.gw-streak'); if(fl){ fl.classList.add('flare'); feel('streak'); } }
+    gwPrev = { count: count, frac: frac, met: met, streak: streak };
   }
 
   function maybeAskGoal(){
@@ -7548,7 +7612,7 @@ listBlock,
   async function renderLeaderboard(){
     if(recentlyFetched('leaderboard', 60000)) return;
     var area = document.getElementById('leaderboardArea');
-    area.innerHTML = '<p class="help">Loading…</p>';
+    area.innerHTML = SKEL;
     try{
       await backfillPublicCards();                       // the admin: fill in everyone's cards first, then read them
       var snap = await peopleSnap('masteredCount', 'desc', 50);
@@ -7575,7 +7639,7 @@ listBlock,
   async function renderAllUsers(){
     if(recentlyFetched('allUsers', 60000)) return;
     var box = document.getElementById('allUsersArea');
-    box.innerHTML = '<p class="help">Loading…</p>';
+    box.innerHTML = SKEL;
     try{
       await backfillPublicCards();
       var usersSnap = await peopleSnap('displayName', 'asc', 300);
@@ -8249,7 +8313,7 @@ listBlock,
     if(!isAdminUser) return;
     if(!force && recentlyFetched('mods', 60000)) return;
     var box = document.getElementById('moderatorsList');
-    box.innerHTML = '<p class="help">Loading…</p>';
+    box.innerHTML = SKEL;
     try{
       var usersSnap = await db.collection('users').orderBy('displayName').limit(200).get();
       var rolesSnap = await db.collection('roles').get();
@@ -8314,7 +8378,7 @@ listBlock,
   async function renderActivityFeed(){
     if(recentlyFetched('activity', 60000)) return;
     var box = document.getElementById('activityFeedArea');
-    box.innerHTML = '<p class="help">Loading…</p>';
+    box.innerHTML = SKEL;
     try{
       var snap = await db.collection('activity').orderBy('createdAt', 'desc').limit(150).get();
       var raw = snap.docs.map(function(d){ return d.data(); });
@@ -8455,7 +8519,7 @@ listBlock,
   async function renderMissedWords(){
     if(recentlyFetched('missed', 120000)) return;
     var box = document.getElementById('missedWordsArea');
-    box.innerHTML = '<p class="help">Loading…</p>';
+    box.innerHTML = SKEL;
     try{
       var snap = await db.collection('quizAttempts').orderBy('createdAt', 'desc').limit(1000).get();
       var agg = {};
