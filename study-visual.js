@@ -583,6 +583,7 @@ function zmApply(svg){
   svg.setAttribute("viewBox", `${(z.cx - w / 2).toFixed(2)} ${(z.cy - h / 2).toFixed(2)} ${w.toFixed(2)} ${h.toFixed(2)}`);
   svg.classList.toggle("zoomed", z.k > 1.01);
   const bar = svg._bar; if (bar) bar.querySelector("[data-z0]").hidden = z.k <= 1.01;
+  lblLater(svg);
 }
 /** Zoom by f about a point given in screen pixels (or the middle). */
 function zmBy(svg, f, px, py){
@@ -619,6 +620,7 @@ function zmFull(svg, title){
   svg.parentNode.insertBefore(ph, svg); ov.querySelector(".zm-body").appendChild(svg); document.body.appendChild(ov); document.documentElement.classList.add("zm-lock"); smilKick(svg);
   const vb0 = svg._vb0.slice(), z0 = Object.assign({}, svg._z); svg.classList.add("zm-fs");
   if (!svg._fsg) { zmGestures(svg, { always: true, wheel: true, dbl: true }); svg._fsg = 1; }
+  requestAnimationFrame(() => lblRun(svg));                        // more room on a full screen: place the labels again
   const close = () => { ph.parentNode.insertBefore(svg, ph); smilKick(svg); ph.remove(); ov.remove(); svg.classList.remove("zm-fs"); document.documentElement.classList.remove("zm-lock"); svg._vb0 = vb0; svg._z = z0; zmApply(svg); document.removeEventListener("keydown", key); };
   const key = e => { if (e.key === "Escape") close(); if (e.key === "+" || e.key === "=") zmBy(svg, 1.5); if (e.key === "-") zmBy(svg, 1 / 1.5); };
   document.addEventListener("keydown", key);
@@ -676,7 +678,7 @@ function contrastGuard(svg){
 /** Measure once the figure's entry animations (bars growing, cards fading in) have finished, so shapes are where they end up. */
 function cgWhenStill(svg){
   let anims = []; try { anims = svg.getAnimations({ subtree: true }).filter(a => { const t = a.effect && a.effect.getComputedTiming(); return t && t.iterations !== Infinity; }); } catch (e) {}
-  Promise.race([Promise.all(anims.map(a => a.finished.catch(() => {}))), new Promise(r => setTimeout(r, 4000))]).then(() => requestAnimationFrame(() => contrastGuard(svg)));
+  Promise.race([Promise.all(anims.map(a => a.finished.catch(() => {}))), new Promise(r => setTimeout(r, 4000))]).then(() => requestAnimationFrame(() => { lblRun(svg); contrastGuard(svg); }));
 }
 const cgSeen = "IntersectionObserver" in window ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { cgSeen.unobserve(e.target); cgWhenStill(e.target); } }), { rootMargin: "200px" }) : null;
 function cgWatch(svg){ if (cgSeen) cgSeen.observe(svg); else contrastGuard(svg); }
@@ -684,6 +686,91 @@ function cgWatch(svg){ if (cgSeen) cgSeen.observe(svg); else contrastGuard(svg);
 (() => { const again = () => document.querySelectorAll("svg[data-zm]").forEach(cgWatch);
   try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", again); } catch (e) {}
   new MutationObserver(again).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "data-skin"] }); })();
+/** Label declutter. Map pins sit close together (Lahuradewa and Chirand, Kurnool caves and Sanganakallu), so their names ran
+    into each other, and zooming only made the overlap bigger. Now, when a figure comes into view and after every zoom:
+    - text grows more slowly than the picture (1/√zoom), so zooming in pulls crowded labels apart;
+    - a pin's label (name + note) that would cover one already placed tries the other side of its pin and a little above or
+      below; if none is free its note is left out, and if even the name has no room it waits for a closer zoom (the pin gets
+      a ring: zoom in for its name);
+    - any other label that overlaps (a river's name, a state's) is nudged a little up, down or along.
+    Pins come first, then labels in the order they were drawn. Everything starts again from the drawn positions each time. */
+function lblInit(svg){
+  if (svg._lbl) return svg._lbl;
+  const isPin = e => e && e.tagName === "circle" && e.classList.contains("pin");
+  const items = [...svg.querySelectorAll("text")].filter(t => !t.closest("defs,clipPath,mask,pattern,marker")).map(t => {
+    const cs = getComputedStyle(t);
+    return { t, x: t.getAttribute("x"), y: t.getAttribute("y"), a: t.getAttribute("text-anchor"), anc: cs.textAnchor,
+      fs: parseFloat(cs.fontSize) || 12, sw: cs.stroke !== "none" ? parseFloat(cs.strokeWidth) || 0 : 0,
+      fs0: t.style.fontSize, sw0: t.style.strokeWidth, d0: t.style.display };
+  });
+  const groups = [];
+  for (let i = 0; i < items.length; i++) {
+    const it = items[i], prev = it.t.previousElementSibling;
+    const g = { items: [it], kind: isPin(prev) ? (it.anc === "middle" ? "badge" : "pin") : "text", pin: isPin(prev) ? prev : null };
+    // a note drawn right after, with the same x and anchor and just below, goes with it
+    while (i + 1 < items.length) {
+      const n = items[i + 1], last = g.items[g.items.length - 1], dy = parseFloat(n.y) - parseFloat(last.y);
+      if (n.t.previousElementSibling !== last.t || n.x !== it.x || n.anc !== it.anc || !(dy > 0) || dy > it.fs * 1.8) break;
+      g.items.push(n); i++;
+    }
+    groups.push(g);
+  }
+  const pins = [...svg.querySelectorAll("circle.pin")].map(c => ({ c, r: c.getAttribute("r") }));
+  return (svg._lbl = { groups, pins });
+}
+function lblRun(svg, layout){
+  if (!svg.isConnected || !svg.getBoundingClientRect().width) return;
+  const L = lblInit(svg), k = svg._z ? svg._z.k : 1, zoomed = k > 1.01, s = 1 / Math.sqrt(k);
+  L.pins.forEach(p => { if (p.r) p.c.setAttribute("r", zoomed ? (parseFloat(p.r) * s).toFixed(2) : p.r); p.c.classList.remove("crowd"); });
+  // where each label sits for a side (flip) and a nudge (dy, in the figure's units)
+  const put = (g, flip, dy, dx) => {
+    const cx = g.pin ? parseFloat(g.pin.getAttribute("cx")) : 0, cy = g.pin ? parseFloat(g.pin.getAttribute("cy")) : 0;
+    g.items.forEach(it => {
+      const t = it.t, x = parseFloat(it.x), y = parseFloat(it.y);
+      if (isNaN(x) || isNaN(y)) return;
+      let nx = x, ny = y;
+      if (g.pin && zoomed) { nx = cx + (x - cx) * s; ny = cy + (y - cy) * s; }          // stay as close to the pin on screen
+      if (flip && g.pin) { nx = 2 * cx - nx; t.setAttribute("text-anchor", it.anc === "end" ? "start" : "end"); }
+      else if (it.a != null) t.setAttribute("text-anchor", it.a); else t.removeAttribute("text-anchor");
+      t.setAttribute("x", (nx + (dx || 0)).toFixed(2)); t.setAttribute("y", (ny + dy).toFixed(2));
+    });
+  };
+  L.groups.forEach(g => {
+    g.items.forEach(it => { const t = it.t;
+      t.style.display = it.d0;
+      t.style.fontSize = zoomed ? (it.fs * s).toFixed(2) + "px" : it.fs0;
+      if (it.sw) t.style.strokeWidth = zoomed ? (it.sw * s).toFixed(2) + "px" : it.sw0; });
+    if (g.kind !== "badge") put(g, false, 0);
+  });
+  if (layout === false) return;
+  const taken = [], pad = 1.5;
+  const hit = r => taken.some(b => r.left < b.right + pad && r.right > b.left - pad && r.top < b.bottom + pad && r.bottom > b.top - pad);
+  const box = g => { let u = null; g.items.forEach(it => { if (it.t.style.display === "none") return; const r = it.t.getBoundingClientRect(); if (!r.width) return;
+    u = u ? { left: Math.min(u.left, r.left), top: Math.min(u.top, r.top), right: Math.max(u.right, r.right), bottom: Math.max(u.bottom, r.bottom) } : { left: r.left, top: r.top, right: r.right, bottom: r.bottom }; }); return u; };
+  L.pins.forEach(p => { const r = p.c.getBoundingClientRect(); if (r.width) taken.push(r); });
+  L.groups.filter(g => g.kind === "badge").forEach(g => { const r = box(g); if (r) taken.push(r); });
+  L.groups.filter(g => g.kind === "pin").concat(L.groups.filter(g => g.kind === "text")).forEach(g => {
+    const r = box(g); if (!r) return;
+    if (!hit(r)) { taken.push(r); return; }
+    const m = g.items[0].t.getScreenCTM(), unit = m ? Math.abs(m.d) || 1 : 1, lh = g.items[0].fs * (zoomed ? s : 1) * 1.2;
+    const h = (r.bottom - r.top) / unit, w = (r.right - r.left) / unit;
+    const tries = g.kind === "pin" ? [[0, 0], [1, 0], [0, -lh * .6], [0, lh * .6], [1, -lh * .6], [1, lh * .6], [0, -h], [0, h], [1, -h], [1, h]]
+      : [[0, -lh * .45], [0, lh * .45], [0, 0, -w * .3], [0, 0, w * .3], [0, -lh * .9], [0, lh * .9], [0, -lh * .6, -w * .3], [0, -lh * .6, w * .3],
+         [0, lh * .6, -w * .3], [0, lh * .6, w * .3], [0, 0, -w * .6], [0, 0, w * .6]];
+    const fit = () => { for (const [f, dy, dx] of tries) { put(g, !!f, dy, dx); const rr = box(g); if (rr && !hit(rr)) { taken.push(rr); return true; } } put(g, false, 0); return false; };
+    if (fit()) return;
+    if (g.kind !== "pin") { taken.push(r); return; }                     // a chart label stays where it was drawn
+    if (g.items.length > 1) { g.items.slice(1).forEach(it => { it.t.style.display = "none"; }); if (fit()) return; }
+    g.items.forEach(it => { it.t.style.display = "none"; });
+    g.pin.classList.add("crowd");
+  });
+}
+/** After a zoom: resize at once, place the labels when the zoom settles. */
+function lblLater(svg){
+  if (!svg._lbl && !svg.getBoundingClientRect().width) return;
+  lblRun(svg, false);
+  clearTimeout(svg._lblT); svg._lblT = setTimeout(() => requestAnimationFrame(() => lblRun(svg)), 120);
+}
 function zmScan(root){
   (root || document).querySelectorAll("svg.imap:not([data-zm]), svg.wmap:not([data-zm]), .phblock figure.fig svg.dg:not([data-zm])").forEach(svg => {
     svg.dataset.zm = 1; if (!svg.viewBox || !svg.viewBox.baseVal || !svg.viewBox.baseVal.width) return;
@@ -767,6 +854,7 @@ ${RV_CSS}
 .imap .pin{fill:var(--accent);stroke:var(--sheet);stroke-width:1.5}
 .imap .pn{font:700 13px var(--f-body);fill:var(--ink);paint-order:stroke;stroke:var(--sheet);stroke-width:3px}
 .imap .pnote{font:500 10px var(--f-body);fill:var(--ink2);paint-order:stroke;stroke:var(--sheet);stroke-width:3px}
+.imap .pin.crowd,.wmap .pin.crowd{stroke:var(--accent);stroke-width:2.5;stroke-dasharray:2 1.5;fill-opacity:.85}
 .imap .pbn{font:800 10.5px var(--f-body);fill:var(--on-acc);text-anchor:middle;pointer-events:none}
 .map-side .plist li{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:baseline}
 .map-side .plist li span{color:var(--ink2);font-size:13.5px;flex:1 1 60%}
