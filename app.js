@@ -7864,11 +7864,15 @@ listBlock,
   }
   function openLockLinkModal(){
     var body;
+    // Inside the पाठShala Android app the lock screen, widgets and reminders are part of the app itself.
+    var appBtn = (window.PathshalaApp && window.PathshalaApp.isApp)
+      ? '<button class="btn ghost" id="lockAppSettings" style="width:100%; margin-top:8px;">⚙ Lock screen, widgets &amp; reminders</button>' : '';
     if(!lockCode){
       body = '<h3>Link the Vocab Lock phone app</h3>' +
         '<p class="help" style="margin-top:0;">Once linked, the phone app knows your levels, memorized words, revision rounds, daily goal and streak. Ratings you give on the phone come back here and count toward your goal and streak.</p>' +
         '<ol class="lock-steps"><li>Tap <b>Create link code</b> below.</li><li>On your phone: tap <b>Link this phone</b> on the next screen (open this page on the phone), or type the code in Vocab Lock → <b>Settings → Account</b>.</li></ol>' +
         '<p class="help" style="font-size:12.5px;">The code works like a key to your progress — keep it to yourself. You can unlink any time here, which stops the old code working.</p>' +
+        appBtn +
         '<div class="modal-actions"><button class="btn ghost" id="lockClose">Close</button><button class="btn teal" id="lockCreate">Create link code</button></div>';
     } else {
       var when = lockSyncedAt ? new Date(lockSyncedAt).toLocaleString() : 'not yet';
@@ -7877,6 +7881,7 @@ listBlock,
         '<div class="lock-code" id="lockCodeBox">' + escapeHtml(lockFmt(lockCode)) + '</div>' +
         '<a class="btn teal" style="display:flex; justify-content:center; text-decoration:none; margin:10px 0 4px;" href="vocablock://link?code=' + encodeURIComponent(lockCode) + '">📱 Link this phone</a>' +
         '<p class="help" style="font-size:12.5px;">Progress last sent to the phone: ' + escapeHtml(when) + '. It updates by itself while this app is open.</p>' +
+        appBtn +
         '<div class="menu-label" style="padding-left:0; margin-top:14px;">Desktop wallpaper (Lively)</div>' +
         '<p class="help" style="margin-top:0; font-size:12.5px;">In Lively Wallpaper, tap <b>+</b> and paste this link. Your words play on the desktop with levels and a progress card.</p>' +
         '<div class="lock-code" style="font-size:12px; letter-spacing:0; text-align:left; padding:10px 12px;">' + escapeHtml(lockWallpaperUrl()) + '</div>' +
@@ -7886,6 +7891,8 @@ listBlock,
     modalBgRef().classList.add('open');
     var close = function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML = ''; };
     document.getElementById('lockClose').addEventListener('click', close);
+    var las = document.getElementById('lockAppSettings');
+    if(las) las.addEventListener('click', function(){ close(); window.PathshalaApp.openLockSettings(); });
     var c = document.getElementById('lockCreate');
     if(c) c.addEventListener('click', function(){ c.disabled = true; c.textContent = 'Creating…'; lockCreateLink(); });
     var u = document.getElementById('lockUnlink');
