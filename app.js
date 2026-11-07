@@ -2786,6 +2786,52 @@
     document.getElementById('displaySettingsClose').addEventListener('click', function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML=''; });
   });
 
+  // ---------------- Offline copy: what is saved on this device, and "save everything now" ----------------
+  function swAsk(msg){
+    return new Promise(function(res, rej){
+      if(!('serviceWorker' in navigator)) return rej(new Error('Offline copies need a newer browser.'));
+      navigator.serviceWorker.ready.then(function(r){
+        if(!r.active) return rej(new Error('Not ready yet — try again in a moment.'));
+        var ch = new MessageChannel();
+        ch.port1.onmessage = function(ev){ msg.onProgress && ev.data && ev.data.progress ? msg.onProgress(ev.data) : res(ev.data); };
+        r.active.postMessage({ type: msg.type }, [ch.port2]);
+      }).catch(rej);
+    });
+  }
+  function fmtMB(b){ return b >= 1048576 ? (b / 1048576).toFixed(b >= 10485760 ? 0 : 1) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB'; }
+  function openOfflineModal(){
+    modalBodyRef().innerHTML = '<h3>Offline copy</h3>' +
+      '<p class="help" style="margin-top:0;">पाठShala keeps a copy of itself on this device so it opens instantly and works without internet. Mini apps are saved as you open them and, a little later, by themselves — or save everything now.</p>' +
+      '<div class="off-stat" id="offStat">Checking…</div>' +
+      '<div class="off-bar"><span id="offBar" style="width:0%"></span></div>' +
+      '<p class="help" id="offUse" style="font-size:12.5px;"></p>' +
+      '<div class="modal-actions"><button class="btn ghost" id="offClose">Close</button><button class="btn teal" id="offSave">Save everything now</button></div>';
+    modalBgRef().classList.add('open');
+    var close = function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML = ''; };
+    document.getElementById('offClose').addEventListener('click', close);
+    var show = function(d){
+      var st = document.getElementById('offStat'), bar = document.getElementById('offBar');
+      if(!st || !d) return;
+      var pc = d.total ? Math.round(d.saved * 100 / d.total) : 0;
+      st.innerHTML = d.saved >= d.total ? '✓ <b>Everything is saved</b> — ' + d.total + ' of ' + d.total + ' files' : '<b>' + d.saved + ' of ' + d.total + '</b> files saved for offline use';
+      bar.style.width = pc + '%';
+    };
+    var usage = function(){
+      if(navigator.storage && navigator.storage.estimate) navigator.storage.estimate().then(function(e){ var u = document.getElementById('offUse'); if(u && e && e.usage) u.textContent = 'Using about ' + fmtMB(e.usage) + ' on this device.'; }).catch(function(){});
+    };
+    swAsk({ type: 'warm-status' }).then(show, function(e){ var st = document.getElementById('offStat'); if(st) st.textContent = e.message; });
+    usage();
+    document.getElementById('offSave').addEventListener('click', function(){
+      var b = this; b.disabled = true; b.textContent = 'Saving…';
+      swAsk({ type: 'warm-all', onProgress: show }).then(function(d){
+        show(d); usage();
+        b.textContent = d && d.saved >= d.total ? 'All saved ✓' : 'Saved what it could';
+        if(d && d.saved < d.total) showToast('Some files could not be saved — check your connection and try again.');
+      }, function(e){ b.disabled = false; b.textContent = 'Save everything now'; showToast(e.message); });
+    });
+  }
+  document.getElementById('offlineBtn').addEventListener('click', function(){ try{ closeAllMenus(); }catch(e){} openOfflineModal(); });
+
   // ---------------- PWA install + service worker (works even before Firebase config) ----------------
   if('serviceWorker' in navigator){
     window.addEventListener('load', function(){
@@ -2859,6 +2905,28 @@
     el.addEventListener('click', function(e){ e.preventDefault(); if(typeof closeAllMenus === 'function') try{ closeAllMenus(); }catch(x){} openApkModal(); });
   });
   if(inAndroidApp) Array.prototype.forEach.call(document.querySelectorAll('.apk-link'), function(el){ el.style.display = 'none'; });
+  // Inside the app: offer the newer APK when the site lists a newer version than the one installed
+  function apkNewer(a, b){
+    var x = String(a).split('.'), y = String(b).split('.');
+    for(var i = 0; i < Math.max(x.length, y.length); i++){ var d = (+x[i] || 0) - (+y[i] || 0); if(d) return d > 0; }
+    return false;
+  }
+  if(inAndroidApp) setTimeout(function(){
+    var have = '';
+    try{ have = window.PathshalaApp.version() || ''; }catch(e){}
+    if(!have || !apkNewer(APK_VERSION, have) || lsGet('apkSkip') === APK_VERSION || document.getElementById('apkUpdateBar')) return;
+    var bar = document.createElement('div');
+    bar.id = 'apkUpdateBar'; bar.className = 'update-bar'; bar.setAttribute('role', 'status');
+    bar.innerHTML = '<span>पाठShala ' + escapeHtml(APK_VERSION) + ' is available (you have ' + escapeHtml(have) + ').</span><button type="button" id="apkUpdateGo">Update</button><button type="button" id="apkUpdateLater" aria-label="Later">✕</button>';
+    document.body.appendChild(bar);
+    document.getElementById('apkUpdateGo').addEventListener('click', function(){
+      bar.remove();
+      // the app hands the download to the browser; open the APK when it finishes to update (settings stay)
+      location.href = new URL(APK_URL, location.href).href;
+      showToast('Downloading पाठShala ' + APK_VERSION + ' — open it when it finishes to update.');
+    });
+    document.getElementById('apkUpdateLater').addEventListener('click', function(){ lsSet('apkSkip', APK_VERSION); bar.remove(); });
+  }, 6000);
   (function(){
     var sub = document.querySelector('#apkBtn span');
     if(sub) sub.textContent = APK_LABEL + ' — lock screen, widgets, offline';
@@ -3789,7 +3857,7 @@
     if(!t) return;
     if(fin){
       todoPop = id;
-      if(navigator.vibrate) try{ navigator.vibrate(30); }catch(e){}
+      if(window.PathshalaApp && typeof window.PathshalaApp.haptic === 'function') window.PathshalaApp.haptic('tick'); else if(navigator.vibrate) try{ navigator.vibrate(30); }catch(e){}
       var left = todoLeftToday();
       showToast(left ? 'Done ' + '✓'.repeat(t.n) + ' — ' + left + ' left for today' : 'Done ' + '✓'.repeat(t.n) + ' — that’s everything for today 🎉');
       var f = todoFocusGet(); if(f && f.id === id) todoFocusSet(null);
@@ -3833,7 +3901,7 @@
       g.gain.setValueAtTime(0.18, ac.currentTime); g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 1.4);
       o.start(); o.stop(ac.currentTime + 1.4);
     }catch(e){}
-    if(navigator.vibrate) try{ navigator.vibrate([200, 100, 200]); }catch(e){}
+    if(window.PathshalaApp && typeof window.PathshalaApp.haptic === 'function') window.PathshalaApp.haptic('done'); else if(navigator.vibrate) try{ navigator.vibrate([200, 100, 200]); }catch(e){}
     showToast('Focus session done — ' + f.min + ' min' + (t ? ' on “' + t.t + '”. ' + (fin ? 'Task finished ✓' : 'Tick added ✓') : '.'));
     if(t) todoPop = t.id;
     if(isActive('tasks')) renderTodo();
@@ -7670,10 +7738,25 @@ listBlock,
       window.PathshalaApp.setWords(js);
     }catch(e){}
   }
+  // Today's session and the nearest exam → the phone's Exam widget and evening plan reminder (app 3.3+)
+  var lockTodaySent = '';
+  function lockSendTodayToApp(){
+    if(!lockInApp() || typeof window.PathshalaApp.setToday !== 'function' || !currentUser) return;
+    try{
+      var ex = null;
+      try{ var up = examsUpcoming()[0]; if(up) ex = { n: up.n || 'Exam', d: up.d }; }catch(e){}
+      var steps = [];
+      try{ steps = sessionToday().map(function(s){ return { i: s.ico || '', l: s.label || '', s: s.sub || '', m: s.min || 0, d: !!s.done }; }); }catch(e){}
+      var js = JSON.stringify({ day: todoDay(0), exam: ex, steps: steps, mist: totalMistakes(), rev: reviewDueKeys().length });
+      if(js === lockTodaySent) return;
+      lockTodaySent = js;
+      window.PathshalaApp.setToday(js);
+    }catch(e){}
+  }
   if(lockInApp()){
-    setInterval(lockSendWordsToApp, 30000);
-    setTimeout(lockSendWordsToApp, 8000);
-    document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'hidden') lockSendWordsToApp(); });
+    setInterval(function(){ lockSendWordsToApp(); lockSendTodayToApp(); }, 30000);
+    setTimeout(function(){ lockSendWordsToApp(); lockSendTodayToApp(); }, 8000);
+    document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'hidden'){ lockSendWordsToApp(); lockSendTodayToApp(); } });
   }
 
   function streakFromHistory(hist, goal){
