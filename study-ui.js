@@ -837,3 +837,62 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
   }
   if (document.body) start(); else addEventListener("DOMContentLoaded", start);
 })();
+
+/* ============================================================
+   MORE DESIGNS — Saffron Dawn, Chalkboard and Exam Hall in every mini app.
+   The pages themselves know two skins (data-skin="paper" / "indigo", with their tokens inline or in study-core.css)
+   and ignore any other name. Here a new design keeps data-skin="paper" (its pattern and layout rules) and adds
+   data-xskin="saffron" | "chalk" | "exam", whose tokens below win over paper's (more specific selectors, later in
+   the page). The app sends the design in the frame address (?skin=) and in "shabd-theme" messages.
+   ============================================================ */
+(function(){
+  if (window.__studyXSkin) return;
+  window.__studyXSkin = true;
+  const root = document.documentElement;
+  const FONTS = {
+    saffron: "Baloo+2:wght@500;600;700;800&family=Mukta:wght@400;500;600;700",
+    chalk: "Kalam:wght@400;700&family=Nunito:wght@400;500;600;700",
+    exam: "Atkinson+Hyperlegible:wght@400;700&family=Hind:wght@400;500;600"
+  };
+  // light, dark: [card, rule, primary, ink, soft, faint, bg, deep, onPrimary, accent, good, bad, warn, pattern, patternSize]
+  const T = {
+    saffron: { fd: "'Baloo 2', system-ui, sans-serif", fb: "'Mukta', system-ui, sans-serif",
+      l: ["#FFFDF7", "#EFD5A6", "#C26500", "#2A1A0B", "#6E5435", "#93795A", "#FFF6E5", "#FBEACB", "#FFFFFF", "#0F6B45", "#138A55", "#C0392B", "#FFB627", "radial-gradient(rgba(217,112,0,.10) 1.6px, transparent 2px)", "24px 24px"],
+      d: ["#26190D", "#3D2A16", "#FF9F1C", "#FCEBD2", "#D3B48A", "#A88C68", "#1A120A", "#22170C", "#1A120A", "#3CC47C", "#3CC47C", "#FF6B5B", "#FFB627", "radial-gradient(rgba(255,159,28,.08) 1.6px, transparent 2px)", "24px 24px"] },
+    chalk: { fd: "'Kalam', cursive", fb: "'Nunito', system-ui, sans-serif",
+      l: ["#FFFFFF", "#D6DED8", "#1B7F5A", "#1E2B25", "#51625A", "#748580", "#F7F8F5", "#ECEFEA", "#FFFFFF", "#B88A0C", "#1B7F5A", "#C2412D", "#E9B824", "linear-gradient(rgba(30,43,37,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(30,43,37,.045) 1px, transparent 1px)", "28px 28px"],
+      d: ["#24443A", "rgba(242,240,230,.28)", "#F6D365", "#F2F0E6", "#C7D3C9", "#9DB2A6", "#1F3A2E", "#1A3227", "#1F3A2E", "#9BE3A8", "#9BE3A8", "#FF9B9B", "#F6D365", "radial-gradient(rgba(255,255,255,.035) 1px, transparent 1.2px)", "5px 5px"] },
+    exam: { fd: "'Atkinson Hyperlegible', system-ui, sans-serif", fb: "'Atkinson Hyperlegible', 'Hind', system-ui, sans-serif",
+      l: ["#FFFFFF", "#1A1A1A", "#0047AB", "#000000", "#262626", "#4D4D4D", "#FFFFFF", "#F2F2F2", "#FFFFFF", "#8A6100", "#006B2D", "#B00020", "#FFD400", "none", "auto"],
+      d: ["#000000", "#FFFFFF", "#7CB3FF", "#FFFFFF", "#E6E6E6", "#BFBFBF", "#000000", "#0D0D0D", "#000000", "#FFD400", "#4ADE80", "#FF6B6B", "#FFD400", "none", "auto"] }
+  };
+  const vars = (t, v, dark) => {
+    const [card, rule, pri, ink, soft, faint, bg, deep, onPri, acc, good, bad, warn, pat, psize] = v, mix = (c, k) => `color-mix(in srgb, ${c} ${k}%, ${card})`;
+    return `--app-pattern:${pat};--app-psize:${psize};--app-card:${card};--app-rule:${rule};--app-pri:${pri};--app-ink:${ink};--app-soft:${soft};--app-faint:${faint};--app-bg:${bg};--app-deep:${deep};` +
+      `--app-display:${t.fd};--app-body:${t.fb};--paper:${bg};--sheet:${card};--sunk:${deep};--ink:${ink};--ink2:${soft};--rule:${rule};--blue:${pri};--on-blue:${onPri};` +
+      `--blue-bg:${mix(pri, dark ? 22 : 14)};--accent:${acc};--accent-bg:${mix(acc, dark ? 24 : 16)};--good:${good};--good-bg:${mix(good, dark ? 22 : 14)};--bad:${bad};--bad-bg:${mix(bad, dark ? 22 : 14)};` +
+      `--warn-bg:${mix(warn, dark ? 26 : 18)};--f-display:${t.fd};--f-body:${t.fb};color-scheme:${dark ? "dark" : "light"};`;
+  };
+  let css = "";
+  Object.keys(T).forEach(k => {
+    const t = T[k], s = `:root[data-skin][data-xskin="${k}"]`;
+    css += `${s}{${vars(t, t.l, false)}}${s}[data-theme="dark"]{${vars(t, t.d, true)}}` +
+      `@media (prefers-color-scheme: dark){${s}:not([data-theme="light"]){${vars(t, t.d, true)}}}`;
+  });
+  css += `:root[data-xskin="chalk"][data-theme="dark"] .card,:root[data-xskin="chalk"][data-theme="dark"] .les{border-style:dashed}` +
+    `:root[data-xskin="exam"] .card,:root[data-xskin="exam"] .opt,:root[data-xskin="exam"] .les{border-width:2px}`;
+  const style = document.createElement("style"); style.id = "xskin-css"; style.textContent = css;
+  const fontsOf = k => { const id = "xskin-font-" + k; if (document.getElementById(id) || !FONTS[k]) return;
+    const l = document.createElement("link"); l.id = id; l.rel = "stylesheet"; l.href = "https://fonts.googleapis.com/css2?family=" + FONTS[k] + "&display=swap"; document.head.appendChild(l); };
+  function apply(sk){
+    if (T[sk]) { root.setAttribute("data-skin", "paper"); root.setAttribute("data-xskin", sk); fontsOf(sk); }
+    else if (sk === "paper" || sk === "indigo") root.removeAttribute("data-xskin");
+  }
+  function start(){
+    if (!document.getElementById("xskin-css")) document.head.appendChild(style);
+    apply(new URLSearchParams(location.search).get("skin") || "");
+  }
+  if (document.head) start(); else addEventListener("DOMContentLoaded", start);
+  // after the page's own handler (it only knows paper / indigo), so a new design wins
+  addEventListener("message", e => { if (e.origin === location.origin && e.data && e.data.type === "shabd-theme" && e.data.skin) setTimeout(() => apply(e.data.skin), 0); });
+})();

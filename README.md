@@ -80,7 +80,7 @@ Each mini app is one self-contained page (`study-<name>.html`) with lessons, a q
 
 ## Features
 
-- Phone and PC layouts, Paper and Indigo themes, each with Light / Dark / Auto
+- Phone and PC layouts and five designs, each with Light / Dark / Auto: **Refined Register** (paper), **Indigo Night**, **Saffron Dawn** (haldi and deep green, Baloo 2 + Mukta), **Chalkboard** (a whiteboard in light, the green board in dark; Kalam + Nunito) and **Exam Hall** (highest contrast, Atkinson Hyperlegible). The three newer ones are Refined Register's shapes with their own tokens (`body.theme-paper.theme-saffron` …); in the mini apps they arrive as `?skin=` and `shabd-theme` messages, and `study-ui.js` keeps `data-skin="paper"` and adds `data-xskin` with their tokens
 - Opens instantly after the first visit, even on slow mobile data: the app, its libraries and fonts load from the saved copy and update in the background (a “new version is ready” bar offers a reload); every mini app, the question bank and search are saved for offline use once the app is idle; installable on a phone
 - Progress saved to your account (Firebase) and synced across devices
 - One unified daily goal and streak across vocab and all study apps
