@@ -665,6 +665,15 @@
   .hub-card.here .hub-meta b{ color:var(--ink-faint); }
   @media (max-width: 860px){ .brand-group .navmenu{ top:62px; bottom:auto; transform-origin:top center; } .study-sync{ display:none; } }
   .brand-paper{ font-family:'Fraunces', Georgia, serif; font-size:21px; font-weight:600; color:var(--mustard); }
+  /* the installed app version under the logo (Android app only) */
+  .brand-btn:has(.brand-ver:not([hidden])){ display:grid; grid-template-columns:auto; row-gap:0; justify-items:start; }
+  .brand-ver{ font-size:10px; line-height:1.1; font-weight:600; letter-spacing:.04em; color:var(--bar-fg); opacity:.6; margin-top:-1px; }
+  .brand-ver.has-update{ color:var(--mustard); opacity:1; }
+  .ver-rows{ display:grid; gap:8px; margin:4px 0 12px; }
+  .ver-rows > div{ display:grid; grid-template-columns:1fr auto; align-items:baseline; padding:10px 12px; border-radius:12px; background:var(--paper-deep); }
+  .ver-rows span{ font-size:13.5px; color:var(--ink-soft, inherit); }
+  .ver-rows b{ font-size:18px; font-family:'Fraunces', Georgia, serif; }
+  .ver-rows small{ grid-column:1 / -1; font-size:12px; opacity:.7; }
   .brand-paper span{ color:var(--bar-fg); }
   .brand-indigo{ display:none; align-items:center; gap:10px; font-family:'Bricolage Grotesque', system-ui, sans-serif; font-size:19px; font-weight:700; letter-spacing:-.02em; }
   .brand-mark{ width:34px; height:34px; border-radius:10px; background:var(--mustard); color:var(--bar-bg); display:flex; align-items:center; justify-content:center; }
@@ -1778,6 +1787,7 @@
     <button class="brand brand-btn" id="homeBrand" title="पाठShala — home">
       <span class="brand-paper">पाठ<span>Shala</span></span>
       <span class="brand-indigo"><span class="brand-mark"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 5h6a4 4 0 0 1 4 4v11a3 3 0 0 0-3-3H2z"></path><path d="M22 5h-6a4 4 0 0 0-4 4v11a3 3 0 0 1 3-3h7z"></path></svg></span>पाठShala</span>
+      <span class="brand-ver" id="brandVer" hidden></span>
     </button>
     </div>
 
@@ -1860,6 +1870,7 @@
           <button class="tab" data-tab="admin"><b>Admin</b><span>Moderators, duplicates, tag and root tools</span></button></div>
           <button class="tab" data-tab="backup"><b>Backup</b><span>Export or import your register</span></button>
           <button id="installBtn" style="display:none;"><b>Install app</b><span>Add to your home screen or desktop</span></button>
+          <button id="appVerBtn" hidden><b>App version</b><span>Check for updates</span></button>
           <button id="offlineBtn"><b>Offline copy</b><span>What's saved on this device · save everything now</span></button>
           <button id="apkBtn" class="apk-open apk-link"><b>Android app (APK)</b><span>Download पाठShala for your phone — lock screen, widgets, offline</span></button>
           <button id="signOutBtn"><b>Sign out</b></button>
@@ -2319,7 +2330,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="app.js?v=9c02265f"></script>
+<script src="app.js?v=1e9ecc41"></script>
 <script src="typing-passages.js?v=df4bd310"></script>
 <script src="typing.js?v=02ff18bc"></script>
 </body>

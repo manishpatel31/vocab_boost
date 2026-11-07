@@ -2911,20 +2911,67 @@
     for(var i = 0; i < Math.max(x.length, y.length); i++){ var d = (+x[i] || 0) - (+y[i] || 0); if(d) return d > 0; }
     return false;
   }
+  // ---- inside the app: the installed version under the logo, Account → App version, and the update bar ----
+  function appVersion(){ try{ return window.PathshalaApp.version() || ''; }catch(e){ return ''; } }
+  function apkDownload(){
+    // the app hands the download to the browser; open the APK when it finishes to update (settings stay)
+    location.href = new URL(APK_URL, location.href).href;
+    showToast('Downloading पाठShala ' + APK_VERSION + ' — open it when it finishes to update.');
+  }
+  function showAppVersion(have){
+    var newer = apkNewer(APK_VERSION, have);
+    var v = document.getElementById('brandVer');
+    if(v){ v.textContent = 'v' + have + (newer ? ' · update' : ''); v.classList.toggle('has-update', newer); v.hidden = false; }
+    var b = document.getElementById('appVerBtn');
+    if(b){ b.hidden = false; b.querySelector('span').textContent = 'Version ' + have + (newer ? ' · ' + APK_VERSION + ' is available' : ' · check for updates'); }
+  }
+  function openAppVersion(){
+    var have = appVersion(), newer = have && apkNewer(APK_VERSION, have);
+    modalBodyRef().innerHTML = '<h3>App version</h3>' +
+      '<div class="ver-rows"><div><span>Installed on this phone</span><b>' + escapeHtml(have || '—') + '</b></div>' +
+      '<div><span>Latest version</span><b>' + escapeHtml(APK_VERSION) + '</b><small>' + escapeHtml(APK_DATE + ' · ' + APK_SIZE) + '</small></div></div>' +
+      (newer
+        ? '<p class="help">A newer version is out. Download it, open it when it finishes and tap <b>Install</b> (or <b>Update</b>) — your settings, lock screen and widgets stay.</p>'
+        : '<p class="help">✓ You have the latest version. New lessons and fixes reach the app by themselves; a new app version is only needed for phone features.</p>') +
+      '<div class="modal-actions"><button class="btn ghost" id="verClose">Close</button>' + (newer ? '<button class="btn teal" id="verGo">Download ' + escapeHtml(APK_VERSION) + '</button>' : '<button class="btn teal" id="verCheck">Check again</button>') + '</div>';
+    modalBgRef().classList.add('open');
+    var close = function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML = ''; };
+    document.getElementById('verClose').addEventListener('click', close);
+    var go = document.getElementById('verGo');
+    if(go) go.addEventListener('click', function(){ close(); apkDownload(); });
+    var chk = document.getElementById('verCheck');
+    if(chk) chk.addEventListener('click', function(){
+      // the latest version number comes with the website: refresh it from the internet, then look again
+      chk.disabled = true; chk.textContent = 'Checking…';
+      fetch('app.js?fresh=' + Date.now(), { cache: 'no-store' }).then(function(r){ return r.text(); }).then(function(t){
+        var m = /APK_VERSION = '([0-9.]+)'/.exec(t), latest = m ? m[1] : APK_VERSION;
+        if(apkNewer(latest, have)){
+          close();
+          showToast('Version ' + latest + ' is out — reloading to get it…');
+          setTimeout(function(){ location.reload(); }, 1200);
+        } else { chk.textContent = 'Up to date ✓'; }
+      }).catch(function(){ chk.disabled = false; chk.textContent = 'Check again'; showToast('Could not check — are you online?'); });
+    });
+  }
+  var appVerBtn = document.getElementById('appVerBtn');
+  if(appVerBtn) appVerBtn.addEventListener('click', function(){ try{ closeAllMenus(); }catch(e){} openAppVersion(); });
+  if(inAndroidApp){
+    // the app tells the page its version a moment after it opens
+    var verTries = 0, verTimer = setInterval(function(){
+      var have = appVersion();
+      if(!have && ++verTries < 50) return;
+      clearInterval(verTimer);
+      if(have) showAppVersion(have);
+    }, 100);
+  }
   if(inAndroidApp) setTimeout(function(){
-    var have = '';
-    try{ have = window.PathshalaApp.version() || ''; }catch(e){}
+    var have = appVersion();
     if(!have || !apkNewer(APK_VERSION, have) || lsGet('apkSkip') === APK_VERSION || document.getElementById('apkUpdateBar')) return;
     var bar = document.createElement('div');
     bar.id = 'apkUpdateBar'; bar.className = 'update-bar'; bar.setAttribute('role', 'status');
     bar.innerHTML = '<span>पाठShala ' + escapeHtml(APK_VERSION) + ' is available (you have ' + escapeHtml(have) + ').</span><button type="button" id="apkUpdateGo">Update</button><button type="button" id="apkUpdateLater" aria-label="Later">✕</button>';
     document.body.appendChild(bar);
-    document.getElementById('apkUpdateGo').addEventListener('click', function(){
-      bar.remove();
-      // the app hands the download to the browser; open the APK when it finishes to update (settings stay)
-      location.href = new URL(APK_URL, location.href).href;
-      showToast('Downloading पाठShala ' + APK_VERSION + ' — open it when it finishes to update.');
-    });
+    document.getElementById('apkUpdateGo').addEventListener('click', function(){ bar.remove(); apkDownload(); });
     document.getElementById('apkUpdateLater').addEventListener('click', function(){ lsSet('apkSkip', APK_VERSION); bar.remove(); });
   }, 6000);
   (function(){

@@ -129,6 +129,7 @@ One app, **पाठShala** (package `com.manish.vocablock`). The code is in the
 - **Today's plan and exam to the phone:** `lockSendTodayToApp` sends today's session (`sessionToday()`), the nearest exam (`examsUpcoming()`), the mistakes count and the review queue through `PathshalaApp.setToday` (app 3.3+). The phone uses them for its Exam & plan widget, the Today widget and the evening plan reminder.
 - **Haptics:** `study-ui.js` (mini-app answers) and the vocab quiz call `PathshalaApp.haptic('right' | 'wrong' | 'tick' | 'done')` when it exists, else `navigator.vibrate`.
 - **Update prompt:** inside the app, if `APK_VERSION` (app.js) is newer than `PathshalaApp.version()`, a bar offers "पाठShala x.y is available — Update". ✕ hides it for that version (`apkSkip`).
+- **Installed version and Check for updates:** inside the app, the installed version shows under the पाठShala logo (`#brandVer`, "v3.3 · update" in mustard when a newer one is out). Account → **App version** (`#appVerBtn`) shows the installed and latest versions, with **Download x.y** or **Check again**. Check again fetches `app.js?fresh=…` straight from the internet; `sw.js` never caches `?fresh=` requests. A newer `APK_VERSION` there reloads the page to pick it up.
 
 **Download:**
 - **Where it appears:** the sign-in screen ("Get the Android app (v…, date)") and Account → **Android app (APK)**. Both open a page showing the version, update date and size, a download button and install steps. The browser "Install app" help links it too.
