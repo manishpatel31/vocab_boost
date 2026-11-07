@@ -3261,6 +3261,10 @@
   /** Admin, once per day: give everyone who hasn't opened the new version yet a public card, from their full profile. */
   async function backfillPublicCards(){
     if(!isAdminUser || lsGet('publicCardsFilled') === todayKey()) return;
+    if(backfillPublicCards.busy) return backfillPublicCards.busy;
+    return (backfillPublicCards.busy = backfillRun().finally(function(){ backfillPublicCards.busy = null; }));
+  }
+  async function backfillRun(){
     try{
       var have = {}, cards = await db.collection('publicProfiles').get();
       cards.forEach(function(d){ have[d.id] = true; });
@@ -7542,7 +7546,7 @@ listBlock,
     var area = document.getElementById('leaderboardArea');
     area.innerHTML = '<p class="help">Loading…</p>';
     try{
-      backfillPublicCards();
+      await backfillPublicCards();                       // the admin: fill in everyone's cards first, then read them
       var snap = await peopleSnap('masteredCount', 'desc', 50);
       var rows = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
       var totalWords = words.length;
@@ -7569,6 +7573,7 @@ listBlock,
     var box = document.getElementById('allUsersArea');
     box.innerHTML = '<p class="help">Loading…</p>';
     try{
+      await backfillPublicCards();
       var usersSnap = await peopleSnap('displayName', 'asc', 300);
       var rolesSnap = await db.collection('roles').get();
       var modMap = {};
