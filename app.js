@@ -2830,12 +2830,38 @@
   });
   if(isIOS){ document.getElementById('installBtn').style.display = 'inline-flex'; }
 
+  // ---------------- Android app (APK) download ----------------
+  // Built from the private vocab-lock repo (GitHub Actions → Releases); a copy is kept here as Pathshala.apk
+  // so anyone can download it. Replace that file when the Android app itself changes.
+  var APK_URL = 'Pathshala.apk';
+  var inAndroidApp = !!(window.PathshalaApp && window.PathshalaApp.isApp);
+  function openApkModal(){
+    var modalBg = document.getElementById('modalBg');
+    var modalBody = document.getElementById('modalBody');
+    modalBody.innerHTML = '<h3>पाठShala for Android</h3>' +
+      '<p class="help" style="margin-top:0;">The whole app full-screen and offline, with your Google account and progress, read-aloud in English and Hindi, words and GS facts on the lock screen, home-screen widgets and streak reminders.</p>' +
+      '<a class="btn teal" id="apkDownload" style="display:flex; justify-content:center; text-decoration:none; margin:10px 0 12px;" href="' + APK_URL + '" download="Pathshala.apk">⬇ Download the APK (2.6 MB)</a>' +
+      '<ol class="lock-steps">' +
+        '<li>Open the downloaded <b>Pathshala.apk</b>.</li>' +
+        '<li>If Android asks, allow your browser to <b>install unknown apps</b>, then tap <b>Install</b>.</li>' +
+        '<li>Open पाठShala and <b>Sign in with Google</b> — the same account as here.</li>' +
+      '</ol>' +
+      '<p class="help" style="font-size:12.5px;">Already have it (or Vocab Lock)? Installing a new download updates it and keeps your settings. New lessons reach the app by themselves.</p>' +
+      '<div class="modal-actions"><button class="btn ghost" id="closeApkInfo">Close</button></div>';
+    modalBg.classList.add('open');
+    document.getElementById('closeApkInfo').addEventListener('click', function(){ modalBg.classList.remove('open'); modalBody.innerHTML=''; });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.apk-open'), function(el){
+    el.addEventListener('click', function(e){ e.preventDefault(); if(typeof closeAllMenus === 'function') try{ closeAllMenus(); }catch(x){} openApkModal(); });
+  });
+  if(inAndroidApp) Array.prototype.forEach.call(document.querySelectorAll('.apk-link'), function(el){ el.style.display = 'none'; });
+
   function openInstallInstructions(){
     var modalBg = document.getElementById('modalBg');
     var modalBody = document.getElementById('modalBody');
     modalBody.innerHTML = '<h3>Install this app</h3>' +
       '<p class="help"><strong>iPhone / iPad (Safari):</strong> tap the Share icon, then "Add to Home Screen".</p>' +
-      '<p class="help"><strong>Android (Chrome):</strong> tap the ⋮ menu, then "Install app" or "Add to Home screen".</p>' +
+      '<p class="help"><strong>Android:</strong> get the full app — <a href="' + APK_URL + '">download the APK</a> (lock screen, widgets, reminders). Or in Chrome tap the ⋮ menu, then "Install app" or "Add to Home screen".</p>' +
       '<p class="help"><strong>Computer (Chrome / Edge):</strong> click the install icon in the address bar, or the browser menu → "Install पाठShala".</p>' +
       '<div class="modal-actions"><button class="btn ghost" id="closeInstallInfo">Close</button></div>';
     modalBg.classList.add('open');
