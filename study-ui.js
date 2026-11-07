@@ -157,6 +157,9 @@
       if (!nb && ioi == null) nb = document.querySelector(`.opt[data-oi="${CSS.escape(oi || "")}"].sel`);
       if (!nb) return;
       nb.classList.remove("fx-pick"); void nb.offsetWidth; nb.classList.add("fx-pick");
+      // a short buzz inside the Android app: a tick for right, a double for wrong
+      const P = window.PathshalaApp;
+      if (P && typeof P.haptic === "function") P.haptic(nb.classList.contains("no") ? "wrong" : "right");
       const set = nb.closest(".opts");
       if (set && nb.classList.contains("no")) set.classList.add("fx-missed");
       // on a small screen the explanation and the Next button can land below the fold

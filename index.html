@@ -1181,6 +1181,9 @@
   .main:has(#view-tasks.active) header.top, .main:has(#view-plan.active) header.top, .main:has(#view-typing.active) header.top{ display:none; }
   /* sections below the first screen are laid out only when scrolled near */
   #homeBody > .hub-sec{ content-visibility:auto; contain-intrinsic-size:auto 900px; }
+  .off-stat{ font-size:15px; margin:6px 0 8px; }
+  .off-bar{ height:8px; border-radius:var(--pill); background:var(--paper-deep); overflow:hidden; }
+  .off-bar span{ display:block; height:100%; background:var(--teal, #2E6E62); border-radius:inherit; transition:width .3s ease; }
   .update-bar{ position:fixed; left:50%; transform:translateX(-50%); top:calc(12px + env(safe-area-inset-top)); z-index:200; display:flex; align-items:center; gap:10px; max-width:calc(100% - 24px); background:var(--ink); color:var(--paper); padding:8px 8px 8px 16px; border-radius:var(--pill); box-shadow:var(--shadow-lg); font-size:14px; }
   .update-bar button{ border:none; background:transparent; color:var(--mustard); font:inherit; font-weight:700; cursor:pointer; padding:6px 10px; border-radius:var(--pill); }
   .update-bar #updateReload{ background:var(--mustard); color:#1B1813; }
@@ -1857,6 +1860,7 @@
           <button class="tab" data-tab="admin"><b>Admin</b><span>Moderators, duplicates, tag and root tools</span></button></div>
           <button class="tab" data-tab="backup"><b>Backup</b><span>Export or import your register</span></button>
           <button id="installBtn" style="display:none;"><b>Install app</b><span>Add to your home screen or desktop</span></button>
+          <button id="offlineBtn"><b>Offline copy</b><span>What's saved on this device · save everything now</span></button>
           <button id="apkBtn" class="apk-open apk-link"><b>Android app (APK)</b><span>Download पाठShala for your phone — lock screen, widgets, offline</span></button>
           <button id="signOutBtn"><b>Sign out</b></button>
         </div>
@@ -2315,7 +2319,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="app.js?v=bd1e82da"></script>
+<script src="app.js?v=a0e761fe"></script>
 <script src="typing-passages.js?v=df4bd310"></script>
 <script src="typing.js?v=02ff18bc"></script>
 </body>
