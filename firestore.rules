@@ -2,7 +2,8 @@
 // A COPY of the live rules, kept here so changes can be seen and undone. The live rules are in the Firebase console:
 // Firestore Database → Rules. Editing this file changes nothing by itself — paste it there (or `firebase deploy
 // --only firestore:rules`) to publish, and paste the console's rules here after changing them there.
-// Copied from the console on 7 Nov 2026. What each part protects: README → "Firestore rules".
+// Copied from the console on 7 Nov 2026, then changed for private emails (publicProfiles; users/{uid} readable only by
+// its owner and the admin) — paste this version into the console. What each part protects: README → "Firestore rules".
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -66,7 +67,9 @@ service cloud.firestore {
 
     // ---------- users, progress, notifications ----------
     match /users/{uid} {
-      allow read: if isSignedIn();
+      // a full profile holds the email: only its owner and the admin may read it
+      // (the leaderboard and the user list read publicProfiles instead)
+      allow read: if isSignedIn() && (request.auth.uid == uid || isAdmin());
       allow write: if isSignedIn() && request.auth.uid == uid;
 
       match /progress/{wordId} {
@@ -82,6 +85,17 @@ service cloud.firestore {
         allow read, update, delete: if isSignedIn() && request.auth.uid == uid;
         allow create: if isSignedIn() && (request.auth.uid == uid || isModerator());
       }
+    }
+
+    // ---------- public profile cards: what others see on the leaderboard and the user list (no email) ----------
+    match /publicProfiles/{uid} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && (request.auth.uid == uid || isAdmin())
+                    && request.resource.data.keys().hasOnly(['displayName', 'photoURL', 'masteredCount', 'engagedCount',
+                                                              'streakCurrent', 'lastMetDay', 'admin', 'updatedAt'])
+                    && request.resource.data.displayName is string && !request.resource.data.displayName.matches('.*@.*')
+                    && (request.resource.data.admin == false || isAdmin());
+      allow delete: if isSignedIn() && (request.auth.uid == uid || isAdmin());
     }
 
     // ---------- moderators ----------

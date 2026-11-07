@@ -7,9 +7,9 @@
 //   throw everything away and download it all again.
 // - Mini apps, the question bank and the search index are saved the first time they are used,
 //   and fetched quietly once the app is idle (see 'warm'), so they open offline too.
-var VERSION = 'shabd-v201';                 // bump on every deploy so browsers pick up this file
+var VERSION = 'shabd-v202';                 // bump on every deploy so browsers pick up this file
 var CACHE = 'shabd-files';                 // kept across versions
-var SHELL = ['./', './index.html', './app.js?v=5e5b1fab', './manifest.json', './icon-192.png', './icon-512.png',
+var SHELL = ['./', './index.html', './app.js?v=3a3f0aa4', './manifest.json', './icon-192.png', './icon-512.png',
   'https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js',
   'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js',
   'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js'];
