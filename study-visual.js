@@ -692,7 +692,8 @@ function cgWatch(svg){ if (cgSeen) cgSeen.observe(svg); else contrastGuard(svg);
     - a pin's label (name + note) that would cover one already placed tries the other side of its pin and a little above or
       below; if none is free its note is left out, and if even the name has no room it waits for a closer zoom (the pin gets
       a ring: zoom in for its name);
-    - any other label that overlaps (a river's name, a state's) is nudged a little up, down or along.
+    - a river's name slides along its own river to a free spot; any other label that overlaps (a state's, a chart's)
+      is nudged a little up, down or along.
     Pins come first, then labels in the order they were drawn. Everything starts again from the drawn positions each time. */
 function lblInit(svg){
   if (svg._lbl) return svg._lbl;
@@ -715,6 +716,8 @@ function lblInit(svg){
     }
     groups.push(g);
   }
+  // a river's name may slide along its own river (the drawn line) to find a free spot
+  groups.forEach(g => { const n = g.items[0].t.dataset.rvl; if (n) g.rv = svg.querySelector(`path.rv[data-rv="${CSS.escape(n)}"]`); });
   const pins = [...svg.querySelectorAll("circle.pin")].map(c => ({ c, r: c.getAttribute("r") }));
   return (svg._lbl = { groups, pins });
 }
@@ -757,6 +760,16 @@ function lblRun(svg, layout){
     const tries = g.kind === "pin" ? [[0, 0], [1, 0], [0, -lh * .6], [0, lh * .6], [1, -lh * .6], [1, lh * .6], [0, -h], [0, h], [1, -h], [1, h]]
       : [[0, -lh * .45], [0, lh * .45], [0, 0, -w * .3], [0, 0, w * .3], [0, -lh * .9], [0, lh * .9], [0, -lh * .6, -w * .3], [0, -lh * .6, w * .3],
          [0, lh * .6, -w * .3], [0, lh * .6, w * .3], [0, 0, -w * .6], [0, 0, w * .6]];
+    if (g.rv && g.rv.getTotalLength) {
+      const t = g.items[0].t, len = g.rv.getTotalLength(), x0 = t.getAttribute("x"), y0 = t.getAttribute("y"), off = 4 * (zoomed ? s : 1);
+      const below = g.items[0].fs * (zoomed ? s : 1) + off;              // the other side of the line
+      for (const f of [.5, .4, .6, .3, .7, .22, .78, .15, .85, .1, .9]) for (const dy of [-off, below]) {
+        const p = g.rv.getPointAtLength(len * f);
+        t.setAttribute("x", (p.x + off).toFixed(2)); t.setAttribute("y", (p.y + dy).toFixed(2));
+        const rr = box(g); if (rr && !hit(rr)) { taken.push(rr); return; }
+      }
+      t.setAttribute("x", x0); t.setAttribute("y", y0);
+    }
     const fit = () => { for (const [f, dy, dx] of tries) { put(g, !!f, dy, dx); const rr = box(g); if (rr && !hit(rr)) { taken.push(rr); return true; } } put(g, false, 0); return false; };
     if (fit()) return;
     if (g.kind !== "pin") { taken.push(r); return; }                     // a chart label stays where it was drawn
