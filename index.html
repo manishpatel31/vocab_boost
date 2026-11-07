@@ -21,16 +21,22 @@
     var l = document.createElement('link');
     l.id = id; l.rel = 'preload'; l.as = 'style';                 // a preload never holds up scripts or the first paint
     l.onload = function(){ this.onload = null; this.rel = 'stylesheet'; };
-    l.href = t === 'indigo'
-      ? 'https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500&display=swap'
-      : 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&display=swap';
+    var F = {
+      indigo: 'Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500',
+      saffron: 'Baloo+2:wght@500;600;700;800&family=Mukta:wght@400;500;600;700',
+      chalk: 'Kalam:wght@400;700&family=Nunito:wght@400;500;600;700',
+      exam: 'Atkinson+Hyperlegible:wght@400;700&family=Hind:wght@400;500;600',
+      paper: 'Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=Tiro+Devanagari+Hindi'
+    };
+    l.href = 'https://fonts.googleapis.com/css2?family=' + (F[t] || F.paper) + '&display=swap';
     document.head.appendChild(l);
   };
-  try{ loadThemeFonts(localStorage.getItem('vocabRegisterTheme') === 'indigo' ? 'indigo' : 'paper'); }catch(e){ loadThemeFonts('paper'); }
+  try{ loadThemeFonts(/^(indigo|saffron|chalk|exam)$/.test(localStorage.getItem('vocabRegisterTheme') || '') ? localStorage.getItem('vocabRegisterTheme') : 'paper'); }catch(e){ loadThemeFonts('paper'); }
 </script>
 <style>
   /* ================= DESIGN TOKENS =================
-     Two designs (Refined Register = theme-paper, Indigo Night = theme-indigo),
+     Five designs (Refined Register = theme-paper, Indigo Night = theme-indigo; Saffron Dawn, Chalkboard and Exam Hall
+     = theme-paper + theme-saffron / theme-chalk / theme-exam, further down),
      each with light and dark (.dark). Every rule below reads these variables. */
   :root, body.theme-paper{
     --paper:#F3EEE3; --paper-deep:#E9E1CF; --rule:#DCCFB2; --card:#FFFCF6;
@@ -98,6 +104,99 @@
     --overlay:rgba(3,7,20,.7);
     --code-bg:#070E26; --code-fg:#DCE3FF;
   }
+  /* ---- three more designs (Style Lab picks, Nov 2026): Refined Register's shapes with their own colours and type.
+     body keeps theme-paper (so every paper rule applies) and adds theme-saffron / theme-chalk / theme-exam. ---- */
+  body.theme-paper.theme-saffron{
+    --paper:#FFF6E5; --paper-deep:#FBEACB; --rule:#EFD5A6; --card:#FFFDF7;
+    --ink:#2A1A0B; --ink-soft:#6E5435; --ink-faint:#93795A;
+    --maroon:#B4361F; --maroon-deep:#93291A; --teal:#0F6B45; --teal-deep:#0B5236;
+    --mustard:#E08A00; --mustard-deep:#C27400;
+    --accent:#0F5132; --accent-fg:#FFF6E5; --accent-hover:#0B4129;
+    --gold:#D97000; --gold-fg:#FFFFFF;
+    --bar-bg:#0F5132; --bar-fg:#FFF6E5; --bar-muted:#CFE3D6; --bar-hover:#14633F; --bar-line:#14633F;
+    --menu-bg:#FFFDF7; --menu-hover:#FCEFD6;
+    --font-display:'Baloo 2', system-ui, sans-serif; --font-body:'Mukta', system-ui, sans-serif; --font-hindi:'Mukta', sans-serif;
+    --h-weight:700; --radius:16px; --radius-lg:22px;
+    --shadow:0 1px 0 rgba(42,26,11,.04), 0 10px 24px -16px rgba(120,60,0,.28);
+    --shadow-lg:0 24px 48px -20px rgba(80,40,0,.45);
+    --bg-pattern:radial-gradient(rgba(217,112,0,.10) 1.6px, transparent 2px); --bg-pattern-size:24px 24px;
+    --overlay:rgba(42,26,11,.5); --code-bg:#2A1A0B; --code-fg:#FCEBD2;
+  }
+  body.theme-paper.theme-saffron.dark{
+    --paper:#1A120A; --paper-deep:#22170C; --rule:#3D2A16; --card:#26190D;
+    --ink:#FCEBD2; --ink-soft:#D3B48A; --ink-faint:#A88C68;
+    --maroon:#FF7A5C; --maroon-deep:#E6603F; --teal:#3CC47C; --teal-deep:#2FA566;
+    --mustard:#FFB627; --mustard-deep:#FF9F1C;
+    --accent:#FFB627; --accent-fg:#1A120A; --accent-hover:#FFC75A;
+    --gold:#FF9F1C; --gold-fg:#1A120A;
+    --bar-bg:#0B2E1E; --bar-fg:#FCEBD2; --bar-muted:#A9C9B6; --bar-hover:#123D28; --bar-line:#123D28;
+    --menu-bg:#26190D; --menu-hover:#33220F;
+    --shadow:0 1px 0 rgba(0,0,0,.2), 0 12px 28px -16px rgba(0,0,0,.6); --shadow-lg:0 24px 48px -20px rgba(0,0,0,.75);
+    --bg-pattern:radial-gradient(rgba(255,159,28,.08) 1.6px, transparent 2px);
+    --overlay:rgba(0,0,0,.6); --code-bg:#110B05; --code-fg:#FCEBD2;
+  }
+  /* Chalkboard: a clean whiteboard in light mode, the green classroom board in dark mode */
+  body.theme-paper.theme-chalk{
+    --paper:#F7F8F5; --paper-deep:#ECEFEA; --rule:#D6DED8; --card:#FFFFFF;
+    --ink:#1E2B25; --ink-soft:#51625A; --ink-faint:#748580;
+    --maroon:#C2412D; --maroon-deep:#A23524; --teal:#1B7F5A; --teal-deep:#146346;
+    --mustard:#D9A514; --mustard-deep:#B88A0C;
+    --accent:#1E2B25; --accent-fg:#F7F8F5; --accent-hover:#2D3E36;
+    --gold:#1B7F5A; --gold-fg:#FFFFFF;
+    --bar-bg:#1E2B25; --bar-fg:#F7F8F5; --bar-muted:#C7D3C9; --bar-hover:#2D3E36; --bar-line:#2D3E36;
+    --menu-bg:#FFFFFF; --menu-hover:#EEF2EF;
+    --font-display:'Kalam', cursive; --font-body:'Nunito', system-ui, sans-serif; --font-hindi:'Kalam', cursive;
+    --h-weight:700; --radius:8px; --radius-lg:12px;
+    --shadow:0 1px 0 rgba(30,43,37,.05), 0 8px 20px -14px rgba(30,43,37,.25); --shadow-lg:0 24px 48px -20px rgba(30,43,37,.4);
+    --bg-pattern:linear-gradient(rgba(30,43,37,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(30,43,37,.045) 1px, transparent 1px); --bg-pattern-size:28px 28px;
+    --overlay:rgba(30,43,37,.5); --code-bg:#1E2B25; --code-fg:#F7F8F5;
+  }
+  body.theme-paper.theme-chalk.dark{
+    --paper:#1F3A2E; --paper-deep:#1A3227; --rule:rgba(242,240,230,.28); --card:#24443A;
+    --ink:#F2F0E6; --ink-soft:#C7D3C9; --ink-faint:#9DB2A6;
+    --maroon:#FF9B9B; --maroon-deep:#F07F7F; --teal:#9BE3A8; --teal-deep:#7FD08E;
+    --mustard:#F6D365; --mustard-deep:#E9C14A;
+    --accent:#F6D365; --accent-fg:#1F3A2E; --accent-hover:#FFE08A;
+    --gold:#9BE3A8; --gold-fg:#1F3A2E;
+    --bar-bg:#162B22; --bar-fg:#F2F0E6; --bar-muted:#C7D3C9; --bar-hover:#20392E; --bar-line:#20392E;
+    --menu-bg:#24443A; --menu-hover:#2B4F43;
+    --shadow:none; --shadow-lg:0 24px 48px -20px rgba(0,0,0,.6);
+    --bg-pattern:radial-gradient(rgba(255,255,255,.035) 1px, transparent 1.2px); --bg-pattern-size:5px 5px;
+    --overlay:rgba(0,0,0,.55); --code-bg:#142820; --code-fg:#F2F0E6;
+  }
+  body.theme-chalk.dark .vcard, body.theme-chalk.dark .panel{ border-style:dashed; }
+  /* Exam Hall: highest contrast, plain shapes, the most legible type */
+  body.theme-paper.theme-exam{
+    --paper:#FFFFFF; --paper-deep:#F2F2F2; --rule:#1A1A1A; --card:#FFFFFF;
+    --ink:#000000; --ink-soft:#262626; --ink-faint:#4D4D4D;
+    --maroon:#B00020; --maroon-deep:#8A0019; --teal:#006B2D; --teal-deep:#005322;
+    --mustard:#8A6100; --mustard-deep:#6E4D00;
+    --accent:#0047AB; --accent-fg:#FFFFFF; --accent-hover:#00388A;
+    --gold:#0047AB; --gold-fg:#FFFFFF;
+    --bar-bg:#000000; --bar-fg:#FFFFFF; --bar-muted:#E0E0E0; --bar-hover:#262626; --bar-line:#333333;
+    --menu-bg:#FFFFFF; --menu-hover:#EDEDED;
+    --font-display:'Atkinson Hyperlegible', system-ui, sans-serif; --font-body:'Atkinson Hyperlegible', system-ui, sans-serif; --font-hindi:'Hind', sans-serif;
+    --h-weight:700; --radius:6px; --radius-lg:8px;
+    --shadow:none; --shadow-lg:0 0 0 2px #000;
+    --bg-pattern:none; --bg-pattern-size:auto;
+    --overlay:rgba(0,0,0,.6); --code-bg:#000000; --code-fg:#FFFFFF;
+  }
+  body.theme-paper.theme-exam.dark{
+    --paper:#000000; --paper-deep:#0D0D0D; --rule:#FFFFFF; --card:#000000;
+    --ink:#FFFFFF; --ink-soft:#E6E6E6; --ink-faint:#BFBFBF;
+    --maroon:#FF6B6B; --maroon-deep:#FF4D4D; --teal:#4ADE80; --teal-deep:#22C55E;
+    --mustard:#FFD400; --mustard-deep:#E6BE00;
+    --accent:#7CB3FF; --accent-fg:#000000; --accent-hover:#A3C9FF;
+    --gold:#7CB3FF; --gold-fg:#000000;
+    --bar-bg:#000000; --bar-fg:#FFFFFF; --bar-muted:#E0E0E0; --bar-hover:#1A1A1A; --bar-line:#333333;
+    --menu-bg:#000000; --menu-hover:#1A1A1A;
+    --shadow:none; --shadow-lg:0 0 0 2px #fff;
+    --overlay:rgba(0,0,0,.7); --code-bg:#0D0D0D; --code-fg:#FFFFFF;
+  }
+  body.theme-exam .vcard, body.theme-exam .panel, body.theme-exam .btn{ border-width:2px; }
+  /* the logo in each design's own display face; Exam Hall's in bright yellow on its black bar */
+  body.theme-saffron .brand-paper, body.theme-chalk .brand-paper, body.theme-exam .brand-paper{ font-family:var(--font-display); font-weight:700; }
+  body.theme-exam .brand-paper{ color:#FFD400; }
 
   /* ---------- colored detail boxes + type badges (light) ---------- */
   .fb-hindi{ background:#EFE9DA; color:#4A4030; font-family:var(--font-hindi); font-size:14px; }
@@ -1849,6 +1948,9 @@
           <div class="theme-swatches">
             <button class="theme-swatch" data-theme-pick="paper"><span class="swatch-dots"><i style="background:#F3EEE3; border:1px solid #CFC3A3;"></i><i style="background:#8C2F39;"></i><i style="background:#C99A2E;"></i><i style="background:#2F6F63;"></i></span><b>Refined Register</b></button>
             <button class="theme-swatch" data-theme-pick="indigo"><span class="swatch-dots"><i style="background:#0B1433; border:1px solid #3D5CF0;"></i><i style="background:#3D5CF0;"></i><i style="background:#F59E2E;"></i><i style="background:#F7C548;"></i></span><b>Indigo Night</b></button>
+            <button class="theme-swatch" data-theme-pick="saffron"><span class="swatch-dots"><i style="background:#FFF6E5; border:1px solid #EFD5A6;"></i><i style="background:#0F5132;"></i><i style="background:#E08A00;"></i><i style="background:#FFB627;"></i></span><b>Saffron Dawn</b></button>
+            <button class="theme-swatch" data-theme-pick="chalk"><span class="swatch-dots"><i style="background:#1F3A2E; border:1px solid #3F6455;"></i><i style="background:#F2F0E6;"></i><i style="background:#F6D365;"></i><i style="background:#9BE3A8;"></i></span><b>Chalkboard</b></button>
+            <button class="theme-swatch" data-theme-pick="exam"><span class="swatch-dots"><i style="background:#FFFFFF; border:1px solid #000;"></i><i style="background:#000000;"></i><i style="background:#0047AB;"></i><i style="background:#FFD400;"></i></span><b>Exam Hall</b></button>
           </div>
           <div class="menu-label">Mode</div>
           <div class="seg-toggle">
@@ -2336,7 +2438,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="app.js?v=88f69a75"></script>
+<script src="app.js?v=a64cd3fa"></script>
 <script src="typing-passages.js?v=df4bd310"></script>
 <script src="typing.js?v=02ff18bc"></script>
 </body>

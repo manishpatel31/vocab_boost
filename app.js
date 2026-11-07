@@ -11,7 +11,10 @@
   var darkMq = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
   function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
   function lsSet(k, v){ try{ if(v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); }catch(e){} }
-  function currentTheme(){ return lsGet(THEME_KEY) === 'indigo' ? 'indigo' : 'paper'; }
+  var THEMES = ['paper', 'indigo', 'saffron', 'chalk', 'exam'];
+  // the colour of the phone's status bar for each design, light / dark
+  var THEME_BAR = { paper: ['#221E17', '#110F0B'], indigo: ['#0B1433', '#0B1433'], saffron: ['#0F5132', '#0B2E1E'], chalk: ['#1E2B25', '#162B22'], exam: ['#000000', '#000000'] };
+  function currentTheme(){ var t = lsGet(THEME_KEY); return THEMES.indexOf(t) !== -1 ? t : 'paper'; }
   function currentMode(){ var m = lsGet(DARK_MODE_KEY); return m === '1' ? 'dark' : (m === '0' ? 'light' : 'system'); }
   function applyAppearance(){
     var theme = currentTheme();
@@ -20,11 +23,12 @@
     var dark = mode === 'dark' || (mode === 'system' && !!(darkMq && darkMq.matches));
     document.body.classList.toggle('theme-indigo', theme === 'indigo');
     document.body.classList.toggle('theme-paper', theme !== 'indigo');
+    ['saffron', 'chalk', 'exam'].forEach(function(t){ document.body.classList.toggle('theme-' + t, theme === t); });
     document.body.classList.toggle('dark', dark);
     document.querySelectorAll('[data-theme-pick]').forEach(function(b){ b.classList.toggle('on', b.dataset.themePick === theme); });
     document.querySelectorAll('[data-mode-pick]').forEach(function(b){ b.classList.toggle('on', b.dataset.modePick === mode); });
     var meta = document.querySelector('meta[name="theme-color"]');
-    if(meta) meta.setAttribute('content', theme === 'indigo' ? '#0B1433' : (dark ? '#110F0B' : '#221E17'));
+    if(meta) meta.setAttribute('content', THEME_BAR[theme][dark ? 1 : 0]);
   }
   applyAppearance();
   if(darkMq){
@@ -934,7 +938,7 @@
   document.getElementById('studyStatsPanel').addEventListener('click', studyClick);
   function studyMeta(){ try{ return JSON.parse(lsGet('shabdStudySync') || '{}'); }catch(e){ return {}; } }
   function setStudyMeta(id, patch){ var m = studyMeta(); m[id] = Object.assign({}, m[id] || {}, patch); lsSet('shabdStudySync', JSON.stringify(m)); }
-  function studySkinValue(){ return document.body.classList.contains('theme-indigo') ? 'indigo' : 'paper'; }
+  function studySkinValue(){ return currentTheme(); }
   function studyThemeValue(){ var v = lsGet('vocabRegisterDarkMode'); return v === '1' ? 'dark' : (v === '0' ? 'light' : 'auto'); }
   function studySyncLabel(t){ var el = document.getElementById('studySync'); if(el) el.textContent = t || ''; }
   function studyDocRef(id){ return db.collection('users').doc(currentUser.uid).collection('study').doc(id); }
