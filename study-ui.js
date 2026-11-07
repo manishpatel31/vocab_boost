@@ -496,3 +496,344 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
     ui();
   }
 })();
+
+/* ============================================================
+   MY NOTES — select a word or sentence in any mini app → "📝 Add note": type it, or draw with a finger or stylus.
+   The words stay highlighted with a 📝 after them; tap either to read, edit or delete the note.
+   - Saved per app in localStorage "shabdNotes_<page>" as { v:1, n: { id: { q, pre, suf, les, t, d, c, u, del? } } }
+     (q = the words, pre / suf = text around them to find the right spot again, les = the lesson, t = typed text,
+     d = drawing, c / u = created / updated time; a deleted note stays as { del:1, u } so other devices learn of it).
+   - Inside पाठShala the app syncs that key to your account like progress ("notes_<app id>", merged note by note)
+     and lists every note under ☰ → My notes and the 📝 button on the mini app's bar. On its own page,
+     the 📝 pill (bottom left) lists this app's notes.
+   - A drawing is strokes "colour|width|x,y x,y …;…" on a 600 × 360 pad, drawn back as SVG (so it stays sharp).
+   - Notes find their words again whenever the page redraws (MutationObserver), by the words plus the text around them.
+   ============================================================ */
+(function(){
+  if (window.__studyNotes) return;
+  window.__studyNotes = true;
+  const FILE = (location.pathname.split("/").pop() || "").replace(/\.html?$/, "");
+  if (!/^study-/.test(FILE)) return;
+  const KEY = "shabdNotes_" + FILE, EMBED = /[?&]embed=1/.test(location.search);
+  const W = 600, H = 360, MAX = 900000;
+  const COLORS = { k: "currentColor", r: "#D64545", b: "#2F6FD1", g: "#2E8B57", y: "rgba(255,196,0,.55)" };
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  const norm = s => String(s || "").replace(/\s+/g, " ").trim();
+  const now = () => Date.now();
+  const SKIP = "script,style,noscript,textarea,input,select,svg,.un-ui,.un-ico,.un-add,[contenteditable]";
+
+  // ---------- storage ----------
+  function load(){ try { const d = JSON.parse(localStorage.getItem(KEY) || "null"); if (d && d.n && typeof d.n === "object") return d; } catch (e) {} return { v: 1, n: {} }; }
+  function save(d){
+    const js = JSON.stringify(d);
+    if (js.length > MAX) { toast("This app's notes are full — delete a few drawings first."); return false; }
+    try { localStorage.setItem(KEY, js); } catch (e) { toast("Couldn't save — this device's storage is full."); return false; }
+    try { if (parent !== window) parent.postMessage({ type: "pathshala-notes", file: FILE }, location.origin); } catch (e) {}
+    apply(); badge();
+    return true;
+  }
+  const notes = () => { const n = load().n; return Object.keys(n).filter(id => !n[id].del).map(id => Object.assign({ id }, n[id])); };
+
+  // ---------- the lesson on screen (the engines open lessons through openLesson) ----------
+  let lesson = null;
+  function hook(){
+    if (typeof window.openLesson !== "function" || window.openLesson.__notes) return;
+    const inner = window.openLesson;
+    window.openLesson = function(id){ lesson = typeof id === "string" || typeof id === "number" ? String(id) : lesson; return inner.apply(this, arguments); };
+    window.openLesson.__notes = true;
+  }
+  hook(); addEventListener("load", hook);
+  const onFront = () => !document.querySelector(".lhead, .steps");     // the lesson's own header is gone: back on a list
+
+  // ---------- page text, with every character's place, for finding words again ----------
+  function index(){
+    const root = document.getElementById("app") || document.body, out = [], map = [];
+    let sp = true;
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: n => n.parentElement && n.parentElement.closest(SKIP) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
+    for (let n; (n = w.nextNode());) {
+      const v = n.nodeValue;
+      for (let i = 0; i < v.length; i++) {
+        if (/\s/.test(v[i])) { if (sp) continue; out.push(" "); map.push([n, i]); sp = true; }
+        else { out.push(v[i]); map.push([n, i]); sp = false; }
+      }
+    }
+    return { s: out.join(""), map };
+  }
+  function locate(ix, nt){
+    const q = norm(nt.q); if (!q) return null;
+    let best = -1, score = -1;
+    for (let i = ix.s.indexOf(q); i !== -1; i = ix.s.indexOf(q, i + 1)) {
+      let sc = 0;
+      const pre = norm(nt.pre), suf = norm(nt.suf), before = ix.s.slice(Math.max(0, i - pre.length), i), after = ix.s.slice(i + q.length, i + q.length + suf.length);
+      for (let k = 1; k <= pre.length && before[before.length - k] === pre[pre.length - k]; k++) sc++;
+      for (let k = 0; k < suf.length && after[k] === suf[k]; k++) sc++;
+      if (sc > score) { score = sc; best = i; }
+    }
+    if (best < 0) return null;
+    const a = ix.map[best], b = ix.map[best + q.length - 1];
+    if (!a || !b) return null;
+    const r = document.createRange();
+    try { r.setStart(a[0], a[1]); r.setEnd(b[0], b[1] + 1); } catch (e) { return null; }
+    return r;
+  }
+
+  // ---------- highlights and 📝 marks ----------
+  let ranges = [], applying = false, mo = null;
+  const HL = typeof Highlight === "function" && window.CSS && CSS.highlights;
+  function apply(){
+    applying = true;
+    document.querySelectorAll(".un-ico").forEach(b => b.remove());
+    const list = notes(), ix = list.length ? index() : null;
+    ranges = [];
+    list.forEach(nt => { const r = locate(ix, nt); if (r) ranges.push([nt.id, r]); });
+    if (HL) CSS.highlights.set("pathshala-note", new Highlight(...ranges.map(x => x[1])));
+    // the 📝 after the words (from the last to the first, so earlier places stay right)
+    ranges.slice().reverse().forEach(([id, r]) => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "un-ico"; b.dataset.note = id; b.setAttribute("aria-label", "Your note"); b.textContent = "📝";
+      const end = r.cloneRange(); end.collapse(false);
+      try { end.insertNode(b); } catch (e) {}
+    });
+    if (mo) mo.takeRecords();
+    applying = false;
+  }
+  let applyT = 0;
+  const soon = () => { clearTimeout(applyT); applyT = setTimeout(apply, 250); };
+  function watch(){
+    const root = document.getElementById("app") || document.body;
+    mo = new MutationObserver(recs => {
+      if (applying) return;
+      const ours = recs.every(r => [...r.addedNodes, ...r.removedNodes].every(n => n.nodeType === 1 && n.matches && n.matches(".un-ico, .un-ui, .un-add")) && r.type === "childList");
+      if (!ours) soon();
+    });
+    mo.observe(root, { childList: true, subtree: true, characterData: true });
+  }
+  addEventListener("storage", e => { if (e.key === KEY) { apply(); badge(); } });
+
+  // ---------- "📝 Add note" by a selection ----------
+  const add = document.createElement("button");
+  add.type = "button"; add.className = "un-add"; add.hidden = true; add.innerHTML = "📝 Add note";
+  let picked = null, selT = 0;
+  function readSelection(){
+    const sel = getSelection();
+    if (!sel || sel.isCollapsed || !sel.rangeCount) return null;
+    const r = sel.getRangeAt(0), host = r.commonAncestorContainer.nodeType === 1 ? r.commonAncestorContainer : r.commonAncestorContainer.parentElement;
+    if (!host || host.closest(SKIP) || !(document.getElementById("app") || document.body).contains(host)) return null;
+    const q = norm(sel.toString());
+    if (q.length < 2 || q.length > 600) return null;
+    const ix = index();
+    let start = -1;
+    if (r.startContainer.nodeType === 3) start = ix.map.findIndex(m => m[0] === r.startContainer && m[1] >= r.startOffset);
+    if (start < 0 || ix.s.slice(start, start + q.length) !== q) start = ix.s.indexOf(q);
+    return { q, pre: start > 0 ? ix.s.slice(Math.max(0, start - 40), start) : "", suf: start >= 0 ? ix.s.slice(start + q.length, start + q.length + 40) : "", rect: r.getBoundingClientRect() };
+  }
+  function showAdd(){
+    picked = readSelection();
+    if (!picked) { add.hidden = true; return; }
+    const r = picked.rect, bw = 130, below = r.bottom + 46 < innerHeight;
+    add.style.left = Math.max(8, Math.min(innerWidth - bw - 8, r.left + r.width / 2 - bw / 2)) + "px";
+    add.style.top = (below ? r.bottom + 10 : Math.max(8, r.top - 46)) + "px";
+    add.hidden = false;
+  }
+  document.addEventListener("selectionchange", () => { clearTimeout(selT); selT = setTimeout(showAdd, 300); });
+  add.addEventListener("pointerdown", e => e.preventDefault());           // keep the selection while tapping
+  add.addEventListener("click", () => {
+    const p = picked || readSelection(); add.hidden = true; if (!p) return;
+    try { getSelection().removeAllRanges(); } catch (e) {}
+    editor({ q: p.q, pre: p.pre, suf: p.suf, les: onFront() ? null : lesson });
+  });
+  addEventListener("scroll", () => { if (!add.hidden) showAdd(); }, { passive: true });
+
+  // ---------- tapping a 📝 or the highlighted words ----------
+  document.addEventListener("click", e => {
+    const ico = e.target.closest && e.target.closest(".un-ico");
+    if (ico) { e.preventDefault(); e.stopPropagation(); view(ico.dataset.note); return; }
+    if (!ranges.length || e.target.closest(".un-ui, .un-add, button, a, input, .opt")) return;
+    const s = getSelection(); if (s && !s.isCollapsed) return;
+    for (const [id, r] of ranges) for (const b of r.getClientRects()) if (e.clientX >= b.left && e.clientX <= b.right && e.clientY >= b.top && e.clientY <= b.bottom) { view(id); return; }
+  }, true);
+
+  // ---------- a drawing, as SVG ----------
+  function strokes(d){
+    return String(d || "").split(";").filter(Boolean).map(s => { const [c, w, pts] = s.split("|"); return { c, w: +w || 3, p: (pts || "").split(" ").filter(Boolean).map(p => p.split(",").map(Number)) }; });
+  }
+  const pack = list => list.map(s => s.c + "|" + s.w + "|" + s.p.map(p => p.join(",")).join(" ")).join(";");
+  function svgOf(d, cls){
+    const list = strokes(d); if (!list.length) return "";
+    return `<svg class="${cls || "un-draw"}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Your drawing">` + list.map(s =>
+      s.p.length === 1 ? `<circle cx="${s.p[0][0]}" cy="${s.p[0][1]}" r="${s.w / 2}" fill="${COLORS[s.c] || COLORS.k}"/>`
+      : `<polyline points="${s.p.map(p => p.join(",")).join(" ")}" fill="none" stroke="${COLORS[s.c] || COLORS.k}" stroke-width="${s.w}" stroke-linecap="round" stroke-linejoin="round"/>`).join("") + `</svg>`;
+  }
+
+  // ---------- sheets ----------
+  // a sheet is one step in the history, so the phone's Back button closes it (not the whole mini app)
+  function sheet(html){
+    drop();
+    if (!(history.state && history.state.unNote)) { try { history.pushState(Object.assign({}, history.state, { unNote: 1 }), ""); } catch (e) {} }
+    const ov = document.createElement("div"); ov.className = "un-ui un-ov";
+    ov.innerHTML = `<div class="un-card" role="dialog" aria-label="Note">${html}</div>`;
+    ov.addEventListener("click", e => { if (e.target === ov) close(); });
+    document.body.appendChild(ov);
+    return ov.firstElementChild;
+  }
+  function drop(){ document.querySelectorAll(".un-ov").forEach(o => o.remove()); }
+  function close(){ if (history.state && history.state.unNote) history.back(); else drop(); }
+  addEventListener("popstate", () => { if (!(history.state && history.state.unNote)) drop(); });
+  addEventListener("keydown", e => { if (e.key === "Escape") close(); });
+  function toast(t){ const el = document.createElement("div"); el.className = "un-ui un-toast"; el.textContent = t; document.body.appendChild(el); setTimeout(() => el.remove(), 2600); }
+  const when = t => { try { return new Date(t).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" }); } catch (e) { return ""; } };
+
+  function view(id){
+    const nt = load().n[id]; if (!nt || nt.del) return;
+    const c = sheet(`<div class="un-q">“${esc(nt.q)}”</div>
+      ${nt.t ? `<div class="un-text">${esc(nt.t)}</div>` : ""}${svgOf(nt.d)}
+      <div class="un-when">${esc(when(nt.u || nt.c))}</div>
+      <div class="un-row"><button type="button" class="un-btn un-del">Delete</button><span></span><button type="button" class="un-btn un-close">Close</button><button type="button" class="un-btn un-pri un-edit">Edit</button></div>`);
+    c.querySelector(".un-close").onclick = close;
+    c.querySelector(".un-edit").onclick = () => editor(Object.assign({ id }, nt));
+    c.querySelector(".un-del").onclick = () => remove(id);
+  }
+  function remove(id){
+    if (!confirm("Delete this note?")) return;
+    const d = load(); d.n[id] = { del: 1, u: now() }; if (save(d)) { close(); toast("Note deleted"); }
+  }
+
+  function editor(nt){
+    const c = sheet(`<div class="un-q">“${esc(nt.q)}”</div>
+      <div class="un-tabs" role="tablist"><button type="button" data-t="type" aria-selected="true">✏️ Type</button><button type="button" data-t="draw" aria-selected="false">🖊️ Draw</button></div>
+      <div class="un-pane" data-p="type"><textarea class="un-ta" rows="5" placeholder="Your trick, extra fact, a reminder…">${esc(nt.t || "")}</textarea></div>
+      <div class="un-pane" data-p="draw" hidden>
+        <div class="un-tools">${Object.keys(COLORS).map((k, i) => `<button type="button" class="un-col${i === 0 ? " on" : ""}" data-c="${k}" aria-label="${{ k: "Ink", r: "Red", b: "Blue", g: "Green", y: "Highlighter" }[k]}" style="--c:${k === "k" ? "var(--ink,#222)" : COLORS[k]}"></button>`).join("")}
+          <span class="un-sep"></span><button type="button" class="un-tool" data-w="3">Thin</button><button type="button" class="un-tool on" data-w="6">Thick</button>
+          <span class="un-sep"></span><button type="button" class="un-tool" data-x="erase" aria-label="Eraser">⌫ Erase</button><button type="button" class="un-tool" data-x="undo" aria-label="Undo">↶</button><button type="button" class="un-tool" data-x="clear">Clear</button></div>
+        <canvas class="un-pad" width="${W * 2}" height="${H * 2}"></canvas>
+        <div class="un-hint">Write or draw with your finger or a stylus · Erase removes a whole line you touch</div>
+      </div>
+      <div class="un-row">${nt.id ? `<button type="button" class="un-btn un-del">Delete</button>` : ""}<span></span><button type="button" class="un-btn un-close">Cancel</button><button type="button" class="un-btn un-pri un-save">Save</button></div>`);
+    const ta = c.querySelector(".un-ta"), pad = c.querySelector(".un-pad"), g = pad.getContext("2d");
+    let list = strokes(nt.d), col = "k", wid = 6, mode = "pen", cur = null;
+    const ink = () => getComputedStyle(c).color;
+    function draw(){
+      g.setTransform(2, 0, 0, 2, 0, 0); g.clearRect(0, 0, W, H); g.lineCap = "round"; g.lineJoin = "round";
+      list.forEach(s => { g.strokeStyle = g.fillStyle = s.c === "k" ? ink() : COLORS[s.c]; g.lineWidth = s.w;
+        if (s.p.length === 1) { g.beginPath(); g.arc(s.p[0][0], s.p[0][1], s.w / 2, 0, 7); g.fill(); return; }
+        g.beginPath(); s.p.forEach((p, i) => i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1])); g.stroke(); });
+    }
+    const at = e => { const r = pad.getBoundingClientRect(); return [Math.round((e.clientX - r.left) / r.width * W), Math.round((e.clientY - r.top) / r.height * H)]; };
+    const near = (s, p) => s.p.some(q => Math.hypot(q[0] - p[0], q[1] - p[1]) < Math.max(10, s.w));
+    pad.addEventListener("pointerdown", e => {
+      e.preventDefault(); pad.setPointerCapture(e.pointerId);
+      const p = at(e);
+      if (mode === "erase") { const n = list.length; list = list.filter(s => !near(s, p)); if (list.length !== n) draw(); cur = { erase: 1 }; return; }
+      const w = e.pointerType === "pen" && e.pressure ? Math.max(1.5, Math.round(wid * (0.55 + e.pressure) * 10) / 10) : (col === "y" ? 16 : wid);
+      cur = { c: col, w, p: [p] }; list.push(cur); draw();
+    });
+    pad.addEventListener("pointermove", e => {
+      if (!cur) return; const p = at(e);
+      if (cur.erase) { const n = list.length; list = list.filter(s => !near(s, p)); if (list.length !== n) draw(); return; }
+      const last = cur.p[cur.p.length - 1]; if (Math.hypot(p[0] - last[0], p[1] - last[1]) < 2) return;
+      cur.p.push(p); draw();
+    });
+    ["pointerup", "pointercancel"].forEach(t => pad.addEventListener(t, () => { cur = null; }));
+    c.querySelectorAll(".un-tabs button").forEach(b => b.onclick = () => {
+      c.querySelectorAll(".un-tabs button").forEach(x => x.setAttribute("aria-selected", String(x === b)));
+      c.querySelectorAll(".un-pane").forEach(p => p.hidden = p.dataset.p !== b.dataset.t);
+      if (b.dataset.t === "draw") requestAnimationFrame(draw);
+    });
+    c.querySelectorAll(".un-col").forEach(b => b.onclick = () => { col = b.dataset.c; mode = "pen"; c.querySelectorAll(".un-col").forEach(x => x.classList.toggle("on", x === b)); c.querySelector('[data-x="erase"]').classList.remove("on"); });
+    c.querySelectorAll("[data-w]").forEach(b => b.onclick = () => { wid = +b.dataset.w; c.querySelectorAll("[data-w]").forEach(x => x.classList.toggle("on", x === b)); });
+    c.querySelector('[data-x="erase"]').onclick = function(){ mode = mode === "erase" ? "pen" : "erase"; this.classList.toggle("on", mode === "erase"); };
+    c.querySelector('[data-x="undo"]').onclick = () => { list.pop(); draw(); };
+    c.querySelector('[data-x="clear"]').onclick = () => { if (list.length && confirm("Clear the drawing?")) { list = []; draw(); } };
+    if (!nt.t && nt.d) c.querySelector('[data-t="draw"]').click();
+    else setTimeout(() => ta.focus(), 50);
+    c.querySelector(".un-close").onclick = close;
+    if (c.querySelector(".un-del")) c.querySelector(".un-del").onclick = () => remove(nt.id);
+    c.querySelector(".un-save").onclick = () => {
+      const t = ta.value.trim(), d = pack(list.filter(s => s.p && s.p.length));
+      if (!t && !d) { toast("Type something or draw first"); return; }
+      const all = load(), id = nt.id || ("n" + now().toString(36) + Math.random().toString(36).slice(2, 6));
+      all.n[id] = { q: nt.q, pre: nt.pre || "", suf: nt.suf || "", les: nt.les || null, t, d, c: nt.c || now(), u: now() };
+      if (save(all)) { close(); toast(nt.id ? "Note updated" : "Note saved 📝"); }
+    };
+  }
+
+  // ---------- this app's notes (the 📝 pill on its own page; the app's bar inside पाठShala) ----------
+  const pill = document.createElement("button");
+  pill.type = "button"; pill.className = "un-ui un-pill"; pill.hidden = true;
+  function badge(){ const n = notes().length; pill.textContent = "📝 " + n; pill.hidden = EMBED || !n; }
+  function listAll(){
+    const list = notes().sort((a, b) => (b.u || 0) - (a.u || 0));
+    const c = sheet(`<h3 class="un-h">My notes in this app <small>${list.length}</small></h3>
+      <div class="un-list">${list.length ? list.map(nt => `<button type="button" class="un-item" data-go="${esc(nt.id)}"><b>“${esc(nt.q.slice(0, 90))}${nt.q.length > 90 ? "…" : ""}”</b>${nt.t ? `<span>${esc(nt.t.slice(0, 140))}</span>` : ""}${nt.d ? svgOf(nt.d, "un-thumb") : ""}<small>${nt.les ? "Lesson " + esc(nt.les) + " · " : ""}${esc(when(nt.u || nt.c))}</small></button>`).join("")
+        : `<p class="un-empty">No notes yet. Select a word or sentence in a lesson and tap <b>📝 Add note</b>.</p>`}</div>
+      <div class="un-row"><span></span><button type="button" class="un-btn un-close">Close</button></div>`);
+    c.querySelector(".un-close").onclick = close;
+    c.querySelectorAll("[data-go]").forEach(b => b.onclick = () => go(b.dataset.go));
+  }
+  function go(id){
+    const nt = load().n[id]; close(); if (!nt || nt.del) return;
+    if (nt.les && typeof window.openLesson === "function" && lesson !== nt.les) { try { window.openLesson(nt.les, "learn"); } catch (e) {} }
+    let tries = 0;
+    (function find(){
+      apply();
+      const b = document.querySelector(`.un-ico[data-note="${CSS.escape(id)}"]`);
+      if (b) { b.scrollIntoView({ block: "center", behavior: "smooth" }); b.classList.add("un-flash"); setTimeout(() => b.classList.remove("un-flash"), 1600); setTimeout(() => view(id), 600); return; }
+      if (++tries < 8) setTimeout(find, 250); else view(id);
+    })();
+  }
+  pill.onclick = listAll;
+  // the app's bar asks for this app's notes, or for one note (from ☰ → My notes)
+  addEventListener("message", e => {
+    if (e.origin !== location.origin || !e.data) return;
+    if (e.data.type === "pathshala-notes-list") listAll();
+    if (e.data.type === "pathshala-notes-go" && typeof e.data.id === "string") go(e.data.id);
+  });
+
+  const css = document.createElement("style");
+  css.textContent = `
+::highlight(pathshala-note){background-color:rgba(255,196,0,.38)}
+.un-ico{all:unset;cursor:pointer;font-size:.85em;line-height:1;padding:0 2px;margin-left:1px;vertical-align:baseline;border-radius:4px}
+.un-ico:hover,.un-ico:focus-visible{background:rgba(255,196,0,.35)}
+.un-ico.un-flash{animation:unFlash 1.5s ease-out}
+@keyframes unFlash{0%,60%{background:rgba(255,196,0,.8);box-shadow:0 0 0 6px rgba(255,196,0,.35)}100%{background:none;box-shadow:none}}
+.un-add{position:fixed;z-index:400;width:130px;padding:9px 0;border:none;border-radius:999px;background:var(--ink,#242019);color:var(--sheet,#fff);font:700 14px var(--f-body,system-ui);box-shadow:0 6px 18px rgba(0,0,0,.25);cursor:pointer}
+.un-pill{position:fixed;left:12px;bottom:calc(84px + var(--nav-h,0px) + env(safe-area-inset-bottom));z-index:150;padding:8px 13px;border-radius:999px;border:1px solid var(--rule,#ddd);background:var(--sheet,#fff);color:var(--ink,#222);font:700 13.5px var(--f-body,system-ui);box-shadow:0 2px 10px rgba(0,0,0,.15);cursor:pointer}
+.un-ov{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.4);display:flex;align-items:flex-end;justify-content:center;padding:12px}
+@media (min-width:640px){.un-ov{align-items:center}}
+.un-card{width:100%;max-width:560px;max-height:92vh;overflow:auto;background:var(--sheet,#fff);color:var(--ink,#222);border-radius:18px;padding:16px;box-shadow:0 12px 40px rgba(0,0,0,.3);font:15px/1.45 var(--f-body,system-ui)}
+.un-q{font-style:italic;color:var(--ink2,#555);border-left:3px solid rgba(255,196,0,.9);padding:2px 0 2px 10px;margin-bottom:12px;max-height:5.8em;overflow:auto}
+.un-h{margin:0 0 10px;font:700 18px var(--f-display,var(--f-body,system-ui))}.un-h small{font-weight:600;color:var(--ink2,#666);font-size:13px;margin-left:6px}
+.un-tabs{display:flex;gap:6px;margin-bottom:10px}
+.un-tabs button{flex:1;padding:8px;border-radius:10px;border:1px solid var(--rule,#ddd);background:none;color:inherit;font:600 14px var(--f-body,system-ui);cursor:pointer}
+.un-tabs button[aria-selected="true"]{background:var(--ink,#222);color:var(--sheet,#fff);border-color:transparent}
+.un-ta{width:100%;box-sizing:border-box;border:1px solid var(--rule,#ddd);border-radius:12px;padding:10px;background:var(--paper,transparent);color:inherit;font:15px/1.45 var(--f-body,system-ui);resize:vertical}
+.un-tools{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:8px}
+.un-col{width:28px;height:28px;border-radius:50%;border:2px solid var(--rule,#ddd);background:var(--c);cursor:pointer;padding:0}
+.un-col.on{outline:3px solid var(--accent,#2f6f63);outline-offset:1px}
+.un-tool{padding:6px 10px;border-radius:9px;border:1px solid var(--rule,#ddd);background:none;color:inherit;font:600 13px var(--f-body,system-ui);cursor:pointer}
+.un-tool.on{background:var(--ink,#222);color:var(--sheet,#fff)}
+.un-sep{width:1px;height:22px;background:var(--rule,#ddd);margin:0 2px}
+.un-pad{display:block;width:100%;aspect-ratio:${W}/${H};border:1px solid var(--rule,#ddd);border-radius:12px;background:var(--paper,#fffdf7);touch-action:none;cursor:crosshair}
+.un-hint{font-size:12px;color:var(--ink2,#666);margin-top:6px}
+.un-text{white-space:pre-wrap;margin:0 0 10px}
+.un-draw{display:block;width:100%;height:auto;border:1px solid var(--rule,#ddd);border-radius:12px;margin:0 0 8px;background:var(--paper,transparent)}
+.un-when{font-size:12px;color:var(--ink2,#666)}
+.un-row{display:flex;align-items:center;gap:8px;margin-top:14px}.un-row > span{flex:1}
+.un-btn{padding:10px 16px;border-radius:12px;border:1px solid var(--rule,#ddd);background:none;color:inherit;font:700 14px var(--f-body,system-ui);cursor:pointer}
+.un-pri{background:var(--accent,#2f6f63);border-color:transparent;color:#fff}
+.un-del{color:var(--bad,#b3261e)}
+.un-list{display:grid;gap:8px}
+.un-item{text-align:left;display:grid;gap:4px;padding:10px 12px;border-radius:12px;border:1px solid var(--rule,#ddd);background:none;color:inherit;font:14px/1.4 var(--f-body,system-ui);cursor:pointer}
+.un-item span{color:var(--ink2,#555);white-space:pre-wrap}.un-item small{color:var(--ink2,#777);font-size:12px}
+.un-thumb{width:120px;height:auto;border:1px solid var(--rule,#ddd);border-radius:8px;background:var(--paper,transparent)}
+.un-empty{color:var(--ink2,#666)}
+.un-toast{position:fixed;left:50%;bottom:calc(24px + var(--nav-h,0px));transform:translateX(-50%);z-index:600;background:var(--ink,#222);color:var(--sheet,#fff);padding:9px 16px;border-radius:999px;font:600 14px var(--f-body,system-ui);box-shadow:0 6px 18px rgba(0,0,0,.25)}`;
+  function start(){
+    document.head.appendChild(css); document.body.appendChild(add); document.body.appendChild(pill);
+    hook(); watch(); apply(); badge();
+    const want = new URLSearchParams(location.search).get("note");
+    if (want) setTimeout(() => go(want), 600);
+  }
+  if (document.body) start(); else addEventListener("DOMContentLoaded", start);
+})();
