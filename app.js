@@ -3237,6 +3237,48 @@
     document.getElementById('loadingOverlay').classList.add('hidden');
   });
 
+  // ---- Public profile card (publicProfiles/{uid}): what other people see on the leaderboard and the user list.
+  // Only a display name, photo, word counts and streak — never the email (a name that is an email shows as "ma•••").
+  // Full profiles (users/{uid}) are readable only by their owner and the admin (firestore.rules).
+  function publicName(n){ n = String(n || '').trim(); if(!n) return 'Learner'; if(n.indexOf('@') === -1) return n; var l = n.split('@')[0]; return l.slice(0, 2) + '•••'; }
+  function publicCard(src){
+    src = src || {};
+    return { displayName: publicName(src.displayName), photoURL: String(src.photoURL || ''), masteredCount: +src.masteredCount || 0, engagedCount: +src.engagedCount || 0,
+      streakCurrent: +src.streakCurrent || 0, lastMetDay: String(src.lastMetDay || ''), admin: false };
+  }
+  var publicTimer = null, publicLast = '';
+  function publishPublicCard(extra){
+    if(!currentUser) return;
+    clearTimeout(publicTimer);
+    publicTimer = setTimeout(function(){
+      var src = Object.assign({}, myProfile || {}, extra || {}, { displayName: currentUser.displayName || (myProfile && myProfile.displayName) || '', photoURL: currentUser.photoURL || '' });
+      var card = publicCard(src); card.admin = !!isAdminUser;
+      var js = JSON.stringify(card); if(js === publicLast) return; publicLast = js;
+      card.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+      db.collection('publicProfiles').doc(currentUser.uid).set(card).catch(function(){ publicLast = ''; });   // rules not added yet: try again next time
+    }, 2000);
+  }
+  /** Admin, once per day: give everyone who hasn't opened the new version yet a public card, from their full profile. */
+  async function backfillPublicCards(){
+    if(!isAdminUser || lsGet('publicCardsFilled') === todayKey()) return;
+    try{
+      var have = {}, cards = await db.collection('publicProfiles').get();
+      cards.forEach(function(d){ have[d.id] = true; });
+      var users = await db.collection('users').get(), batch = db.batch(), n = 0;
+      users.forEach(function(d){ if(have[d.id] || n >= 450) return; var c = publicCard(d.data()); c.updatedAt = firebase.firestore.FieldValue.serverTimestamp(); batch.set(db.collection('publicProfiles').doc(d.id), c); n++; });
+      if(n) await batch.commit();
+      lsSet('publicCardsFilled', todayKey());
+    }catch(e){ /* rules not added yet */ }
+  }
+  /** Leaderboard / user list: the public cards; until the new rules are in, the full profiles as before. */
+  async function peopleSnap(order, dir, limit){
+    try{
+      var snap = await db.collection('publicProfiles').orderBy(order, dir).limit(limit).get();
+      if(!snap.empty) return snap;
+    }catch(e){}
+    return db.collection('users').orderBy(order, dir).limit(limit).get();
+  }
+
   async function ensureUserProfile(){
     try{
       await db.collection('users').doc(currentUser.uid).set({
@@ -3246,6 +3288,7 @@
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       }, {merge:true});
     }catch(e){ /* non-critical */ }
+    publishPublicCard();
   }
 
   async function checkModeratorRole(){
@@ -5445,6 +5488,7 @@ list.map(function(w, i){ return (i + 1) + '. ' + w.term; }).join('\n'),
         db.collection('users').doc(currentUser.uid).set({
           masteredCount: mastered, engagedCount: engaged, updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         }, {merge:true}).catch(function(){});
+        publishPublicCard({ masteredCount: mastered, engagedCount: engaged });
       }
     }, 1500);
   }
@@ -5764,6 +5808,7 @@ list.map(function(w, i){ return (i + 1) + '. ' + w.term; }).join('\n'),
       var upd = { dailyGoal: chosen, goalMode: chosenMode };
       myProfile = Object.assign({}, myProfile || {}, upd);
       db.collection('users').doc(currentUser.uid).set(upd, {merge: true}).catch(function(e){ showToast('Could not save your goal: ' + e.message); });
+      publishPublicCard(upd);
       lsSet('vocabGoalAsked', '1');
       modalBgRef().classList.remove('open'); modalBodyRef().innerHTML = '';
       showToast('Goal set: ' + chosen + ' a day.');
@@ -5813,6 +5858,7 @@ list.map(function(w, i){ return (i + 1) + '. ' + w.term; }).join('\n'),
     if(isActive('stats')) renderStreakPanel();
     renderHomeSoon();
     db.collection('users').doc(currentUser.uid).set(upd, {merge: true}).catch(function(e){ showToast('Could not save your streak: ' + e.message); });
+    publishPublicCard(upd);
     if(justMet){
       var n = upd.streakCurrent;
       setTimeout(function(){
@@ -7496,7 +7542,8 @@ listBlock,
     var area = document.getElementById('leaderboardArea');
     area.innerHTML = '<p class="help">Loading…</p>';
     try{
-      var snap = await db.collection('users').orderBy('masteredCount', 'desc').limit(50).get();
+      backfillPublicCards();
+      var snap = await peopleSnap('masteredCount', 'desc', 50);
       var rows = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
       var totalWords = words.length;
       if(rows.length === 0){ area.innerHTML = emptyStateHtml('No data yet', 'The leaderboard fills in as people study and mark words memorized.'); return; }
@@ -7507,7 +7554,7 @@ listBlock,
             '<div style="display:flex; align-items:center; gap:10px;">' +
               '<span style="font-family:var(--font-display); font-size:18px; font-weight:600; color:var(--ink-faint); width:24px; flex-shrink:0;">#'+(i+1)+'</span>' +
               (u.photoURL ? '<img class="avatar" src="'+escapeAttr(u.photoURL)+'" alt="" style="width:32px;height:32px;">' : '') +
-              '<div class="term" style="font-size:16px;">'+escapeHtml(u.displayName||u.email||'Someone')+'</div>' +
+              '<div class="term" style="font-size:16px;">'+escapeHtml(publicName(u.displayName))+'</div>' +
             '</div>' +
           '</div>' +
           '<div class="conf-row" style="border-top:none;"><span class="conf-label">'+pct+'% of the library memorized</span></div>' +
@@ -7522,20 +7569,20 @@ listBlock,
     var box = document.getElementById('allUsersArea');
     box.innerHTML = '<p class="help">Loading…</p>';
     try{
-      var usersSnap = await db.collection('users').orderBy('displayName').limit(300).get();
+      var usersSnap = await peopleSnap('displayName', 'asc', 300);
       var rolesSnap = await db.collection('roles').get();
       var modMap = {};
       rolesSnap.forEach(function(d){ modMap[d.id] = true; });
       var rows = usersSnap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
       if(rows.length === 0){ box.innerHTML = emptyStateHtml('No users yet', 'People show up here once they sign in.'); return; }
       box.innerHTML = '<div class="grid">' + rows.map(function(u){
-        var isAdminU = ADMIN_EMAILS.indexOf(u.email) !== -1;
+        var isAdminU = u.admin === true || (u.email && ADMIN_EMAILS.indexOf(u.email) !== -1);
         var isModU = !!modMap[u.id];
         return '<div class="vcard" style="cursor:default;">' +
           '<div class="vcard-top">' +
             '<div style="display:flex; align-items:center; gap:10px;">' +
               (u.photoURL ? '<img class="avatar" src="'+escapeAttr(u.photoURL)+'" alt="" style="width:32px;height:32px;">' : '') +
-              '<div class="term" style="font-size:15px;">'+escapeHtml(u.displayName||u.email||'Someone')+'</div>' +
+              '<div class="term" style="font-size:15px;">'+escapeHtml(isAdminUser ? (u.displayName||u.email||'Someone') : publicName(u.displayName))+'</div>' +
             '</div>' +
             (isAdminU ? '<span class="admin-badge">admin</span>' : (isModU ? '<span class="mod-badge">moderator</span>' : '')) +
           '</div>' +

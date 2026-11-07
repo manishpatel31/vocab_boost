@@ -164,7 +164,8 @@ One app, **पाठShala** (package `com.manish.vocablock`). The code is in the
 |---|---|---|---|
 | `words`, `spellwords`, `rootGroups` | anyone signed in | moderators (root groups: admin). Anyone signed in may change only `confLevels` on a word | the shared word register, Spelling Bank, Roots |
 | `submissions`, `spellSubmissions` | the author and moderators | the author creates; moderators approve or edit | Add words, approvals |
-| `users/{uid}` (profile) | **anyone signed in** | only that user | leaderboard (top 50 by words memorized), the admin's moderator search by email |
+| `users/{uid}` (full profile, with the email) | that user and the admin | only that user | the app itself; the admin's moderator search by email |
+| `publicProfiles/{uid}` (public card: name, photo, word counts, streak; **no email**) | anyone signed in | that user (the admin may fill in cards) | Leaderboard and All users |
 | `users/{uid}/progress`, `/study`, `/notifications` | only that user (moderators may create notifications) | only that user | word progress; every mini app's progress, Tasks, Plan, exams, review queue and **My notes** (`study/notes_<app>`) |
 | `roles` | anyone signed in | admin | moderators |
 | `activity` | anyone signed in | the person it is about; admin deletes | activity feed |
@@ -177,7 +178,7 @@ One app, **पाठShala** (package `com.manish.vocablock`). The code is in the
 **The admin** is the Google account `47manish31@gmail.com` (`isAdmin`, same as `ADMIN_EMAILS` in `app.js`). **Moderators** are the uids in `roles`.
 
 **Things to know:**
-- **Profiles are readable by everyone signed in.** Each user's `users/{uid}` (name, email, goal, counts) is visible to any signed-in person, because the leaderboard lists users. To keep emails private, move the email to a field only the owner can read, or give the leaderboard its own small public doc, then limit `users/{uid}` reads to the owner and the admin.
+- **Emails are private.** Other people see only your public card (`publicProfiles`): display name, photo, word counts and streak. The rules refuse a card whose name contains "@", and `publicName()` shows an email-like name as "ma•••". `publishPublicCard()` updates your card whenever your counts, goal or streak change. When the admin opens Progress, `backfillPublicCards()` makes cards, once a day, for people who haven't opened the new version yet. Until the new rules are pasted into the console, the Leaderboard falls back to full profiles as before.
 - **Phone codes and inboxes.** `lockSync` and `lockInbox` are read without signing in, because the phone's background check and the wallpaper have no Google sign-in. Keep the link code private: anyone with it can read that progress summary and send ratings.
 - **Notes and new mini apps need no new rule.** My notes and any new mini app's progress live under `users/{uid}/study/{doc}`, which the `study` rule already covers.
 
