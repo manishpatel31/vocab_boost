@@ -671,5 +671,21 @@ go(["course", "tests", "revise", "mistakes"].includes(start) ? start : "course")
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(run, 30); }); else setTimeout(run, 30);
 })();
 </script>
+<script>
+/* the shared mini-app layer (study-ui.js): this page's Continue card, and its colours under the names the layer uses */
+window.STUDY_UI = { front: () => {
+  if (TAB !== "course" || document.querySelector("#back")) return null;
+  const done = Object.keys(S.done).length, nx = nextRule();
+  const ids = Object.keys(S.ans).filter(k => QALL[k]), right = ids.filter(k => S.ans[k] === 1).length;
+  return { done, total: RULES.length, unit: "rules",
+    label: nx ? (done ? "Continue" : "Start") + " · Rule " + nx : "All 100 rules done",
+    title: nx ? RULE[nx].title : "Take the full mock: 50 questions from every rule",
+    stat: ids.length ? ids.length + " questions tried · " + Math.round(right * 100 / ids.length) + "% right" : "2–3 questions after every rule, a test after every 10",
+    button: nx ? (done ? "Continue ›" : "Start ›") : "Full mock ›",
+    go: () => nx ? openRule(nx, "learn") : startTest("mock") };
+} };
+</script>
+<style id="study-ui-names">:root{--rule:var(--line);--sheet:var(--card);--sunk:color-mix(in srgb,var(--line) 45%,var(--paper));--ink2:var(--muted);--blue:var(--navy);--blue-bg:var(--navy-soft);--on-blue:#fff;--good:var(--fix);--good-bg:var(--fix-soft);--bad:var(--pen);--accent:var(--hl);--f-num:var(--f-mono)}</style>
+<script src="study-ui.js?v=0d3973b5" data-study-ui></script>
 </body>
 </html>

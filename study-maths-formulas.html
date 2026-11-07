@@ -1196,4 +1196,18 @@ go(["book","heat","tricks","sheet"].includes(start) ? start : "book");
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(run, 30); }); else setTimeout(run, 30);
 })();
 </script>
+<script>
+/* the shared mini-app layer (study-ui.js): this page's Continue card — chapters to revise, no questions */
+window.STUDY_UI = { keepRow: true, front: () => {
+  if (TAB !== "book" || !document.querySelector("#res .lessons")) return null;
+  const done = CH.filter(c => isDone(c.id)).length, nx = CH.find(c => !isDone(c.id));
+  return { done, total: CH.length, unit: "chapters",
+    label: nx ? (done ? "Continue" : "Start") + " · Chapter " + CNUM(nx.id) : "Every chapter revised",
+    title: nx ? nx.t : "Read the last-hour sheet",
+    stat: done + " of " + CH.length + " chapters revised · about five minutes each",
+    button: nx ? (done ? "Continue ›" : "Start ›") : "Last hour ›",
+    go: () => nx ? openLesson(nx.id) : go("sheet") };
+} };
+</script>
+<script src="study-ui.js?v=0d3973b5" data-study-ui></script>
 </body></html>

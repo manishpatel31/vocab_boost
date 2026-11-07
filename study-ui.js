@@ -1,10 +1,18 @@
 /* The shared layer of every mini app — the study-core pages (Maths, Reasoning, Physics, BNS, Voice, Narration,
    Statistics), the workbook pages (History, GK, Geography, Chemistry, Computer) and the hand-built pages with Plan and
-   Lab tabs. study-core.js, study-workbook.js and study-plan-lab.js each load it (it runs once). It reads only the
-   markup those engines share, so a change here reaches all of them:
+   Lab tabs. study-core.js, study-workbook.js and study-plan-lab.js each load it (it runs once); Grammar 100 and the
+   Formula Book, which have their own code, load it with a script tag and describe their front page through
+   window.STUDY_UI (below). It reads only the markup the pages share, so a change here reaches all of them:
    .hero / .lessons > .les (the Learn page), .steps (a lesson's Learn · Quiz · Summary), #lq and #lqnext (its quiz),
    .mbar and #mprev / #mnext / #mmark (a running mock), #plist > .qcard[data-q], #pshuf and #pmore (Practice),
-   .seg and .chips (tab and filter rows), .nav (the tab bar) and the Lab's #labopts / #labgo.
+   .seg and .chips (tab and filter rows), .nav (the tab bar) and the Lab's #labopts / #labgo — and Grammar 100's own
+   ids: nav.tabs, #rq / #rqnext (a rule's questions), #timer, #prev / #next / #sub (a test), and the Formula Book's
+   chapter row (‹ Previous · #mark · Next ›).
+
+   window.STUDY_UI (optional, set by a page before this loads):
+     front()   → null when the page on screen is not the front page, else { done, total, unit, label, title, stat,
+                 button, go } for the Continue card (the engines' Learn page needs none: it is read from .lessons)
+     keepRow   true: keep the row under the intro (the Formula Book's Full book / Start a new round buttons)
 
    Keys (on a computer):
      1–4 or A–D     answer the question on screen (Lab: pick an option)
@@ -83,7 +91,8 @@
     return true;
   }
   function next(){
-    const b = live("#fxnext") || live("#lqnext") || live("#labgo") || live("#mnext");
+    const b = live("#fxnext") || live("#lqnext") || live("#rqnext") || live("#labgo") || live("#mnext") ||
+      (document.querySelector("#timer") && live("#next")) || live("#mark ~ [data-nav]");
     if (b) { b.click(); return true; }
     // Practice: the questions are a list, so move to the next one still waiting
     const cur = target(), all = openSets();
@@ -107,7 +116,7 @@
     box.innerHTML = `<div><h3>Keyboard shortcuts</h3><dl>
       <dt><kbd>1</kbd>–<kbd>4</kbd> or <kbd>A</kbd>–<kbd>D</kbd></dt><dd>Answer the question on screen</dd>
       <dt><kbd>Enter</kbd> <kbd>→</kbd> <kbd>N</kbd></dt><dd>Next question (in Practice, the next unanswered one)</dd>
-      <dt><kbd>←</kbd> <kbd>P</kbd></dt><dd>Previous question in a mock</dd>
+      <dt><kbd>←</kbd> <kbd>P</kbd></dt><dd>Previous question in a mock (in the Formula Book, the chapter before)</dd>
       <dt><kbd>M</kbd></dt><dd>Mark for review in a mock</dd>
       <dt><kbd>?</kbd></dt><dd>Show or hide this list</dd>
       </dl><button type="button" class="btn">Close</button></div>`;
@@ -129,7 +138,7 @@
     else if (/^[a-f]$/.test(low) && !e.shiftKey) done = pick(low.charCodeAt(0) - 97);
     else if (k === "Enter" && !onButton) done = next();
     else if (k === "ArrowRight" || low === "n") done = next();
-    else if (k === "ArrowLeft" || low === "p") done = press("#mprev");
+    else if (k === "ArrowLeft" || low === "p") done = press("#mprev") || (!!document.querySelector("#timer") && press("#prev")) || press("[data-nav]:has(~ #mark)");
     else if (low === "m") done = press("#mmark");
     if (done) e.preventDefault();
   });
@@ -138,13 +147,13 @@
   document.addEventListener("click", e => {
     const b = e.target.closest && e.target.closest(".opt");
     if (!b || b.disabled) return;
-    const card = b.closest(".qcard[data-q]"), lq = b.closest("#lq"), oi = b.dataset.oi, ioi = b.dataset.ioi;
+    const card = b.closest(".qcard[data-q]"), lq = b.closest("#lq, #rq"), oi = b.dataset.oi, ioi = b.dataset.ioi;
     requestAnimationFrame(() => {
       // the engines redraw the question after a pick, so find the same option in the new markup
       let nb = null;
       if (b.isConnected) nb = b;
       else if (card) nb = document.querySelector(`.qcard[data-q="${CSS.escape(card.dataset.q)}"] .opt[data-oi="${CSS.escape(oi || "")}"]`);
-      else if (lq) nb = document.querySelector(`#lq .opt[data-oi="${CSS.escape(oi || "")}"]`);
+      else if (lq) nb = document.querySelector(`#${lq.id} .opt[data-oi="${CSS.escape(oi || "")}"]`);
       if (!nb && ioi == null) nb = document.querySelector(`.opt[data-oi="${CSS.escape(oi || "")}"].sel`);
       if (!nb) return;
       nb.classList.remove("fx-pick"); void nb.offsetWidth; nb.classList.add("fx-pick");
@@ -229,16 +238,21 @@ html.in-shabd .mbar{top:env(safe-area-inset-top,0px)!important}
 .steps.fx-steps button[aria-current="step"] i{background:var(--blue);color:var(--on-blue)}
 .steps.fx-steps button.fx-done{color:var(--good)}
 .steps.fx-steps button.fx-done i{background:var(--good-bg);color:var(--good)}
+.steps.fx-bar{position:sticky;top:var(--fx-top,0px);z-index:12;padding:10px 0 9px;background:var(--paper)}
+.steps.fx-bar::after{content:"";position:absolute;left:0;bottom:1px;height:2px;border-radius:2px;width:calc(100% * var(--fx-read,0));background:var(--blue);transition:width .15s linear}
 /* buttons that stay in reach of a thumb: Take the quiz, the quiz's Next, the mock's Prev / Mark / Clear / Next, Practice's bar */
 .fx-dock{position:sticky;bottom:var(--fx-nav,0px);z-index:14;margin-inline:-16px;padding:10px 16px calc(10px + var(--fx-safe,0px));background:color-mix(in srgb,var(--paper) 90%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-top:1px solid var(--rule)}
 @media (min-width:1024px){.fx-dock{margin-inline:0;padding-inline:0}}
-html.fx-focus .nav{display:none}
+.fx-dock:has(> #mark){flex-wrap:nowrap;gap:8px}
+.fx-dock:has(> #mark) .btn{padding-inline:12px;white-space:nowrap}
+.fx-dock:has(> #mark) #mark{flex:1}
+html.fx-focus .nav,html.fx-focus nav.tabs{display:none}
 html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
 @media (max-width:1023px){
-  html.fx-focus .fx-dock:has(> #mprev){position:fixed;left:0;right:0;bottom:0;margin:0}
+  html.fx-focus .fx-dock:has(> #mprev),html.fx-focus .fx-dock:has(> #prev){position:fixed;left:0;right:0;bottom:0;margin:0}
   html.fx-focus #app{padding-bottom:84px}
 }
-@media (min-width:1024px){html.fx-focus .nav{display:block}}
+@media (min-width:1024px){html.fx-focus .nav,html.fx-focus nav.tabs{display:block}}
 /* Practice, one question at a time */
 #plist.fx-one > .qcard:not(.fx-cur),#plist.fx-one > #pmore{display:none}
 #plist.fx-one{grid-template-columns:minmax(0,1fr)!important;max-width:760px}
@@ -259,7 +273,7 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
 .dots{display:inline-flex;gap:2px;vertical-align:middle;margin-left:6px}
 .dots i{width:5px;height:5px;border-radius:50%;background:var(--rule);display:block}
 .dots i.on{background:var(--accent)}
-@media (prefers-reduced-motion:reduce){#plist.fx-one > .qcard.fx-cur{animation:none}.steps.fx-steps::after{transition:none}}
+@media (prefers-reduced-motion:reduce){#plist.fx-one > .qcard.fx-cur{animation:none}.steps.fx-steps::after,.steps.fx-bar::after{transition:none}}
 `;
   document.head.appendChild(css2);
 
@@ -268,7 +282,7 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
 
   /** The tab bar's height when it sits at the bottom (a phone), 0 when it is the side bar or hidden; and the header's. */
   function measure(){
-    const nav = document.querySelector(".nav"), top = document.querySelector(".top");
+    const nav = document.querySelector(".nav, nav.tabs"), top = document.querySelector(".top");
     let h = 0;
     if (nav && visible(nav)) { const r = nav.getBoundingClientRect(); if (r.top > innerHeight / 2) h = Math.round(innerHeight - r.top); }
     root.style.setProperty("--fx-nav", h + "px");
@@ -291,29 +305,39 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
     p.after(b);
   }
 
-  /** Learn page: Continue card in place of the bar and button under the intro. */
+  /** Learn page: Continue card in place of the bar and button under the intro. The engines' Learn page is read from its
+      lesson list; Grammar 100 and the Formula Book say what to show through window.STUDY_UI.front(). */
   function front(){
-    const hero = appEl.querySelector(".view > .hero"), list = appEl.querySelector(".lessons");
-    if (!hero || !list) return;
+    const cfg = window.STUDY_UI || {}, hero = appEl.querySelector(".view > .hero");
+    let info = null;
+    if (cfg.front) { try { info = cfg.front(); } catch (e) { info = null; } if (!info) return; }
+    else if (!appEl.querySelector(".lessons")) return;
+    if (!hero) return;
     fold(hero.querySelector(":scope > p"));
     fold(appEl.querySelector(".view > .callout"));
     if (hero.dataset.fxFront) return;
     hero.dataset.fxFront = "1";
-    const rows = [...appEl.querySelectorAll(".les")], done = rows.filter(r => r.classList.contains("done")).length;
-    const next = appEl.querySelector(".les.next") || rows.find(r => !r.classList.contains("done"));
-    let tried = 0, right = 0, total = 0;
-    try { const ids = new Set(QS.map(q => q.id)); total = QS.length; Object.keys(S.ans || {}).forEach(k => { if (ids.has(k)) { tried++; if (S.ans[k] === 1) right++; } }); } catch (e) {}
-    const pct = rows.length ? Math.round(done * 100 / rows.length) : 0;
-    const name = next ? (next.querySelector(".t b") || next).childNodes[0].textContent.trim() : "";
-    const num = next ? (next.querySelector(".no") || {}).textContent : "";
+    if (!info) {
+      const rows = [...appEl.querySelectorAll(".les")], done = rows.filter(r => r.classList.contains("done")).length;
+      const next = appEl.querySelector(".les.next") || rows.find(r => !r.classList.contains("done"));
+      let tried = 0, right = 0, total = 0;
+      try { const ids = new Set(QS.map(q => q.id)); total = QS.length; Object.keys(S.ans || {}).forEach(k => { if (ids.has(k)) { tried++; if (S.ans[k] === 1) right++; } }); } catch (e) {}
+      const num = next ? (next.querySelector(".no") || {}).textContent : "";
+      info = { done, total: rows.length, unit: "lessons",
+        label: next ? (done ? "Continue" : "Start") + (/^\d+$/.test(num) ? " · Lesson " + num : "") : "All lessons done",
+        title: next ? (next.querySelector(".t b") || next).childNodes[0].textContent.trim() : "Every lesson is done",
+        stat: total ? tried + " of " + total + " questions tried" + (tried ? " · " + Math.round(right * 100 / tried) + "% right" : "") : rows.length + " lessons",
+        button: next ? (done ? "Continue ›" : "Start ›") : "Take a mock ›",
+        go: () => { if (next) next.click(); else if (typeof go === "function") go("mock"); } };
+    }
+    const pct = info.total ? Math.round(info.done * 100 / info.total) : 0;
     const card = el("div", "fx-front",
-      `<div class="fx-ring" style="--p:${pct}" role="img" aria-label="${done} of ${rows.length} lessons done"><span><b>${done}</b><small>of ${rows.length}</small></span></div>` +
-      `<div class="fx-fr-tx"><span class="eyebrow">${next ? (done ? "Continue" : "Start") + (/^\d+$/.test(num) ? " · Lesson " + num : "") : "All lessons done"}</span>` +
-      `<b>${next ? esc2(name) : "Every lesson is done"}</b>` +
-      `<small>${total ? tried + " of " + total + " questions tried" + (tried ? " · " + Math.round(right * 100 / tried) + "% right" : "") : rows.length + " lessons"}</small></div>` +
-      `<button type="button" class="btn pri fx-fr-go">${next ? (done ? "Continue ›" : "Start ›") : "Take a mock ›"}</button>`);
-    card.querySelector(".fx-fr-go").onclick = () => { if (next) next.click(); else if (typeof go === "function") go("mock"); };
-    hero.classList.add("fx-has-front");
+      `<div class="fx-ring" style="--p:${pct}" role="img" aria-label="${info.done} of ${info.total} ${esc2(info.unit || "lessons")} done"><span><b>${info.done}</b><small>of ${info.total}</small></span></div>` +
+      `<div class="fx-fr-tx"><span class="eyebrow">${esc2(info.label)}</span><b>${esc2(info.title)}</b><small>${esc2(info.stat || "")}</small></div>` +
+      `<button type="button" class="btn pri fx-fr-go">${esc2(info.button)}</button>`);
+    card.querySelector(".fx-fr-go").onclick = info.go;
+    if (!cfg.keepRow) hero.classList.add("fx-has-front");
+    else hero.querySelectorAll(":scope > .meter").forEach(m => { m.hidden = true; });
     hero.after(card);
   }
 
@@ -321,6 +345,7 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
   function steps(){
     const st = appEl.querySelector(".steps");
     if (!st) return;
+    if (!st.querySelector("button")) { if (!st.dataset.fx) { st.dataset.fx = "1"; st.classList.add("fx-bar"); } read(); return; }   // Grammar 100: three segments, not buttons
     if (!st.dataset.fx) {
       st.dataset.fx = "1";
       st.classList.add("fx-steps");
@@ -334,27 +359,34 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
     read();
   }
   function read(){
-    const st = appEl.querySelector(".steps.fx-steps");
+    const st = appEl.querySelector(".steps.fx-steps, .steps.fx-bar");
     if (!st) return;
-    const learning = !!st.querySelector('[aria-current="step"][data-step="learn"]');
+    const learning = !!appEl.querySelector("#toquiz"), finished = !!appEl.querySelector("#relearn");   // the reading step, the last step
     const max = document.documentElement.scrollHeight - innerHeight;
-    st.style.setProperty("--fx-read", learning ? (max > 0 ? Math.min(1, scrollY / max) : 1).toFixed(3) : (st.querySelector('[aria-current="step"][data-step="sum"]') ? 1 : 0));
+    st.style.setProperty("--fx-read", learning ? (max > 0 ? Math.min(1, scrollY / max) : 1).toFixed(3) : finished ? 1 : 0);
   }
 
-  /** Buttons in reach of a thumb, and a mock as a focus screen. */
+  /** Buttons in reach of a thumb, and a mock (or Grammar 100's timed test) as a focus screen. */
+  function dock(b){
+    if (!b || !b.parentElement || b.parentElement.classList.contains("fx-dock")) return;
+    if (b.parentElement.classList.contains("row")) { b.parentElement.classList.add("fx-dock"); return; }
+    const d = el("div", "fx-dock");   // a button on its own (Grammar 100's "Practise this rule", its Next question)
+    b.before(d);
+    d.appendChild(b);
+  }
   function docks(){
-    [["#toquiz"], ["#lqnext"], ["#mprev"]].forEach(([sel]) => {
-      const b = appEl.querySelector(sel), row = b && b.parentElement;
-      if (row && !row.classList.contains("fx-dock")) row.classList.add("fx-dock");
-    });
-    const mock = !!appEl.querySelector("#mprev");
+    const timed = appEl.querySelector("#timer") && appEl.querySelector("#sub");
+    ["#toquiz", "#lqnext", "#rqnext", "#mprev", "#mark"].forEach(sel => dock(appEl.querySelector(sel)));
+    if (timed) dock(appEl.querySelector("#prev"));
+    const mock = !!appEl.querySelector("#mprev") || !!timed;
     root.classList.toggle("fx-focus", mock);
-    const bar = appEl.querySelector(".mbar");
-    if (mock && bar && !bar.querySelector(".fx-leave") && typeof showMockLeave === "function") {
+    const bar = appEl.querySelector(".mbar") || (timed && appEl.querySelector("#timer").parentElement);
+    const leave = typeof showMockLeave === "function" ? () => showMockLeave("learn") : typeof showLeave === "function" ? () => showLeave("tests") : null;
+    if (mock && bar && leave && !bar.querySelector(".fx-leave")) {
       const b = el("button", "btn sm ghost fx-leave", "Leave");
       b.type = "button";
-      b.title = "Leave the test (your answers are scored)";
-      b.onclick = () => showMockLeave("learn");
+      b.title = "Leave the test";
+      b.onclick = leave;
       bar.appendChild(b);
     }
   }
