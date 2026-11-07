@@ -1108,6 +1108,26 @@
     setStudyMeta(id, { localAt: Date.now() });
     clearTimeout(notesPushT[id]); notesPushT[id] = setTimeout(function(){ studyPush(id); }, 1500);
   });
+  // ---- 🎨 Theme on the mini app's bar: change the design or light / dark without leaving the lesson ----
+  var THEME_NAMES = { paper: 'Refined Register', indigo: 'Indigo Night', saffron: 'Saffron Dawn', chalk: 'Chalkboard', exam: 'Exam Hall' };
+  function openThemePicker(){
+    var swatches = {};
+    document.querySelectorAll('.theme-swatches [data-theme-pick]').forEach(function(b){ swatches[b.dataset.themePick] = b.querySelector('.swatch-dots') ? b.querySelector('.swatch-dots').outerHTML : ''; });
+    var draw = function(){
+      var t = currentTheme(), m = currentMode();
+      modalBodyRef().innerHTML = '<h3>Theme</h3><div class="tp-grid">' + THEMES.map(function(id){
+          return '<button type="button" class="theme-swatch' + (id === t ? ' on' : '') + '" data-tp="' + id + '">' + (swatches[id] || '') + '<b>' + THEME_NAMES[id] + '</b></button>'; }).join('') + '</div>' +
+        '<div class="menu-label" style="padding-left:0;">Mode</div><div class="tp-modes">' +
+        [['light', '☀ Light'], ['dark', '☾ Dark'], ['system', 'Auto']].map(function(x){ return '<button type="button" data-tpm="' + x[0] + '" class="' + (x[0] === m ? 'on' : '') + '">' + x[1] + '</button>'; }).join('') + '</div>' +
+        '<div class="modal-actions"><button class="btn teal" id="tpDone">Done</button></div>';
+      modalBodyRef().querySelectorAll('[data-tp]').forEach(function(b){ b.addEventListener('click', function(){ lsSet(THEME_KEY, b.dataset.tp); applyAppearance(); draw(); }); });
+      modalBodyRef().querySelectorAll('[data-tpm]').forEach(function(b){ b.addEventListener('click', function(){ var v = b.dataset.tpm; lsSet(DARK_MODE_KEY, v === 'system' ? null : (v === 'dark' ? '1' : '0')); applyAppearance(); draw(); }); });
+      document.getElementById('tpDone').addEventListener('click', function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML = ''; });
+    };
+    draw();
+    modalBgRef().classList.add('open');
+  }
+  document.getElementById('studyThemeBtn').addEventListener('click', openThemePicker);
   document.getElementById('studyNotesBtn').addEventListener('click', function(){
     var f = document.getElementById('studyFrame');
     if(studyOpen && f && f.contentWindow) f.contentWindow.postMessage({ type: 'pathshala-notes-list' }, location.origin);
@@ -2855,6 +2875,10 @@
         '<input type="checkbox" id="hapticsChk" style="margin-top:3px; width:18px; height:18px;" '+(hapticsOn()?'checked':'')+'>' +
         '<span>Vibration — a light tap on buttons, a buzz for right and wrong answers, streaks, goals and the last minute of a mock (phones that can vibrate)</span>' +
       '</label></div>' +
+      '<div class="field"><label style="display:flex; gap:10px; align-items:flex-start; cursor:pointer;">' +
+        '<input type="checkbox" id="soundsChk" style="margin-top:3px; width:18px; height:18px;" '+(soundsOn()?'checked':'')+'>' +
+        '<span>Sounds — a soft click on taps, a chime for a right answer, a low note for a wrong one, and short tunes for streaks, goals and the last minute of a mock</span>' +
+      '</label></div>' +
       '<div class="modal-actions"><button class="btn ghost" id="displaySettingsClose">Close</button></div>';
     modalBgRef().classList.add('open');
     document.getElementById('textSizeSelect').addEventListener('change', function(){
@@ -2866,6 +2890,7 @@
       applyDisplaySettings();
     });
     document.getElementById('hapticsChk').addEventListener('change', function(){ lsSet('pathshalaHaptics', this.checked ? null : '0'); if(this.checked) feel('right'); });
+    document.getElementById('soundsChk').addEventListener('change', function(){ lsSet('pathshalaSounds', this.checked ? null : '0'); if(this.checked) SOUNDS.right(); });
     document.getElementById('displaySettingsClose').addEventListener('click', function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML=''; });
   });
 
@@ -3160,7 +3185,31 @@
   // On unless switched off in Display settings ('pathshalaHaptics' = '0', read by the mini apps too).
   var HAPTIC = { tick: [8], select: [15], right: [12, 60, 18], wrong: [45, 50, 45], streak: [15, 40, 15, 40, 30], goal: [20, 50, 20, 50, 20, 50, 70], level: [30, 30, 30, 30, 30, 30, 120], warn: [80, 120, 80], hold: [25] };
   function hapticsOn(){ return lsGet('pathshalaHaptics') !== '0'; }
+  function soundsOn(){ return lsGet('pathshalaSounds') !== '0'; }
+  // Sounds, made on the spot (no files): the same set as the Style Lab. Off with Display settings → Sounds.
+  var audioCtx = null;
+  function tone(freq, start, dur, type, vol){
+    try{
+      if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if(audioCtx.state === 'suspended') audioCtx.resume();
+      var o = audioCtx.createOscillator(), g = audioCtx.createGain(), t0 = audioCtx.currentTime + start;
+      o.type = type || 'sine'; o.frequency.value = freq; o.connect(g); g.connect(audioCtx.destination);
+      g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(vol || .16, t0 + .01); g.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+      o.start(t0); o.stop(t0 + dur + .02);
+    }catch(e){}
+  }
+  var SOUNDS = {
+    tick: function(){ tone(1800, 0, .035, 'triangle', .05); },
+    select: function(){ tone(1500, 0, .04, 'triangle', .07); },
+    right: function(){ tone(880, 0, .12); tone(1320, .09, .2); },
+    wrong: function(){ tone(220, 0, .16, 'triangle', .2); tone(180, .1, .2, 'triangle', .18); },
+    streak: function(){ [660, 880, 1100].forEach(function(f, i){ tone(f, i * .08, .16); }); },
+    goal: function(){ [523, 659, 784, 1046].forEach(function(f, i){ tone(f, i * .09, .25); }); },
+    level: function(){ [523, 659, 784, 1046, 1318].forEach(function(f, i){ tone(f, i * .08, .28); }); },
+    warn: function(){ tone(440, 0, .15, 'square', .06); tone(440, .25, .15, 'square', .06); }
+  };
   function feel(k){
+    if(soundsOn() && SOUNDS[k]) SOUNDS[k]();
     if(!hapticsOn()) return;
     var A = window.PathshalaApp;
     if(A && typeof A.haptic === 'function' && (k === 'right' || k === 'wrong')){ A.haptic(k); return; }

@@ -1315,6 +1315,11 @@
   .main:has(#view-tasks.active) header.top, .main:has(#view-plan.active) header.top, .main:has(#view-typing.active) header.top{ display:none; }
   /* sections below the first screen are laid out only when scrolled near */
   #homeBody > .hub-sec{ content-visibility:auto; contain-intrinsic-size:auto 900px; }
+  .tp-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:6px 0 14px; }
+  .tp-grid .theme-swatch{ width:100%; }
+  .tp-modes{ display:flex; gap:6px; }
+  .tp-modes button{ flex:1; padding:9px; border-radius:10px; border:1.5px solid var(--rule); background:var(--card); color:var(--ink); font:inherit; font-weight:600; cursor:pointer; }
+  .tp-modes button.on{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
   .mn-search{ width:100%; box-sizing:border-box; padding:9px 12px; border-radius:12px; border:1px solid var(--rule); background:var(--card); color:inherit; font:inherit; margin:4px 0 6px; }
   .mn-list{ max-height:60vh; overflow:auto; display:grid; gap:8px; }
   .mn-item{ text-align:left; display:grid; gap:3px; padding:10px 12px; border-radius:12px; border:1px solid var(--rule); background:var(--card); color:inherit; font:inherit; font-size:14px; cursor:pointer; }
@@ -1863,6 +1868,7 @@
     <span class="study-sync" id="studySync"></span>
     <span class="study-timer" id="studyTimer"></span>
     <button class="study-ask" id="studyAskBtn" title="Ask AI about this chapter — select text first to ask about it" style="display:none;">✨<span> Ask AI</span></button>
+    <button class="study-track" id="studyThemeBtn" title="Design and light / dark">🎨<span> Theme</span></button>
     <button class="study-track" id="studyNotesBtn" title="My notes in this app — select text in a lesson to add one">📝<span> Notes</span></button>
     <button class="study-track" id="studyTrackBtn" title="This app's sessions and scores">📈<span> Tracker</span></button>
   </div>
@@ -2464,7 +2470,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="app.js?v=0ed3e78a"></script>
+<script src="app.js?v=c3e13844"></script>
 <script src="typing-passages.js?v=df4bd310"></script>
 <script src="typing.js?v=02ff18bc"></script>
 </body>

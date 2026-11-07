@@ -788,4 +788,4 @@ window.addEventListener("storage", e => {
   if (e.key && e.key !== KEY && APP.apps.some(a => a.key === e.key) && (TAB === "plan" || TAB === "start")) go(TAB); });
 
 /* the shared layer of every mini app: keys, answer feedback, look and feel (study-ui.js; tools/stamp.js sets its ?v=) */
-(function(){ if (window.__studyUI || document.querySelector("script[data-study-ui]")) return; const s = document.createElement("script"); s.src = "study-ui.js?v=14700f25"; s.dataset.studyUi = ""; document.head.appendChild(s); })();
+(function(){ if (window.__studyUI || document.querySelector("script[data-study-ui]")) return; const s = document.createElement("script"); s.src = "study-ui.js?v=502b564d"; s.dataset.studyUi = ""; document.head.appendChild(s); })();

@@ -925,7 +925,31 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
   const P = { tick: [8], select: [15], right: [12, 60, 18], wrong: [45, 50, 45], streak: [15, 40, 15, 40, 30], goal: [20, 50, 20, 50, 20, 50, 70], level: [30, 30, 30, 30, 30, 30, 120], warn: [80, 120, 80], hold: [25] };
   const on = () => { try { return localStorage.getItem("pathshalaHaptics") !== "0"; } catch (e) { return true; } };
   const still = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // sounds (the app's set; Display settings → Sounds, 'pathshalaSounds' = '0' turns them off)
+  const soundOn = () => { try { return localStorage.getItem("pathshalaSounds") !== "0"; } catch (e) { return true; } };
+  let ac = null;
+  function tone(f, start, dur, type, vol){
+    try {
+      if (!ac) ac = new (window.AudioContext || window.webkitAudioContext)();
+      if (ac.state === "suspended") ac.resume();
+      const o = ac.createOscillator(), g = ac.createGain(), t0 = ac.currentTime + start;
+      o.type = type || "sine"; o.frequency.value = f; o.connect(g); g.connect(ac.destination);
+      g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(vol || .16, t0 + .01); g.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+      o.start(t0); o.stop(t0 + dur + .02);
+    } catch (e) {}
+  }
+  const SND = {
+    tick: () => tone(1800, 0, .035, "triangle", .05),
+    select: () => tone(1500, 0, .04, "triangle", .07),
+    right: () => { tone(880, 0, .12); tone(1320, .09, .2); },
+    wrong: () => { tone(220, 0, .16, "triangle", .2); tone(180, .1, .2, "triangle", .18); },
+    streak: () => [660, 880, 1100].forEach((f, i) => tone(f, i * .08, .16)),
+    goal: () => [523, 659, 784, 1046].forEach((f, i) => tone(f, i * .09, .25)),
+    level: () => [523, 659, 784, 1046, 1318].forEach((f, i) => tone(f, i * .08, .28)),
+    warn: () => { tone(440, 0, .15, "square", .06); tone(440, .25, .15, "square", .06); }
+  };
   function feel(k){
+    if (soundOn() && SND[k]) SND[k]();
     if (!on()) return;
     const A = window.PathshalaApp;
     if (A && typeof A.haptic === "function" && (k === "right" || k === "wrong")) { A.haptic(k); return; }
