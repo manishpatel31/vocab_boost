@@ -4276,7 +4276,7 @@
   function switchTab(name){
     var from = tabOrder.indexOf(tabAt), to = tabOrder.indexOf(name), same = name === tabAt;
     tabAt = name;
-    if(!same && !stillMotion()){ var nv = document.getElementById('view-' + name); if(nv){ nv.classList.remove('tab-in-l', 'tab-in-r'); void nv.offsetWidth; nv.classList.add(to >= 0 && from >= 0 && to < from ? 'tab-in-l' : 'tab-in-r'); setTimeout(function(){ nv.classList.remove('tab-in-l', 'tab-in-r'); }, 400); } }
+    if(!same && !stillMotion()){ var nv = document.getElementById('view-' + name); if(nv){ nv.classList.remove('tab-in-l', 'tab-in-r'); void nv.offsetWidth; nv.classList.add(to >= 0 && from >= 0 && to < from ? 'tab-in-l' : 'tab-in-r'); setTimeout(function(){ nv.classList.remove('tab-in-l', 'tab-in-r'); }, 520); } }
     if(name !== 'typing' && window.shabdTyping) window.shabdTyping.leave();
     tabs.forEach(function(t){ t.classList.toggle('active', t.dataset.tab === name); });
     views.forEach(function(v){ v.classList.toggle('active', v.id === 'view-' + name); });

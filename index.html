@@ -548,10 +548,10 @@
   .celebrate-level .celebrate-badge{ position:relative; overflow:hidden; }
   .celebrate-level .celebrate-badge::after{ content:""; position:absolute; inset:0; background:linear-gradient(110deg, transparent 30%, rgba(255,255,255,.6) 50%, transparent 70%); transform:translateX(-120%); animation:fxShine .9s .55s ease-out forwards; }
   @keyframes fxShine{ to{ transform:translateX(120%); } }
-  .tab-in-r{ animation:fxSlideR .32s cubic-bezier(.2,.8,.2,1); }
-  .tab-in-l{ animation:fxSlideL .32s cubic-bezier(.2,.8,.2,1); }
-  @keyframes fxSlideR{ from{ opacity:0; transform:translateX(26px); } to{ opacity:1; transform:none; } }
-  @keyframes fxSlideL{ from{ opacity:0; transform:translateX(-26px); } to{ opacity:1; transform:none; } }
+  .tab-in-r{ animation:fxSlideR .42s cubic-bezier(.2,.8,.2,1); }
+  .tab-in-l{ animation:fxSlideL .42s cubic-bezier(.2,.8,.2,1); }
+  @keyframes fxSlideR{ from{ opacity:0; transform:translateX(64px); } to{ opacity:1; transform:none; } }
+  @keyframes fxSlideL{ from{ opacity:0; transform:translateX(-64px); } to{ opacity:1; transform:none; } }
   .skel{ display:grid; gap:9px; padding:6px 0; max-width:520px; }
   .skel i{ display:block; height:13px; border-radius:7px; background:linear-gradient(90deg, var(--paper-deep) 25%, color-mix(in srgb, var(--paper-deep) 40%, var(--card)) 50%, var(--paper-deep) 75%); background-size:300% 100%; animation:fxShim 1.3s linear infinite; }
   .skel i:nth-child(2){ width:80%; } .skel i:nth-child(3){ width:60%; }
@@ -2470,7 +2470,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="app.js?v=c3e13844"></script>
+<script src="app.js?v=f622a2d0"></script>
 <script src="typing-passages.js?v=df4bd310"></script>
 <script src="typing.js?v=02ff18bc"></script>
 </body>
