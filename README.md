@@ -74,8 +74,9 @@ Each mini app is one self-contained page (`study-<name>.html`) with lessons, a q
 | `wallpaper.html` | Live desktop wallpaper (works with Lively Wallpaper) showing words and GS/Maths fact cards |
 | `sw.js` | Service worker: offline use and caching |
 | `manifest.json`, `*.png` | Install-to-home-screen settings and icons |
+| `Pathshala.apk` | The Android app download (a copy of the latest `VocabLock.apk` from the private `vocab-lock` repo). Its version and date are `APK_VERSION` / `APK_DATE` / `APK_SIZE` in `app.js`. The service worker never saves it offline |
 
-> **Please don't rename, move or delete these files.** The app, the offline cache, search and the Android companion all look for them at these exact names and paths.
+> **Please don't rename, move or delete these files.** The app, the offline cache, search and the Android app all look for them at these exact names and paths.
 
 ## Features
 
@@ -92,7 +93,7 @@ Each mini app is one self-contained page (`study-<name>.html`) with lessons, a q
 - If the sign-in service can't be reached (offline on a first visit, or a network that blocks Google's servers) the app says so with a Try again button instead of staying on “Opening पाठShala…”; an account without a photo shows its initials
 - AI tutor (optional, off by default): turn it on under Account → AI tutor and paste your own free API key (Google Gemini, Groq or OpenRouter). Ask any SSC doubt in Explain, Solve, Vocab, PYQs, Quiz me, Mock test, Brainstorm or My weak spots mode, with replies in English, Hinglish or Hindi. Pick how the answer should look (Quick answer, Step by step, In detail, Detail + examples, From basics, Revision notes, Tricks only); under each answer, one tap gets PYQs, practice questions or a timed 20-question mock on that topic, a simpler version, more examples, memory tricks, revision notes or a related topic. Answers are framed for SSC CGL and use the app's own lesson notes, questions and words when they match, linking to the lesson; Gemini can also search Google for current affairs. The AI is also built into the app: a ✨ Ask AI button in every mini app knows which lesson is open (and asks about any text you select), every app card on Home has an ✨ AI button that analyses your progress in that app (important topics, weightage, a mock from that app's questions, a plan, PYQs, weak topics, last-minute revision), and answered questions in Practice, the Mistakes book and mock results have “Ask AI why”. The model is chosen automatically: Auto ranks every model the key can use, takes the best one that answers, and skips models that failed recently. With keys for more than one service (Use all my saved keys, on by default), each question goes to the service best suited to it — Gemini for current affairs, Hindi, maths and long explanations; Groq for quick answers, words and quiz questions — and the next service answers when one is busy or out of free limit. Each answer shows the service and model that wrote it. The key stays on that device and requests go straight from the browser to the AI company. Quiz me uses the app's question bank when it covers the topic, otherwise the AI writes new questions
 - Mini app builder prompt (Account → Admin): pick a subject, the exams, the app it is for (or a new one) and a few options, and copy a prompt for ChatGPT, Gemini or Claude. Paste it with a PDF, PPT, notes or a video transcript attached, and the AI writes every lesson, story, fact table, trick, trap, question (with past-paper tags it can verify), revision card, tile and Lab game idea in the plain-text format `tools/` builds apps from. For an existing app the prompt lists that app's lessons, so new material fits around them. "Continue" and "check your work" prompts handle long sources
-- Android app (APK, built from the private `vocab-lock` repository): the whole site full-screen and offline, with the phone's Google sign-in, Hindi/English voices, notifications, share and Downloads, plus the lock screen ("Vocab Lock": words and GS/Maths facts), home-screen widgets and background reminders. Inside the app, Account → Phone app (Vocab Lock) has a "Lock screen, widgets & reminders" button, and the phone links itself to the account after sign-in. Anyone can download it from the sign-in screen or Account → **Android app (APK)** (`Pathshala.apk` in this repository — a copy of the latest `VocabLock.apk` from `vocab-lock` Releases; replace it when the Android app itself changes, not for new lessons; the service worker never saves it offline; hidden inside the app)
+- **Android app** (पाठShala, one APK): the whole site full-screen and offline with the phone's Google sign-in, voices and notifications, plus words and GS facts on the lock screen (AOD), home-screen widgets and background reminders — see [Android app](#android-app)
 
 ## Adding a new mini app
 
@@ -102,10 +103,45 @@ Each mini app is one self-contained page (`study-<name>.html`) with lessons, a q
 4. Add the file to the `WARM` list in `sw.js` and bump `VERSION` (e.g. `shabd-v15` → `shabd-v16`) so phones pick up the change.
 5. Commit and push. GitHub Pages updates in a minute or two.
 
+## Android app
+
+One app, **पाठShala** (package `com.manish.vocablock`). The code is in the private repository **`manishpatel31/vocab-lock`**, which holds the signing key. Its README is the full guide: code map, bridge messages, data flow, Google sign-in setup, release steps, pitfalls and troubleshooting.
+
+**What it is:**
+- **This website in a full-screen app.** The APK holds no website files. It loads `https://manishpatel31.github.io/vocab_boost/`, and the service worker keeps it offline after the first open.
+  - Everything pushed here reaches the app by itself. A new APK is needed only for Android changes.
+- **A small script injected into these pages** (`pathshala-shim.js` in the app, allowed only on this site's origin) swaps browser features for the phone's own:
+  - Google sign-in through the phone's account picker, then `signInWithCredential`; the same Firebase account.
+  - `speechSynthesis` through Android text-to-speech (English India and Hindi voices).
+  - `Notification`, share, copy, file downloads to Downloads, the screen wake lock, external links, the back button.
+- **The lock screen, widgets and reminders** (formerly the separate "Vocab Lock" app) are part of the same app.
+
+**What this website does for the app** (only when `window.PathshalaApp.isApp` is set; in a browser nothing changes):
+- **Account menu:** "Phone app (Vocab Lock)" becomes **Lock screen & widgets** and opens the phone's settings (`PathshalaApp.openLockSettings()`).
+- **No link code:** after sign-in, `lockAutoSetup` creates the `lockSync/{code}` doc by itself once the register has loaded, and `lockAttach` hands the code to the phone (`PathshalaApp.link`).
+  - The phone reads the progress summary from that doc and sends lock-screen ratings back as `lockSync/{code}/events`, which `lockApplyEvents` applies.
+- **Words go straight to the phone:** `lockSendWordsToApp` sends the word library (`words.map(lockItem)`) through `PathshalaApp.setWords` (app 3.1+) when it changes, so no admin "Publish" is needed.
+  - The admin "Publish words to lock-screen app" (`lockFeed`) remains for older installs.
+- **The download link is hidden inside the app.**
+- **New bridge methods:** check them with `typeof PathshalaApp.x === 'function'` first, because people may run an older APK.
+
+**Download:**
+- **Where it appears:** the sign-in screen ("Get the Android app (v…, date)") and Account → **Android app (APK)**. Both open a page showing the version, update date and size, a download button and install steps. The browser "Install app" help links it too.
+- **The file** is `Pathshala.apk` in this repository: https://manishpatel31.github.io/vocab_boost/Pathshala.apk.
+- **`sw.js` leaves `.apk` files to the network** (`kind()`), so the download is never cached or stale.
+
+**Releasing a new Android version:**
+1. In `vocab-lock`: bump `versionCode` / `versionName`, test the pre-release `test-N` build on a phone, then merge to `main` (that publishes `build-N`).
+2. Here:
+   - replace `Pathshala.apk` with that `VocabLock.apk` (renamed);
+   - update `APK_VERSION`, `APK_DATE` and `APK_SIZE` in `app.js`;
+   - run `node tools/stamp.js`, then push to `main`.
+3. Installing a newer APK updates the app and keeps its settings. It must always be signed with the same key from `vocab-lock`.
+
 ## Hosting & notes
 
 - Hosted on GitHub Pages straight from the `main` branch root.
 - The Firebase config inside `index.html` is meant to be public. Data is protected by Firestore security rules, not by hiding the config.
-- The Android project lives in a separate **private** repository because it contains the app signing key.
+- The Android project lives in a separate **private** repository (`vocab-lock`) because it contains the app signing key — see [Android app](#android-app).
 
 *Made for SSC aspirants. Questions are for practice; always check current facts against official sources.*
