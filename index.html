@@ -1190,6 +1190,10 @@
   .main:has(#view-tasks.active) header.top, .main:has(#view-plan.active) header.top, .main:has(#view-typing.active) header.top{ display:none; }
   /* sections below the first screen are laid out only when scrolled near */
   #homeBody > .hub-sec{ content-visibility:auto; contain-intrinsic-size:auto 900px; }
+  .mn-search{ width:100%; box-sizing:border-box; padding:9px 12px; border-radius:12px; border:1px solid var(--rule); background:var(--card); color:inherit; font:inherit; margin:4px 0 6px; }
+  .mn-list{ max-height:60vh; overflow:auto; display:grid; gap:8px; }
+  .mn-item{ text-align:left; display:grid; gap:3px; padding:10px 12px; border-radius:12px; border:1px solid var(--rule); background:var(--card); color:inherit; font:inherit; font-size:14px; cursor:pointer; }
+  .mn-item span{ opacity:.8; white-space:pre-wrap; } .mn-item small{ opacity:.6; font-size:12px; }
   .off-stat{ font-size:15px; margin:6px 0 8px; }
   .off-bar{ height:8px; border-radius:var(--pill); background:var(--paper-deep); overflow:hidden; }
   .off-bar span{ display:block; height:100%; background:var(--teal, #2E6E62); border-radius:inherit; transition:width .3s ease; }
@@ -1734,6 +1738,7 @@
     <span class="study-sync" id="studySync"></span>
     <span class="study-timer" id="studyTimer"></span>
     <button class="study-ask" id="studyAskBtn" title="Ask AI about this chapter — select text first to ask about it" style="display:none;">✨<span> Ask AI</span></button>
+    <button class="study-track" id="studyNotesBtn" title="My notes in this app — select text in a lesson to add one">📝<span> Notes</span></button>
     <button class="study-track" id="studyTrackBtn" title="This app's sessions and scores">📈<span> Tracker</span></button>
   </div>
   <iframe class="study-frame" id="studyFrame" title="Study module"></iframe>
@@ -1871,6 +1876,7 @@
           <button class="tab" data-tab="backup"><b>Backup</b><span>Export or import your register</span></button>
           <button id="installBtn" style="display:none;"><b>Install app</b><span>Add to your home screen or desktop</span></button>
           <button id="appVerBtn" hidden><b>App version</b><span>Check for updates</span></button>
+          <button id="myNotesBtn"><b>My notes</b><span>Your notes and drawings from every mini app</span></button>
           <button id="offlineBtn"><b>Offline copy</b><span>What's saved on this device · save everything now</span></button>
           <button id="apkBtn" class="apk-open apk-link"><b>Android app (APK)</b><span>Download पाठShala for your phone — lock screen, widgets, offline</span></button>
           <button id="signOutBtn"><b>Sign out</b></button>
@@ -2330,7 +2336,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="app.js?v=1e9ecc41"></script>
+<script src="app.js?v=5e5b1fab"></script>
 <script src="typing-passages.js?v=df4bd310"></script>
 <script src="typing.js?v=02ff18bc"></script>
 </body>

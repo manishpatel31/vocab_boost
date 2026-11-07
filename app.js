@@ -953,6 +953,13 @@
     if(!mod || typeof r.data !== 'string') return false;
     if(r.key && mod.key && r.key !== mod.key) return false;   /* saved by an older version of this app */
     var local = lsGet(mod.key);
+    if(/^notes_/.test(id)){
+      var nm = JSON.stringify(notesMerge(notesParse(local), notesParse(r.data)));
+      if(nm !== local) lsSet(mod.key, nm);
+      if(nm !== r.data){ setStudyMeta(id, { localAt: Date.now() }); clearTimeout(studyApply['t' + id]); studyApply['t' + id] = setTimeout(function(){ studyPush(id); }, 1500); }
+      else setStudyMeta(id, { syncedAt: r.updatedAt || Date.now(), localAt: r.updatedAt || Date.now() });
+      return nm !== local;
+    }
     if(id === 'tracker' || id === 'todo'){
       // lists kept on several devices: merge both, then upload the merge if this device added anything
       var merged = (id === 'todo' ? todoMerge : trackMerge)(trackParse(local), trackParse(r.data)), mj = JSON.stringify(merged);
@@ -1028,7 +1035,7 @@
   }
   window.addEventListener('storage', function(ev){ if(studyOpen && ev.key === STUDY[studyOpen].key) studyCheckChange(); });
 
-  async function openStudy(id, fromHistory, lesson, tab){
+  async function openStudy(id, fromHistory, lesson, tab, note){
     var mod = STUDY[id];
     if(!mod) return;
     closeAllMenus();
@@ -1041,13 +1048,14 @@
     document.body.classList.add('study-on');
     if(!fromHistory){ try{ history.pushState({ study: id }, '', '#study-' + id); }catch(e){} }
     // fetch this app's progress from your account, but don't keep the app waiting more than a second for it
-    var pulled = false, pull = studyPull(id).then(function(){ pulled = true; }, function(){ pulled = true; });
+    var pulled = false, pull = Promise.all([studyPull(id), studyPull('notes_' + id)]).then(function(){ pulled = true; }, function(){ pulled = true; });
     await Promise.race([pull, new Promise(function(r){ setTimeout(r, 1000); })]);
     if(studyOpen !== id) return;
     studyLast = lsGet(mod.key);
     trackStart(id);
     Object.keys(STUDY).concat(Object.keys(STUDY_EXTRA)).forEach(function(k){ studyPush(k); });   // this device's unsaved progress (incl. from before syncing existed)
-    var frameUrl = mod.file + '?embed=1&skin=' + studySkinValue() + '&theme=' + studyThemeValue() + (lesson ? '&lesson=' + encodeURIComponent(lesson) : '') + (tab ? '#' + encodeURIComponent(tab) : '');
+    studyPush('notes_' + id);
+    var frameUrl = mod.file + '?embed=1&skin=' + studySkinValue() + '&theme=' + studyThemeValue() + (lesson ? '&lesson=' + encodeURIComponent(lesson) : '') + (note ? '&note=' + encodeURIComponent(note) : '') + (tab ? '#' + encodeURIComponent(tab) : '');
     setStudyFrame(frameUrl);
     if(!pulled){   // progress from your account arrived after the app opened: reopen it with the newer copy
       var shown = lsGet(mod.key);
@@ -1087,6 +1095,57 @@
   }
   document.getElementById('studyBack').addEventListener('click', function(){ closeStudy(false); });
   document.getElementById('studyTrackBtn').addEventListener('click', function(){ if(studyOpen){ trackTick(); openTrackerApp(studyOpen); } });
+  // ---- My notes (written in the mini apps by study-ui.js; synced here as notes_<app>) ----
+  var notesPushT = {};
+  window.addEventListener('message', function(e){
+    var f = document.getElementById('studyFrame');
+    if(e.origin !== location.origin || !e.data || e.data.type !== 'pathshala-notes' || !f || e.source !== f.contentWindow || !studyOpen) return;
+    var id = 'notes_' + studyOpen;
+    setStudyMeta(id, { localAt: Date.now() });
+    clearTimeout(notesPushT[id]); notesPushT[id] = setTimeout(function(){ studyPush(id); }, 1500);
+  });
+  document.getElementById('studyNotesBtn').addEventListener('click', function(){
+    var f = document.getElementById('studyFrame');
+    if(studyOpen && f && f.contentWindow) f.contentWindow.postMessage({ type: 'pathshala-notes-list' }, location.origin);
+  });
+  function notesAll(){
+    var out = [];
+    Object.keys(STUDY).forEach(function(id){
+      var d = notesParse(lsGet(notesKey(id)));
+      Object.keys(d.n).forEach(function(k){ var x = d.n[k]; if(!x.del) out.push(Object.assign({ id: k, app: id }, x)); });
+    });
+    return out.sort(function(a, b){ return (b.u || 0) - (a.u || 0); });
+  }
+  function openMyNotes(q){
+    var all = notesAll(), qq = String(q || '').toLowerCase();
+    var list = qq ? all.filter(function(n){ return ((n.q || '') + ' ' + (n.t || '') + ' ' + STUDY[n.app].title).toLowerCase().indexOf(qq) !== -1; }) : all;
+    var byApp = {};
+    list.forEach(function(n){ (byApp[n.app] = byApp[n.app] || []).push(n); });
+    modalBodyRef().innerHTML = '<h3>My notes <small style="font-weight:600; opacity:.65; font-size:13px;">' + all.length + '</small></h3>' +
+      (all.length ? '<input type="search" id="mnSearch" class="mn-search" placeholder="Search your notes" value="' + escapeAttr(q || '') + '">' : '') +
+      '<div class="mn-list">' + (list.length ? Object.keys(byApp).map(function(app){
+        return '<div class="menu-label" style="padding-left:0; margin-top:10px;">' + escapeHtml(STUDY[app].title) + ' · ' + byApp[app].length + '</div>' +
+          byApp[app].map(function(n){ return '<button type="button" class="mn-item" data-mn-app="' + app + '" data-mn-id="' + escapeAttr(n.id) + '" data-mn-les="' + escapeAttr(n.les || '') + '">' +
+            '<b>“' + escapeHtml((n.q || '').slice(0, 90)) + ((n.q || '').length > 90 ? '…' : '') + '”</b>' +
+            (n.t ? '<span>' + escapeHtml(n.t.slice(0, 140)) + '</span>' : '') + (n.d ? '<span>🖊️ Drawing</span>' : '') +
+            '<small>' + (n.les ? 'Lesson ' + escapeHtml(n.les) + ' · ' : '') + escapeHtml(new Date(n.u || n.c || Date.now()).toLocaleDateString()) + '</small></button>';
+          }).join('');
+      }).join('') : '<p class="help">' + (all.length ? 'No note matches that.' : 'No notes yet. In any mini app, select a word or sentence and tap <b>📝 Add note</b> — type a trick or extra fact, or draw it with your finger or a stylus. Notes stay highlighted on the page and sync to your account.') + '</p>') + '</div>' +
+      '<div class="modal-actions"><button class="btn ghost" id="mnClose">Close</button></div>';
+    modalBgRef().classList.add('open');
+    var close = function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML = ''; };
+    document.getElementById('mnClose').addEventListener('click', close);
+    var srch = document.getElementById('mnSearch');
+    if(srch) srch.addEventListener('input', function(){ var v = this.value, pos = this.selectionStart; openMyNotes(v); var s2 = document.getElementById('mnSearch'); if(s2){ s2.focus(); try{ s2.setSelectionRange(pos, pos); }catch(e){} } });
+    modalBodyRef().querySelectorAll('[data-mn-id]').forEach(function(b){ b.addEventListener('click', function(){
+      var app = b.dataset.mnApp, id = b.dataset.mnId, les = b.dataset.mnLes || null, f = document.getElementById('studyFrame');
+      close();
+      if(studyOpen === app && f && f.contentWindow){ f.contentWindow.postMessage({ type: 'pathshala-notes-go', id: id }, location.origin); return; }
+      if(studyOpen) closeStudy(true);
+      openStudy(app, false, les, null, id);
+    }); });
+  }
+  document.getElementById('myNotesBtn').addEventListener('click', function(){ try{ closeAllMenus(); }catch(e){} openMyNotes(); });
   window.addEventListener('popstate', function(){
     if(location.hash === '#drill') return;
     if(drillOpen){ closeDrill(true); if(drillOpen) return; }
@@ -1143,7 +1202,19 @@
   function mathQIds(){ return mathIds().filter(function(id){ return !STUDY[id].noq; }); }
   function reasoningIds(){ return Object.keys(STUDY).filter(function(id){ return STUDY[id].subj === 'reasoning'; }); }
   var STUDY_EXTRA = { mocks: { key: 'shabdMockHistory', title: 'Mixed mock history' }, tracker: { key: 'shabdTracker', title: 'Study tracker' }, todo: { key: 'shabdTodo', title: 'Tasks' }, planner: { key: 'shabdPlanner', title: 'Study planner' }, exams: { key: 'shabdExams', title: 'Exams' }, typing: { key: 'shabdTyping', title: 'Typing tests' }, review: { key: 'shabdReview', title: 'Spaced review' } };
-  function studyMod(id){ return STUDY[id] || STUDY_EXTRA[id]; }
+  function studyMod(id){
+    if(STUDY[id] || STUDY_EXTRA[id]) return STUDY[id] || STUDY_EXTRA[id];
+    var m = /^notes_(\w+)$/.exec(id || '');   // a mini app's notes (study-ui.js "My notes"): localStorage shabdNotes_<page>
+    return m && STUDY[m[1]] ? { key: notesKey(m[1]), title: 'Notes · ' + STUDY[m[1]].title } : undefined;
+  }
+  function notesKey(id){ return 'shabdNotes_' + String(STUDY[id].file).replace(/\.html?$/, ''); }
+  function notesParse(js){ try{ var d = JSON.parse(js || 'null'); return d && d.n && typeof d.n === 'object' ? d : { v: 1, n: {} }; }catch(e){ return { v: 1, n: {} }; } }
+  /** Notes kept on several devices: note by note, the one changed last wins (a deleted note stays as { del, u }). */
+  function notesMerge(a, b){
+    var out = { v: 1, n: {} };
+    [a, b].forEach(function(d){ Object.keys(d.n).forEach(function(k){ var x = d.n[k], y = out.n[k]; if(!y || (x.u || 0) > (y.u || 0)) out.n[k] = x; }); });
+    return out;
+  }
   // ================= Study tracker: one record per visit to a mini app =================
   // Stored in localStorage 'shabdTracker' and synced like the mini apps (users/{uid}/study/tracker).
   // { v:1, every:15, apps:{ id:{ s:[session…], completedAt, snooze } } }
