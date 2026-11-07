@@ -97,9 +97,9 @@ Each mini app is one self-contained page (`study-<name>.html`) with lessons, a q
   - **Back button:** the phone's Back closes a note sheet first.
 - **Readable labels on every map and diagram** (`study-visual.js`, `lblRun`): close-together places no longer cover each other's names. When a figure comes into view and after every zoom:
   - a pin's label tries the other side of its dot and a little above or below; if there's no room its note is dropped, and if even the name has no room the pin gets a dashed ring until you zoom in;
-  - other labels (rivers, states, charts) slide a little up, down or along;
+  - a river's name slides along its own river (either side of the line) to a free spot; other labels (states, charts) slide a little up, down or along;
   - text grows more slowly than the picture when zoomed (1/√zoom), so zooming in pulls crowded labels apart.
-  Across all 505 figures in the lessons, overlapping labels went from 68 to 16 (6 at 2× zoom).
+  Across all 505 figures in the lessons, overlapping labels went from 68 to 4 (1 at 2× zoom); the river maps from 27 to 1.
 - Deep links: Search results open the exact lesson
 - Mini apps built for a phone: a Continue card on each app's front page, lesson steps pinned with reading progress, Next and Take the quiz in reach of a thumb, mocks as a focus screen, and Practice one question at a time with a streak (`study-ui.js`)
 - Keyboard shortcuts in the mini apps on a computer: 1–4 or A–D answers the question on screen, Enter (or → / N) goes to the next one — in Practice the next unanswered question — ← / P and M move back and mark in a mock, the Lab's 60-second games play from the keyboard, and ? lists the keys. A mini app opened from Home takes the keyboard straight away
