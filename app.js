@@ -7600,6 +7600,7 @@ listBlock,
     lockUnsubEvents = null;
     if(lockTimer) clearInterval(lockTimer);
     lockTimer = null;
+    if(typeof lockAutoTimer !== 'undefined' && lockAutoTimer) clearInterval(lockAutoTimer);
     lockCode = null; lockLastEventT = 0; lockLastJson = ''; lockEventQueue = []; lockSeenEvents = {}; lockSyncedAt = 0;
   }
   async function lockSyncStart(){
@@ -7608,7 +7609,8 @@ listBlock,
     var uid = currentUser.uid;
     try{
       var snap = await db.collection('lockSync').where('uid', '==', uid).limit(1).get();
-      if(!currentUser || currentUser.uid !== uid || snap.empty) return;
+      if(!currentUser || currentUser.uid !== uid) return;
+      if(snap.empty){ lockAutoSetup(); return; }
       var d = snap.docs[0];
       var data = d.data() || {};
       try{ lockLastEventT = (JSON.parse(data.json || '{}').lastEventT) || 0; }catch(e){ lockLastEventT = 0; }
@@ -7618,6 +7620,7 @@ listBlock,
   }
   function lockAttach(code){
     lockCode = code;
+    if(lockInApp()) try{ window.PathshalaApp.link(code); }catch(e){}
     lockUnsubEvents = db.collection('lockSync').doc(code).collection('events').onSnapshot(function(snap){
       snap.forEach(function(doc){
         if(lockSeenEvents[doc.id]) return;
@@ -7633,6 +7636,35 @@ listBlock,
     setTimeout(function(){ lockPushSummary(false); }, 3000);
   }
   function lockReady(){ return !!(currentUser && lockCode && progressLoaded && myProfile && words.length); }
+
+  // ---- Inside the पाठShala Android app the lock screen, widgets and reminders are part of the app:
+  // the sync link is made by itself (no code to type) and the word library goes straight to the phone.
+  function lockInApp(){ return !!(window.PathshalaApp && window.PathshalaApp.isApp); }
+  var lockAutoTimer = null;
+  function lockAutoSetup(){
+    clearInterval(lockAutoTimer);
+    if(!lockInApp() || !currentUser) return;
+    var uid = currentUser.uid, tries = 0;
+    lockAutoTimer = setInterval(function(){
+      if(!currentUser || currentUser.uid !== uid || lockCode || ++tries > 60){ clearInterval(lockAutoTimer); return; }
+      if(progressLoaded && words.length && myProfile){ clearInterval(lockAutoTimer); lockCreateLink(true); }
+    }, 3000);
+  }
+  var lockWordsSent = '';
+  function lockSendWordsToApp(){
+    if(!lockInApp() || typeof window.PathshalaApp.setWords !== 'function' || !words.length) return;
+    try{
+      var js = JSON.stringify(words.map(lockItem));
+      if(js === lockWordsSent) return;
+      lockWordsSent = js;
+      window.PathshalaApp.setWords(js);
+    }catch(e){}
+  }
+  if(lockInApp()){
+    setInterval(lockSendWordsToApp, 30000);
+    setTimeout(lockSendWordsToApp, 8000);
+    document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'hidden') lockSendWordsToApp(); });
+  }
 
   function streakFromHistory(hist, goal){
     if(!goal) return { count: 0, last: '' };
@@ -7852,9 +7884,9 @@ listBlock,
     if(document.visibilityState === 'hidden') lockPushSummary(false);
   });
 
-  async function lockCreateLink(){
-    if(!currentUser) return;
-    if(!progressLoaded || !words.length){ showToast('Still loading your register — try again in a few seconds.'); return; }
+  async function lockCreateLink(quiet){
+    if(!currentUser || (quiet && lockCode)) return;
+    if(!progressLoaded || !words.length){ if(!quiet) showToast('Still loading your register — try again in a few seconds.'); return; }
     var code = lockNewCode();
     try{
       await db.collection('lockSync').doc(code).set({
@@ -7865,8 +7897,9 @@ listBlock,
       if(lockUnsubEvents) lockUnsubEvents();
       lockAttach(code);
       await lockPushSummary(true);
-      openLockLinkModal();
+      if(!quiet) openLockLinkModal();
     }catch(e){
+      if(quiet) return;
       showToast('Could not create the link: ' + e.message + (String(e.message).indexOf('permission') !== -1 ? ' — add the new lockSync rules in Firebase first.' : ''));
     }
   }
@@ -7936,7 +7969,14 @@ listBlock,
       else showToast(txt);
     });
   }
-  document.getElementById('lockLinkBtn').addEventListener('click', function(){ openLockLinkModal(); });
+  document.getElementById('lockLinkBtn').addEventListener('click', function(){
+    if(lockInApp()){ closeAllMenus(); window.PathshalaApp.openLockSettings(); return; }
+    openLockLinkModal();
+  });
+  if(lockInApp()){
+    var llb = document.getElementById('lockLinkBtn');
+    llb.innerHTML = '<b>Lock screen &amp; widgets</b><span>Words on the lock screen (AOD), home-screen widgets and reminders</span>';
+  }
 
   async function renderModeratorsList(force){
     if(!isAdminUser) return;
