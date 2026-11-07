@@ -2831,15 +2831,16 @@
   if(isIOS){ document.getElementById('installBtn').style.display = 'inline-flex'; }
 
   // ---------------- Android app (APK) download ----------------
-  // Built from the private vocab-lock repo; each build is published here as a release asset.
-  var APK_URL = 'https://github.com/manishpatel31/vocab_boost/releases/latest/download/Pathshala.apk';
+  // Built from the private vocab-lock repo (GitHub Actions → Releases); a copy is kept here as Pathshala.apk
+  // so anyone can download it. Replace that file when the Android app itself changes.
+  var APK_URL = 'Pathshala.apk';
   var inAndroidApp = !!(window.PathshalaApp && window.PathshalaApp.isApp);
   function openApkModal(){
     var modalBg = document.getElementById('modalBg');
     var modalBody = document.getElementById('modalBody');
     modalBody.innerHTML = '<h3>पाठShala for Android</h3>' +
       '<p class="help" style="margin-top:0;">The whole app full-screen and offline, with your Google account and progress, read-aloud in English and Hindi, words and GS facts on the lock screen, home-screen widgets and streak reminders.</p>' +
-      '<a class="btn teal" id="apkDownload" style="display:flex; justify-content:center; text-decoration:none; margin:10px 0 12px;" href="' + APK_URL + '">⬇ Download the APK</a>' +
+      '<a class="btn teal" id="apkDownload" style="display:flex; justify-content:center; text-decoration:none; margin:10px 0 12px;" href="' + APK_URL + '" download="Pathshala.apk">⬇ Download the APK (2.6 MB)</a>' +
       '<ol class="lock-steps">' +
         '<li>Open the downloaded <b>Pathshala.apk</b>.</li>' +
         '<li>If Android asks, allow your browser to <b>install unknown apps</b>, then tap <b>Install</b>.</li>' +
