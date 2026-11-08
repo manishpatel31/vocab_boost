@@ -1320,6 +1320,10 @@
   .tp-modes{ display:flex; gap:6px; }
   .tp-modes button{ flex:1; padding:9px; border-radius:10px; border:1.5px solid var(--rule); background:var(--card); color:var(--ink); font:inherit; font-weight:600; cursor:pointer; }
   .tp-modes button.on{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .zm-row{ display:flex; align-items:center; gap:10px; margin:6px 0 4px; }
+  .zm-row button{ width:52px; height:48px; border-radius:12px; border:1.5px solid var(--rule); background:var(--card); color:var(--ink); font:inherit; font-size:24px; font-weight:700; cursor:pointer; }
+  .zm-row button:disabled{ opacity:.35; cursor:default; }
+  .zm-row output{ flex:1; text-align:center; font-size:26px; font-weight:700; font-variant-numeric:tabular-nums; }
   .mn-search{ width:100%; box-sizing:border-box; padding:9px 12px; border-radius:12px; border:1px solid var(--rule); background:var(--card); color:inherit; font:inherit; margin:4px 0 6px; }
   .mn-list{ max-height:60vh; overflow:auto; display:grid; gap:8px; }
   .mn-item{ text-align:left; display:grid; gap:3px; padding:10px 12px; border-radius:12px; border:1px solid var(--rule); background:var(--card); color:inherit; font:inherit; font-size:14px; cursor:pointer; }
@@ -1641,6 +1645,7 @@
   .study-timer{ font-size:12.5px; color:var(--bar-muted); white-space:nowrap; font-variant-numeric:tabular-nums; }
   .study-track{ border:1px solid color-mix(in srgb, var(--bar-muted) 45%, transparent); background:none; color:inherit; border-radius:999px; padding:5px 11px; font:inherit; font-size:12.5px; cursor:pointer; white-space:nowrap; }
   @media (max-width: 600px){ .study-track span{ display:none; } }
+  @media (max-width: 420px){ .study-bar{ gap:5px; } .study-track{ padding:5px 8px; } }
   body.study-on .modal-bg{ z-index:450; }
   /* app card: facts + History / Revise beside the ring */
   div.hub-card{ cursor:pointer; transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease; }
@@ -1868,8 +1873,9 @@
     <span class="study-sync" id="studySync"></span>
     <span class="study-timer" id="studyTimer"></span>
     <button class="study-ask" id="studyAskBtn" title="Ask AI about this chapter — select text first to ask about it" style="display:none;">✨<span> Ask AI</span></button>
+    <button class="study-track" id="studyZoomBtn" title="Zoom the lesson — or pinch it with two fingers">🔍<span> Zoom</span></button>
     <button class="study-track" id="studyThemeBtn" title="Design and light / dark">🎨<span> Theme</span></button>
-    <button class="study-track" id="studyNotesBtn" title="My notes in this app — select text in a lesson to add one">📝<span> Notes</span></button>
+    <button class="study-track" id="studyNotesBtn" title="My notes in this app — ＋ New note sticks one anywhere on the page">📝<span> Notes</span></button>
     <button class="study-track" id="studyTrackBtn" title="This app's sessions and scores">📈<span> Tracker</span></button>
   </div>
   <iframe class="study-frame" id="studyFrame" title="Study module"></iframe>
@@ -2470,7 +2476,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="app.js?v=f622a2d0"></script>
+<script src="app.js?v=ae479db9"></script>
 <script src="typing-passages.js?v=df4bd310"></script>
 <script src="typing.js?v=02ff18bc"></script>
 </body>
