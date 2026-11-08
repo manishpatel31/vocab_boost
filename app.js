@@ -954,9 +954,19 @@
   /** Bring one module's synced copy (from your account) into this device. Returns true if this device's copy changed. */
   function studyApply(id, r){
     var mod = studyMod(id);
+    if(mod && r.reset && typeof r.data !== 'string'){
+      // "Restart this app" on another device: its progress was cleared there, so clear it here too (once)
+      var rm = studyMeta()[id] || {};
+      if((rm.resetSeen || 0) >= r.reset) return false;
+      var had = lsGet(mod.key) !== null;
+      lsSet(mod.key, null);
+      setStudyMeta(id, { resetSeen: r.reset, syncedAt: r.updatedAt || r.reset, localAt: r.updatedAt || r.reset });
+      return had;
+    }
     if(!mod || typeof r.data !== 'string') return false;
     if(r.key && mod.key && r.key !== mod.key) return false;   /* saved by an older version of this app */
     var local = lsGet(mod.key);
+    if(r.reset && typeof r.data !== 'string') return false;
     if(/^notes_/.test(id)){
       var nm = JSON.stringify(notesMerge(notesParse(local), notesParse(r.data)));
       if(nm !== local) lsSet(mod.key, nm);
@@ -1286,6 +1296,9 @@
     [a.apps || {}, b.apps || {}].forEach(function(apps){
       Object.keys(apps).forEach(function(id){
         var x = apps[id] || {}, o = out.apps[id] || (out.apps[id] = { s: [] });
+        var ra = Math.max(((a.apps || {})[id] || {}).restartAt || 0, ((b.apps || {})[id] || {}).restartAt || 0);
+        if(ra) o.restartAt = ra;
+        if(x.completedAt && x.completedAt <= ra) x = Object.assign({}, x, { completedAt: 0 });
         var seen = {}; o.s.forEach(function(s){ seen[s.id] = 1; });
         (x.s || []).forEach(function(s){ if(!seen[s.id]){ o.s.push(s); seen[s.id] = 1; } });
         if(x.completedAt && (!o.completedAt || x.completedAt < o.completedAt)) o.completedAt = x.completedAt;
@@ -1516,9 +1529,51 @@
           '<span>' + (s.l !== undefined ? s.l + '/' + (m.lessons || '?') : '—') + (s.done ? ' 🎉' : '') + '</span>' +
           '<b>' + (s.sc !== null && s.sc !== undefined ? s.sc + '%' : '—') + '</b></div>';
       }).join('') + '</div>' : '<p class="help">No sessions yet — every visit of 2 minutes or more is saved here automatically.</p>') +
-      '<div class="modal-actions"><button class="btn ghost" data-tr-close>Close</button><button class="btn teal" data-open-study="' + id + '">' + (x.started ? 'Open app' : 'Start') + ' ›</button></div></div>');
+      '<div class="modal-actions"><button class="btn ghost" data-tr-close>Close</button><button class="btn teal" data-open-study="' + id + '">' + (x.started ? 'Open app' : 'Start') + ' ›</button></div>' +
+      (x.started ? '<div class="tr-restart"><button type="button" class="btn ghost sm" data-study-restart="' + id + '">↺ Restart this app…</button><span>Clear all progress and start again</span></div>' : '') + '</div>');
+    var rb = document.querySelector('#modalBody [data-study-restart]');
+    if(rb) rb.addEventListener('click', function(){ openStudyRestart(id); });
   }
   var openTrackerApp = openTrackHistory;
+  /** "Restart this app": clear one mini app's progress here and on your other devices (an { reset, updatedAt } copy
+      in users/{uid}/study/{id} that studyApply turns into a clear). Its Tracker history stays; notes go only if asked. */
+  function studyRestart(id, withNotes){
+    var mod = STUDY[id], at = Date.now(), reopen = studyOpen === id;
+    if(!mod) return;
+    if(reopen) closeStudy(true);
+    lsSet(mod.key, null);
+    setStudyMeta(id, { resetSeen: at, syncedAt: at, localAt: at });
+    if(currentUser) studyDocRef(id).set({ reset: at, key: mod.key, updatedAt: at }).catch(function(){});
+    var t = trackData(), a = t.apps[id];
+    if(a){ a.restartAt = at; delete a.completedAt; lsSet(TRACK_KEY, JSON.stringify(t)); setStudyMeta('tracker', { localAt: at }); studyPush('tracker'); }
+    if(withNotes){
+      var nd = notesParse(lsGet(notesKey(id)));
+      Object.keys(nd.n).forEach(function(k){ if(!nd.n[k].del) nd.n[k] = { del: 1, u: at }; });
+      lsSet(notesKey(id), JSON.stringify(nd)); setStudyMeta('notes_' + id, { localAt: at }); studyPush('notes_' + id);
+    }
+    renderHomeSoon();
+    if(reopen) openStudy(id, true);
+    showToast(mod.title + ' restarted — a fresh start');
+  }
+  function openStudyRestart(id){
+    var mod = STUDY[id], pr = studyProgress(id), st = studyState(id), mocks = Array.isArray(st.mocks) ? st.mocks.length : 0, wrong = studyWrongIds(id).length;
+    var nd = notesParse(lsGet(notesKey(id))).n, nn = Object.keys(nd).filter(function(k){ return !nd[k].del; }).length;
+    var bits = [];
+    if(pr.done) bits.push(pr.done + ' ' + (mod.unit || 'lessons') + ' done');
+    if(pr.tried) bits.push(pr.tried + ' questions answered');
+    if(wrong) bits.push(wrong + ' in the Mistakes book');
+    if(mocks) bits.push(mocks + ' mock score' + (mocks > 1 ? 's' : ''));
+    var body = trackSheet('<div class="tr-sheet"><h3>↺ Restart ' + escapeHtml(mod.title) + '?</h3>' +
+      '<p>This clears everything you’ve done in this app' + (bits.length ? ' — <b>' + bits.join(', ') + '</b>' : '') + ' — so it starts again like new, on this phone and on your other devices.</p>' +
+      '<p class="help">Your Tracker history stays as a record. This can’t be undone.</p>' +
+      (nn ? '<label class="rs-notes"><input type="checkbox" id="rsNotes"> Also delete my ' + nn + ' note' + (nn > 1 ? 's' : '') + ' in this app</label>' : '') +
+      '<div class="modal-actions"><button class="btn ghost" data-tr-close>Keep my progress</button><button class="btn maroon" id="rsGo">Restart app</button></div></div>');
+    body.querySelector('#rsGo').addEventListener('click', function(){
+      var wn = !!(body.querySelector('#rsNotes') && body.querySelector('#rsNotes').checked);
+      document.getElementById('modalBg').classList.remove('open'); body.innerHTML = '';
+      studyRestart(id, wn);
+    });
+  }
   /** Revision plan: a timeline of past study and coming revisions, and the controls to set it. */
   function openTrackRevise(id){
     var x = trackInfo(id), m = x.m, t = trackData(), now = Date.now(), every = x.every;
