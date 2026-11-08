@@ -153,4 +153,4 @@
 })();
 
 /* the shared layer of every mini app: keys, answer feedback, look and feel (study-ui.js; tools/stamp.js sets its ?v=) */
-(function(){ if (window.__studyUI || document.querySelector("script[data-study-ui]")) return; const s = document.createElement("script"); s.src = "study-ui.js?v=f59af98d"; s.dataset.studyUi = ""; document.head.appendChild(s); })();
+(function(){ if (window.__studyUI || document.querySelector("script[data-study-ui]")) return; const s = document.createElement("script"); s.src = "study-ui.js?v=116eb51f"; s.dataset.studyUi = ""; document.head.appendChild(s); })();

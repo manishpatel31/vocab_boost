@@ -622,7 +622,7 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
     const root = document.getElementById("app") || document.body;
     mo = new MutationObserver(recs => {
       if (applying) return;
-      const ours = recs.every(r => [...r.addedNodes, ...r.removedNodes].every(n => n.nodeType === 1 && n.matches && n.matches(".un-ico, .un-ui, .un-add, .un-pin")) && r.type === "childList");
+      const ours = recs.every(r => [...r.addedNodes, ...r.removedNodes].every(n => n.nodeType === 1 && n.matches && n.matches(".un-ico, .un-ui, .un-add, .un-pin, .pdf-go, .pdf-pick")) && r.type === "childList");
       if (!ours) soon();
     });
     mo.observe(root, { childList: true, subtree: true, characterData: true });
@@ -1329,6 +1329,9 @@ html.un-placing #app{cursor:crosshair}
 
 /* ============================================================
    CHAPTER PDFs — attach a Google Drive PDF (shared "Anyone with the link") to any chapter and read it inside the app.
+   - On the list of chapters, a chapter with PDFs gets a 📄 button at the right end of its row (📄 2 for two or more,
+     which opens a small list). Rows are .les[data-open] in .lessons (lesson apps, the Maths formula book) and the
+     unit headers .uh[data-unit] in Grammar 100; each is wrapped in a .pdf-rw so the button can sit beside it.
    - Under a lesson's title: "📄 PDFs" with a chip per PDF and "＋ Attach PDF". A chip opens the PDF full screen
      (Google's viewer: scroll, zoom, page jump), with ✎ to rename, move to another chapter or remove it.
    - Links: drive.google.com/file/d/<id>/…, …open?id=<id>, docs.google.com/<document|presentation|spreadsheets>/d/<id>
@@ -1349,7 +1352,7 @@ html.un-placing #app{cursor:crosshair}
   function save(d){
     try { localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) { toast("Couldn't save — this device's storage is full."); return false; }
     try { if (parent !== window) parent.postMessage({ type: "pathshala-pdfs", file: FILE }, location.origin); } catch (e) {}
-    strip(true);
+    strip(true); rows();
     return true;
   }
   const list = les => { const n = load().n; return Object.keys(n).filter(id => !n[id].del && (les === undefined || String(n[id].les || "") === String(les || ""))).map(id => Object.assign({ id }, n[id])).sort((a, b) => (a.c || 0) - (b.c || 0)); };
@@ -1423,8 +1426,63 @@ html.un-placing #app{cursor:crosshair}
     }
     if (at.nextElementSibling !== bar) at.after(bar);
   }
+  // ---------- 📄 at the right end of a chapter's row on the list ----------
+  function rows(){
+    const app = document.getElementById("app");
+    if (!app) return;
+    const k = kind(), found = [];
+    if (k === "rule") app.querySelectorAll(".uh[data-unit]").forEach(r => found.push([r, "u" + r.dataset.unit]));
+    else app.querySelectorAll(".lessons > .les[data-open], .lessons > .pdf-rw > .les[data-open]").forEach(r => found.push([r, r.dataset.open]));
+    if (!found.length) return;
+    const all = list();
+    found.forEach(([row, les]) => {
+      const mine = all.filter(p => String(p.les || "") === String(les));
+      // Grammar's unit header is styled as a child of its card (.unit), so the card holds the button; a lesson row gets a wrapper
+      const own = k === "rule";
+      let w = own ? row.parentElement : (row.parentElement && row.parentElement.classList.contains("pdf-rw") ? row.parentElement : null);
+      if (!mine.length) { if (w) { w.classList.remove("has"); w.querySelectorAll(":scope > .pdf-go, :scope > .pdf-pick").forEach(e => e.remove()); } return; }
+      if (!w) { w = document.createElement("div"); w.className = "pdf-rw"; row.before(w); w.appendChild(row); }
+      w.classList.add("pdf-rw", "has");
+      const mid = own ? (row.offsetTop + row.offsetHeight / 2) + "px" : "";
+      let g = w.querySelector(":scope > .pdf-go");
+      const label = "📄" + (mine.length > 1 ? "<b>" + mine.length + "</b>" : ""), sig = mine.map(p => p.id + p.u).join(",");
+      if (!g) { g = document.createElement("button"); g.type = "button"; g.className = "pdf-go"; w.appendChild(g); }
+      g.style.top = mid; w.style.setProperty("--pdf-mid", mid || "50%");
+      if (g.dataset.sig !== sig) {
+        g.dataset.sig = sig; g.innerHTML = label;
+        g.setAttribute("aria-label", mine.length > 1 ? mine.length + " PDFs for this chapter" : "Open the PDF: " + mine[0].name);
+        g.title = mine.length > 1 ? mine.length + " PDFs" : mine[0].name;
+      }
+      g.onclick = e => {
+        e.stopPropagation();
+        const ps = list().filter(p => String(p.les || "") === String(les));
+        if (ps.length === 1) { open(ps[0].id); return; }
+        pick(w, ps);
+      };
+    });
+  }
+  function pick(w, ps){
+    const was = w.querySelector(".pdf-pick");
+    document.querySelectorAll(".pdf-pick").forEach(e => e.remove());
+    if (was) return;                                            // a second tap closes it
+    const m = document.createElement("div");
+    m.className = "pdf-pick"; m.setAttribute("role", "menu");
+    m.innerHTML = ps.map(p => `<button type="button" role="menuitem" data-pdf="${esc(p.id)}">📄 ${esc(p.name)}<small>${p.o ? "opened " + esc(when(p.o)) : "not opened yet"}</small></button>`).join("");
+    w.appendChild(m);
+    m.querySelectorAll("[data-pdf]").forEach(b => b.onclick = e => { e.stopPropagation(); m.remove(); open(b.dataset.pdf); });
+    // a tap outside only closes the list (it doesn't also open the chapter under it)
+    const eat = e => { e.preventDefault(); e.stopImmediatePropagation(); };
+    const off = e => {
+      if (!m.isConnected) { document.removeEventListener("pointerdown", off, true); return; }   // closed another way
+      if (m.contains(e.target) || (e.target.closest && e.target.closest(".pdf-go"))) return;
+      m.remove(); document.removeEventListener("pointerdown", off, true);
+      document.addEventListener("click", eat, { capture: true, once: true });
+      setTimeout(() => document.removeEventListener("click", eat, true), 600);
+    };
+    setTimeout(() => document.addEventListener("pointerdown", off, true), 0);
+  }
   let t = 0;
-  const soon = () => { clearTimeout(t); t = setTimeout(() => { hook(); strip(); }, 80); };
+  const soon = () => { clearTimeout(t); t = setTimeout(() => { hook(); strip(); rows(); }, 80); };
   const when = ms => { try { const d = new Date(ms), today = new Date(); return d.toDateString() === today.toDateString() ? "today" : d.toLocaleDateString(undefined, { day: "numeric", month: "short" }); } catch (e) { return ""; } };
 
   // ---------- sheets (the phone's Back closes them) ----------
@@ -1497,6 +1555,14 @@ html.un-placing #app{cursor:crosshair}
 .pdf-chip small{font-weight:500;color:var(--ink2,#777);font-size:11.5px;white-space:nowrap}
 .pdf-chip::before{content:"📄";font-size:13px}
 .pdf-add{border-style:dashed;color:var(--accent,#2f6f63);border-color:color-mix(in srgb,var(--accent,#2f6f63) 55%,transparent);background:none}
+.pdf-rw{position:relative}
+.pdf-rw.has > .les,.pdf-rw.has > .uh{padding-right:64px}
+.pdf-go{position:absolute;right:10px;top:50%;transform:translateY(-50%);z-index:1;display:inline-flex;align-items:center;justify-content:center;gap:3px;height:36px;min-width:40px;padding:0 10px;border-radius:12px;border:1.5px solid var(--rule,#ddd);background:var(--sheet,#fff);color:var(--ink,#222);font:700 13px var(--f-body,system-ui);box-shadow:0 1px 3px rgba(0,0,0,.08);cursor:pointer}
+.pdf-go b{font-size:12px;color:var(--ink2,#666)}
+.pdf-pick{position:absolute;right:10px;top:calc(var(--pdf-mid,50%) + 24px);z-index:6;min-width:220px;max-width:calc(100vw - 32px);background:var(--sheet,#fff);border:1px solid var(--rule,#ddd);border-radius:14px;box-shadow:0 12px 30px rgba(0,0,0,.22);padding:6px;display:grid}
+.pdf-pick button{all:unset;display:grid;padding:9px 12px;border-radius:10px;font:600 14px var(--f-body,system-ui);color:var(--ink,#222);cursor:pointer;overflow-wrap:anywhere}
+.pdf-pick button:hover,.pdf-pick button:focus-visible{background:var(--paper,#f4f1ea)}
+.pdf-pick small{font-weight:500;color:var(--ink2,#666);font-size:12px}
 .pdf-ov{position:fixed;inset:0;z-index:520;background:rgba(0,0,0,.4);display:flex;align-items:flex-end;justify-content:center;padding:12px}
 @media (min-width:640px){.pdf-ov{align-items:center}}
 .pdf-f{display:grid;gap:4px;margin:0 0 10px;font:600 13px var(--f-body,system-ui);color:var(--ink2,#555)}
@@ -1513,8 +1579,9 @@ html.pdf-lock,html.pdf-lock body{overflow:hidden}
   function start(){
     document.head.appendChild(css);
     const app = document.getElementById("app");
-    if (app) new MutationObserver(recs => { if (recs.every(r => [...r.addedNodes, ...r.removedNodes].every(n => n === bar))) return; soon(); }).observe(app, { childList: true, subtree: true });
-    addEventListener("storage", e => { if (e.key === KEY) strip(true); });
+    const mine = n => n === bar || (n.nodeType === 1 && n.matches && n.matches(".pdf-go, .pdf-pick, .pdf-pick *"));
+    if (app) new MutationObserver(recs => { if (recs.every(r => [...r.addedNodes, ...r.removedNodes].every(mine))) return; soon(); }).observe(app, { childList: true, subtree: true });
+    addEventListener("storage", e => { if (e.key === KEY) { strip(true); rows(); } });
     soon();
   }
   if (document.body) start(); else addEventListener("DOMContentLoaded", start);
