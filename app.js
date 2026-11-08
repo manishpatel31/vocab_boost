@@ -967,7 +967,7 @@
     if(r.key && mod.key && r.key !== mod.key) return false;   /* saved by an older version of this app */
     var local = lsGet(mod.key);
     if(r.reset && typeof r.data !== 'string') return false;
-    if(/^notes_/.test(id)){
+    if(/^(notes|pdfs)_/.test(id)){
       var nm = JSON.stringify(notesMerge(notesParse(local), notesParse(r.data)));
       if(nm !== local) lsSet(mod.key, nm);
       if(nm !== r.data){ setStudyMeta(id, { localAt: Date.now() }); clearTimeout(studyApply['t' + id]); studyApply['t' + id] = setTimeout(function(){ studyPush(id); }, 1500); }
@@ -1062,7 +1062,7 @@
     document.body.classList.add('study-on');
     if(!fromHistory){ try{ history.pushState({ study: id }, '', '#study-' + id); }catch(e){} }
     // fetch this app's progress from your account, but don't keep the app waiting more than a second for it
-    var pulled = false, pull = Promise.all([studyPull(id), studyPull('notes_' + id)]).then(function(){ pulled = true; }, function(){ pulled = true; });
+    var pulled = false, pull = Promise.all([studyPull(id), studyPull('notes_' + id), studyPull('pdfs_' + id)]).then(function(){ pulled = true; }, function(){ pulled = true; });
     await Promise.race([pull, new Promise(function(r){ setTimeout(r, 1000); })]);
     if(studyOpen !== id) return;
     studyLast = lsGet(mod.key);
@@ -1113,8 +1113,8 @@
   var notesPushT = {};
   window.addEventListener('message', function(e){
     var f = document.getElementById('studyFrame');
-    if(e.origin !== location.origin || !e.data || e.data.type !== 'pathshala-notes' || !f || e.source !== f.contentWindow || !studyOpen) return;
-    var id = 'notes_' + studyOpen;
+    if(e.origin !== location.origin || !e.data || (e.data.type !== 'pathshala-notes' && e.data.type !== 'pathshala-pdfs') || !f || e.source !== f.contentWindow || !studyOpen) return;
+    var id = (e.data.type === 'pathshala-pdfs' ? 'pdfs_' : 'notes_') + studyOpen;   // chapter PDFs (study-ui.js) sync like notes
     setStudyMeta(id, { localAt: Date.now() });
     clearTimeout(notesPushT[id]); notesPushT[id] = setTimeout(function(){ studyPush(id); }, 1500);
   });
@@ -1267,7 +1267,9 @@
   function studyMod(id){
     if(STUDY[id] || STUDY_EXTRA[id]) return STUDY[id] || STUDY_EXTRA[id];
     var m = /^notes_(\w+)$/.exec(id || '');   // a mini app's notes (study-ui.js "My notes"): localStorage shabdNotes_<page>
-    return m && STUDY[m[1]] ? { key: notesKey(m[1]), title: 'Notes · ' + STUDY[m[1]].title } : undefined;
+    if(m) return STUDY[m[1]] ? { key: notesKey(m[1]), title: 'Notes · ' + STUDY[m[1]].title } : undefined;
+    m = /^pdfs_(\w+)$/.exec(id || '');        // its chapter PDFs (study-ui.js "Chapter PDFs"): shabdPdfs_<page>, same shape as notes
+    return m && STUDY[m[1]] ? { key: 'shabdPdfs_' + String(STUDY[m[1]].file).replace(/\.html?$/, ''), title: 'PDFs · ' + STUDY[m[1]].title } : undefined;
   }
   function notesKey(id){ return 'shabdNotes_' + String(STUDY[id].file).replace(/\.html?$/, ''); }
   function notesParse(js){ try{ var d = JSON.parse(js || 'null'); return d && d.n && typeof d.n === 'object' ? d : { v: 1, n: {} }; }catch(e){ return { v: 1, n: {} }; } }
