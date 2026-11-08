@@ -519,7 +519,8 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
    - A drawing is strokes "colour|width|x,y x,y …;…" on a 600 × 360 pad, drawn back as SVG (so it stays sharp).
    - Notes find their words again whenever the page redraws (MutationObserver), by the words plus the text around them.
    - A note can also be PLACED anywhere on the page: 📝 on the bar → "＋ New note on this page" → tap a spot → write it.
-     It shows as a sticky card there (drag ⠿ to move it, – folds it to a 📝 dot) and scrolls with the lesson.
+     It shows as a small 📝 there (tap to read; "Show on page" opens it out as a sticky card, – folds it back;
+     drag the 📝 or the card's ⠿ to move it) and scrolls with the lesson.
      Saved as { q: "", pin: { q, pre, suf, x, y }, f? }: pin.q / pre / suf find the nearest text again (like a highlight),
      x is the spot across the page (0–1) and y the distance below that text (in unzoomed px); f = folded.
    - The drawing pad grows as you write near its bottom (and "＋ Space" adds more); its height is kept as h.
@@ -708,11 +709,11 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
   function card(nt){
     const el = document.createElement("div");
     el.className = "un-pin" + (nt.f ? " un-fold" : ""); el.dataset.pin = nt.id;
-    el.innerHTML = nt.f ? `<button type="button" class="un-pin-dot" aria-label="Your note (tap to open, drag to move)">📝</button>`
+    el.innerHTML = nt.f ? `<button type="button" class="un-pin-dot" aria-label="Your note (tap to read, drag to move)">📝</button>`
       : `<div class="un-pin-bar"><span class="un-grip" role="button" aria-label="Drag to move" title="Drag to move">⠿</span><button type="button" class="un-pin-fold" aria-label="Fold the note" title="Fold">–</button></div>
         <button type="button" class="un-pin-body" aria-label="Your note">${nt.t ? `<span>${esc(nt.t)}</span>` : ""}${svgOf(nt.d, "un-pin-draw", nt.h)}</button>`;
     const fold = v => { const d = load(), x = d.n[nt.id]; if (!x) return; if (v) x.f = 1; else delete x.f; x.u = now(); save(d); };
-    if (nt.f) drag(el, el.querySelector(".un-pin-dot"), () => fold(false));
+    if (nt.f) drag(el, el.querySelector(".un-pin-dot"), () => view(nt.id));
     else {
       drag(el, el.querySelector(".un-grip"));
       el.querySelector(".un-pin-fold").onclick = () => fold(true);
@@ -833,8 +834,10 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
     const c = sheet(`${nt.q ? `<div class="un-q">“${esc(nt.q)}”</div>` : `<div class="un-q un-q-pin">📌 Note on the page</div>`}
       ${nt.t ? `<div class="un-text">${esc(nt.t)}</div>` : ""}${svgOf(nt.d, "", nt.h)}
       <div class="un-when">${esc(when(nt.u || nt.c))}</div>
-      <div class="un-row"><button type="button" class="un-btn un-del">Delete</button><span></span><button type="button" class="un-btn un-close">Close</button><button type="button" class="un-btn un-pri un-edit">Edit</button></div>`);
+      <div class="un-row"><button type="button" class="un-btn un-del">Delete</button>${nt.pin ? `<button type="button" class="un-btn un-show">${nt.f ? "Show on page" : "Fold to 📝"}</button>` : ""}<span></span><button type="button" class="un-btn un-close">Close</button><button type="button" class="un-btn un-pri un-edit">Edit</button></div>`);
     c.querySelector(".un-close").onclick = close;
+    const sh = c.querySelector(".un-show");
+    if (sh) sh.onclick = () => { const d = load(), x = d.n[id]; if (!x) return; if (x.f) delete x.f; else x.f = 1; x.u = now(); if (save(d)) close(); };
     c.querySelector(".un-edit").onclick = () => editor(Object.assign({ id }, nt));
     c.querySelector(".un-del").onclick = () => remove(id);
   }
@@ -918,7 +921,7 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
       const low = drawn.reduce((m, s) => s.p.reduce((mm, p) => Math.max(mm, p[1]), m), 0), h = Math.max(H, Math.min(PH, Math.ceil(low + 40)));
       all.n[id] = { q: nt.q || "", pre: nt.pre || "", suf: nt.suf || "", les: nt.les || null, t, d, c: nt.c || now(), u: now() };
       if (nt.pin) all.n[id].pin = nt.pin;
-      if (nt.f) all.n[id].f = 1;
+      if (nt.f || (nt.pin && !nt.id)) all.n[id].f = 1;
       if (d && h > H) all.n[id].h = h;
       if (save(all)) { close(); toast(nt.id ? "Note updated" : "Note saved 📝"); }
     };
