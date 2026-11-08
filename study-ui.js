@@ -1333,7 +1333,8 @@ html.un-placing #app{cursor:crosshair}
      which opens a small list). Rows are .les[data-open] in .lessons (lesson apps, the Maths formula book) and the
      unit headers .uh[data-unit] in Grammar 100; each is wrapped in a .pdf-rw so the button can sit beside it.
    - Under a lesson's title: "📄 PDFs" with a chip per PDF and "＋ Attach PDF". A chip opens the PDF full screen
-     (Google's viewer: scroll, zoom, page jump), with ✎ to rename, move to another chapter or remove it.
+     (Google's viewer: scroll, page jump), with − / ＋ (a wider frame → bigger pages), and ✎ to rename, move to
+     another chapter or remove it. In the Android app (3.4+) a pinch zooms it too.
    - Links: drive.google.com/file/d/<id>/…, …open?id=<id>, docs.google.com/<document|presentation|spreadsheets>/d/<id>
      (shown through their /preview page); any other https link to a PDF goes through Google's viewer (docs.google.com/viewer).
    - Saved per app in localStorage "shabdPdfs_<page>" as { v:1, n: { id: { les, name, url, c, u, o?, del? } } }
@@ -1492,7 +1493,14 @@ html.un-placing #app{cursor:crosshair}
     const ov = document.createElement("div"); ov.className = "un-ui " + cls; ov.innerHTML = html;
     document.body.appendChild(ov); return ov;
   }
-  function shut(){ document.querySelectorAll(".pdf-ov, .pdf-view").forEach(o => o.remove()); document.documentElement.classList.remove("pdf-lock"); }
+  // Inside the Android app the phone's own pinch-zoom is off (the app scales its pages itself); APK 3.4+ turns it on
+  // while a PDF is open (PathshalaApp.pinchZoom), so Google's viewer can be pinched, and back off (zoom reset) on close.
+  const pinch = on => { try { const A = window.PathshalaApp || (parent !== window && parent.PathshalaApp); if (A && A.pinchZoom) A.pinchZoom(on); } catch (e) {} };
+  function shut(){
+    const had = !!document.querySelector(".pdf-view");
+    document.querySelectorAll(".pdf-ov, .pdf-view").forEach(o => o.remove()); document.documentElement.classList.remove("pdf-lock");
+    if (had) pinch(false);
+  }
   function close(){ if (history.state && history.state.unPdf) history.back(); else shut(); }
   addEventListener("popstate", () => { if (!(history.state && history.state.unPdf)) shut(); });
   function toast(msg){ const el = document.createElement("div"); el.className = "un-ui un-toast"; el.textContent = msg; document.body.appendChild(el); setTimeout(() => el.remove(), 2600); }
@@ -1535,15 +1543,25 @@ html.un-placing #app{cursor:crosshair}
     p.o = now(); p.u = now(); save(d);
     const ov = layer("pdf-view", `<div class="pdf-top"><button type="button" class="pdf-x" aria-label="Close">‹</button>
         <div class="pdf-t"><b>${esc(p.name)}</b><small>${esc(lessonTitle(p.les) || "")}</small></div>
-        <button type="button" class="pdf-help" aria-label="Not opening?">?</button><button type="button" class="pdf-ed" aria-label="Edit">✎</button></div>
-      <div class="pdf-body"><div class="pdf-wait">Opening the PDF…</div><iframe class="pdf-frame" title="${esc(p.name)}" allow="fullscreen" referrerpolicy="no-referrer"></iframe></div>`);
+        <button type="button" class="pdf-zo" aria-label="Zoom out" disabled>−</button><button type="button" class="pdf-zi" aria-label="Zoom in">＋</button><button type="button" class="pdf-ed" aria-label="Edit">✎</button></div>
+      <div class="pdf-body"><div class="pdf-wait"><span>Opening the PDF…</span><small>Not opening, or asks you to sign in? In Google Drive set the file to <b>Share → General access → Anyone with the link</b>. It also needs the internet.</small></div><iframe class="pdf-frame" title="${esc(p.name)}" allow="fullscreen" referrerpolicy="no-referrer"></iframe></div>`);
     document.documentElement.classList.add("pdf-lock");
+    pinch(true);
     const fr = ov.querySelector(".pdf-frame");
+    // − / ＋: Google's viewer fits its pages to its width, so a wider frame (scrolled sideways here) shows them bigger, still sharp
+    let z = 1;
+    const zo = ov.querySelector(".pdf-zo"), zi = ov.querySelector(".pdf-zi"), body = ov.querySelector(".pdf-body");
+    const zoom = d => {
+      const cx = (body.scrollLeft + body.clientWidth / 2) / (body.scrollWidth || 1);
+      z = Math.round(Math.max(1, Math.min(3, z + d)) * 4) / 4;
+      fr.style.width = (z * 100) + "%"; zo.disabled = z <= 1; zi.disabled = z >= 3;
+      body.scrollLeft = cx * body.scrollWidth - body.clientWidth / 2;
+    };
+    zo.onclick = () => zoom(-0.5); zi.onclick = () => zoom(0.5);
     fr.addEventListener("load", () => { const w = ov.querySelector(".pdf-wait"); if (w) w.remove(); });
     fr.src = src;
     ov.querySelector(".pdf-x").onclick = close;
     ov.querySelector(".pdf-ed").onclick = () => edit(Object.assign({ id }, load().n[id]));
-    ov.querySelector(".pdf-help").onclick = () => alert("Not opening, or asks you to sign in?\n\nThe file must be shared publicly: in Google Drive open the file's ⋮ menu → Share → General access → “Anyone with the link” (Viewer). Then try again.\n\nIt also needs the internet.");
   }
 
   const css = document.createElement("style");
@@ -1573,9 +1591,11 @@ html.pdf-lock,html.pdf-lock body{overflow:hidden}
 .pdf-top{display:flex;align-items:center;gap:8px;padding:8px 10px;padding-top:calc(8px + env(safe-area-inset-top,0px));background:var(--sheet,#fff);color:var(--ink,#222);border-bottom:1px solid var(--rule,#ddd)}
 .pdf-top button{flex:none;width:38px;height:38px;border-radius:10px;border:1px solid var(--rule,#ddd);background:none;color:inherit;font:700 18px var(--f-body,system-ui);cursor:pointer}
 .pdf-t{flex:1;min-width:0;display:grid}.pdf-t b{font:700 15px var(--f-body,system-ui);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pdf-t small{font-size:12px;color:var(--ink2,#666);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pdf-body{position:relative;flex:1;min-height:0;background:#525659}
-.pdf-frame{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent}
-.pdf-wait{position:absolute;inset:0;display:grid;place-items:center;color:#eee;font:600 14px var(--f-body,system-ui)}`;
+.pdf-body{position:relative;flex:1;min-height:0;background:#525659;overflow-x:auto;overflow-y:hidden;overscroll-behavior:contain}
+.pdf-frame{position:absolute;left:0;top:0;width:100%;height:100%;border:0;background:transparent}
+.pdf-top button:disabled{opacity:.35;cursor:default}
+.pdf-wait{position:absolute;inset:0;display:grid;place-content:center;gap:10px;padding:24px;text-align:center;color:#eee;font:600 14px var(--f-body,system-ui)}
+.pdf-wait small{max-width:34ch;font-weight:500;font-size:12.5px;color:#cfd3d6;line-height:1.45}`;
   function start(){
     document.head.appendChild(css);
     const app = document.getElementById("app");
