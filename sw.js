@@ -7,7 +7,7 @@
 //   throw everything away and download it all again.
 // - Mini apps, the question bank and the search index are saved the first time they are used,
 //   and fetched quietly once the app is idle (see 'warm'), so they open offline too.
-var VERSION = 'shabd-v215';                 // bump on every deploy so browsers pick up this file
+var VERSION = 'shabd-v216';                 // bump on every deploy so browsers pick up this file
 var CACHE = 'shabd-files';                 // kept across versions
 var SHELL = ['./', './index.html', './app.js?v=140ff0d8', './manifest.json', './icon-192.png', './icon-512.png',
   'https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js',
@@ -15,8 +15,8 @@ var SHELL = ['./', './index.html', './app.js?v=140ff0d8', './manifest.json', './
   'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js'];
 var WARM = [
   './study-bank.json', './study-search.json',
-  './study-core.css?v=76a25583', './study-core.js?v=127be02e',
-  './study-workbook.css?v=bb5cf493', './study-workbook.js?v=01a772d1', './study-games.js?v=2c884142', './study-plan-lab.js?v=5e10dd2e', './study-ui.js?v=116eb51f',   // shared engine, look and Lab games of the workbook apps            // shared look and engine of the chapter apps (?v= set by tools/stamp.js)
+  './study-core.css?v=76a25583', './study-core.js?v=16ecc61c',
+  './study-workbook.css?v=bb5cf493', './study-workbook.js?v=ff16c140', './study-games.js?v=2c884142', './study-plan-lab.js?v=fcbb266d', './study-ui.js?v=1f584e26',   // shared engine, look and Lab games of the workbook apps            // shared look and engine of the chapter apps (?v= set by tools/stamp.js)
   './study-grammar-100.html', './study-bns-bnss-bsa.html', './study-govt-schemes.html',
   './study-history.html', './study-history-ancient.html', './study-history-medieval.html', './study-history-modern.html', './study-art-culture.html', './study-world-history.html', './study-current-affairs.html', './study-firsts-symbols.html', './study-heritage-monuments.html', './study-tribes-languages.html', './study-personalities.html', './study-science-tech.html', './study-statistics.html', './study-finance-accounts.html', './study-cloze-rc.html', './study-para-jumbles.html', './study-computer.html', './study-computer-hardware.html', './study-computer-software.html', './study-computer-internet.html', './study-census.html', './study-intl-orgs.html', './study-reports-indices.html', './study-sports.html', './study-festivals.html', './study-visual.js?v=3ef0b899', './study-world.js?v=6f51c606', './study-rivers.js?v=105322fa', './study-ipr-plans.html', './study-folk-dances.html', './study-appointments.html', './study-polity.html', './study-economics.html', './study-space.html', './study-physics.html', './typing.js?v=02ff18bc', './typing-passages.js?v=df4bd310', './study-chemistry.html', './study-books-authors.html', './study-important-days.html', './study-defence.html', './study-awards.html', './study-protected-areas.html', './study-rivers-india.html', './study-national-parks.html', './study-indian-geography.html', './study-world-geography.html', './study-states-uts.html', './study-agriculture.html', './study-banking.html', './study-physical-geography.html', './study-industries-transport.html', './study-inventions.html', './study-hq-founders.html', './study-classical-dances.html', './study-music-instruments.html', './study-const-bodies.html', './study-environment.html', './study-biology.html', './study-geometry.html', './study-mensuration2d.html', './study-mensuration3d.html', './study-trigonometry.html', './study-voice.html', './study-narration.html', './study-maths-formulas.html', './study-number-system.html', './study-calendar.html', './study-clock.html'
 ];
