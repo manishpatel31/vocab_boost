@@ -100,12 +100,19 @@ Each mini app is one self-contained page (`study-<name>.html`) with lessons, a q
   - **🎨 Theme** on a mini app's bar changes the design or light / dark without leaving the lesson; the open mini app restyles at once.
   - Everything respects "reduce motion".
 - **My notes** (every mini app, `study-ui.js`): select a word or sentence and tap **📝 Add note** to type a trick or extra fact, or draw it with a finger or stylus.
+  - **Notes placed anywhere:** 📝 Notes on the bar → **＋ New note on this page** → tap any spot → write or draw. It shows as a sticky card there and scrolls with the lesson. Drag ⠿ to move it; – folds it to a 📝 dot (tap to open it again). A placed note is stored as `{ q: "", pin: { q, pre, suf, x, y }, f? }`. `pin.q / pre / suf` find the nearest *visible* text above the spot again (folded boxes such as "More ▾" are skipped). `x` is the spot across the page (0–1) and `y` the distance below that text in unzoomed px, so the card follows its text through zoom and reflow.
   - **Drawing pad:** five colours including a highlighter, thin or thick pen, pressure from a stylus, stroke eraser, undo and clear.
+    - The pad grows by itself when you write near the bottom, and **＋ Space** adds more. Its height is saved as `h` (up to 4800).
+    - Two fingers scroll the pad; once a stylus has been used, a finger scrolls too (palm-friendly). **✋ Scroll** lets one finger scroll.
   - **On the page:** the words stay highlighted with a 📝 after them; tap either to read, edit or delete the note.
   - **Lists:** each app's notes are under 📝 Notes on the mini app's bar (on its own page, the 📝 pill). All notes, with search, are under ☰ → **My notes**, and tapping one opens its lesson at the note.
   - **Storage:** saved per app in `shabdNotes_<page>` and synced to your account as `users/{uid}/study/notes_<app>`, merged note by note (newest edit wins; deletes stay as tombstones so other devices learn of them).
   - **Finding words again:** notes find their words after the page redraws using the words plus 40 characters around them. A drawing is stored as strokes on a 600 × 360 pad and shown as SVG.
-  - **Back button:** the phone's Back closes a note sheet first.
+  - **Back button:** the phone's Back closes a note sheet first, or stops choosing a spot.
+- **Zoom** (every mini app, `study-ui.js` ZOOM): pinch the lesson with two fingers, or tap 🔍 on the mini app's bar (− / ＋, Reset).
+  - It uses CSS `zoom` on `#app`, so text reflows to the screen's width with no sideways scrolling. The range is 80–200 %.
+  - One setting covers every mini app (`localStorage pathshalaZoom`).
+  - Maps keep their own pinch-zoom, and the note sheets are left alone.
 - **Readable labels on every map and diagram** (`study-visual.js`, `lblRun`): close-together places no longer cover each other's names. When a figure comes into view and after every zoom:
   - a pin's label tries the other side of its dot and a little above or below; if there's no room its note is dropped, and if even the name has no room the pin gets a dashed ring until you zoom in;
   - a river's name slides along its own river (either side of the line) to a free spot; other labels (states, charts) slide a little up, down or along;

@@ -1128,6 +1128,34 @@
     modalBgRef().classList.add('open');
   }
   document.getElementById('studyThemeBtn').addEventListener('click', openThemePicker);
+  // 🔍 on the mini app's bar: one zoom for every mini app (localStorage 'pathshalaZoom', 80–200 %), sent to the open frame.
+  // Pinching the lesson does the same inside the frame (study-ui.js ZOOM) and saves it there.
+  var ZOOM_KEY = 'pathshalaZoom';
+  function studyZoomNow(){ var v = parseFloat(lsGet(ZOOM_KEY)); return v >= 0.8 && v <= 2 ? v : 1; }
+  function studyZoomSet(v){
+    v = Math.round(Math.max(0.8, Math.min(2, v)) * 10) / 10;
+    lsSet(ZOOM_KEY, v === 1 ? null : String(v));
+    var f = document.getElementById('studyFrame');
+    if(studyOpen && f && f.contentWindow) f.contentWindow.postMessage({ type: 'pathshala-zoom', z: v }, location.origin);
+    return v;
+  }
+  function openZoom(){
+    var draw = function(){
+      var z = studyZoomNow();
+      modalBodyRef().innerHTML = '<h3>Zoom</h3>' +
+        '<div class="zm-row"><button type="button" id="zmOut" aria-label="Zoom out"' + (z <= 0.8 ? ' disabled' : '') + '>−</button><output id="zmNow">' + Math.round(z * 100) + '%</output>' +
+        '<button type="button" id="zmIn" aria-label="Zoom in"' + (z >= 2 ? ' disabled' : '') + '>＋</button></div>' +
+        '<p class="help">Or pinch the lesson with two fingers. The same size is used in every mini app.</p>' +
+        '<div class="modal-actions"><button class="btn ghost" id="zmReset"' + (z === 1 ? ' disabled' : '') + '>Reset to 100%</button><button class="btn teal" id="zmDone">Done</button></div>';
+      document.getElementById('zmOut').addEventListener('click', function(){ studyZoomSet(studyZoomNow() - 0.1); draw(); });
+      document.getElementById('zmIn').addEventListener('click', function(){ studyZoomSet(studyZoomNow() + 0.1); draw(); });
+      document.getElementById('zmReset').addEventListener('click', function(){ studyZoomSet(1); draw(); });
+      document.getElementById('zmDone').addEventListener('click', function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML = ''; });
+    };
+    draw();
+    modalBgRef().classList.add('open');
+  }
+  document.getElementById('studyZoomBtn').addEventListener('click', openZoom);
   document.getElementById('studyNotesBtn').addEventListener('click', function(){
     var f = document.getElementById('studyFrame');
     if(studyOpen && f && f.contentWindow) f.contentWindow.postMessage({ type: 'pathshala-notes-list' }, location.origin);
@@ -1150,11 +1178,11 @@
       '<div class="mn-list">' + (list.length ? Object.keys(byApp).map(function(app){
         return '<div class="menu-label" style="padding-left:0; margin-top:10px;">' + escapeHtml(STUDY[app].title) + ' · ' + byApp[app].length + '</div>' +
           byApp[app].map(function(n){ return '<button type="button" class="mn-item" data-mn-app="' + app + '" data-mn-id="' + escapeAttr(n.id) + '" data-mn-les="' + escapeAttr(n.les || '') + '">' +
-            '<b>“' + escapeHtml((n.q || '').slice(0, 90)) + ((n.q || '').length > 90 ? '…' : '') + '”</b>' +
+            '<b>' + (n.q ? '“' + escapeHtml(n.q.slice(0, 90)) + (n.q.length > 90 ? '…' : '') + '”' : '📌 Note on the page') + '</b>' +
             (n.t ? '<span>' + escapeHtml(n.t.slice(0, 140)) + '</span>' : '') + (n.d ? '<span>🖊️ Drawing</span>' : '') +
             '<small>' + (n.les ? 'Lesson ' + escapeHtml(n.les) + ' · ' : '') + escapeHtml(new Date(n.u || n.c || Date.now()).toLocaleDateString()) + '</small></button>';
           }).join('');
-      }).join('') : '<p class="help">' + (all.length ? 'No note matches that.' : 'No notes yet. In any mini app, select a word or sentence and tap <b>📝 Add note</b> — type a trick or extra fact, or draw it with your finger or a stylus. Notes stay highlighted on the page and sync to your account.') + '</p>') + '</div>' +
+      }).join('') : '<p class="help">' + (all.length ? 'No note matches that.' : 'No notes yet. In any mini app, tap <b>📝 Notes</b> → <b>＋ New note</b> and then any spot to stick one there, or select a word or sentence and tap <b>📝 Add note</b> — type a trick or extra fact, or draw it with your finger or a stylus. Notes stay highlighted on the page and sync to your account.') + '</p>') + '</div>' +
       '<div class="modal-actions"><button class="btn ghost" id="mnClose">Close</button></div>';
     modalBgRef().classList.add('open');
     var close = function(){ modalBgRef().classList.remove('open'); modalBodyRef().innerHTML = ''; };

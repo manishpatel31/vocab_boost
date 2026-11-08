@@ -518,6 +518,12 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
      the 📝 pill (bottom left) lists this app's notes.
    - A drawing is strokes "colour|width|x,y x,y …;…" on a 600 × 360 pad, drawn back as SVG (so it stays sharp).
    - Notes find their words again whenever the page redraws (MutationObserver), by the words plus the text around them.
+   - A note can also be PLACED anywhere on the page: 📝 on the bar → "＋ New note on this page" → tap a spot → write it.
+     It shows as a sticky card there (drag ⠿ to move it, – folds it to a 📝 dot) and scrolls with the lesson.
+     Saved as { q: "", pin: { q, pre, suf, x, y }, f? }: pin.q / pre / suf find the nearest text again (like a highlight),
+     x is the spot across the page (0–1) and y the distance below that text (in unzoomed px); f = folded.
+   - The drawing pad grows as you write near its bottom (and "＋ Space" adds more); its height is kept as h.
+     Two fingers scroll the pad; once a stylus is used, a finger scrolls too; "✋ Scroll" lets one finger scroll.
    ============================================================ */
 (function(){
   if (window.__studyNotes) return;
@@ -569,10 +575,11 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
     }
     return { s: out.join(""), map };
   }
-  function locate(ix, nt){
+  function locate(ix, nt, vis){
     const q = norm(nt.q); if (!q) return null;
     let best = -1, score = -1;
     for (let i = ix.s.indexOf(q); i !== -1; i = ix.s.indexOf(q, i + 1)) {
+      if (vis) { const m = ix.map[i], r = document.createRange(); try { r.setStart(m[0], m[1]); r.setEnd(m[0], m[1] + 1); } catch (e) { continue; } const b = r.getClientRects()[0]; if (!b || !seen(m[0], b)) continue; }
       let sc = 0;
       const pre = norm(nt.pre), suf = norm(nt.suf), before = ix.s.slice(Math.max(0, i - pre.length), i), after = ix.s.slice(i + q.length, i + q.length + suf.length);
       for (let k = 1; k <= pre.length && before[before.length - k] === pre[pre.length - k]; k++) sc++;
@@ -604,6 +611,7 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
       const end = r.cloneRange(); end.collapse(false);
       try { end.insertNode(b); } catch (e) {}
     });
+    pins(ix);
     if (mo) mo.takeRecords();
     applying = false;
   }
@@ -613,7 +621,7 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
     const root = document.getElementById("app") || document.body;
     mo = new MutationObserver(recs => {
       if (applying) return;
-      const ours = recs.every(r => [...r.addedNodes, ...r.removedNodes].every(n => n.nodeType === 1 && n.matches && n.matches(".un-ico, .un-ui, .un-add")) && r.type === "childList");
+      const ours = recs.every(r => [...r.addedNodes, ...r.removedNodes].every(n => n.nodeType === 1 && n.matches && n.matches(".un-ico, .un-ui, .un-add, .un-pin")) && r.type === "childList");
       if (!ours) soon();
     });
     mo.observe(root, { childList: true, subtree: true, characterData: true });
@@ -654,6 +662,133 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
   });
   addEventListener("scroll", () => { if (!add.hidden) showAdd(); }, { passive: true });
 
+
+  // ---------- notes placed on the page (📝 on the bar → ＋ New note → tap a spot) ----------
+  const layer = document.createElement("div"); layer.className = "un-ui un-layer";
+  const appEl = () => document.getElementById("app") || document.body;
+  const zoomOf = () => parseFloat(appEl().style.zoom) || 1;
+  const here = () => onFront() ? null : lesson;
+  // text you can see: not hidden, see-through, or cut off by a folded box ("More ▾" keeps its text, clipped to nothing)
+  function seen(node, b){
+    const el = node.parentElement;
+    if (!el || (el.checkVisibility && !el.checkVisibility({ opacityProperty: true, visibilityProperty: true }))) return false;
+    for (let a = el; a && a !== document.body; a = a.parentElement) {
+      const cs = getComputedStyle(a);
+      if (cs.overflowX === "visible" && cs.overflowY === "visible") continue;
+      const r = a.getBoundingClientRect();
+      if (b.bottom <= r.top + 1 || b.top >= r.bottom - 1 || b.right <= r.left || b.left >= r.right) return false;
+    }
+    return true;
+  }
+  // the text nearest above the spot (x, y on screen): its first words, the text around them, and where the spot is from it
+  function anchorAt(x, y){
+    const ix = index();
+    let best = -1, bestTop = -Infinity, first = -1, last = null;
+    for (let i = 0; i < ix.map.length; i++) {
+      const node = ix.map[i][0];
+      if (node === last || ix.s[i] === " ") continue;
+      last = node;
+      const r = document.createRange(); r.selectNodeContents(node);
+      const b = r.getClientRects()[0];
+      if (!b || !b.height) continue;
+      if (b.top <= y + 2 && b.top >= bestTop) { if (!seen(node, b)) continue; bestTop = b.top; best = i; }
+      else if (first < 0 && b.top > y && seen(node, b)) first = i;
+    }
+    const i = best >= 0 ? best : first;
+    if (i < 0) return null;
+    const q = ix.s.slice(i, i + 40).trim();
+    const a = { q, pre: ix.s.slice(Math.max(0, i - 40), i), suf: ix.s.slice(i + q.length, i + q.length + 40) };
+    const r = locate(ix, a, true), rb = r && r.getClientRects()[0];
+    if (!rb) return null;
+    const ar = appEl().getBoundingClientRect();
+    a.x = Math.round(Math.max(0, Math.min(1, (x - ar.left) / ar.width)) * 1000) / 1000;
+    a.y = Math.round((y - rb.top) / zoomOf());
+    return a;
+  }
+  function card(nt){
+    const el = document.createElement("div");
+    el.className = "un-pin" + (nt.f ? " un-fold" : ""); el.dataset.pin = nt.id;
+    el.innerHTML = nt.f ? `<button type="button" class="un-pin-dot" aria-label="Your note (tap to open, drag to move)">📝</button>`
+      : `<div class="un-pin-bar"><span class="un-grip" role="button" aria-label="Drag to move" title="Drag to move">⠿</span><button type="button" class="un-pin-fold" aria-label="Fold the note" title="Fold">–</button></div>
+        <button type="button" class="un-pin-body" aria-label="Your note">${nt.t ? `<span>${esc(nt.t)}</span>` : ""}${svgOf(nt.d, "un-pin-draw", nt.h)}</button>`;
+    const fold = v => { const d = load(), x = d.n[nt.id]; if (!x) return; if (v) x.f = 1; else delete x.f; x.u = now(); save(d); };
+    if (nt.f) drag(el, el.querySelector(".un-pin-dot"), () => fold(false));
+    else {
+      drag(el, el.querySelector(".un-grip"));
+      el.querySelector(".un-pin-fold").onclick = () => fold(true);
+      el.querySelector(".un-pin-body").onclick = () => view(nt.id);
+    }
+    return el;
+  }
+  // drag the card by its handle; a tap without moving calls tap()
+  function drag(el, handle, tap){
+    handle.addEventListener("pointerdown", e => {
+      if (e.button) return;
+      e.preventDefault(); handle.setPointerCapture(e.pointerId);
+      const sx = e.clientX, sy = e.clientY, sl = parseFloat(el.style.left) || 0, st = parseFloat(el.style.top) || 0, ss = scrollY;
+      let moved = false;
+      const move = ev => {
+        if (!moved && Math.hypot(ev.clientX - sx, ev.clientY - sy) < 6) return;
+        moved = true; el.classList.add("un-dragging");
+        if (ev.clientY > innerHeight - 40) scrollBy(0, 14); else if (ev.clientY < 40) scrollBy(0, -14);
+        el.style.left = (sl + ev.clientX - sx) + "px"; el.style.top = (st + ev.clientY - sy + scrollY - ss) + "px";
+      };
+      const up = () => {
+        handle.removeEventListener("pointermove", move); handle.removeEventListener("pointerup", up); handle.removeEventListener("pointercancel", up);
+        el.classList.remove("un-dragging");
+        if (!moved) { if (tap) tap(); return; }
+        const b = el.getBoundingClientRect(), a = anchorAt(b.left, b.top), d = load(), x = d.n[el.dataset.pin];
+        if (!a || !x) { pins(); return; }
+        x.pin = a; x.u = now(); save(d);
+      };
+      handle.addEventListener("pointermove", move); handle.addEventListener("pointerup", up); handle.addEventListener("pointercancel", up);
+    });
+  }
+  function pins(ix){
+    const list = notes().filter(nt => nt.pin && nt.pin.q), at = here(), keep = new Set();
+    if (list.length && !ix) ix = index();
+    const ar = appEl().getBoundingClientRect(), z = zoomOf(), vw = document.documentElement.clientWidth;
+    list.forEach(nt => {
+      if ((nt.les || null) !== at) return;
+      const r = locate(ix, nt.pin, true), rb = r && r.getClientRects()[0];
+      if (!rb || !rb.height) return;
+      keep.add(nt.id);
+      let el = layer.querySelector(`[data-pin="${CSS.escape(nt.id)}"]`);
+      if (el && el.classList.contains("un-dragging")) return;
+      const sig = String(nt.u || 0) + (nt.f ? "f" : "");
+      if (!el || el.dataset.sig !== sig) { if (el) el.remove(); el = card(nt); el.dataset.sig = sig; layer.appendChild(el); }
+      const w = el.offsetWidth || 172;
+      el.style.left = Math.round(Math.max(4, Math.min(vw - w - 4, ar.left + nt.pin.x * ar.width)) + scrollX) + "px";
+      el.style.top = Math.round(rb.top + nt.pin.y * z + scrollY) + "px";
+    });
+    layer.querySelectorAll("[data-pin]").forEach(el => { if (!keep.has(el.dataset.pin)) el.remove(); });
+  }
+  let pinT = 0;
+  const pinSoon = () => { clearTimeout(pinT); pinT = setTimeout(() => pins(), 120); };
+  addEventListener("resize", pinSoon);
+  addEventListener("pathshala-zoomed", pinSoon);
+
+  // choosing the spot: a banner, then the next tap on the page is the spot (Back or Cancel stops)
+  let placing = false;
+  const banner = document.createElement("div");
+  banner.className = "un-ui un-place"; banner.hidden = true; banner.setAttribute("role", "status");
+  banner.innerHTML = `<span>📌 Tap the spot where your note should go</span><button type="button" class="un-btn">Cancel</button>`;
+  function place(){
+    drop();
+    if (!(history.state && history.state.unNote)) { try { history.pushState(Object.assign({}, history.state, { unNote: 1 }), ""); } catch (e) {} }
+    placing = true; banner.hidden = false; document.documentElement.classList.add("un-placing");
+  }
+  function endPlace(){ placing = false; banner.hidden = true; document.documentElement.classList.remove("un-placing"); }
+  banner.querySelector("button").onclick = () => { endPlace(); close(); };
+  document.addEventListener("click", e => {
+    if (!placing || (e.target.closest && e.target.closest(".un-place"))) return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    const a = anchorAt(e.clientX, e.clientY);
+    endPlace();
+    if (!a) { close(); toast("Couldn't place it there — try a spot near some text"); return; }
+    editor({ q: "", pin: a, les: here() });
+  }, true);
+
   // ---------- tapping a 📝 or the highlighted words ----------
   document.addEventListener("click", e => {
     const ico = e.target.closest && e.target.closest(".un-ico");
@@ -668,9 +803,9 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
     return String(d || "").split(";").filter(Boolean).map(s => { const [c, w, pts] = s.split("|"); return { c, w: +w || 3, p: (pts || "").split(" ").filter(Boolean).map(p => p.split(",").map(Number)) }; });
   }
   const pack = list => list.map(s => s.c + "|" + s.w + "|" + s.p.map(p => p.join(",")).join(" ")).join(";");
-  function svgOf(d, cls){
+  function svgOf(d, cls, h){
     const list = strokes(d); if (!list.length) return "";
-    return `<svg class="${cls || "un-draw"}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Your drawing">` + list.map(s =>
+    return `<svg class="${cls || "un-draw"}" viewBox="0 0 ${W} ${Math.max(H, +h || H)}" role="img" aria-label="Your drawing">` + list.map(s =>
       s.p.length === 1 ? `<circle cx="${s.p[0][0]}" cy="${s.p[0][1]}" r="${s.w / 2}" fill="${COLORS[s.c] || COLORS.k}"/>`
       : `<polyline points="${s.p.map(p => p.join(",")).join(" ")}" fill="none" stroke="${COLORS[s.c] || COLORS.k}" stroke-width="${s.w}" stroke-linecap="round" stroke-linejoin="round"/>`).join("") + `</svg>`;
   }
@@ -688,15 +823,15 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
   }
   function drop(){ document.querySelectorAll(".un-ov").forEach(o => o.remove()); }
   function close(){ if (history.state && history.state.unNote) history.back(); else drop(); }
-  addEventListener("popstate", () => { if (!(history.state && history.state.unNote)) drop(); });
+  addEventListener("popstate", () => { if (!(history.state && history.state.unNote)) { drop(); if (placing) endPlace(); } });
   addEventListener("keydown", e => { if (e.key === "Escape") close(); });
   function toast(t){ const el = document.createElement("div"); el.className = "un-ui un-toast"; el.textContent = t; document.body.appendChild(el); setTimeout(() => el.remove(), 2600); }
   const when = t => { try { return new Date(t).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" }); } catch (e) { return ""; } };
 
   function view(id){
     const nt = load().n[id]; if (!nt || nt.del) return;
-    const c = sheet(`<div class="un-q">“${esc(nt.q)}”</div>
-      ${nt.t ? `<div class="un-text">${esc(nt.t)}</div>` : ""}${svgOf(nt.d)}
+    const c = sheet(`${nt.q ? `<div class="un-q">“${esc(nt.q)}”</div>` : `<div class="un-q un-q-pin">📌 Note on the page</div>`}
+      ${nt.t ? `<div class="un-text">${esc(nt.t)}</div>` : ""}${svgOf(nt.d, "", nt.h)}
       <div class="un-when">${esc(when(nt.u || nt.c))}</div>
       <div class="un-row"><button type="button" class="un-btn un-del">Delete</button><span></span><button type="button" class="un-btn un-close">Close</button><button type="button" class="un-btn un-pri un-edit">Edit</button></div>`);
     c.querySelector(".un-close").onclick = close;
@@ -709,42 +844,59 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
   }
 
   function editor(nt){
-    const c = sheet(`<div class="un-q">“${esc(nt.q)}”</div>
+    const c = sheet(`${nt.q ? `<div class="un-q">“${esc(nt.q)}”</div>` : `<div class="un-q un-q-pin">📌 Note on the page</div>`}
       <div class="un-tabs" role="tablist"><button type="button" data-t="type" aria-selected="true">✏️ Type</button><button type="button" data-t="draw" aria-selected="false">🖊️ Draw</button></div>
       <div class="un-pane" data-p="type"><textarea class="un-ta" rows="5" placeholder="Your trick, extra fact, a reminder…">${esc(nt.t || "")}</textarea></div>
       <div class="un-pane" data-p="draw" hidden>
         <div class="un-tools">${Object.keys(COLORS).map((k, i) => `<button type="button" class="un-col${i === 0 ? " on" : ""}" data-c="${k}" aria-label="${{ k: "Ink", r: "Red", b: "Blue", g: "Green", y: "Highlighter" }[k]}" style="--c:${k === "k" ? "var(--ink,#222)" : COLORS[k]}"></button>`).join("")}
           <span class="un-sep"></span><button type="button" class="un-tool" data-w="3">Thin</button><button type="button" class="un-tool on" data-w="6">Thick</button>
-          <span class="un-sep"></span><button type="button" class="un-tool" data-x="erase" aria-label="Eraser">⌫ Erase</button><button type="button" class="un-tool" data-x="undo" aria-label="Undo">↶</button><button type="button" class="un-tool" data-x="clear">Clear</button></div>
-        <canvas class="un-pad" width="${W * 2}" height="${H * 2}"></canvas>
-        <div class="un-hint">Write or draw with your finger or a stylus · Erase removes a whole line you touch</div>
+          <span class="un-sep"></span><button type="button" class="un-tool" data-x="erase" aria-label="Eraser">⌫ Erase</button><button type="button" class="un-tool" data-x="undo" aria-label="Undo">↶</button><button type="button" class="un-tool" data-x="clear">Clear</button>
+          <span class="un-sep"></span><button type="button" class="un-tool" data-x="hand" aria-pressed="false" title="Scroll the pad with one finger">✋ Scroll</button><button type="button" class="un-tool" data-x="more" title="Make the pad longer">＋ Space</button></div>
+        <div class="un-padwrap"><canvas class="un-pad"></canvas></div>
+        <div class="un-hint">Write with a finger or stylus · two fingers scroll · the pad grows when you reach the bottom · Erase removes a whole line you touch</div>
       </div>
       <div class="un-row">${nt.id ? `<button type="button" class="un-btn un-del">Delete</button>` : ""}<span></span><button type="button" class="un-btn un-close">Cancel</button><button type="button" class="un-btn un-pri un-save">Save</button></div>`);
-    const ta = c.querySelector(".un-ta"), pad = c.querySelector(".un-pad"), g = pad.getContext("2d");
-    let list = strokes(nt.d), col = "k", wid = 6, mode = "pen", cur = null;
+    const ta = c.querySelector(".un-ta"), pad = c.querySelector(".un-pad"), wrap = c.querySelector(".un-padwrap"), g = pad.getContext("2d");
+    let list = strokes(nt.d), col = "k", wid = 6, mode = "pen", cur = null, PH = Math.max(H, +nt.h || H);
     const ink = () => getComputedStyle(c).color;
     function draw(){
-      g.setTransform(2, 0, 0, 2, 0, 0); g.clearRect(0, 0, W, H); g.lineCap = "round"; g.lineJoin = "round";
+      g.setTransform(2, 0, 0, 2, 0, 0); g.clearRect(0, 0, W, PH); g.lineCap = "round"; g.lineJoin = "round";
       list.forEach(s => { g.strokeStyle = g.fillStyle = s.c === "k" ? ink() : COLORS[s.c]; g.lineWidth = s.w;
         if (s.p.length === 1) { g.beginPath(); g.arc(s.p[0][0], s.p[0][1], s.w / 2, 0, 7); g.fill(); return; }
         g.beginPath(); s.p.forEach((p, i) => i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1])); g.stroke(); });
     }
-    const at = e => { const r = pad.getBoundingClientRect(); return [Math.round((e.clientX - r.left) / r.width * W), Math.round((e.clientY - r.top) / r.height * H)]; };
+    function size(){ pad.width = W * 2; pad.height = PH * 2; pad.style.aspectRatio = W + " / " + PH; draw(); }
+    const grow = y => { if (y > PH - 50 && PH < 4800) { PH = Math.min(4800, PH + 240); size(); } };
+    size();
+    const at = e => { const r = pad.getBoundingClientRect(); return [Math.round((e.clientX - r.left) / r.width * W), Math.round((e.clientY - r.top) / r.height * PH)]; };
     const near = (s, p) => s.p.some(q => Math.hypot(q[0] - p[0], q[1] - p[1]) < Math.max(10, s.w));
+    // fingers and the mouse: two of them scroll; with ✋, or once a stylus has been used, one scrolls too
+    const pts = new Map(); let pan = null, penSeen = false, hand = false;
+    const mid = () => { let x = 0, y = 0; pts.forEach(p => { x += p[0]; y += p[1]; }); return [x / pts.size, y / pts.size]; };
     pad.addEventListener("pointerdown", e => {
       e.preventDefault(); pad.setPointerCapture(e.pointerId);
+      if (e.pointerType === "pen") penSeen = true;
+      else pts.set(e.pointerId, [e.clientX, e.clientY]);
+      if (e.pointerType !== "pen" && (pts.size >= 2 || hand || (penSeen && e.pointerType === "touch"))) {
+        if (cur && !cur.erase && pts.size >= 2 && now() - cur.t0 < 500) { const i = list.indexOf(cur); if (i >= 0) { list.splice(i, 1); draw(); } }
+        cur = null; pan = mid(); return;
+      }
       const p = at(e);
-      if (mode === "erase") { const n = list.length; list = list.filter(s => !near(s, p)); if (list.length !== n) draw(); cur = { erase: 1 }; return; }
+      if (mode === "erase") { const n = list.length; list = list.filter(s => !near(s, p)); if (list.length !== n) draw(); cur = { erase: 1, t0: now() }; return; }
       const w = e.pointerType === "pen" && e.pressure ? Math.max(1.5, Math.round(wid * (0.55 + e.pressure) * 10) / 10) : (col === "y" ? 16 : wid);
-      cur = { c: col, w, p: [p] }; list.push(cur); draw();
+      cur = { c: col, w, p: [p], t0: now() }; list.push(cur); grow(p[1]); draw();
     });
     pad.addEventListener("pointermove", e => {
+      if (pts.has(e.pointerId)) pts.set(e.pointerId, [e.clientX, e.clientY]);
+      if (pan) { if (!pts.has(e.pointerId)) return; const m = mid(); wrap.scrollTop -= m[1] - pan[1]; wrap.scrollLeft -= m[0] - pan[0]; pan = m; return; }
       if (!cur) return; const p = at(e);
       if (cur.erase) { const n = list.length; list = list.filter(s => !near(s, p)); if (list.length !== n) draw(); return; }
       const last = cur.p[cur.p.length - 1]; if (Math.hypot(p[0] - last[0], p[1] - last[1]) < 2) return;
-      cur.p.push(p); draw();
+      cur.p.push(p); grow(p[1]); draw();
     });
-    ["pointerup", "pointercancel"].forEach(t => pad.addEventListener(t, () => { cur = null; }));
+    ["pointerup", "pointercancel"].forEach(t => pad.addEventListener(t, e => { pts.delete(e.pointerId); if (!pts.size) pan = null; else if (pan) pan = mid(); cur = null; }));
+    c.querySelector('[data-x="hand"]').onclick = function(){ hand = !hand; this.classList.toggle("on", hand); this.setAttribute("aria-pressed", String(hand)); };
+    c.querySelector('[data-x="more"]').onclick = () => { PH = Math.min(4800, PH + 360); size(); wrap.scrollTo({ top: wrap.scrollHeight, behavior: "smooth" }); };
     c.querySelectorAll(".un-tabs button").forEach(b => b.onclick = () => {
       c.querySelectorAll(".un-tabs button").forEach(x => x.setAttribute("aria-selected", String(x === b)));
       c.querySelectorAll(".un-pane").forEach(p => p.hidden = p.dataset.p !== b.dataset.t);
@@ -760,10 +912,14 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
     c.querySelector(".un-close").onclick = close;
     if (c.querySelector(".un-del")) c.querySelector(".un-del").onclick = () => remove(nt.id);
     c.querySelector(".un-save").onclick = () => {
-      const t = ta.value.trim(), d = pack(list.filter(s => s.p && s.p.length));
+      const drawn = list.filter(s => s.p && s.p.length), t = ta.value.trim(), d = pack(drawn);
       if (!t && !d) { toast("Type something or draw first"); return; }
       const all = load(), id = nt.id || ("n" + now().toString(36) + Math.random().toString(36).slice(2, 6));
-      all.n[id] = { q: nt.q, pre: nt.pre || "", suf: nt.suf || "", les: nt.les || null, t, d, c: nt.c || now(), u: now() };
+      const low = drawn.reduce((m, s) => s.p.reduce((mm, p) => Math.max(mm, p[1]), m), 0), h = Math.max(H, Math.min(PH, Math.ceil(low + 40)));
+      all.n[id] = { q: nt.q || "", pre: nt.pre || "", suf: nt.suf || "", les: nt.les || null, t, d, c: nt.c || now(), u: now() };
+      if (nt.pin) all.n[id].pin = nt.pin;
+      if (nt.f) all.n[id].f = 1;
+      if (d && h > H) all.n[id].h = h;
       if (save(all)) { close(); toast(nt.id ? "Note updated" : "Note saved 📝"); }
     };
   }
@@ -771,14 +927,16 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
   // ---------- this app's notes (the 📝 pill on its own page; the app's bar inside पाठShala) ----------
   const pill = document.createElement("button");
   pill.type = "button"; pill.className = "un-ui un-pill"; pill.hidden = true;
-  function badge(){ const n = notes().length; pill.textContent = "📝 " + n; pill.hidden = EMBED || !n; }
+  function badge(){ const n = notes().length; pill.textContent = n ? "📝 " + n : "📝"; pill.hidden = EMBED; }
   function listAll(){
     const list = notes().sort((a, b) => (b.u || 0) - (a.u || 0));
     const c = sheet(`<h3 class="un-h">My notes in this app <small>${list.length}</small></h3>
-      <div class="un-list">${list.length ? list.map(nt => `<button type="button" class="un-item" data-go="${esc(nt.id)}"><b>“${esc(nt.q.slice(0, 90))}${nt.q.length > 90 ? "…" : ""}”</b>${nt.t ? `<span>${esc(nt.t.slice(0, 140))}</span>` : ""}${nt.d ? svgOf(nt.d, "un-thumb") : ""}<small>${nt.les ? "Lesson " + esc(nt.les) + " · " : ""}${esc(when(nt.u || nt.c))}</small></button>`).join("")
-        : `<p class="un-empty">No notes yet. Select a word or sentence in a lesson and tap <b>📝 Add note</b>.</p>`}</div>
+      <button type="button" class="un-new">＋ New note on this page</button>
+      <div class="un-list">${list.length ? list.map(nt => `<button type="button" class="un-item" data-go="${esc(nt.id)}"><b>${nt.q ? `“${esc(nt.q.slice(0, 90))}${nt.q.length > 90 ? "…" : ""}”` : "📌 Note on the page"}</b>${nt.t ? `<span>${esc(nt.t.slice(0, 140))}</span>` : ""}${nt.d ? svgOf(nt.d, "un-thumb", nt.h) : ""}<small>${nt.les ? "Lesson " + esc(nt.les) + " · " : ""}${esc(when(nt.u || nt.c))}</small></button>`).join("")
+        : `<p class="un-empty">No notes yet. Tap <b>＋ New note</b> and then any spot to stick one there, or select a word or sentence in a lesson and tap <b>📝 Add note</b>.</p>`}</div>
       <div class="un-row"><span></span><button type="button" class="un-btn un-close">Close</button></div>`);
     c.querySelector(".un-close").onclick = close;
+    c.querySelector(".un-new").onclick = place;
     c.querySelectorAll("[data-go]").forEach(b => b.onclick = () => go(b.dataset.go));
   }
   function go(id){
@@ -787,7 +945,7 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
     let tries = 0;
     (function find(){
       apply();
-      const b = document.querySelector(`.un-ico[data-note="${CSS.escape(id)}"]`);
+      const b = document.querySelector(`.un-ico[data-note="${CSS.escape(id)}"], .un-pin[data-pin="${CSS.escape(id)}"]`);
       if (b) { b.scrollIntoView({ block: "center", behavior: "smooth" }); b.classList.add("un-flash"); setTimeout(() => b.classList.remove("un-flash"), 1600); setTimeout(() => view(id), 600); return; }
       if (++tries < 8) setTimeout(find, 250); else view(id);
     })();
@@ -824,7 +982,27 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
 .un-tool{padding:6px 10px;border-radius:9px;border:1px solid var(--rule,#ddd);background:none;color:inherit;font:600 13px var(--f-body,system-ui);cursor:pointer}
 .un-tool.on{background:var(--ink,#222);color:var(--sheet,#fff)}
 .un-sep{width:1px;height:22px;background:var(--rule,#ddd);margin:0 2px}
-.un-pad{display:block;width:100%;aspect-ratio:${W}/${H};border:1px solid var(--rule,#ddd);border-radius:12px;background:var(--paper,#fffdf7);touch-action:none;cursor:crosshair}
+.un-padwrap{max-height:min(52vh,460px);overflow:auto;border:1px solid var(--rule,#ddd);border-radius:12px;overscroll-behavior:contain;background:var(--paper,#fffdf7)}
+.un-pad{display:block;width:100%;aspect-ratio:${W}/${H};touch-action:none;cursor:crosshair}
+.un-q-pin{font-style:normal;font-weight:600}
+.un-new{width:100%;padding:12px;margin:0 0 10px;border-radius:12px;border:2px dashed var(--accent,#2f6f63);background:none;color:var(--accent,#2f6f63);font:700 15px var(--f-body,system-ui);cursor:pointer}
+.un-layer{position:absolute;left:0;top:0;width:0;height:0;z-index:60}
+.un-pin{position:absolute;width:172px;background:#FFF1A8;color:#2B2615;border-radius:4px 4px 14px 4px;box-shadow:0 6px 16px rgba(0,0,0,.18),0 1px 0 rgba(0,0,0,.06);font:13.5px/1.4 var(--f-body,system-ui);transform:rotate(-.6deg);transition:box-shadow .15s,transform .15s}
+:root[data-theme="dark"] .un-pin,:root[data-theme="dark"] .un-pin-dot{background:#5A4E1C;color:#FFF6D0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .un-pin,:root:not([data-theme="light"]) .un-pin-dot{background:#5A4E1C;color:#FFF6D0}}
+.un-pin-bar{display:flex;justify-content:space-between;align-items:center;padding:2px 2px 0}
+.un-grip{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;padding:4px 10px;font-size:15px;line-height:1;opacity:.55}
+.un-pin-fold{all:unset;cursor:pointer;padding:2px 10px;font-weight:800;font-size:16px;line-height:1;opacity:.55}
+.un-pin-body{all:unset;box-sizing:border-box;display:block;width:100%;cursor:pointer;padding:0 11px 10px;max-height:200px;overflow:hidden;white-space:pre-wrap;overflow-wrap:anywhere}
+.un-pin-draw{display:block;width:100%;height:auto;margin-top:4px}
+.un-pin.un-fold{width:auto;background:none;box-shadow:none;transform:none}
+.un-pin-dot{all:unset;cursor:pointer;touch-action:none;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#FFF1A8;box-shadow:0 3px 10px rgba(0,0,0,.22);font-size:17px}
+.un-pin.un-dragging{z-index:2;transform:rotate(-2deg) scale(1.04);box-shadow:0 16px 32px rgba(0,0,0,.3)}
+.un-pin.un-flash{animation:unFlash 1.5s ease-out}
+.un-place{position:fixed;left:50%;top:calc(10px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:450;display:flex;gap:10px;align-items:center;width:max-content;max-width:calc(100vw - 24px);background:var(--ink,#222);color:var(--sheet,#fff);padding:7px 7px 7px 14px;border-radius:999px;font:600 14px var(--f-body,system-ui);box-shadow:0 6px 18px rgba(0,0,0,.3)}
+.un-place[hidden]{display:none}
+.un-place .un-btn{padding:6px 12px;border-color:rgba(255,255,255,.45);color:inherit}
+html.un-placing #app{cursor:crosshair}
 .un-hint{font-size:12px;color:var(--ink2,#666);margin-top:6px}
 .un-text{white-space:pre-wrap;margin:0 0 10px}
 .un-draw{display:block;width:100%;height:auto;border:1px solid var(--rule,#ddd);border-radius:12px;margin:0 0 8px;background:var(--paper,transparent)}
@@ -841,7 +1019,9 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
 .un-toast{position:fixed;left:50%;bottom:calc(24px + var(--nav-h,0px));transform:translateX(-50%);z-index:600;background:var(--ink,#222);color:var(--sheet,#fff);padding:9px 16px;border-radius:999px;font:600 14px var(--f-body,system-ui);box-shadow:0 6px 18px rgba(0,0,0,.25)}`;
   function start(){
     document.head.appendChild(css); document.body.appendChild(add); document.body.appendChild(pill);
+    document.body.appendChild(layer); document.body.appendChild(banner);
     hook(); watch(); apply(); badge();
+    if (window.ResizeObserver) new ResizeObserver(pinSoon).observe(appEl());
     const want = new URLSearchParams(location.search).get("note");
     if (want) setTimeout(() => go(want), 600);
   }
@@ -1077,4 +1257,69 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
     watch();
   }
   if (document.body) start(); else addEventListener("DOMContentLoaded", start);
+})();
+
+/* ============================================================
+   ZOOM — pinch the lesson with two fingers, or 🔍 on the app's bar (＋ / −).
+   Zooms the page's content (#app) with CSS zoom, so the text reflows to the screen's width (no sideways scrolling).
+   80 % – 200 %, one setting for every mini app, kept in localStorage "pathshalaZoom". The app's bar sends
+   { type: "pathshala-zoom", z }. Maps keep their own pinch (an SVG with its own zoom is left alone), and so do
+   the note sheets. A "pathshala-zoomed" event tells MY NOTES to move its placed notes.
+   ============================================================ */
+(function(){
+  if (window.__studyZoom) return;
+  window.__studyZoom = true;
+  const FILE = (location.pathname.split("/").pop() || "").replace(/\.html?$/, "");
+  if (!/^study-/.test(FILE)) return;
+  const KEY = "pathshalaZoom", MIN = 0.8, MAX = 2;
+  const clamp = v => Math.round(Math.max(MIN, Math.min(MAX, v)) * 100) / 100;
+  const read = () => { try { const v = parseFloat(localStorage.getItem(KEY)); return v ? clamp(v) : 1; } catch (e) { return 1; } };
+  const app = () => document.getElementById("app");
+  let z = 1;
+  function set(v, fy){
+    v = clamp(v); const el = app();
+    if (!el || v === z) return;
+    fy = fy == null ? innerHeight / 2 : fy;
+    const top = el.getBoundingClientRect().top + scrollY, rel = (scrollY + fy - top) / z;   // keep the spot under the fingers
+    z = v; el.style.zoom = v === 1 ? "" : String(v);
+    if (scrollY + fy > top) scrollTo(scrollX, top + rel * v - fy);
+    dispatchEvent(new Event("pathshala-zoomed"));
+  }
+  const keep = () => { try { if (z === 1) localStorage.removeItem(KEY); else localStorage.setItem(KEY, String(z)); } catch (e) {} };
+
+  // the size while pinching
+  const chip = document.createElement("div"); chip.className = "zm-chip"; chip.hidden = true;
+  let chipT = 0;
+  const show = () => { chip.textContent = Math.round(z * 100) + "%"; chip.hidden = false; clearTimeout(chipT); chipT = setTimeout(() => chip.hidden = true, 900); };
+
+  const own = el => { for (let s = el && el.closest ? el.closest("svg") : null; s; s = s.parentElement ? s.parentElement.closest("svg") : null) if (s._z) return true; return false; };
+  const skip = el => !el || !el.closest || !!el.closest(".un-ui, canvas, input, textarea, select") || own(el);
+  const dist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+  let pinch = null, want = 1, raf = 0;
+  document.addEventListener("touchstart", e => {
+    if (e.touches.length !== 2) { if (e.touches.length > 2) pinch = null; return; }
+    if ([...e.touches].some(t => skip(t.target))) return;
+    pinch = { d: dist(e.touches) || 1, z, fy: (e.touches[0].clientY + e.touches[1].clientY) / 2 };
+    want = z;
+  }, { passive: true });
+  document.addEventListener("touchmove", e => {
+    if (!pinch || e.touches.length !== 2) return;
+    e.preventDefault();
+    want = pinch.z * dist(e.touches) / pinch.d;
+    if (!raf) raf = requestAnimationFrame(() => { raf = 0; if (pinch) { set(want, pinch.fy); show(); } });
+  }, { passive: false });
+  const end = e => { if (pinch && e.touches.length < 2) { pinch = null; keep(); } };
+  document.addEventListener("touchend", end, { passive: true });
+  document.addEventListener("touchcancel", end, { passive: true });
+
+  addEventListener("message", e => {
+    if (e.origin !== location.origin || !e.data || e.data.type !== "pathshala-zoom") return;
+    set(+e.data.z || 1); show();
+  });
+  addEventListener("storage", e => { if (e.key === KEY) set(read()); });
+
+  const css = document.createElement("style");
+  css.textContent = `.zm-chip{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:460;background:var(--ink,#222);color:var(--sheet,#fff);padding:6px 14px;border-radius:999px;font:700 14px var(--f-body,system-ui);font-variant-numeric:tabular-nums;box-shadow:0 6px 18px rgba(0,0,0,.25);pointer-events:none}.zm-chip[hidden]{display:none}`;
+  function start(){ document.head.appendChild(css); document.body.appendChild(chip); set(read()); }
+  if (document.body && app()) start(); else addEventListener("DOMContentLoaded", start);
 })();
