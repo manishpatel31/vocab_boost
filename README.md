@@ -109,6 +109,12 @@ Each mini app is one self-contained page (`study-<name>.html`) with lessons, a q
   - **Storage:** saved per app in `shabdNotes_<page>` and synced to your account as `users/{uid}/study/notes_<app>`, merged note by note (newest edit wins; deletes stay as tombstones so other devices learn of them).
   - **Finding words again:** notes find their words after the page redraws using the words plus 40 characters around them. A drawing is stored as strokes on a 600 × 360 pad and shown as SVG.
   - **Back button:** the phone's Back closes a note sheet first, or stops choosing a spot.
+- **Chapter PDFs** (every mini app, `study-ui.js` CHAPTER PDFs): attach a PDF link to a chapter and read it inside the app.
+  - In a lesson, **📄 PDFs → ＋ Attach PDF** under its title. Paste a Google Drive link (shared as *Anyone with the link*), name it, and pick the chapter. Grammar 100 attaches to a unit, and the Maths formula book to a chapter.
+  - A chip opens it full screen in Google's viewer, which handles scrolling, zoom and pages. The chip shows when you last opened it. **✎** renames it, moves it to another chapter or removes it, and the phone's Back closes it.
+  - Supported links: `drive.google.com/file/d/<id>/…` and `open?id=` (shown through `/preview`), Google Docs, Slides and Sheets, and any other https PDF link (through `docs.google.com/viewer`).
+  - Stored in `shabdPdfs_<page>` with the same shape as My notes (`{ v, n: { id: { les, name, url, c, u, o?, del? } } }`). It syncs as `users/{uid}/study/pdfs_<app>`, merged per PDF. No new Firestore rule is needed.
+  - It needs the internet: Google shows the PDF, so the offline copy doesn't include it.
 - **Restart a mini app** (`app.js` `studyRestart`): 📈 Tracker → History → **↺ Restart this app…** clears that app's progress so it starts like new.
   - It clears lessons, answers, the Mistakes book entries, mock scores and the "Completed" mark. Tracker history stays.
   - Its notes are deleted too, but only if you tick the box.
