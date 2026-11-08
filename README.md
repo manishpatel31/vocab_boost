@@ -109,6 +109,10 @@ Each mini app is one self-contained page (`study-<name>.html`) with lessons, a q
   - **Storage:** saved per app in `shabdNotes_<page>` and synced to your account as `users/{uid}/study/notes_<app>`, merged note by note (newest edit wins; deletes stay as tombstones so other devices learn of them).
   - **Finding words again:** notes find their words after the page redraws using the words plus 40 characters around them. A drawing is stored as strokes on a 600 × 360 pad and shown as SVG.
   - **Back button:** the phone's Back closes a note sheet first, or stops choosing a spot.
+- **Restart a mini app** (`app.js` `studyRestart`): 📈 Tracker → History → **↺ Restart this app…** clears that app's progress so it starts like new.
+  - It clears lessons, answers, the Mistakes book entries, mock scores and the "Completed" mark. Tracker history stays.
+  - Its notes are deleted too, but only if you tick the box.
+  - Other devices learn of it through a `{ reset, key, updatedAt }` copy in `users/{uid}/study/{id}`: `studyApply` clears their copy once (`resetSeen` in `shabdStudySync`). The tracker keeps the newest `restartAt` and ignores completions from before it.
 - **Zoom** (every mini app, `study-ui.js` ZOOM): pinch the lesson with two fingers, or tap 🔍 on the mini app's bar (− / ＋, Reset).
   - It uses CSS `zoom` on `#app`, so text reflows to the screen's width with no sideways scrolling. The range is 80–200 %.
   - One setting covers every mini app (`localStorage pathshalaZoom`).
