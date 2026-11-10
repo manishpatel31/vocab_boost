@@ -1339,6 +1339,8 @@ html.un-placing #app{cursor:crosshair}
    - The list of lessons: 📄 at the right end of a lesson's row with its own PDFs (📄 2 → a short list).
      Rows are .les[data-open] in .lessons (lesson apps, the Maths formula book; wrapped in a .pdf-rw) and the unit
      cards of Grammar 100 (.unit, beside .uh[data-unit]).
+   - "📁 Import a Drive folder" (inside पाठShala) asks the app to open its import for this app (app.js openPdfImport):
+     a folder's PDFs (Android app 3.6+) or many links, matched to lessons by name and the user's AI, then reviewed.
    - The reader: full screen through Google's viewer (drive /preview, Docs / Slides / Sheets /preview, any other
      https PDF via docs.google.com/viewer), − / ＋ (a wider frame → bigger pages), pinch in the app (3.4+), ✎ to edit.
    - Saved per app in localStorage "shabdPdfs_<page>": { v:1, n: { id: { name, url, ls: [lesson ids], all?, les,
@@ -1618,12 +1620,15 @@ html.un-placing #app{cursor:crosshair}
           <textarea id="pdfLinks" rows="3" placeholder="https://drive.google.com/file/d/…&#10;https://drive.google.com/file/d/…&#10;Lecture 3 | https://drive.google.com/file/d/…"></textarea>
           <div class="pdf-prow"><small>${canName() ? "Names are read from Drive. Write <b>Name | link</b> to name one yourself." : "Write <b>Name | link</b> to name one, or rename it below. (The Android app 3.5+ reads names from Drive.)"} Files must be shared as <b>Anyone with the link</b>.</small><button type="button" class="un-btn un-pri pdf-addall">Add</button></div>
         </section>
+        ${parent !== window ? `<button type="button" class="pdf-imp"><b>📁 Import a Drive folder</b><span>Every PDF in it, placed in the right lessons by name (and your AI)</span></button>` : ""}
         <div class="pdf-seg" role="tablist"><button type="button" data-v="pdf">By PDF</button><button type="button" data-v="les">By lesson</button></div>
         <div class="pdf-mlist"></div>
       </div>`);
     mgr.querySelector(".pdf-x").onclick = () => close();
     mgr.querySelectorAll(".pdf-seg button").forEach(b => b.onclick = () => { view = b.dataset.v; mgr._draw(); });
     mgr.querySelector(".pdf-addall").onclick = addAll;
+    const imp = mgr.querySelector(".pdf-imp");               // the app does the folder import (it has the AI and every lesson)
+    if (imp) imp.onclick = () => { try { parent.postMessage({ type: "pathshala-pdf-import", file: FILE }, location.origin); } catch (e) {} };
     mgr._draw = draw;
     draw();
   }
@@ -1822,6 +1827,8 @@ html.pdf-lock,html.pdf-lock body{overflow:hidden}
 .pdf-paste label{font-size:14px;color:var(--ink2,#555)}.pdf-paste label b{color:var(--ink,#222)}
 .pdf-paste textarea{width:100%;box-sizing:border-box;min-height:84px;padding:10px 12px;border-radius:12px;border:1px solid var(--rule,#ddd);background:var(--paper,transparent);color:var(--ink,#222);font:14px/1.4 var(--f-body,system-ui);resize:vertical}
 .pdf-prow{display:flex;align-items:flex-end;gap:10px}.pdf-prow small{flex:1;font-size:12.5px;color:var(--ink2,#666)}
+.pdf-imp{display:grid;gap:2px;text-align:left;padding:12px 14px;border-radius:16px;border:1.5px dashed color-mix(in srgb,var(--accent,#2f6f63) 60%,transparent);background:color-mix(in srgb,var(--accent,#2f6f63) 7%,transparent);color:var(--ink,#222);font:14px var(--f-body,system-ui);cursor:pointer}
+.pdf-imp b{font-size:15px;color:var(--accent,#2f6f63)}.pdf-imp span{font-size:12.5px;color:var(--ink2,#666)}
 .pdf-seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:12px;background:var(--sheet,#fff);border:1px solid var(--rule,#ddd)}
 .pdf-seg button{padding:9px;border-radius:9px;border:0;background:none;color:var(--ink2,#555);font:700 14px var(--f-body,system-ui);cursor:pointer}
 .pdf-seg button[aria-selected=true]{background:var(--ink,#222);color:var(--sheet,#fff)}

@@ -120,6 +120,16 @@ Each mini app is one self-contained page (`study-<name>.html`) with lessons, a q
   - **Links:** `drive.google.com/file/d/<id>/…` and `open?id=` (shown through `/preview`), Google Docs / Slides / Sheets, and any other https PDF (through `docs.google.com/viewer`).
   - **Stored** in `shabdPdfs_<page>`: `{ v, n: { id: { name, url, ls: [lesson ids], all?, les, c, u, o?, del? } } }`. `all` means the whole app, and `les` (= `ls[0]`) is what versions before the manager read. It syncs as `users/{uid}/study/pdfs_<app>`, merged per PDF, with no new Firestore rule.
   - **Online only:** Google shows the PDFs, so they need the internet and are not in the offline copy.
+- **Import PDFs from Drive** (`app.js` `openPdfImport`): ☰ → **Import PDFs from Drive** covers every app. A mini app's Manage PDFs → **📁 Import a Drive folder** covers that app only.
+  - **Paste:** Drive folder links and / or PDF links, one per line (`Name | link` names one).
+    - A folder is listed with its subfolders by the Android app (3.6+, `PathshalaApp.driveFolder`). PDFs and Google Docs / Slides are kept; other files are skipped and counted.
+    - A single link's name comes from the app (3.5+, `pdfTitle`).
+  - **Matching by name:** the deepest folder (or the file name) that names an app wins (`todoFindAppHit`: app names and aliases). Inside the app, "chapter / lesson / unit 3" picks that lesson, or else the lesson whose title words the name carries (`piLessonOf`). With no app named, a clear lesson title in any app (`piAnyLesson`, e.g. "Preamble explained" → Polity's Preamble). An app with no lesson named → **Whole app**.
+  - **The AI:** what names can't place is sent to the user's AI (Ask AI's keys, `shabdBridge.ai`, 60 files a call). It gets only the file names, folders, app titles and lesson titles, and must answer with known ids.
+  - **Review:** every PDF shows its place (name / AI / not matched / already in <app>), which you can change before **Attach**.
+  - **Writing:** into each page's `shabdPdfs_<page>` (merged by Drive file id, so a file is never added twice), then pushed as `pdfs_<app>`.
+  - **Lessons by page** come from `study-lessons.json`. Regenerate it after adding or renaming lessons: `python3 -m http.server 8765 &` then `node tools/lesson_index.js`. Grammar 100 is listed by unit, the Computer app by its three sub-pages, and the History hub is left out because its three parts are apps of their own.
+  - **Sub-pages sync:** a hub's sub-pages (the Computer app's three) now sync their notes and PDFs as `notes_<page>` / `pdfs_<page>` (before, they stayed on one device).
 - **Restart a mini app** (`app.js` `studyRestart`): 📈 Tracker → History → **↺ Restart this app…** clears that app's progress so it starts like new.
   - It clears lessons, answers, the Mistakes book entries, mock scores and the "Completed" mark. Tracker history stays.
   - Its notes are deleted too, but only if you tick the box.

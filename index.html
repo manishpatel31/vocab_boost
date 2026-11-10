@@ -1324,6 +1324,20 @@
   .tr-restart .btn{ color:var(--maroon); border:1.5px solid color-mix(in srgb, var(--maroon) 45%, transparent); background:none; box-shadow:none; }
   .tr-restart span{ font-size:12.5px; color:var(--ink-faint); }
   .rs-notes{ display:flex; gap:8px; align-items:center; margin:10px 0 4px; font-weight:600; cursor:pointer; }
+  .pi-list{ display:grid; gap:8px; margin-top:4px; }
+  .pi-row{ border:1px solid var(--rule); border-radius:12px; padding:9px 11px; display:grid; gap:7px; background:var(--paper); }
+  .pi-row.off{ opacity:.55; }
+  .pi-top{ display:flex; align-items:flex-start; gap:9px; cursor:pointer; }
+  .pi-top input{ width:19px; height:19px; margin:2px 0 0; flex:none; accent-color:var(--teal); }
+  .pi-top > span:first-of-type{ flex:1; min-width:0; display:grid; gap:1px; }
+  .pi-top b{ font-size:14.5px; overflow-wrap:anywhere; }
+  .pi-top small{ font-size:12px; color:var(--ink-faint); overflow-wrap:anywhere; }
+  .pi-how{ flex:none; font-size:11px; font-weight:700; padding:2px 8px; border-radius:999px; border:1px solid var(--rule); white-space:nowrap; }
+  .pi-how.ok{ color:var(--teal); border-color:color-mix(in srgb, var(--teal) 45%, transparent); }
+  .pi-how.ai{ color:var(--accent); border-color:color-mix(in srgb, var(--accent) 45%, transparent); }
+  .pi-how.no{ color:var(--ink-faint); border-style:dashed; }
+  .pi-sel{ display:grid; gap:6px; }
+  .pi-sel select{ width:100%; padding:8px 10px; border-radius:10px; border:1px solid var(--rule); background:var(--card); color:var(--ink); font:inherit; font-size:13.5px; }
   .zm-row{ display:flex; align-items:center; gap:10px; margin:6px 0 4px; }
   .zm-row button{ width:52px; height:48px; border-radius:12px; border:1.5px solid var(--rule); background:var(--card); color:var(--ink); font:inherit; font-size:24px; font-weight:700; cursor:pointer; }
   .zm-row button:disabled{ opacity:.35; cursor:default; }
@@ -2021,6 +2035,7 @@
           <button id="installBtn" style="display:none;"><b>Install app</b><span>Add to your home screen or desktop</span></button>
           <button id="appVerBtn" hidden><b>App version</b><span>Check for updates</span></button>
           <button id="myNotesBtn"><b>My notes</b><span>Your notes and drawings from every mini app</span></button>
+          <button id="pdfImportBtn"><b>Import PDFs from Drive</b><span>A folder of notes → attached to the right apps and lessons</span></button>
           <button id="offlineBtn"><b>Offline copy</b><span>What's saved on this device · save everything now</span></button>
           <button id="apkBtn" class="apk-open apk-link"><b>Android app (APK)</b><span>Download पाठShala for your phone — lock screen, widgets, offline</span></button>
           <button id="signOutBtn"><b>Sign out</b></button>
@@ -2480,7 +2495,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="app.js?v=8d3cd809"></script>
+<script src="app.js?v=0ccd3f88"></script>
 <script src="typing-passages.js?v=df4bd310"></script>
 <script src="typing.js?v=02ff18bc"></script>
 </body>
