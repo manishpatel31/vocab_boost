@@ -3332,7 +3332,7 @@
   // so anyone can download it. Replace that file when the Android app itself changes.
   var APK_URL = 'Pathshala.apk';
   // Update these three together with Pathshala.apk (then run node tools/stamp.js) — the site shows them next to the download.
-  var APK_VERSION = '3.5.0', APK_DATE = '10 Nov 2026', APK_SIZE = '3.4 MB';
+  var APK_VERSION = '3.6.0', APK_DATE = '10 Nov 2026', APK_SIZE = '3.4 MB';
   var APK_LABEL = 'Version ' + APK_VERSION + ' · updated ' + APK_DATE;
   var inAndroidApp = !!(window.PathshalaApp && window.PathshalaApp.isApp);
   function openApkModal(){
