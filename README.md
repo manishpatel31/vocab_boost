@@ -109,13 +109,17 @@ Each mini app is one self-contained page (`study-<name>.html`) with lessons, a q
   - **Storage:** saved per app in `shabdNotes_<page>` and synced to your account as `users/{uid}/study/notes_<app>`, merged note by note (newest edit wins; deletes stay as tombstones so other devices learn of them).
   - **Finding words again:** notes find their words after the page redraws using the words plus 40 characters around them. A drawing is stored as strokes on a 600 × 360 pad and shown as SVG.
   - **Back button:** the phone's Back closes a note sheet first, or stops choosing a spot.
-- **Chapter PDFs** (every mini app, `study-ui.js` CHAPTER PDFs): attach a PDF link to a chapter and read it inside the app.
-  - In a lesson, **📄 PDFs → ＋ Attach PDF** under its title. Paste a Google Drive link (shared as *Anyone with the link*), name it, and pick the chapter. Grammar 100 attaches to a unit, and the Maths formula book to a chapter.
-  - On the list of chapters, a chapter with PDFs shows **📄** at the right end of its row; tap it to open the PDF without opening the chapter. With two or more it shows **📄 2** and opens a short list (with when each was last opened). A chapter with none shows nothing. Lesson rows (`.lessons > .les[data-open]`) get a `.pdf-rw` wrapper to hold the button. Grammar's unit cards (`.unit`) hold it beside their `.uh` header.
-  - A chip opens it full screen in Google's viewer, which handles scrolling and pages. **− / ＋** zoom it by widening the frame: Google fits its pages to the frame's width, so they come out bigger and still sharp, and you scroll sideways. In the Android app (3.4+), a pinch also zooms it: `PathshalaApp.pinchZoom(true)` turns the WebView's own pinch-zoom on while a PDF is open and off on close, which also resets the zoom. The chip shows when you last opened it. **✎** renames it, moves it to another chapter or removes it, and the phone's Back closes it.
-  - Supported links: `drive.google.com/file/d/<id>/…` and `open?id=` (shown through `/preview`), Google Docs, Slides and Sheets, and any other https PDF link (through `docs.google.com/viewer`).
-  - Stored in `shabdPdfs_<page>` with the same shape as My notes (`{ v, n: { id: { les, name, url, c, u, o?, del? } } }`). It syncs as `users/{uid}/study/pdfs_<app>`, merged per PDF. No new Firestore rule is needed.
-  - It needs the internet: Google shows the PDF, so the offline copy doesn't include it.
+- **Chapter PDFs** (every mini app, `study-ui.js` CHAPTER PDFs): Google Drive PDFs attached to a whole mini app or to any of its lessons, read inside the app.
+  - **Learn page:** a "📄 PDFs for this app" card above the lessons, with the app's own PDFs and **Manage PDFs**.
+  - **Manage PDFs:**
+    - Paste one link or many, one per line; `Name | link` names one. Inside the Android app (3.5+) each name is read from Drive (`PathshalaApp.pdfTitle`). Otherwise names are "PDF 1"… and you rename them in place.
+    - Attach from either side: **By PDF** (a PDF → tick Whole app and/or lessons) or **By lesson** (a lesson → tick PDFs).
+  - **In a lesson:** **📄 PDFs** under its title shows its PDFs and the app's own ones (marked APP), plus **＋ Attach PDF**. That form reads the name from Drive in the app and has the same Whole app / lesson ticks.
+  - **On the list:** a lesson with its own PDFs shows **📄** at the right end of its row; **📄 2** opens a short list with when each was last opened. Lesson rows (`.lessons > .les[data-open]`) get a `.pdf-rw` wrapper to hold the button. Grammar's unit cards (`.unit`) hold it beside their `.uh` header.
+  - **Reader:** full screen in Google's viewer. **− / ＋** zoom by widening the frame, a pinch zooms in the Android app (3.4+), and **✎** edits the PDF. Each layer (manager, tick list, form, reader) is a history step, so the phone's Back closes the top one.
+  - **Links:** `drive.google.com/file/d/<id>/…` and `open?id=` (shown through `/preview`), Google Docs / Slides / Sheets, and any other https PDF (through `docs.google.com/viewer`).
+  - **Stored** in `shabdPdfs_<page>`: `{ v, n: { id: { name, url, ls: [lesson ids], all?, les, c, u, o?, del? } } }`. `all` means the whole app, and `les` (= `ls[0]`) is what versions before the manager read. It syncs as `users/{uid}/study/pdfs_<app>`, merged per PDF, with no new Firestore rule.
+  - **Online only:** Google shows the PDFs, so they need the internet and are not in the offline copy.
 - **Restart a mini app** (`app.js` `studyRestart`): 📈 Tracker → History → **↺ Restart this app…** clears that app's progress so it starts like new.
   - It clears lessons, answers, the Mistakes book entries, mock scores and the "Completed" mark. Tracker history stays.
   - Its notes are deleted too, but only if you tick the box.
