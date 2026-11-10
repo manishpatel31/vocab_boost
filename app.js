@@ -967,7 +967,7 @@
     if(r.key && mod.key && r.key !== mod.key) return false;   /* saved by an older version of this app */
     var local = lsGet(mod.key);
     if(r.reset && typeof r.data !== 'string') return false;
-    if(/^(notes|pdfs)_/.test(id)){
+    if(/^(notes|pdfs)_/.test(id)){   // (also a hub's sub-page: notes_study-… / pdfs_study-…)
       var nm = JSON.stringify(notesMerge(notesParse(local), notesParse(r.data)));
       if(nm !== local) lsSet(mod.key, nm);
       if(nm !== r.data){ setStudyMeta(id, { localAt: Date.now() }); clearTimeout(studyApply['t' + id]); studyApply['t' + id] = setTimeout(function(){ studyPush(id); }, 1500); }
@@ -1062,7 +1062,7 @@
     document.body.classList.add('study-on');
     if(!fromHistory){ try{ history.pushState({ study: id }, '', '#study-' + id); }catch(e){} }
     // fetch this app's progress from your account, but don't keep the app waiting more than a second for it
-    var pulled = false, pull = Promise.all([studyPull(id), studyPull('notes_' + id), studyPull('pdfs_' + id)]).then(function(){ pulled = true; }, function(){ pulled = true; });
+    var pulled = false, pull = Promise.all([studyPull(id), studyPull('notes_' + id), studyPull('pdfs_' + id)].concat(((PDF_SUB_PAGES || {})[id] || []).reduce(function(a, f){ return a.concat([studyPull('notes_' + pdfStem(f)), studyPull('pdfs_' + pdfStem(f))]); }, []))).then(function(){ pulled = true; }, function(){ pulled = true; });
     await Promise.race([pull, new Promise(function(r){ setTimeout(r, 1000); })]);
     if(studyOpen !== id) return;
     studyLast = lsGet(mod.key);
@@ -1114,7 +1114,9 @@
   window.addEventListener('message', function(e){
     var f = document.getElementById('studyFrame');
     if(e.origin !== location.origin || !e.data || (e.data.type !== 'pathshala-notes' && e.data.type !== 'pathshala-pdfs') || !f || e.source !== f.contentWindow || !studyOpen) return;
-    var id = (e.data.type === 'pathshala-pdfs' ? 'pdfs_' : 'notes_') + studyOpen;   // chapter PDFs (study-ui.js) sync like notes
+    // chapter PDFs (study-ui.js) sync like notes; a hub's sub-page (the Computer app's three) keeps its own record
+    var kind = e.data.type === 'pathshala-pdfs' ? 'pdfs' : 'notes';
+    var id = (typeof e.data.file === 'string' && pageSyncId(kind, studyOpen, e.data.file)) || (kind + '_' + studyOpen);
     setStudyMeta(id, { localAt: Date.now() });
     clearTimeout(notesPushT[id]); notesPushT[id] = setTimeout(function(){ studyPush(id); }, 1500);
   });
@@ -1208,6 +1210,258 @@
     }); });
   }
   document.getElementById('myNotesBtn').addEventListener('click', function(){ try{ closeAllMenus(); }catch(e){} openMyNotes(); });
+  // ================= Import PDFs from Drive =================
+  // ☰ → Import PDFs from Drive (every app), or a mini app's Manage PDFs → "Import a folder" (that app only).
+  // Paste Drive folder links and / or PDF links. A folder is listed with its subfolders by the Android app (3.6+,
+  // PathshalaApp.driveFolder); a file's name comes from the Android app (3.5+, pdfTitle) or "Name | link".
+  // Each PDF is matched to an app and a lesson by its file and folder names (the apps' names and aliases, the
+  // lessons' titles, "chapter 3" / "lesson 3" / "unit 3"); what names alone can't place goes to your AI (Ask AI's
+  // keys) with only the names and the app / lesson titles. Everything is shown for review before it's attached.
+  // Lessons by page come from study-lessons.json (tools/lesson_index.js). The PDFs go into each page's own store,
+  // shabdPdfs_<page> (study-ui.js CHAPTER PDFs), and sync as pdfs_<app> (pdfs_<page> for the Computer app's pages).
+  var PDF_SUB_PAGES = { computer: ['study-computer-hardware.html', 'study-computer-software.html', 'study-computer-internet.html'] };
+  var pdfIdxP = null;
+  function pdfIndex(){
+    if(!pdfIdxP) pdfIdxP = fetch('study-lessons.json').then(function(r){ if(!r.ok) throw new Error('study-lessons.json missing'); return r.json(); })
+      .catch(function(e){ pdfIdxP = null; throw e; });
+    return pdfIdxP;
+  }
+  function pdfStem(file){ return String(file).replace(/\.html?$/, ''); }
+  /** The synced record of a page's notes or PDFs ('notes' / 'pdfs'): <kind>_<app>, or <kind>_<page> for a hub's sub-page. */
+  function pageSyncId(kind, app, stem){
+    if(STUDY[app] && pdfStem(STUDY[app].file) === stem) return kind + '_' + app;
+    return (PDF_SUB_PAGES[app] || []).indexOf(stem + '.html') !== -1 ? kind + '_' + stem : '';
+  }
+  function pdfDriveId(url){ var m = /\/(?:file\/)?d\/([\w-]{10,})/.exec(url || '') || /[?&]id=([\w-]{10,})/.exec(url || ''); return m ? m[1] : String(url || '').trim(); }
+  function pdfIsFolder(url){ return /drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?folders\/|embeddedfolderview|open\?id=.*folder)/.test(url) || /drive\.google\.com\/drive\/.*folders/.test(url); }
+  var PI_FILLER = ' notes note pdf lecture lec class handwritten hand written final new copy by sir mam maam part chapter chap ch lesson les unit full complete short revision pyq pyqs ssc cgl chsl mts hindi english eng hin vol volume module mod topic topics book ';
+  function piToks(s){ return todoNorm(s).split(' ').filter(function(w, i, all){ return w && all.indexOf(w) === i && !/^\d+$/.test(w) && w.length > 1 && TODO_TITLE_FILLER.indexOf(' ' + w + ' ') === -1 && PI_FILLER.indexOf(' ' + w + ' ') === -1; }); }
+  /** An app from a file's name and folders: the deepest folder (or the name) that names an app. */
+  function piAppOf(name, path, idx){
+    var parts = [name].concat(String(path || '').split('/').reverse());
+    for(var i = 0; i < parts.length; i++){ var h = todoFindAppHit(parts[i]); if(h && idx.apps[h.id]) return h; }
+    var h2 = todoFindAppHit(path + ' ' + name);
+    return h2 && idx.apps[h2.id] ? h2 : null;
+  }
+  function piLessons(app, idx){
+    var out = [], a = idx.apps[app]; if(!a) return out;
+    Object.keys(a.files).forEach(function(f){ a.files[f].forEach(function(l){ out.push({ id: l[0], t: l[1], file: f, n: out.length + 1, tt: piToks(l[1]) }); }); });
+    return out;
+  }
+  /** The lesson a file names: "chapter / lesson / unit 3", else the lesson whose title words it carries. */
+  function piLessonOf(app, name, path, appWords, idx){
+    var ls = piLessons(app, idx), low = todoNorm(name);
+    var num = /(?:^| )(?:chapter|chap|ch|lesson|les|unit|l|u|c)\s?0*(\d{1,3})(?= |$)/.exec(low);
+    if(num){ var k = +num[1], hit = ls.filter(function(l){ return parseInt(String(l.id).replace(/\D/g, ''), 10) === k; })[0] || ls[k - 1]; if(hit) return hit; }
+    var aw = ' ' + todoNorm(appWords || '') + ' ';
+    var toks = piToks(name).filter(function(w){ return aw.indexOf(' ' + w + ' ') === -1; });
+    if(!toks.length) return null;
+    var best = null, bestS = 0, second = 0;
+    ls.forEach(function(l){
+      if(!l.tt.length) return;
+      var hitT = l.tt.filter(function(w){ return toks.some(function(x){ return todoTokSame(x, w); }); }).length;
+      var hitF = toks.filter(function(x){ return l.tt.some(function(w){ return todoTokSame(x, w); }); }).length;
+      if(!hitT) return;
+      var s = hitT / l.tt.length * 0.6 + hitF / toks.length * 0.4;
+      if(s > bestS){ second = bestS; best = l; bestS = s; } else if(s > second) second = s;
+    });
+    return best && bestS >= 0.45 && bestS - second >= 0.08 ? best : null;
+  }
+  /** No app named: the one lesson, in any app, whose title the file's name clearly carries ("Preamble explained" → Polity's Preamble). */
+  function piAnyLesson(name, idx){
+    var toks = piToks(name); if(!toks.length) return null;
+    var best = null, bestS = 0, second = 0;
+    Object.keys(idx.apps).forEach(function(app){
+      piLessons(app, idx).forEach(function(l){
+        if(!l.tt.length) return;
+        var hitT = l.tt.filter(function(w){ return toks.some(function(x){ return todoTokSame(x, w); }); }).length;
+        if(!hitT) return;
+        var hitF = toks.filter(function(x){ return l.tt.some(function(w){ return todoTokSame(x, w); }); }).length;
+        var sc = hitT / l.tt.length * 0.6 + hitF / toks.length * 0.4;
+        if(sc > bestS){ second = bestS; best = { app: app, l: l }; bestS = sc; } else if(sc > second) second = sc;
+      });
+    });
+    return best && bestS >= 0.6 && bestS - second >= 0.1 ? best : null;
+  }
+  async function piAskAi(rows, idx, scope, onStatus){
+    var want = rows.filter(function(r){ return r.ai; });
+    if(!want.length || !window.shabdBridge || !aiReady()) return 0;
+    var apps = scope ? [scope] : Object.keys(idx.apps);
+    var cat = apps.map(function(id){ return id + ' = ' + idx.apps[id].t + '\n' + piLessons(id, idx).map(function(l){ return '  ' + l.id + ': ' + l.t; }).join('\n'); }).join('\n');
+    var sys = 'You sort a student\'s study-note PDFs into the apps and lessons of an SSC exam study app, using only each file\'s name and folder. ' +
+      'Reply with JSON only: {"m":[{"i":<file number>,"app":"<app id, or \\"\\" when unsure>","ls":"all" or ["<lesson id>", …]}]}. ' +
+      'Use "all" when the file covers the whole app or many of its lessons; give lesson ids only when the name clearly points to them. Never invent ids.';
+    var done = 0;
+    for(var s = 0; s < want.length; s += 60){
+      var part = want.slice(s, s + 60);
+      if(onStatus) onStatus('Asking your AI about ' + (s + part.length) + ' of ' + want.length + ' unmatched…');
+      var user = 'APPS AND LESSONS' + (scope ? ' (all files belong to this app)' : '') + ':\n' + cat + '\n\nFILES:\n' + part.map(function(r, i){ return i + '. ' + (r.path ? r.path + '/' : '') + r.name; }).join('\n');
+      try{
+        var txt = await window.shabdBridge.ai(sys, user, {});
+        var js = JSON.parse(String(txt).replace(/^[\s\S]*?(\{)/, '$1').replace(/\}[^}]*$/, '}'));
+        (js.m || []).forEach(function(x){
+          var r = part[+x.i]; if(!r) return;
+          var app = scope || String(x.app || '');
+          if(!idx.apps[app]) return;
+          var ids = piLessons(app, idx).map(function(l){ return l.id; });
+          var ls = x.ls === 'all' ? [] : (Array.isArray(x.ls) ? x.ls.map(String).filter(function(id){ return ids.indexOf(id) !== -1; }) : []);
+          if(x.ls !== 'all' && !ls.length && scope) return;
+          r.app = app; r.ls = ls; r.all = !ls.length; r.how = 'ai'; r.on = !r.dup; done++;
+        });
+      }catch(e){ if(onStatus) onStatus('Your AI couldn’t answer (' + String(e && e.message || e).slice(0, 80) + ') — set the rest yourself.'); return done; }
+    }
+    return done;
+  }
+  function piExisting(apps, idx){                  // drive id → the first app it's already attached in
+    var have = {};
+    apps.forEach(function(app){
+      var a = idx.apps[app]; if(!a) return;
+      Object.keys(a.files).forEach(function(f){
+        var d = notesParse(lsGet('shabdPdfs_' + pdfStem(f)));
+        Object.keys(d.n).forEach(function(k){ var id = pdfDriveId(d.n[k].url); if(!d.n[k].del && !have[id]) have[id] = app; });
+      });
+    });
+    return have;
+  }
+  function piAttach(rows, idx){
+    var touched = {}, n = 0, now = Date.now();
+    rows.forEach(function(r, i){
+      if(!r.on || !r.app || !idx.apps[r.app]) return;
+      var a = idx.apps[r.app], pages = {};
+      if(r.all || !r.ls.length) Object.keys(a.files).forEach(function(f){ pages[f] = { all: 1, ls: [] }; });
+      else r.ls.forEach(function(id){ Object.keys(a.files).forEach(function(f){ if(a.files[f].some(function(l){ return l[0] === id; })) (pages[f] = pages[f] || { all: 0, ls: [] }).ls.push(id); }); });
+      Object.keys(pages).forEach(function(f){
+        var stem = pdfStem(f), key = 'shabdPdfs_' + stem, d = notesParse(lsGet(key)), did = pdfDriveId(r.url), id = null;
+        Object.keys(d.n).forEach(function(k){ if(!d.n[k].del && pdfDriveId(d.n[k].url) === did) id = k; });
+        var x = id ? d.n[id] : { name: r.name, url: r.url, ls: [], c: now + i };
+        var ls = Array.isArray(x.ls) ? x.ls.slice() : (x.les ? [String(x.les)] : []);
+        pages[f].ls.forEach(function(l){ if(ls.indexOf(l) === -1) ls.push(l); });
+        x = Object.assign({}, x, { ls: ls, les: ls[0] || null, u: now });
+        if(pages[f].all) x.all = 1;
+        d.n[id || ('p' + (now + i).toString(36) + Math.random().toString(36).slice(2, 6))] = x;
+        lsSet(key, JSON.stringify(d));
+        touched[r.app + '|' + stem] = 1;
+      });
+      n++;
+    });
+    Object.keys(touched).forEach(function(k){
+      var p = k.split('|'), sid = pageSyncId('pdfs', p[0], p[1]);
+      if(sid){ setStudyMeta(sid, { localAt: Date.now() }); studyPush(sid); }
+    });
+    return { n: n, apps: Object.keys(touched).map(function(k){ return k.split('|')[0]; }).filter(function(a, i, all){ return all.indexOf(a) === i; }).length };
+  }
+  function openPdfImport(scope){
+    var A = window.PathshalaApp, canFolder = !!(A && A.driveFolder), canName = !!(A && A.pdfTitle);
+    var rows = [], idx = null, busy = false;
+    var close = function(){ if(busy) return; modalBgRef().classList.remove('open'); modalBodyRef().innerHTML = ''; };
+    modalBodyRef().innerHTML = '<h3>📁 Import PDFs from Drive</h3>' +
+      '<p class="help" style="margin-top:0;">' + (scope ? 'Into <b>' + escapeHtml(STUDY[scope].title) + '</b>. ' : 'Into any of your apps. ') +
+      'Paste a Drive <b>folder</b> link (every PDF inside, subfolders too) and / or PDF links — one per line. Share them as <b>Anyone with the link</b>.' +
+      (canFolder ? '' : ' <b>Folders need the Android app 3.6</b>; here, paste the PDF links themselves.') + '</p>' +
+      '<textarea id="piLinks" class="mn-search" rows="4" style="min-height:96px; font-size:14px;" placeholder="https://drive.google.com/drive/folders/…&#10;https://drive.google.com/file/d/…&#10;Polity notes | https://drive.google.com/file/d/…"></textarea>' +
+      '<div id="piStatus" class="help" style="min-height:1.4em; margin:8px 0;"></div><div id="piList" class="pi-list"></div>' +
+      '<div class="modal-actions"><button class="btn ghost" id="piClose">Close</button><button class="btn teal" id="piGo">Find PDFs</button></div>';
+    modalBgRef().classList.add('open');
+    var status = function(t){ var el = document.getElementById('piStatus'); if(el) el.innerHTML = t; };
+    document.getElementById('piClose').addEventListener('click', close);
+    var appOpts = function(sel){ return '<option value="">— skip —</option>' + Object.keys(idx.apps).sort(function(a, b){ return idx.apps[a].t.localeCompare(idx.apps[b].t); }).map(function(id){ return '<option value="' + id + '"' + (id === sel ? ' selected' : '') + '>' + escapeHtml(idx.apps[id].t) + '</option>'; }).join(''); };
+    var lesOpts = function(app, r){ return '<option value="*all"' + (r.all || !r.ls.length ? ' selected' : '') + '>Whole app</option>' + piLessons(app, idx).map(function(l){ return '<option value="' + escapeAttr(l.id) + '"' + (r.ls[0] === l.id && !r.all ? ' selected' : '') + '>' + l.n + ' · ' + escapeHtml(l.t) + '</option>'; }).join(''); };
+    var count = function(){ var b = document.getElementById('piGo'), k = rows.filter(function(r){ return r.on && r.app; }).length; if(b && rows.length) { b.textContent = 'Attach ' + k + ' PDF' + (k === 1 ? '' : 's'); b.disabled = !k; } };
+    var draw = function(){
+      var box = document.getElementById('piList'); if(!box) return;
+      var how = { name: '<span class="pi-how ok">name</span>', ai: '<span class="pi-how ai">AI</span>', none: '<span class="pi-how no">not matched</span>' };
+      box.innerHTML = rows.map(function(r, i){
+        return '<div class="pi-row' + (r.on ? '' : ' off') + '" data-i="' + i + '"><label class="pi-top"><input type="checkbox"' + (r.on ? ' checked' : '') + (r.dup ? ' disabled' : '') + '><span><b>' + escapeHtml(r.name) + '</b>' +
+          (r.path ? '<small>📁 ' + escapeHtml(r.path) + '</small>' : '') + '</span>' + (r.dup ? '<span class="pi-how no">already in ' + escapeHtml(r.dup) + '</span>' : how[r.how]) + '</label>' +
+          (r.dup ? '' : '<div class="pi-sel">' + (scope ? '' : '<select class="pi-app">' + appOpts(r.app) + '</select>') + (r.app ? '<select class="pi-les">' + lesOpts(r.app, r) + '</select>' : '') + '</div>') + '</div>';
+      }).join('');
+      box.querySelectorAll('.pi-row').forEach(function(el){
+        var r = rows[+el.dataset.i], cb = el.querySelector('input'), sa = el.querySelector('.pi-app'), sl = el.querySelector('.pi-les');
+        cb.addEventListener('change', function(){ r.on = cb.checked; el.classList.toggle('off', !r.on); count(); });
+        if(sa) sa.addEventListener('change', function(){ r.app = sa.value; r.ls = []; r.all = true; r.on = !!r.app; r.how = r.app ? r.how : 'none'; draw(); });
+        if(sl) sl.addEventListener('change', function(){ if(sl.value === '*all'){ r.all = true; r.ls = []; } else { r.all = false; r.ls = [sl.value]; } });
+      });
+      count();
+    };
+    document.getElementById('piGo').addEventListener('click', async function(){
+      if(busy) return;
+      if(rows.length){                                                    // second press: attach
+        var res = piAttach(rows, idx);
+        busy = false; close();
+        showToast(res.n ? '📄 Attached ' + res.n + ' PDF' + (res.n === 1 ? '' : 's') + (res.apps > 1 ? ' to ' + res.apps + ' apps' : '') : 'Nothing attached');
+        return;
+      }
+      var lines = document.getElementById('piLinks').value.split(/\n+/).map(function(s){ return s.trim(); }).filter(Boolean);
+      if(!lines.length){ status('Paste a folder link or PDF links first.'); return; }
+      busy = true; this.disabled = true;
+      try{
+        idx = await pdfIndex();
+        var found = [], skipped = 0, folderErr = '', seen = {};
+        for(var i = 0; i < lines.length; i++){
+          var m = /https?:\/\/\S+/.exec(lines[i]); if(!m) continue;
+          var url = m[0].replace(/[),.;]+$/, ''), named = lines[i].indexOf('|') !== -1 ? lines[i].split('|')[0].trim() : '';
+          if(pdfIsFolder(url)){
+            if(!canFolder){ folderErr = 'Folders need the Android app 3.6 — paste the PDF links themselves here.'; continue; }
+            status('Reading the folder… (this can take a minute for big folders)');
+            var res = await A.driveFolder(url);
+            if(res.error && !res.files.length){ folderErr = 'Couldn’t read a folder: ' + escapeHtml(res.error) + '.'; continue; }
+            res.files.forEach(function(f){
+              var pdf = /pdf$/i.test(f.mime || '') || /\.pdf$/i.test(f.name || '') || /google-apps\.(document|presentation)$/.test(f.mime || '');
+              if(!pdf){ skipped++; return; }
+              found.push({ name: String(f.name || '').replace(/\.pdf$/i, ''), url: f.url || ('https://drive.google.com/file/d/' + f.id + '/view'), path: f.path || '' });
+            });
+          } else found.push({ name: named, url: url, path: '', ask: !named });
+        }
+        found = found.filter(function(f){ var k = pdfDriveId(f.url); if(seen[k]) return false; seen[k] = 1; return true; });
+        if(!found.length){ busy = false; this.disabled = false; status(folderErr || 'No PDFs found in what you pasted.'); return; }
+        // names of single links, from Drive (in the app)
+        var ask = found.filter(function(f){ return f.ask; });
+        for(var j = 0; j < ask.length; j++){
+          status('Reading names from Drive… ' + (j + 1) + ' of ' + ask.length);
+          var t = canName ? await A.pdfTitle(ask[j].url) : '';
+          ask[j].name = String(t || '').replace(/\.pdf$/i, '').trim() || ('PDF ' + (j + 1));
+        }
+        // match by names
+        var have = piExisting(scope ? [scope] : Object.keys(idx.apps), idx);
+        rows = found.map(function(f){
+          var hit = scope ? { id: scope, words: STUDY[scope].title } : piAppOf(f.name, f.path, idx);
+          var r = { name: f.name.slice(0, 80), url: f.url, path: f.path, app: hit ? hit.id : '', ls: [], all: true, how: 'none', on: false, ai: false };
+          var was = have[pdfDriveId(r.url)];
+          if(was){ r.dup = (STUDY[was] || {}).title || was; r.app = r.app || was; return r; }
+          if(!hit){ var any = piAnyLesson(f.name, idx); if(any){ hit = { id: any.app, words: '' }; r.app = any.app; } }
+          if(r.app){
+            var l = piLessonOf(r.app, f.name, f.path, hit.words, idx);
+            if(l){ r.ls = [l.id]; r.all = false; }
+            r.how = 'name'; r.on = !r.dup;
+            // a name with words of its own that matched no lesson: worth asking the AI where it goes
+            var own = piToks(f.name).filter(function(w){ return (' ' + todoNorm(hit.words) + ' ').indexOf(' ' + w + ' ') === -1; });
+            if(!l && own.length && piLessons(r.app, idx).length > 1) r.ai = true;
+          } else r.ai = true;
+          return r;
+        });
+        var matched = rows.filter(function(r){ return r.how === 'name' && !r.dup; }).length, dups = rows.filter(function(r){ return r.dup; }).length;
+        var head = rows.length + ' PDF' + (rows.length === 1 ? '' : 's') + ' found' + (skipped ? ' (' + skipped + ' other file' + (skipped === 1 ? '' : 's') + ' skipped)' : '') + (dups ? ' · ' + dups + ' already added' : '') + ' · ' + matched + ' placed by name';
+        status(head + (folderErr ? '<br>' + folderErr : ''));
+        draw();
+        if(rows.some(function(r){ return r.ai && !r.dup; })){
+          if(aiReady()){
+            var got = await piAskAi(rows.filter(function(r){ return !r.dup; }), idx, scope, status);
+            status(head + ' · ' + got + ' by your AI. Check them, then attach.' + (folderErr ? '<br>' + folderErr : ''));
+            draw();
+          } else status(document.getElementById('piStatus').innerHTML + '<br>Turn on AI (☰ → AI tutor) to place the rest automatically, or choose them below.');
+        }
+      }catch(e){ status('Something went wrong: ' + escapeHtml(String(e && e.message || e))); }
+      busy = false; this.disabled = false; count();
+    });
+  }
+  document.getElementById('pdfImportBtn').addEventListener('click', function(){ try{ closeAllMenus(); }catch(e){} openPdfImport(null); });
+  // a mini app's Manage PDFs → "Import a folder": that app only
+  window.addEventListener('message', function(e){
+    var f = document.getElementById('studyFrame');
+    if(e.origin !== location.origin || !e.data || e.data.type !== 'pathshala-pdf-import' || !f || e.source !== f.contentWindow || !studyOpen) return;
+    openPdfImport(studyOpen === 'history' ? null : studyOpen);
+  });
+
   window.addEventListener('popstate', function(){
     if(location.hash === '#drill') return;
     if(drillOpen){ closeDrill(true); if(drillOpen) return; }
@@ -1269,7 +1523,11 @@
     var m = /^notes_(\w+)$/.exec(id || '');   // a mini app's notes (study-ui.js "My notes"): localStorage shabdNotes_<page>
     if(m) return STUDY[m[1]] ? { key: notesKey(m[1]), title: 'Notes · ' + STUDY[m[1]].title } : undefined;
     m = /^pdfs_(\w+)$/.exec(id || '');        // its chapter PDFs (study-ui.js "Chapter PDFs"): shabdPdfs_<page>, same shape as notes
-    return m && STUDY[m[1]] ? { key: 'shabdPdfs_' + String(STUDY[m[1]].file).replace(/\.html?$/, ''), title: 'PDFs · ' + STUDY[m[1]].title } : undefined;
+    if(m && STUDY[m[1]]) return { key: 'shabdPdfs_' + String(STUDY[m[1]].file).replace(/\.html?$/, ''), title: 'PDFs · ' + STUDY[m[1]].title };
+    // a hub's sub-page (the Computer app's three): notes_<page> / pdfs_<page>
+    m = /^(notes|pdfs)_(study-[\w-]+)$/.exec(id || '');
+    if(m && Object.keys(PDF_SUB_PAGES || {}).some(function(h){ return PDF_SUB_PAGES[h].indexOf(m[2] + '.html') !== -1; })) return { key: (m[1] === 'notes' ? 'shabdNotes_' : 'shabdPdfs_') + m[2], title: (m[1] === 'notes' ? 'Notes · ' : 'PDFs · ') + m[2] };
+    return undefined;
   }
   function notesKey(id){ return 'shabdNotes_' + String(STUDY[id].file).replace(/\.html?$/, ''); }
   function notesParse(js){ try{ var d = JSON.parse(js || 'null'); return d && d.n && typeof d.n === 'object' ? d : { v: 1, n: {} }; }catch(e){ return { v: 1, n: {} }; } }
