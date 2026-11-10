@@ -1328,18 +1328,23 @@ html.un-placing #app{cursor:crosshair}
 })();
 
 /* ============================================================
-   CHAPTER PDFs — attach a Google Drive PDF (shared "Anyone with the link") to any chapter and read it inside the app.
-   - On the list of chapters, a chapter with PDFs gets a 📄 button at the right end of its row (📄 2 for two or more,
-     which opens a small list). Rows are .les[data-open] in .lessons (lesson apps, the Maths formula book) and the
-     unit headers .uh[data-unit] in Grammar 100; each is wrapped in a .pdf-rw so the button can sit beside it.
-   - Under a lesson's title: "📄 PDFs" with a chip per PDF and "＋ Attach PDF". A chip opens the PDF full screen
-     (Google's viewer: scroll, page jump), with − / ＋ (a wider frame → bigger pages), and ✎ to rename, move to
-     another chapter or remove it. In the Android app (3.4+) a pinch zooms it too.
-   - Links: drive.google.com/file/d/<id>/…, …open?id=<id>, docs.google.com/<document|presentation|spreadsheets>/d/<id>
-     (shown through their /preview page); any other https link to a PDF goes through Google's viewer (docs.google.com/viewer).
-   - Saved per app in localStorage "shabdPdfs_<page>" as { v:1, n: { id: { les, name, url, c, u, o?, del? } } }
-     (les = the chapter's lesson id, o = last opened). Same shape as My notes, so the app syncs it the same way,
-     as "pdfs_<app id>" in your account, merged PDF by PDF (newest change wins; a removed one stays as { del, u }).
+   CHAPTER PDFs — Google Drive PDFs (shared "Anyone with the link") attached to a whole mini app or to any of its
+   lessons, and read inside the app.
+   - Learn page: a "📄 PDFs for this app" card above the lessons, with the app's own PDFs and "Manage PDFs".
+   - Manage PDFs: paste one link or many (one per line; "Name | link" names it). Inside the Android app (3.5+) each
+     name is read from Drive (PathshalaApp.pdfTitle); otherwise "PDF 1"… — rename in place. Then attach each PDF to
+     the whole app and/or any lessons, from either side: "By PDF" (a PDF → tick lessons) or "By lesson" (a lesson →
+     tick PDFs).
+   - A lesson: "📄 PDFs" under its title with its PDFs, the app's own ones (marked "app") and "＋ Attach PDF".
+   - The list of lessons: 📄 at the right end of a lesson's row with its own PDFs (📄 2 → a short list).
+     Rows are .les[data-open] in .lessons (lesson apps, the Maths formula book; wrapped in a .pdf-rw) and the unit
+     cards of Grammar 100 (.unit, beside .uh[data-unit]).
+   - The reader: full screen through Google's viewer (drive /preview, Docs / Slides / Sheets /preview, any other
+     https PDF via docs.google.com/viewer), − / ＋ (a wider frame → bigger pages), pinch in the app (3.4+), ✎ to edit.
+   - Saved per app in localStorage "shabdPdfs_<page>": { v:1, n: { id: { name, url, ls: [lesson ids], all?, les,
+     c, u, o?, del? } } } — all = the whole app, o = last opened, les = ls[0] (what older versions read). Same shape
+     as My notes, so the app syncs it the same way, as "pdfs_<app id>", merged PDF by PDF (newest change wins;
+     a removed one stays as { del, u }).
    ============================================================ */
 (function(){
   if (window.__studyPdfs) return;
@@ -1349,14 +1354,20 @@ html.un-placing #app{cursor:crosshair}
   const KEY = "shabdPdfs_" + FILE;
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
   const now = () => Date.now();
+  const newId = () => "p" + now().toString(36) + Math.random().toString(36).slice(2, 6);
   function load(){ try { const d = JSON.parse(localStorage.getItem(KEY) || "null"); if (d && d.n && typeof d.n === "object") return d; } catch (e) {} return { v: 1, n: {} }; }
   function save(d){
     try { localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) { toast("Couldn't save — this device's storage is full."); return false; }
     try { if (parent !== window) parent.postMessage({ type: "pathshala-pdfs", file: FILE }, location.origin); } catch (e) {}
-    strip(true); rows();
+    paint();
     return true;
   }
-  const list = les => { const n = load().n; return Object.keys(n).filter(id => !n[id].del && (les === undefined || String(n[id].les || "") === String(les || ""))).map(id => Object.assign({ id }, n[id])).sort((a, b) => (a.c || 0) - (b.c || 0)); };
+  const lsOf = p => Array.isArray(p.ls) ? p.ls.map(String) : (p.les != null && p.les !== "" ? [String(p.les)] : []);
+  const put = (d, id, p) => { const ls = lsOf(p); d.n[id] = Object.assign({}, p, { ls, les: ls[0] || null, u: now() }); if (!p.all) delete d.n[id].all; };
+  const list = () => { const n = load().n; return Object.keys(n).filter(id => !n[id].del).map(id => Object.assign({ id }, n[id])).sort((a, b) => (a.c || 0) - (b.c || 0)); };
+  const forLesson = les => list().filter(p => lsOf(p).includes(String(les)));
+  const forApp = () => list().filter(p => p.all);
+
   // Three kinds of page: lesson apps (LESSONS + openLesson, a .lhead on a lesson), the Maths formula book
   // (CH + openLesson, a single .chap with #mark) and Grammar 100 (DATA units of RULE, openRule, a .rulehead).
   const kind = () => {
@@ -1365,16 +1376,19 @@ html.un-placing #app{cursor:crosshair}
     try { if (Array.isArray(LESSONS) && LESSONS.length) return "les"; } catch (e) {}
     return "";
   };
-  const lessons = () => {                                      // [{ id, title }] — the chapters a PDF can belong to
+  const lessons = () => {                                      // [{ id, title }] — what a PDF can belong to
     const k = kind();
     if (k === "les") return LESSONS.map(l => ({ id: String(l.id), title: l.title }));
     if (k === "ch") return CH.map(c => ({ id: String(c.id), title: c.t || c.title || c.id }));
     if (k === "rule") return DATA.map(u => ({ id: "u" + u.n, title: "Unit " + u.n + " · " + u.name }));
     return [];
   };
+  const lessonNo = id => lessons().findIndex(x => String(x.id) === String(id)) + 1;
   const lessonTitle = id => { const l = lessons().find(x => String(x.id) === String(id)); return l ? l.title : ""; };
+  const appTitle = () => { try { if (typeof APP === "object" && APP.title) return APP.title; } catch (e) {} return document.title; };
+  const where = p => { const ls = lsOf(p), bits = []; if (p.all) bits.push("Whole app"); if (ls.length) bits.push(ls.length === 1 ? lessonTitle(ls[0]) : ls.length + " lessons"); return bits.join(" · "); };
 
-  // the chapter on screen: the lesson (or Grammar rule's unit) the page last opened, while it is showing
+  // the lesson on screen: the one the page last opened (or a Grammar rule's unit), while it is showing
   let lesson = null;
   function wrap(name, take){
     const f = window[name];
@@ -1388,13 +1402,27 @@ html.un-placing #app{cursor:crosshair}
     wrap("openRule", n => { try { return RULE[n] ? "u" + RULE[n].ch : null; } catch (e) { return null; } });
   }
   hook(); addEventListener("load", hook);
-  function anchor(){
+  function anchor(){                                           // where a lesson's strip goes (null: not in a lesson)
     const app = document.getElementById("app"), k = kind();
     if (!app || lesson === null) return null;
     if (k === "ch") return app.querySelectorAll(".chap").length === 1 && app.querySelector("#mark") ? app.querySelector(".chap > .stack") : null;
     if (k === "rule") return app.querySelector(".rulehead");
     if (!app.querySelector(".lhead")) return null;
     return app.querySelector(".steps") || app.querySelector(".lhead ~ h1") || app.querySelector(".lhead");
+  }
+  function frontAnchor(){                                      // the Learn page: before the first group of lessons
+    const app = document.getElementById("app");
+    if (!app || anchor()) return null;
+    const first = app.querySelector(".lessons, .unit");
+    if (!first) return null;
+    let c = first;
+    while (c.parentElement && c.parentElement.parentElement !== app && c.parentElement !== app) c = c.parentElement;
+    for (;;) {                                                 // keep a group's heading, note and the search box with it
+      const p = c.previousElementSibling;
+      if (p && p.matches(".grph, input.search, p.muted") && !p.matches(".pdf-app")) { c = p; continue; }
+      break;
+    }
+    return c;
   }
 
   // ---------- a link → the page that shows it ----------
@@ -1410,24 +1438,56 @@ html.un-placing #app{cursor:crosshair}
     if (host === "docs.google.com" && (m = u.pathname.match(/\/(document|presentation|spreadsheets)\/d\/([\w-]{10,})/))) return `https://docs.google.com/${m[1]}/d/${m[2]}/preview`;
     return "https://docs.google.com/viewer?embedded=true&url=" + encodeURIComponent(u.href);
   }
+  // the file's name from Drive: only the Android app can read it (3.5+); "" when it can't
+  const canName = () => { try { const A = window.PathshalaApp || (parent !== window && parent.PathshalaApp); return !!(A && A.pdfTitle); } catch (e) { return false; } };
+  function driveName(url){
+    try {
+      const A = window.PathshalaApp || (parent !== window && parent.PathshalaApp);
+      if (!A || !A.pdfTitle) return Promise.resolve("");
+      return Promise.resolve(A.pdfTitle(url)).then(t => String(t || "").replace(/\.pdf$/i, "").trim().slice(0, 80), () => "");
+    } catch (e) { return Promise.resolve(""); }
+  }
 
   // ---------- the strip under a lesson's title ----------
   const bar = document.createElement("div");
   bar.className = "un-ui pdf-strip";
+  const chip = (p, app) => `<button type="button" class="pdf-chip" data-pdf="${esc(p.id)}" title="${esc(p.name)}${p.o ? " · last opened " + esc(when(p.o)) : ""}"><b>${esc(p.name)}</b>${app ? `<i>app</i>` : ""}${p.o ? `<small>${esc(when(p.o))}</small>` : ""}</button>`;
   function strip(force){
     const at = anchor();
     if (!at) { if (bar.isConnected) bar.remove(); return; }
-    const mine = list(lesson), sig = lesson + "|" + mine.map(p => p.id + p.u).join(",");
+    const mine = forLesson(lesson), app = forApp().filter(p => !mine.some(q => q.id === p.id));
+    const sig = lesson + "|" + mine.concat(app).map(p => p.id + p.u).join(",");
     if (force || bar.dataset.sig !== sig) {
       bar.dataset.sig = sig;
-      bar.innerHTML = `<span class="pdf-lbl">📄 PDFs</span>` + mine.map(p => `<button type="button" class="pdf-chip" data-pdf="${esc(p.id)}" title="${esc(p.name)}${p.o ? " · last opened " + esc(when(p.o)) : ""}"><b>${esc(p.name)}</b>${p.o ? `<small>${esc(when(p.o))}</small>` : ""}</button>`).join("") +
+      bar.innerHTML = `<span class="pdf-lbl">📄 PDFs</span>` + mine.map(p => chip(p)).join("") + app.map(p => chip(p, 1)).join("") +
         `<button type="button" class="pdf-add">＋ Attach PDF</button>`;
       bar.querySelectorAll("[data-pdf]").forEach(b => b.onclick = () => open(b.dataset.pdf));
-      bar.querySelector(".pdf-add").onclick = () => edit({ les: lesson });
+      bar.querySelector(".pdf-add").onclick = () => edit({ ls: lesson !== null ? [lesson] : [] });
     }
     if (at.nextElementSibling !== bar) at.after(bar);
   }
-  // ---------- 📄 at the right end of a chapter's row on the list ----------
+
+  // ---------- the card on the Learn page ----------
+  const card = document.createElement("div");
+  card.className = "un-ui pdf-app";
+  function front(force){
+    const at = frontAnchor();
+    if (!at) { if (card.isConnected) card.remove(); return; }
+    const app = forApp(), inLes = list().filter(p => !p.all && lsOf(p).length).length, loose = list().filter(p => !p.all && !lsOf(p).length).length;
+    const sig = app.map(p => p.id + p.u).join(",") + "|" + inLes + "|" + loose;
+    if (force || card.dataset.sig !== sig) {
+      card.dataset.sig = sig;
+      card.innerHTML = `<div class="pdf-ah"><b>📄 PDFs for this app</b><button type="button" class="pdf-mng">Manage PDFs</button></div>` +
+        (app.length ? `<div class="pdf-alist">${app.map(p => `<button type="button" class="pdf-arow" data-pdf="${esc(p.id)}"><span>📄</span><b>${esc(p.name)}</b><small>${p.o ? "opened " + esc(when(p.o)) : "not opened yet"}</small></button>`).join("")}</div>`
+          : `<p class="pdf-anone">${inLes || loose ? "No PDF for the whole app yet." : "Paste Google Drive links in <b>Manage PDFs</b> — attach your notes to the whole app or to its lessons."}</p>`) +
+        (inLes || loose ? `<p class="pdf-ameta">${inLes ? inLes + " PDF" + (inLes > 1 ? "s" : "") + " in lessons (📄 on their rows)" : ""}${inLes && loose ? " · " : ""}${loose ? loose + " not attached yet" : ""}</p>` : "");
+      card.querySelectorAll("[data-pdf]").forEach(b => b.onclick = () => open(b.dataset.pdf));
+      card.querySelector(".pdf-mng").onclick = () => manager();
+    }
+    if (at.previousElementSibling !== card) at.before(card);
+  }
+
+  // ---------- 📄 at the right end of a lesson's row on the list ----------
   function rows(){
     const app = document.getElementById("app");
     if (!app) return;
@@ -1437,7 +1497,7 @@ html.un-placing #app{cursor:crosshair}
     if (!found.length) return;
     const all = list();
     found.forEach(([row, les]) => {
-      const mine = all.filter(p => String(p.les || "") === String(les));
+      const mine = all.filter(p => lsOf(p).includes(String(les)));
       // Grammar's unit header is styled as a child of its card (.unit), so the card holds the button; a lesson row gets a wrapper
       const own = k === "rule";
       let w = own ? row.parentElement : (row.parentElement && row.parentElement.classList.contains("pdf-rw") ? row.parentElement : null);
@@ -1451,12 +1511,12 @@ html.un-placing #app{cursor:crosshair}
       g.style.top = mid; w.style.setProperty("--pdf-mid", mid || "50%");
       if (g.dataset.sig !== sig) {
         g.dataset.sig = sig; g.innerHTML = label;
-        g.setAttribute("aria-label", mine.length > 1 ? mine.length + " PDFs for this chapter" : "Open the PDF: " + mine[0].name);
+        g.setAttribute("aria-label", mine.length > 1 ? mine.length + " PDFs for this lesson" : "Open the PDF: " + mine[0].name);
         g.title = mine.length > 1 ? mine.length + " PDFs" : mine[0].name;
       }
       g.onclick = e => {
         e.stopPropagation();
-        const ps = list().filter(p => String(p.les || "") === String(les));
+        const ps = forLesson(les);
         if (ps.length === 1) { open(ps[0].id); return; }
         pick(w, ps);
       };
@@ -1471,7 +1531,7 @@ html.un-placing #app{cursor:crosshair}
     m.innerHTML = ps.map(p => `<button type="button" role="menuitem" data-pdf="${esc(p.id)}">📄 ${esc(p.name)}<small>${p.o ? "opened " + esc(when(p.o)) : "not opened yet"}</small></button>`).join("");
     w.appendChild(m);
     m.querySelectorAll("[data-pdf]").forEach(b => b.onclick = e => { e.stopPropagation(); m.remove(); open(b.dataset.pdf); });
-    // a tap outside only closes the list (it doesn't also open the chapter under it)
+    // a tap outside only closes the list (it doesn't also open the lesson under it)
     const eat = e => { e.preventDefault(); e.stopImmediatePropagation(); };
     const off = e => {
       if (!m.isConnected) { document.removeEventListener("pointerdown", off, true); return; }   // closed another way
@@ -1482,56 +1542,197 @@ html.un-placing #app{cursor:crosshair}
     };
     setTimeout(() => document.addEventListener("pointerdown", off, true), 0);
   }
+  function paint(){ strip(true); front(true); rows(); if (mgr && mgr.isConnected) mgr._draw(); }
   let t = 0;
-  const soon = () => { clearTimeout(t); t = setTimeout(() => { hook(); strip(); rows(); }, 80); };
+  const soon = () => { clearTimeout(t); t = setTimeout(() => { hook(); strip(); front(); rows(); }, 80); };
   const when = ms => { try { const d = new Date(ms), today = new Date(); return d.toDateString() === today.toDateString() ? "today" : d.toLocaleDateString(undefined, { day: "numeric", month: "short" }); } catch (e) { return ""; } };
 
-  // ---------- sheets (the phone's Back closes them) ----------
+  // ---------- layers: each one is a step in the history, so the phone's Back closes the top one ----------
+  const stack = [];
   function layer(cls, html){
-    shut();
-    if (!(history.state && history.state.unPdf)) { try { history.pushState(Object.assign({}, history.state, { unPdf: 1 }), ""); } catch (e) {} }
     const ov = document.createElement("div"); ov.className = "un-ui " + cls; ov.innerHTML = html;
-    document.body.appendChild(ov); return ov;
+    document.body.appendChild(ov); stack.push(ov);
+    try { history.pushState(Object.assign({}, history.state, { unPdf: stack.length }), ""); ov._h = 1; } catch (e) {}
+    document.documentElement.classList.add("pdf-lock");
+    return ov;
   }
   // Inside the Android app the phone's own pinch-zoom is off (the app scales its pages itself); APK 3.4+ turns it on
   // while a PDF is open (PathshalaApp.pinchZoom), so Google's viewer can be pinched, and back off (zoom reset) on close.
   const pinch = on => { try { const A = window.PathshalaApp || (parent !== window && parent.PathshalaApp); if (A && A.pinchZoom) A.pinchZoom(on); } catch (e) {} };
-  function shut(){
-    const had = !!document.querySelector(".pdf-view");
-    document.querySelectorAll(".pdf-ov, .pdf-view").forEach(o => o.remove()); document.documentElement.classList.remove("pdf-lock");
-    if (had) pinch(false);
+  function pop(){
+    const top = stack.pop();
+    if (top) { if (top.classList.contains("pdf-view")) pinch(false); top.remove(); }
+    if (!stack.length) document.documentElement.classList.remove("pdf-lock");
+    else if (stack[stack.length - 1].classList.contains("pdf-view")) pinch(true);
   }
-  function close(){ if (history.state && history.state.unPdf) history.back(); else shut(); }
-  addEventListener("popstate", () => { if (!(history.state && history.state.unPdf)) shut(); });
+  function close(n){ n = n || 1; const h = stack.slice(-n).filter(o => o._h).length; if (h) history.go(-h); else for (let i = 0; i < n; i++) pop(); }
+  addEventListener("popstate", () => { const want = (history.state && history.state.unPdf) || 0; while (stack.length > want) pop(); });
   function toast(msg){ const el = document.createElement("div"); el.className = "un-ui un-toast"; el.textContent = msg; document.body.appendChild(el); setTimeout(() => el.remove(), 2600); }
 
-  // ---------- attach / edit ----------
-  function edit(p){
-    const ls = lessons();
-    const ov = layer("pdf-ov", `<div class="un-card pdf-card" role="dialog" aria-label="Attach a PDF">
+  // ---------- ticking: lessons for one PDF, or PDFs for one lesson ----------
+  function tick(title, items, done){
+    // items: [{ key, label, sub?, on, head? }]
+    const ov = layer("pdf-ov", `<div class="un-card pdf-card" role="dialog" aria-label="${esc(title)}">
+      <h3 class="un-h">${esc(title)}</h3>
+      <div class="pdf-ticks">${items.map(x => `<label class="pdf-tk${x.head ? " head" : ""}"><input type="checkbox" value="${esc(x.key)}"${x.on ? " checked" : ""}><span>${x.label}${x.sub ? `<small>${x.sub}</small>` : ""}</span></label>`).join("") || `<p class="pdf-anone">Nothing to choose yet.</p>`}</div>
+      <div class="un-row"><button type="button" class="un-btn pdf-none">Clear</button><span></span><button type="button" class="un-btn pdf-cancel">Cancel</button><button type="button" class="un-btn un-pri pdf-ok">Done</button></div></div>`);
+    ov.addEventListener("click", e => { if (e.target === ov) close(); });
+    ov.querySelector(".pdf-cancel").onclick = () => close();
+    ov.querySelector(".pdf-none").onclick = () => ov.querySelectorAll("input").forEach(i => i.checked = false);
+    ov.querySelector(".pdf-ok").onclick = () => { const on = [...ov.querySelectorAll("input:checked")].map(i => i.value); close(); done(on); };
+  }
+  function tickLessons(id){
+    const p = load().n[id]; if (!p || p.del) return;
+    const ls = lsOf(p);
+    tick("Attach “" + p.name + "” to", [{ key: "*all", label: "<b>Whole app</b>", sub: "On the Learn page and in every lesson", on: !!p.all, head: 1 }]
+      .concat(lessons().map((l, i) => ({ key: l.id, label: `<em>${i + 1}</em> ${esc(l.title)}`, on: ls.includes(l.id) }))), on => {
+      const d = load(), x = d.n[id]; if (!x || x.del) return;
+      put(d, id, Object.assign({}, x, { all: on.includes("*all") ? 1 : 0, ls: on.filter(k => k !== "*all") }));
+      save(d);
+    });
+  }
+  function tickPdfs(les){
+    const ps = list(), isApp = les === "*all";
+    tick(isApp ? "PDFs for the whole app" : "PDFs for " + lessonNo(les) + " · " + lessonTitle(les), ps.map(p => ({ key: p.id, label: `<b>${esc(p.name)}</b>`, sub: esc(where(p) || "not attached yet"), on: isApp ? !!p.all : lsOf(p).includes(String(les)) })), on => {
+      const d = load();
+      ps.forEach(p => {
+        const x = d.n[p.id]; if (!x || x.del) return;
+        const want = on.includes(p.id);
+        if (isApp) { if (!!x.all !== want) put(d, p.id, Object.assign({}, x, { all: want ? 1 : 0 })); return; }
+        const ls = lsOf(x), has = ls.includes(String(les));
+        if (has !== want) put(d, p.id, Object.assign({}, x, { ls: want ? ls.concat(String(les)) : ls.filter(k => k !== String(les)) }));
+      });
+      save(d);
+    });
+  }
+
+  // ---------- Manage PDFs ----------
+  let mgr = null, view = "pdf";
+  const fresh = new Set(), reading = new Set();
+  function manager(){
+    mgr = layer("pdf-mgr", `<div class="pdf-top"><button type="button" class="pdf-x" aria-label="Back">‹</button>
+        <div class="pdf-t"><b>Manage PDFs</b><small>${esc(appTitle())}</small></div></div>
+      <div class="pdf-mbody">
+        <section class="pdf-paste">
+          <label for="pdfLinks"><b>Add PDFs</b> — paste Google Drive links, one per line</label>
+          <textarea id="pdfLinks" rows="3" placeholder="https://drive.google.com/file/d/…&#10;https://drive.google.com/file/d/…&#10;Lecture 3 | https://drive.google.com/file/d/…"></textarea>
+          <div class="pdf-prow"><small>${canName() ? "Names are read from Drive. Write <b>Name | link</b> to name one yourself." : "Write <b>Name | link</b> to name one, or rename it below. (The Android app 3.5+ reads names from Drive.)"} Files must be shared as <b>Anyone with the link</b>.</small><button type="button" class="un-btn un-pri pdf-addall">Add</button></div>
+        </section>
+        <div class="pdf-seg" role="tablist"><button type="button" data-v="pdf">By PDF</button><button type="button" data-v="les">By lesson</button></div>
+        <div class="pdf-mlist"></div>
+      </div>`);
+    mgr.querySelector(".pdf-x").onclick = () => close();
+    mgr.querySelectorAll(".pdf-seg button").forEach(b => b.onclick = () => { view = b.dataset.v; mgr._draw(); });
+    mgr.querySelector(".pdf-addall").onclick = addAll;
+    mgr._draw = draw;
+    draw();
+  }
+  function addAll(){
+    const ta = mgr.querySelector("#pdfLinks"), lines = ta.value.split(/\n+/).map(s => s.trim()).filter(Boolean);
+    if (!lines.length) { toast("Paste one or more links first"); ta.focus(); return; }
+    const d = load(), have = new Set(Object.keys(d.n).filter(k => !d.n[k].del).map(k => viewUrl(d.n[k].url)));
+    let added = 0, dup = 0, bad = 0, n = Object.keys(d.n).filter(k => !d.n[k].del).length;
+    const ask = [];
+    lines.forEach(line => {
+      const m = line.match(/https?:\/\/\S+/);
+      if (!m || !viewUrl(m[0])) { bad++; return; }
+      const url = m[0].replace(/[),.;]+$/, ""), v = viewUrl(url);
+      if (have.has(v)) { dup++; return; }
+      have.add(v);
+      let name = line.includes("|") ? line.split("|")[0].trim() : line.slice(0, m.index).replace(/[-–:|]+\s*$/, "").trim();
+      const id = newId();
+      n++;
+      put(d, id, { name: (name || "PDF " + n).slice(0, 80), url, ls: [], c: now() + added });
+      if (!name) { d.n[id].auto = 1; ask.push([id, url]); }
+      fresh.add(id); added++;
+    });
+    if (added && save(d)) ta.value = "";
+    toast([added ? added + " added" : "", dup ? dup + " already there" : "", bad ? bad + " not a link" : ""].filter(Boolean).join(" · ") || "Nothing added");
+    if (view !== "pdf") { view = "pdf"; draw(); }
+    // names from Drive, one by one (only in the app)
+    ask.forEach(([id, url]) => {
+      if (!canName()) return;
+      reading.add(id); draw();
+      driveName(url).then(name => {
+        reading.delete(id);
+        const d2 = load(), x = d2.n[id];
+        if (name && x && !x.del && x.auto) { delete x.auto; x.name = name; x.u = now(); save(d2); }
+        else draw();
+      });
+    });
+  }
+  function draw(){
+    if (!mgr || !mgr.isConnected) return;
+    mgr.querySelectorAll(".pdf-seg button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.v === view)));
+    const box = mgr.querySelector(".pdf-mlist"), ps = list(), act = document.activeElement;
+    if (act && act.classList && act.classList.contains("pdf-nm") && box.contains(act)) return;   // don't redraw under typing
+    if (view === "pdf") {
+      const order = ps.filter(p => fresh.has(p.id)).reverse().concat(ps.filter(p => !fresh.has(p.id)));
+      box.innerHTML = order.length ? order.map(p => {
+        const ls = lsOf(p), tags = (p.all ? [`<span class="pdf-tag app">Whole app</span>`] : []).concat(ls.map(id => `<span class="pdf-tag">${lessonNo(id) || "?"} · ${esc(lessonTitle(id) || id)}</span>`));
+        return `<div class="pdf-item${fresh.has(p.id) ? " new" : ""}" data-id="${esc(p.id)}">
+          <div class="pdf-ir"><input class="pdf-nm" value="${esc(p.name)}" maxlength="80" aria-label="Name">${reading.has(p.id) ? `<small class="pdf-rd">reading name…</small>` : ""}
+            <button type="button" class="pdf-ib pdf-op" aria-label="Open" title="Open">📄</button><button type="button" class="pdf-ib pdf-rm" aria-label="Remove" title="Remove">🗑</button></div>
+          <div class="pdf-tags">${tags.length ? tags.join("") : `<span class="pdf-tag none">Not attached yet</span>`}<button type="button" class="pdf-lsb">${tags.length ? "Change" : "Attach to…"}</button></div></div>`;
+      }).join("") : `<p class="pdf-anone">No PDFs yet. Paste links above and tap <b>Add</b>.</p>`;
+      box.querySelectorAll(".pdf-item").forEach(el => {
+        const id = el.dataset.id, nm = el.querySelector(".pdf-nm");
+        nm.onchange = () => { const v = nm.value.trim().replace(/\s+/g, " "); const d = load(), x = d.n[id]; if (!x || x.del) return; if (!v) { nm.value = x.name; return; } if (v !== x.name) { delete x.auto; x.name = v; x.u = now(); save(d); } };
+        nm.onkeydown = e => { if (e.key === "Enter") nm.blur(); };
+        el.querySelector(".pdf-op").onclick = () => open(id);
+        el.querySelector(".pdf-lsb").onclick = () => tickLessons(id);
+        el.querySelector(".pdf-rm").onclick = () => remove(id);
+      });
+    } else {
+      const row = (key, title, sub, ps2) => `<div class="pdf-lrow" data-les="${esc(key)}"><div class="pdf-lh"><b>${title}</b>${sub ? `<small>${sub}</small>` : ""}</div>
+        <div class="pdf-tags">${ps2.map(p => `<button type="button" class="pdf-tag pdf-tp" data-pdf="${esc(p.id)}">📄 ${esc(p.name)}</button>`).join("")}<button type="button" class="pdf-lsb">${ps2.length ? "Change" : "＋ PDFs"}</button></div></div>`;
+      box.innerHTML = (ps.length ? "" : `<p class="pdf-anone">No PDFs yet. Paste links above and tap <b>Add</b>.</p>`) +
+        row("*all", "Whole app", "On the Learn page and in every lesson", ps.filter(p => p.all)) +
+        lessons().map((l, i) => row(l.id, `<em>${i + 1}</em> ${esc(l.title)}`, "", ps.filter(p => lsOf(p).includes(l.id)))).join("");
+      box.querySelectorAll(".pdf-lrow").forEach(el => {
+        el.querySelector(".pdf-lsb").onclick = () => { if (!list().length) { toast("Add some PDFs first"); mgr.querySelector("#pdfLinks").focus(); return; } tickPdfs(el.dataset.les); };
+        el.querySelectorAll(".pdf-tp").forEach(b => b.onclick = () => open(b.dataset.pdf));
+      });
+    }
+  }
+  function remove(id, then){
+    const p = load().n[id]; if (!p || p.del) return;
+    if (!confirm("Remove “" + p.name + "” from this app? (The file stays in your Drive.)")) return;
+    const d = load(); d.n[id] = { del: 1, u: now() }; fresh.delete(id);
+    if (save(d)) { toast("PDF removed"); if (then) then(); }
+  }
+
+  // ---------- attach one (＋ Attach PDF) / edit one (✎) ----------
+  function edit(p, onDone){
+    const ls = lessons(), on = new Set(lsOf(p));
+    const ov = layer("pdf-ov", `<div class="un-card pdf-card" role="dialog" aria-label="${p.id ? "Edit PDF" : "Attach a PDF"}">
       <h3 class="un-h">${p.id ? "Edit PDF" : "Attach a PDF"}</h3>
       <label class="pdf-f"><span>Google Drive link</span><input type="url" class="pdf-url" inputmode="url" autocomplete="off" placeholder="https://drive.google.com/file/d/…" value="${esc(p.url || "")}"></label>
       <p class="pdf-tip">In Drive: ⋮ → Share → <b>General access: Anyone with the link</b> → Copy link.</p>
-      <label class="pdf-f"><span>Name</span><input type="text" class="pdf-name" maxlength="80" placeholder="e.g. Lecture 3 notes" value="${esc(p.name || "")}"></label>
-      ${ls.length ? `<label class="pdf-f"><span>Chapter</span><select class="pdf-les">${ls.map(l => `<option value="${esc(l.id)}"${String(l.id) === String(p.les) ? " selected" : ""}>${esc(l.title)}</option>`).join("")}</select></label>` : ""}
+      <label class="pdf-f"><span>Name</span><input type="text" class="pdf-name" maxlength="80" placeholder="${canName() ? "Read from Drive when you paste the link" : "e.g. Lecture 3 notes"}" value="${esc(p.name || "")}"></label>
+      <div class="pdf-f"><span>Show it in</span><div class="pdf-ticks short">
+        <label class="pdf-tk head"><input type="checkbox" value="*all"${p.all ? " checked" : ""}><span><b>Whole app</b><small>On the Learn page and in every lesson</small></span></label>
+        ${ls.map((l, i) => `<label class="pdf-tk"><input type="checkbox" value="${esc(l.id)}"${on.has(l.id) ? " checked" : ""}><span><em>${i + 1}</em> ${esc(l.title)}</span></label>`).join("")}</div></div>
       <div class="un-row">${p.id ? `<button type="button" class="un-btn un-del">Remove</button>` : ""}<span></span><button type="button" class="un-btn pdf-cancel">Cancel</button><button type="button" class="un-btn un-pri pdf-save">${p.id ? "Save" : "Attach"}</button></div></div>`);
     ov.addEventListener("click", e => { if (e.target === ov) close(); });
     const url = ov.querySelector(".pdf-url"), name = ov.querySelector(".pdf-name");
-    setTimeout(() => (p.id ? name : url).focus(), 60);
-    ov.querySelector(".pdf-cancel").onclick = close;
-    if (p.id) ov.querySelector(".un-del").onclick = () => {
-      if (!confirm("Remove “" + p.name + "” from this chapter? (The file stays in your Drive.)")) return;
-      const d = load(); d.n[p.id] = { del: 1, u: now() }; if (save(d)) { close(); toast("PDF removed"); }
-    };
+    setTimeout(() => { (p.id ? name : url).focus(); const first = ov.querySelector(".pdf-ticks input:checked:not([value='*all'])"); if (first) first.closest("label").scrollIntoView({ block: "nearest" }); }, 60);
+    let auto = !p.name;
+    name.oninput = () => { auto = !name.value.trim(); };
+    const guess = () => { const v = url.value.trim(); if (!auto || !viewUrl(v) || !canName()) return; name.placeholder = "Reading the name from Drive…"; driveName(v).then(t => { if (auto && t && url.value.trim() === v) name.value = t; name.placeholder = "e.g. Lecture 3 notes"; }); };
+    url.addEventListener("change", guess); url.addEventListener("paste", () => setTimeout(guess, 0));
+    ov.querySelector(".pdf-cancel").onclick = () => close();
+    if (p.id) ov.querySelector(".un-del").onclick = () => remove(p.id, () => close(stack.length >= 2 && stack[stack.length - 2].classList.contains("pdf-view") ? 2 : 1));
     ov.querySelector(".pdf-save").onclick = () => {
       const v = url.value.trim(), nm = name.value.trim().replace(/\s+/g, " ");
       if (!viewUrl(v)) { toast("Paste the PDF's link (it starts with https://)"); url.focus(); return; }
       if (!nm) { toast("Give it a name"); name.focus(); return; }
-      const sel = ov.querySelector(".pdf-les"), les = sel ? sel.value : null;
-      const d = load(), id = p.id || ("p" + now().toString(36) + Math.random().toString(36).slice(2, 6)), old = d.n[id] || {};
-      d.n[id] = { les, name: nm, url: v, c: old.c || now(), u: now() };
-      if (old.o) d.n[id].o = old.o;
-      if (save(d)) { close(); toast(p.id ? "PDF updated" : "PDF attached 📄"); }
+      const picked = [...ov.querySelectorAll(".pdf-ticks input:checked")].map(i => i.value);
+      if (!picked.length) { toast("Tick the whole app or at least one lesson"); return; }
+      const d = load(), id = p.id || newId(), old = d.n[id] || {};
+      put(d, id, Object.assign({}, old, { name: nm, url: v, all: picked.includes("*all") ? 1 : 0, ls: picked.filter(k => k !== "*all"), c: old.c || now() }));
+      delete d.n[id].auto;
+      if (save(d)) { close(); toast(p.id ? "PDF updated" : "PDF attached 📄"); if (onDone) onDone(id); }
     };
   }
 
@@ -1542,26 +1743,29 @@ html.un-placing #app{cursor:crosshair}
     const src = viewUrl(p.url);
     p.o = now(); p.u = now(); save(d);
     const ov = layer("pdf-view", `<div class="pdf-top"><button type="button" class="pdf-x" aria-label="Close">‹</button>
-        <div class="pdf-t"><b>${esc(p.name)}</b><small>${esc(lessonTitle(p.les) || "")}</small></div>
+        <div class="pdf-t"><b>${esc(p.name)}</b><small>${esc(where(p))}</small></div>
         <button type="button" class="pdf-zo" aria-label="Zoom out" disabled>−</button><button type="button" class="pdf-zi" aria-label="Zoom in">＋</button><button type="button" class="pdf-ed" aria-label="Edit">✎</button></div>
       <div class="pdf-body"><div class="pdf-wait"><span>Opening the PDF…</span><small>Not opening, or asks you to sign in? In Google Drive set the file to <b>Share → General access → Anyone with the link</b>. It also needs the internet.</small></div><iframe class="pdf-frame" title="${esc(p.name)}" allow="fullscreen" referrerpolicy="no-referrer"></iframe></div>`);
-    document.documentElement.classList.add("pdf-lock");
     pinch(true);
     const fr = ov.querySelector(".pdf-frame");
     // − / ＋: Google's viewer fits its pages to its width, so a wider frame (scrolled sideways here) shows them bigger, still sharp
     let z = 1;
     const zo = ov.querySelector(".pdf-zo"), zi = ov.querySelector(".pdf-zi"), body = ov.querySelector(".pdf-body");
-    const zoom = d => {
+    const zoom = dz => {
       const cx = (body.scrollLeft + body.clientWidth / 2) / (body.scrollWidth || 1);
-      z = Math.round(Math.max(1, Math.min(3, z + d)) * 4) / 4;
+      z = Math.round(Math.max(1, Math.min(3, z + dz)) * 4) / 4;
       fr.style.width = (z * 100) + "%"; zo.disabled = z <= 1; zi.disabled = z >= 3;
       body.scrollLeft = cx * body.scrollWidth - body.clientWidth / 2;
     };
     zo.onclick = () => zoom(-0.5); zi.onclick = () => zoom(0.5);
     fr.addEventListener("load", () => { const w = ov.querySelector(".pdf-wait"); if (w) w.remove(); });
     fr.src = src;
-    ov.querySelector(".pdf-x").onclick = close;
-    ov.querySelector(".pdf-ed").onclick = () => edit(Object.assign({ id }, load().n[id]));
+    ov.querySelector(".pdf-x").onclick = () => close();
+    ov.querySelector(".pdf-ed").onclick = () => edit(Object.assign({ id }, load().n[id]), () => {
+      const x = load().n[id]; if (!x || !ov.isConnected) return;
+      ov.querySelector(".pdf-t b").textContent = x.name; ov.querySelector(".pdf-t small").textContent = where(x);
+      if (viewUrl(x.url) !== src) fr.src = viewUrl(x.url);
+    });
   }
 
   const css = document.createElement("style");
@@ -1571,8 +1775,17 @@ html.un-placing #app{cursor:crosshair}
 .pdf-chip,.pdf-add{display:inline-flex;align-items:baseline;gap:6px;max-width:100%;padding:6px 12px;border-radius:999px;border:1.5px solid var(--rule,#ddd);background:var(--sheet,#fff);color:var(--ink,#222);font:600 13.5px var(--f-body,system-ui);cursor:pointer}
 .pdf-chip b{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:62vw}
 .pdf-chip small{font-weight:500;color:var(--ink2,#777);font-size:11.5px;white-space:nowrap}
+.pdf-chip i{font-style:normal;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--accent,#2f6f63)}
 .pdf-chip::before{content:"📄";font-size:13px}
 .pdf-add{border-style:dashed;color:var(--accent,#2f6f63);border-color:color-mix(in srgb,var(--accent,#2f6f63) 55%,transparent);background:none}
+.pdf-app{border:1.5px solid var(--rule,#ddd);border-radius:16px;background:var(--sheet,#fff);padding:12px 14px;display:grid;gap:8px}
+.pdf-ah{display:flex;align-items:center;justify-content:space-between;gap:10px;font:700 15px var(--f-body,system-ui)}
+.pdf-mng{flex:none;padding:7px 12px;border-radius:999px;border:1.5px solid var(--accent,#2f6f63);background:none;color:var(--accent,#2f6f63);font:700 13px var(--f-body,system-ui);cursor:pointer}
+.pdf-alist{display:grid;gap:6px}
+.pdf-arow{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px;text-align:left;padding:9px 11px;border-radius:12px;border:1px solid var(--rule,#ddd);background:var(--paper,transparent);color:var(--ink,#222);font:600 14px var(--f-body,system-ui);cursor:pointer}
+.pdf-arow b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pdf-arow small{color:var(--ink2,#777);font-weight:500;font-size:12px;white-space:nowrap}
+.pdf-anone,.pdf-ameta{margin:0;font-size:13px;color:var(--ink2,#666)}
 .pdf-rw{position:relative}
 .pdf-rw.has > .les,.pdf-rw.has > .uh{padding-right:64px}
 .pdf-go{position:absolute;right:10px;top:50%;transform:translateY(-50%);z-index:1;display:inline-flex;align-items:center;justify-content:center;gap:3px;height:36px;min-width:40px;padding:0 10px;border-radius:12px;border:1.5px solid var(--rule,#ddd);background:var(--sheet,#fff);color:var(--ink,#222);font:700 13px var(--f-body,system-ui);box-shadow:0 1px 3px rgba(0,0,0,.08);cursor:pointer}
@@ -1581,12 +1794,20 @@ html.un-placing #app{cursor:crosshair}
 .pdf-pick button{all:unset;display:grid;padding:9px 12px;border-radius:10px;font:600 14px var(--f-body,system-ui);color:var(--ink,#222);cursor:pointer;overflow-wrap:anywhere}
 .pdf-pick button:hover,.pdf-pick button:focus-visible{background:var(--paper,#f4f1ea)}
 .pdf-pick small{font-weight:500;color:var(--ink2,#666);font-size:12px}
-.pdf-ov{position:fixed;inset:0;z-index:520;background:rgba(0,0,0,.4);display:flex;align-items:flex-end;justify-content:center;padding:12px}
+.pdf-ov{position:fixed;inset:0;z-index:540;background:rgba(0,0,0,.4);display:flex;align-items:flex-end;justify-content:center;padding:12px}
 @media (min-width:640px){.pdf-ov{align-items:center}}
 .pdf-f{display:grid;gap:4px;margin:0 0 10px;font:600 13px var(--f-body,system-ui);color:var(--ink2,#555)}
-.pdf-f input,.pdf-f select{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:12px;border:1px solid var(--rule,#ddd);background:var(--paper,transparent);color:var(--ink,#222);font:15px var(--f-body,system-ui)}
+.pdf-f input[type=url],.pdf-f input[type=text]{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:12px;border:1px solid var(--rule,#ddd);background:var(--paper,transparent);color:var(--ink,#222);font:15px var(--f-body,system-ui)}
 .pdf-tip{margin:-4px 0 12px;font-size:12.5px;color:var(--ink2,#666)}
-.pdf-view{position:fixed;inset:0;z-index:530;display:flex;flex-direction:column;background:var(--paper,#f4f1ea)}
+.pdf-ticks{display:grid;gap:2px;max-height:min(56vh,480px);overflow:auto;border:1px solid var(--rule,#ddd);border-radius:12px;padding:4px;margin-bottom:4px}
+.pdf-ticks.short{max-height:min(34vh,300px)}
+.pdf-tk{display:flex;align-items:flex-start;gap:10px;padding:9px 10px;border-radius:9px;cursor:pointer;font:500 14.5px/1.35 var(--f-body,system-ui);color:var(--ink,#222)}
+.pdf-tk:hover{background:var(--paper,#f4f1ea)}
+.pdf-tk.head{border-bottom:1px dashed var(--rule,#ddd);border-radius:9px 9px 0 0;margin-bottom:2px}
+.pdf-tk input{width:20px;height:20px;margin:1px 0 0;flex:none;accent-color:var(--accent,#2f6f63)}
+.pdf-tk span{display:grid;gap:1px}.pdf-tk small{font-size:12px;color:var(--ink2,#666)}
+.pdf-tk em,.pdf-lh em{font-style:normal;font-weight:700;color:var(--ink2,#777);font-variant-numeric:tabular-nums;margin-right:4px}
+.pdf-view,.pdf-mgr{position:fixed;inset:0;z-index:530;display:flex;flex-direction:column;background:var(--paper,#f4f1ea)}
 html.pdf-lock,html.pdf-lock body{overflow:hidden}
 .pdf-top{display:flex;align-items:center;gap:8px;padding:8px 10px;padding-top:calc(8px + env(safe-area-inset-top,0px));background:var(--sheet,#fff);color:var(--ink,#222);border-bottom:1px solid var(--rule,#ddd)}
 .pdf-top button{flex:none;width:38px;height:38px;border-radius:10px;border:1px solid var(--rule,#ddd);background:none;color:inherit;font:700 18px var(--f-body,system-ui);cursor:pointer}
@@ -1595,13 +1816,36 @@ html.pdf-lock,html.pdf-lock body{overflow:hidden}
 .pdf-frame{position:absolute;left:0;top:0;width:100%;height:100%;border:0;background:transparent}
 .pdf-top button:disabled{opacity:.35;cursor:default}
 .pdf-wait{position:absolute;inset:0;display:grid;place-content:center;gap:10px;padding:24px;text-align:center;color:#eee;font:600 14px var(--f-body,system-ui)}
-.pdf-wait small{max-width:34ch;font-weight:500;font-size:12.5px;color:#cfd3d6;line-height:1.45}`;
+.pdf-wait small{max-width:34ch;font-weight:500;font-size:12.5px;color:#cfd3d6;line-height:1.45}
+.pdf-mbody{flex:1;min-height:0;overflow:auto;padding:14px max(14px,env(safe-area-inset-left,0px)) calc(24px + env(safe-area-inset-bottom,0px));display:grid;gap:14px;align-content:start;max-width:720px;width:100%;margin:0 auto;box-sizing:border-box;color:var(--ink,#222);font:15px/1.45 var(--f-body,system-ui)}
+.pdf-paste{display:grid;gap:8px;padding:12px;border:1.5px solid var(--rule,#ddd);border-radius:16px;background:var(--sheet,#fff)}
+.pdf-paste label{font-size:14px;color:var(--ink2,#555)}.pdf-paste label b{color:var(--ink,#222)}
+.pdf-paste textarea{width:100%;box-sizing:border-box;min-height:84px;padding:10px 12px;border-radius:12px;border:1px solid var(--rule,#ddd);background:var(--paper,transparent);color:var(--ink,#222);font:14px/1.4 var(--f-body,system-ui);resize:vertical}
+.pdf-prow{display:flex;align-items:flex-end;gap:10px}.pdf-prow small{flex:1;font-size:12.5px;color:var(--ink2,#666)}
+.pdf-seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:12px;background:var(--sheet,#fff);border:1px solid var(--rule,#ddd)}
+.pdf-seg button{padding:9px;border-radius:9px;border:0;background:none;color:var(--ink2,#555);font:700 14px var(--f-body,system-ui);cursor:pointer}
+.pdf-seg button[aria-selected=true]{background:var(--ink,#222);color:var(--sheet,#fff)}
+.pdf-mlist{display:grid;gap:8px}
+.pdf-item,.pdf-lrow{display:grid;gap:8px;padding:10px 12px;border:1px solid var(--rule,#ddd);border-radius:14px;background:var(--sheet,#fff)}
+.pdf-item.new{border-color:var(--accent,#2f6f63);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent,#2f6f63) 18%,transparent)}
+.pdf-ir{display:flex;align-items:center;gap:6px}
+.pdf-nm{flex:1;min-width:0;padding:8px 10px;border-radius:10px;border:1px solid transparent;background:var(--paper,transparent);color:var(--ink,#222);font:700 15px var(--f-body,system-ui)}
+.pdf-nm:focus{border-color:var(--accent,#2f6f63);outline:none}
+.pdf-rd{font-size:11.5px;color:var(--accent,#2f6f63);white-space:nowrap}
+.pdf-ib{flex:none;width:36px;height:36px;border-radius:10px;border:1px solid var(--rule,#ddd);background:none;cursor:pointer;font-size:15px}
+.pdf-tags{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.pdf-tag{display:inline-flex;align-items:center;gap:4px;max-width:100%;padding:4px 10px;border-radius:999px;background:var(--paper,#f4f1ea);border:1px solid var(--rule,#ddd);color:var(--ink,#222);font:600 12.5px var(--f-body,system-ui);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pdf-tag.app{background:color-mix(in srgb,var(--accent,#2f6f63) 14%,transparent);border-color:color-mix(in srgb,var(--accent,#2f6f63) 45%,transparent)}
+.pdf-tag.none{border-style:dashed;color:var(--ink2,#666)}
+button.pdf-tag{cursor:pointer}
+.pdf-lsb{padding:4px 12px;border-radius:999px;border:1.5px dashed color-mix(in srgb,var(--accent,#2f6f63) 55%,transparent);background:none;color:var(--accent,#2f6f63);font:700 12.5px var(--f-body,system-ui);cursor:pointer}
+.pdf-lh{display:grid;gap:1px}.pdf-lh b{font-size:14.5px}.pdf-lh small{font-size:12px;color:var(--ink2,#666)}`;
   function start(){
     document.head.appendChild(css);
     const app = document.getElementById("app");
-    const mine = n => n === bar || (n.nodeType === 1 && n.matches && n.matches(".pdf-go, .pdf-pick, .pdf-pick *"));
+    const mine = n => n === bar || n === card || (n.nodeType === 1 && n.matches && n.matches(".pdf-go, .pdf-pick, .pdf-pick *, .pdf-app *, .pdf-strip *"));
     if (app) new MutationObserver(recs => { if (recs.every(r => [...r.addedNodes, ...r.removedNodes].every(mine))) return; soon(); }).observe(app, { childList: true, subtree: true });
-    addEventListener("storage", e => { if (e.key === KEY) { strip(true); rows(); } });
+    addEventListener("storage", e => { if (e.key === KEY) paint(); });
     soon();
   }
   if (document.body) start(); else addEventListener("DOMContentLoaded", start);
