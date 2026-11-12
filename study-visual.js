@@ -365,6 +365,14 @@ function visPlace(list){
     else { const k = l.blocks.findIndex(x => x.title && strip(x.title).startsWith(where)); at = k < 0 ? l.blocks.length : k + 1; }
     l.blocks.splice(at, 0, ...blocks); });
 }
+// diagrams with states (see .dgsw-b): one listener for every page
+document.addEventListener("click", e => {
+  const b = e.target.closest && e.target.closest("[data-dgst]"); if (!b) return;
+  const w = b.closest("[data-dgsw]"); if (!w) return;
+  w.querySelectorAll("[data-dgst]").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  w.querySelectorAll("[data-s]").forEach(g => g.classList.toggle("on", g.getAttribute("data-s").split(" ").includes(b.dataset.dgst)));
+  const c = w.querySelector(".dgsw-c"); if (c) c.textContent = b.dataset.cap || "";
+});
 function visBlock(b){
   const f = { photos: photosHTML, indiamap: indiaMapHTML, mapfig: mapFigHTML, statechart: stateChartHTML, info: infoHTML, tlfig: tlFigHTML,
     bars: barsHTML, calendar: calendarHTML, shelf: shelfHTML, cards: cardsHTML, rivermap: riverMapHTML, worldfig: typeof worldFigHTML === "function" ? worldFigHTML : null }[b.k];
@@ -801,6 +809,8 @@ function zmScan(root){
 }
 const ZM_CSS = `.zm-wrap{position:relative}
 .zm-bar{position:absolute;top:6px;right:6px;display:flex;gap:4px;z-index:2}
+/* drawn diagrams: the buttons sit in a strip of their own above the drawing, not over its top-right corner */
+figure.fig > .zm-wrap:has(> svg.dg){padding-top:42px}figure.fig > .zm-wrap:has(> svg.dg) > .zm-bar{top:0;right:0}
 .zm-bar button,.zm-btns button{min-width:34px;height:34px;border-radius:10px;border:1px solid var(--rule);background:color-mix(in srgb,var(--sheet) 88%,transparent);color:var(--ink);font:700 17px var(--f-body);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.12);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
 .zm-bar button:hover,.zm-btns button:hover{background:var(--sheet)}
 svg.zoomed{touch-action:none;cursor:grab}
@@ -821,6 +831,15 @@ function visInit(){
 .nav-in{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr)}.nav button{min-width:0}.nav button span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--on-acc:#1a140c}}:root[data-theme="dark"]{--on-acc:#1a140c}
 .dg{font-family:var(--f-body)}
+/* a diagram with states: buttons [data-dgst] in a [data-dgsw] wrapper show the svg groups [data-s~="<state>"]; .sl slides in from --dx / --dy */
+.dgsw-b{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.dgsw-b button{padding:7px 12px;border-radius:999px;border:1.5px solid var(--rule);background:var(--sheet);color:var(--ink);font:600 13px var(--f-body);cursor:pointer}
+.dgsw-b button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-acc)}
+.dgsw-c{margin:8px 0 0;font-size:13.5px;color:var(--ink);font-weight:600;min-height:2.8em}
+.dg [data-s]{opacity:0;transition:opacity .3s;pointer-events:none}.dg [data-s].on{opacity:1}
+.dg [data-s].on .sl{animation:dgslide .8s cubic-bezier(.2,.8,.2,1) both}
+@keyframes dgslide{from{transform:translate(var(--dx,0px),var(--dy,0px))}to{transform:none}}
+@media (prefers-reduced-motion:reduce){.dg [data-s].on .sl{animation:none}}
 .dg text{fill:var(--ink)} .dg .b{font-weight:700} .dg .mut{fill:var(--ink2);font-weight:500} .dg .acc-t{fill:var(--accent)}
 .dg .grid{stroke:var(--rule);stroke-width:1} .dg .card{fill:var(--sheet);stroke:var(--rule)} .dg .acc{fill:var(--accent)} .dg .blu{fill:var(--blue)}
 .dg .acs{stroke:var(--accent)} .dg .bls{stroke:var(--blue)}
