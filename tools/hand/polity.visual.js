@@ -135,4 +135,61 @@ place("L20", "Range map", KIT.fig("The Constitution as a number line", STRIP, "K
 place("L13", "Women firsts", KIT.photos("Women firsts in pictures", [["Sucheta Kripalani", "First woman CM — UP, 1963"], ["Sarojini Naidu", "First woman Governor — UP, 1947"], ["Anna Chandy", "First woman HC judge, 1959"], ["Leila Seth", "First woman HC Chief Justice, 1991"],
   ["M. Fathima Beevi", "First woman SC judge, 1989"], ["Vijaya Lakshmi Pandit", "First woman UNGA President, 1953"]]));
 
+// ---- added: the schedules, citizenship, the Fundamental Rights by article, the directives by family, the amendments in time ----
+const pT = (x, y, t, c, a, sz) => `<text x="${x}" y="${y}" font-size="${sz || 12}" font-weight="700" text-anchor="${a || "start"}" style="fill:${c || "var(--ink)"}">${t}</text>`;
+const pM = (x, y, t, a, sz) => `<text x="${x}" y="${y}" font-size="${sz || 11}" text-anchor="${a || "start"}" class="mut">${t}</text>`;
+const pW = (x, y, t, sz) => `<text x="${x}" y="${y}" font-size="${sz || 10.5}" text-anchor="middle" style="fill:#fff;opacity:.95">${t}</text>`;
+const PB = "#2f6db5", PR = "#c0392b", PG = "#2f8f4e", PY = "#a8780a", PV = "#7d4fb5", PK = "#5b6470", PT = "#1a8a8a";
+
+// L3 — the twelve schedules as tiles
+const SCH = [["States &amp; UTs", "names, territory", PB], ["Salaries", "President, judges, CAG", PB], ["Oaths", "not President or VP", PB], ["RS seats", "state-wise share", PB],
+  ["Scheduled areas", "Tribes Advisory Council", PG], ["Tribal areas", "AS · ML · TR · MZ", PG], ["Three lists", "Union · State · Concurrent", PY], ["Languages", "14 → 22", PY],
+  ["Land reform laws", "1st Amdt, 1951", PR], ["Anti-defection", "52nd Amdt, 1985", PR], ["Panchayats", "29 subjects · 73rd", PV], ["Municipalities", "18 subjects · 74th", PV]];
+if (rows("L3", "The 12 schedules").length !== 12 || !/Anti-defection/.test(rows("L3", "The 12 schedules")[9][1]) || !/Languages/.test(rows("L3", "The 12 schedules")[7][1])) fail("polity L3: the schedules table changed");
+const SCHS = `<svg class="dg" viewBox="0 0 640 250" role="img" aria-label="The twelve schedules of the Constitution">
+  ${SCH.map((r, i) => { const x = 8 + (i % 4) * 158, y = 6 + Math.floor(i / 4) * 68; return `<rect x="${x}" y="${y}" width="150" height="60" rx="10" class="card"/><rect x="${x}" y="${y}" width="34" height="60" rx="10" fill="${r[2]}"/>${pW(x + 17, y + 37, i + 1, 17)}${pT(x + 42, y + 26, r[0], r[2], "start", 12)}${pM(x + 42, y + 43, r[1], "start", r[1].length > 24 ? 8.5 : 9.5)}`; }).join("")}
+  ${pM(8, 228, "1–4: the Union's housekeeping  ·  5–6: tribal areas  ·  7–8: lists and languages  ·  9–12: added by amendment", "start", 11)}
+  ${pM(8, 245, "The original Constitution had 8 schedules; four were added later (9th in 1951, 10th in 1985, 11th and 12th in 1992).", "start", 11)}</svg>`;
+place("L3", "The 12 schedules", KIT.fig("The twelve schedules at a glance", SCHS, "A chant that keeps the order: Territory, Salaries, Oaths, Rajya Sabha, Scheduled areas, Tribal areas, Lists, Languages, Land reforms, Defection, Panchayats, Municipalities."));
+
+// L5 — citizenship: five doors in, three doors out
+if (!/Birth, descent, registration, naturalisation, incorporation/.test(rows("L5", "Citizenship facts").join(" "))) fail("polity L5: ways to acquire changed");
+const CTZ = `<svg class="dg" viewBox="0 0 640 230" role="img" aria-label="Ways to acquire and to lose Indian citizenship">
+  <rect x="8" y="6" width="380" height="216" rx="12" class="gbg"/>${pT(198, 28, "5 ways to ACQUIRE  (Citizenship Act, 1955)", PG, "middle", 13)}
+  ${[["Birth", "born in India (rules tightened in 1987 and 2004)"], ["Descent", "born abroad to an Indian parent"], ["Registration", "persons of Indian origin, spouses of citizens"], ["Naturalisation", "a foreigner after 11 years' residence (5 under CAA 2019)"], ["Incorporation of territory", "a new area joins India (Sikkim, Puducherry)"]]
+    .map((r, i) => `<circle cx="30" cy="${54 + i * 34}" r="11" fill="${PG}"/>${pW(30, 58 + i * 34, i + 1, 12)}${pT(50, 52 + i * 34, r[0], "var(--ink)", "start", 12.5)}${pM(50, 67 + i * 34, r[1], "start", 10.5)}`).join("")}
+  <rect x="398" y="6" width="234" height="216" rx="12" class="abg"/>${pT(515, 28, "3 ways to LOSE", PR, "middle", 13)}
+  ${[["Renunciation", "given up voluntarily"], ["Termination", "automatic, on taking another", "country's citizenship (Art 9)"], ["Deprivation", "taken away by the government", "(fraud, disloyalty)"]]
+    .map((r, i) => `<circle cx="420" cy="${58 + i * 54}" r="11" fill="${PR}"/>${pW(420, 62 + i * 54, i + 1, 12)}${pT(440, 56 + i * 54, r[0], "var(--ink)", "start", 12.5)}${pM(440, 71 + i * 54, r[1], "start", 10.5)}${r[2] ? pM(440, 84 + i * 54, r[2], "start", 10.5) : ""}`).join("")}
+  ${pM(515, 212, "Single citizenship: taken from the UK", "middle", 10.5)}</svg>`;
+place("L5", "Citizenship facts", KIT.fig("Citizenship: five doors in, three doors out", CTZ, "The Constitution (Articles 5–11) only settled who was a citizen in 1950. Everything after that comes from the Citizenship Act, 1955, made under Article 11."));
+
+// L6 — Part III, article by article
+const FRG = [[12, 13, "General", PK], [14, 18, "Equality", PB], [19, 22, "Freedom", PG], [23, 24, "Against exploitation", PR], [25, 28, "Religion", PV], [29, 30, "Culture &amp; education", PY], [31, 31, "", "#9aa0a6"], [32, 32, "Remedies", PT], [33, 35, "Limits &amp; law-making", PK]];
+const FRN = { 12: "State", 13: "Void laws", 14: "Equal law", 15: "No bias", 16: "Jobs", 17: "Untouchability", 18: "Titles", 19: "6 freedoms", 20: "Conviction", 21: "Life", 22: "Arrest", 23: "Trafficking", 24: "Child labour", 25: "Conscience", 26: "Rel. affairs", 27: "No rel. tax", 28: "No rel. class", 29: "Minorities", 30: "Min. schools", 31: "repealed", 32: "Writs (SC)", 33: "Forces", 34: "Martial law", 35: "Parliament" };
+const FRX = n => 10 + ((n - 12) % 8) * 78, FRY = n => 30 + Math.floor((n - 12) / 8) * 62;
+const FRM = `<svg class="dg" viewBox="0 0 640 262" role="img" aria-label="The Fundamental Rights from Article 12 to Article 35">
+  ${pT(10, 18, "Part III · Articles 12 to 35", "var(--ink)", "start", 13)}${pM(630, 18, "★ = citizens only (15, 16, 19, 29, 30)", "end", 11)}
+  ${FRG.map(g => { let o = ""; for (let n = g[0]; n <= g[1]; n++) { const x = FRX(n), y = FRY(n), cit = [15, 16, 19, 29, 30].includes(n);
+    o += `<rect x="${x}" y="${y}" width="72" height="54" rx="9" fill="${g[3]}"${n === 31 ? ' opacity=".45"' : ""}/>${pW(x + 36, y + 24, n + (n === 21 ? " · 21A" : "") + (cit ? " ★" : ""), 15)}${pW(x + 36, y + 42, FRN[n], n === 17 ? 8.5 : 9.5)}`; } return o; }).join("")}
+  ${FRG.filter(g => g[2]).map((g, i) => `<rect x="${10 + (i % 4) * 158}" y="${224 + Math.floor(i / 4) * 18}" width="11" height="11" rx="3" fill="${g[3]}"/>${pM(26 + (i % 4) * 158, 234 + Math.floor(i / 4) * 18, g[2] + " " + (g[0] === g[1] ? g[0] : g[0] + "–" + g[1]), "start", 10.5)}`).join("")}</svg>`;
+place("L6", "Article by article", KIT.fig("Part III on one page", FRM, "Article 31 (property) was repealed by the 44th Amendment, 1978; property is now a legal right under Article 300A. Articles 20 and 21 cannot be suspended even in an emergency."));
+
+// L8 — the directives by family; FR against DPSP
+const DP = [["Socialist", PR, ["38 welfare state", "39 livelihood, equal pay", "39A free legal aid", "41 right to work", "42 humane work, maternity", "43 living wage", "43A workers in management", "47 nutrition, health"]],
+  ["Gandhian", PG, ["40 village panchayats", "43 cottage industries", "43B co-operatives", "46 SC/ST and weaker sections", "47 prohibition", "48 ban on cow slaughter"]],
+  ["Liberal-intellectual", PB, ["44 Uniform Civil Code", "45 early childhood care", "48 modern agriculture", "48A environment, forests", "49 monuments", "50 judiciary from executive", "51 international peace"]]];
+const DPS = `<svg class="dg" viewBox="0 0 640 300" role="img" aria-label="Directive Principles grouped as socialist, Gandhian and liberal">
+  ${DP.map((g, i) => { const x = 8 + i * 211; return `<rect x="${x}" y="6" width="203" height="178" rx="12" class="card"/><rect x="${x}" y="6" width="203" height="30" rx="12" fill="${g[1]}"/>${pW(x + 101, 26, g[0], 13)}${g[2].map((t, k) => `${pT(x + 12, 56 + k * 16, t.split(" ")[0], g[1], "start", 11.5)}${pM(x + 44, 56 + k * 16, t.slice(t.indexOf(" ") + 1), "start", 10.5)}`).join("")}`; }).join("")}
+  <rect x="8" y="194" width="624" height="100" rx="12" class="s5"/><path d="M320 200 V288" stroke="var(--rule)"/>
+  ${pT(164, 214, "Fundamental Rights · Part III", PB, "middle", 12.5)}${["justiciable: courts enforce them", "mostly negative: tell the state what not to do", "political democracy · from the USA", "can be suspended in an emergency (not 20, 21)"].map((t, k) => pM(164, 232 + k * 15, t, "middle", 10.5)).join("")}
+  ${pT(476, 214, "Directive Principles · Part IV", PY, "middle", 12.5)}${["non-justiciable (Art 37)", "positive: tell the state what to do", "social and economic democracy · from Ireland", "need a law to take effect"].map((t, k) => pM(476, 232 + k * 15, t, "middle", 10.5)).join("")}</svg>`;
+place("L8", "Most-asked", KIT.fig("The directives in three families, and FR vs DPSP", DPS, "The three families are a study aid; the Constitution does not classify the directives. 39A, 43A and 48A came with the 42nd Amendment, 43B with the 97th."));
+
+// L16 — the amendments that are asked most, in time
+const AM = { "1st": "Ninth Schedule", "7th": "States reorganised", "24th": "Parliament can amend FR", "42nd": "Mini-Constitution", "44th": "Property out of FR", "52nd": "Anti-defection", "61st": "Voting age 21 → 18", "73rd": "Panchayats (74th: municipalities)", "86th": "Art 21A: education 6–14", "101st": "GST", "103rd": "10% EWS quota", "106th": "1/3 seats for women" };
+const AMR = rows("L16", "Landmark");
+place("L16", "Landmark", { k: "tlfig", title: "Twelve amendments on a timeline", rows: Object.keys(AM).map(k => { const r = AMR.find(x => x[0].startsWith(k + " ")); if (!r) fail("polity L16: no amendment " + k); return [parseInt(r[0].match(/\d{4}/)[0], 10), k + ": " + AM[k], ""]; }),
+  cap: "42nd (1976) changed the most; 44th (1978) undid much of it. 73rd and 74th (1992) gave panchayats and municipalities a place in the Constitution." });
+
 VISUAL = { mode: "world", VIS: { key: "polity_photos_v1", word: "person", words: "people", search: "", quiz: "photo", ask: "", rows: [], tabs: [["vphotos", "Photo quiz"]] } };
