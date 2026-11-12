@@ -1283,6 +1283,50 @@
     });
     return best && bestS >= 0.6 && bestS - second >= 0.1 ? best : null;
   }
+  /** Files the names couldn't put on a lesson: show Gemini the first page of each (Drive's own thumbnail, fetched by the
+      Android app 3.7+, PathshalaApp.driveThumb) with the lesson titles. Works for typed and for scanned / handwritten notes.
+      Six pages a request; files that share an app are asked together with only that app's lessons. */
+  async function piAskPages(rows, idx, scope, onStatus){
+    var A = window.PathshalaApp, c = aiCfg();
+    var want = rows.filter(function(r){ return !r.dup && (!r.app || (r.all && piLessons(r.app, idx).length > 1)); });
+    if(!want.length) return { n: 0, err: '', skip: '' };
+    if(!(A && A.driveThumb)) return { n: 0, err: '', skip: 'app' };
+    if(!c.on || !c.keys.gemini) return { n: 0, err: '', skip: 'key' };
+    var groups = {}, done = 0, fail = '', seen = 0;
+    want.forEach(function(r){ var k = scope || r.app || '*'; (groups[k] = groups[k] || []).push(r); });
+    var sys = 'You sort a student\'s study-note PDFs into the apps and lessons of an SSC exam study app. For each file you get its name and a picture of its FIRST PAGE (typed or handwritten, English or Hindi). ' +
+      'Read the heading and topic on the page and choose the lesson it belongs to. Reply with JSON only: {"m":[{"i":<file number>,"app":"<app id, or \"\" when unsure>","ls":"all" or ["<lesson id>", …]}]}. ' +
+      'Give lesson ids only when the page clearly matches; use "all" for notes that cover the whole subject; leave "app" empty when you cannot tell. Never invent ids.';
+    var keys = Object.keys(groups);
+    for(var g = 0; g < keys.length && !fail; g++){
+      var app = keys[g] === '*' ? '' : keys[g], list = groups[keys[g]];
+      var apps = app ? [app] : Object.keys(idx.apps);
+      var cat = apps.map(function(id){ return id + ' = ' + idx.apps[id].t + '\n' + piLessons(id, idx).map(function(l){ return '  ' + l.id + ': ' + l.t; }).join('\n'); }).join('\n');
+      for(var s0 = 0; s0 < list.length && !fail; s0 += 6){
+        var part = list.slice(s0, s0 + 6);
+        if(onStatus) onStatus('Reading first pages… ' + Math.min(seen + part.length, want.length) + ' of ' + want.length);
+        var thumbs = await Promise.all(part.map(function(r){ return A.driveThumb(pdfDriveId(r.url)).catch(function(){ return null; }); }));
+        seen += part.length;
+        var use = part.filter(function(r, i){ return thumbs[i] && thumbs[i].data; }), imgs = thumbs.filter(function(t){ return t && t.data; });
+        if(!use.length) continue;
+        var user = 'APPS AND LESSONS' + (app ? ' (all these files belong to this app)' : '') + ':\n' + cat + '\n\nFILES (their first pages follow, in this order):\n' + use.map(function(r, i){ return i + '. ' + (r.path ? r.path + '/' : '') + r.name; }).join('\n');
+        try{
+          var res = await aiCall(Object.assign({}, c, { provider: 'gemini' }), sys, [{ role: 'user', text: user, images: imgs.map(function(t){ return { mime: t.mime || 'image/jpeg', data: t.data }; }) }], { json: true, maxTries: 3 });
+          var js = JSON.parse(String(res.text).replace(/^[\s\S]*?(\{)/, '$1').replace(/\}[^}]*$/, '}'));
+          (js.m || []).forEach(function(x){
+            var r = use[+x.i]; if(!r) return;
+            var a2 = scope || r.app || String(x.app || '');
+            if(!idx.apps[a2]) return;
+            var ids = piLessons(a2, idx).map(function(l){ return l.id; });
+            var ls = Array.isArray(x.ls) ? x.ls.map(String).filter(function(id){ return ids.indexOf(id) !== -1; }) : [];
+            if(!ls.length && r.app) return;                       // nothing more exact than Whole app
+            r.app = a2; r.ls = ls; r.all = !ls.length; r.how = 'page'; r.on = true; done++;
+          });
+        }catch(e){ fail = String(e && e.message || e).slice(0, 120); }
+      }
+    }
+    return { n: done, err: fail, skip: '' };
+  }
   async function piAskAi(rows, idx, scope, onStatus){
     var want = rows.filter(function(r){ return r.ai; }), fail = '';
     if(!want.length || !window.shabdBridge || !aiReady()) return { n: 0, err: '' };
@@ -1369,7 +1413,7 @@
     var count = function(){ var b = document.getElementById('piGo'), k = rows.filter(function(r){ return r.on && r.app; }).length; if(b && rows.length) { b.textContent = 'Attach ' + k + ' PDF' + (k === 1 ? '' : 's'); b.disabled = !k; } };
     var draw = function(){
       var box = document.getElementById('piList'); if(!box) return;
-      var how = { name: '<span class="pi-how ok">name</span>', ai: '<span class="pi-how ai">AI</span>', none: '<span class="pi-how no">not matched</span>' };
+      var how = { name: '<span class="pi-how ok">name</span>', ai: '<span class="pi-how ai">AI</span>', page: '<span class="pi-how ai">AI · first page</span>', none: '<span class="pi-how no">not matched</span>' };
       box.innerHTML = rows.map(function(r, i){
         return '<div class="pi-row' + (r.on ? '' : ' off') + '" data-i="' + i + '"><label class="pi-top"><input type="checkbox"' + (r.on ? ' checked' : '') + (r.dup ? ' disabled' : '') + '><span><b>' + escapeHtml(r.name) + '</b>' +
           (r.path ? '<small>📁 ' + escapeHtml(r.path) + '</small>' : '') + '</span>' + (r.dup ? '<span class="pi-how no">already in ' + escapeHtml(r.dup) + '</span>' : how[r.how]) + '</label>' +
@@ -1445,9 +1489,15 @@
         if(rows.some(function(r){ return r.ai && !r.dup; })){
           if(aiReady()){
             var got = await piAskAi(rows.filter(function(r){ return !r.dup; }), idx, scope, status);
-            var onLes = rows.filter(function(r){ return !r.dup && r.app && !r.all; }).length, whole = rows.filter(function(r){ return !r.dup && r.app && r.all; }).length;
-            status(head + ' · ' + got.n + ' by your AI.' + (got.err ? '<br><b>Your AI couldn’t answer:</b> ' + escapeHtml(got.err) + ' — check ☰ → AI tutor, or choose the lessons below.' : '') +
-              '<br>' + onLes + ' on a lesson · ' + whole + ' on Whole app (their names don’t say which lesson — pick one below).' + (folderErr ? '<br>' + folderErr : ''));
+            draw();
+            // what the names couldn't place: look at each PDF's first page
+            var pg = await piAskPages(rows, idx, scope, status);
+            var onLes = rows.filter(function(r){ return !r.dup && r.app && !r.all; }).length, whole = rows.filter(function(r){ return !r.dup && r.app && r.all; }).length, lost = rows.filter(function(r){ return !r.dup && !r.app; }).length;
+            status(head + ' · ' + got.n + ' by your AI from the names' + (pg.n ? ' · ' + pg.n + ' from the first page' : '') + '.' +
+              (got.err || pg.err ? '<br><b>Your AI couldn’t answer:</b> ' + escapeHtml(got.err || pg.err) + ' — check ☰ → AI tutor, or choose the lessons below.' : '') +
+              '<br>' + onLes + ' on a lesson · ' + whole + ' on Whole app' + (lost ? ' · ' + lost + ' not placed' : '') + '.' +
+              (pg.skip === 'app' ? '<br>Update to the <b>Android app 3.7</b> and the AI can also read each PDF’s first page (for names like “Lecture 5”).' : pg.skip === 'key' ? '<br>Add a <b>Gemini key</b> (☰ → AI tutor) and the AI can also read each PDF’s first page.' : '') +
+              (folderErr ? '<br>' + folderErr : ''));
             draw();
           } else status(document.getElementById('piStatus').innerHTML + '<br><b>AI is off</b> — turn it on in ☰ → AI tutor (a free Gemini key) to place the rest automatically, or choose them below.');
         }
@@ -9199,7 +9249,8 @@ listBlock,
     if(c.provider === 'gemini'){
       var body = {
         systemInstruction: { parts: [{ text: sys }] },
-        contents: msgs.map(function(m){ return { role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.text }] }; }),
+        // a message may carry pictures (m.images = [{ mime, data: base64 }]), e.g. the first pages of PDFs for the import
+        contents: msgs.map(function(m){ return { role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.text }].concat((m.images || []).map(function(im){ return { inline_data: { mime_type: im.mime, data: im.data } }; })) }; }),
         generationConfig: { temperature: opts.json ? 0.6 : 0.4, maxOutputTokens: maxTok }
       };
       if(opts.json) body.generationConfig.responseMimeType = 'application/json';
