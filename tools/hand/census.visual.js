@@ -81,4 +81,8 @@ place("L9", "SC and ST", { k: "cards", title: "Scheduled Castes and Scheduled Tr
   ["Scheduled Castes", SS[0][1], "Highest share: " + SS[1][1] + " · most people: " + SS[2][1], "👥"],
   ["Scheduled Tribes", SS[0][2], "Highest share: " + SS[1][2] + " · most people: " + SS[2][2] + " · largest tribe Bhil", "🏞️"]] });
 
+// ---- memory tricks for the lessons that had none ----
+place("L8", "Other groups", { k: "trick", h: "<b>Census town = 5 – 4 – 75</b>: 5,000 people, 400 per km², 75% of working men outside farming. All three are needed.<br>Urban share in 2011: <b>31%</b>. Most urban state <b>Goa</b>, most urban UT <b>Delhi</b>, least urban state <b>Himachal</b>. Two firsts: urban growth beat rural growth, and farm labourers outnumbered cultivators." });
+place("L11", "Population policy", { k: "trick", h: "<b>16 – 8</b>: the 16th census, the 8th after independence. <b>Three firsts</b>: first digital census, first self-enumeration, first full caste count since 1931.<br><b>Houses in 2026, heads in 2027</b>: houselisting April–September 2026, population count February 2027, reference moment 1 March 2027. NPP 2000: TFR 2.1 by <b>2010</b>, stable population by <b>2045</b>." });
+
 VISUAL = { mode: true, VIS: { key: "census_v1", word: "picture", words: "pictures", search: "", quiz: "photo", ask: "", rows: [], tabs: [] } };

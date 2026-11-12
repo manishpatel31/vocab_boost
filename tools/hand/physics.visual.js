@@ -164,4 +164,8 @@ place("L15", "Field lines", KIT.fig("A bar magnet's field", BM, "Sprinkle iron f
 place("L16", "Discovery one-liners", KIT.photos("Discoverers in pictures", [["Henri Becquerel", "Radioactivity, 1896"], ["Marie Curie", "Polonium, radium"], ["J. J. Thomson", "Electron, 1897"], ["Ernest Rutherford", "Nucleus, 1911"], ["James Chadwick", "Neutron, 1932"],
   ["C. V. Raman", "Raman effect, 1928"], ["Satyendra Nath Bose", "Bose–Einstein statistics"], ["Albert Einstein", "Photoelectric effect"], ["Victor Francis Hess", "Cosmic rays"], ["Wilhelm Röntgen", "X-rays, 1895"]]));
 
+// ---- memory tricks for the lessons that had none ----
+place("L7", "Heat & elasticity", { k: "trick", h: "<b>Heat up for the 4th, cool down for the 5th.</b> Heat a gas strongly → plasma (Sun, lightning). Cool atoms to near absolute zero → Bose–Einstein condensate. BEC dates: predicted <b>1924–25</b>, made <b>1995</b>, Nobel <b>2001</b>.<br><b>Stress has a unit, strain is plain</b>: stress = force ÷ area (pascal); strain is a ratio, so no unit." });
+place("L16", "Discovery one-liners", { k: "trick", h: "<b>n = peNta, p = positive holes.</b> n-type: add a 5-electron atom (phosphorus, arsenic, antimony) → extra electrons. p-type: add a 3-electron atom (boron, aluminium, gallium, indium) → holes.<br><b>Fission splits, fusion joins</b>: fission (like a fissure) powers reactors and the atom bomb; fusion powers the Sun. Becquerel found radioactivity; the Curies found <b>po</b>lonium (named after <b>Po</b>land) and radium." });
+
 VISUAL = { mode: true, VIS: { key: "physics_photos_v1", word: "picture", words: "pictures", search: "", quiz: "photo", ask: "", rows: [], tabs: [["vphotos", "Photo quiz"]] } };

@@ -64,4 +64,7 @@ place("L1", "The UN", { k: "photos", title: "In pictures", items: [P("Headquarte
   P("Palace_of_Nations", "Palais des Nations", "Geneva"), P("United_Nations_Security_Council", "Security Council chamber", "15 members"), P("António_Guterres", "António Guterres", "9th Secretary-General")] });
 place("L2", "Bretton Woods", { k: "photos", title: "In pictures", items: [P("Bretton_Woods_Conference", "Bretton Woods, 1944", "Birth of the IMF and World Bank"),
   P("Centre_William_Rappard", "WTO headquarters", "Geneva"), P("Kristalina_Georgieva", "Kristalina Georgieva", "IMF"), P("Ngozi_Okonjo-Iweala", "Ngozi Okonjo-Iweala", "WTO")] });
+// ---- memory tricks for the lessons that had none ----
+place("L12", "Summits", { k: "trick", h: "<b>Three heads with an India link</b>: World Bank — Ajay Banga (Indian-born), BIMSTEC — Indra Mani Pandey (Indian diplomat), and the NDB sits in the BRICS family under Dilma Rousseff (former President of Brazil).<br><b>Women at the top</b>: WTO (Ngozi Okonjo-Iweala), IMF (Kristalina Georgieva), NDB (Dilma Rousseff), AIIB (Zou Jiayi). 2026 summits: <b>BRICS in New Delhi</b>, G7 in Évian (France), G20 in Miami (USA)." });
+
 VISUAL = { mode: "world", VIS: { key: "intlorgs_photos_v1", word: "organisation", words: "organisations", search: "", quiz: "place or person", ask: "", rows: [], tabs: [["vphotos", "Photo quiz"]] } };
