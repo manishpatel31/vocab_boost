@@ -44,4 +44,8 @@ const IMF = `<svg class="dg" viewBox="0 0 660 ${80 + IM.length * 44}" role="img"
     `<text x="470" y="${y + 23}" font-size="10.5" class="mut">${r[2].split(" → ")[0].slice(0, 30)}</text>`; }).join("")}</g></svg>`;
 place("L6", "Imperative patterns", KIT.fig("Commands in the passive", IMF, "With an object: Let + object + be + V3. Without one, use “You are requested / ordered / advised / warned to + V1”, chosen by the tone of the command."));
 
+// ---- memory tricks for the lessons that had none ----
+place("L9", "Phrasal verbs", { k: "trick", h: "<b>Feelings and fillings don't take “by”.</b> Surprised, shocked, annoyed → <b>at</b>. Pleased, satisfied, filled, covered → <b>with</b>. Known → <b>to</b>. Interested, contained → <b>in</b>.<br><b>The particle is glued to the verb</b>: looked after → was looked after; sent for → was sent for. Never drop it." });
+place("L11", "Tier 2 tricky", { k: "trick", h: "<b>Passive → active: bring the “by” word to the front.</b> Agent becomes the subject, drop the be-form, put the verb back in its tense, and the old subject becomes the object. <b>No “by”?</b> Use someone, people or they.<br>“Let … be + V3” → a plain order. “You are requested to …” → Please + V1." });
+
 VISUAL = { mode: true, VIS: { key: "voice_v1", word: "picture", words: "pictures", search: "", quiz: "photo", ask: "", rows: [], tabs: [] } };

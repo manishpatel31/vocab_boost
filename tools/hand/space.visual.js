@@ -97,4 +97,7 @@ place("L14", "Firsts — machines", { k: "tlfig", title: "Machine firsts", rows:
 place("L14", "Firsts — people", { k: "tlfig", title: "Human firsts", rows: rows("L14", "Firsts — people").map(r => [yr(r[2]), r[0] + " — " + r[1], ""]).filter(r => r[0]) },
   KIT.photos("Space firsts in pictures", [["Yuri Gagarin", "1961"], ["Valentina Tereshkova", "1963"], ["Neil Armstrong", "1969"], ["Sputnik 1", "1957"], ["Earthrise", "Apollo 8, 1968"], ["Laika", "1957"]]));
 
+// ---- memory tricks for the lessons that had none ----
+place("L15", "Space events", { k: "trick", h: "<b>Samudrayaan is sea, not space</b>: Ministry of Earth Sciences and NIOT Chennai, not ISRO. Matsya-6000 in four numbers, <b>3 – 6 – 12 – 96</b>: 3 people, 6,000 m, 12 hours normal, 96 hours in an emergency.<br>The vision's two big dates: <b>station by 2035, an Indian on the Moon by 2040</b>. National Space Day is 23 August, the day Chandrayaan-3 landed." });
+
 VISUAL = { mode: true, VIS: { key: "space_photos_v1", word: "picture", words: "pictures", search: "", quiz: "photo", ask: "", rows: [], tabs: [["vphotos", "Photo quiz"]] } };

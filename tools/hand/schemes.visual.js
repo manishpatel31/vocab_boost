@@ -81,4 +81,7 @@ const SSY = `<svg class="dg" viewBox="0 0 640 150" role="img" aria-label="The li
   ${sM(8, 122, "Launched with Beti Bachao Beti Padhao on 22 Jan 2015.  Interest 8.2%, tax-free at all three stages (EEE).", "start", 11)}${sM(8, 138, "Years are counted from the day the account is opened, not from the girl's birth.", "start", 11)}</svg>`;
 place("L10", "Sukanya", KIT.fig("A Sukanya Samriddhi account, start to finish", SSY, "Pay in for 15 years, wait 6 more: the account matures 21 years after it is opened."));
 
+// ---- memory tricks for the lessons that had none ----
+place("L12", "Digital India", { k: "trick", h: "<b>Hydrogen colours = how it is made.</b> <b>Green</b>: renewable power (cleanest). <b>Pink</b>: nuclear power. <b>Blue</b>: natural gas with the CO₂ captured. <b>Grey</b>: natural gas, CO₂ let out. <b>Brown / black</b>: coal (dirtiest).<br>Surya Ghar in three numbers: <b>1 crore homes · 300 free units · ₹78,000</b> maximum subsidy. MNRE runs Surya Ghar and Green Hydrogen; Jal Shakti runs the water schemes." });
+
 VISUAL = { mode: true, VIS: { key: "schemes_photos_v1", word: "place", words: "places", search: "", quiz: "place", ask: "", rows: [], tabs: [] } };
