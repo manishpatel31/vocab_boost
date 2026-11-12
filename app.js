@@ -1284,8 +1284,8 @@
     return best && bestS >= 0.6 && bestS - second >= 0.1 ? best : null;
   }
   async function piAskAi(rows, idx, scope, onStatus){
-    var want = rows.filter(function(r){ return r.ai; });
-    if(!want.length || !window.shabdBridge || !aiReady()) return 0;
+    var want = rows.filter(function(r){ return r.ai; }), fail = '';
+    if(!want.length || !window.shabdBridge || !aiReady()) return { n: 0, err: '' };
     var apps = scope ? [scope] : Object.keys(idx.apps);
     var cat = apps.map(function(id){ return id + ' = ' + idx.apps[id].t + '\n' + piLessons(id, idx).map(function(l){ return '  ' + l.id + ': ' + l.t; }).join('\n'); }).join('\n');
     var sys = 'You sort a student\'s study-note PDFs into the apps and lessons of an SSC exam study app, using only each file\'s name and folder. ' +
@@ -1301,16 +1301,16 @@
         var js = JSON.parse(String(txt).replace(/^[\s\S]*?(\{)/, '$1').replace(/\}[^}]*$/, '}'));
         (js.m || []).forEach(function(x){
           var r = part[+x.i]; if(!r) return;
-          var app = scope || String(x.app || '');
+          var app = scope || r.app || String(x.app || '');     // an app the names already gave stays
           if(!idx.apps[app]) return;
           var ids = piLessons(app, idx).map(function(l){ return l.id; });
           var ls = x.ls === 'all' ? [] : (Array.isArray(x.ls) ? x.ls.map(String).filter(function(id){ return ids.indexOf(id) !== -1; }) : []);
-          if(x.ls !== 'all' && !ls.length && scope) return;
+          if(!ls.length && r.how === 'name') return;            // nothing more exact than what the names gave
           r.app = app; r.ls = ls; r.all = !ls.length; r.how = 'ai'; r.on = !r.dup; done++;
         });
-      }catch(e){ if(onStatus) onStatus('Your AI couldn’t answer (' + String(e && e.message || e).slice(0, 80) + ') — set the rest yourself.'); return done; }
+      }catch(e){ fail = String(e && e.message || e).slice(0, 120); break; }
     }
-    return done;
+    return { n: done, err: fail };
   }
   function piExisting(apps, idx){                  // drive id → the first app it's already attached in
     var have = {};
@@ -1433,9 +1433,8 @@
             var l = piLessonOf(r.app, f.name, f.path, hit.words, idx);
             if(l){ r.ls = [l.id]; r.all = false; }
             r.how = 'name'; r.on = !r.dup;
-            // a name with words of its own that matched no lesson: worth asking the AI where it goes
-            var own = piToks(f.name).filter(function(w){ return (' ' + todoNorm(hit.words) + ' ').indexOf(' ' + w + ' ') === -1; });
-            if(!l && own.length && piLessons(r.app, idx).length > 1) r.ai = true;
+            // no lesson found in the name: ask the AI which lesson it is (it stays on Whole app if the AI can't tell)
+            if(!l && piLessons(r.app, idx).length > 1) r.ai = true;
           } else r.ai = true;
           return r;
         });
@@ -1446,9 +1445,11 @@
         if(rows.some(function(r){ return r.ai && !r.dup; })){
           if(aiReady()){
             var got = await piAskAi(rows.filter(function(r){ return !r.dup; }), idx, scope, status);
-            status(head + ' · ' + got + ' by your AI. Check them, then attach.' + (folderErr ? '<br>' + folderErr : ''));
+            var onLes = rows.filter(function(r){ return !r.dup && r.app && !r.all; }).length, whole = rows.filter(function(r){ return !r.dup && r.app && r.all; }).length;
+            status(head + ' · ' + got.n + ' by your AI.' + (got.err ? '<br><b>Your AI couldn’t answer:</b> ' + escapeHtml(got.err) + ' — check ☰ → AI tutor, or choose the lessons below.' : '') +
+              '<br>' + onLes + ' on a lesson · ' + whole + ' on Whole app (their names don’t say which lesson — pick one below).' + (folderErr ? '<br>' + folderErr : ''));
             draw();
-          } else status(document.getElementById('piStatus').innerHTML + '<br>Turn on AI (☰ → AI tutor) to place the rest automatically, or choose them below.');
+          } else status(document.getElementById('piStatus').innerHTML + '<br><b>AI is off</b> — turn it on in ☰ → AI tutor (a free Gemini key) to place the rest automatically, or choose them below.');
         }
       }catch(e){ status('Something went wrong: ' + escapeHtml(String(e && e.message || e))); }
       busy = false; this.disabled = false; count();

@@ -247,6 +247,11 @@ html.in-shabd .mbar{top:env(safe-area-inset-top,0px)!important}
 .steps.fx-steps::after{content:"";position:absolute;left:10px;bottom:2px;height:3px;border-radius:3px;width:calc((100% - 20px) * var(--fx-read,0));background:var(--blue);transition:width .15s linear}
 .steps.fx-steps button{display:flex;align-items:center;justify-content:center;gap:7px;border:0;background:none;border-radius:9px;padding:7px 4px}
 .steps.fx-steps button i{font-style:normal;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:11.5px;font-weight:700;background:var(--rule);color:var(--ink2)}
+/* Exam Hall: its rule colour is as dark as its text, so the number sat unseen on its disc — ring it instead */
+:root[data-xskin="exam"] .steps.fx-steps button:not([aria-current="step"]):not(.fx-done) i{background:none;box-shadow:inset 0 0 0 1.5px var(--ink2);color:var(--ink)}
+/* pages with their own styles (not study-workbook.css): a fieldset is as wide as its widest select, which pushed the Mock page sideways */
+fieldset{min-width:0;grid-template-columns:minmax(0,1fr)}
+fieldset select{max-width:100%;min-width:0}
 .steps.fx-steps button[aria-current="step"]{background:var(--sheet);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.14)}
 .steps.fx-steps button[aria-current="step"] i{background:var(--blue);color:var(--on-blue)}
 .steps.fx-steps button.fx-done{color:var(--good)}
