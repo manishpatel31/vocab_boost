@@ -312,6 +312,8 @@ table.cover td{min-width:90px}
 .figwrap figure{margin:0;display:grid;gap:6px;justify-items:center;text-align:center}
 .fig svg,.figwrap svg{width:100%;max-width:340px;height:auto;color:var(--ink)}
 .fig figcaption,.figwrap figcaption{font-size:13px;color:var(--ink2)}
+.figwrap svg text{fill:currentColor;font-family:var(--f-body);font-weight:600}.figwrap svg text.m{fill:var(--ink2);font-weight:500}
+.figwrap figcaption{text-align:left;max-width:340px}
 sup,sub{font-size:.72em;line-height:0}
 
 </style>
@@ -1016,12 +1018,115 @@ function drawList(){
 }
 
 /* ---------- one chapter ---------- */
+/* ---------- figures: one or more labelled pictures per chapter, shown as "In a picture" under the formulas ---------- */
+const FIGS = (() => {
+  const B = "#2f6db5", R = "#c0392b", G = "#2f8f4e", Y = "#b9770e", V = "#7d4fb5", K = "currentColor";
+  const S = (w, h, label, body) => `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${label}">${body}</svg>`;
+  const L = (d, c, w, dash) => `<path d="${d}" fill="none" stroke="${c || K}" stroke-width="${w || 2}" stroke-linecap="round" stroke-linejoin="round"${dash ? ' stroke-dasharray="5 4"' : ""}/>`;
+  const F = (d, c, o) => `<path d="${d}" fill="${c}" opacity="${o || .18}" stroke="none"/>`;
+  const T = (x, y, t, c, a, s) => `<text x="${x}" y="${y}" text-anchor="${a || "middle"}" font-size="${s || 12}"${c ? ` style="fill:${c}"` : ""}>${t}</text>`;
+  const M = (x, y, t, a, s) => `<text x="${x}" y="${y}" text-anchor="${a || "middle"}" font-size="${s || 11}" class="m">${t}</text>`;
+  const D = (x, y, c, r) => `<circle cx="${x}" cy="${y}" r="${r || 3.5}" fill="${c || K}"/>`;
+  const C = (x, y, r, c, w, fill) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill || "none"}" stroke="${c || K}" stroke-width="${w || 2}"${fill ? ' fill-opacity=".16"' : ""}/>`;
+  const RA = (x, y, s) => L(`M${x + s} ${y} V${y - s} H${x}`, K, 1.4);                     // a right-angle mark at (x, y), opening up-right
+  const fig = (cap, svg) => [cap, svg];
+  return {
+    C2: [fig("Each family of numbers sits inside the next. Irrationals (√2, π) are real but not rational.",
+      S(300, 190, "Number families as nested sets", `<rect x="4" y="4" width="292" height="182" rx="12" fill="${V}" fill-opacity=".1" stroke="${V}"/><rect x="14" y="34" width="196" height="144" rx="10" fill="${B}" fill-opacity=".12" stroke="${B}"/>
+        <rect x="24" y="62" width="150" height="108" rx="9" fill="${G}" fill-opacity=".14" stroke="${G}"/><rect x="34" y="90" width="110" height="72" rx="8" fill="${Y}" fill-opacity=".16" stroke="${Y}"/><rect x="44" y="118" width="70" height="36" rx="7" fill="${R}" fill-opacity=".16" stroke="${R}"/>
+        ${T(150, 24, "Real numbers", V)}${T(112, 52, "Rational (p/q)", B)}${T(99, 80, "Integers", G)}${T(89, 108, "Whole", Y)}${T(79, 141, "Natural", R)}${T(253, 100, "Irrational", V)}${M(253, 118, "√2, π, e")}`))],
+    C3: [fig("12 = 2² × 3 and 18 = 2 × 3². HCF takes the common part (lowest powers); LCM takes everything (highest powers). HCF × LCM = product of the two numbers.",
+      S(300, 190, "HCF and LCM from prime factors", `${C(115, 92, 72, B, 2, B)}${C(185, 92, 72, R, 2, R)}${T(70, 60, "12", B, "middle", 15)}${T(230, 60, "18", R, "middle", 15)}
+        ${T(78, 98, "2", K, "middle", 16)}${T(150, 88, "2 × 3", K, "middle", 16)}${T(222, 98, "3", K, "middle", 16)}${M(150, 106, "HCF = 6")}${T(150, 182, "LCM = 2 × (2 × 3) × 3 = 36", G, "middle", 12.5)}`))],
+    C5: [fig("Two changes of a% and b% one after the other: net change = a + b + ab/100. A rise of 20% then 10% is 32%, not 30%.",
+      S(300, 200, "Successive percentage change as an area", `<rect x="40" y="60" width="150" height="110" fill="${B}" fill-opacity=".16" stroke="${B}" stroke-width="2"/><rect x="190" y="60" width="50" height="110" fill="${G}" fill-opacity=".2" stroke="${G}"/>
+        <rect x="40" y="30" width="150" height="30" fill="${Y}" fill-opacity=".22" stroke="${Y}"/><rect x="190" y="30" width="50" height="30" fill="${R}" fill-opacity=".3" stroke="${R}"/>
+        ${T(115, 120, "100", B, "middle", 15)}${T(215, 120, "+a", G)}${T(115, 50, "+b", Y)}${T(215, 50, "ab/100", R, "middle", 10.5)}${M(115, 188, "original")}${M(215, 188, "a% more")}${M(270, 50, "b% more", "middle", 10)}`))],
+    C6: [fig("Profit and loss are counted on cost price; discount is counted on marked price.",
+      S(300, 150, "Cost price, selling price and marked price on a line", `${L("M20 70 H280", K, 2)}${D(20, 70)}${D(150, 70, B, 5)}${D(210, 70, G, 5)}${D(280, 70, R, 5)}
+        ${T(20, 56, "0")}${T(150, 56, "CP", B, "middle", 14)}${T(210, 56, "SP", G, "middle", 14)}${T(280, 56, "MP", R, "middle", 14)}
+        ${L("M150 90 V98 H210 V90", G, 1.6)}${T(180, 114, "profit", G)}${M(180, 128, "% on CP")}${L("M210 90 V98 H280 V90", R, 1.6)}${T(245, 114, "discount", R)}${M(245, 128, "% on MP")}${L("M150 24 V16 H280 V24", Y, 1.6)}${T(215, 12, "mark-up", Y, "middle", 11)}`))],
+    C7: [fig("Simple interest adds the same amount every year; compound interest adds interest on interest. For 2 years, CI − SI = P(r/100)².",
+      S(300, 190, "Simple interest and compound interest compared", `${L("M30 20 V160 H290", K, 1.6)}${[0, 1, 2, 3].map(i => `<rect x="${52 + i * 60}" y="${120 - i * 24}" width="20" height="${40 + i * 24}" fill="${B}" fill-opacity=".5"/><rect x="${74 + i * 60}" y="${120 - [0, 24, 53, 88][i]}" width="20" height="${40 + [0, 24, 53, 88][i]}" fill="${R}" fill-opacity=".55"/>${M(73 + i * 60, 176, i ? "year " + i : "start")}`).join("")}
+        ${T(48, 34, "■ SI", B, "start")}${T(98, 34, "■ CI", R, "start")}${M(286, 26, "the gap widens every year", "end", 10.5)}`))],
+    C9: [fig("Write the two prices on the left, the mean price in the middle, and subtract across. Cheaper : dearer = (d − m) : (m − c).",
+      S(300, 180, "The rule of alligation as a cross", `${T(50, 40, "c", B, "middle", 18)}${M(50, 58, "cheaper")}${T(50, 150, "d", R, "middle", 18)}${M(50, 168, "dearer")}${T(150, 98, "m", Y, "middle", 20)}${M(150, 116, "mean price")}
+        ${T(250, 40, "d − m", R, "middle", 16)}${T(250, 150, "m − c", B, "middle", 16)}${L("M68 46 L130 86", K, 1.6)}${L("M170 104 L228 142", K, 1.6)}${L("M68 142 L130 104", K, 1.6)}${L("M170 86 L228 48", K, 1.6)}${M(250, 98, "ratio c : d")}`))],
+    C12: [fig("Cover what you want: D = S × T, S = D ÷ T, T = D ÷ S. Opposite directions: add the speeds. Same direction: subtract.",
+      S(300, 190, "The distance, speed and time triangle, and relative speed", `${L("M80 20 L20 130 H140 Z", K, 2)}${L("M48 80 H112 M80 80 V130", K, 1.6)}${T(80, 66, "D", B, "middle", 20)}${T(52, 118, "S", R, "middle", 20)}${T(108, 118, "T", G, "middle", 20)}
+        ${L("M170 50 H212", B, 2.4)}${L("M206 44 L214 50 L206 56", B, 2.4)}${L("M290 50 H248", R, 2.4)}${L("M254 44 L246 50 L254 56", R, 2.4)}${T(230, 78, "s₁ + s₂", K, "middle", 13)}${M(230, 94, "towards each other")}
+        ${L("M170 124 H212", B, 2.4)}${L("M206 118 L214 124 L206 130", B, 2.4)}${L("M236 124 H264", R, 2.4)}${L("M258 118 L266 124 L258 130", R, 2.4)}${T(230, 152, "s₁ − s₂", K, "middle", 13)}${M(230, 168, "same direction")}${M(80, 152, "km/h × 5/18 = m/s", "middle", 10.5)}`))],
+    C13: [fig("(a + b)² as a square of side a + b: one a², one b² and two rectangles ab.",
+      S(300, 200, "The identity a plus b whole squared as areas", `<rect x="60" y="20" width="110" height="110" fill="${B}" fill-opacity=".18" stroke="${B}" stroke-width="2"/><rect x="170" y="20" width="50" height="110" fill="${G}" fill-opacity=".2" stroke="${G}" stroke-width="2"/>
+        <rect x="60" y="130" width="110" height="50" fill="${G}" fill-opacity=".2" stroke="${G}" stroke-width="2"/><rect x="170" y="130" width="50" height="50" fill="${R}" fill-opacity=".22" stroke="${R}" stroke-width="2"/>
+        ${T(115, 80, "a²", B, "middle", 18)}${T(195, 80, "ab", G, "middle", 15)}${T(115, 160, "ab", G, "middle", 15)}${T(195, 160, "b²", R, "middle", 15)}${M(115, 14, "a")}${M(195, 14, "b")}${M(50, 80, "a")}${M(50, 160, "b")}${T(262, 104, "= a² + 2ab + b²", K, "middle", 10.5)}`))],
+    C14: [fig("The three medians meet at the centroid G, which cuts each median 2 : 1 from the vertex.",
+      S(300, 190, "Medians and the centroid of a triangle", `${L("M150 16 L30 170 H270 Z", K, 2.2)}${L("M150 16 L150 170", B, 1.6)}${L("M30 170 L210 93", B, 1.6)}${L("M270 170 L90 93", B, 1.6)}${D(150, 118.7, R, 5)}${T(162, 114, "G", R, "start", 14)}
+        ${T(150, 12, "A")}${T(22, 182, "B")}${T(278, 182, "C")}${T(150, 184, "D")}${T(160, 70, "2", B, "start", 12)}${T(160, 150, "1", B, "start", 12)}${M(236, 60, "AG : GD = 2 : 1", "middle", 11)}`)),
+      fig("Angle at each centre: incentre I → 90° + A/2; circumcentre O → 2A; orthocentre H → 180° − A.",
+      S(300, 190, "Angles subtended by BC at the incentre, circumcentre and orthocentre", `${L("M150 20 L40 165 H260 Z", K, 2.2)}${D(150, 112, G, 5)}${L("M40 165 L150 112 L260 165", G, 1.8, true)}${T(150, 102, "I", G, "middle", 13)}${T(150, 14, "A")}${T(32, 178, "B")}${T(268, 178, "C")}
+        ${T(150, 148, "∠BIC = 90° + A/2", G, "middle", 12)}${M(150, 184, "∠BOC = 2A   ·   ∠BHC = 180° − A", "middle", 11)}`)),
+      fig("Two triangles worth knowing by heart. Sides opposite 30°, 60°, 90° are 1 : √3 : 2; opposite 45°, 45°, 90° are 1 : 1 : √2.",
+      S(300, 180, "The 30-60-90 and 45-45-90 triangles", `${L("M20 150 H104 V4 Z", K, 2.2)}${L("M90 150 V136 H104", K, 1.4)}
+        ${T(62, 166, "1")}${T(116, 84, "√3", K, "start")}${T(52, 70, "2", K, "end")}${M(40, 144, "60°", "middle", 10)}${M(93, 48, "30°", "middle", 10)}
+        ${L("M170 150 H280 V40 Z", K, 2.2)}${L("M266 150 V136 H280", K, 1.4)}${T(225, 166, "1")}${T(288, 100, "1", K, "start")}${T(214, 88, "√2", K, "end")}${M(196, 144, "45°", "middle", 10)}${M(270, 70, "45°", "middle", 10)}`))],
+    C15: [fig("Sum of interior angles = (n − 2) × 180°. Sum of exterior angles is always 360°, so each exterior angle of a regular polygon = 360° ÷ n.",
+      S(300, 190, "Interior and exterior angles of a regular hexagon", `${L("M100 30 H200 L250 100 L200 170 H100 L50 100 Z", K, 2.2)}${L("M200 170 H280", R, 1.8, true)}${L("M226 170 A26 26 0 0 0 215 149", R, 1.8)}${T(244, 156, "60°", R, "start", 11)}
+        ${L("M176 170 A24 24 0 0 1 214 150", B, 1.8)}${T(180, 148, "120°", B, "middle", 11)}${T(150, 96, "n = 6", K, "middle", 14)}${M(150, 114, "(6 − 2) × 180° = 720°")}${M(150, 186, "interior + exterior = 180°", "middle", 10.5)}`)),
+      fig("Every square is a rectangle and a rhombus; every rectangle and rhombus is a parallelogram.",
+      S(300, 180, "The family of quadrilaterals", `${[["Quadrilateral", 150, 22, K], ["Trapezium", 70, 66, Y], ["Parallelogram", 200, 66, B], ["Rectangle", 140, 112, G], ["Rhombus", 246, 112, V], ["Square", 200, 158, R]].map(r => `<rect x="${r[1] - 48}" y="${r[2] - 14}" width="96" height="24" rx="8" fill="none" stroke="${r[3]}" stroke-width="1.6"/>${T(r[1], r[2] + 3, r[0], r[3] === K ? "" : r[3], "middle", 11)}`).join("")}
+        ${L("M130 32 L84 52 M170 32 L200 52 M184 76 L150 98 M216 76 L240 98 M150 122 L190 144 M240 122 L212 144", K, 1.3)}`))],
+    C16: [fig("The angle at the centre is twice the angle at the circumference on the same arc. An angle in a semicircle is 90°.",
+      S(300, 200, "Angle at the centre and angle at the circumference", `${C(150, 104, 84)}${D(150, 104)}${L("M90 163 L150 104 L210 163", R, 2)}${L("M90 163 L150 20 L210 163", B, 2)}${T(150, 14, "P")}${T(82, 178, "A")}${T(218, 178, "B")}${T(160, 100, "O", K, "start")}
+        ${T(150, 134, "2θ", R, "middle", 13)}${T(150, 52, "θ", B, "middle", 13)}`)),
+      fig("A tangent is perpendicular to the radius at the point of contact. Two tangents from one outside point are equal.",
+      S(300, 190, "Tangents to a circle from an external point", `${C(110, 95, 70)}${D(110, 95)}${D(270, 95, R, 4.5)}${L("M270 95 L140.6 32", B, 2)}${L("M270 95 L140.6 158", B, 2)}${L("M110 95 L140.6 32", K, 1.6)}${L("M110 95 L140.6 158", K, 1.6)}${L("M110 95 H270", K, 1.2, true)}
+        ${T(100, 99, "O", K, "end")}${T(280, 99, "P", R, "start")}${T(140, 24, "A")}${T(140, 176, "B")}${M(214, 52, "PA = PB")}${M(170, 92, "OP bisects ∠APB", "middle", 10)}${L("M134.5 44.6 L147 50.7 L153.1 38.1", K, 1.3)}`)),
+      fig("Chords that cross inside, and a tangent with a secant from outside: the products are equal.",
+      S(300, 190, "Intersecting chords and the tangent-secant rule", `${C(80, 95, 62)}${L("M30 60 L128 134", B, 2)}${L("M40 142 L126 54", R, 2)}${D(83.5, 100.4, K, 4)}${T(88, 120, "P", K, "start", 11)}${M(80, 178, "PA × PB = PC × PD")}
+        ${C(220, 95, 50)}${L("M150 160 L229.8 144", G, 2)}${L("M150 160 L250 60", V, 2)}${D(150, 160, K, 4)}${T(146, 174, "P", K, "end", 11)}${T(236, 158, "T", G, "start", 11)}${T(178, 118, "A", V, "end", 11)}${T(256, 58, "B", V, "start", 11)}${M(222, 178, "PT² = PA × PB", "middle", 11)}`))],
+    C17: [fig("Distance = √[(x₂ − x₁)² + (y₂ − y₁)²]. A point dividing AB in m : n is ((mx₂ + nx₁)/(m + n), (my₂ + ny₁)/(m + n)).",
+      S(300, 200, "Distance and section formula on the coordinate plane", `${L("M30 180 H290 M40 190 V14", K, 1.6)}${L("M70 150 L250 50", B, 2.4)}${L("M70 150 H250 V50", K, 1.2, true)}${D(70, 150, R, 5)}${D(250, 50, R, 5)}${D(178, 90, G, 5)}
+        ${T(44, 170, "A (x₁, y₁)", R, "start", 11)}${T(246, 40, "B (x₂, y₂)", R, "end", 11)}${T(170, 82, "P", G, "end")}${M(124, 112, "m", "middle", 12)}${M(214, 62, "n", "middle", 12)}${M(160, 166, "x₂ − x₁")}${M(256, 104, "y₂ − y₁", "start")}${M(286, 194, "x", "end")}${M(48, 22, "y", "start")}`)),
+      fig("Signs of (x, y) in the four quadrants, counted anticlockwise.",
+      S(300, 180, "The four quadrants", `${L("M20 90 H280 M150 10 V170", K, 1.8)}${T(215, 50, "I  (+, +)", B, "middle", 14)}${T(85, 50, "II  (−, +)", G, "middle", 14)}${T(85, 136, "III  (−, −)", R, "middle", 14)}${T(215, 136, "IV  (+, −)", V, "middle", 14)}${M(276, 84, "x", "end")}${M(158, 20, "y", "start")}${M(158, 104, "O (0, 0)", "start", 10)}`))],
+    C18: [fig("Triangle and trapezium: both need the perpendicular height, not a slant side.",
+      S(300, 130, "Areas of a triangle and a trapezium", `${L("M20 90 L60 20 L130 90 Z", B, 2)}${L("M60 20 V90", B, 1.3, true)}${M(68, 60, "h", "start")}${M(75, 104, "b")}${T(75, 122, "½ b h", B, "middle", 13)}
+        ${L("M180 90 L200 24 H260 L286 90 Z", G, 2)}${L("M230 24 V90", G, 1.3, true)}${M(230, 18, "a")}${M(233, 104, "b")}${M(238, 60, "h", "start")}${T(233, 122, "½ (a + b) h", G, "middle", 13)}`)),
+      fig("A sector is the fraction θ/360 of the whole circle, for both its area and its arc.",
+      S(300, 120, "Area and arc of a sector", `${L("M40 104 L40 24 A80 80 0 0 1 109.3 64 Z", R, 2)}${M(54, 84, "θ", "start", 12)}${M(34, 66, "r", "end")}${T(136, 50, "area = θ/360 × πr²", R, "start", 13)}${T(136, 78, "arc = θ/360 × 2πr", R, "start", 13)}`)),
+      fig("Rhombus: half the product of the diagonals, which cross at right angles and bisect each other.",
+      S(300, 130, "Area of a rhombus from its diagonals", `${L("M90 16 L150 64 L90 112 L30 64 Z", V, 2)}${L("M90 16 V112 M30 64 H150", V, 1.2, true)}${M(96, 44, "d₁", "start")}${M(120, 60, "d₂")}${T(176, 60, "area = ½ d₁ d₂", V, "start", 13)}${M(176, 80, "side² = (d₁/2)² + (d₂/2)²", "start", 10.5)}`))],
+    C19: [fig("Four solids and their volumes. Cone = ⅓ of the cylinder with the same base and height; sphere = ⅔ of the cylinder that just holds it.",
+      S(300, 236, "Cuboid, cylinder, cone and sphere", `${L("M16 44 H86 V94 H16 Z M16 44 L38 26 H108 L86 44 M108 26 V76 L86 94", B, 2)}${M(51, 108, "l × b × h")}${T(51, 122, "cuboid", B, "middle", 11)}
+        <ellipse cx="218" cy="30" rx="36" ry="10" fill="none" stroke="${G}" stroke-width="2"/>${L("M182 30 V90 A36 10 0 0 0 254 90 V30", G, 2)}${L("M218 30 H254", G, 1.2, true)}${M(238, 26, "r", "middle", 10)}${M(262, 64, "h", "start", 10)}${M(218, 114, "πr²h")}${T(218, 128, "cylinder", G, "middle", 11)}
+        ${L("M24 200 L60 134 L96 200", R, 2)}<ellipse cx="60" cy="200" rx="36" ry="9" fill="none" stroke="${R}" stroke-width="2"/>${L("M60 134 V200 H96", R, 1.2, true)}${M(66, 172, "h", "start", 10)}${M(88, 166, "l", "start", 10)}${T(60, 228, "⅓ πr²h · curved πrl", R, "middle", 11)}${M(110, 150, "l² = r² + h²", "start", 10.5)}
+        ${C(226, 172, 34, V)}<ellipse cx="226" cy="172" rx="34" ry="9" fill="none" stroke="${V}" stroke-width="1.2" stroke-dasharray="4 3"/>${L("M226 172 H260", V, 1.2)}${M(242, 168, "r", "middle", 10)}${T(226, 228, "⁴⁄₃ πr³ · surface 4πr²", V, "middle", 11)}`))],
+    C20: [fig("SOH · CAH · TOA: sin = opposite/hypotenuse, cos = adjacent/hypotenuse, tan = opposite/adjacent.",
+      S(300, 180, "A right triangle with its sides named", `${L("M30 150 H190 V40 Z", K, 2.2)}${L("M176 150 V136 H190", K, 1.4)}${L("M66 150 A36 36 0 0 0 60 130", B, 1.8)}${T(80, 144, "θ", B, "middle", 13)}
+        ${T(110, 168, "adjacent (base)", G, "middle", 12)}${T(198, 92, "opposite", R, "start", 12)}${T(100, 84, "hypotenuse", V, "end", 12)}${M(198, 108, "(perpendicular)", "start", 10)}`)),
+      fig("All Students Take Coffee: which ratios are positive in each quadrant.",
+      S(300, 200, "Signs of the trigonometric ratios in the four quadrants", `${L("M20 100 H280 M150 12 V188", K, 1.8)}${T(215, 56, "All +", B, "middle", 14)}${M(215, 72, "0° – 90°")}${T(85, 56, "Sin +", G, "middle", 14)}${M(85, 72, "(and cosec)")}
+        ${T(85, 144, "Tan +", R, "middle", 14)}${M(85, 160, "(and cot)")}${T(215, 144, "Cos +", V, "middle", 14)}${M(215, 160, "(and sec)")}${M(284, 94, "0°", "end", 10)}${M(158, 22, "90°", "start", 10)}${M(16, 94, "180°", "start", 10)}${M(158, 186, "270°", "start", 10)}`))],
+    C21: [fig("Elevation is measured up from the horizontal, depression down from it. The two angles are equal (alternate angles), so most questions are one right triangle: height = distance × tan θ.",
+      S(300, 190, "Angles of elevation and depression", `${L("M20 160 H280", K, 2)}${L("M240 160 V40", K, 3)}${L("M40 160 L240 40", B, 1.8)}${L("M240 40 H110", K, 1.3, true)}${D(40, 160, R, 5)}${D(240, 40, R, 5)}
+        ${L("M74 160 A34 34 0 0 0 69 142", G, 1.8)}${T(88, 152, "θ", G, "middle", 13)}${M(92, 134, "elevation", "start", 10.5)}${L("M206 40 A34 34 0 0 0 211 57", V, 1.8)}${T(194, 54, "θ", V, "middle", 13)}${M(170, 32, "depression", "middle", 10.5)}
+        ${T(250, 104, "h", K, "start", 13)}${T(140, 178, "d", K, "middle", 13)}${M(40, 178, "observer")}${M(252, 34, "top", "start")}`))],
+    C23: [fig("Two dice give 36 equally likely outcomes. Count the cells: a sum of 7 has six ways (the diagonal), so P = 6/36 = 1/6.",
+      S(300, 210, "The 36 outcomes of two dice with their sums", `${[1, 2, 3, 4, 5, 6].map(i => M(52 + i * 34, 20, i, "middle", 11) + M(40, 44 + (i - 1) * 28, i, "middle", 11) + [1, 2, 3, 4, 5, 6].map(j => `<rect x="${36 + j * 34}" y="${28 + (i - 1) * 28}" width="32" height="26" rx="5" fill="${i + j === 7 ? R : B}" fill-opacity="${i + j === 7 ? .32 : .1}" stroke="${i + j === 7 ? R : "none"}"/>${T(52 + j * 34, 46 + (i - 1) * 28, i + j, i + j === 7 ? R : "", "middle", 11.5)}`).join("")).join("")}${M(160, 206, "sum of the two dice", "middle", 10.5)}`))],
+    C24: [fig("In a pie chart the whole is 360° = 100%, so 1% = 3.6° and 90° = 25%.",
+      S(300, 190, "Reading a pie chart: degrees and percentages", `${F("M110 95 L110 20 A75 75 0 0 1 185 95 Z", B, .45)}${F("M110 95 L185 95 A75 75 0 0 1 49.3 139 Z", G, .45)}${F("M110 95 L49.3 139 A75 75 0 0 1 110 20 Z", Y, .45)}${C(110, 95, 75, K, 1.6)}
+        ${T(140, 66, "25%", B)}${M(140, 80, "90°")}${T(128, 142, "40%", G)}${M(128, 156, "144°")}${T(70, 88, "35%", Y)}${M(70, 102, "126°")}
+        ${T(206, 60, "% → degrees", K, "start", 12)}${M(206, 76, "× 3.6", "start")}${T(206, 108, "degrees → %", K, "start", 12)}${M(206, 124, "÷ 3.6", "start")}${T(206, 156, "value", K, "start", 12)}${M(206, 172, "= % × total ÷ 100", "start")}`))]
+  };
+})();
 function chapterHTML(c, full){
   const i = CNUM(c.id);
   return `<article class="stack chap" id="ch-${c.id}">
     <div class="stack" style="gap:6px"><span class="eyebrow">Chapter ${i} of ${CH.length} · ${c.g}</span><h1>${esc(c.t)}</h1><span class="muted">${c.hi}</span></div>
     <div class="hot"><span class="lab">🔥 Exam radar ${"🔥".repeat(c.heat)}</span><b>Tier 1:</b> ${c.t1} · <b>Tier 2:</b> ${c.t2} questions. ${c.ask}</div>
     ${(c.f||[]).length ? `<div class="block"><h3>Formulas <span class="muted" style="font-weight:400;font-size:13px">★ = last-hour sheet</span></h3><div class="fgrid">${c.f.map(r=>`<div class="fcard${r[3]?" star":""}"><span class="fn">${r[3]?"★ ":""}${r[0]}</span><span class="fx">${r[1]}</span>${r[2]?`<span class="fnote">${r[2]}</span>`:""}</div>`).join("")}</div></div>` : ""}
+    ${(FIGS[c.id]||[]).length ? `<div class="block"><h3>In a picture</h3><div class="figwrap">${FIGS[c.id].map(f=>`<figure>${f[1]}<figcaption>${f[0]}</figcaption></figure>`).join("")}</div></div>` : ""}
     ${(c.tb||[]).map(t => `<div class="block"><h3>${t.title}</h3><div class="tbl"><table><thead><tr>${t.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${t.rows.map(r=>`<tr>${r.map(v=>`<td>${v}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`).join("")}
     ${(c.c||[]).length ? `<div class="block"><h3>Key concepts</h3><ul class="pts">${c.c.map(x=>`<li>${x}</li>`).join("")}</ul></div>` : ""}
     ${(c.tr||[]).map(x => `<div class="trick"><span class="lab">Trick</span>${x}</div>`).join("")}
