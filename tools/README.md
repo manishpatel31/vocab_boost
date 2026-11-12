@@ -178,7 +178,7 @@ the labels would crowd), `bars`, `calendar` (rows `[month, day, label]`), `cards
 (ready HTML or SVG).
 
 The hand-built pages take theirs from `tools/hand/<name>.visual.js` (same API): `node tools/workbook/apply-hand.js
-sports|intlorgs|polity|economics|biology|space|physics|reports|schemes|appointments|ipr|bns|trigonometry|geometry|mensuration2d|mensuration3d|number-system|clock|calendar|census|voice|narration` checks every place against the page's lessons and writes
+sports|intlorgs|polity|economics|biology|space|physics|reports|schemes|appointments|ipr|bns|trigonometry|geometry|mensuration2d|mensuration3d|number-system|clock|calendar|census|voice|narration|statistics` checks every place against the page's lessons and writes
 the blocks in, just before the boot (pages on `study-core.js`, like Physics: at the end of their own script, as
 study-core.js itself draws the blocks and adds the quiz tabs). After any of these, run `node tools/stamp.js`.
 The chapter apps built by `build_app.py` (Number System, Clock, Calendar) get theirs the same way: when
