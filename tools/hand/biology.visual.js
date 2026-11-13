@@ -177,4 +177,51 @@ place("L24", "Pathogen, vector", KIT.photos("Vectors in pictures", [["Anopheles"
   { name: r => r[0].replace(/^Phlebotominae$/, "Sandfly") }),
   KIT.photos("Pioneers of medicine", [["Edward Jenner", "Smallpox vaccine, 1796"], ["Louis Pasteur", "Rabies vaccine"], ["Robert Koch", "TB germ"], ["Ronald Ross", "Malaria and the mosquito"], ["Alexander Fleming", "Penicillin, 1928"], ["Karl Landsteiner", "Blood groups"]]));
 
+// ---- added: where a plant grows and what its two pipes carry; the plant kingdom as steps; the animal phyla by body plan ----
+
+const xT = (x, y, t, c, a, sz) => `<text x="${x}" y="${y}" font-size="${sz || 12}" font-weight="700" text-anchor="${a || "start"}" style="fill:${c || "var(--ink)"}">${t}</text>`;
+const xM = (x, y, t, a, sz) => `<text x="${x}" y="${y}" font-size="${sz || 10.5}" text-anchor="${a || "start"}" class="mut">${t}</text>`;
+const xW = (x, y, t, sz, b) => `<text x="${x}" y="${y}" font-size="${sz || 10.5}"${b ? ' font-weight="700"' : ""} text-anchor="middle" style="fill:#fff;opacity:.96">${t}</text>`;
+const xL = (d, c, w, dash) => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w || 2.4}" stroke-linecap="round" stroke-linejoin="round"${dash ? ' stroke-dasharray="5 4"' : ""}/>`;
+const xA = (id, c) => `<marker id="${id}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="${c}"/></marker>`;
+const XB = "#2f6db5", XR = "#c0392b", XG = "#2f8f4e", XY = "#a8780a", XV = "#7d4fb5", XK = "#5b6470", XT = "#1a8a8a";
+
+// L7 — meristems, xylem and phloem on one plant
+const PLT = `<svg class="dg" viewBox="0 0 640 300" role="img" aria-label="Meristems of a plant, and what xylem and phloem carry"><defs>${xA("biU", XB)}${xA("biP", XG)}</defs>
+  <path d="M20 200 H320" stroke="${XY}" stroke-width="2"/>${xM(316, 196, "soil", "end")}
+  ${xL("M90 60 V200", XG, 9)}${xL("M90 200 V262", XY, 7)}${xL("M90 215 L50 250 M90 225 L134 256 M90 240 L70 276", XY, 3)}
+  <path d="M90 120 C60 100,34 110,28 132 C50 140,74 136,90 124Z" fill="${XG}" opacity=".7"/><path d="M90 158 C124 140,150 148,156 168 C134 176,108 172,90 162Z" fill="${XG}" opacity=".7"/>
+  <circle cx="90" cy="54" r="9" fill="${XR}"/><circle cx="70" cy="279" r="6" fill="${XR}"/><circle cx="50" cy="252" r="5" fill="${XR}"/><circle cx="134" cy="258" r="5" fill="${XR}"/>
+  ${xT(112, 50, "Apical meristem", XR)}${xM(112, 65, "shoot and root tips → length")}
+  <circle cx="90" cy="124" r="6" fill="${XV}"/>${xL("M98 122 H108", XV, 1.5)}${xT(112, 104, "Intercalary", XV)}${xM(112, 119, "base of leaves, internodes →")}${xM(112, 132, "grass regrows after grazing")}
+  <rect x="82" y="176" width="16" height="20" rx="3" fill="none" stroke="${XB}" stroke-width="2.5"/>${xT(170, 184, "Lateral (cambium)", XB)}${xM(170, 197, "sides → girth")}${xL("M100 186 H166", XB, 1.5)}
+  <rect x="350" y="30" width="110" height="200" rx="12" fill="${XB}" opacity=".14" stroke="${XB}"/><rect x="490" y="30" width="110" height="200" rx="12" fill="${XG}" opacity=".14" stroke="${XG}"/>
+  ${xT(405, 22, "XYLEM", XB, "middle", 13)}${xT(545, 22, "PHLOEM", XG, "middle", 13)}
+  <path d="M405 210 V56" stroke="${XB}" stroke-width="5" marker-end="url(#biU)"/><path d="M545 206 V60" stroke="${XG}" stroke-width="5" marker-end="url(#biP)" marker-start="url(#biP)"/>
+  ${xM(405, 248, "water and minerals", "middle", 11)}${xM(405, 263, "one way: up from the roots", "middle", 11)}${xM(405, 278, "mostly dead cells", "middle", 11)}
+  ${xM(545, 248, "food (sugar)", "middle", 11)}${xM(545, 263, "both ways", "middle", 11)}${xM(545, 278, "mostly living cells", "middle", 11)}</svg>`;
+place("L7", "Complex tissues", KIT.fig("Where a plant grows, and its two pipelines", PLT, "Meristems are the only dividing tissue: tips add length, the cambium adds girth. Xylem is a one-way water pipe; phloem moves food in both directions."));
+
+// L10 — the plant kingdom as five steps
+const PK = rows("L10", "Five plant groups");
+if (PK.length !== 5 || !/^Thallophyta/.test(PK[0][0]) || !/^Angiosperms/.test(PK[4][0])) fail("biology L10: the plant groups changed");
+const PKG = ["no root, stem, leaf", "+ leafy body", "+ vessels", "+ seeds (naked)", "+ flowers, fruit"], PKE = ["Spirogyra, Ulva", "moss, Marchantia", "ferns, Marsilea", "pine, Cycas", "mango, wheat"];
+const PKS = `<svg class="dg" viewBox="0 0 640 270" role="img" aria-label="The five groups of the plant kingdom as steps">
+  ${PK.map((r, i) => { const x = 8 + i * 126, y = 196 - i * 38; return `<rect x="${x}" y="${y}" width="120" height="${250 - y}" rx="8" fill="${[XT, XG, XY, XV, XR][i]}"/>${xW(x + 60, y + 22, r[0].replace(/ \(.*\)/, ""), 12, 1)}${xW(x + 60, y + 38, PKE[i], 9.5)}${xM(x + 60, y - 8, PKG[i], "middle", 9.5)}`; }).join("")}
+  ${xM(8, 266, "Cryptogams (no seeds): the first three.    Phanerogams (seed plants): gymnosperms and angiosperms.", "start", 11)}</svg>`;
+place("L10", "Five plant groups", KIT.fig("The plant kingdom, one step at a time", PKS, "Each step up adds one thing. Bryophytes are the amphibians of the plant kingdom; pteridophytes are the first vascular plants."));
+
+// L11 — the animal phyla by body plan
+const PH = rows("L11", "Phylum ladder").map(r => r[0].replace(/ \(.*\)/, ""));
+if (PH.length !== 11 || PH[0] !== "Porifera" || PH[4] !== "Nematoda" || PH[5] !== "Annelida") fail("biology L11: the phylum ladder changed");
+const PHN = ["sponges", "Hydra, jellyfish", "comb jellies", "flatworms", "roundworms", "earthworm, leech", "insects, crabs", "snail, octopus", "starfish", "Balanoglossus", "fish to mammals"];
+const PHS = `<svg class="dg" viewBox="0 0 640 318" role="img" aria-label="The animal phyla, grouped by body cavity">
+  ${PH.map((n, i) => `<rect x="150" y="${6 + i * 27}" width="250" height="23" rx="6" fill="${i < 4 ? XK : i === 4 ? XY : XG}"/>${xW(232, 22 + i * 27, n, 11.5, 1)}${xW(340, 22 + i * 27, PHN[i], 9.5)}`).join("")}
+  ${xL("M140 8 V110", XK, 3)}${xT(132, 56, "No coelom", XK, "end", 12)}${xM(132, 71, "Porifera to", "end")}${xM(132, 84, "Platyhelminthes", "end")}
+  ${xL("M140 116 V136", XY, 3)}${xT(132, 130, "Pseudocoelom", XY, "end", 12)}
+  ${xL("M140 143 V300", XG, 3)}${xT(132, 216, "True coelom", XG, "end", 12)}${xM(132, 231, "Annelida onwards", "end")}
+  ${xT(416, 22, "asymmetrical", "var(--ink)", "start", 11)}${xT(416, 49, "radial · sting cells", "var(--ink)", "start", 11)}${xT(416, 76, "radial · comb plates", "var(--ink)", "start", 11)}
+  ${xT(416, 157, "segmented", "var(--ink)", "start", 11)}${xT(416, 184, "largest phylum · jointed legs", "var(--ink)", "start", 11)}${xT(416, 211, "2nd largest · soft body", "var(--ink)", "start", 11)}${xT(416, 238, "spiny skin · radial as adults", "var(--ink)", "start", 11)}${xT(416, 292, "notochord", "var(--ink)", "start", 11)}</svg>`;
+place("L11", "Body-plan sorter", KIT.fig("Eleven phyla by body plan", PHS, "Read down the ladder: no body cavity, then a false one (roundworms), then a true coelom from the earthworms onwards."));
+
 VISUAL = { mode: true, VIS: { key: "biology_photos_v1", word: "picture", words: "pictures", search: "", quiz: "photo", ask: "", rows: [], tabs: [["vphotos", "Photo quiz"]] } };

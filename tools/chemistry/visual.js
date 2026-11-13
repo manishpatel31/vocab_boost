@@ -125,4 +125,59 @@ place("K18", "Fission and fusion", KIT.fig("A fission chain reaction", FS, "Each
 place("K18", "Chemists and what", KIT.photos("Chemists in pictures", rows("K18", "Chemists").filter(r => !/^Nobel/.test(r[0])).slice(0, 12), { cap: r => r[1].replace(/;.*$/, ""),
   wiki: r => ({ "Acharya Prafulla Chandra Ray": "Prafulla Chandra Ray", "C. N. R. Rao": "C. N. R. Rao" })[r[0]] || r[0] }));
 
+// ---- added: reaction types as shapes, the gas laws as graphs, two kinds of plastic, two kinds of hard water ----
+
+const xT = (x, y, t, c, a, sz) => `<text x="${x}" y="${y}" font-size="${sz || 12}" font-weight="700" text-anchor="${a || "start"}" style="fill:${c || "var(--ink)"}">${t}</text>`;
+const xM = (x, y, t, a, sz) => `<text x="${x}" y="${y}" font-size="${sz || 10.5}" text-anchor="${a || "start"}" class="mut">${t}</text>`;
+const xW = (x, y, t, sz, b) => `<text x="${x}" y="${y}" font-size="${sz || 10.5}"${b ? ' font-weight="700"' : ""} text-anchor="middle" style="fill:#fff;opacity:.96">${t}</text>`;
+const xL = (d, c, w, dash) => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w || 2.4}" stroke-linecap="round" stroke-linejoin="round"${dash ? ' stroke-dasharray="5 4"' : ""}/>`;
+const xA = (id, c) => `<marker id="${id}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="${c}"/></marker>`;
+const XB = "#2f6db5", XR = "#c0392b", XG = "#2f8f4e", XY = "#a8780a", XV = "#7d4fb5", XK = "#5b6470", XT = "#1a8a8a";
+
+// K6 — four reaction types as shapes; heat out and heat in
+const ball = (x, y, c, t) => `<circle cx="${x}" cy="${y}" r="13" fill="${c}"/>${xW(x, y + 4, t, 11, 1)}`;
+const rx = (y, name, left, right, eg) => `${xT(8, y + 4, name, "var(--ink)", "start", 12.5)}${left}<path d="M330 ${y} H362" stroke="var(--ink2)" stroke-width="2" marker-end="url(#chR)"/>${right}${xM(8, y + 20, eg, "start", 10)}`;
+const RXN = `<svg class="dg" viewBox="0 0 640 262" role="img" aria-label="Four types of chemical reaction as shapes"><defs>${xA("chR", "var(--ink2)")}</defs>
+  ${rx(26, "Combination", ball(212, 26, XB, "A") + xT(238, 31, "+", "var(--ink)", "middle", 15) + ball(264, 26, XR, "B"), ball(400, 26, XB, "A") + ball(424, 26, XR, "B"), "CaO + H₂O → Ca(OH)₂")}
+  ${rx(82, "Decomposition", ball(226, 82, XB, "A") + ball(250, 82, XR, "B"), ball(400, 82, XB, "A") + xT(426, 87, "+", "var(--ink)", "middle", 15) + ball(452, 82, XR, "B"), "CaCO₃ → CaO + CO₂")}
+  ${rx(138, "Displacement", ball(186, 138, XG, "A") + xT(212, 143, "+", "var(--ink)", "middle", 15) + ball(238, 138, XB, "B") + ball(262, 138, XR, "C"), ball(400, 138, XG, "A") + ball(424, 138, XR, "C") + xT(450, 143, "+", "var(--ink)", "middle", 15) + ball(476, 138, XB, "B"), "Fe + CuSO₄ → FeSO₄ + Cu")}
+  ${rx(194, "Double displacement", ball(170, 194, XB, "A") + ball(194, 194, XR, "B") + xT(220, 199, "+", "var(--ink)", "middle", 15) + ball(246, 194, XG, "C") + ball(270, 194, XY, "D"), ball(400, 194, XB, "A") + ball(424, 194, XY, "D") + xT(450, 199, "+", "var(--ink)", "middle", 15) + ball(476, 194, XG, "C") + ball(500, 194, XR, "B"), "Na₂SO₄ + BaCl₂ → BaSO₄↓ + 2NaCl")}
+  <rect x="524" y="8" width="108" height="100" rx="10" class="abg"/>${xT(578, 28, "Exothermic", XR, "middle", 12)}${xM(578, 46, "heat comes out", "middle")}${xM(578, 62, "burning, respiration,", "middle", 9.5)}${xM(578, 75, "quicklime + water,", "middle", 9.5)}${xM(578, 88, "neutralisation", "middle", 9.5)}
+  <rect x="524" y="118" width="108" height="100" rx="10" class="bbg"/>${xT(578, 138, "Endothermic", XB, "middle", 12)}${xM(578, 156, "heat goes in", "middle")}${xM(578, 172, "photosynthesis,", "middle", 9.5)}${xM(578, 185, "heating limestone,", "middle", 9.5)}${xM(578, 198, "electrolysis of water", "middle", 9.5)}
+  ${xM(8, 250, "Displacement: the more reactive element pushes out the less reactive one.  Double displacement: the ions swap partners.", "start", 10.5)}</svg>`;
+place("K6", "Types of reactions", KIT.fig("Four reaction types as shapes", RXN, "Combination joins, decomposition splits, displacement swaps one, double displacement swaps two. A precipitation and a neutralisation are both double displacements."));
+
+// K15 — three gas laws as graphs
+const gax = (x, xl, yl) => `<path d="M${x + 24} 24 V150 H${x + 190}" fill="none" stroke="var(--ink)" stroke-width="1.5"/>${xM(x + 190, 166, xl, "end")}${xM(x + 28, 30, yl)}`;
+const GAS = `<svg class="dg" viewBox="0 0 640 214" role="img" aria-label="Boyle's, Charles's and Gay-Lussac's laws as graphs">
+  ${gax(0, "Volume", "Pressure")}${xL("M40 36 Q52 128 186 140", XB, 3)}${xT(107, 188, "Boyle: P × V = constant", XB, "middle", 12)}${xM(107, 204, "temperature fixed · squeeze it, it shrinks", "middle", 9.5)}
+  ${gax(214, "Temperature (K)", "Volume")}${xL("M238 150 L400 44", XR, 3)}${xT(321, 188, "Charles: V ∝ T", XR, "middle", 12)}${xM(321, 204, "pressure fixed · a balloon swells in the sun", "middle", 9.5)}${xM(240, 166, "0 K")}
+  ${gax(428, "Temperature (K)", "Pressure")}${xL("M452 150 L614 44", XG, 3)}${xT(535, 188, "Gay-Lussac: P ∝ T", XG, "middle", 12)}${xM(535, 204, "volume fixed · never heat a spray can", "middle", 9.5)}${xM(454, 166, "0 K")}</svg>`;
+place("K15", "Gas laws", KIT.fig("Three gas laws as graphs", GAS, "Boyle's law gives a curve (a hyperbola); the two temperature laws give straight lines through absolute zero. Together: PV = nRT."));
+
+// K12 — two kinds of plastic; two ways to build a chain
+const beads = (x, y, n, c, gap) => Array.from({ length: n }, (_, i) => `<circle cx="${x + i * (gap || 20)}" cy="${y}" r="8" fill="${c}"/>`).join("") + xL(`M${x} ${y} H${x + (n - 1) * (gap || 20)}`, c, 2);
+const PLY = `<svg class="dg" viewBox="0 0 640 250" role="img" aria-label="Thermoplastics and thermosetting plastics; addition and condensation polymers">
+  <rect x="8" y="6" width="306" height="112" rx="12" class="gbg"/>${xT(20, 28, "Thermoplastic", XG, "start", 13)}${xM(20, 44, "separate chains: softens on heating, can be recycled")}
+  ${beads(30, 66, 13, XG)}${beads(40, 86, 12, XG)}${xM(20, 108, "polythene, PVC, polystyrene, nylon")}
+  <rect x="326" y="6" width="306" height="112" rx="12" class="abg"/>${xT(338, 28, "Thermosetting", XR, "start", 13)}${xM(338, 44, "cross-linked chains: sets hard for ever")}
+  ${beads(348, 66, 13, XR)}${beads(348, 86, 13, XR)}${[0, 3, 6, 9, 12].map(i => xL(`M${348 + i * 20} 66 V86`, XR, 2)).join("")}${xM(338, 108, "bakelite, melamine, urea-formaldehyde")}
+  <rect x="8" y="128" width="306" height="112" rx="12" class="bbg"/>${xT(20, 150, "Addition polymer", XB, "start", 13)}${xM(20, 166, "one kind of monomer joins end to end; nothing is lost")}
+  ${beads(30, 190, 13, XB)}${xM(20, 226, "polythene, PVC, Teflon")}
+  <rect x="326" y="128" width="306" height="112" rx="12" class="card"/>${xT(338, 150, "Condensation polymer", XV, "start", 13)}${xM(338, 166, "two monomers join; a small molecule (water) leaves")}
+  ${Array.from({ length: 12 }, (_, i) => `<circle cx="${350 + i * 20}" cy="190" r="8" fill="${i % 2 ? XY : XV}"/>`).join("")}${xL("M350 190 H570", XV, 2)}${xT(596, 194, "+ H₂O", XB, "start", 11)}${xM(338, 226, "nylon-6,6, polyester, bakelite")}</svg>`;
+place("K12", "Rubber, fibres", KIT.fig("Plastics in two pairs", PLY, "Thermoplastics are loose chains, so they melt and can be remoulded. Thermosets are cross-linked, so they char instead of melting: that is why pan handles are bakelite."));
+
+// K17 — hard water
+const HW = rows("K17", "Hard and soft water");
+if (!/Bicarbonates/.test(HW[0][1]) || !/Chlorides and sulphates/.test(HW[1][1])) fail("chemistry K17: the hard water table changed");
+const HWS = `<svg class="dg" viewBox="0 0 640 200" role="img" aria-label="Temporary and permanent hardness of water and how each is removed"><defs>${xA("chH", "var(--ink2)")}</defs>
+  <rect x="210" y="6" width="220" height="34" rx="10" fill="${XK}"/>${xW(320, 28, "Hard water: Ca²⁺ and Mg²⁺ salts", 12.5, 1)}<path d="M320 40 V52 M164 52 H476 M164 52 V62 M476 52 V62" fill="none" stroke="var(--ink2)" stroke-width="1.6"/>
+  <rect x="8" y="62" width="306" height="56" rx="10" fill="${XB}"/>${xW(161, 84, "Temporary hardness", 13, 1)}${xW(161, 102, "bicarbonates of calcium and magnesium")}
+  <rect x="326" y="62" width="306" height="56" rx="10" fill="${XR}"/>${xW(479, 84, "Permanent hardness", 13, 1)}${xW(479, 102, "chlorides and sulphates of calcium and magnesium")}
+  <path d="M161 118 V134" stroke="var(--ink2)" stroke-width="2" marker-end="url(#chH)"/><path d="M479 118 V134" stroke="var(--ink2)" stroke-width="2" marker-end="url(#chH)"/>
+  <rect x="8" y="138" width="306" height="54" rx="10" class="bbg"/>${xT(161, 160, "Just boil it", XB, "middle", 12.5)}${xM(161, 178, "or Clark's method: add slaked lime", "middle", 11)}
+  <rect x="326" y="138" width="306" height="54" rx="10" class="abg"/>${xT(479, 160, "Boiling does not work", XR, "middle", 12.5)}${xM(479, 178, "washing soda · ion exchange (zeolite, permutit) · Calgon", "middle", 10.5)}</svg>`;
+place("K17", "Hard and soft water", KIT.fig("Two kinds of hard water", HWS, "Hard water wastes soap (it forms scum instead of lather). Temporary hardness goes on boiling; permanent hardness needs a chemical or an ion exchanger."));
+
 VISUAL = { mode: true, VIS: { key: "chemistry_photos_v1", word: "picture", words: "pictures", search: "", quiz: "photo", ask: "", rows: [], tabs: [["vphotos", "Photo quiz"]] } };
