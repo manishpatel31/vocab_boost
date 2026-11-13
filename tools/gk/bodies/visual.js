@@ -46,4 +46,22 @@ place("C9", "Which kind", { k: "info", title: "Constitutional, statutory or exec
 const TN = rows("C10", "Tenure"), RM = rows("C10", "How removed");
 place("C10", "Tenure", { k: "cards", title: "Term and removal at a glance", rows: TN.map(r => { const m = RM.find(x => x[0] === r[0]); return [r[0], r[1], m ? "Removed: " + m[1].replace(/\.$/, "") : "", "⏳"]; }) });
 
+// ---- added: UPSC against a State PSC, the Attorney General against an Advocate General ----
+
+const vT = (x, y, t, c, a, sz) => `<text x="${x}" y="${y}" font-size="${sz || 12}" font-weight="700" text-anchor="${a || "start"}" style="fill:${c || "var(--ink)"}">${t}</text>`;
+const vM = (x, y, t, a, sz) => `<text x="${x}" y="${y}" font-size="${sz || 10.5}" text-anchor="${a || "start"}" class="mut">${t}</text>`;
+const vW = (x, y, t, sz, b) => `<text x="${x}" y="${y}" font-size="${sz || 10.5}"${b ? ' font-weight="700"' : ""} text-anchor="middle" style="fill:#fff;opacity:.96">${t}</text>`;
+const vE = t => String(t).replace(/&(?!amp;|lt;|gt;)/g, "&amp;").replace(/</g, "&lt;");
+const vWrap = (t, n) => { const out = [""]; String(t).split(" ").forEach(w => { if ((out[out.length - 1] + " " + w).trim().length > n) out.push(w); else out[out.length - 1] = (out[out.length - 1] + " " + w).trim(); }); return out; };
+const VC = ["#2f6db5", "#2f8f4e", "#a8780a", "#7d4fb5", "#c0392b", "#1a8a8a", "#5b6470"];
+const yr = s => { const m = String(s).match(/\b(1[89]|20)\d\d\b/); return m ? +m[0] : 0; };
+const cut = (t, n) => { t = String(t).split(/ — |; /)[0].replace(/\.$/, ""); return t.length > n ? t.slice(0, n - 1).replace(/\s+\S*$/, "") + "…" : t; };
+/** Two things side by side, from a table whose rows are [point, left, right]. */
+const versus = (label, a, b, rs, ca, cb) => `<svg class="dg" viewBox="0 0 640 ${62 + rs.length * 30}" role="img" aria-label="${label}">
+  <rect x="150" y="6" width="236" height="40" rx="10" fill="${ca || VC[0]}"/>${vW(268, 31, vE(a), 13, 1)}<rect x="396" y="6" width="236" height="40" rx="10" fill="${cb || VC[4]}"/>${vW(514, 31, vE(b), 13, 1)}
+  ${rs.map((r, i) => `<rect x="8" y="${54 + i * 30}" width="624" height="26" rx="6" class="${i % 2 ? "card" : "s5"}"/>${vT(16, 72 + i * 30, vE(cut(r[0], 22)), "var(--ink)", "start", 11.5)}${vM(268, 72 + i * 30, vE(cut(r[1], 47)), "middle", 10.5)}${vM(514, 72 + i * 30, vE(cut(r[2], 47)), "middle", 10.5)}${r[1] === r[2] ? "" : `<circle cx="391" cy="${67 + i * 30}" r="3" fill="${VC[2]}"/>`}`).join("")}</svg>`;
+
+place("C3", "UPSC vs State PSC", KIT.fig("UPSC and State PSC, side by side", versus("UPSC compared with a State Public Service Commission", "UPSC", "State PSC", rows("C3", "UPSC vs State PSC")), "The dots mark the rows that differ. The catch: a State PSC member is appointed by the Governor but can be removed only by the President."));
+place("C5", "Attorney General vs Advocate General", KIT.fig("Attorney General and Advocate General, side by side", versus("Attorney General compared with Advocate General", "Attorney General", "Advocate General", rows("C5", "Attorney General vs Advocate General"), VC[3], VC[5]), "Swap President for Governor, Supreme Court for High Court and Parliament for state legislature, and one becomes the other."));
+
 VISUAL = { mode: true, VIS: { key: "bodies_photos_v1", word: "picture", words: "pictures", search: "", quiz: "photo", ask: "", rows: [], tabs: [["vphotos", "Photo quiz"]] } };

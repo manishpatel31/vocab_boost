@@ -19,4 +19,29 @@ const PG = `<svg class="dg" viewBox="0 0 680 260" role="img" aria-label="Growth 
   <rect x="170" y="248" width="12" height="10" fill="#c0503a"/><text x="186" y="257" font-size="10.5" class="mut">missed</text></svg>`;
 place("L10", "Plans 8", KIT.fig("Each plan: growth target vs achieved", PG, "Green bars beat the target; red ones fell short. The 1st, 5th, 6th, 7th and 8th Plans beat their targets; the 3rd was the worst."));
 
+// ---- added: the 1956 schedules, before and after 1991, plans 4–7 with the breaks, GDP three ways, the five sectors ----
+const vT = (x, y, t, c, a, sz) => `<text x="${x}" y="${y}" font-size="${sz || 12}" font-weight="700" text-anchor="${a || "start"}" style="fill:${c || "var(--ink)"}">${t}</text>`;
+const vM = (x, y, t, a, sz) => `<text x="${x}" y="${y}" font-size="${sz || 10.5}" text-anchor="${a || "start"}" class="mut">${t}</text>`;
+const vW = (x, y, t, sz, b) => `<text x="${x}" y="${y}" font-size="${sz || 10.5}"${b ? ' font-weight="700"' : ""} text-anchor="middle" style="fill:#fff;opacity:.96">${t}</text>`;
+const vE = t => String(t).replace(/&(?!amp;|lt;|gt;)/g, "&amp;").replace(/</g, "&lt;");
+const vWrap = (t, n) => { const out = [""]; String(t).split(" ").forEach(w => { if ((out[out.length - 1] + " " + w).trim().length > n) out.push(w); else out[out.length - 1] = (out[out.length - 1] + " " + w).trim(); }); return out; };
+const VC = ["#2f6db5", "#2f8f4e", "#a8780a", "#7d4fb5", "#c0392b", "#1a8a8a", "#5b6470"];
+const yr = s => { const m = String(s).match(/\b(1[89]|20)\d\d\b/); return m ? +m[0] : 0; };
+const cut = (t, n) => { t = String(t).split(/ — |; /)[0].replace(/\.$/, ""); return t.length > n ? t.slice(0, n - 1).replace(/\s+\S*$/, "") + "…" : t; };
+/** Two things side by side, from a table whose rows are [point, left, right]. */
+const versus = (label, a, b, rs, ca, cb) => `<svg class="dg" viewBox="0 0 640 ${62 + rs.length * 30}" role="img" aria-label="${label}">
+  <rect x="150" y="6" width="236" height="40" rx="10" fill="${ca || VC[0]}"/>${vW(268, 31, vE(a), 13, 1)}<rect x="396" y="6" width="236" height="40" rx="10" fill="${cb || VC[4]}"/>${vW(514, 31, vE(b), 13, 1)}
+  ${rs.map((r, i) => `<rect x="8" y="${54 + i * 30}" width="624" height="26" rx="6" class="${i % 2 ? "card" : "s5"}"/>${vT(16, 72 + i * 30, vE(cut(r[0], 22)), "var(--ink)", "start", 11.5)}${vM(268, 72 + i * 30, vE(cut(r[1], 47)), "middle", 10.5)}${vM(514, 72 + i * 30, vE(cut(r[2], 47)), "middle", 10.5)}${r[1] === r[2] ? "" : `<circle cx="391" cy="${67 + i * 30}" r="3" fill="${VC[2]}"/>`}`).join("")}</svg>`;
+
+
+const SC = rows("L4", "Schedules A");
+place("L4", "Schedules A", { k: "cards", title: "IPR 1956: three schedules", rows: SC.map((r, i) => ["Schedule " + r[0], (r[1] === "rest" ? "all the rest" : r[1] + " industries"), cut(r[2].replace(/ \(.*\)$/, ""), 70), ["🏛️", "🤝", "🏭"][i] || ""]) });
+place("L7", "Two phases", KIT.fig("Before and after 1991, side by side", versus("India's economy before and after 1991", "1947 – 1990", "After 1991", rows("L7", "Two phases"), VC[6], VC[1]), "Every row flips: from a state that owns and protects to a state that regulates and opens up."));
+const P47 = rows("L9", "Plans 4 to 7").map(r => { const m = r[1].match(/(\d{4})\D+(\d{2,4})/); return [r[0] + " Plan", +m[1], +(m[2].length === 2 ? m[1].slice(0, 2) + m[2] : m[2]), VC[0], ""]; });
+const BRK = rows("L9", "Three breaks").map(r => { const m = r[1].match(/(\d{4})\D+(\d{2,4})/); return [r[0], +m[1], +(m[2].length === 2 ? m[1].slice(0, 2) + m[2] : m[2]), VC[4], "break"]; });
+if (P47.length !== 4 || BRK.length !== 3) fail("ipr L9: plans or breaks changed");
+place("L9", "Three breaks", KIT.fig("Plans 4 to 7 and the three breaks", KIT.gantt("Plans four to seven with the breaks in planning", P47.concat(BRK).sort((x, y) => x[1] - y[1]), 1965, 1996, 5), "Blue bars are plans; red bars are the three breaks. The 5th Plan was cut short by a year, and the Rolling Plan filled the gap."));
+place("L11", "Three ways to measure GDP", { k: "cards", title: "One GDP, three ways to count it", rows: rows("L11", "Three ways to measure GDP").map((r, i) => [r[0] + " method", ["what people earn", "what is produced", "what is spent"][i] || "", r[1], ["💰", "🏭", "🛒"][i] || ""]) });
+place("L11", "Five sectors", { k: "cards", title: "Five sectors, from soil to boardroom", rows: rows("L11", "Five sectors").map((r, i) => [(i + 1) + " · " + r[0], r[1], r[2], ["🌾", "🏭", "🏦", "🔬", "👔"][i] || ""]) });
+
 VISUAL = { mode: true, VIS: { key: "ipr_photos_v1", word: "picture", words: "pictures", search: "", quiz: "photo", ask: "", rows: [], tabs: [] } };

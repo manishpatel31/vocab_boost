@@ -180,4 +180,28 @@ const HWS = `<svg class="dg" viewBox="0 0 640 200" role="img" aria-label="Tempor
   <rect x="326" y="138" width="306" height="54" rx="10" class="abg"/>${xT(479, 160, "Boiling does not work", XR, "middle", 12.5)}${xM(479, 178, "washing soda · ion exchange (zeolite, permutit) · Calgon", "middle", 10.5)}</svg>`;
 place("K17", "Hard and soft water", KIT.fig("Two kinds of hard water", HWS, "Hard water wastes soap (it forms scum instead of lather). Temporary hardness goes on boiling; permanent hardness needs a chemical or an ion exchanger."));
 
+// ---- added: water of crystallisation, medicines by job, soap against detergent, pollution diseases, the green agreements in time ----
+const vT = (x, y, t, c, a, sz) => `<text x="${x}" y="${y}" font-size="${sz || 12}" font-weight="700" text-anchor="${a || "start"}" style="fill:${c || "var(--ink)"}">${t}</text>`;
+const vM = (x, y, t, a, sz) => `<text x="${x}" y="${y}" font-size="${sz || 10.5}" text-anchor="${a || "start"}" class="mut">${t}</text>`;
+const vW = (x, y, t, sz, b) => `<text x="${x}" y="${y}" font-size="${sz || 10.5}"${b ? ' font-weight="700"' : ""} text-anchor="middle" style="fill:#fff;opacity:.96">${t}</text>`;
+const vE = t => String(t).replace(/&(?!amp;|lt;|gt;)/g, "&amp;").replace(/</g, "&lt;");
+const vWrap = (t, n) => { const out = [""]; String(t).split(" ").forEach(w => { if ((out[out.length - 1] + " " + w).trim().length > n) out.push(w); else out[out.length - 1] = (out[out.length - 1] + " " + w).trim(); }); return out; };
+const VC = ["#2f6db5", "#2f8f4e", "#a8780a", "#7d4fb5", "#c0392b", "#1a8a8a", "#5b6470"];
+const yr = s => { const m = String(s).match(/\b(1[89]|20)\d\d\b/); return m ? +m[0] : 0; };
+const cut = (t, n) => { t = String(t).split(/ — |; /)[0].replace(/\.$/, ""); return t.length > n ? t.slice(0, n - 1).replace(/\s+\S*$/, "") + "…" : t; };
+/** Two things side by side, from a table whose rows are [point, left, right]. */
+const versus = (label, a, b, rs, ca, cb) => `<svg class="dg" viewBox="0 0 640 ${62 + rs.length * 30}" role="img" aria-label="${label}">
+  <rect x="150" y="6" width="236" height="40" rx="10" fill="${ca || VC[0]}"/>${vW(268, 31, vE(a), 13, 1)}<rect x="396" y="6" width="236" height="40" rx="10" fill="${cb || VC[4]}"/>${vW(514, 31, vE(b), 13, 1)}
+  ${rs.map((r, i) => `<rect x="8" y="${54 + i * 30}" width="624" height="26" rx="6" class="${i % 2 ? "card" : "s5"}"/>${vT(16, 72 + i * 30, vE(cut(r[0], 22)), "var(--ink)", "start", 11.5)}${vM(268, 72 + i * 30, vE(cut(r[1], 47)), "middle", 10.5)}${vM(514, 72 + i * 30, vE(cut(r[2], 47)), "middle", 10.5)}${r[1] === r[2] ? "" : `<circle cx="391" cy="${67 + i * 30}" r="3" fill="${VC[2]}"/>`}`).join("")}</svg>`;
+
+
+const WC = rows("K9", "How they are made").find(r => /^Water of crystallisation/.test(r[0]));
+if (!WC || !/5 in blue vitriol, 10 in washing soda, 2 in gypsum, ½ in PoP/.test(WC[1])) fail("chemistry K9: water of crystallisation changed");
+place("K9", "How they are made", { k: "bars", title: "Water of crystallisation: how many H₂O", unit: "H₂O", left: 150, sort: false, hi: 4, rows: [["Plaster of Paris", 0.5, "CaSO₄·½H₂O"], ["Gypsum", 2, "CaSO₄·2H₂O"], ["Blue vitriol", 5, "CuSO₄·5H₂O"], ["Washing soda", 10, "Na₂CO₃·10H₂O"]] });
+place("K13", "Medicines by job", { k: "cards", title: "Medicines: name tells the job", rows: rows("K13", "Medicines by job").map((r, i) => [r[0], r[1].toLowerCase(), cut(r[2], 60), ["💊", "🌡️", "🦠", "🩹", "🧴", "🥛", "🤧"][i] || "💊"]) });
+place("K13", "Soaps and detergents", KIT.fig("Soap and detergent, side by side", versus("Soap compared with detergent", "Soap", "Detergent", rows("K13", "Soaps and detergents").filter(r => r[2] !== "Same idea"), VC[1], VC[0]), "The exam favourite: soap forms scum in hard water, a detergent does not. Both clean by forming micelles around grease."));
+place("K16", "Water and soil pollution", { k: "cards", title: "Which pollutant, which disease", rows: rows("K16", "Water and soil pollution").map((r, i) => [r[0].replace(/ \(.*\)$/, ""), cut(r[1].split(" — ")[0].split(" (")[0], 34), cut(r[1].split(" — ")[1] || "", 50), ["🐟", "🦴", "👶", "🦶", "🦷", "🔩", "🟢"][i] || "⚠️"]) });
+const AG = rows("K16", "Agreements and fixes").filter(r => /\((\d{4})\)/.test(r[0]));
+place("K16", "Agreements and fixes", { k: "tlfig", title: "The green agreements, year by year", rows: AG.map(r => [yr(r[0]), r[0].replace(/ \(\d{4}\)/, ""), ""]).sort((x, y) => x[0] - y[0]), cap: "Montreal (1987) is about the ozone layer; Kyoto (1997) and Paris (2015) are about global warming; Kigali (2016) added HFCs to Montreal." });
+
 VISUAL = { mode: true, VIS: { key: "chemistry_photos_v1", word: "picture", words: "pictures", search: "", quiz: "photo", ask: "", rows: [], tabs: [["vphotos", "Photo quiz"]] } };
