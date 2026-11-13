@@ -1445,6 +1445,14 @@ html.un-placing #app{cursor:crosshair}
     if (host === "docs.google.com" && (m = u.pathname.match(/\/(document|presentation|spreadsheets)\/d\/([\w-]{10,})/))) return `https://docs.google.com/${m[1]}/d/${m[2]}/preview`;
     return "https://docs.google.com/viewer?embedded=true&url=" + encodeURIComponent(u.href);
   }
+  // the Drive file id of a PDF that can be marked up here (a file link, inside an app that can hand over its bytes), else ""
+  function inkId(raw){
+    if (!(window.__pdfInk && window.__pdfInk.can())) return "";
+    let u; try { u = new URL(String(raw).trim()); } catch (e) { return ""; }
+    if (u.hostname.replace(/^www\./, "") !== "drive.google.com") return "";
+    const m = u.pathname.match(/\/file\/d\/([\w-]{10,})/), id = m ? m[1] : u.searchParams.get("id");
+    return id && /^[\w-]{10,}$/.test(id) ? id : "";
+  }
   // the file's name from Drive: only the Android app can read it (3.5+); "" when it can't
   const canName = () => { try { const A = window.PathshalaApp || (parent !== window && parent.PathshalaApp); return !!(A && A.pdfTitle); } catch (e) { return false; } };
   function driveName(url){
@@ -1754,7 +1762,7 @@ html.un-placing #app{cursor:crosshair}
     p.o = now(); p.u = now(); save(d);
     const ov = layer("pdf-view", `<div class="pdf-top"><button type="button" class="pdf-x" aria-label="Close">‹</button>
         <div class="pdf-t"><b>${esc(p.name)}</b><small>${esc(where(p))}</small></div>
-        <button type="button" class="pdf-zo" aria-label="Zoom out" disabled>−</button><button type="button" class="pdf-zi" aria-label="Zoom in">＋</button><button type="button" class="pdf-ed" aria-label="Edit">✎</button></div>
+        <button type="button" class="pdf-zo" aria-label="Zoom out" disabled>−</button><button type="button" class="pdf-zi" aria-label="Zoom in">＋</button>${inkId(p.url) ? `<button type="button" class="pdf-inkb" aria-label="Draw and highlight on this PDF" title="Mark up">✏️</button>` : ""}<button type="button" class="pdf-ed" aria-label="Edit">✎</button></div>
       <div class="pdf-body"><div class="pdf-wait"><span>Opening the PDF…</span><small>Not opening, or asks you to sign in? In Google Drive set the file to <b>Share → General access → Anyone with the link</b>. It also needs the internet.</small></div><iframe class="pdf-frame" title="${esc(p.name)}" allow="fullscreen" referrerpolicy="no-referrer"></iframe></div>`);
     pinch(true);
     const fr = ov.querySelector(".pdf-frame");
@@ -1770,6 +1778,9 @@ html.un-placing #app{cursor:crosshair}
     zo.onclick = () => zoom(-0.5); zi.onclick = () => zoom(0.5);
     fr.addEventListener("load", () => { const w = ov.querySelector(".pdf-wait"); if (w) w.remove(); });
     fr.src = src;
+    // ✏️ draw and highlight (PDF INK, below): the pages are drawn here instead of in Google's frame
+    const ib = ov.querySelector(".pdf-inkb");
+    if (ib) ib.onclick = () => { pinch(false); window.__pdfInk.start(ov, id, inkId(load().n[id].url)); };
     ov.querySelector(".pdf-x").onclick = () => close();
     ov.querySelector(".pdf-ed").onclick = () => edit(Object.assign({ id }, load().n[id]), () => {
       const x = load().n[id]; if (!x || !ov.isConnected) return;
@@ -1861,4 +1872,190 @@ button.pdf-tag{cursor:pointer}
     soon();
   }
   if (document.body) start(); else addEventListener("DOMContentLoaded", start);
+})();
+
+/* ============================================================
+   PDF INK — draw and highlight on a chapter PDF (inside the Android app 3.8+).
+   Google's viewer is a sealed frame, so marking up needs the pages drawn here: the app hands over the PDF's bytes
+   at  __drive/<Drive file id>.pdf  (WebActivity fetches the public file; a website can't), PDF.js (vendor/pdfjs,
+   loaded on first use) draws each page on a canvas as it scrolls into view, and a second canvas over it takes the ink.
+   - Tools: ✋ move (the page scrolls as usual), 🖊 pen, 🖍 highlighter, ⌫ eraser (removes a whole stroke), ↶ undo,
+     four colours, − / ＋. With a drawing tool on, a stylus or one finger draws and two fingers scroll; once a stylus
+     has been used a finger only scrolls (palm-friendly). A stylus coming near switches from ✋ to the last drawing tool.
+   - Strokes are kept per page as "h|c|w|x,y x,y…;…" with x, y and w in 1/10000 of the page's width / height, so they
+     fit any zoom. Saved in localStorage "shabdPdfInk_<page>": { v:1, n: { <pdf id>: { u, p: { <page no>: strokes } } } },
+     the same shape as My notes, and synced by the app as "ink_<app id>" (the newest copy of a PDF's ink wins).
+   - window.__pdfInk.can() says whether this device can do it; .start(view, pdfId, driveId) is called by the reader's ✏️.
+   ============================================================ */
+(function(){
+  if (window.__pdfInk) return;
+  const FILE = (location.pathname.split("/").pop() || "").replace(/\.html?$/, "");
+  if (!/^study-/.test(FILE)) return;
+  const KEY = "shabdPdfInk_" + FILE, COLS = { k: "#1d2a22", r: "#d64545", b: "#2f6fd1", g: "#2e8b57", y: "#ffc400" };
+  const app = () => { try { return window.PathshalaApp || (parent !== window && parent.PathshalaApp) || null; } catch (e) { return null; } };
+  const can = () => { const A = app(); return !!(A && A.pdfInk); };
+  function load(){ try { const d = JSON.parse(localStorage.getItem(KEY) || "null"); if (d && d.n && typeof d.n === "object") return d; } catch (e) {} return { v: 1, n: {} }; }
+  function toast(msg){ const el = document.createElement("div"); el.className = "un-ui un-toast"; el.textContent = msg; document.body.appendChild(el); setTimeout(() => el.remove(), 2800); }
+  const parse = s => String(s || "").split(";").filter(Boolean).map(t => { const [h, c, w, pts] = t.split("|"); return { h: h === "1", c, w: +w || 30, p: (pts || "").split(" ").filter(Boolean).map(q => q.split(",").map(Number)) }; });
+  const pack = l => l.filter(s => s.p.length).map(s => (s.h ? 1 : 0) + "|" + s.c + "|" + s.w + "|" + s.p.map(q => q.join(",")).join(" ")).join(";");
+
+  let libP = null;
+  function lib(){
+    if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+    if (!libP) libP = new Promise((res, rej) => { const s = document.createElement("script"); s.src = "vendor/pdfjs/pdf.min.js"; s.onload = () => { try { window.pdfjsLib.GlobalWorkerOptions.workerSrc = "vendor/pdfjs/pdf.worker.min.js"; res(window.pdfjsLib); } catch (e) { rej(e); } }; s.onerror = () => { libP = null; rej(new Error("couldn't load the PDF reader")); }; document.head.appendChild(s); });
+    return libP;
+  }
+
+  async function start(view, pdfId, driveId){
+    const body = view.querySelector(".pdf-body"), top = view.querySelector(".pdf-top");
+    if (!body || view.dataset.ink) return;
+    view.dataset.ink = "1";
+    top.querySelectorAll(".pdf-zo, .pdf-zi, .pdf-inkb").forEach(b => b.hidden = true);
+    const old = body.innerHTML;
+    body.classList.add("ink-on");
+    body.innerHTML = `<div class="ink-wait"><span>Getting the PDF ready to mark up…</span><small class="ink-pc"></small></div>`;
+    const bar = document.createElement("div");
+    bar.className = "ink-bar";
+    bar.innerHTML = `<button type="button" data-t="move" class="on" aria-label="Move the page" title="Move">✋</button><button type="button" data-t="pen" aria-label="Pen" title="Pen">🖊</button><button type="button" data-t="hl" aria-label="Highlighter" title="Highlighter">🖍</button><button type="button" data-t="erase" aria-label="Eraser" title="Eraser">⌫</button>
+      <span class="ink-sep"></span>${Object.keys(COLS).map((k, i) => `<button type="button" class="ink-col${i === 0 ? " on" : ""}" data-c="${k}" style="--c:${COLS[k]}" aria-label="${{ k: "Black", r: "Red", b: "Blue", g: "Green", y: "Yellow" }[k]}"></button>`).join("")}
+      <span class="ink-sep"></span><button type="button" data-x="undo" aria-label="Undo" title="Undo">↶</button><button type="button" data-x="zo" aria-label="Smaller">−</button><button type="button" data-x="zi" aria-label="Bigger">＋</button><span class="ink-pg" aria-live="off"></span>`;
+    top.after(bar);
+    const fail = msg => { body.classList.remove("ink-on"); bar.remove(); delete view.dataset.ink; body.innerHTML = old; const fr = body.querySelector(".pdf-frame"); if (fr) fr.src = fr.src; top.querySelectorAll(".pdf-zo, .pdf-zi, .pdf-inkb").forEach(b => b.hidden = false); toast(msg); };
+    let doc;
+    try {
+      const L = await lib(), task = L.getDocument({ url: "__drive/" + encodeURIComponent(driveId) + ".pdf", disableRange: true, disableStream: true, disableAutoFetch: false });
+      const pc = body.querySelector(".ink-pc");
+      task.onProgress = e => { if (pc && e.total) pc.textContent = Math.round(e.loaded * 100 / e.total) + "%"; else if (pc && e.loaded) pc.textContent = (e.loaded / 1048576).toFixed(1) + " MB"; };
+      doc = await task.promise;
+    } catch (e) { fail("Couldn't open this PDF for marking up — is it shared as “Anyone with the link”?"); return; }
+    if (!view.isConnected) { try { doc.destroy(); } catch (e) {} return; }
+
+    const data = load(), rec = data.n[pdfId] && !data.n[pdfId].del ? data.n[pdfId] : { u: 0, p: {} };
+    const ink = {};                                               // page no → strokes
+    Object.keys(rec.p || {}).forEach(k => ink[k] = parse(rec.p[k]));
+    const hist = [];                                              // [page no, stroke] for undo
+    let saveT = 0;
+    const save = () => { clearTimeout(saveT); saveT = setTimeout(() => {
+      const d = load(), p = {}; Object.keys(ink).forEach(k => { const s = pack(ink[k]); if (s) p[k] = s; });
+      d.n[pdfId] = { u: Date.now(), p };
+      const js = JSON.stringify(d);
+      if (js.length > 850000) { toast("This app's PDF ink is nearly full — erase some marks you no longer need."); }
+      try { localStorage.setItem(KEY, js); } catch (e) { toast("Couldn't save the marks — this device's storage is full."); return; }
+      try { if (parent !== window) parent.postMessage({ type: "pathshala-ink", file: FILE }, location.origin); } catch (e) {}
+    }, 500); };
+
+    body.innerHTML = `<div class="ink-scroll"><div class="ink-pages"></div></div>`;
+    const scroll = body.querySelector(".ink-scroll"), pagesEl = body.querySelector(".ink-pages"), pg = bar.querySelector(".ink-pg");
+    let zoom = 1, tool = "move", draw = "pen", col = "k", penSeen = false;
+    const first = await doc.getPage(1), v1 = first.getViewport({ scale: 1 }), ratio = v1.height / v1.width;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const pages = [];
+    for (let n = 1; n <= doc.numPages; n++) {
+      const el = document.createElement("div"); el.className = "ink-page"; el.dataset.n = n; el.style.aspectRatio = "1 / " + ratio;
+      el.innerHTML = `<canvas class="ink-pdf"></canvas><canvas class="ink-ink"></canvas><span class="ink-no">${n}</span>`;
+      pagesEl.appendChild(el); pages.push({ n, el, done: 0, busy: false });
+    }
+    const paint = P => {                                           // the ink of one page, at the canvas's current size
+      const c = P.el.querySelector(".ink-ink"), g = c.getContext("2d"), W = c.width, H = c.height;
+      g.clearRect(0, 0, W, H); g.lineCap = "round"; g.lineJoin = "round";
+      (ink[P.n] || []).forEach(s => { g.globalAlpha = s.h ? 0.5 : 1; g.strokeStyle = g.fillStyle = COLS[s.c] || COLS.k; g.lineWidth = Math.max(1, s.w / 10000 * W);
+        if (s.p.length === 1) { g.beginPath(); g.arc(s.p[0][0] / 10000 * W, s.p[0][1] / 10000 * H, g.lineWidth / 2, 0, 7); g.fill(); return; }
+        g.beginPath(); s.p.forEach((q, i) => { const x = q[0] / 10000 * W, y = q[1] / 10000 * H; i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke(); });
+      g.globalAlpha = 1;
+    };
+    async function render(P){
+      const w = Math.round(P.el.clientWidth * dpr);
+      if (P.busy || P.done === w || !w) return;
+      P.busy = true;
+      try {
+        const page = P.n === 1 ? first : await doc.getPage(P.n), vp0 = page.getViewport({ scale: 1 }), vp = page.getViewport({ scale: w / vp0.width });
+        P.el.style.aspectRatio = "1 / " + (vp0.height / vp0.width);
+        const c = P.el.querySelector(".ink-pdf"), tmp = document.createElement("canvas"); tmp.width = Math.round(vp.width); tmp.height = Math.round(vp.height);
+        await page.render({ canvasContext: tmp.getContext("2d"), viewport: vp }).promise;
+        c.width = tmp.width; c.height = tmp.height; c.getContext("2d").drawImage(tmp, 0, 0);
+        const ic = P.el.querySelector(".ink-ink"); ic.width = tmp.width; ic.height = tmp.height; paint(P);
+        P.done = w; P.el.classList.add("ready");
+      } catch (e) {}
+      P.busy = false;
+    }
+    const drop = P => { if (!P.done) return; const c = P.el.querySelector(".ink-pdf"); c.width = c.height = 0; const ic = P.el.querySelector(".ink-ink"); ic.width = ic.height = 0; P.done = 0; P.el.classList.remove("ready"); };
+    const near = new Set();
+    const io = new IntersectionObserver(es => { es.forEach(e => { const P = pages[+e.target.dataset.n - 1]; if (e.isIntersecting) { near.add(P); render(P); } else near.delete(P); });
+      pages.forEach(P => { if (P.done && !near.has(P) && pages.filter(x => x.done).length > 8) drop(P); }); }, { root: scroll, rootMargin: "700px 0px" });
+    pages.forEach(P => io.observe(P.el));
+    const showPg = () => { const mid = scroll.scrollTop + scroll.clientHeight / 2; let cur = 1; for (const P of pages) { if (P.el.offsetTop <= mid) cur = P.n; else break; } pg.textContent = cur + " / " + doc.numPages; };
+    scroll.addEventListener("scroll", showPg, { passive: true }); showPg();
+
+    const setTool = t => { tool = t; if (t === "pen" || t === "hl") draw = t; bar.querySelectorAll("[data-t]").forEach(b => b.classList.toggle("on", b.dataset.t === t)); pagesEl.classList.toggle("drawing", t !== "move"); };
+    bar.querySelectorAll("[data-t]").forEach(b => b.onclick = () => setTool(b.dataset.t));
+    bar.querySelectorAll(".ink-col").forEach(b => b.onclick = () => { col = b.dataset.c; bar.querySelectorAll(".ink-col").forEach(x => x.classList.toggle("on", x === b)); if (tool === "move" || tool === "erase") setTool(draw); });
+    bar.querySelector('[data-x="undo"]').onclick = () => { const h = hist.pop(); if (!h) return; const l = ink[h[0]] || []; if (h[2]) l.push(...h[2]); else { const i = l.indexOf(h[1]); if (i >= 0) l.splice(i, 1); } const P = pages[h[0] - 1]; if (P.done) paint(P); save(); };
+    const setZoom = z => { const cy = (scroll.scrollTop + scroll.clientHeight / 2) / (scroll.scrollHeight || 1); zoom = Math.max(1, Math.min(3, z)); pagesEl.style.width = (zoom * 100) + "%"; scroll.scrollTop = cy * scroll.scrollHeight - scroll.clientHeight / 2;
+      bar.querySelector('[data-x="zo"]').disabled = zoom <= 1; bar.querySelector('[data-x="zi"]').disabled = zoom >= 3; setTimeout(() => near.forEach(render), 60); };
+    bar.querySelector('[data-x="zo"]').onclick = () => setZoom(zoom - 0.5); bar.querySelector('[data-x="zi"]').onclick = () => setZoom(zoom + 0.5); setZoom(1);
+
+    // drawing
+    const pts = new Map(); let cur = null, pan = null;
+    const at = (e, el) => { const r = el.getBoundingClientRect(); return [Math.round((e.clientX - r.left) / r.width * 10000), Math.round((e.clientY - r.top) / r.height * 10000)]; };
+    const mid = () => { let x = 0, y = 0; pts.forEach(p => { x += p[0]; y += p[1]; }); return [x / pts.size, y / pts.size]; };
+    const hit = (s, q, W, H) => s.p.some(a => Math.hypot((a[0] - q[0]) * W, (a[1] - q[1]) * H) / 10000 < Math.max(12, s.w / 10000 * W));
+    const eraseAt = (P, q) => { const l = ink[P.n] || [], r = P.el.getBoundingClientRect(), gone = l.filter(s => hit(s, q, r.width, r.height)); if (!gone.length) return; ink[P.n] = l.filter(s => !gone.includes(s)); hist.push([P.n, null, gone]); paint(P); save(); };
+    scroll.addEventListener("pointermove", e => { if (e.pointerType === "pen" && tool === "move" && !e.buttons) setTool(draw); }, { passive: true });   // a stylus coming near
+    pagesEl.addEventListener("pointerdown", e => {
+      if (tool === "move") return;
+      const el = e.target.closest(".ink-page"); if (!el) return;
+      const P = pages[+el.dataset.n - 1];
+      e.preventDefault(); try { pagesEl.setPointerCapture(e.pointerId); } catch (x) {}
+      if (e.pointerType === "pen") penSeen = true; else pts.set(e.pointerId, [e.clientX, e.clientY]);
+      if (e.pointerType !== "pen" && (pts.size >= 2 || (penSeen && e.pointerType === "touch"))) {
+        if (cur && cur.s && pts.size >= 2 && Date.now() - cur.t0 < 500) { const l = ink[cur.P.n], i = l.indexOf(cur.s); if (i >= 0) l.splice(i, 1); hist.pop(); paint(cur.P); }
+        cur = null; pan = mid(); return;
+      }
+      const q = at(e, el);
+      if (tool === "erase") { cur = { P, erase: 1, t0: Date.now() }; eraseAt(P, q); return; }
+      const hl = tool === "hl", base = hl ? 340 : 40, w = e.pointerType === "pen" && e.pressure && !hl ? Math.round(base * (0.6 + e.pressure)) : base;
+      const s = { h: hl, c: hl && col === "k" ? "y" : col, w, p: [q] };
+      (ink[P.n] = ink[P.n] || []).push(s); hist.push([P.n, s]); cur = { P, s, el, t0: Date.now() }; paint(P);
+    });
+    pagesEl.addEventListener("pointermove", e => {
+      if (pts.has(e.pointerId)) pts.set(e.pointerId, [e.clientX, e.clientY]);
+      if (pan) { if (!pts.has(e.pointerId)) return; const m = mid(); scroll.scrollTop -= m[1] - pan[1]; scroll.scrollLeft -= m[0] - pan[0]; pan = m; return; }
+      if (!cur) return;
+      if (cur.erase) { const el = e.target.closest && e.target.closest(".ink-page"); if (el) eraseAt(pages[+el.dataset.n - 1], at(e, el)); return; }
+      const q = at(e, cur.el), last = cur.s.p[cur.s.p.length - 1];
+      if (Math.hypot(q[0] - last[0], q[1] - last[1]) < 12) return;
+      cur.s.p.push([Math.max(0, Math.min(10000, q[0])), Math.max(0, Math.min(10000, q[1]))]); paint(cur.P);
+    });
+    ["pointerup", "pointercancel"].forEach(t => pagesEl.addEventListener(t, e => { pts.delete(e.pointerId); if (!pts.size) pan = null; else if (pan) pan = mid(); if (cur && cur.s) save(); cur = null; }));
+    new ResizeObserver(() => near.forEach(render)).observe(scroll);
+    new MutationObserver(() => { if (!view.isConnected) { io.disconnect(); try { doc.destroy(); } catch (e) {} } }).observe(document.body, { childList: true });
+    if (!localStorage.getItem("pdfInkTip")) { toast("Pick 🖊 or 🖍 to draw. Two fingers scroll while drawing; ✋ goes back to moving the page."); try { localStorage.setItem("pdfInkTip", "1"); } catch (e) {} }
+  }
+
+  const css = document.createElement("style");
+  css.textContent = `
+.ink-bar{display:flex;align-items:center;gap:5px;padding:6px 8px;background:var(--sheet,#fff);border-bottom:1px solid var(--rule,#ddd);overflow-x:auto;scrollbar-width:none;color:var(--ink,#222)}
+.ink-bar::-webkit-scrollbar{display:none}
+.ink-bar button{flex:none;min-width:38px;height:36px;border-radius:10px;border:1px solid var(--rule,#ddd);background:none;color:inherit;font:700 16px var(--f-body,system-ui);cursor:pointer}
+.ink-bar button.on{background:var(--ink,#222);color:var(--sheet,#fff);border-color:transparent}
+.ink-bar button:disabled{opacity:.35}
+.ink-bar .ink-col{min-width:28px;width:28px;height:28px;border-radius:50%;background:var(--c);border:2px solid var(--rule,#ddd)}
+.ink-bar .ink-col.on{background:var(--c);outline:3px solid var(--accent,#2f6f63);outline-offset:1px}
+.ink-sep{flex:none;width:1px;height:22px;background:var(--rule,#ddd);margin:0 2px}
+.ink-pg{margin-left:auto;padding-left:8px;font:600 12.5px var(--f-body,system-ui);color:var(--ink2,#666);white-space:nowrap;font-variant-numeric:tabular-nums}
+.pdf-body.ink-on{overflow:hidden}
+.ink-scroll{position:absolute;inset:0;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.ink-pages{width:100%;margin:0 auto;display:grid;gap:10px;padding:10px 0 40px;box-sizing:border-box}
+.ink-pages.drawing{touch-action:none}
+.ink-page{position:relative;width:100%;background:#fff;box-shadow:0 1px 6px rgba(0,0,0,.35)}
+.ink-page canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.ink-page .ink-ink{mix-blend-mode:multiply}
+.ink-pages.drawing .ink-page{cursor:crosshair}
+.ink-no{position:absolute;right:6px;bottom:4px;font:600 10px var(--f-body,system-ui);color:#888;pointer-events:none}
+.ink-page:not(.ready)::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,#f3f3f3 40%,#fafafa 50%,#f3f3f3 60%);background-size:200% 100%;animation:inkload 1.2s linear infinite}
+@keyframes inkload{to{background-position:-200% 0}}
+.ink-wait{position:absolute;inset:0;display:grid;place-content:center;gap:8px;text-align:center;color:#eee;font:600 14px var(--f-body,system-ui)}
+.ink-wait small{font-weight:500;color:#cfd3d6}`;
+  (document.head || document.documentElement).appendChild(css);
+  window.__pdfInk = { can, start };
 })();
