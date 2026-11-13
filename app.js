@@ -967,7 +967,7 @@
     if(r.key && mod.key && r.key !== mod.key) return false;   /* saved by an older version of this app */
     var local = lsGet(mod.key);
     if(r.reset && typeof r.data !== 'string') return false;
-    if(/^(notes|pdfs)_/.test(id)){   // (also a hub's sub-page: notes_study-… / pdfs_study-…)
+    if(/^(notes|pdfs|ink)_/.test(id)){   // (also a hub's sub-page: notes_study-… / pdfs_study-… / ink_study-…)
       var nm = JSON.stringify(notesMerge(notesParse(local), notesParse(r.data)));
       if(nm !== local) lsSet(mod.key, nm);
       if(nm !== r.data){ setStudyMeta(id, { localAt: Date.now() }); clearTimeout(studyApply['t' + id]); studyApply['t' + id] = setTimeout(function(){ studyPush(id); }, 1500); }
@@ -1062,7 +1062,7 @@
     document.body.classList.add('study-on');
     if(!fromHistory){ try{ history.pushState({ study: id }, '', '#study-' + id); }catch(e){} }
     // fetch this app's progress from your account, but don't keep the app waiting more than a second for it
-    var pulled = false, pull = Promise.all([studyPull(id), studyPull('notes_' + id), studyPull('pdfs_' + id)].concat(((PDF_SUB_PAGES || {})[id] || []).reduce(function(a, f){ return a.concat([studyPull('notes_' + pdfStem(f)), studyPull('pdfs_' + pdfStem(f))]); }, []))).then(function(){ pulled = true; }, function(){ pulled = true; });
+    var pulled = false, pull = Promise.all([studyPull(id), studyPull('notes_' + id), studyPull('pdfs_' + id), studyPull('ink_' + id)].concat(((PDF_SUB_PAGES || {})[id] || []).reduce(function(a, f){ return a.concat([studyPull('notes_' + pdfStem(f)), studyPull('pdfs_' + pdfStem(f)), studyPull('ink_' + pdfStem(f))]); }, []))).then(function(){ pulled = true; }, function(){ pulled = true; });
     await Promise.race([pull, new Promise(function(r){ setTimeout(r, 1000); })]);
     if(studyOpen !== id) return;
     studyLast = lsGet(mod.key);
@@ -1113,9 +1113,9 @@
   var notesPushT = {};
   window.addEventListener('message', function(e){
     var f = document.getElementById('studyFrame');
-    if(e.origin !== location.origin || !e.data || (e.data.type !== 'pathshala-notes' && e.data.type !== 'pathshala-pdfs') || !f || e.source !== f.contentWindow || !studyOpen) return;
+    if(e.origin !== location.origin || !e.data || (e.data.type !== 'pathshala-notes' && e.data.type !== 'pathshala-pdfs' && e.data.type !== 'pathshala-ink') || !f || e.source !== f.contentWindow || !studyOpen) return;
     // chapter PDFs (study-ui.js) sync like notes; a hub's sub-page (the Computer app's three) keeps its own record
-    var kind = e.data.type === 'pathshala-pdfs' ? 'pdfs' : 'notes';
+    var kind = e.data.type === 'pathshala-pdfs' ? 'pdfs' : e.data.type === 'pathshala-ink' ? 'ink' : 'notes';   // ink = drawings on a PDF (study-ui.js PDF INK)
     var id = (typeof e.data.file === 'string' && pageSyncId(kind, studyOpen, e.data.file)) || (kind + '_' + studyOpen);
     setStudyMeta(id, { localAt: Date.now() });
     clearTimeout(notesPushT[id]); notesPushT[id] = setTimeout(function(){ studyPush(id); }, 1500);
@@ -1575,9 +1575,11 @@
     if(m) return STUDY[m[1]] ? { key: notesKey(m[1]), title: 'Notes · ' + STUDY[m[1]].title } : undefined;
     m = /^pdfs_(\w+)$/.exec(id || '');        // its chapter PDFs (study-ui.js "Chapter PDFs"): shabdPdfs_<page>, same shape as notes
     if(m && STUDY[m[1]]) return { key: 'shabdPdfs_' + String(STUDY[m[1]].file).replace(/\.html?$/, ''), title: 'PDFs · ' + STUDY[m[1]].title };
+    m = /^ink_(\w+)$/.exec(id || '');         // drawings on its PDFs (study-ui.js "PDF INK"): shabdPdfInk_<page>, same shape again
+    if(m && STUDY[m[1]]) return { key: 'shabdPdfInk_' + String(STUDY[m[1]].file).replace(/\.html?$/, ''), title: 'PDF ink · ' + STUDY[m[1]].title };
     // a hub's sub-page (the Computer app's three): notes_<page> / pdfs_<page>
-    m = /^(notes|pdfs)_(study-[\w-]+)$/.exec(id || '');
-    if(m && Object.keys(PDF_SUB_PAGES || {}).some(function(h){ return PDF_SUB_PAGES[h].indexOf(m[2] + '.html') !== -1; })) return { key: (m[1] === 'notes' ? 'shabdNotes_' : 'shabdPdfs_') + m[2], title: (m[1] === 'notes' ? 'Notes · ' : 'PDFs · ') + m[2] };
+    m = /^(notes|pdfs|ink)_(study-[\w-]+)$/.exec(id || '');
+    if(m && Object.keys(PDF_SUB_PAGES || {}).some(function(h){ return PDF_SUB_PAGES[h].indexOf(m[2] + '.html') !== -1; })) return { key: { notes: 'shabdNotes_', pdfs: 'shabdPdfs_', ink: 'shabdPdfInk_' }[m[1]] + m[2], title: { notes: 'Notes · ', pdfs: 'PDFs · ', ink: 'PDF ink · ' }[m[1]] + m[2] };
     return undefined;
   }
   function notesKey(id){ return 'shabdNotes_' + String(STUDY[id].file).replace(/\.html?$/, ''); }
