@@ -792,7 +792,31 @@ function lblLater(svg){
   lblRun(svg, false);
   clearTimeout(svg._lblT); svg._lblT = setTimeout(() => requestAnimationFrame(() => lblRun(svg)), 120);
 }
+/* Diagrams come alive as they scroll into view: plain curves draw themselves, boxes and dots rise in, and the cards and
+   bars of an infographic block follow one after another. Once per diagram; nothing moves under "reduce motion".
+   (Curves that are dashed, carry an arrowhead or belong to a tappable state keep their own behaviour.) */
+const RV_OK = !(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) && "IntersectionObserver" in window;
+const dgSeen = RV_OK ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("rv-in"); dgSeen.unobserve(e.target); } }), { threshold: 0.18 }) : null;
+function dgAlive(root){
+  if (!RV_OK) return;
+  (root || document).querySelectorAll("svg.dg:not([data-rv])").forEach(svg => {
+    svg.dataset.rv = 1;
+    let i = 0;
+    svg.querySelectorAll("path, rect, circle, ellipse").forEach(el => {
+      if (el.closest("[data-s], defs, marker") || el.hasAttribute("style") || el.querySelector("animate")) return;
+      const line = el.tagName === "path" && el.getAttribute("fill") === "none";
+      if (line) { if (el.hasAttribute("stroke-dasharray") || el.hasAttribute("marker-end") || el.hasAttribute("marker-start") || el.hasAttribute("pathLength")) return; el.setAttribute("pathLength", "1"); el.classList.add("rv-draw"); }
+      else { el.classList.add("rv-pop"); const op = el.getAttribute("opacity"); if (op) el.style.setProperty("--rvo", op); }
+      el.style.setProperty("--rvd", Math.min(i++, 14) * 45 + "ms");
+    });
+    dgSeen.observe(svg);
+  });
+  (root || document).querySelectorAll(".phblock .fam:not([data-rv]), .phblock .shelf:not([data-rv])").forEach(box => {
+    box.dataset.rv = 1; [...box.children].forEach((c, k) => { c.classList.add("rv-card"); c.style.setProperty("--rvd", Math.min(k, 12) * 55 + "ms"); }); dgSeen.observe(box);
+  });
+}
 function zmScan(root){
+  dgAlive(root);
   (root || document).querySelectorAll("svg.imap:not([data-zm]), svg.wmap:not([data-zm]), .phblock figure.fig svg.dg:not([data-zm])").forEach(svg => {
     svg.dataset.zm = 1; if (!svg.viewBox || !svg.viewBox.baseVal || !svg.viewBox.baseVal.width) return;
     const wrap = document.createElement("div"); wrap.className = "zm-wrap"; svg.parentNode.insertBefore(wrap, svg); wrap.appendChild(svg);
@@ -831,6 +855,17 @@ function visInit(){
 .nav-in{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr)}.nav button{min-width:0}.nav button span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--on-acc:#1a140c}}:root[data-theme="dark"]{--on-acc:#1a140c}
 .dg{font-family:var(--f-body)}
+/* diagrams drawing themselves in (dgAlive) */
+.dg .rv-draw{stroke-dasharray:1;stroke-dashoffset:1}
+.dg.rv-in .rv-draw{animation:rvdraw .85s cubic-bezier(.3,.7,.2,1) var(--rvd,0ms) forwards}
+@keyframes rvdraw{to{stroke-dashoffset:0}}
+.dg .rv-pop{opacity:0}
+.dg.rv-in .rv-pop{animation:rvpop .5s ease var(--rvd,0ms) forwards}
+@keyframes rvpop{from{opacity:0;transform:translateY(6px)}to{opacity:var(--rvo,1);transform:none}}
+.rv-card{opacity:0}
+.rv-in > .rv-card{animation:rvcard .45s cubic-bezier(.2,.8,.2,1) var(--rvd,0ms) forwards}
+@keyframes rvcard{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+@media print{.dg .rv-draw{stroke-dashoffset:0}.dg .rv-pop,.rv-card{opacity:1}}
 /* a diagram with states: buttons [data-dgst] in a [data-dgsw] wrapper show the svg groups [data-s~="<state>"]; .sl slides in from --dx / --dy */
 .dgsw-b{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
 .dgsw-b button{padding:7px 12px;border-radius:999px;border:1.5px solid var(--rule);background:var(--sheet);color:var(--ink);font:600 13px var(--f-body);cursor:pointer}

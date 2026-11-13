@@ -20,4 +20,41 @@ place("P5", "The 18 biosphere reserves", { k: "mapfig", title: "The 18 biosphere
 place("P5", "When they joined UNESCO", { k: "tlfig", title: "Joining UNESCO's World Network, year by year",
   rows: rows("P5", "When they joined UNESCO").map(r => [+r[1], r[0], ""]),
   cap: "Nilgiri was the first (2000); Cold Desert (2025) is the newest — the 13th Indian reserve in the network." });
+// ---- added: laws in time, park against sanctuary, parks / sanctuaries / reserves / wetlands / heritage sites on the map, tigers by state, the Red List ladder ----
+
+const vT = (x, y, t, c, a, sz) => `<text x="${x}" y="${y}" font-size="${sz || 12}" font-weight="700" text-anchor="${a || "start"}" style="fill:${c || "var(--ink)"}">${t}</text>`;
+const vM = (x, y, t, a, sz) => `<text x="${x}" y="${y}" font-size="${sz || 10.5}" text-anchor="${a || "start"}" class="mut">${t}</text>`;
+const vW = (x, y, t, sz, b) => `<text x="${x}" y="${y}" font-size="${sz || 10.5}"${b ? ' font-weight="700"' : ""} text-anchor="middle" style="fill:#fff;opacity:.96">${t}</text>`;
+const vE = t => String(t).replace(/&(?!amp;|lt;|gt;)/g, "&amp;").replace(/</g, "&lt;");
+const vWrap = (t, n) => { const out = [""]; String(t).split(" ").forEach(w => { if ((out[out.length - 1] + " " + w).trim().length > n) out.push(w); else out[out.length - 1] = (out[out.length - 1] + " " + w).trim(); }); return out; };
+const VC = ["#2f6db5", "#2f8f4e", "#a8780a", "#7d4fb5", "#c0392b", "#1a8a8a", "#5b6470"];
+const yr = s => { const m = String(s).match(/\b(1[89]|20)\d\d\b/); return m ? +m[0] : 0; };
+const cut = (t, n) => { t = String(t).split(/ — |; /)[0].replace(/\.$/, ""); return t.length > n ? t.slice(0, n - 1).replace(/\s+\S*$/, "") + "…" : t; };
+/** Two things side by side, from a table whose rows are [point, left, right]. */
+const versus = (label, a, b, rs, ca, cb) => `<svg class="dg" viewBox="0 0 640 ${62 + rs.length * 30}" role="img" aria-label="${label}">
+  <rect x="150" y="6" width="236" height="40" rx="10" fill="${ca || VC[0]}"/>${vW(268, 31, vE(a), 13, 1)}<rect x="396" y="6" width="236" height="40" rx="10" fill="${cb || VC[4]}"/>${vW(514, 31, vE(b), 13, 1)}
+  ${rs.map((r, i) => `<rect x="8" y="${54 + i * 30}" width="624" height="26" rx="6" class="${i % 2 ? "card" : "s5"}"/>${vT(16, 72 + i * 30, vE(cut(r[0], 22)), "var(--ink)", "start", 11.5)}${vM(268, 72 + i * 30, vE(cut(r[1], 47)), "middle", 10.5)}${vM(514, 72 + i * 30, vE(cut(r[2], 47)), "middle", 10.5)}${r[1] === r[2] ? "" : `<circle cx="391" cy="${67 + i * 30}" r="3" fill="${VC[2]}"/>`}`).join("")}</svg>`;
+
+place("P1", "Laws and projects by year", { k: "tlfig", title: "Wildlife laws and projects, year by year", rows: rows("P1", "Laws and projects by year").map(r => [yr(r[1]), r[0], ""]), cap: "The Wildlife (Protection) Act (1972) came first; Project Tiger followed a year later." });
+place("P1", "National park vs wildlife sanctuary", KIT.fig("National park and sanctuary, side by side", versus("National park compared with wildlife sanctuary", "National park", "Wildlife sanctuary", rows("P1", "National park vs wildlife sanctuary"), VC[1], VC[2]), "A national park is the stricter of the two: no grazing and no private rights inside it."));
+place("P2", "National parks", KIT.stateMap("National parks on the map", rows("P2", "National parks"), { max: 2, cap: "Each state shows its best-known parks from the table. Use ＋ or ⛶ to zoom in." }));
+place("P3", "Wildlife sanctuaries", KIT.stateMap("Wildlife sanctuaries on the map", rows("P3", "Wildlife sanctuaries"), { max: 2, cap: "Each state shows its sanctuaries from the table. Use ＋ or ⛶ to zoom in." }));
+const TG = rows("P4", "Tiger numbers").find(r => /^Most tigers$/.test(r[0]));
+if (!TG) fail("parks P4: no 'Most tigers' row");
+const TGN = [...TG[1].matchAll(/([A-Z][A-Za-z ]+?) \((\d+)\)/g)].map(m => [m[1].replace(/^(then|and) /, "").trim(), +m[2], ""]);
+if (TGN.length < 3) fail("parks P4: tiger numbers changed");
+place("P4", "Tiger numbers", { k: "bars", title: "Tigers by state, 2022 census", unit: "tigers", left: 130, sort: false, hi: 1, rows: TGN });
+place("P4", "Tiger reserves", KIT.stateMap("Tiger reserves on the map", rows("P4", "Tiger reserves"), { max: 3, cap: "Each state shows its tiger reserves from the table. Madhya Pradesh has the most. Use ＋ or ⛶ to zoom in." }));
+place("P6", "Ramsar sites by state", KIT.stateMap("Ramsar wetlands on the map", rows("P6", "Ramsar sites by state"), { max: 2, cap: "Each state shows its Ramsar sites from the table. Tamil Nadu has the most. Use ＋ or ⛶ to zoom in." }));
+place("P7", "World Heritage sites", KIT.stateMap("World Heritage sites on the map", rows("P7", "World Heritage sites"), { max: 2, cap: "Each state shows its World Heritage sites from the table. Use ＋ or ⛶ to zoom in." }));
+// P8 — the Red List as a ladder
+const RL = rows("P8", "IUCN Red List status"), RLS = ["Critically endangered", "Endangered", "Vulnerable", "Near threatened", "Least concern"], RLC = ["#b3261e", "#d9692a", "#c79a12", "#6f9a3a", "#2f8f4e"];
+const RLG = RLS.map(s => RL.filter(r => r[1].toLowerCase() === s.toLowerCase()).map(r => r[0]));
+if (!RLG[0].length || !RLG[1].length) fail("parks P8: Red List statuses changed");
+const RLV = `<svg class="dg" viewBox="0 0 640 ${RLS.reduce((h, s, i) => h + 34 + Math.max(1, Math.ceil(RLG[i].length / 3)) * 18, 30)}" role="img" aria-label="IUCN Red List categories with Indian animals">
+  ${(() => { let y = 6, o = ""; RLS.forEach((s, i) => { const n = Math.max(1, Math.ceil(RLG[i].length / 3)), h = 26 + n * 18; o += `<rect x="8" y="${y}" width="${200 - i * 0}" height="${h}" rx="10" fill="${RLC[i]}"/>${vW(108, y + h / 2 + 4, s, 12.5, 1)}<rect x="214" y="${y}" width="418" height="${h}" rx="10" class="card"/>` +
+      (RLG[i].length ? RLG[i].map((a, k) => vM(226 + (k % 3) * 136, y + 22 + Math.floor(k / 3) * 18, vE(cut(a.replace(/ \(.*\)$/, ""), 22)), "start", 11)).join("") : vM(226, y + 22, "none in this lesson's table", "start", 10.5)); y += h + 6; });
+    return o + vM(8, y + 12, "Most at risk at the top. “Threatened” means the top three: critically endangered, endangered and vulnerable.", "start", 11); })()}</svg>`;
+place("P8", "IUCN Red List status", KIT.fig("The Red List as a ladder", RLV, "The IUCN (Gland, Switzerland) publishes the Red List. An animal moves down the ladder when its numbers recover: the Asiatic lion and the snow leopard both did."));
+
 VISUAL = { mode: true, VIS: { key: "parks_photos_v1", word: "reserve", words: "reserves", search: "", ask: "", rows: [], tabs: [] } };
