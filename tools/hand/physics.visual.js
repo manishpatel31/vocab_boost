@@ -82,7 +82,65 @@ const CM = `<svg class="dg" viewBox="0 0 660 240" role="img" aria-label="Concave
   ${ray("M200 60 L400 60 L578 60 L441 144", "#c0392b", "rm")}${ray("M200 60 L480 120 L578 141 L441 141", "#c0392b", "rm")}
   <line x1="441" y1="120" x2="441" y2="142" stroke="#7d4fb5" stroke-width="3"/>${T(441, 165, "image", "#7d4fb5", "middle", 11)}
   ${T(20, 220, "Beyond C → between F and C: real, inverted, diminished", "var(--ink)", "start", 12)}</svg>`;
-place("L9", "Concave mirror", KIT.fig("A concave mirror at work", CM, "A ray parallel to the axis reflects through F; a ray through F reflects parallel. Where they meet is the image. Only an object between P and F gives a virtual, erect, enlarged image (a shaving mirror)."));
+// ---- tappable: where the image forms as the object moves (mirror, lens); what a fused bulb does (series, parallel) ----
+const pT = (x, y, t, c, a, sz) => `<text x="${x}" y="${y}" font-size="${sz || 12}" font-weight="700" text-anchor="${a || "start"}" style="fill:${c || "var(--ink)"}">${t}</text>`;
+const pM = (x, y, t, a, sz) => `<text x="${x}" y="${y}" font-size="${sz || 10.5}" text-anchor="${a || "start"}" class="mut">${t}</text>`;
+const pL = (d, c, w, dash) => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w || 2}" stroke-linecap="round" stroke-linejoin="round"${dash ? ' stroke-dasharray="5 4"' : ""}/>`;
+const pArrow = (x, y0, y1, c, w) => `<path d="M${x} ${y0} V${y1}" stroke="${c}" stroke-width="${w || 4}" stroke-linecap="round"/><path d="M${x - 6} ${y1 + (y1 < y0 ? 9 : -9)} L${x} ${y1} L${x + 6} ${y1 + (y1 < y0 ? 9 : -9)}" fill="none" stroke="${c}" stroke-width="${w || 4}" stroke-linecap="round" stroke-linejoin="round"/>`;
+const PSW = (title, states, svg, cap) => ({ k: "info", title, html: `<div data-dgsw><div class="dgsw-b" role="group" aria-label="Move the object">${states.map((x, i) =>
+  `<button type="button" data-dgst="${i}" data-cap="${x[1].replace(/"/g, "&quot;")}" aria-pressed="${i === 0}">${x[0]}</button>`).join("")}</div><figure class="fig wide" style="--minw:560px;margin:0">${svg}</figure><p class="dgsw-c" aria-live="polite">${states[0][1]}</p></div>`, cap });
+const OB = "#2f8f4e", IM = "#c0392b", RY = "#c69214", RY2 = "#2f6db5";
+const f1 = n => +n.toFixed(1);
+// concave mirror: pole at (470, 150), f = 90 px (F at 380, C at 290); object of height 50 at distance u
+const mirState = (i, u) => { const X = 470, Y = 150, f = 90, h = 50, tx = X - u, ty = Y - h;
+  let g = pArrow(tx, Y, ty, OB) + pL(`M${tx} ${ty} H${X}`, RY, 2);
+  if (u === f) {   // image at infinity: the two reflected rays are parallel
+    g += pL(`M${X} ${ty} L${f1(X - 420)} ${f1(ty + 420 * h / f)}`, RY, 2) + pL(`M${tx} ${ty} L${X} ${Y} L${f1(X - 300)} ${f1(Y + 300 * h / f)}`, RY2, 2) + pT(120, 262, "parallel rays: image at infinity", IM, "start", 11);
+  } else { const v = u * f / (u - f), hi = -h * v / u, ix = X - v, iy = Y - hi;
+    if (v > 0) g += pL(`M${X} ${ty} L${f1(ix)} ${f1(iy)}`, RY, 2) + pL(`M${tx} ${ty} L${X} ${f1(iy)} H${f1(ix)}`, RY2, 2) + pArrow(f1(ix), Y, f1(iy), IM);
+    else g += pL(`M${X} ${ty} L${f1(X - 150)} ${f1(ty + 150 * h / f)}`, RY, 2) + pL(`M${X} ${ty} L${f1(ix)} ${f1(iy)}`, RY, 1.6, true) + pL(`M${tx} ${ty} L${X} ${f1(iy)} H${f1(X - 190)}`, RY2, 2) + pL(`M${X} ${f1(iy)} H${f1(ix)}`, RY2, 1.6, true) + pArrow(f1(ix), Y, f1(iy), IM, 3) + pM(f1(ix), f1(iy) - 8, "virtual", "middle", 10);
+  }
+  return `<g data-s="${i}"${i === 0 ? ' class="on"' : ""}>${g}</g>`; };
+const MT = rows("L9", "Concave mirror");
+const mrow = k => { const r = MT.find(x => x[0] === k); if (!r) fail("physics L9: no mirror row " + k); return `Object ${k.toLowerCase().replace(/^at c$/, "at C").replace(" c", " C").replace(" f", " F").replace(" p", " P")} → image ${r[1].toLowerCase().replace(/^infinity$/, "at infinity").replace(/^behind mirror$/, "behind the mirror").replace(/\bc\b/g, "C").replace(/\bf\b/g, "F")}: ${r[2].toLowerCase()}.`; };
+const MIS = [["Beyond C", 260], ["At C", 180], ["Between C and F", 130], ["At F", 90], ["Between P and F", 50]];
+const MIR = `<svg class="dg" viewBox="0 0 640 290" role="img" aria-label="A concave mirror: where the image forms for five object positions">
+  <path d="M20 150 H620" stroke="var(--ink2)" stroke-width="1.2"/>${pL("M452 40 Q486 150 452 260", "var(--ink)", 4)}
+  ${[["P", 470], ["F", 380], ["C", 290]].map(r => `<circle cx="${r[1]}" cy="150" r="3.5" fill="var(--ink)"/>${pT(r[1], 168, r[0], "var(--ink)", "middle", 12)}`).join("")}
+  ${MIS.map((m, i) => mirState(i, m[1])).join("")}
+  ${pT(20, 24, "object", OB, "start", 11)}${pT(76, 24, "image", IM, "start", 11)}${pM(126, 24, "ray parallel to the axis → through F", "start", 10)}${pM(126, 38, "ray through F → back parallel", "start", 10)}</svg>`;
+const MIRSW = PSW("Move the object: concave mirror", MIS.map(m => [m[0], mrow(m[0])]), MIR, "As the object comes closer the real image moves away and grows. Inside F the image flips to a virtual, upright, enlarged one: the shaving mirror.");
+// convex lens: optical centre at (320, 150), f = 80 px; object of height 50 at distance u
+const lenState = (i, u) => { const X = 320, Y = 150, f = 80, h = 50, tx = X - u, ty = Y - h;
+  let g = pArrow(tx, Y, ty, OB) + pL(`M${tx} ${ty} H${X}`, RY, 2);
+  if (u === f) g += pL(`M${X} ${ty} L${f1(X + 290)} ${f1(ty + 290 * h / f)}`, RY, 2) + pL(`M${tx} ${ty} L${f1(X + 290)} ${f1(Y + 290 * h / f)}`, RY2, 2) + pT(400, 40, "parallel rays: image at infinity", IM, "start", 11);
+  else { const v = u * f / (u - f), hi = -h * v / u, ix = X + v, iy = Y - hi;
+    if (v > 0) g += pL(`M${X} ${ty} L${f1(ix)} ${f1(iy)}`, RY, 2) + pL(`M${tx} ${ty} L${f1(ix)} ${f1(iy)}`, RY2, 2) + pArrow(f1(ix), Y, f1(iy), IM);
+    else g += pL(`M${X} ${ty} L${f1(X + 200)} ${f1(ty + 200 * h / f)}`, RY, 2) + pL(`M${X} ${ty} L${f1(ix)} ${f1(iy)}`, RY, 1.6, true) + pL(`M${tx} ${ty} L${f1(X + 200)} ${f1(Y + 200 * h / u)}`, RY2, 2) + pL(`M${tx} ${ty} L${f1(ix)} ${f1(iy)}`, RY2, 1.6, true) + pArrow(f1(ix), Y, f1(iy), IM, 3) + pM(f1(ix), f1(iy) - 8, "virtual", "middle", 10);
+  }
+  return `<g data-s="${i}"${i === 0 ? ' class="on"' : ""}>${g}</g>`; };
+const LES = [["Beyond 2F", 230, "Object beyond 2F → image between F and 2F on the other side: real, inverted, smaller (a camera)."], ["At 2F", 160, "Object at 2F → image at 2F: real, inverted, same size."],
+  ["Between F and 2F", 120, "Object between F and 2F → image beyond 2F: real, inverted, enlarged (a projector)."], ["At F", 80, "Object at F → image at infinity: the rays leave parallel (a searchlight)."], ["Inside F", 50, "Object inside F → image on the same side: virtual, erect, enlarged (a magnifying glass)."]];
+const LEN = `<svg class="dg" viewBox="0 0 640 290" role="img" aria-label="A convex lens: where the image forms for five object positions">
+  <path d="M10 150 H630" stroke="var(--ink2)" stroke-width="1.2"/><path d="M320 40 Q344 150 320 260 Q296 150 320 40 Z" fill="#2f6db5" fill-opacity=".18" stroke="#2f6db5" stroke-width="2"/>
+  ${[["O", 320], ["F", 240], ["2F", 160], ["F", 400], ["2F", 480]].map(r => `<circle cx="${r[1]}" cy="150" r="3.5" fill="var(--ink)"/>${pT(r[1], 168, r[0], "var(--ink)", "middle", 12)}`).join("")}
+  ${LES.map((m, i) => lenState(i, m[1])).join("")}
+  ${pT(20, 24, "object", OB, "start", 11)}${pT(76, 24, "image", IM, "start", 11)}${pM(20, 278, "parallel ray → through F on the far side;  ray through the centre O → straight on", "start", 10)}</svg>`;
+const LENSW = PSW("Move the object: convex lens", LES.map(m => [m[0], m[2]]), LEN, "Lens formula: 1/v − 1/u = 1/f. A convex lens behaves like a concave mirror: real images everywhere except inside F.");
+// circuits: three bulbs in series and in parallel; one fuses
+const bulb = (x, y, on, dim, dead) => `<circle cx="${x}" cy="${y}" r="15" fill="${dead ? "#9aa0a6" : on ? "#f6c945" : "#e9e3cf"}" fill-opacity="${on && dim ? .55 : 1}" stroke="var(--ink)" stroke-width="2"/>${on && !dead ? `<circle cx="${x}" cy="${y}" r="${dim ? 21 : 26}" fill="#f6c945" opacity="${dim ? .18 : .32}"/>` : ""}${dead ? pL(`M${x - 9} ${y - 9} L${x + 9} ${y + 9} M${x + 9} ${y - 9} L${x - 9} ${y + 9}`, "#c0392b", 3) : ""}`;
+const batt = (x, y) => `<path d="M${x} ${y - 16} V${y + 16}" stroke="var(--ink)" stroke-width="3"/><path d="M${x + 9} ${y - 8} V${y + 8}" stroke="var(--ink)" stroke-width="5"/>`;
+const ser = (on, dead) => `${pL("M80 70 H560 V220 H329 M320 220 H80 V70", "var(--ink)", 2.4)}${batt(320, 220)}${[200, 320, 440].map((x, k) => bulb(x, 70, on, true, dead && k === 1)).join("")}${on ? `<path d="M80 70 H560 V220 H80 V70" fill="none" stroke="#c69214" stroke-width="2" stroke-dasharray="2 12" style="animation:rvflow 1s linear infinite"/>` : ""}`;
+const par = dead => `${pL("M80 50 H560 V250 H329 M320 250 H80 V50 M80 120 H560 M80 185 H560", "var(--ink)", 2.4)}${batt(320, 250)}${[50, 120, 185].map((y, k) => bulb(320, y, !(dead && k === 1), false, dead && k === 1)).join("")}<path d="M80 50 H560 V250 H80 V50" fill="none" stroke="#c69214" stroke-width="2" stroke-dasharray="2 12" style="animation:rvflow 1s linear infinite"/>`;
+const CIR = `<svg class="dg" viewBox="0 0 640 280" role="img" aria-label="Three bulbs in series and in parallel, and what happens when one fuses">
+  <g data-s="0" class="on">${ser(true, false)}${pT(320, 150, "one path: the same current through all", "var(--ink)", "middle", 12)}${pM(320, 168, "the voltage is shared, so each bulb is dim", "middle")}</g>
+  <g data-s="1">${ser(false, true)}${pT(320, 150, "the path is broken: no current anywhere", "#c0392b", "middle", 12)}${pM(320, 168, "every bulb goes out", "middle")}</g>
+  <g data-s="2">${par(false)}</g><g data-s="3">${par(true)}</g></svg>`;
+const CIRSW = PSW("Tap to test: series and parallel", [["Series", "Series: R = R₁ + R₂ + R₃. One path, the same current in every bulb, the voltage divided: all three glow dimly."],
+  ["Series, one fuses", "Series with one bulb fused: the only path is broken, so all the bulbs go out (old festival lights)."],
+  ["Parallel", "Parallel: 1/R = 1/R₁ + 1/R₂ + 1/R₃. Each bulb has its own path and the full voltage: all three glow brightly."],
+  ["Parallel, one fuses", "Parallel with one bulb fused: the other two have their own paths and stay bright. This is why homes are wired in parallel."]], CIR, "Series: same current, voltage shared. Parallel: same voltage, current shared.");
+place("L9", "Concave mirror", KIT.fig("A concave mirror at work", CM, "A ray parallel to the axis reflects through F; a ray through F reflects parallel. Where they meet is the image. Only an object between P and F gives a virtual, erect, enlarged image (a shaving mirror)."), MIRSW);
 
 // L10 — refractive indices; a convex lens
 place("L10", "Refractive indices", { k: "bars", title: "Refractive index", unit: "", left: 140, hi: 1, sort: false, rows: rows("L10", "Refractive indices").map(r => [r[0], parseFloat(r[1].replace(/[^\d.]/g, "")) || 1, ""]),
@@ -95,7 +153,7 @@ const CL = `<svg class="dg" viewBox="0 0 660 240" role="img" aria-label="Convex 
   ${ray("M90 70 L210 70 L330 70 L430 120 L501 155.6 L560 185", "#c0392b", "rl")}${ray("M90 70 L210 95 L330 120 L501 155.6 L560 168", "#c0392b", "rl")}
   <line x1="501" y1="120" x2="501" y2="155.6" stroke="#7d4fb5" stroke-width="3"/>${T(501, 178, "image", "#7d4fb5", "middle", 11)}
   ${T(20, 225, "Beyond 2F → between F and 2F: real, inverted, diminished (a camera)", "var(--ink)", "start", 12)}</svg>`;
-place("L10", "Lenses", KIT.fig("A convex lens at work", CL, "A ray parallel to the axis bends through F on the far side; a ray through the optical centre goes straight on. A convex lens converges light (positive power); a concave lens spreads it (negative power)."));
+place("L10", "Lenses", KIT.fig("A convex lens at work", CL, "A ray parallel to the axis bends through F on the far side; a ray through the optical centre goes straight on. A convex lens converges light (positive power); a concave lens spreads it (negative power)."), LENSW);
 
 // L11 — the eye; the defects; the prism
 const EY = `<svg class="dg" viewBox="0 0 660 260" role="img" aria-label="Parts of the human eye">
@@ -144,7 +202,7 @@ const CI = `<svg class="dg" viewBox="0 0 660 230" role="img" aria-label="Series 
   <g transform="translate(340,0)"><path d="M30 40 V190 M30 40 H280 V190 H30 M30 100 H280 M30 150 H280" fill="none" stroke="var(--ink)" stroke-width="2"/>${bat(26, 70)}${bulb(155, 40)}${bulb(155, 100)}${bulb(155, 150)}
     ${[40, 100, 150].map((y, i) => `<circle r="4" fill="#c0392b"><animateMotion dur="2.2s" begin="${i * .3}s" repeatCount="indefinite" path="M30 ${y} H280"/></circle>`).join("")}${T(155, 215, "Parallel: many paths", "var(--ink)", "middle", 13)}
     <text x="155" y="182" text-anchor="middle" font-size="10.5" class="mut">same voltage · 1/R = 1/R₁ + 1/R₂ + 1/R₃</text></g></svg>`;
-place("L13", "Combining resistors", KIT.fig("Series and parallel", CI, "Houses are wired in parallel: each appliance gets the full 220 V and one failing does not switch off the rest. A fuse goes in series with the live wire."));
+place("L13", "Combining resistors", KIT.fig("Series and parallel", CI, "Houses are wired in parallel: each appliance gets the full 220 V and one failing does not switch off the rest. A fuse goes in series with the live wire."), CIRSW);
 
 // L14 — wiring colours
 const WR = rows("L14", "Wiring colours"), WC = { Red: "#c0392b", Brown: "#7a4a22", Black: "#222", Blue: "#2f6db5", Green: "#2f8f4e", "Green-yellow": "repeating-linear-gradient(90deg,#2f8f4e 0 14px,#e6c229 14px 28px)" };

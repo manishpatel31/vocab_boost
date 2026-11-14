@@ -36,4 +36,11 @@ place("P8", "Samadhis and memorial ghats", { k: "photos", title: "The memorials 
   P("Deekshabhoomi", "Deekshabhoomi", "Ambedkar's conversion, 1956"), P("Statue_of_Unity", "Statue of Unity", "Vallabhbhai Patel"),
   P("Statue_of_Equality_(Ramanuja)", "Statue of Equality", "Ramanujacharya")] });
 
+// ---- added: birthplaces on the map; Gandhi's places in time ----
+const CITY_ST = { "Kolkata": "West Bengal", "Varanasi": "Uttar Pradesh", "Prayagraj": "Uttar Pradesh", "Allahabad": "Uttar Pradesh", "Pune": "Maharashtra", "Mumbai": "Maharashtra", "Chennai": "Tamil Nadu", "Delhi": "Delhi", "Ahmedabad": "Gujarat", "Lucknow": "Uttar Pradesh", "Patna": "Bihar", "Amritsar": "Punjab", "Hyderabad": "Telangana", "Bhopal": "Madhya Pradesh", "Jaipur": "Rajasthan", "Mysuru": "Karnataka", "Bengaluru": "Karnataka" };
+const BP = rows("P9", "Where they were born").map(r => { if (/Pakistan|Bangladesh|Nepal/.test(r[1])) return null; const m = r[1].match(/\(([^)]+)\)/); let st = m && KIT.code(m[1]) ? m[1] : null; if (!st) { const c = Object.keys(CITY_ST).find(k => r[1].includes(k)); st = c ? CITY_ST[c] : null; } return st ? [r[0] + " — " + r[1].replace(/ \(.*\)$/, "").split(",")[0], st] : null; }).filter(Boolean);
+if (BP.length >= 4) place("P9", "Where they were born", KIT.stateMap("Birthplaces on the map", BP, { max: 2, cap: "Each state shows who was born there and where, from the table. People born outside today's India are left out. Use ＋ or ⛶ to zoom in." }));
+const GM = rows("P9", "Gandhi's map").map(r => { const y = (r[1].match(/\b(18|19)\d\d\b/) || [0])[0]; return y ? [+y, r[0].split(",")[0].replace(/ and .*$/, ""), ""] : null; }).filter(Boolean).sort((a, b) => a[0] - b[0]);
+if (GM.length >= 4) place("P9", "Gandhi's map", { k: "tlfig", title: "Gandhi's places, year by year", rows: GM, cap: "South Africa first, then Ahmedabad, Champaran, Sevagram, and finally Delhi." });
+
 VISUAL = { mode: true, VIS: { key: "personalities_photos_v1", word: "personality", words: "personalities", search: "", quiz: "personality or memorial", ask: "", rows: [], tabs: [["vphotos", "Photo quiz"]] } };
