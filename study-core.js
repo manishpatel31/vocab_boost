@@ -477,4 +477,4 @@ const start = (location.hash||"").replace("#","");
 go(["learn","practice","mock","revise"].includes(start) ? start : "learn");
 
 /* the shared layer of every mini app: keys, answer feedback, look and feel (study-ui.js; tools/stamp.js sets its ?v=) */
-(function(){ if (window.__studyUI || document.querySelector("script[data-study-ui]")) return; const s = document.createElement("script"); s.src = "study-ui.js?v=41e38283"; s.dataset.studyUi = ""; document.head.appendChild(s); })();
+(function(){ if (window.__studyUI || document.querySelector("script[data-study-ui]")) return; const s = document.createElement("script"); s.src = "study-ui.js?v=55020320"; s.dataset.studyUi = ""; document.head.appendChild(s); })();

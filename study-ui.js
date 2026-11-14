@@ -44,6 +44,10 @@
 
   const style = document.createElement("style");
   style.textContent = `
+/* bars (heat map, scores, charts) grow from zero the first time they are seen */
+@keyframes fxgrow{from{transform:scaleX(0)}to{transform:none}}
+.hbar i,.hero .meter i{transform-origin:left center;animation:fxgrow .7s cubic-bezier(.2,.8,.2,1) both}
+@media (prefers-reduced-motion:reduce){.hbar i,.hero .meter i{animation:none}}
 @media (hover:hover){.opt:not(:disabled):hover{border-color:var(--blue);background:var(--blue-bg)}}
 .opt:not(:disabled):active{transform:scale(.985)}
 .opt{transition:border-color .12s ease,background-color .12s ease,transform .08s ease}
@@ -228,6 +232,8 @@ html.in-shabd .mbar{top:env(safe-area-inset-top,0px)!important}
 /* Learn page: a Continue card, and a long intro folded to three lines */
 .hero.fx-has-front > .meter,.hero.fx-has-front > .row{display:none}
 .fx-front{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--sheet);border:1px solid var(--rule);border-radius:16px;box-shadow:0 8px 22px -16px rgba(0,0,0,.35)}
+@property --p{syntax:"<number>";inherits:false;initial-value:0}
+.fx-ring{transition:--p .9s cubic-bezier(.2,.8,.2,1)}
 .fx-ring{--p:0;position:relative;width:62px;height:62px;flex:none;border-radius:50%;background:conic-gradient(var(--blue) calc(var(--p) * 1%),var(--sunk) 0)}
 .fx-ring::before{content:"";position:absolute;inset:6px;border-radius:50%;background:var(--sheet)}
 .fx-ring span{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05}
@@ -354,6 +360,15 @@ html.fx-focus{--fx-safe:env(safe-area-inset-bottom,0px)}
       `<div class="fx-fr-tx"><span class="eyebrow">${esc2(info.label)}</span><b>${esc2(info.title)}</b><small>${esc2(info.stat || "")}</small></div>` +
       `<button type="button" class="btn pri fx-fr-go">${esc2(info.button)}</button>`);
     card.querySelector(".fx-fr-go").onclick = info.go;
+    // the ring fills and the number counts up when the page is first shown, and again whenever progress has moved
+    if (!still() && pct !== front.last) {
+      const ring = card.querySelector(".fx-ring"), num = ring.querySelector("b"), from = front.last == null ? 0 : front.last, n0 = front.lastN || 0, t0 = performance.now();
+      ring.style.setProperty("--p", from); num.textContent = n0;
+      requestAnimationFrame(() => requestAnimationFrame(() => ring.style.setProperty("--p", pct)));
+      const tick = t => { const k = Math.min(1, (t - t0) / 800), e = 1 - Math.pow(1 - k, 3); num.textContent = Math.round(n0 + (info.done - n0) * e); if (k < 1 && num.isConnected) requestAnimationFrame(tick); };
+      requestAnimationFrame(tick);
+    }
+    front.last = pct; front.lastN = info.done;
     if (!cfg.keepRow) hero.classList.add("fx-has-front");
     else hero.querySelectorAll(":scope > .meter").forEach(m => { m.hidden = true; });
     hero.after(card);

@@ -12,4 +12,7 @@ place("L13", "First women", KIT.photos("Firsts in pictures", rows("L13", "First 
 // ---- memory tricks for the lessons that had none ----
 place("L8", "Regulators", { k: "trick", h: "<b>R – S – I – P, in order of age</b>: <b>R</b>BI 1935 → <b>S</b>EBI 1992 → <b>I</b>RDAI 1999 → <b>P</b>FRDA 2013 (the years they got statutory status; RBI was nationalised in 1949). SEBI has two dates: set up in 1988, given its Act in 1992. Money market and banks → RBI; shares → SEBI; insurance → IRDAI; pensions → PFRDA." });
 
+// ---- added: the three kinds of bodies ----
+place("L1", "Three kinds of bodies", { k: "cards", title: "Three kinds of bodies: who made it?", rows: rows("L1", "Three kinds of bodies").map((r, i) => [r[0], "made by: " + r[1].toLowerCase(), r[2].split(", ").slice(0, 5).join(" · "), ["📜", "⚖️", "🏛️"][i] || ""]) });
+
 VISUAL = { mode: true, VIS: { key: "appointments_photos_v1", word: "person", words: "people", search: "", quiz: "person", ask: "", rows: [], tabs: [["vphotos", "Photo quiz"]] } };
